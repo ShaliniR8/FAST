@@ -1,0 +1,128 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+<%=form_for @owner do |f|%>
+	<div class="panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title">
+				Assign <%=@owner.class.name.titleize%>
+				<button type="button"
+					class="close pull-right"
+					data-dismiss="modal"
+					aria-label="Close">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+		</div>
+
+		<div class="panel-body" style="max-height:500px;overflow-y:auto">
+			<div class="row">
+				<div class="form-group form-inline col-xs-6">
+					<%=f.hidden_field :status, :value => 'Assigned'%>
+
+					<b style="color:red">*</b>
+					<%=label_tag :res, "Responsible User"%>
+					<div class="input-group">
+						<%=text_field_tag :res,
+							"",
+							{:class => "form-control ml5 emp required_field",
+							:value => (User.find(@owner.send(field_name)).full_name rescue ''),
+							:readonly => true,
+							:id => "emp_1"}%>
+						<%=f.hidden_field field_name.to_sym, :id => "employee-select1"%>
+						<span class="input-group-btn">
+							<%=link_to "...", "#", :class => "btn btn-info", :id => "emp1"%>
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<%=f.submit "Assign",
+				:class => "btn btn-success pull-right mt5",
+				:disable_with => "Assigning..."%>
+
+		</div>
+	</div>
+<%end%>
+
+<div style="display:none" id="emp_div">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<div class="panel-title">
+				Employee Search
+				<button type="button"
+					class="close pull-right"
+					aria-label="Close">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class='col-xs-12'>
+					<table class="table table-hover table-striped table-bordered" id="users">
+						<thead>
+							<tr>
+								<%User.get_headers.keys.each do |k|%>
+									<th><%=k%></th>
+								<%end%>
+							</tr>
+						</thead>
+						<tbody class="xbody">
+							<%User.all.each do |u|%>
+								<tr uid="<%=u.id%>" class="list_tr">
+									<%User.get_headers.values.each do |v|%>
+										<td><%=u.send(v)%></td>
+									<%end%>
+								</tr>
+							<%end%>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function(){
+
+		$('#users').DataTable({
+			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+			"iDisplayLength": 5
+		});
+
+
+		$('#emp1').on('click',function(){
+			$('form').hide();
+			$("#emp_div").show();;
+			$('#users tbody tr' ).unbind();
+			$('.close' ).unbind();	   		
+			$('#users').on('click', 'tbody tr', function(){
+				$('#emp_1').val($(this).find('td').eq(3).text());
+				$('#employee-select1').val($(this).find('td').eq(0).text());
+				$('form').show();
+				$('#emp_div').hide();
+			});
+			$('.close').on('click',function(){
+				$('#emp_1').val("");
+				$('#employee-select1').val("");
+				$('form').show();
+				$('#emp_div').hide();
+			});
+			$(window).trigger('resize');
+		});
+
+		$("form").on('submit',function(){
+			$(this).find('.required_field').each(function(){
+				if ($(this).val()==""){
+					event.preventDefault();
+				}
+			});
+		});
+	});
+</script>

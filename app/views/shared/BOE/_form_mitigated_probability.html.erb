@@ -1,0 +1,23 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mb10">
+	<hr/>
+	<h4 style="color:#DC7633"><b>PROBABILITY EXCERCISE</b></h4>
+	<table class="table table-bordered table-centered table-cursor">
+		<tr>
+			<th bgcolor="#DC7633" colspan="5" bgcolor="grey" style="color:white">PROBABILITY</th>
+		</tr>
+		<tr>
+			<%@probability_table[:column_header].each do |header|%>
+				<th bgcolor="#FEF5E7" width="15%"><%=header%></th>
+			<%end%>
+		</tr>
+		<tr>
+			<%@probability_table[:row_header].each_with_index do |row_header,row_index|%>
+				<tr>
+					<%@probability_table[:column_header].each_with_index do |column_header,column_index|%>
+						<td class="mitigate_probability_td" data-row="<%=row_index%>" data-status="" data-column="<%=column_index%>"><%=@probability_table[:rows][row_index][column_index]%></td>
+					<%end%>
+				</tr>
+			<%end%>
+		</tr>
+	</table>
+</div>

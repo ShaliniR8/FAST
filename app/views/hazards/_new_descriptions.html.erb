@@ -1,0 +1,48 @@
+<%=form_tag add_descriptions_hazard_path(@hazard), :method => "post" do %>
+	<div class="panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title">New Descriptions
+				<button type="button" 
+					class="close pull-right" 
+					data-dismiss="modal" 
+					aria-label="Close">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+		</div>
+		<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+			<div class="row">
+				<div class="col-xs-12 form-inline form-group">
+					<%=label_tag :category%>
+					<%#select_tag :category,options_for_select(@categories),{:include_blank=>true,:class=>"ml5 form-control",:id=>"cat_select"}%>
+					<%=text_field_tag :category, '', :class=>"form-control", :list=>"cat_list", :id=>"cat_select"%>
+					<datalist id="cat_list">
+						<%@categories.each do |cat| %>
+							<option value="<%= cat %>"><%= cat %></option>
+						<%end%>
+					</datalist>
+				</div>
+				<div id="attributes">
+				</div>
+			</div>
+			<%=submit_tag "Save",
+				:class => "btn btn-success pull-right mr10", 
+				:disable_with => "Saving..."%>
+		</div>
+	</div>
+<%end%>
+<script>
+	$(document).ready(function(){
+		$('#cat_select').on('input',function(){
+			if ($(this).val()!=""){
+				$.get("<%=retract_description_attributes_hazards_path%>"+"?category="+$(this).val(),function(data){
+					$("#attributes").html(data);
+					$(window).trigger('resize');
+				});
+			}else{
+				$("#attributes").html("");
+				$(window).trigger('resize');
+			}
+		});
+	});
+</script>

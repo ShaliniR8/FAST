@@ -1,0 +1,59 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="panel-title">
+			To 
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="table-responsive">
+			<table id="recipients" class="table table-bordered">
+				<thead>
+					<tr>
+						<%@headers.each do |header|%>
+							<th class="<%=header[:size]%>">
+								<%=header[:title]%>
+							</th>
+						<%end%>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<%@users.each do |user|%>
+						<tr user="<%=user.id%>">
+							<%@headers.each do |header|%>
+								<td><%=user.send(header[:field])%></td>
+							<%end%>
+							<td>
+								<%if @reply_to.present?%>
+									<%if @reply_to.send_from.user.id==user.id%>
+										<a class="btn btn-danger send_btn disabled">Send</a>
+									<%else%>
+										<%if @send_to==user.id%>
+											<a class="btn btn-danger send_btn disabled">Send</a>
+										<%else%>
+											<a class="btn btn-transparent send_btn">Send</a>
+											<a class="btn btn-transparent cc_btn">CC</a>
+										<%end%>
+									<%end%>
+								<%else%>
+									<%if @send_to==user.id%>
+										<a class="btn btn-danger send_btn disabled">Send</a>
+									<%else%>
+										<a class="btn btn-transparent send_btn">Send</a>
+										<a class="btn btn-transparent cc_btn">CC</a>
+									<%end%>
+								<%end%>
+							</td>
+						</tr>
+					<%end%>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

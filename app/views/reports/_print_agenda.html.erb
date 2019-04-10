@@ -1,0 +1,87 @@
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<style>
+th {
+	text-align: center;
+}
+td {
+	text-align: center;
+}
+body {
+	font: normal 12px Verdana, Arial, sans-serif;
+}
+table{
+	font: normal 12px Verdana, Arial, sans-serif;
+	width:   580px
+}
+.category{
+	border: 1px solid black;
+	margin-bottom:10px;
+	padding:3px;
+}
+.grid_block{
+	display: inline-block;
+	width: 280px;
+	margin-right: 5px;
+	margin-left:  5px;
+	margin-bottom: 3px;
+	margin-top:2px;
+}
+.line_block{
+	display: inline-block;
+	width: 590px;
+	margin-right: 5px;
+	margin-left:  5px;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	border: 1px solid black;
+}
+.table_area{
+	width: 600px;
+}
+
+</style>
+
+<%if report.agendas.present?%>
+	<div class="category">
+		<h5><b>Meeting Agenda</b></h5>
+		<div class="category">
+			<b>Event ID: </b><%=report.id%></br>
+			<b>Event Title: </b><%=report.name%></br>
+			<%if BaseConfig.airline[:event_summary]%>
+				<b>Type: </b><%=report.get_label%></br>
+				<b>Venue: </b><%=report.get_venue%></br>
+				<b>ICAO: </b><%=report.get_icao%></br>
+			<%end%>
+			<b>Event Date: </b><%=report.get_event_date%></br>
+			<b>Description: </b><%=report.description%></br> 
+			<b>Baseline Risk: </b><%=report.display_before_risk_factor%></br>
+			<b>Mitigated Risk: </b><%=report.display_after_risk_factor%></br>
+			<b>Status: </b><%=report.status%></br>
+			<b>Meeting Minutes: </b><%=report.minutes%></br>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>User</th>
+						<th>Date/Time</th>
+						<th>Discuss</th>
+						<th>Disposition</th>
+						<th>Comment</th>
+					</tr>
+				</thead>
+				<tbody>
+					<%report.agendas.each do |a|%> 
+						<tr>
+							<td><%=a.title%></td>
+							<td><%=a.get_user%></td>
+							<td><%=a.get_created%></td>
+							<td><%=a.discussion ? "Yes" : "No"%></td>
+							<td><%=a.accepted ? "Accepted" : "Declined"%></td>
+							<td><%=a.comment%></td>
+						</tr>
+					<%end%>
+				</tbody>     
+			</table>
+		</div>
+	</div>
+<%end%>

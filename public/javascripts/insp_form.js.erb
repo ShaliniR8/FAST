@@ -1,0 +1,206 @@
+
+  $(function(){
+      $("#accordion").accordion({
+autoHeight: false
+});
+      $("#runway").accordion({
+autoHeight: false
+});
+      $("#week_inspector").accordion({
+autoHeight: false
+});
+
+
+      $('input[id$="CondRemarks"]').each(function(i, input) {
+        $(input).hide();
+        });
+      function condRemarks() {
+      var id  = $(this).attr("id");
+      var opt = $(this).find("option:selected").text();
+
+      if (opt == 'Other') {
+      // Parse surface name and show corresponding remarks field
+        var tokens = id.split("_");
+        var surface = tokens[2].slice(4).replace('CondLevel', '');
+        var remarks_id = "#sbn_inspection_sTwy" + surface + "CondRemarks";
+        $(remarks_id).show();
+      }
+      }
+$('select[id$="CondLevel"]').each(function(i, select) {
+    $(select).change(condRemarks);
+    });
+});
+
+
+
+function submitForm()
+{
+var FF = !(window.mozInnerScreenX == null);
+          if(FF) {
+          // is firefox 
+            document.mainForm.submit();
+          } else { 
+           Offline.check();
+                    if(Offline.state == "up")
+                      {
+                          document.mainForm.submit();
+                      }
+                      else
+                      {
+                        alert("No internet connection available, please check your connection and try again.");
+                      }
+          }
+         
+
+
+}
+
+  function supplemental(){
+    var supplemental = document.getElementById("supplement");
+    var normal = document.getElementById("normal");
+    var accordion = document.getElementById("accordion");
+    var runway = document.getElementById("runway");
+    var select = document.getElementById("<%= @current_user.airport.downcase %>_inspection_supplemental");
+    var week_ins = document.getElementById("week_inspector");
+    if(select == null){
+      var type = "";
+    }else{
+      var type = select.options[select.selectedIndex].text;
+    }
+    
+
+    if (type == "Supplemental"|| type == "Special") {
+      supplemental.style.display = "block";
+    }
+    else if(type == ""){
+      // do nothing
+    }
+    else {
+      supplemental.style.display = "none";
+    }
+    // normal.style.display = "block";
+    // accordion.style.display = "block";
+    // week_ins.style.display = "none";
+  }
+supplemental();
+
+  function openMap(checkbox)
+{
+  if(checkbox.checked){
+    window.open('/inspections/upload_map?id=<%=@futureId%>&type=<%=@checklist.inspectionType%>');
+  }
+}
+
+  function hidePin(line_item)
+{
+    line = "bt_" + line_item;
+  
+    map_btn = document.getElementById(line);
+  
+    if (typeof(map_btn) != 'undefined' && map_btn != null)
+    {
+      map_btn.style.visibility='hidden';
+    }
+}
+
+  function showPin(line_item)
+{
+  line = "bt_" + line_item;
+  map_btn = document.getElementById(line);
+  console.log(map_btn);
+  
+    if (typeof(map_btn) != 'undefined' && map_btn != null)
+    {
+      map_btn.style.visibility='visible';
+    }
+
+}
+
+ $(function(){
+      $('#Ainc_date').datetimepicker({
+addSliderAccess: true,
+sliderAccessArgs: { touchonly: true }});
+      });
+
+
+
+ $(function(){ 
+
+    
+    $('#addWO').live('click', function () {
+        //    newID=$(this).parent("div");
+      var startingPoint = $(this).attr('name');
+                var i = $('#'+startingPoint+' p').size();
+
+
+
+            var maint =  document.getElementById('b'+startingPoint+'_maint');
+            var maint_checked = false;
+            //has maint
+            if (typeof(maint) != 'undefined' && maint != null)
+            {
+                //not checked
+                if(maint.checked == true)
+                  {
+                    maint_checked = true;
+                  }
+            }
+
+            var unsat =  document.getElementById('b'+startingPoint+'_false');
+            var unsat_checked = false;
+            //has unsat
+            if (typeof(unsat) != 'undefined' && unsat != null)
+            {
+                 //not checked
+                if(unsat.checked == true)
+                  {
+                    unsat_checked = true;
+                  }
+            }
+
+      if ( unsat_checked == false && maint_checked == false )
+      {
+        <%if @table.getAirportInfo[:maint_radio]==true %>
+          alert("Work Orders can only be attached to Unsat or Maint conditions");
+        <%else%>
+          alert("Work Orders can only be attached to Unsat conditions");
+        <%end%>
+        document.getElementByName(startingPoint).attr('disabled','disabled');
+      }
+      else{
+        startPoint=$('#'+startingPoint);
+            //    alert(newID);
+
+                if (!document.getElementById("map-canvas"))
+                {
+               
+                    $('<p><input id="work_orders_remarks' +i+ '"name="work_order['+startingPoint+i+']" style="width: 275px;" type="text"></p>').appendTo(startPoint);   
+                  
+                }
+                else
+                {
+                item_desc = workOrderDesc[workOrderNames.indexOf(startingPoint)].replace(/["']/g, " inches ");
+                $('<p> <input id="work_orders_remarks' +i+ '"name="work_order['+startingPoint+i+']" style="width: 275px;" type="text"><img src="/images/red_pin.png" style="margin-left:3px;margin-bottom:5px" onclick="openPinMap(\'' + startingPoint+i + '\',\'' + startingPoint + '\',\''+item_desc+'\');" />').appendTo(startPoint);
+                }
+                    i++;
+                    //Maximum Number of Files
+                if (i == 10){
+                        $('#addWO').attr('disabled','disabled');
+                    }
+                    return false;
+      }
+    });
+
+    $('#remWO').live('click', function() { 
+          var startingPoint = $(this).attr('name');
+                var i = $('#'+startingPoint+' p').size();
+      if( i > 0 ) {
+            $('#'+startingPoint+' p:last-child').remove();
+
+            if(i== 10){
+            $('#addWO').removeAttr('disabled');
+            }
+      i--;
+            }
+            return false;
+            });

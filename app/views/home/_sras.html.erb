@@ -1,0 +1,57 @@
+<div class="col-xs-12 col-sm-3">
+	<div class="panel panel-danger">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<b>SRA (SRM) Statistics</b> 
+			</div>
+		</div>
+		<div class="panel-body" style="height:300px">
+			<div class="row">
+				<div class="col-xs-12">
+					<h4>Average Days to Complete: <%=Sra.get_avg_complete%></h4>
+				</div>
+			</div>
+			<div id="sras" style="width: 100%"></div>   
+			<div id="sras_download" style="width: 100%" align="right"></div> 
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript"> 
+	<%= render partial: "analytics_data.js.erb", locals: {type: :sra} %>
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(function() {drawChartsra(sraData);});
+	function drawChartsra(data) {
+		var sra_options = {
+			chart: {title: 'Safety Risk Assesment Statistics'},
+			legend:'none',          
+			height:230,
+			colors:['blue'],
+			bars: 'horizontal' ,
+			chartArea: {left:100}// Required for Material Bar Charts.
+		};
+
+		var sra_chart = new google.visualization.BarChart(document.getElementById('sras'));
+		google.visualization.events.addListener(sra_chart, 'onmouseover', cursor_pointer);
+		google.visualization.events.addListener(sra_chart, 'onmouseout', cursor_default);
+		google.visualization.events.addListener(sra_chart, 'ready', function () {
+			document.getElementById('sras_download').innerHTML = '<a href="' + sra_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		sra_chart.draw(google.visualization.arrayToDataTable(data), sra_options);  
+		google.visualization.events.addListener(sra_chart, 'select', function(){
+			var all_status=<%=raw @sras.keys%>
+			var root_url="<%=sras_path%>?status="
+			var selection = sra_chart.getSelection();
+			var message = "";
+			for (var i = 0; i < selection.length; i++) {
+				var item = selection[i];
+				message= root_url+all_status[item.row];
+			}
+			window.location=message;
+		});
+	}
+	$(window).bind('resizeEnd', function() {
+		drawChartsra(sraData);
+	});
+</script>

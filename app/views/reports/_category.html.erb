@@ -1,0 +1,37 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"%>
+	<div class="panel <%=category.panel%>">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b><%=category.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div> 
+    </div>
+    <div class="panel-body" style="display:none">
+      <div class="row" id="fields" style="word-wrap: break-word">
+        <%category.fields.each do |field|%>
+          <%rec_field=record.record_fields.where("fields_id=?",field.id).first%>
+          <%if rec_field.present? && rec_field.value.present?%>
+            <%size="col-md-"+field.display_size.to_s+" col-xs-" +field.display_size.to_s+"  col-sm-"+field.display_size.to_s+" col-lg-"+field.display_size.to_s%>
+            <div class="<%=size%>">
+              <b><%=field.label.html_safe%>: </b>
+              
+              <%value = rec_field.present? ? rec_field.value : ""%>
+              <%if (field.display_type=="checkbox" || field.display_type=="radio")%>
+                <%=value.split(";").select{|x| x.present?}.join(",  ")%>
+              <%elsif field.display_type == "textarea"%>
+                </br><%=value.gsub(/\n/, '<br/>').html_safe%>
+              <%elsif field.display_type == "employee"%>
+                <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                  <%=User.find(value).full_name%>
+                <%else%>
+                  <%=value%>
+                <%end%>
+              <%else%>
+              <%=value%>
+              <%end%>
+            </div>
+          <%end%>
+        <%end%>      
+      </div>   
+    </div>
+	</div>
+</div>

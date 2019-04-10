@@ -1,0 +1,39 @@
+<div class="col-xs-6 to_hide">
+	<div class="panel panel-default">
+		<div class="panel-heading click-heading collapsed">
+			<div class="panel-title">
+				Attachment: <%=attachment.document_filename%>
+				<span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+			</div> 
+		</div>
+		<div class="panel-body">
+			<%=f.fields_for :attachments, attachment do |ff|%>
+				<b>Caption:</b><br>
+				<%=ff.text_field :caption ,
+					{:class => "form-control mb10", :style => "max-width:250px"}%>
+				<%if Attachment.image_extensions.include? attachment.name.file.extension%>		
+					<a href="<%=attachment.name.url%>" target="_blank">
+						<%=image_tag attachment.name.url, 
+							:class => "img-responsive",
+							:style => "max-width:400px;max-height:400px;"%></br>
+					</a>
+				<%elsif Attachment.audio_extensions.include? attachment.name.file.extension%>
+					<audio controls>
+						<source src="<%=attachment.name.url%>" type="audio/mpeg">
+					</audio>
+				<%elsif Attachment.video_extensions.include? attachment.name.file.extension%>
+					<video width="640" height="360" controls autostart="false">
+						<source src="<%=attachment.name.url%>" type="video/mp4">
+					</video>
+				<%else%>
+					<b><%=link_to "Click to Open/Download", attachment.name.url%></b></br>
+				<%end%>
+				<div class="delete_area">
+					<%=ff.hidden_field :id,:value=>attachment.id%>
+					<%=ff.hidden_field :_destroy,{:value=>0,:class=>"delete_flag"}%>
+					<a class="btn btn-danger pull-right" onclick="delete_att(this)">Delete</a>
+				</div>
+			<%end%>
+		</div>
+	</div>
+</div>

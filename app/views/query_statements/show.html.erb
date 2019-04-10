@@ -1,0 +1,29 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<%= javascript_include_tag "/javascripts/utility/collapse-panel2.js" %>
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="panel panel-primary">
+			<div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
+				<div class="panel-title">
+					<div class="top_text">
+						<b><%=@query.title%></b> 
+					</div>
+					<div class="top_buttons pull-right">
+						<%=link_to "Edit Query Conditions",edit_query_statement_path(@query),:class=>"btn btn-warning", :disable_with => "Editing..."%>
+						<%=link_to "Clone Query",copy_query_statement_path(@query),:class=>"btn btn-success", :confirm => 'Are you sure?', :disable_with => "Cloning..."%>
+						<%=link_to "Delete", query_statement_path(@query), :method => "delete", :confirm => 'Are you sure?',:class=>"btn btn-danger"%>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body" id="form_body"> 
+				<div class="row">
+					<%=render 'visualize'%>
+					<%=render "records/record_table"%>
+					<%=render "display_conditions"%>
+				</div>
+			</div> 
+		</div>       
+	</div> 
+</div>

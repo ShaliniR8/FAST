@@ -1,0 +1,63 @@
+<% 
+  types = {
+    submission: "submission",
+    record: "record",
+    report: "report",
+    corrective_action: "correctiveAction",
+    framework: "framework",
+    vp: "vp",
+    jobaid: "jobaid",
+    fp: "fp",
+    vpp: "vpp",
+    jap: "jap",
+    audit: "audit",
+    inspection: "inspection",
+    evaluation: "evaluation",
+    investigation: "investigation",
+    finding: "finding",
+    sms_action: "smsAction",
+    recommendation: "recommendation",
+    sra: "sra",
+    hazard: "hazard",
+    risk_control: "riskControl",
+    safety_plan: "safetyPlan",
+  } 
+%>
+<% if type == :all %>
+  <% types.each do |type, js_name| %>
+    <% array = instance_variable_get("@#{type}".pluralize) %>
+    var <%= js_name %>Data = [
+      ['Status','Number', { role: 'style' }, {role: 'annotation'}]
+      <% if array.present?%>
+        <% array.each_with_index do |(k,v),index|%>
+          <% if type == :submission %>
+            <%= ",['#{escape_javascript(k)}',#{v.length},'color:#{group_to_color(v.first.template.emp_group)}', #{v.length}]"%>
+          <% else %>
+            <%= ",['#{escape_javascript(k.titleize)}',#{v.length},'color:#{@colors[k]}', #{v.length}]"%>
+          <% end %>
+        <% end%>
+      <% else%>
+      ,["",0,"", ""]
+      <%end%>
+    ];
+  <% end %>
+<% else %>
+  var <%= types[type] %>Data = [
+    ['Status','Number', { role: 'style' }, {role: 'annotation'}]
+    <% array = instance_variable_get("@#{type}".pluralize) %>
+    <% if array.present? %>
+      <% array.each_with_index do |(k,v),index| %>
+        <% if type == :submission %>
+          <%=",['#{escape_javascript(k)}',#{v.length},'color:#{group_to_color(v.first.template.emp_group)}', #{v.length}]" %>
+        <% else %>
+          <%=",['#{escape_javascript(k.titleize)}',#{v.length},'color:#{@colors[k]}', #{v.length}]" %>
+        <% end %>
+      <% end %>
+    <% else %>
+    ,["",0,"", ""]
+    <%end%>
+  ];
+<% end %>
+
+//create one file for a single generic type, and one file for all, that renders multiple generic.
+

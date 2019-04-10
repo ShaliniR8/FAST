@@ -1,0 +1,23 @@
+<tr class="field_group to_delete">
+	<td><%=f.check_box :header, :class => "form-control"%></td>
+	<td><%=f.text_field :number, :class => "form-control"%></td>
+	<td><%=f.text_area :question, :class => "form-control", :rows => 2%></td>
+	<td><%=f.text_field :faa_reference, :class => "form-control"%></td>
+	<td><%=f.text_field :airline_reference, :class => "form-control"%></td>
+	<td>
+		<%=f.hidden_field :archive, :id => "archive_field"%>
+		<%=link_to "Remove", "#", :class => "btn btn-danger remove_btn"%>
+	</td>
+</tr>
+
+<script>
+	$(function(){
+
+		$(".remove_btn").on("click", function(e){
+			e.preventDefault();
+			$(this).closest("td").find("#archive_field").val(true);
+			$(this).closest(".to_delete").hide();
+		})
+
+	});
+</script>

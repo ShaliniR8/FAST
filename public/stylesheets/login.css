@@ -1,0 +1,73 @@
+.MainContent
+{
+	margin-top:0px;
+
+	height:520px;
+	width:100%;
+	margin-left:auto;
+	margin-right:auto;
+	border:1px solid #999999;
+	border-bottom:none;
+	border-top:none;
+	float:left;
+	background-image:url(/images/login_background.png);
+	background-repeat:repeat-x;
+	font-size:small;
+}
+.ProdigiqLogo
+{
+
+	text-align:left;
+}
+
+
+.Header
+{
+	margin-top:40px;
+	background-color:none;
+	width:990px;
+	text-align:center;
+}
+
+.TopPicture
+{
+	width:100%;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.MainContent a
+{
+	border:none;
+}
+
+.LoginFields
+{
+	width:90%;
+	padding-left:15%;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:20px;
+	padding-bottom:20px;
+}
+
+.LoginText
+{
+	text-align:left;
+	margin-left:0px;
+	padding-left:0px;
+}
+
+.LoginContainer
+{
+	width:990px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.LoginBody
+{
+        background: url('/images/portal_background5.gif') repeat-x scroll 0 0 #E6EFF7;
+	color:#111;
+	font-family: Lucida Grande, Helvetica, sans-serif;
+}

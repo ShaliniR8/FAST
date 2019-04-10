@@ -1,0 +1,82 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+
+<div class="col-xs-12">  
+	<div class="table-responsive">
+		<table class="table table-bordered table-striped" id="dt">
+			<thead>
+				<tr>
+					<%@action_headers.each do |header|%>
+						<th class="<%=header[:size]%>">
+							<%=header[:title]%>
+						</th>
+					<%end%>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%@corrective_actions.each do |c|%>
+					<tr class="atr" action="<%=corrective_action_path(c)%>">
+						<%@action_headers.each do |h|%>
+							<td>
+								<%if h[:type] == 'user'%>
+									<%=User.find(c.send(h[:field])).full_name rescue ''%>
+								<%else%>
+									<%=c.send(h[:field])%>
+								<%end%>		
+							</td>
+						<%end%>
+						<td>
+							<%=link_to 'View', 
+								corrective_action_path(c),
+								:disable_with => 'Redirecting...', 
+								:class => 'btn btn-info'%>
+						</td>
+					</tr>
+				<%end%>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+<script>
+	$(document).ready(function(){
+
+		<%if action_name == "index"%>
+			$("#dt").dataTable({
+				"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+				"aaSorting": [[0, "desc"]],
+				"iDisplayLength": 10,
+				initComplete: function(){
+					this.api().columns().every(function(){
+						var column = this;
+						rand_num = new Date().getTime();
+						var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
+							.appendTo($(column.footer()).empty())
+							.on( 'keyup change input', function(){
+								if(column.search() !== this.value){
+									column.search( this.value ).draw();
+								} 
+							});
+ 
+						column.data().unique().sort().each( function ( d, j ) {
+							if(d!="" && d!=undefined){
+								$('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
+							}
+						});
+					});
+				}
+			});
+		<%end%>
+	});
+</script>
+
+<style>
+	tfoot {
+		display: table-header-group; 
+	}
+</style>

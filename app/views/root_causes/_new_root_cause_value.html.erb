@@ -1,0 +1,32 @@
+<div class="row">
+	<div class="col-xs-12 form-inline form-group">
+		<%=fields_for :root_causes do |f| %>
+			<%=f.label :cause_option_id, "Select Option"%>
+			<%if @has_option%>
+				<%=f.select :cause_option_id, options_for_select(@categories.map{|x| [x.name, x.id]}), {:include_blank=>true}, {:class => "ml5 form-control required_field selected_option"}%>
+			<%else%>
+				<%=f.select :cause_option_id, options_for_select({@cause_option.name => @cause_option.id}), {:include_blank=>true}, {:class => "ml5 form-control required_field selected_option"}%>
+			<%end%>
+
+			<div class="other_value mt10" style="display:none">
+				<%=f.label :cause_option_value, "Enter Value"%>
+				<%=f.text_field :cause_option_value, :class => "ml5 form-control selected_value"%>
+			</div>
+		<%end%>
+	</div>
+</div>
+
+
+<script>
+	$(function(){
+		$(".selected_option").on("change", function(){
+			var selected = $('.selected_option option:selected').text();
+			if(selected == "Other"){
+				$(".other_value").show();
+			}else{
+				$(".selected_value").val("");
+				$(".other_value").hide();
+			}
+		});
+	});
+</script>

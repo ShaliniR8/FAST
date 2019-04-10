@@ -1,0 +1,54 @@
+<div class='item active mt50' style='height:auto;'>
+  <div class='grid per90 center-block'>
+    <%=render '/shared/record_table',
+      :btn_name => 'New',
+      :btn_path => new_user_path,
+      :panel => 'steelblue'%>
+
+    <div class='col-xs-12'>
+      <div class='panel panel-steelblue'>
+        
+        <div class='panel-heading'>
+          <div class='panel-title top_text'>
+            <div class='top_text'>
+              <b>Statistics</b>
+            </div>
+          </div>
+        </div>
+
+        <div class='panel-body'>
+          <div class='table-responsive'>
+            <table id='stats_table' class='table table-hover table-striped table-bordered'>
+              <thead>
+                <tr>
+                  <th>Statistic</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%@statistics.each do |stat|%>
+                  <tr>
+                    <td><%=stat[:label]%></td>
+                    <td><%=stat[:value]%></td>
+                  </tr>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  #stats_table {
+    cursor: default;
+  }
+  #stats_table th {
+    text-align: initial;
+    width: 50%;
+  }
+</style>

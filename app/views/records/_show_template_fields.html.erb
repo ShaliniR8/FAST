@@ -1,0 +1,11 @@
+<%@record = record%>
+<%@record.categories.order(:category_order).each do |c|%>
+	<%@cat = c%>
+	<%if @cat.id == 338%>
+		<%if @cat.not_empty_for(@record)%>
+			<%=render "/records/show_observation_phases_category"%>
+		<%end%>
+	<%elsif @cat.not_empty_for(@record)%>
+		<%=render "/records/category"%>
+	<%end%>
+<%end%>

@@ -1,0 +1,42 @@
+
+  
+  .pdf_hide {
+    display: none;
+    margin-bottom:10px;
+  }
+
+
+.highlight{
+  background-color: #E7E7E7;
+}
+table.checkListTable tr td{
+    vertical-align: middle;
+    height: 30px;
+    //padding: 5px 0 5px 0;
+    
+    border-width: 2px;
+    border-color: black;
+}
+
+table.innerCheckListTable tr td{
+    vertical-align: middle; 
+    //padding: 10px 0 10px 0;
+    height: 30px;
+    
+    border-width: 2px;
+}
+
+table.fieldCondTable tr td{
+    vertical-align: middle;
+    border-bottom:1px solid #CCCCCC;
+    text-align:center;
+    padding:3px 1px 3px 1px;
+}
+
+th.fieldCondHeader {
+    vertical-align: middle;
+    border-bottom:1px solid #000000;
+    text-align:center;
+    padding:3px 1px 3px 1px;
+    background-color: #eeeeee;
+}

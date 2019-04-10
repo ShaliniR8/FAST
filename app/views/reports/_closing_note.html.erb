@@ -1,0 +1,51 @@
+<div class="col-sm-12 col-md-12 col-lg-12"%>
+	<div class="panel panel-lightskyblue">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<b>Basic Info</b>
+			</div> 
+		</div>
+		<div class="panel-body"> 
+			<div class="row">
+				<div class="col-xs-12">
+					<%=render "forms/show_fields", :fields => @fields, :record => @report%>
+				
+
+					<%if @report.status == "Closed"%>
+						<div class="col-xs-12">
+							<hr/>
+						</div>
+						<div class="col-xs-12 col-sm-6">
+							<b>Exclude from scoreboard: </b><%= @report.scoreboard ? "Yes" : "No"%> 
+						</div>
+						<div class="col-xs-12 col-sm-6">
+							<b>Accepted Into ASAP: </b><%= @report.asap ? "Yes" : "No"%> 
+						</div>
+						<div class="col-xs-12 col-sm-6">
+							<b>Sole Source: </b><%=@report.sole ? "Yes" : "No"%> 
+						</div>
+						<div class="col-xs-12 col-sm-6">
+							<b>Disposition: </b><%=@report.disposition%> 
+						</div>
+						<div class="col-xs-12 col-sm-12">
+							<b>Company Disposition: </b><%=@report.company_disposition%>
+						</div>
+						<div class="col-xs-12">
+							<b>Narrative: </b></br>
+							<%if @report.narrative.present?%><%=@report.narrative.gsub(/\n/, '<br/>').html_safe%> <%end%>
+						</div>
+						<div class="col-xs-12">
+							<b>Regulation: </b></br>
+							<%if @report.regulation.present?%><%=@report.regulation.gsub(/\n/, '<br/>').html_safe%> <%end%>
+						</div>
+						<div class="col-xs-12">
+							<b>Notes: </b></br>
+							<%if @report.notes.present?%><%=@report.notes.gsub(/\n/, '<br/>').html_safe%> <%end%>
+						</div>
+
+					<%end%>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

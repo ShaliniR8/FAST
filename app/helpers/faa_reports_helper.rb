@@ -1,0 +1,2 @@
+module FaaReportsHelper
+end

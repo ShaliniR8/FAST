@@ -1,0 +1,76 @@
+<style>
+body {
+    font: normal 12px Verdana, Arial, sans-serif;
+}
+table{
+    font: normal 11px Verdana, Arial, sans-serif;
+}
+.category{
+    border: 1px solid black;
+    margin-bottom:10px;
+    padding:3px;
+}
+.grid_block{
+    display: inline-block;
+    width: 300px;
+    margin-bottom: 3px;
+    margin-top: 2px;
+}
+.line_block{
+    display: inline-block;
+    width: 580px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 5px;
+    margin-top:5px;
+}
+</style>
+<h5>Risk Control #<%=risk_control.get_id%>: <%=risk_control.title%></h5>
+<b>ID: </b><%=risk_control.get_id%></br>
+<b>Status: </b><%=risk_control.status%></br>
+<% if !deidentified%>
+    <%if risk_control.get_responsible_user_name.present?%><b>Responsible User: </b><%=risk_control.get_responsible_user_name%></br><%end%>
+    <%if risk_control.get_approver_name.present?%><b>Approver: </b><%=risk_control.get_approver_name%></br><%end%>
+<%end%>
+<%if risk_control.get_completion_date.present?%><b>Scheduled Completion Date: </b><%=risk_control.get_completion_date%></br><%end%>
+<%if risk_control.control_type.present?%><b>Type: </b><%=risk_control.control_type%></br><%end%>
+<%if risk_control.approver_comment.present?%><b>Approver Comment:</b></br><%=risk_control.approver_comment.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+<%if risk_control.follow_up.present?%><b>Follow-Up/Monitoring:</b></br><%=risk_control.follow_up.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+<%if risk_control.notes.present?%><b>Notes:</b></br><%=risk_control.notes.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+<%if risk_control.description.present?%><b>Description of Risk Control/Mitigation Plan:</b></br><%=risk_control.description.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+
+
+<%description_headers = RiskControlDescription.get_headers%>
+<%if risk_control.descriptions.present?%>
+    <div class="category">
+        <h5>Descriptions</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <%description_headers.each do |h|%>
+                        <th><%=h[:title]%></th>
+                    <%end%>
+                </tr>
+            </thead>
+            <tbody>
+                <%risk_control.descriptions.each do |c|%>
+                    <tr>
+                        <%description_headers.each do |h|%>
+                            <td><%=c.send(h[:field])%></td>
+                        <%end%>
+                    </tr>
+                <%end%>
+            </tbody>
+        </table>
+    </div>
+<%end%>
+
+
+<%if risk_control.costs.present?%>
+  <%risk_control.costs.each do |c|%>
+    <div class="category">
+      <%=render '/sras/print_cost',:cost=>c%>
+    </div>
+  <%end%>
+<%end%>
+

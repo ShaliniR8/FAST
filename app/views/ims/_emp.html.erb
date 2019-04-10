@@ -1,0 +1,30 @@
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <div class="panel-title"><b>Employee Search</b>
+    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+  </div>
+  <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+    <div class="row">
+      <div class='col-xs-12'>
+        <table class="table table-hover" id="users">
+          <thead>
+              <tr>
+                <%@headers.keys.each do |k|%>
+                    <th><%=k%></th>
+                <%end%>  
+              </tr>
+          </thead>
+          <tbody>
+            <%@users.each do |u|%>
+              <tr uid="<%=u.id%>" class="list_tr">
+                <%@headers.values.each do |v|%>
+                  <td><%=u.send(v)%></td>
+                <%end%>
+              </tr>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+# SQLite version 3.x
+#   gem install sqlite3
+#development:
+#  adapter: sqlite3
+#  database: db/development.sqlite3
+#  pool: 5
+#  timeout: 5000
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+
+production:
+  adapter: mysql2
+  encoding: utf8
+  database: wbat_asapdev_bskdata_db
+  username: devuser
+  password: jaguar1995
+  host: localhost
+  timeout: 5000
+
+audit_production:
+  adapter: mysql2
+  encoding: utf8
+  database: wbat_asapdev_bskdata_db
+  username: devuser
+  password: jaguar1995
+  host: localhost
+  timeout: 5000
+
+
+
+# DEVELOPMENT DATABASES
+
+development:
+  adapter: mysql2
+  encoding: utf8
+  database: wbat_asapdev_bskdata_db
+  username: devuser
+  password: jaguar1995
+  host: localhost
+  timeout: 5000
+
+audit_development:
+  adapter: mysql2
+  encoding: utf8
+  database: wbat_asapdev_bskdata_db
+  username: devuser
+  password: jaguar1995
+  host: localhost
+  timeout: 5000
+

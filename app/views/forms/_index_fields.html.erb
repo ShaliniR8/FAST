@@ -1,0 +1,181 @@
+<%= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css" %>
+<%= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js" %>
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+<div class="col-xs-12">
+
+	<%=render "shared/alerts"%>
+	<%=render "access_controls/new_modal"%> 
+
+	<%title = (defined? @title) ? @title : @table.name.pluralize.titleize%>
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<div class="top_text">
+					<%=params[:status]%> <%=title%>
+				</div>
+				<div class="top_buttons pull-right">
+
+					<%=link_to "Advanced Search", '#', 
+						:class => "btn btn-warning pull-right mr5", 
+						:id => "adv", 
+						"data-toggle" => "modal", 
+						"data-target" => ".bs-example-modal-lg"%>  
+					<%=link_to "Reset", 
+						request.path, 
+						:disable_with => 'Resetting...',
+						:class => "btn btn-default pull-right mr5"%> 
+
+				</div>
+			</div>
+		</div>
+
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table id="records_table" class="table table-hover table-striped table-bordered">
+					<thead>
+						<tr>
+							<%@headers.each do |header|%>
+								<th><%=header[:title]%></th>
+							<%end%>
+							<th width="20%">Action</th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<%@headers.each do |header|%>
+								<th><%=header[:title]%></th>
+							<%end%>
+							<th>Action</th>
+						</tr>
+					</tfoot>					
+					<tbody>
+						<%@records.each do |record|%>
+							<tr record_id="<%=record.id%>">
+								<%@headers.each do |header|%>
+
+									<%field_name = header[:field]%>
+									<%field_value = record.send(field_name)%>
+									<%field_display = header[:display]%>
+									<%field_progress = header[:progress].present? ? record.send(header[:progress]) : '0%'%>
+									<%html_class = header[:html_class].present? ? record.send(header[:html_class]) : ''%>
+
+									<td class="<%=html_class%> percent" percentage="<%=field_progress%>">
+										<%case header[:type]%>
+										<%when "boolean"%>
+											<%boolean_options = {true => "Yes", false => "No"}%>
+											<%=boolean_options[field_value]%>
+										<%when "date"%>
+											<%=date_to_string(field_value)%>
+										<%when "datetime"%>
+											<%=datetime_to_string(field_value)%>
+										<%when "checkbox"%>
+											<%=field_value%>
+										<%when "user"%>
+											<%if field_value != nil && field_value != ""%>
+												<%=User.find(field_value).full_name rescue ''%>
+											<%end%>
+										<%when "textarea"%>
+											<%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
+										<%when "select"%>
+											<%if field_display.present?%>
+												<%=field_display[field_value]%>
+											<%else%>
+												<%=field_value%>
+											<%end%>
+										<%else%>
+											<%=field_value%>
+										<%end%>
+									</td>
+								<%end%>
+								<td width="20%">
+									<%=link_to "Open", 
+										"/#{@table.table_name}/#{record.id}", 
+										:class => "btn btn-lightblue mr5 mb5",  
+										:target => nil%>
+									<%=link_to "Open in New Tab",
+										"/#{@table.table_name}/#{record.id}",
+										:class => "btn btn-lightblue mr5 mb5",
+										:target => :_blank%>
+								</td>
+							</tr>
+						<%end%>
+					</tbody>
+				</table>
+			</div>          
+		</div>
+	</div>
+</div>
+
+
+<style>
+	.datepicker{
+		z-index: 1200!important;
+	} 
+	tfoot {
+		display: table-header-group;
+	}
+	.table tbody tr > td.red {
+		background-color: orange !important;
+	}
+	.table tbody tr > td.yellow {
+		background-color: yellow !important;
+	}
+	.table tbody tr > td.green {
+		background-color: mediumseagreen !important;
+	}
+</style>
+
+
+
+<script>
+	$(function(){
+
+		$('#adv').on('click',function(){
+			$.get("<%=advanced_search_home_index_path(:table => @table)%>", function(data){
+				$(".modal-content").html(data);
+				$(window).resize();
+			});
+		});
+
+
+		$('#records_table tbody tr td').on('click',function(){
+			var cellIdx = $(this)[0].cellIndex;
+			var lastIdx = $(this).closest("tr").find("td:last")[0].cellIndex;
+			if(cellIdx != lastIdx){
+				window.location = ("/<%="#{@table.table_name}"%>/" + $(this).closest("tr").attr('record_id'));
+			}
+		});
+
+		$('#records_table').DataTable({
+			dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+					 "<'row'<'col-sm-12'tr>>" +
+					 "<'row'<'col-sm-5'i><'col-sm-7'p>>" + 
+					 "<'row'<'col-sm-12'B>>",
+			buttons: ['copy', 'csv', 'excel', 'print'],
+			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+			"iDisplayLength": 10,
+			"aaSorting": [[0, "desc"]],
+			"columnDefs": [{ type: 'natural', targets: 0 }],
+				initComplete: function(){
+					this.api().columns().every(function(){
+						var column = this;
+						rand_num = new Date().getTime();
+						var select = $('<input class=\'form-control\' list=\'' + rand_num + '\'><datalist id=\'' + rand_num + '\'><option value=""></option></datalist>')
+								.appendTo( $(column.footer()).empty())
+								.on( 'keyup change input', function(){
+									if(column.search() !== this.value){
+										column.search(this.value).draw();
+									} 
+								});
+						column.data().unique().sort().each(function(d, j){
+							if(d != "" && d != undefined){
+								$('#' + rand_num).append( '<option value="' + d + '">' + d + '</option>' );
+							}
+						});
+					});
+				},
+		});
+	});
+</script>

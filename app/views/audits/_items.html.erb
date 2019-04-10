@@ -1,0 +1,46 @@
+<%if owner.items.present?%>
+	<div class="col-xs-12 col-lg-12"%>
+		<div class="panel panel-info">
+			<div class="panel-heading click-heading collapsed">
+				<div class="panel-title">
+					<b>Requirement Checklist</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+				</div> 
+			</div>
+			<div class="panel-body" style="display:none"> 
+				<%if type == "audit"%>
+					<%=link_to "Download Checklist",download_checklist_audit_path(owner,:format=>"csv"),:class=>"btn btn-success pull-right mb5",:target=>"_blank"%>
+				<%elsif type == "evaluation"%>
+					<%=link_to "Download Checklist",download_checklist_evaluation_path(owner,:format=>"csv"),:class=>"btn btn-success pull-right mb5",:target=>"_blank"%>
+				<%elsif type == "inspection"%>
+					<%=link_to "Download Checklist",download_checklist_inspection_path(owner,:format=>"csv"),:class=>"btn btn-success pull-right mb5",:target=>"_blank"%>
+				<%end%>
+				<table class="table table-striped table-bordered" id="item_table">
+					<thead>
+						<tr>
+							<%@checklist_headers.each do |h|%>
+								<th><%=h[:title]%></th>
+							<%end%>
+							<th>Comment</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%owner.items.each do |i|%>
+							<tr>
+								<%@checklist_headers.each do |h|%>
+									<td><%=i.send(h[:field])%></td>
+								<%end%>
+								<td><%=i.comment%></td>
+							</tr>
+						<%end%>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+<%end%>
+
+<script>
+	$(function(){
+		$('#item_table').dataTable();
+	});
+</script>

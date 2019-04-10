@@ -1,0 +1,80 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+
+<div class="col-sm-12 mt20">
+	<div class="table-responsive">
+		<table id="candidates" class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<%@headers.each do |header|%>
+						<th width="35%"><%=header[:title]%></th>
+					<%end%>    
+					<th width="30%">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%@access.each do |a|%>
+					<tr aid="<%=a.id%>">     
+						<%@headers.each do |header|%>
+							<td width="35%"><%=a.send(header[:field])%></td>
+						<%end%>
+						<td width="30%">
+							<%=link_to "View Privileges",
+								"#",
+								:class=>"btn btn-info list_btn mt5",
+								"data-toggle"=>"modal",
+								"data-target"=>".bs-example-modal-lg"%>
+
+							<%=link_to "Delete",
+								access_control_path(a),
+								:confirm => "Are you sure?",
+								:method => "delete",
+								:class => "ml5 btn btn-danger delete_btn mt5"%>
+
+							<%=link_to "<span class=\"glyphicon glyphicon-question-sign\"></span>".html_safe,
+								"#",
+								:class => "btn btn-warning ml5",
+								"data-toggle" => "tooltip",
+								"data-placement" => "top",
+								"title" => a.find_desc%>
+						</td>
+					</tr>
+				<%end%>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+<style>
+	.tooltip-inner {
+		max-width: 80% !important;
+		font-weight: bold;
+		font-size: 15px !important;
+	}
+</style>
+
+
+
+<script>
+	$('[data-toggle="tooltip"]').tooltip();
+	$('#candidates').DataTable({
+		"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+		"iDisplayLength": 150
+	});
+	$(".new_rule_btn").on("click",function(){
+		$.get("<%=new_access_control_path%>",function(data){
+			$(".modal-content").html(data);
+			$(window).trigger('resize');
+		});
+	});
+	$(".list_btn").on("click",function(){
+		$.get("/access_controls/"+$(this).closest('tr').attr('aid')+"/list_privileges",function(data){
+			$(".modal-content").html(data);
+			$(window).trigger('resize');
+		});
+	});
+</script>

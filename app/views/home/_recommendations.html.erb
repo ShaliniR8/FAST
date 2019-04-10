@@ -1,0 +1,55 @@
+<div class="col-xs-12 col-sm-4">
+	<div class="panel panel-success">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<b>Recommendations Statistics</b> 
+			</div>
+		</div>
+		<div class="panel-body" style="height:300px">
+			<div class="row">
+				<div class="col-xs-12">
+					<h5>Average Days to Complete: <%=Recommendation.get_avg_complete%></h5>
+				</div>
+			</div>
+			<div id="recommendations" style="width: 100%"></div>   
+			<div id="recommendations_download" style="width: 100%" align="right"></div> 
+		</div>
+	</div>
+</div>
+<script type="text/javascript"> 
+	<%= render partial: "analytics_data.js.erb", locals: {type: :recommendation} %>
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(function() {drawChart4(recommendationData);});
+	function drawChart4(data) {
+		var rec_options = {
+			chart: {title: 'Safety Assurance Statistics'},
+			legend:'none',          
+			height:230,
+			colors:['blue'],
+			bars: 'horizontal' ,
+			chartArea: {left:100}// Required for Material Bar Charts.
+		};
+
+		var recommendation_chart = new google.visualization.BarChart(document.getElementById('recommendations'));
+		google.visualization.events.addListener(recommendation_chart, 'onmouseover', cursor_pointer);
+		google.visualization.events.addListener(recommendation_chart, 'onmouseout', cursor_default);
+		google.visualization.events.addListener(recommendation_chart, 'ready', function () {
+			document.getElementById('recommendations_download').innerHTML = '<a href="' + recommendation_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		recommendation_chart.draw(google.visualization.arrayToDataTable(data), rec_options);  
+		google.visualization.events.addListener(recommendation_chart, 'select', function(){
+			var all_status=<%=raw @recommendations.keys%>
+			var root_url="<%=recommendations_path%>?status="
+			var selection = recommendation_chart.getSelection();
+			var message = "";
+			for (var i = 0; i < selection.length; i++) {
+				var item = selection[i];
+				message= root_url+all_status[item.row];
+			}
+			window.location=message;
+		});
+	}
+	$(window).bind('resizeEnd', function() {
+		drawChart4(recommendationData);
+	});
+</script>

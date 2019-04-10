@@ -1,0 +1,94 @@
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+<div class="col-xs-12"%>
+	<div class="panel clickable panel-info">
+		<div class="panel-heading click-heading collapsed">
+			<div class="panel-title">
+				<b style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
+					<%=link_to "##{hazard.get_id} #{hazard.title}",
+						hazard_path(hazard),
+						:style=>"color:white"%>
+				</b>
+				<span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+			</div>
+		</div>
+		<div class="panel-body" style="display:none">
+			<div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
+				<div class="col-xs-12 mt20">
+					<%=render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => hazard%>
+				</div>
+				<%if BaseConfig.airline[:base_risk_matrix]%>
+					<%=render "shared/bsk_risk_matrix_show",
+						:owner => hazard,
+						:type => "hazards",
+						:like => like,
+						:color_matrix => color_matrix,
+						:frequency => frequency,
+						:allow_mitigate => false,
+						:show_btns => show_btns%>
+				<%else%>
+					<%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+						:owner => hazard,
+						:allow_mitigate => false,
+						:allow_baseline => false,
+						:show_btns => show_btns%>
+				<%end%>
+
+				<%if BaseConfig.airline[:has_root_causes] && hazard.root_causes.present?%>
+					<div class="col-xs-12"%>
+						<div class="panel clickable panel-info">
+							<div class="panel-heading click-heading collapsed">
+								<div class="panel-title">
+									<b>Root Causes</b>
+									<span class="pull-right clickable">
+										<i class="mt5 glyphicon glyphicon-chevron-down"></i>
+									</span>
+								</div>
+							</div>
+							<div class="panel-body" style="display:none">
+								<div class="row">
+									<%=render '/root_causes/root_causes_table',
+										:owner => hazard,
+										:show_btns => false,
+										:headers => HazardRootCause.get_headers%>
+								</div>
+							</div>
+						</div>
+					</div>
+				<%end%>
+				<%=render '/hazards/descriptions', :owner => hazard,
+				:show_btns => false, :headers => Cause.get_meta_fields('show')%>
+				<%if hazard.risk_controls.present?%>
+					<div class="col-xs-12"%>
+						<div class="panel clickable panel-info">
+							<div class="panel-heading click-heading collapsed">
+								<div class="panel-title">
+									<b>Risk Controls</b>
+									<span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+								</div>
+							</div>
+							<div class="panel-body" style="display:none">
+								<div class="row">
+									<%hazard.risk_controls.each do |risk_control|%>
+										<%=render "hazards/show_risk_control",:risk_control=>risk_control%>
+									<%end%>
+								</div>
+							</div>
+						</div>
+					</div>
+				<%end%>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+ .datepicker{
+	z-index: 1200!important;
+ }
+	td,th{
+		text-align: center;
+	}
+</style>
+
+

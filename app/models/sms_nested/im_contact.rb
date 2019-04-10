@@ -1,0 +1,2 @@
+class ImContact < Contact 
+end

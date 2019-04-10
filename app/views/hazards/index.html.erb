@@ -1,0 +1,21 @@
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<%=render "/shared/index_table"%>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function(){
+		$('#adv').on('click',function(){
+		 $.get("<%=advanced_search_hazards_path%>",function(data){
+			 $(".modal-content").html(data);
+			 $(window).resize();
+		 });
+		});
+
+		// color cells
+		$("#records_table tbody tr").each(function(){
+
+		});
+	})
+</script>

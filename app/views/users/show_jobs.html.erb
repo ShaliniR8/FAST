@@ -1,0 +1,76 @@
+<script type="text/javascript">
+  function openWorkWindow(id)
+  {
+    window.location = '/work_orders/show/'+id;
+  }
+</script>
+
+<div class="content">
+<div class="grid">
+  <div class="white_grid">
+  <% if current_user.level == "Admin" or current_user.level == "Maintenance Supervisor" %>
+  <script type="text/javascript">
+    //<![CDATA[
+        jQuery(document).ready(function () {
+
+            var mydata = [
+              <% i = 0 %>
+              <%unless @work_orders.nil? or @work_orders.size==0 %>
+              <% while i < @work_orders.size-1 %>
+                <% if @work_orders[i].assigned_to == @user.full_name and @work_orders[i].status == "In Progress" %>
+                ["<%= @work_orders[i].id %>", "<%= @work_orders[i].date_assigned %>","<%= @work_orders[i].description %>"],
+                <% end %>
+                <% i+=1 %>
+                  <% end %>
+                     <% if @work_orders[i].assigned_to == @user.full_name  and @work_orders[i].status == "In Progress" %>
+                    ["<%= @work_orders[i].id %>", "<%= @work_orders[i].date_assigned %>","<%= @work_orders[i].description %>"]
+                    <% end %>
+                    <% end %>
+            ];
+            // convert mydata to the standard format
+            var myNewData = [];
+            for (var i=0;i<mydata.length; i++) {
+                var d = mydata[i];
+                myNewData.push({id:d[0],inspector:d[1],jobs:d[2]});
+            }
+            var grid = $("#list");
+            grid.jqGrid({
+                datatype: "local",
+                data: myNewData,
+                colNames:['ID','Date Assigned','Description'],
+                colModel:[
+                    {name:'id',index:'id', width:20, sorttype: 'int', hidden:false},
+                    {name:'inspector',index:'inspector', width:20},
+                    {name:'jobs',index:'jobs', editable:true, width:60}
+
+
+
+                ],
+                rowNum:25,
+                rowList:[10,25,50],
+                pager: '#pager',
+                sortname: 'id',
+                viewrecords: true,
+                sortorder: "asc",
+                caption:"<div style='opacity:0'>|</div>",
+                height: "345",
+                multiselect:false,
+                onSelectRow: function(id) {
+                  if(id){
+                    openWorkWindow(id);
+                    }
+                },
+                autowidth:true
+
+            });
+            grid.jqGrid('navGrid','#pager',{add:false,edit:false,del:false});
+        });
+    </script>
+    <table id="list"><tr><td/></tr></table>
+    <div id="pager"></div>
+      <% else %>
+<h1>Forbidden: You do not have the required credentials to access this page.</h1>
+<% end %>
+</div>
+</div>
+</div>

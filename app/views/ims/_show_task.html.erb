@@ -1,0 +1,35 @@
+<%if owner.tasks.present?%>
+	<div class="col-xs-12 col-lg-12"%>
+		<div class="panel panel-info">
+			<div class="panel-heading click-heading collapsed">
+				<div class="panel-title">
+					<b>Tasks</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+				</div> 
+			</div>
+			<div class="panel-body" style="display:none"> 
+				<div class="row">
+					<%owner.tasks.each do |task|%>
+						<div class="col-xs-12">
+							<div class="panel panel-info">
+								<div class="panel-heading click-heading collapsed">
+									<div class="panel-title">
+											<b>#<%=task.id%> <%=task.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+									</div> 
+								</div>
+								<div class="panel-body" style="display:none"> 
+									<div class="row">
+										<%=render '/forms/show_fields', 
+											:fields => fields, 
+											:record => task
+										%>
+									</div>
+								</div>
+							</div>
+						</div>
+					<%end%>
+				</div>
+			</div>
+		</div>
+	</div>
+<%end%>
+

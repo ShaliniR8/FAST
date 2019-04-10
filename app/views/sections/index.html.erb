@@ -1,0 +1,29 @@
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<%=render "records/record_table"%>
+	</div> 
+</div>
+
+
+<script>
+	$(document).ready(function(){
+		$('#adv').on('click',function(){
+			$.get("<%=advanced_search_submissions_path%>",function(data){
+				$(".modal-content").html(data);
+				$(window).resize();
+			});
+		});
+		$('#det').on('click',function(){
+			$.get("<%=detailed_search_submissions_path%>",function(data){
+				$(".modal-content").html(data);
+				$(window).resize();
+			});
+		});
+		$('#cus').on('click', function(){
+			$.get("<%=custom_view_submissions_path%>",function(data){
+				$(".modal-content").html(data);
+				$(window).resize();
+			});
+		});
+	});
+</script>

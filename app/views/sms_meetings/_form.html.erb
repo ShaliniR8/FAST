@@ -1,0 +1,141 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<script type="text/javascript" src=<%=@action=="new" ? "/javascripts/sms_meetings/table-control.js" : "/javascripts/sms_meetings/edit-control.js"%>></script>
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+   	<div class="panel panel-primary">
+     	<div class="panel-heading">
+     		<div class="panel-title">
+       		<b><%=@action.titleize+" Meeting"%></b> 
+     		</div>
+     	</div>
+     	<div class="panel-body" id="form_body"> 
+     		<%= form_for @meeting.becomes(SmsMeeting),:html => {:multipart => true} do |f|%>
+          <%=hidden_field_tag :type,params[:type]%>
+          <%if @action == "new"%>
+            <%=f.fields_for :host, Host.new do |ff|%>
+              <%=ff.hidden_field :users_id, :value => current_user.id%>
+            <%end%>
+          <%end%>
+          <%if params[:type].present?%>
+            <%=hidden_field_tag :type,params[:type]%>
+          <%end%>  
+          <%=render "meetings/meeting_general_info", :f=>f%>
+          <div class="row">
+
+            <!-- Packages -->
+            <div class="col-sm-12 col-md-12 col-lg-12">
+              <div class="panel panel-default mt10">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <b>Packages</b>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <%=render "add_package"%>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-sm-12 col-md-12 col-lg-12">
+              <div class="panel panel-default mt10">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <b>Users</b>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <%=render "meetings/invite"%>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <div class="col-sm-12 col-md-12 col-lg-12"%>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <b>Attachments</b>
+                  </div> 
+                </div>
+                <div class="panel-body"> 
+                  <div class="row" id="attachments">
+                    <%@meeting.attachments.each do |att|%>
+                      <%=render "records/existing_attachments_field",:f=>f,:attachment=>att%>
+                    <%end%>
+                  </div>
+                  <div class="pull-right"><%= link_to_add_fields "Add an attachment", f, :attachments%></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt10">
+            <div class="form-actions">
+              <%= f.submit "Save", class:"btn btn-success pull-right", disable_with: "Saving..."%>
+            </div>
+            <%=link_to "Cancel", 
+              action_name == "edit" ? sms_meeting_path(@meeting) : sms_meetings_path(:type=>params[:type]), 
+              :id=>"cancel-btn", 
+              :class=>"mr5 btn btn-warning pull-right", :confirm=>'Are you sure?'%>
+          </div>
+        <%end%>
+      </div> 
+    </div>       
+	</div> 
+</div>  
+
+
+
+
+
+
+
+<script>
+  $(document).ready(
+    function(){
+      $(".add_btn").on("click",function(){
+        if ($(this).text()=="Add"){
+          $(this).text("Added");
+          $(this).removeClass("btn-info").addClass("btn-success");
+        }else{
+          $(this).text("Add");
+          $(this).removeClass("btn-success").addClass("btn-info");
+        }
+      });
+
+      var dt=$('#packages').DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
+
+      $('form').on('submit',function(){
+        var count=0;
+        var form=$(this);
+        dt.rows().nodes().to$().each(function(){
+          //console.log(count+"="+$(this).attr("report"));
+          if ($(this).find(".add_btn").text()=="Added"){
+            form.append('<input type="hidden" name=packages['+count+ '] value='+$(this).attr("package")+'>');
+            count++;
+          }
+        });
+        return true;
+      });
+    }
+  );
+</script>

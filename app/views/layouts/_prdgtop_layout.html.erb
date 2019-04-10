@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+
+  <%= stylesheet_link_tag 'scaffold' %>
+  
+  <%= stylesheet_link_tag 'buttons' %>
+
+    <title><%= controller.action_name.titleize + " : " + controller.controller_name.titleize %></title>
+
+    <!-- Bootstrap core CSS -->
+  <%= stylesheet_link_tag 'bootstrap/bootstrap.min' %>
+
+     <!-- Used for offline notification -->
+  <%= stylesheet_link_tag "offline-theme-chrome", :media=>"all" %>  
+  <%= stylesheet_link_tag "offline-language-english", :media=>"all" %>
+  <%= stylesheet_link_tag "offline-language-english-indicator", :media=>"all" %> 
+    
+  <%= javascript_include_tag 'offline.min.js' %>
+
+    <!-- Custom styles for this template -->
+
+<!-- Javascript from previous layout -->
+<script type="text/javascript">
+function handleSelection(id) {
+   window.open('/work_requests/'+id, '', 'width=950, height=700');
+
+}
+function openWorkOrder()
+{
+  window.open('/work_orders/new', 'New Work Order', 'fullscreen=yes, scrollbars=yes')
+}
+function openNewLeaseWindow()
+{
+   window.open('/work_requests/new', 'New Lease', 'width=950, height=700,scrollbars=yes');
+}
+function openChecklistWindow(id)
+{
+  <% if controller.controller_name != "checklists" %>
+    window.location = "<%= "/" + controller.controller_name + "/edit/" %>" +id;
+  <% else %>
+    window.location = "<%= "/" + controller.controller_name + "/show/" %>" +id;
+  <% end %>
+}
+function openNewChecklistWindow()
+{
+  window.open('/checklists/new', 'New Checklist', 'fullscreen=yes,scrollbars=yes');
+
+}
+function refreshPage()
+{
+  location.reload(true);
+
+} 
+</script>
+
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="/javascripts/html5shiv.js"></script>
+      <script src="/javascripts/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+<body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div>
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand brand" href="/gateway"><img src="/ProDIGIQ_small.png" alt="Company Logo"/></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= current_user.full_name %><b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href ="/users/self_edit/<%= current_user.id %>">Profile</a></li>
+                <li><a href ="/users/change_password/<%= current_user.id %>">Change Password</a></li>
+                 <% if current_user.level == "Admin" %>
+                 <li class="divider"></li>
+                 <li class="dropdown-header"><u>Admin</u></li>
+                 <li><a href ="/users_index">Accounts</a></li>
+                 <li><a href ="/users/new">New Account</a></li>
+                 <%end%>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                 <li><a href ="https://support.prosafet.com" target="_blank">Support</a></li>
+              </ul>
+            </li>
+            <li><a href ="<%=logout_path%>">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+<p style="color: green"><%= notice %></p>
+<div style="clear:both; margin-top: 75px;" class="shrink">
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+
+    
+  <%= stylesheet_link_tag 'jqgrid/jquery-ui-1.7.1.custom' %>
+  <%= stylesheet_link_tag 'jqgrid/ui.jqgrid' %>
+
+  <link rel="stylesheet" type="text/css" href="/SpryAssets/SpryCollapsiblePanel.css" />
+  <script type="text/javascript" src="/javascripts/jqgrid2/jquery.min.js"></script>
+  <script type="text/javascript" src="/javascripts/jqgrid2/grid.locale-en.js"></script>
+  <script type="text/javascript" src="/javascripts/jqgrid2/jquery.jqGrid.min.js"></script>
+  
+
+<div class="mainContent">
+	<div>
+		<%= yield %>
+	</div>
+</div>
+</div>
+
+  </body>
+</html>

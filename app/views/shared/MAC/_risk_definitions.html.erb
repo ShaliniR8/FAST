@@ -1,0 +1,16 @@
+<div class="col-xs-12 mb20">
+	<hr>
+	<h4><b>RISK DEFINITIONS</b></h4>
+	<table class="table table-bordered table-fixed table-centered">
+		<tr>
+			<%MAC_Config::MATRIX_INFO[:risk_definitions].each do |k, v| %>
+				<td bgcolor="<%=k%>" width="20%" style="color:#34495E">
+					<h4><b><%=v[:rating]%></b></h4>
+					<b>- <%=v[:cells]%> -</b>
+					<hr>
+					<%=v[:description]%>
+				</td>
+			<%end%>
+		</tr>
+	</table>
+</div>

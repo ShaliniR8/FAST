@@ -1,0 +1,52 @@
+<div class="col-xs-12 col-lg-12"%>
+	<div class="panel panel-lightskyblue">
+		<div class="panel-heading click-heading collapsed">
+			<div class="panel-title">
+				<b>Risk Assessment</b>
+				<span class="pull-right clickable">
+					<i class="mt5 glyphicon glyphicon-chevron-down"></i>
+				</span>
+			</div> 
+		</div>
+		<div class="panel-body" style="display:none"> 
+			<div class="row">
+				<div class="col-xs-12">
+					<%if show_btns%>
+						<%if allow_mitigate%>
+							<span data-toggle="modal" data-target=".bs-example-modal-lg">
+								<%=link_to "Mitigate Risk","#",
+									:class=>"btn btn-warning pull-right ml5",
+									:id=>"mitigate_btn",
+									"data-toggle"=>"tooltip", 
+									"data-placement"=>"top", 
+									:title=>"Assess Mitigated Risk"%>
+							</span>
+						<%end%>
+						<span data-toggle="modal" data-target=".bs-example-modal-lg">
+							<%=link_to "Baseline Risk","#",
+								:class=>"btn btn-info pull-right",
+								:id=>"baseline_btn",
+								"data-toggle"=>"tooltip", 
+								"data-placement"=>"top", 
+								:title=>"Assess Baseline Risk"%>
+						</span>
+					<%end%>
+				</div>
+			</div>
+			<div class="row">
+				<%=render "shared/bsk_risk_matrix_show_assessment", :owner => owner%>
+				<%=render "shared/bsk_risk_matrix_show_matrix", 
+					:owner => owner, 		
+					:type => type%>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	$(document).ready(function(){
+		$("#<%=type%><%=owner.id%> > tbody > tr > #<%=owner.severity%>-<%=Investigation.get_likelihood.index(owner.likelihood)%>").append("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
+		$("#<%=type%><%=owner.id%> > tbody > tr > #<%=owner.severity_after%>-<%=Investigation.get_likelihood.index(owner.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
+	});
+</script>

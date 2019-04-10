@@ -1,0 +1,63 @@
+<%=form_for @im.becomes(Im) do |x|%>
+	<%=x.fields_for :contacts,@contact do |f|%>
+		<div class="panel-warning">
+			<div class="panel-heading">
+				<div class="panel-title">New Contact
+				<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+			</div>
+			<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+				<div class="row">
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :location, "Supplier or Location Detail"%>
+						<%=f.text_field :location,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :reference_number, "Reference Number"%>
+						<%=f.text_field :reference_number,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :contact_name, "Contact Name"%>
+						<%=f.text_field :contact_name,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :email%>
+						<%=f.text_field :email,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :work_phone, "Work Phone"%>
+						<%=f.text_field :work_phone,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :mobile_phone, "Mobile Phone"%>
+						<%=f.text_field :mobile_phone,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :add_1, "Address Line 1"%>
+						<%=f.text_field :add_1,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :add_2, "Address Line 2"%>
+						<%=f.text_field :add_2,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :city%>
+						<%=f.text_field :city,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :state,"State or Country"%>
+						<%=f.text_field :state,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group form-inline col-xs-6">
+						<%=f.label :zip%>
+						<%=f.text_field :zip,:class=>"form-control ml5"%>
+					</div>
+					<div class="form-group col-xs-12">
+						<%=f.label :notes%>
+						<%=f.text_area :notes,:class=>"form-control ml5",:rows=>'5'%>
+					</div>
+				</div>
+				<%=x.submit "Save",:class=>"btn btn-success pull-right mt5", disable_with: "Saving..."%>
+			</div>
+		</div>
+	<%end%>
+<%end%>

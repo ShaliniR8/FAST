@@ -1,0 +1,62 @@
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+
+<%=render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => hazard%>
+
+<%if BaseConfig.airline[:base_risk_matrix]%>
+	<%=render "shared/bsk_risk_matrix_show", 
+		:owner => hazard, 
+		:type => "hazards", 
+		:like => like, 
+		:color_matrix => color_matrix, 
+		:frequency => frequency, 
+		:allow_mitigate => true %>
+<%else%>
+	<%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+		:owner => hazard, 
+		:allow_mitigate => true%>
+<%end%>
+
+<%if hazard.risk_controls.present?%>
+	<div class="col-xs-12"%>
+		<div class="panel clickable panel-info">
+			<div class="panel-heading click-heading collapsed">
+				<div class="panel-title">
+					<b>Risk Controls</b>
+					<span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+				</div> 
+			</div>
+			<div class="panel-body" style="display:none"> 
+				<div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
+					<%hazard.risk_controls.each do |risk_control|%>
+						<%=render "hazards/show_risk_control", :risk_control => risk_control%>
+					<%end%>
+				</div>
+			</div>
+		</div>
+	</div>
+<%end%>
+
+
+<style>
+ .datepicker{
+	z-index: 1200!important;
+ }
+</style>
+
+<script>
+	$(document).ready(function(){
+		$('#mitigate_btn').on('click',function(){
+			$.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$('#baseline_btn').on('click',function(){
+			$.get("<%=baseline_hazard_path(@hazard)%>",function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+	});
+</script>

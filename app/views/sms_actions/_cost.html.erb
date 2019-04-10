@@ -1,0 +1,37 @@
+<%if owner.costs.present?%>
+	<div class="col-xs-12 col-lg-12"%>
+		<div class="panel panel-info">
+			<div class="panel-heading click-heading collapsed">
+				<div class="panel-title">
+					<b>Costs</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+				</div> 
+			</div>
+			<div class="panel-body" style="display:none"> 
+				<div class="row">
+					<%owner.costs.each do |cost|%>
+						<div class="col-xs-12 col-lg-12"%>
+							<div class="panel panel-info">
+								<div class="panel-heading click-heading collapsed">
+									<div class="panel-title"><b>#<%=cost.id%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span></div>
+								</div>
+								<div class="panel-body" style="display:none"> 
+									<div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
+										<%=render '/forms/show_fields', 
+											:fields => Cost.get_meta_fields('show'), 
+											:record => cost
+										%>
+									</div>
+								</div>
+							</div>
+						</div>
+					<%end%>
+				</div>
+			</div>
+		</div>
+	</div>
+<%end%>
+
+
+
+
+

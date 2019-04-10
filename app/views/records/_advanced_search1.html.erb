@@ -1,0 +1,62 @@
+<div class="panel panel-warning">
+    <div class="panel-heading">
+      	<div class="panel-title">
+        	<b>Advanced Search</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button> 
+      	</div>
+    </div>
+    <div class="panel-body">  	  
+     	<%= form_tag records_path,:method=>"get" do%>
+     		<%=hidden_field_tag :advance_search,true%>
+            <div class="search-group row">
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		<b>Term:</b>
+            		 <%=select_tag :searchterm_1,options_for_select(Record.get_terms),{:include_blank=>"",:class=>'form-control term mb5'}%>
+            	</div>
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		<b>Value:</b>
+            		 <%=text_field_tag :field_1,nil,{:class=>'form-control search_field mb5'}%>
+            	</div>
+            </div>
+            <div class="search-group row">
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		 <%=select_tag :searchterm_2,options_for_select(Record.get_terms),{:include_blank=>"",:class=>'form-control term mb5'}%>
+            	</div>
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		 <%=text_field_tag :field_2,nil,{:class=>'form-control search_field mb5'}%>
+            	</div>
+            </div>
+            <div class="search-group row">
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		 <%=select_tag :searchterm_3,options_for_select(Record.get_terms),{:include_blank=>"",:class=>'form-control term mb5'}%>
+            	</div>
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		 <%=text_field_tag :field_3,nil,{:class=>'form-control search_field mb5'}%>
+            	</div>
+            </div>
+            <div class="search-group row">
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		 <%=select_tag :searchterm_4,options_for_select(Record.get_terms),{:include_blank=>"",:class=>'form-control term mb5'}%>
+            	</div>
+            	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+            		 <%=text_field_tag :field_4,nil,{:class=>'form-control search_field mb5'}%>
+            	</div>
+            </div>
+        	<%= submit_tag "Search", class:"ml5 btn btn-xl btn-success pull-right mt10"%>
+        <%end%>
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+	$(".term").on('change',function(){
+		if ($(this).val()=="submitted"||$(this).val()=="updated"||$(this).val()=="get_event_date")
+		{
+			$(this).closest(".search-group").find(".search_field").datepicker({format:"yyyy-mm-dd"});
+		}
+		else
+		{
+			$(this).closest(".search-group").find(".search_field").datepicker("remove");
+		}
+	});
+});
+</script>

@@ -1,0 +1,53 @@
+<div class="col-xs-12 col-sm-12">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<b>Submissions Statistics</b> 
+			</div>
+		</div>
+		<div class="panel-body" style="height:500px">
+			<div id="subs" style="width: 100%"></div> 
+			<div id="subs_download" style="width: 100%" align="right"></div>   
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript"> 
+	<%= render partial: "analytics_data.js.erb", locals: {type: :submission} %>
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(function() { drawChartsubs(submissionData); });
+	function drawChartsubs(data, params) {
+		var subs_data = google.visualization.arrayToDataTable(data);
+		var subs_options = {
+			legend:'none',
+			height:450,
+			colors:['blue'],
+			bars: 'horizontal' ,
+			chartArea: {left:250}// Required for Material Bar Charts.
+		};
+		var subs_chart = new google.visualization.BarChart(document.getElementById('subs'));
+		google.visualization.events.addListener(subs_chart, 'onmouseover', cursor_pointer);
+		google.visualization.events.addListener(subs_chart, 'onmouseout', cursor_default);
+		google.visualization.events.addListener(subs_chart, 'ready', function () {
+			var x = subs_chart.getImageURI();
+			document.getElementById('subs_download').innerHTML = '<a href="' + subs_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		subs_chart.draw(subs_data, subs_options);
+		google.visualization.events.addListener(subs_chart, 'select', function(){
+			var all_status=<%=raw @submissions.keys%>
+			var root_url="<%=submissions_path%>?template=";
+			var dateParams = params ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
+			var selection = subs_chart.getSelection();
+			var message = "";
+			var row = selection[0].row + 1;
+			var submissionType = data[row][0];
+			message= root_url + submissionType + dateParams; 
+			window.location=message;
+		});
+	}
+
+	$(window).bind('resizeEnd', function() {
+		drawChartsubs(submissionData);
+	});
+</script>

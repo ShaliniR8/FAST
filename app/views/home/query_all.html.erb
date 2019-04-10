@@ -1,0 +1,165 @@
+<script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
+
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="col-lg-12">
+			<div class="panel panel-steelblue">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<b>Query Center</b>
+					</div>
+				</div>
+				<div class="panel-body">
+
+					<div class="col-xs-12">
+						<a class="btn" 
+							data-toggle="collapse" 
+							data-target="#view_instructions">
+							View Instructions &raquo;
+						</a>
+						<%=render "shared/alerts"%>
+						<div class="collapse well" id="view_instructions">
+							<ol>
+							  <li>Select the type object you would like to run query on.</li>
+							  <li>Build a query.</li>
+							  	<ol>
+							  		<li>Add new conditions to your query. If no condition is added, result will include all reports.</li>
+							  		<li>Enter constraints.</li>
+							  			<ul>
+							  				<li><b>Condition Type</b>: The method that will be used for the comparison.</li>
+							  				<li><b>Field</b>: The field that data will be pulled from to compare.</li>
+							  				<li><b>Value</b>: The value of the field that is going to be compared with.</li>
+							  			</ul>
+							  		<li>Add nested conditions to your query.</li>
+							  			<ul>
+							  				<li>Nested conditions will run in parallel.</li>
+							  				<li><b>Nested Operator</b></li>
+							  					<ul>
+							  						<li><b>AND</b>: If selected, result will satisfy all nested conditions.</li>
+							  						<li><b>OR</b>: If selected, result will satisfy at least one nested conditions.</li>
+							  					</ul>
+							  			</ul>
+							  	</ol>
+							  <li>Click on <b>Search</b> to run query.</li>
+							</ol> 
+						</div>
+					</div>
+
+					<%=form_tag "search_all", :method => "post" do%>
+
+						<div class="col-xs-4">
+							<%=hidden_field_tag :report_type, :id => "report_type"%>
+							<%=render "/home/query/select_type"%>
+						</div>
+
+
+						<div class="col-xs-8">
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									<div class="panel-title">
+										Step 2. Build Query
+									</div>
+								</div>
+								<div class="panel-body">
+									<div id="to_insert_base" class="row"></div>
+									<div class="col-xs-12">
+										<%=link_to_add_blocks "Add New Condition",
+											"base",
+											"base"%>    
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-xs-12 pull-right ml15">
+							<%=submit_tag "Search", 
+								:class => "pull-right btn btn-success",
+								:disable_with => "Searching..."%>    
+						</div>
+						
+					<%end%>
+
+				</div>
+			</div>
+		</div>
+	</div> 
+</div>
+
+
+<script>
+
+
+	$("form").on("submit", function(e){
+		var selected_report_type = [];
+		$("#templates tbody tr td").each(function(){
+			if($(this).css("background-color") == "rgb(173, 216, 230)"){
+				selected_report_type.push($(this).attr("data-id"));
+			}
+		});
+		var result = true;
+		if(selected_report_type.length == 0){
+			result = false;
+			swal({
+				title: "Error.",
+				text: "Please select a report type.",
+				type: "error"
+			});
+		}
+		$("#report_type").val(selected_report_type);
+		return result;
+	});
+
+
+
+
+	function add_blocks(base_area, namespace, insert_space){
+		var content = "<%=escape_javascript(render('block_all'))%>";
+		var uid = new Date().getTime();
+		var name_space = namespace + "[" + uid + "]";
+		var regexp = new RegExp("name_space", "g");
+		var regexp2 = new RegExp("insert_space", "g");
+		var insertposition = $("#to_insert_" + insert_space);
+		$(insertposition).show();
+		var deleteposition = $("#to_delete_" + insert_space);
+		var insertspace = insert_space + "_" + uid;
+		$(content.replace(regexp, name_space).replace(regexp2, insertspace)).appendTo(insertposition);
+		$(deleteposition).remove();
+		inject(insertspace);
+	}
+
+
+
+	function inject(insert_space){
+		var id_space = "#" + insert_space;
+		$(id_space + '.cat_select option').hide();
+		$(id_space + '.field_select option').hide();
+		$(".temp_select").on('change', function(){
+			temp_id = $(this).val();
+			$(id_space + '.field_select option').hide();
+			$(id_space + '.cat_select').val("");
+			$(id_space + '.field_select').val("");
+			$(id_space + '.cat_select option').each(function(){
+				cat_ids = $(this).val().split("-");
+				cat_temp = cat_ids[0];
+				if (cat_temp != temp_id){
+					$(this).hide();
+				}else{
+					$(this).show();
+				}
+			});
+		});
+
+	}
+</script>
+
+<style>
+	.well ul > li, 
+	.well ol > li{
+		font-weight: normal
+	}
+</style>
+	

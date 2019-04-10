@@ -1,0 +1,50 @@
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+
+<style>
+  label.required:after{
+    content: "*";
+    color: red;
+  }
+</style>
+
+
+<div class="item active mt50" id="test2?" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b>Reset Password</b>
+        </div>
+      </div>
+      <div class="panel-body collapse in" id="showevent">
+        <%= form_for @user, :url => password_reset_path(params[:id]) do |f| %>
+          <div class="row">
+            <%= hidden_field_tag :email, @user.email%>
+            <div class="form-group form-inline col-xs-12">
+              <%=f.label :email, "Email"%>
+              <%=f.email_field :email, {:class=>"form-control", :readonly => "true"}%>
+            </div>
+
+            <div class="form-group form-inline col-xs-12">
+              <%=f.label :password, "New Password", :class=>"required"%>
+              <%=f.password_field :password, {:class=>"form-control password required_field"}%>
+            </div>
+
+            <div class="form-group form-inline col-xs-12">
+              <%=f.label :password_confirmation, "Re-enter New Password", :class=>"required"%>
+              <%=f.password_field :password_confirmation, {:class=>"form-control password required_field"}%>
+            </div>
+          </div>
+
+          <%= f.submit "Reset Password", :class=>"btn btn-success pull-right", disable_with: "Saving..."%>
+          <%=link_to "Cancel", root_url, :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right"%>
+
+        <%end%>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

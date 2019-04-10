@@ -1,0 +1,71 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"%>
+	<div class="panel <%=cat.panel%>">
+		<div class="panel-heading click-heading collapsed">
+			<div class="panel-title">
+				<b><%=cat.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+			</div> 
+		</div>
+		<div class="panel-body" style="display:none" > 
+			<div class="row" id="fields" style="word-wrap: break-word">
+				<div class="col-xs-12">
+					<div class="table-responsive">
+						<table id="observation_phases_table_<%=record.id%>" class="table table-hover table-striped table-bordered" width="100%">
+							<thead>
+								<tr>
+									<th>Observation Phase</th>
+									<th>Condition</th>
+									<th>Threat</th>
+									<th>Sub Threat</th>
+									<th>Error</th>
+									<th>Sub Error</th>
+									<th>Human Factor</th>
+									<th>Comment</th>
+								</tr>
+							</thead>
+							<tbody>
+								<%cat.fields.group_by(&:element_id).each do |element_id, arr|%>
+									<%if record.record_fields.where(:fields_id => arr.first.id).present? && record.record_fields.where(:fields_id => arr.first.id).first.value.present?%>
+										<tr>
+											<th><%=arr.first.label%></th>
+											<%arr.each do |x|%>
+												<%record_fields = record.record_fields.where(:fields_id => x.id).first%>
+												<td><%=record_fields.value%></td>
+											<%end%>
+										</tr>
+									<%end%>
+								<%end%>
+							</tbody>
+						</table>
+					</div>   
+				</div> 
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<style>
+	.smallselect {
+		position: relative;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+</style>
+
+
+
+<script>
+	$(function(){
+		$('#observation_phases_table_<%=record.id%>').DataTable({
+			dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+					 "<'row'<'col-sm-12'tr>>" +
+					 "<'row'<'col-sm-5'i><'col-sm-7'p>>" + 
+					 "<'row'<'col-sm-12'B>>",
+			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+			"iDisplayLength": 10,
+			"aaSorting": [[0, "asc"]],
+			"columnDefs": [{ type: 'natural', targets: 0 }],
+		});
+	});
+</script>

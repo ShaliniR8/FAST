@@ -1,0 +1,4 @@
+[<%=raw(@user.to_json)%>, 
+<%=raw(@submissions.to_json(:include => :template))%>,
+<%=raw(@user.notices.to_json)%>]
+

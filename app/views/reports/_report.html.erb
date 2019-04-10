@@ -1,0 +1,71 @@
+<tr>
+
+	<%@report_headers.each do |h|%>
+		<td class="<%=h[:html_class].present? ? @report.send(h[:html_class]) : ''%>">
+			<%case h[:type]%>
+			<%when 'date'%>
+				<%=@report.send(h[:field]).strftime("%Y-%m-%d") rescue ''%>	
+			<%when 'datetime'%>
+				<%=@report.send(h[:field]).strftime("%Y-%m-%d %H:%M") rescue ''%>	
+			<%when 'textarea'%>
+				<%=@report.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue ''%>	
+			<%else%>
+				<%=@report.send(h[:field])%>	
+			<%end%>	
+		</td>
+	<%end%>
+
+	<td>
+		<%=link_to "View Narrative", 
+			"#", 
+			:class => "btn btn-info view_narrative_btn mb5", 
+			"data-toggle" => "modal", 
+			"data-target" => ".bs-example-modal-lg", 
+			:route => show_narrative_report_path(@report, :meeting => @meeting.id) %>
+		<%=link_to "Go To Event", 
+			report_path(@report), 
+			:class => "btn btn-info mb5", 
+			:disable_with => "Redirecting..."%>
+		<%=link_to "Carryover", 
+			"#",
+			:class => "btn btn-danger mb5",
+			:onclick => "delete_report(#{@report.id},this)", 
+			:disable_with => "Removing..."%>
+		<%=link_to "Agenda",
+			"#",
+			:class => "btn btn-warning agenda_btn mb5", 
+			"data-toggle" => "modal", 
+			"data-target" => ".bs-example-modal-lg", 
+			:route => get_agenda_report_path(@report, :meeting => @meeting.id)%>
+		<%=link_to "Add Minutes", 
+			"#", 
+			:class => "btn btn-success minutes_btn mb5", 
+			"data-toggle" => "modal", 
+			"data-target" => ".bs-example-modal-lg", 
+			:route => new_minutes_report_path(@report, :meeting => @meeting.id) %>
+	</td>
+</tr>
+
+
+<script>
+	$(document).ready(function(){
+		$(".view_narrative_btn").on('click',function(){
+			$.get($(this).attr('route'),function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$(".agenda_btn").on('click',function(){
+			$.get($(this).attr('route'),function(data){
+				$(".modal-content").html(data);	
+				$(window).trigger('resize');			
+			});
+		});
+		$(".minutes_btn").on('click',function(){
+			$.get($(this).attr('route'),function(data){
+				$(".modal-content").html(data);		
+				$(window).trigger('resize');		
+			});
+		});
+	});
+</script>

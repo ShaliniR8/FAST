@@ -1,0 +1,71 @@
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<style>
+th {
+  text-align: center;
+}
+
+td {
+  text-align: center;
+}
+body {
+    font: normal 12px Verdana, Arial, sans-serif;
+}
+table{
+    font: normal 12px Verdana, Arial, sans-serif;
+    width:   580px
+}
+.category{
+    border: 1px solid black;
+    margin-bottom:10px;
+    padding:3px;
+}
+.grid_block{
+    display: inline-block;
+    width: 280px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 3px;
+    margin-top:2px;
+}
+.line_block{
+    display: inline-block;
+    width: 590px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    border: 1px solid black;
+}
+.table_area{
+    width: 600px;
+}
+
+</style>
+
+<%if sra.srm_agendas.present?%>
+    <div class="category">
+        <h5>Meeting Agenda</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Date/Time</th>
+                    <th>Discuss</th>
+                    <th>Disposition</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%sra.srm_agendas.each do |a|%> 
+                    <tr>
+                        <td><%=a.get_user%></td>
+                        <td><%=a.get_created%></td>
+                        <td><%=a.discussion ? "Yes" : "No"%></td>
+                        <td><%=a.accepted ? "Accepted" : "Declined"%></td>
+                        <td><%=a.comment%></td>
+                    </tr>
+                <%end%>
+            </tbody>     
+        </table>
+    </div>
+<%end%>

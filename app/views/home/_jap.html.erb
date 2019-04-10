@@ -1,0 +1,55 @@
+<div class="col-xs-12 col-sm-3">
+	<div class="panel panel-purple">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<b>Job Aid Package Statistics</b> 
+			</div>
+		</div>
+		<div class="panel-body" style="height:300px">
+						<div class="row">
+				<div class="col-xs-12">
+					<h5>Average Days to Complete: <%=JobAidPackage.get_avg_complete%></h5>
+				</div>
+			</div>
+			<div id="jap" style="width: 100%"></div>   
+			<div id="jap_download" style="width: 100%" align="right"></div> 
+		</div>
+	</div>
+</div>
+<script type="text/javascript"> 
+	<%= render partial: "analytics_data.js.erb", locals: {type: :jap} %>
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(function() {drawChartjap(japData);});
+	function drawChartjap(data) {
+		var jap_options = {
+			chart: {title: 'SMS IM Statistics'},
+			legend:'none',          
+			height:230,
+			colors:['blue'],
+			bars: 'horizontal',
+			chartArea: {left:100} // Required for Material Bar Charts.
+		};
+
+		var jap_chart = new google.visualization.BarChart(document.getElementById('jap'));
+		google.visualization.events.addListener(jap_chart, 'onmouseover', cursor_pointer);
+		google.visualization.events.addListener(jap_chart, 'onmouseout', cursor_default);
+		google.visualization.events.addListener(jap_chart, 'ready', function () {
+			document.getElementById('jap_download').innerHTML = '<a href="' + jap_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		jap_chart.draw(google.visualization.arrayToDataTable(data), jap_options);  
+		google.visualization.events.addListener(jap_chart, 'select', function(){
+			var all_status=<%=raw @jap.keys%>
+			var root_url="<%=packages_path%>?type=JobAidPackage&status="
+			var selection = jap_chart.getSelection();
+			var message = "";
+			for (var i = 0; i < selection.length; i++) {
+				var item = selection[i];
+				message= root_url+all_status[item.row];
+			}
+			window.location=message;
+		});
+	}
+	$(window).bind('resizeEnd', function() {
+		drawChartjap(japData);
+	});
+</script>

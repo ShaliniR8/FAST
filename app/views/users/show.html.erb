@@ -1,0 +1,179 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+
+<div class="item active mt50" id="test2?" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="col-lg-12">
+			<%=render "shared/alerts"%>
+			<div class="panel panel-steelblue">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<div class="top_text">
+							Account Summary
+						</div>
+						<div class="top_buttons pull-right">
+							<%if current_user.level == "Admin"%>
+
+
+								<%#=link_to "Access Level", 
+									access_level_user_path(@user),
+									:class => "btn btn-chocolate",
+									:disable_with => "Redirecting..."%>
+
+
+
+								<%=link_to "All Users", 
+									users_path, 
+									:id => "index-btn", 
+									:class=>"btn btn-default",
+									:disable_with => "Redirecting..."%>
+								<%=link_to "Simulate", 
+									simulate_user_path(@user), 
+									:class => "btn btn-success", 
+									:disable_with => "Simulating..."%>
+								<%=link_to "Update Privileges",
+									edit_privilege_user_path(@user),
+									:disable_with => 'Updating',
+									:class => "btn btn-warning"%>      
+								<%=link_to @user.disable? ? "Enable" : "Disable", 
+									disable_user_path(@user),
+									:class => "btn btn-danger"%>
+						<%end%>
+
+						<%=link_to "Edit Profile", current_user.level == "Admin" ? edit_user_path(@user) : self_edit_user_path(@user), :id=>"edit-btn", :class=>"btn btn-warning", :disable_with => "Editing..."%>
+						</div>
+					</div>
+				</div>
+				<div class="panel-body collapse in" id="showuser">
+
+
+					<div class="col-xs-12 col-sm-12 col-md-6">
+
+						<hr><h4><b>ACCOUNT INFORMATION</b></h4>
+
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+								<b>Account Status </b></div>
+								<input type="text" class="form-control" value="<%=@user.disable ? "Disabled" : "Active"%>" readonly />
+							</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+								<b>Username </b></div><input type="text" class="form-control" value="<%=@user.username%>" readonly />
+							</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+								<b>Account Type </b></div><input type="text" class="form-control" value="<%=@user.level%>" readonly />
+							</div>
+					
+					</div>
+
+
+
+					<div class="col-xs-12 col-sm-12 col-md-6">
+
+						<hr><h4><b>EMPLOYEE INFORMATION</b></h4>
+
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+								<b>Employee Number </b></div><input type="text" class="form-control" value="<%=@user.employee_number%>" readonly />
+							</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Full Name </b></div><input type="text" class="form-control" value="<%=@user.full_name%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Email </b></div><input type="text" class="form-control" value="<%=@user.email%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Job Title </b></div><input type="text" class="form-control" value="<%=@user.job_title%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Address </b></div><input type="text" class="form-control" value="<%=@user.address%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>City </b></div><input type="text" class="form-control" value="<%=@user.city%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>State </b></div><input type="text" class="form-control" value="<%=@user.state%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Zipcode </b></div><input type="text" class="form-control" value="<%=@user.zipcode%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Mobile Number </b></div><input type="text" class="form-control" value="<%=@user.mobile_number%>" readonly />
+						</div>
+						<div class="form-group form-inline col-xs-12">
+							<div class="col-sm-4">
+							<b>Work Phone Number </b></div><input type="text" class="form-control" value="<%=@user.work_phone_number%>" readonly />
+						</div>
+
+					</div>
+
+					<div class="col-xs-12 col-lg-12 mt20">
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<div class="panel-title">
+									<b>Privileges</b>
+								</div> 
+							</div>
+							<div class="panel-body">
+								<div class="row">
+
+									<div class="col-sm-12">
+										<div class="table-responsive">
+											<table id="privileges" class="table table-bordered table-striped">
+												<thead>
+													<tr>
+														<th>ID</th>  
+														<th>Privilege</th>
+														<th>Description</th>
+													</tr>
+												</thead>
+												<tbody>
+													<%@user.privileges.each do |a|%>
+														<tr aid="<%=a.name%>">   
+															<td><%=a.id%></td>  
+															<td><%=a.name%></td>  
+															<td><%=a.description.gsub(/\n/, '<br/>').html_safe%></td>  
+														</tr>
+													<%end%>
+												</tbody>
+											</table>
+										</div>
+									</div>
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+$(document).ready(function(){
+  $('#privileges').DataTable({
+	"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+	"iDisplayLength": 50
+  });
+});
+</script>
+
+<style>
+	.form-group .form-control{
+		width: 50%;
+	}
+</style>

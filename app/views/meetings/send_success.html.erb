@@ -1,0 +1,26 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+	   	<div class="panel panel-primary">
+	     	<div class="panel-heading">
+	     		<div class="panel-title">
+	     		</div>
+	     	</div>
+	     	<div class="panel-body">
+	     		<div class="row">
+	     			<div class="col-sm-12">
+	     				<h4>The message has been sent successfully. You will receive a email copy.</h4>
+	     			</div>
+	     		</div>
+	    	</div>
+	    </div>       
+	</div> 
+</div>
+<script>
+	$(document).ready(function(){
+		setTimeout(function(){
+			window.location = "<%=meeting_path(params[:meeting])%>"
+    		console.log("closed")
+		},200);
+	});
+</script>

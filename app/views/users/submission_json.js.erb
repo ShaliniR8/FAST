@@ -1,0 +1,1 @@
+<%=raw(@user.to_json(:include=>{:submissions=>{:include=>{:submission_fields=>{:include=>:field}}}}))%>

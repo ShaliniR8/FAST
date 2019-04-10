@@ -1,0 +1,17 @@
+<%print_special_matrix(owner)%>
+
+<%if @print_risk.present? || @print_sub_risk.present? %>
+    <div class="category">
+        <h5><b>Risk Assessment</b></h5>
+        <%if !@print_risk.nil?%>
+            <b>Severity: </b><%= @print_severity %></br>
+            <b>Probability: </b><%= @print_probability %></br>
+            <b>Risk: </b><%= @print_risk %></br></br>
+        <%end%>
+        <%if !@print_sub_risk.nil?%>
+            <b>Severity after mitigation: </b><%= @print_sub_severity %></br>
+            <b>Probability after mitigation: </b><%= @print_sub_probability %></br>
+            <b>Risk after mitigation: </b><%= @print_sub_risk %></br>
+        <%end%>
+    </div>
+<%end%>

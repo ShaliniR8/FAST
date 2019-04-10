@@ -1,0 +1,40 @@
+<%= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css" %>
+<%= javascript_include_tag "/javascripts/utility/collapse-panel2.js" %>
+<%= javascript_include_tag "/javascripts/utility/format-builder.js" %>
+<%= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js" %>
+<%= javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js" %>
+
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<b style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">Root Cause Trending</b>
+					<div class="top_buttons pull-right">
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="row">  
+					<%= render "filter", :ancestor_ids => params[:category_id].present? ? @ancestor_ids : []%>
+					<%= render "trend_in_histogram"%>
+					<%= render "stats_table"%>
+					<div id="record_listing">
+						<%= render "hazard_listing"%>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(window).resize(function() {
+		if(this.resizeTO) clearTimeout(this.resizeTO);
+		this.resizeTO = setTimeout(function(){
+			$(this).trigger('resizeEnd');
+		},100);
+	});
+
+</script>

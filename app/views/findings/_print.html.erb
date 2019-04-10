@@ -1,0 +1,59 @@
+<div class="title">
+	Finding #<%=owner.get_id%>: <%=owner.title%>
+</div>
+
+
+<div class="content">
+	<%fields = Finding.get_meta_fields('show')%>
+	<%=render "forms/print_fields", 
+		:fields => fields, 
+		:owner => owner,
+		:deidentified => deidentified
+	%>
+
+	<%if BaseConfig.airline[:base_risk_matrix]%>
+		<%=render "/shared/print_risk_matrix", 
+			:owner => owner 
+		%>
+	<%else%>
+		<%=render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", 
+			:owner => owner %>
+	<%end%>
+
+	<%if owner.descriptions.present?%>
+		<%=render "forms/print_descriptions", 
+			:descriptions => owner.descriptions, 
+			:title => "Descriptions"%>
+	<%end%>
+
+	<%if owner.causes.present?%>
+		<%=render "forms/print_descriptions", 
+			:descriptions => owner.causes, 
+			:title => "Causes"%>
+	<%end%>
+
+
+
+	<%owner.corrective_actions.each do |c|%>
+		<div class="col-xs-12">
+			<hr>
+			<%=render "sms_actions/print",
+				:owner => c, 
+				:deidentified => deidentified
+			%>
+		</div>
+	<%end%>
+
+	<%owner.recommendations.each do |c|%>
+		<div class="col-xs-12">
+			<hr>
+			<div class="category">
+				<%=render "recommendations/print",
+					:owner => c, 
+					:deidentified => deidentified
+				%>
+			</div>
+		</div>
+	<%end%>
+
+</div>

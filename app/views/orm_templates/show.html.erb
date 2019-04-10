@@ -1,0 +1,90 @@
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<%=render "shared/alerts"%>
+		<%=render "access_controls/new_modal"%>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<div class="top_text">
+						<b>Template #<%=@template.id%>: <%=@template.name%></b>
+					</div>
+					<div class="top_buttons pull-right">
+						<%=link_to "Add Item", "#", :class => "btn btn-success", :id => "add_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
+						<%=link_to "Edit", "#", :class => "btn btn-warning", :id => "edit_template_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
+					</div>
+				</div>
+			</div>
+		 
+		 	<div class="panel-body">
+		 		<div class="row mb10">
+		 			<div class="col-xs-12">
+		 				<div class="row">
+		 					<div class="col-xs-12">
+		 						<p style="font-weight:bold;"><%=@template.description%></p>
+		 						<table class="table table-bordered" width="100%">
+									<thead>
+										<tr style="font-size:18px;">
+											<th width="20%" bgcolor="#DCDCDC">Item</th>
+											<th width="20%" bgcolor="#DCDCDC">Low</th>
+											<th width="20%" bgcolor="#DCDCDC">Moderate</th>
+											<th width="20%" bgcolor="#DCDCDC">High</th>
+											<th width="20%" bgcolor="#DCDCDC">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<%@template.orm_fields.each do |x|%>
+											<tr aid="<%=x.id%>">
+												<th bgcolor="#F0F0F0" style="font-size:15px;"><%=x.name%></th>
+												<td data-row="<%=x.id%>" data-column="low" data-value="<%=x.low_pt%>" data-status="">
+													<p style="text-align:left;"><%=x.low%></p><span class="badge badge-success" style="float:right;"><%=x.low_pt%></span>
+												</td>
+												<td data-row="<%=x.id%>" data-column="moderate" data-value="<%=x.moderate_pt%>" data-status="">
+													<p style="text-align:left;"><%=x.moderate%></p><span class="badge badge-warning" style="float:right;"><%=x.moderate_pt%></span>
+												</td>
+												<td data-row="<%=x.id%>" data-column="high" data-value="<%=x.high_pt%>" data-status="">
+													<p style="text-align:left;"><%=x.high%></p><span class="badge badge-danger" style="float:right;"><%=x.high_pt%></span>
+												</td>
+												<td>
+													<%=link_to "Edit", "#", :class => "btn btn-warning edit_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
+													<%=link_to "Delete", orm_field_path(x), :class => "btn btn-danger", :confirm => "Are you sure?", :method => "delete"%>
+												</td>
+											</tr>
+										<%end%>
+									</tbody>
+								</table>
+							</div>
+
+		 				</div>
+		 			</div>
+		 		</div>
+		 	</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(function(){
+		$("#edit_template_btn").on("click", function(){
+			$.get("<%=edit_orm_template_path(@template)%>", function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$(".edit_btn").on("click", function(){
+			console.log("edit");
+			$.get("/orm_fields/"+$(this).closest("tr").attr("aid")+"/edit", function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$("#add_btn").on("click", function(){
+			$.get("/orm_fields/new?template_id=<%=@template.id%>", function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+
+	});
+</script>
+
+

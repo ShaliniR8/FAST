@@ -1,0 +1,40 @@
+<%risk_matrix_initializer%>
+<%color_matrix = @color_matrix%>
+<%like = Finding.get_likelihood%>
+<%frequency = (0..4).to_a.reverse%>
+
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">	
+	<hr/>
+	<h4><b>RISK ASSESSMENT MATRIX</b></h4>
+	<table id="<%=type%><%=owner.id%>" 
+		class="table table-bordered table-centered mb10" 
+		cellspacing="0" 
+		width="100%">
+		<tr>
+			<th rowspan="2" colspan="2" bgcolor="lightgray"></th>
+			<th colspan="5" bgcolor="grey" style="color:white">LIKELIHOOD</th>
+		</tr>
+		<tr>
+			<%like.each do |header| %>
+				<th><%=header%></th>
+			<%end%>
+		</tr>
+		<tr>
+			<th rowspan="6" bgcolor="grey" width="5%" style="color:white">SEVERITY</th>
+			<%color_matrix.each_index do |row|%>
+				<tr>
+					<td width="5%"><b><%=frequency[row]%></b></td>
+					<%color_matrix[row].each_index do |cell|%>
+						<td id="<%=4-row%>-<%=cell%>" 
+							style="width:15%;background:<%=color_matrix[row][cell]%>" 
+							background="<%=color_matrix[row][cell]%>">
+						</td>    
+					<%end%>
+				</tr>
+			<%end%>
+		</tr>
+	</table>
+
+	<span class='glyphicon glyphicon-remove-sign' style='color:red'></span><b> Baseline Risk Assessment</b>
+	<span class='glyphicon glyphicon-ok-sign' style='color:red'></span><b> Mitigated Risk Assessment</b>  
+</div>

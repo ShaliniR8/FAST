@@ -1,0 +1,21 @@
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+ 		<%=render "/records/record_table"%>
+	</div>
+</div>
+<style>
+	td,th{
+		text-align: center;
+	}
+</style>
+
+<script>
+  $(document).ready(function(){
+      $('#adv').on('click',function(){
+        $.get("<%=advanced_search_ims_path%>"+"?type=<%=params[:type]%>",function(data){
+          $(".modal-content").html(data);
+          $(window).resize();
+        });
+      });
+  })
+</script>

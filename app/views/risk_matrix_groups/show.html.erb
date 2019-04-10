@@ -1,0 +1,45 @@
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<%=render "shared/alerts"%>
+		<%=render "access_controls/new_modal"%>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<div class="top_text">
+						<b>Risk Matrix Group #<%=@record.id%>: <%=@record.name%></b>
+					</div>
+					<div class="top_buttons pull-right">
+						<%=link_to "Delete", "#", :class => "btn btn-danger"%>
+						<%=link_to "Edit", "#", :class => "btn btn-warning"%>
+					</div>
+				</div>
+			</div>
+		 
+		 	<div class="panel-body">
+		 		<div class="row mb10">
+		 			<div class="col-xs-12">
+		 				<div class="row">
+		 					<div class="col-xs-12">
+		 						<%=render "/risk_matrix_groups/show_risk_matrix_table"%>
+		 						<%=render "/risk_matrix_groups/show_severity_table"%>
+		 						<%=render "/risk_matrix_groups/show_probability_table"%>
+		 						
+
+							</div>
+		 				</div>
+		 			</div>
+		 		</div>
+		 	</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(function(){
+
+
+
+	});
+</script>
+
+

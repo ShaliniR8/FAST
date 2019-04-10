@@ -1,0 +1,18 @@
+<div class="col-xs-6 to_delete">
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<div class="panel-title">
+				Attachment
+				<span class="pull-right" onclick="removepanel(this)">
+					<i class="mt5 glyphicon glyphicon-remove"></i>
+				</span>
+			</div> 
+		</div>
+		<div class="panel-body" id= "new_event_attachments"> 
+			<b>Select File to Upload:</b><br>
+			<%= f.file_field :name%>
+			<b>Caption:</b><br>
+			<%=f.text_field :caption, class: "form-control"%>
+		</div>
+	</div>
+</div>

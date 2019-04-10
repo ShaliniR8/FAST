@@ -1,0 +1,32 @@
+<div class="panel panel-lightskyblue">
+	<div class="panel-heading">
+		<div class="panel-title">
+			Select Checklist
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+		</div>
+	</div>
+	<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+		
+		<%=form_tag create_checklist_record_checklist_templates_path, 
+			:method => "post", 
+			:multipart => true do %>
+			<div class="row">
+				<div class="form-inline form-group col-xs-6">
+					<%=label_tag "Select a Checklist"%>
+					<%=select_tag :checklist_template, 
+						options_from_collection_for_select(@checklist_templates, "id", "name"), 
+						{:include_blank => "", :class => "form-control"}%>
+					<%=hidden_field_tag :owner_class, @owner_class%>
+					<%=hidden_field_tag :owner_id, @owner_id%>
+				</div>
+
+				<div class="form-inline form-group col-xs-6">
+					<%=render "upload_checklist_records"%>
+				</div>
+			</div>
+			<%=submit_tag "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
+		<%end%>
+	</div>
+</div>

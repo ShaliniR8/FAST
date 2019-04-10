@@ -1,0 +1,142 @@
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<div class="panel panel-info">
+	<div class="panel-heading">
+		<div class="panel-title">
+   		<b>New Document</b>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+		</div>
+	</div>
+	<div class="panel-body" id="form_body"> 
+		<%= form_for @document,:html => {:multipart => true} do |f|%>
+      <div class="row">
+        <div class="col-sm-3 mb10">
+          <b>Document Type:</b><br>
+          <%=select_tag :document_type, options_for_select(@file_options),:include_blank=>true,:class=>"form-control required_field",:id=>"type_select"%>
+        </div>
+        <div class="col-sm-4 mb10">
+          <b>Category:</b><br>
+          <%=f.select :category,@category_options,{:include_blank=>""},{:class=>"form-control required_field"}%>
+        </div>
+        <div class="col-sm-12" style="display:none" id="file_upload">
+          <%=f.fields_for :attachment,DocumentAttachment.new do |ff|%> 
+            <b>Select File to Upload:</b><br>
+            <%=ff.file_field :name, class: "required_field_file"%>
+            <b>Title:</b><br>
+            <%=ff.text_field :caption, class: "form-control required_field_file_title"%>      
+          <%end%>
+        </div>
+        <div class="col-sm-12" style="display:none" id="link_upload">
+          <b>URL:</b><br>
+          <%=f.text_field :link,:class=>"form-control required_field_url"%>
+          <b>Title:</b><br>
+          <%=f.text_field :title,:class=>"form-control required_field_url_title"%>
+        </div>
+        <div class="col-sm-12" style="display:none" id="tracked_upload">
+          <b>Version:</b><br>
+          <%=f.number_field :version, :class=>"form-control required_field_tracked_version"%>
+          <b>Tracking Identifier:</b><br>
+          <%=f.select :tracking_identifier, Document.get_tracking_identifiers, {:include_blank => ''}, {:class=>"form-control required_field_tracked_identifier"}%>
+        </div>
+      </div>
+      <div class="mt10">
+        <div class="form-actions">
+          <%= f.submit "Save", class:"btn btn-success pull-right"%>
+        </div>
+        <%=link_to "Cancel", documents_path, :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right"%>
+      </div>
+    <%end%>
+  </div> 
+</div> 
+
+<script>
+
+  function requiredFieldEmpty(selector, shortClassNames) {
+    return shortClassNames.reduce(function(requiredFieldEmpty, shortClassName) {
+      className = `.required_field_${shortClassName}`
+      $(selector).find(className).each(function() {
+        $(className).css('border-color', '')
+        if ($(this).val() === '') {
+          $(className).css('border-color', 'red')
+          requiredFieldEmpty = true
+        }
+      })
+      return requiredFieldEmpty
+    }, false)
+  }
+
+  $(document).ready(function() {
+
+    $('form').on('submit', function() {
+      switch ($('#type_select').val()) {
+        case 'File Upload':
+          if (requiredFieldEmpty(this, ['file', 'file_title'])) {
+            event.preventDefault()
+            return false
+          }
+          break
+
+        case 'External Link':
+          if (requiredFieldEmpty(this, ['url', 'url_title'])) {
+            event.preventDefault()
+            return false
+          }
+          break
+
+        case 'File Upload (Tracked)':
+          if (requiredFieldEmpty(this, ['file', 'file_title', 'tracked_version', 'tracked_identifier'])) {
+            event.preventDefault()
+            return false
+          }
+          break
+      }
+    })
+
+    $('#type_select').on('change', function() {
+      switch ($(this).val()) {
+        case 'File Upload':
+          $('#file_upload').show()
+
+          $('#file_upload input').val(null)
+
+          $('#link_upload').hide()
+          $('#link_upload input').val(null)
+          
+          $('#tracked_upload').hide()
+          $('#tracked_upload input').val(null)
+          break
+
+        case 'External Link':
+          $('#link_upload').show()
+
+          $('#file_upload').hide()
+          $('#file_upload input').val(null)
+
+          $('#tracked_upload').hide()
+          $('#tracked_upload input').val(null)
+          break
+
+        case 'File Upload (Tracked)':
+          $('#tracked_upload').show()
+          $('#file_upload').show()
+
+          $('#file_upload input').val(null)
+
+          $('#link_upload').hide()
+          $('#link_upload input').val(null)
+          break
+
+        default:
+          $('#file_upload').hide()
+          $('#file_upload input').val(null)
+
+          $('#link_upload').hide()
+          $('#link_upload input').val(null)
+          
+          $('#tracked_upload').hide()
+          $('#tracked_upload input').val(null)
+      }
+    })
+
+  })
+
+</script>

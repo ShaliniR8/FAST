@@ -1,0 +1,55 @@
+<div class="col-xs-12 col-sm-4">
+	<div class="panel panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<b>Findings Statistics</b> 
+			</div>
+		</div>
+		<div class="panel-body" style="height:300px">
+			<div class="row">
+				<div class="col-xs-12">
+					<h5>Average Days to Complete: <%=Finding.get_avg_complete%></h5>
+				</div>
+			</div>
+			<div id="findings" style="width: 100%"></div>   
+			<div id="findings_download" style="width: 100%" align="right"></div> 
+		</div>
+	</div>
+</div>
+<script type="text/javascript"> 
+	<%= render partial: "analytics_data.js.erb", locals: {type: :finding} %>
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(function() {drawChart3(findingData);});
+	function drawChart3(data) {
+		var finding_options = {
+			chart: {title: 'Safety Assurance Statistics'},          
+			legend:'none',
+			height:230,
+			colors:['orange'],
+			bars: 'horizontal',
+			chartArea: {left:100} // Required for Material Bar Charts.
+		};
+		var finding_chart = new google.visualization.BarChart(document.getElementById('findings'));
+		google.visualization.events.addListener(finding_chart, 'onmouseover', cursor_pointer);
+		google.visualization.events.addListener(finding_chart, 'onmouseout', cursor_default);
+		google.visualization.events.addListener(finding_chart, 'ready', function () {
+			document.getElementById('findings_download').innerHTML = '<a href="' + finding_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		finding_chart.draw(google.visualization.arrayToDataTable(data), finding_options); 
+		google.visualization.events.addListener(finding_chart, 'select', function(){
+			var all_status=<%=raw @findings.keys%>
+			var root_url="<%=findings_path%>?status="
+			var selection = finding_chart.getSelection();
+			var message = "";
+			for (var i = 0; i < selection.length; i++) {
+				var item = selection[i];
+				message= root_url+all_status[item.row];
+			}
+			window.location=message;
+		}); 
+	}
+
+	$(window).bind('resizeEnd', function() {
+		drawChart3(findingData);
+	});
+</script>

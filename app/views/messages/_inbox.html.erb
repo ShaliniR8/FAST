@@ -1,0 +1,122 @@
+<div class="panel panel-steelblue">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<div class="top_text">
+				<%=@message.subject%>
+			</div> 
+			<div class="top_buttons pull-right">
+				<% if @title.present? %>
+					<%=link_to "Delete",
+						message_path(@message, :source => @title),
+						:method => "delete",
+						:class => "btn btn-danger pull-right",
+						:id => "destroy-btn",
+						:remote => true%>
+				<%end%>
+				<%=link_to "Reply", "#",
+					:class => "btn btn-warning pull-right mr5", 
+					:disable_with => 'Replying...',
+					:id => "rep-btn"%>
+				<%=link_to "View Dialogs", "#", 
+					:class => "btn btn-info pull-right mr5", 
+					:id => "dialog-btn"%>
+			</div>
+		</div>
+	</div>
+
+	<div class="panel-body">
+
+		
+
+		<div class="col-xs-12">
+			<div class='col-xs-12'>
+				<div class="col-xs-12">
+					<b style="font-size:20px">
+						<%=@message.subject rescue 'N/A'%>		
+					</b>
+					<div class="pull-right">
+						<%=@message.get_time%>	
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12 mt10">
+				<div class="col-xs-2">
+					<b>From:</b>
+				</div>
+				<div class="col-xs-10">
+					<%=@message.getAll("send_from").html_safe%>
+				</div>
+			</div>
+			<div class="col-xs-12">
+				<%if !@message.getAll("send_to").blank?%>
+					<div class="col-xs-2">
+						<b>To:</b>
+					</div>	
+					<div class="col-xs-10">
+						<%=@message.getAll("send_to").html_safe%>	
+					</div>
+				<%end%>
+				<%if !@message.getAll("cc").blank?%>
+					<div class="col-xs-2">
+						<b>Cc:</b>
+					</div>
+					<div class="col-xs-10">
+						<%=@message.getAll("cc").html_safe%>		
+					</div>
+				<%end%>
+			</div>
+			<div class='col-xs-12 mt10'>
+				<div class="col-xs-2">
+					<b>Attached:</b>
+				</div>
+				<div class="col-xs-10">
+					<b><%=link_to "#{@message.link_type} ##{@message.link_id}", @report_link%></b>
+				</div>
+			</div>
+			<div class="col-xs-12 mt10">
+				<hr/>
+				<div class='col-xs-12'>
+					<%=@message.content.gsub(/\n/, '<br/>').html_safe%>
+				</div>
+			</div>	
+			<div class="col-xs-12 col-sm-12 mt20">
+				<%@message.attachments.each do |att|%>
+					<%=render "show_attachment",:attachment=>att%>
+				<%end%>
+			</div>
+		</div>
+		
+		<div id="view_prev"></div>
+		<div class="row" id="view_dialog"></div>
+		<div class="row" id="reply_message"></div>
+
+	</div>
+</div>
+
+
+
+
+
+<script>
+	$(document).ready(function(){
+		$('#fwd-btn').on("click",function(){
+			window.open("<%=new_message_path(@message)%>",'popup','width=600,height=600');
+		});
+		$('#rep-btn').on("click",function(){
+			window.document.location = "<%=new_message_path(:reply_to=>@message.id)%>";
+		});
+		$("#dialog-btn").on("click",function(){
+			$.get("<%=reply_message_path(@message.id)%>",function(data){
+				$("#view_dialog").html(data);
+			});
+			$.get("<%=prev_message_path(@message.id)%>",function(data){
+				$("#view_prev").html(data);
+			});
+		});
+		$('#destroy-btn').on('click',function(){
+			$(document).ajaxSuccess(function(){
+				location.reload();
+			});
+		});
+	});	
+</script>

@@ -1,0 +1,89 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"%>
+	<div class="panel panel-info">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b><%=link_to "#{record.template.name} #{record.get_id}",record_path(record),:target=>"_blank",:style=>"color:white"%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div> 
+    </div>
+    <div class="panel-body" style="display:none">
+      <div class="row" id="fields">
+
+        <div class="col-xs-12 mb10">
+          <b>Report ID: </b><%=record.get_id%></br>
+          <%if current_user.has_access("records","summary")%><b>Submitted By: </b><%=record.created_by.full_name%></br><%end%>
+          <b>Status: </b><%=record.status%></br>
+          <b>Viewer Access: </b><%=record.viewer_access ? "Yes" : "No"%></br>
+          <b>Date/Time of Event: </b><%=record.get_event_date%></br>
+          <b>General Description: </b><%=record.description%></br>
+        </div>
+
+        <%record.categories.each do |cat|%>
+          <%if cat.not_empty_for(record) && cat.print && current_user.has_access("records","summary")%>
+          <%=render "/records/category",:category=>cat,:record=>record%>
+          <%end%>
+        <%end%> 
+        <%if record.descriptions.present?%><%=render 'records/descriptions',:owner=>record, :button=>false%><%end%>
+        <%if record.causes.present?%><%=render 'records/causes',:owner=>record, :button=>false%><%end%>
+        <%if record.detections.present?%><%=render 'records/detections',:owner=>record, :button=>false%><%end%>
+        <%if record.reactions.present?%><%=render 'records/reactions',:owner=>record, :button=>false%><%end%>
+        <%if record.suggestions.present?%><%=render 'records/suggestions',:owner=>record, :button=>false%> <%end%>
+        <div class="col-xs-12 col-lg-12"%>
+          <div class="panel panel-info">
+            <div class="panel-heading click-heading collapsed">
+              <div class="panel-title">
+                <b>Risk Matrix</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+              </div> 
+            </div>
+            <div class="panel-body" style="display:none"> 
+              <div class="row">
+                <div class='col-xs-3'><b>Severity: </b><%=record.severity%></div>
+                <div class='col-xs-3'><b>Likelihood: </b><%=record.likelihood%></div>
+                <div class='col-xs-6'><b>Risk Factor: </b><%=record.risk%></div>
+
+                <div class='col-xs-3'><b>Severity after Mitigation: </b><%=record.severity_after%></div>
+                <div class='col-xs-3'><b>Likelihood after Mitigation: </b><%=record.likelihood_after%></div>
+                <div class='col-xs-6'><b>Risk Factor after Mitigation: </b><%=record.risk_factor_after%></div>
+
+                <div class='col-xs-10'><b>Notes: </b>
+                  <%if record.statement.present?%>
+                    <%=record.statement.gsub(/\n/, '<br/>').html_safe%>
+                  <%end%>
+                </div>
+                <div class="col-xs-12">
+                  <table id="record<%=record.id%>"class="table table-bordered" cellspacing="0" width="100%">
+                    <tr>
+                      <th style="width:18%"></th>
+                      <th colspan="5"><center>Likelihood</center></th>
+                    </tr>
+                    <tr>
+                      <th style="width:18%"><center>Severity</center></th>
+                      <%@like.each do |header| %>
+                        <th style="width:15%"><center><%=header%></center></th>
+                      <%end%>
+                    </tr>
+                    <%@color_matrix.each_index do |row|%>
+                      <tr>
+                        <td><center><b><%=@frequency[row]%></b></center></td>
+                        <%@color_matrix[row].each_index do |cell|%>
+                          <td id="<%=4-row%>-<%=cell%>" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>"></td>    
+                        <%end%>
+                      </tr>
+                    <%end%>
+                  </table>
+                  <span class='glyphicon glyphicon-remove' style='color:red'></span><b> Baseline Risk Assessment</b></br>
+                  <span class='glyphicon glyphicon-ok' style='color:red'></span><b> Substitute Risk Assessment</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>    
+      </div>   
+    </div>
+	</div>
+</div>
+<script>
+  $(document).ready(function(){
+    $("#record<%=record.id%> > tbody > tr > #<%=record.severity%>-<%=Finding.get_likelihood.index(record.likelihood)%>").html("<center><span class='glyphicon glyphicon-remove' style='color:red'></span></center>");
+    $("#record<%=record.id%> > tbody > tr > #<%=record.severity_after%>-<%=Finding.get_likelihood.index(record.likelihood_after)%>").html("<center><span class='glyphicon glyphicon-ok' style='color:red'></span></center>");
+  });
+</script>

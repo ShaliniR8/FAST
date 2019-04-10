@@ -1,0 +1,15 @@
+<tr>
+	<td><%=f.text_field :title,:class=>"form-control"%></td>
+	<td><%=f.select :status,options_for_select(@status),{:include_blank=>""},:class=>"form-control"%></td>
+	<td><%=current_user.full_name%></td>
+	<td><%=Time.now.strftime("%Y-%m-%d %H:%M")%></td>
+	<td><%=Time.now.strftime("%Y-%m-%d %H:%M")%></td>
+	<td><%=f.select :discussion,options_for_select(@tof),{:include_blank=>""},:class=>"form-control"%></td>
+	<td><%=f.select :accepted,options_for_select(@accept_deline),{:include_blank=>""},:class=>"form-control"%></td>
+	<%=f.hidden_field :event_id,:value=>@package.id%>
+	<%=f.hidden_field :user_id,:value=>current_user.id%>
+</tr>
+<tr>
+	<td><center><b>Comment</b></center></td>
+	<td colspan="6"><%=f.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
+</tr>

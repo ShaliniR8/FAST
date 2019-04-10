@@ -1,0 +1,10 @@
+log/*.log
+tmp
+public/uploads/**
+public/exports/**
+
+mitre/**
+nasa/**
+
+.byebug_history
+*.svn

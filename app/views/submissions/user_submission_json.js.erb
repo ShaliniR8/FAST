@@ -1,0 +1,1 @@
+<%=raw(@submissions.to_json(:include=>{:submission_fields=>{:include=>:field}}))%>

@@ -1,0 +1,70 @@
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<%="#{action_name.titleize} SRA"%> 
+				</div>
+			</div>
+			<div class="panel-body" id="form_body"> 
+				<%=form_for @sra ,:html => {:multipart => true} do |f|%> 
+
+					<%if params[:record].present?%>
+						<%=f.hidden_field :record_id, :value => params[:record]%>
+					<%end%>
+
+					<%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @sra%>
+					<%=render '/forms/attachments_form', :f => f, :owner => @sra%>
+
+					<div class="mt10 mr10">
+						<%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+							:class => "btn btn-success pull-right", 
+							:disable_with => "Saving..."%>
+						<%=link_to "Cancel",
+							action_name == "edit" ? sra_path(@sra) : @cancel_path, 
+							:id => "cancel-btn", 
+							:class=>"mr5 btn btn-warning pull-right", 
+							:confirm => 'Are you sure?'%>
+					</div>
+				<%end%>
+			</div> 
+		</div>       
+	</div> 
+</div>
+
+
+
+<style>
+	.datepicker{
+		z-index: 1200!important;
+ 	}
+</style>
+
+
+
+
+<script>
+
+	$(document).ready(function(){
+
+		$("#<%=@sra.severity%>-<%=Investigation.get_likelihood.index(@sra.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
+		$('#sev').on('change',function(){
+			reset_risk();
+		});
+		$('#like').on('change',function(){
+			reset_risk();
+		});
+
+	});
+</script>

@@ -1,0 +1,372 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
+
+
+<%template_full_access = current_user.has_template_access(@record.template.name).include? "full"%>
+<%template_viewer_access = current_user.has_template_access(@record.template.name).include? "viewer"%>
+<%submission_show_access = current_user.has_access("submissions","show")%>
+<%record_edit_access = current_user.has_access("records", "edit")%>
+<%record_delete_access = current_user.has_access("records","destroy")%>
+<%report_show_access = current_user.has_access("reports","show")%>
+<%sa_module_access = current_user.has_access('Safety Assurance','module')%>
+<%sra_module_access = current_user.has_access('Safety Risk Management','module')%>
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="col-lg-12">
+			<%=render "access_controls/new_modal"%>
+			<%=render "shared/alerts"%>
+			<div class="panel panel-primary">
+
+				<div class="panel-heading">
+					<div class="panel-title">
+						<div class="top_text">
+							Report #<%=@record.get_id%>: <%="#{@record.template.name}"%>
+						</div>
+						<div class="top_buttons pull-right">
+
+							<a class="btn btn-default expandall mb5">Expand All</a>
+
+							<%if template_full_access || template_viewer_access%>
+
+								<%if record_edit_access%>
+									<%if @record.submission.present? && !@record.submission.anonymous?%>
+										<%=link_to "Message Submitter",
+											new_message_path(
+												:send_to => @record.created_by.id,
+												:link => record_path(@record)),
+											:id=>"index-btn",
+											:class=>"btn btn-warning mb5 "%>
+									<%end%>
+									<%if !@record.viewer_access%>
+										<%=link_to "Enable Viewer Access",
+											enable_record_path(@record),
+											:class=>"btn btn-warning mb5",
+											:disable_with => "Updating..."%>
+									<%else%>
+										<%=link_to "Disable Viewer Access",
+											enable_record_path(@record),
+											:class=>"btn btn-warning mb5",
+											:disable_with => "Updating..."%>
+									<%end%>
+								<%end%>
+
+								<%=link_to "Attach in Message",
+									new_message_path(
+										:link => record_path(@record),
+										:link_type => "Record",
+										:link_id => @record.id),
+									:class => "btn btn-warning mb5",
+									:disable_with => "Redirecting..."%>
+
+								<%if @record.submission.present? && submission_show_access%>
+									<%=link_to "View Submission",
+										submission_path(@record.submission),
+										:class=>"btn btn-info mb5",
+										:disable_with => "Redirecting..." %>
+								<%end%>
+
+								<%if @record.report.present? && report_show_access%>
+									<%=link_to "View Event",
+										report_path(@record.report),
+										:id=>"report-btn",
+										:class=>"btn btn-info mb5",
+										:disable_with => "Redirecting..."%>
+								<%end%>
+
+								<%if @record.investigation.present? && sa_module_access%>
+									<%=link_to "View Investigation",
+										investigation_path(@record.investigation),
+										:class=>"btn btn-info mb5",
+										:disable_with => "Redirecting..."%>
+								<%end%>
+
+								<%if @record.sra.present? && sra_module_access%>
+									<%=link_to "View SRA(SRM)",
+										sra_path(@record.sra),
+										:class=>"btn btn-info mb5",
+										:disable_with => "Redirecting..."%>
+								<%end%>
+
+								<%=link_to "PDF",
+									print_record_path(
+										@record,
+										:deidentified => false,
+										:format => :pdf),
+									:class=>'btn btn-darkturquoise mb5'%>
+								<%=link_to "De-ID PDF",
+									print_record_path(
+										@record,
+										:deidentified => true,
+										:format => :pdf),
+									:class=>'btn btn-darkturquoise mb5'%>
+
+								<%if record_edit_access%>
+									<%if @record.status == "New"%>
+										<%=link_to  "Open Report",
+											open_record_path(@record),
+											:class => "btn btn-warning mb5",
+											:confirm => "Are you sure?",
+											:disable_with => "Opening..."%>
+									<%elsif @record.status != "Closed"%>
+										<%=link_to  "Edit",
+											edit_record_path(@record),
+											:id=>"edit-btn",
+											:class=>"btn btn-warning mb5",
+											:disable_with => "Editing..."%>
+									<%end%>
+								<%end%>
+
+								<%if current_user.admin?%>
+									<%=link_to 'Override Status', '#', 
+										:class => 'btn btn-danger mb5',
+										:id => 'override_status_btn',
+										"data-toggle" => "modal",
+										"data-target" => ".bs-example-modal-lg"%>
+								<%end%>
+
+								<%if record_delete_access%>
+									<%=link_to 'Delete',
+										record_path(@record),
+										:method=>"delete",
+										:confirm=>'Are you sure?',
+										:class=>"btn btn-danger mb5 "%>
+								<%end%>
+
+
+
+
+							<%end%>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel-body collapse in" id="form_body">
+					<div class="col-xs-12">
+						<%if template_full_access%>
+							<%if @record.status == "Closed"%>
+								<%=link_to "Reopen",
+									reopen_record_path(@record),
+									:class=>"btn btn-warning pull-right mr5 mb5",
+									:confirm => "Are you sure?",
+									:disable_with => "Reopening..."%>
+							<%end%>
+
+							<%if @record.status != "Closed"%>
+								<%=link_to "Close Report",
+									close_record_path(@record),
+									:class=>"btn btn-danger pull-right mr5 mb5",
+									:confirm => "Are you sure?",
+									:disable_with => "Closing...",
+									"data-toggle" => "tooltip",
+									"data-placement" => "top",
+									:title => "This will close the Report. No changes can be made after the Report is closed"%>
+							<%end%>
+
+
+							<%if record_edit_access && @record.status == "Open"%>
+								<%=link_to "Create Event",
+									new_report_path(:template=>@record.template,:base_record=>@record),
+									:id => "report-btn",
+									:class => "btn btn-success mr5 mb5 pull-right",
+									:disable_with => "Creating..."%>
+								<%=link_to "Add to Event",
+									add_reports_path(:template=>@record.template,:record=>@record),
+									:id => "report-btn",
+									:class => "btn btn-success mr5 mb5  pull-right",
+									:disable_with => "Adding..."%>
+							<%end%>
+
+							<%if @record.status != "Closed" &&
+									@record.status != "New" &&
+									record_edit_access%>
+								<%if @record.report.present?%>
+									<%=link_to "Add Corrective Action",
+										new_corrective_action_path(:record=>@record.id, :report=>@record.report.id),
+										:class=>"btn btn-success pull-right mr5 mb5",
+										:disable_with => "Redirecting..."%>
+								<%else%>
+									<%=link_to "Add Corrective Action",
+										new_corrective_action_path(:record=>@record.id),
+										:class=>"btn btn-success pull-right mr5 mb5 "%>
+								<%end%>
+							<%end%>
+
+						<%elsif template_viewer_access%>
+							<%=link_to "Add Comment",
+								"#",
+								:class=>"btn btn-success pull-right mr5 mb5 ",
+								:id=>'comment_btn',
+								"data-toggle"=>"modal",
+								"data-target"=>".bs-example-modal-lg"%>
+						<%end%>
+					</div>
+
+					<div class="col-xs-12 mb20">
+						<%if sra_module_access &&
+							@record.status != "Closed" &&
+							@record.status != "New" &&
+							!@record.sra.present?%>
+							<%=link_to "Launch SRA(SRM)",
+								new_sra_path(:record=>@record),
+								:class=>"btn btn-warning pull-right mr5 mb5",
+								:disable_with => "Redirecting..."%>
+						<%end%>
+
+						<%if sa_module_access &&
+							@record.status != "Closed" &&
+							@record.status != "New" &&
+							!@record.investigation.present?%>
+							<%=link_to "Launch Investigation",
+								new_investigation_path(:record=>@record),
+								:class=>"btn btn-warning pull-right mr5 mb5",
+								:disable_with => "Redirecting..."%>
+						<%end%>
+
+						<%if @record.template.map_template_id.present? &&
+							record_edit_access &&
+							@record.status == "Open"%>
+							<%=link_to "Convert to #{@record.template.map_template.name}",
+								convert_record_path(@record,:copy=>false),
+								:class=>"btn btn-success pull-right mr5 mb5 "%>
+							<%=link_to "Copy to #{@record.template.map_template.name}",
+								convert_record_path(@record,:copy=>true),
+								:class=>"btn btn-success pull-right mr5 mb5 "%>
+						<%end%>
+					</div>
+
+
+					<%=render "/shared/processing_instructions", :owner => @record%>
+
+					<%=render "forms/show_fields", :fields => Record.get_meta_fields('show'), :record => @record%>
+
+
+					<%if @record.submission.present?%>
+						<%if @record.submission.comments.present?%>
+							<div class="col-xs-12 col-lg-12">
+								<div class="panel panel-default">
+									<div class="panel-heading click-heading collapsed">
+										<div class="panel-title">
+											<b>Submitter Notes</b>
+											<span class="pull-right clickable">
+												<i class="mt5 glyphicon glyphicon-chevron-down"></i>
+											</span>
+										</div>
+									</div>
+									<div class="panel-body" style="display:none">
+										<div class="row">
+											<%=render "submissions/show_notes", :owner => @record.submission%>
+										</div>
+									</div>
+								</div>
+							</div>
+						<%end%>
+					<%end%>
+
+					<%=render "/records/show_template_fields", :record => @record%>
+
+
+					<%if BaseConfig.airline[:base_risk_matrix]%>
+						<%=render "shared/bsk_risk_matrix_show",
+							:owner => @record,
+							:type => "records",
+							:like => @like,
+							:color_matrix => @color_matrix,
+							:frequency => @frequency,
+							:allow_mitigate => true,
+							:show_btns => true %>
+					<%else%>
+						<%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+							:owner => @record,
+							:allow_mitigate => true,
+							:show_btns => true%>
+					<%end%>
+
+					<%=render "/audits/show_comment",:owner => @record%>
+
+					<%can_change = record_edit_access && @record.status != "Closed"%>
+					<%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => can_change%>
+					<%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => can_change%>
+					<%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => can_change%>
+					<%=render '/causes/all', :owner => @record, :cause_type => 'reaction', :can_change => can_change%>
+					<%=render '/causes/all', :owner => @record, :cause_type => 'suggestion', :can_change => can_change%>
+
+
+					<%if @record.corrective_actions.present?%>
+						<div class="col-xs-12 col-lg-12">
+							<div class="panel panel-info">
+								<div class="panel-heading click-heading collapsed">
+									<div class="panel-title">
+										<b>Corrective Actions</b>
+										<span class="pull-right clickable">
+											<i class="mt5 glyphicon glyphicon-chevron-down"></i>
+										</span>
+									</div>
+								</div>
+								<div class="panel-body" style="display:none">
+									<div class="row">
+										<%@no_footer = true%>
+										<%=render "/corrective_actions/actions"%>
+									</div>
+								</div>
+							</div>
+						</div>
+					<%end%>
+
+					<%=render "/forms/attachments_show", :owner => @record%>
+					<%=render "/records/transactions", :owner => @record%>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<style>
+ .datepicker{
+	z-index: 1200!important;
+ }
+</style>
+
+
+
+
+<script>
+	$(document).ready(function(){
+
+		$('#comment_btn').on('click',function(){
+			$.get("<%=comment_record_path(@record)%>",function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$('#att_btn').on('click',function(){
+			$.get("<%=new_attachment_record_path(@record)%>",function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$('#mitigate_btn').on('click',function(){
+			$.get("<%=mitigate_record_path(@record)%>",function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$('#baseline_btn').on('click',function(){
+			$.get("<%=baseline_record_path(@record)%>",function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+		$('#override_status_btn').on('click',function(){
+			$.get("<%=override_status_record_path(@record)%>", function(data){
+				$(".modal-content").html(data);
+				$(window).trigger('resize');
+			});
+		});
+	});
+</script>

@@ -1,0 +1,101 @@
+<div class="block_condition">
+	<%=f.fields_for :query_conditions,condition do |ff|%>
+		<div id="data_section" data-uid="<%=uid%>"></div>	
+		
+		<%if session[:mode] == "ASAP"%>
+			<div class="row">
+				<div class="form-group col-xs-2">
+					<%=ff.select :template_id, options_from_collection_for_select(@templates, 'id', 'name', condition.template_id), {:prompt => "Select Template"}, {:class => "form-control ml5 template_select"}%> 
+				</div>
+				<div class="form-group col-xs-2">
+					<%=ff.select :category_id, options_for_select(@categories.map{ |c| [c.title, c.id, {'data-templates_id' => c.templates_id, :style => c.templates_id == condition.template_id ? "" : "display:none;"}] },condition.category_id),{:prompt => "Select Category"},{:class=>"form-control ml5 category_select"}%> 
+				</div>
+				<div class="form-group col-xs-2">
+					<%=ff.select :field_id, options_for_select(@fields.map{ |c| [c.label, c.id, {'data-categories_id' => c.categories_id, :style => c.categories_id == condition.category_id ? "" : "display:none;"}] },condition.field_id),{:prompt => "Select Field"}, {:class=>"form-control ml5 field_select",:style=>"max-width:350px"}%> 
+				</div>
+
+				<div class="form-group col-xs-5">
+					<div id="value_area">
+						<%if condition.field.present?%>
+							<%field = condition.field%>
+							
+							<%if field.display_type == "text"%>
+								<%if field.data_type == 'date' || field.data_type == "datetime"%>
+									<div class="term input-group datetimerangepicker form-inline">
+										<%=ff.text_field :start_date, {:value => condition.start_date.present? ? condition.start_date.strftime("%Y-%m-%d %H:%M") : "", :class=>"form-control field-datetime-autoposition cursor-pointer search_field"}%>
+										<div class="input-group-addon">to</div>
+										<%=ff.text_field :end_date, {:value => condition.end_date.present? ? condition.end_date.strftime("%Y-%m-%d %H:%M") : "", :class=>"form-control field-datetime-autoposition cursor-pointer search_field"}%>
+									</div>
+								<%else%>
+									<%field_class = 'form-control'%>
+									<%= ff.text_field :value, { :value => condition.value, :class => "form-control " + field.element_class, :placeholder => field.label, :id => field.element_id } %>
+								<%end%>
+
+
+							<%elsif field.display_type == "checkbox"%> 
+								<%= ff.text_field :value, { :value => condition.value, :class => "form-control " + field.element_class, :placeholder => field.label, :id => field.element_id } %>
+
+
+								<%if false%>
+								</br>
+								<div  class="<%=field.display_size == 12 && field.show_label ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+									<%size=field.getOptions.length%> 
+									<%field.getOptions.each do |option|%>
+										<%if size>5%>
+											<div class="col-sm-4 col-md-3 col-lg-3">
+												<%=check_box_tag "query_statement[query_conditions_attributes][#{uid}][value][]",option,(condition.value.include? option)%>&nbsp<%=option%>
+											</div>
+										<%else%>
+											<div class="col-sm-<%=(12/size).to_s%> col-md-<%=(12/size).to_s%> col-lg-<%=(12/size).to_s%>">
+												<%=check_box_tag "query_statement[query_conditions_attributes][#{uid}][value][]",option,(condition.value.include? option)%>&nbsp<%=option%>
+											</div>
+										<%end%>
+									<%end%>
+								</div> 
+								<%end%>
+
+
+							<%elsif field.display_type == "dropdown"%>
+								<%#=ff.select :value, options_for_select(field.getOptions,condition.value),{:include_blank=>""},{:class=>'form-control'+" "+field.element_class,:id=>field.element_id}%>
+								<%field_class = 'form-control'%>
+								<%=ff.text_field :value, { :value => condition.value, :class => "form-control " + field.element_class, :placeholder => field.label, :id => field.element_id } %>
+
+							<%elsif field.display_type == "datalist"%>
+								<%=ff.text_field :value, {:value=>condition.value, :list=>"#{field.id}", :class=>"form-control"}%>
+								<datalist id="<%=field.id%>">
+									<% field.getOptions.each do |opt|%>
+										<option value="<%=opt%>"></option>
+									<%end%>
+								</datalist>
+
+							<%else%>
+								<%field_class = 'form-control'%>
+								<%=ff.text_field :value, { :value => condition.value, :class => "form-control " + field.element_class, :placeholder => field.label, :id => field.element_id } %>
+							<%end%>
+
+						<%end%>
+					</div>
+				</div>
+				<div class="col-xs-1">
+					<%=link_to '<i class="glyphicon glyphicon-minus"></i>'.html_safe, "#", :class => 'btn btn-danger', :onclick=>"mark_delete(this);" %>
+					<%=ff.hidden_field :_destroy,:value=>false,:id=>"delete_field"%>
+				</div>
+			</div>
+
+
+		<%else%>
+			<div class="form-group col-xs-3">
+				<%=ff.select :field_id,options_for_select(@fields.map{|fff| [fff[:name],fff[:value],{'data-class_name'=>fff[:class],:style=>"display:none;"}]}),{:include_blank=>""},{:class=>"form-control fd ml5"}%> 
+			</div>
+		<%end%>
+		
+	<%end%>
+</div>
+
+
+<!-- <script type="text/javascript">
+	$('.field-datetime-autoposition').datetimepicker({
+    format: 'YYYY-MM-DD HH:mm',
+    ignoreReadonly: true
+  });
+</script> -->

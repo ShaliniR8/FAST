@@ -1,0 +1,36 @@
+<%load_special_matrix(owner)%>
+<%like = Finding.get_likelihood%>
+<%frequency = (0..4).to_a.reverse%>
+
+<%=render '/forms/show_fields', :fields => Finding.get_meta_fields('show'), :record => owner%>
+
+<%if BaseConfig.airline[:base_risk_matrix]%>
+	<%=render "shared/bsk_risk_matrix_show",
+		:owner => owner,
+		:type=>"findings",
+		:allow_mitigate => true,
+		:show_btns => show_btn%>
+<%else%>
+	<%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+		:owner => owner,
+		:show_btns => show_btn%>
+<%end%>
+
+
+<%can_change = current_user.has_access(@type,"edit") &&
+	owner.status != "Completed" &&
+	owner.status != "Pending Approval" && show_btn%>
+<%=render '/causes/all',
+	:owner => owner,
+	:cause_type => 'description',
+	:can_change => can_change%>
+<%=render '/causes/all',
+	:owner => owner,
+	:cause_type => 'cause',
+	:can_change => can_change%>
+
+
+<%=render '/sms_actions/show_all', :owner => owner, :show_btn => false%>
+<%=render '/recommendations/show_all', :owner => owner, :show_btn => false%>
+
+<%=render "/audits/show_comment",	:owner => owner%>

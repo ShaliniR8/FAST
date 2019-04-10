@@ -1,0 +1,156 @@
+/*#header {
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 1px 2px #e3e3e3;
+  margin-bottom: 25px;
+}*/
+#header .logo {
+  padding: 20px 0;
+  float: left;
+  margin-right: 50px;
+}
+#header .site-nav {
+  position: relative;
+  float: right;
+  margin-right: 25px;
+}
+#header .site-nav > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#header .site-nav > ul > li {
+  float: left;
+}
+#header .site-nav > ul > li > a {
+  text-decoration: none;
+  display: block;
+  padding: 24px 15px;
+  font-size: 15px;
+  color: #333333;
+  transition: all;
+  transition-duration: 0.4s;
+  font-weight: bold;
+}
+#header .site-nav > ul > li > a:hover {
+  background-color: #fafafa;
+  color: #000000;
+}
+#header .site-nav > ul > li .dropdown-menu {
+  margin-top: -1px;
+}
+#header .site-nav > ul > li .dropdown-submenu {
+  position: relative;
+}
+#header .site-nav > ul > li .dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+}
+#header .site-nav > ul > li .dropdown-submenu > .dropdown-menu:after,
+#header .site-nav > ul > li .dropdown-submenu > .dropdown-menu:before {
+  border: none;
+}
+#header .site-nav > ul > li .dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+#header .site-nav > ul > li .dropdown-submenu:hover > a:after {
+  border-left-color: #bdbdbd;
+}
+#header .site-nav > ul > li .dropdown-submenu > a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #e3e3e3;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+#header .site-nav > ul > li .dropdown-submenu.pull-left {
+  float: none;
+}
+#header .site-nav > ul > li .dropdown-submenu.pull-left > .dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+}
+/* -----------------------------------------
+   Responisve styles
+----------------------------------------- */
+.responsive-menu-toggle {
+  padding: 20px 0;
+  float: left;
+  margin-right: 15px;
+  color: #333333;
+  display: none;
+}
+.responsive-menu-toggle i {
+  font-size: 24px;
+}
+/* -----------------------------------------
+   Ipad 3/4
+----------------------------------------- */
+@media all and (max-width: 1024px) {
+  /* Navigation */
+  .responsive-menu-toggle {
+    display: block;
+  }
+  #header .site-nav {
+    display: none;
+    margin-right: 0;
+    width: 100%;
+  }
+  #header .site-nav > ul > li {
+    width: 100%;
+  }
+  #header .site-nav > ul > li > a {
+    border-bottom: 1px solid #e3e3e3;
+  }
+  #header .site-nav > ul > li.open .dropdown-menu {
+    float: left;
+    width: 100%;
+    position: relative;
+  }
+  #header .site-nav > ul > li.open .dropdown-menu li.dropdown-submenu:hover .dropdown-menu {
+    float: left;
+    width: 100%;
+    position: relative;
+    top: auto;
+    left: auto;
+  }
+  #content #topbar {
+    height: auto;
+  }
+  #content #topbar .breadcrumb {
+    text-align: left;
+  }
+  .projects {
+    margin-bottom: 25px;
+  }
+  .portfolio.portfolio-4-columns .mix {
+    width: 50% !important;
+  }
+}
+/* -----------------------------------------
+   Most Tablets and some phones
+----------------------------------------- */
+@media all and (max-width: 991px) {
+  .responsive-menu-toggle {
+    position: absolute;
+  }
+  #header .logo {
+    text-align: center;
+    width: 100%;
+  }
+  #morphsearch {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  #morphsearch .morphsearch-content .search-column {
+    width: 100%;
+  }
+}

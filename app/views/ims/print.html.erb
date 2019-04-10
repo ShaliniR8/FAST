@@ -1,0 +1,92 @@
+<style>
+body {
+    font: normal 12px Verdana, Arial, sans-serif;
+}
+table{
+    font: normal 11px Verdana, Arial, sans-serif;
+}
+.category{
+    border: 1px solid black;
+    margin-bottom:10px;
+    padding:3px;
+}
+.grid_block{
+  display: inline-block;
+    width: 300px;
+    margin-bottom: 3px;
+    margin-top: 2px;
+}
+.line_block{
+  display: inline-block;
+    width: 580px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 5px;
+    margin-top:5px;
+}
+</style>
+
+<h4>
+    <%type=""%>
+    <%if @im.type == "FrameworkIm"%><%type = "Framework IM"%>
+    <%elsif @im.type == "VpIm"%><%type = "SMS VP/Part 5 IM"%>
+    <%else%><%type = "Job Aid"%><%end%>
+    <b><%=type%> #<%=@im.get_id%>: </b><%=@im.title%>
+</h4>
+<div class="category">
+    <%if @im.get_id.present?%><b>ID: </b><%=@im.get_id%></br><%end%>
+    <%if @im.title.present?%><b>Title: </b><%=@im.title%></br><%end%>
+    <%if @im.status.present?%><b>Status: </b><%=@im.status%></br><%end%>
+    <%if @im.get_eva.present?%><b>Lead Evaluator: </b><%=@im.get_eva%></br><%end%>
+    <%if @im.get_rev.present?%><b>Preliminary Reviewer: </b><%=@im.get_rev%></br><%end%>
+    <%if @im.get_completion_date.present?%><b>Scheduled Completion Date: </b><%=@im.get_completion_date%></br><%end%>
+    <%if @im.location.present?%><b>Location: </b><%=@im.location%></br><%end%>
+    <%if @im.apply_to.present?%><b>Plan Applied To: </b><%=@im.apply_to%></br><%end%>
+    <%if @im.org_type.present?%><b>Organization Type: </b><%=@im.org_type%></br><%end%>
+
+    <!-- intentionally leave this out to save print space - requested by airlines   
+    <%if @im.obj_scope.present?%><b>Objective and Scope: </br></b><%=@im.obj_scope.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+    <%if @im.ref_req.present?%><b>References and Requirements: </br></b><%=@im.ref_req.gsub(/\n/, '<br/>').html_safe%><%end%></br>
+    <%if @im.instruction.present?%><b>Instructions: </br></b><%=@im.instruction.gsub(/\n/, '<br/>').html_safe%><%end%></br> 
+    <%if @im.comment.present?%><b>Reviewer Comment: </br></b><%=@im.comment.gsub(/\n/, '<br/>').html_safe%></br><%end%>-->
+
+        <%@checklist_headers=Object.const_get(@im.type+'Item').get_headers%>
+        <%@im.items.each do |i|%>
+            <div class="category">
+                <h5>Expectation: #<%=i.id%></h5>
+                <%@checklist_headers.each do |h|%>
+                    <b><%=h[:title]%>: </b><%=i.send(h[:field])%></br>
+                <%end%>
+
+                <%if i.packages.present?%>
+                    <%@headers=Package.get_headers%>
+                    <%i.packages.each do |p|%>
+                        <div class="category">  
+                            <h5>Package: #<%=p.get_id%></h5>
+                            <%@headers.each do |h|%>
+                                <b><%=h[:title]%>: </b><%=p.send(h[:field])%></br>
+                            <%end%>
+
+                            <%if p.meeting.present?%>
+                                <div class="category">
+                                    <h5>Meeting: #<%=p.meeting.get_id%></h5>
+                                    <%if p.meeting.status.present?%><b>Status: </b><%=p.meeting.status%></br><%end%>
+                                    <%if p.meeting.review_start.present?%><b>Review Start: </b><%=p.meeting.get_time(:review_start)%>  <%=p.meeting.review_timezone%><%end%>
+                                    <%if p.meeting.review_end.present?%><b>Review End: </b><%=p.meeting.get_time(:review_end)%>  <%=p.meeting.review_timezone%></br><%end%>
+                                    <%if p.meeting.meeting_start.present?%><b>Meeting Start: </b><%=p.meeting.get_time(:meeting_start)%>  <%=p.meeting.meeting_timezone%><%end%>
+                                    <%if p.meeting.meeting_end.present?%><b>Meeting End: </b><%=p.meeting.get_time(:meeting_end)%>  <%=p.meeting.meeting_timezone%></br><%end%>
+                                    <%if p.meeting.closing_date.present?%><b>Date Closed: </b><%=p.meeting.get_time(:closing_date)%></br><%end%>
+                                    <%if p.meeting.notes.present?%><b>Notes: </b></br><%=p.meeting.notes.gsub(/\n/, '<br/>').html_safe%><%end%>
+                                </div>
+                            <%end%>
+                        </div>
+                    <%end%>
+                    
+                <%end%>
+            </div>
+        <%end%>
+
+    
+
+</div>
+

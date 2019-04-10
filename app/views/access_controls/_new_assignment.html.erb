@@ -1,0 +1,28 @@
+<%=form_tag assign_access_control_path(@access),:method=>"post" do%>
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<h4 class="modal-title">Rule Assignment</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row" id="assign_to">
+		</div>
+	</div>
+	<div class="modal-footer">
+		<%=link_to "Add Assign To","#",:class=>"btn btn-danger",:id=>"add_btn"%>
+		<%=submit_tag "Submit",:class=>"btn btn-primary"%>
+	</div>
+<%end%>
+<script>
+	var count=0;
+	$(document).ready(function(){
+		var to_add="<%=escape_javascript(render :partial=>'assign_to')%>";
+		var regexp=new RegExp("index", "g");
+		$(to_add.replace(regexp,count)).appendTo($("#assign_to"));
+		count++
+		$("#add_btn").on('click',function(){
+
+			$(to_add.replace(regexp,count)).appendTo($("#assign_to"));
+			count++;
+		});
+	});
+</script>

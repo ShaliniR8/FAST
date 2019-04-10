@@ -1,0 +1,33 @@
+<div class="table-responsive mt10">
+	<table id="reports" class="table table-striped table-bordered">
+		<thead>
+			<tr>
+				<%@report_headers.each do |header|%>
+					<th>
+						<%=header[:title]%>
+					</th>
+				<%end%>
+					<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%@reports.each do |report|%>
+				<tr report="<%=report.id%>">
+					<%@report_headers.each do |header|%>
+						<td><%=report.send(header[:field])%></td>
+					<%end%> 
+					<%if (report.status) == "Meeting Ready"%>
+						<td><a class="btn btn-info add_btn">Add</a></td>
+					<%else%>
+						<td>Added</td>
+					<%end%>
+				</tr>
+			<%end%>
+		</tbody>
+	</table>
+</div>
+
+
+
+
+

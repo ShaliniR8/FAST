@@ -1,0 +1,68 @@
+<style>
+body {
+    font: normal 12px Verdana, Arial, sans-serif;
+}
+.category{
+    border: 1px solid black;
+    margin-bottom:10px;
+    padding:3px;
+}
+.grid_block{
+  display: inline-block;
+    width: 300px;
+    margin-bottom: 3px;
+    margin-top: 2px;
+}
+.line_block{
+  display: inline-block;
+    width: 580px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 5px;
+    margin-top:5px;
+}
+</style>
+
+
+    <h4><b><%="#{@package.class.display_name} ##{@package.get_id}:"%></b> <%="#{@package.title}"%></h4>
+    <div class="category">
+        <b>ID: </b><%=@package.id%></br>
+        <%if @package.title.present?%><b>Title: </b><%=@package.title%></br><%end%>
+        <%if @package.status.present?%><b>Status: </b><%=@package.status%></br><%end%>
+        <%if @package.level_of_compliance.present?%><b>Requested Level of Compliance: </b><%=@package.level_of_compliance%></br><%end%>
+        <%if @package.statement.present?%><b>Statement of Compliance: </b></br><%=@package.statement.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+        <%if @package.plan_due_date.present?%><b>Plan Due Date: </b><%=@package.get_time(:plan_due_date)%></br><%end%>
+        <%if @package.description.present?%><b>Gap Description: </b></br><%=@package.description.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+        <%if @package.responsibility.present?%><b>Responsibility: </b></br><%=@package.responsibility.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+        <%if @package.comment.present?%><b>Evaluator Comment: </b></br><%=@package.comment.gsub(/\n/, '<br/>').html_safe%></br><%end%>
+
+        <%if @package.item.present?%>
+            <div class="category">
+                <h5>Expectation: <%=@package.item.title%></h5>
+                <b>Status: </b><%=@package.item.status%></br>
+                <b>Department: </b><%=@package.item.department%></br>
+                <b>Reference Number: </b><%=@package.item.reference_number%></br>
+                <b>Level of Compliance:</b><%=@package.item.level_of_compliance%></br>
+                <b>Requirement:</b><%=@package.item.requirement%></br>
+                <b>Comment :</b><%=@package.item.comment%></br>
+            </div>
+        <%end%>
+
+        <%if @package.meeting.present?%>
+            <div class="category">
+                <h5>Meeting: #<%=@package.meeting.id%></h5>
+                <%if @package.meeting.id.present?%><b>ID: </b><%=@package.meeting.id%></br><%end%>
+                <%if @package.meeting.status.present?%><b>Status: </b><%=@package.meeting.status%></br><%end%>
+                <%if @package.meeting.review_start.present?%><b>Review Start: </b><%=@package.meeting.get_time(:review_start)%>  <%=@package.meeting.review_timezone%><%end%>
+                <%if @package.meeting.review_end.present?%><b>Review End: </b><%=@package.meeting.get_time(:review_end)%>  <%=@package.meeting.review_timezone%></br><%end%>
+                <%if @package.meeting.meeting_start.present?%><b>Meeting Start: </b><%=@package.meeting.get_time(:meeting_start)%>  <%=@package.meeting.meeting_timezone%><%end%>
+                <%if @package.meeting.meeting_end.present?%><b>Meeting End: </b><%=@package.meeting.get_time(:meeting_end)%>  <%=@package.meeting.meeting_timezone%></br><%end%>
+                <%if @package.meeting.closing_date.present?%><b>Date Closed: </b><%=@package.meeting.get_time(:closing_date)%></br><%end%>
+                <%if @package.meeting.notes.present?%><b>Notes: </b></br><%=@package.meeting.notes.gsub(/\n/, '<br/>').html_safe%><%end%>
+            </div>
+        <%end%>
+
+
+
+    </div>
+

@@ -1,0 +1,345 @@
+#divBack
+{
+        position: absolute;
+        width: 111px;
+        height: 60px;
+        left: 5px;
+        top: 13px;
+        text-align: center;
+}
+
+.jchartfxToolTipHidden {
+    opacity: 0;
+    -webkit-transition: opacity 0.5s ease-in-out;
+    -moz-transition: opacity 0.5s ease-in-out;
+    -o-transition: opacity 0.5s ease-in-out;
+    -ms-transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out; 
+}
+
+.jchartfxToolTip {
+    background-color: #282828;
+    color: #F0F0F0;
+    padding: 3px;
+    font-size: 9pt;
+    font-family: Arial;
+    font-weight: bold;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    pointer-events: none;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #999999;
+    -webkit-font-smoothing: antialiased;  
+    pointer-events: none;
+}
+
+.jchartfx .Title 
+{
+        font-size: 12pt;
+}
+.jchartfx {
+        font-family: Verdana, Arial, sans-serif;
+        font-weight: normal;
+        font-size: 12px;
+}
+.jchartfx .Attribute0 {
+        fill: #FF6600;
+        stroke: #FF6600;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute0Line {
+        stroke: #FF6600;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute0Alt {
+        fill: #0B8ECE;
+}
+
+.jchartfx .Attribute1 {
+        fill: #33FF33;
+        stroke: #33FF33;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute1Line {
+        stroke: #33FF33;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute1Alt {
+        fill: #B3B3B3;
+}
+
+.jchartfx .Attribute2 {
+        fill: #FF0000;
+        stroke: #C0962E;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute2Line {
+        stroke: #FF0000;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute2Alt {
+        fill: #C0962E;
+}
+
+.jchartfx .Attribute3 {
+        fill: #FFFF00;
+        stroke: #FFFF00;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute3Line {
+        stroke: #FFFF00;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute3Alt {
+        fill: #999999;
+}
+
+.jchartfx .Attribute4 {
+        fill: #2E9AFE;
+        stroke: #404040;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute4Line {
+        stroke: #404040;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute4Alt {
+        fill: #6A6A6A;
+}
+
+.jchartfx .Attribute5 {
+        fill: #FFFFFF;
+        stroke: #235E86;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute5Line {
+        stroke: #FFFFFF;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute5Alt {
+        fill: #FFFFFF;
+}
+
+.jchartfx .Attribute6 {
+        fill: #FFFFFF;
+        stroke: #096FA0;
+        stroke-width: 1;
+}
+
+.jchartfx .Attribute6Line {
+        stroke: #FFFFFF;
+        stroke-width: 3;
+}
+
+.jchartfx .Attribute6Alt {
+        fill: #FFFFFF;
+}
+
+.jchartfx .Border {
+        fill: #FFFFFF;
+        stroke: #555555;
+        stroke-width: 1;
+}
+
+.jchartfx .PlotArea {
+        fill: transparent;
+        stroke: #444444;
+        stroke-width: 1;
+}
+.jchartfx .AxisY_Text {
+        fill: #000000;
+}
+
+.jchartfx .AxisY_Major {
+        stroke: #444444;
+}
+
+.jchartfx .AxisY_Minor {
+        stroke: #444444;
+}
+
+.jchartfx .AxisY_Interlaced {
+        fill: #FFFFFF;
+}
+
+.jchartfx .AxisY_Line {
+        stroke: #444444;
+        stroke-width: 2;
+}
+
+.jchartfx .AxisX_Text {
+        fill: #000000;
+}
+
+.jchartfx .AxisX_Major {
+        stroke: #444444;
+}
+
+.jchartfx .AxisX_Minor {
+        stroke: #444444;
+}
+
+.jchartfx .AxisX_Interlaced {
+        fill: #FFFFFF;
+}
+
+.jchartfx .AxisX_Line {
+        stroke: #444444;
+        stroke-width: 2;
+}
+
+.jchartfx .PointLabel {
+        fill: #123123;
+}
+
+.jchartfx .PointLabelBorder {
+        fill: #C0C0C0;
+        stroke: #FFFFFF;
+}
+
+.jchartfx .Title {
+        fill: #000000;
+}
+
+.jchartfx .LegendBox {
+        fill: #000000;
+        stroke: #555555;
+        stroke-width: 1;
+}
+
+.jchartfx .LegendItem {
+        fill: #000000;
+}
+body 
+{
+    font-family: Arial;
+    font-size: 9pt;
+}
+
+#main
+{
+    width:550px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+#description
+{
+    font-family: Arial;
+    font-size: 9pt;
+    Height: 50px;
+}
+
+
+.ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix
+{
+ height: 25 px;
+
+}
+
+
+.dialog
+{
+width: 650px;
+}
+
+
+.dialogl
+{
+width: 650px;
+}
+
+
+.DivChart
+{
+    margin-top:10px;    
+        margin-left: 10px; 
+        width: 550px; 
+        overflow:hidden;
+        position:relative;
+}
+.ChartDetails{
+       height:300px;
+       width:550px;
+       display:inline-block;
+       overflow:hidden;
+}
+.DivPlotArea{
+        width: 0px;
+        height: 0px;
+        top: 313px;
+        left: 34px;
+        position: absolute;
+        padding: 0px; 
+}
+
+.DivChartWhole{
+        height: 150px; 
+        width: 550px; 
+        display: inline-block;
+}
+
+.handleDivDrag{
+        background-image: url(http://jchartfx.com/sampleImages/divbg.png);
+        width: 0px;
+        height: 0px;
+        top: 0px;
+        left: 0px;
+        position: relative;
+        margin: 0px;
+
+}
+
+.handleBarOffRight{
+        background-image: url(http://jchartfx.com/sampleImages/handle.png);
+        background-position: center;
+        background-repeat: no-repeat;
+        margin: 0 -6px;
+}
+
+.handleBarOffLeft{
+        background-image: url(http://jchartfx.com/sampleImages/handle.png);
+        background-position: center;
+        background-repeat: no-repeat;
+        margin: 0 -6px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.ui-resizable-handle {background-image:none !important;}
+}
+
+#chart .SpecialPointMaximum {
+        fill: #00FF40;
+}
+
+#chart .SpecialPointMinimum {
+        stroke: #E81500;
+}
+
+
+ul.optionslist
+{
+     font-family: Tahoma;
+     font-size: 10px; 
+     list-style:none;
+     
+}
+.optionslist li{display:inline; margin-right:6px; }
+.optionslist li img {margin-right:5px; vertical-align: middle;}
+.optionslist li input{margin-right:5px;}
+.optionslist li label{display:inline;}
+
+

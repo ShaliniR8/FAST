@@ -1,0 +1,34 @@
+<%=form_for @sra do |f|%>
+	<div class="panel-warning panel">
+		<div class="panel-heading">
+			<div class="panel-title"><%=params[:commit].titleize%> SRA
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-xs-12 form-group">
+					<%=f.label @comment_field,@comment_field.titleize,:style=> params[:commit]=="Approve" ?  "" : "color:red"%>
+					<%=f.text_area @comment_field,:class=>"form-control required_field",:rows=>'5'%>
+				</div>
+				<%=f.hidden_field :status,:value=>@new_status%>
+				<%=f.submit "Submit",:class=>"btn btn-success pull-right mr10"%>
+			</div>
+		</div>
+	</div>
+<%end%>
+
+
+<script>
+	<%if params[:commit]== "Reject"%>
+		$(document).ready(function(){
+			$('form').on('submit',function(){
+				$(this).find('.required_field').each(function(){
+					if ($(this).val()==""){
+						$(".required_field").css('border-color', 'red');
+		        event.preventDefault();
+					}
+				});
+			});
+		});
+	<%end%>
+</script>

@@ -1,0 +1,39 @@
+<%if !cur.hidden%>
+	<%=f.fields_for :cause_options, cur do |xf|%>
+		<div class="col-sm-12 col-md-12 col-lg-12"%>
+			<div class="just-padding">
+				<div class="list-group list-group-root well">
+					<div class="list-group-item form-inline">
+						<%if cur.children.present?%>
+							<a href="#list_<%=cur.id%>" class="cat_<%=cur.id%> glyphicon glyphicon-chevron-right" data-toggle="collapse"></a>
+						<%end%>
+						<%=xf.text_field :name, :class => "form-control", :style=>"max-width:400px;"%>
+					</div>
+					<div class="list-group collapse" id="list_<%=cur.id%>">
+						<%cur.children.each do |child|%>
+							<%=render "edit_categories", :cur => child, :f => xf%>
+						<%end%>
+					</div>
+				</div>
+			</div>
+		</div>
+	<%end%>
+<%end%>
+
+
+
+
+
+
+
+
+
+<script>
+	$(function(){
+		$('.cat_<%=cur.id%>').on('click', function() {
+			$(this)
+				.toggleClass('glyphicon-chevron-right')
+				.toggleClass('glyphicon-chevron-down');
+		});
+	});
+</script>

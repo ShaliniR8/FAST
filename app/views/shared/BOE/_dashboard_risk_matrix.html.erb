@@ -1,0 +1,160 @@
+<div class="col-xs-6">
+  	<div class="panel panel-success">
+	    <div class="panel-heading">
+	    	<div class="panel-title">
+	    		<div class="top_text">
+	        		<b><%=@matrix_title%></b> 
+	        	</div>
+	        	<%if session[:mode]=="SMS"%>
+		        	<div class="top_buttons pull-right">
+		        		<b><%=link_to "Investigations","#", :class=>"btn btn-info show_finding",:id=>"matrix_switch"%></b>
+		        	</div>
+		        <%elsif session[:mode]=="ASAP"%>
+		        	<div class="top_buttons pull-right">
+		        		<b><%=link_to "Events","#", :class=>"btn btn-info show_record",:id=>"matrix_switch"%></b>
+		        	</div>
+		        <%elsif session[:mode]=="SRM"%>
+		        	<div class="top_buttons pull-right">
+		        		<b><%=link_to "SRAs","#", :class=>"btn btn-info show_hazard",:id=>"matrix_switch"%></b>
+		        	</div>
+		        <%end%>
+	      	</div>
+	    </div>
+	    <!-- <div class="panel-body" style="height:300px"> -->
+	    <div class="panel-body">
+			<table id="risk_matrix" class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<%if @risk_table[:starting_space]%>
+							<th bgcolor="white"></th>
+						<%end%>
+						<%@risk_table[:column_header].each do |header|%>
+							<th bgcolor="white"><%=header%></th>
+						<%end%>
+					</tr>
+				</thead>
+				<tbody>
+					<% params = {
+						advance_search: true,
+						searchterm_1: :severity,
+						searchterm_2: :likelihood,
+						start_date: @start_date,
+						end_date: @end_date,
+						emp_groups: @emp_groups,
+					} %>
+					<%@risk_table[:row_header].each_with_index do |row_header,row_index|%>
+						<tr>
+							<td><b><%=row_header%></b></td>
+							<%@risk_table[:column_header].each_with_index do |column_header,column_index|%>
+
+								<%if session[:mode]=="SMS"%>
+									<td class="color_cell finding_cell" href="<%=findings_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>"><center><b><%= @finding_matrix[row_index][column_index]%></b></center></td>
+									<td class="color_cell inv_cell" href="<%=investigations_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"  style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @inv_matrix[row_index][column_index]%></b></center></td>
+								<%elsif session[:mode]=="SRM"%>
+									<td class="color_cell hazard_cell"  href="<%=hazards_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>"><center><b><%= @hazard_matrix[row_index][column_index]%></b></center></td>
+									<td class="color_cell sra_cell"  href="<%=sras_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @sra_matrix[row_index][column_index]%></b></center></td>
+								<%elsif session[:mode]=="ASAP"%>
+									<td class="color_cell record_cell"  href="<%=records_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>"><center><b><%= @record_matrix[row_index][column_index]%></b></center></td>
+									<td class="color_cell report_cell"  href="<%=reports_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @report_matrix[row_index][column_index]%></b></center></td>
+								<%end%>
+							<%end%>
+						</tr>
+					<%end%>
+				</tbody>
+			</table>
+		</div>
+		<div align="right" class="mr10"><a href="#" id="export"><u>Download Table</u></a></div>
+  	</div>
+</div>
+<script>
+
+	$('#export').on('click', function() {
+	    html2canvas($('#risk_matrix'), {
+	        onrendered: function(canvas) {                                      
+	            var saveAs = function(uri, filename) {
+	                var link = document.createElement('a');
+	                if (typeof link.download === 'string') {
+	                    document.body.appendChild(link); // Firefox requires the link to be in the body
+	                    link.download = filename;
+	                    link.href = uri;
+	                    link.click();
+	                    document.body.removeChild(link); // remove the link when done
+	                } else {
+	                    location.replace(uri);
+	                }
+	            };
+	
+	            var img = canvas.toDataURL("image/png"),
+	                uri = img.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+	
+				if ($("#matrix_switch").hasClass('show_finding')){
+					saveAs(uri, 'Baseline Risk Analysis-Findings.png');
+				}else if($("#matrix_switch").hasClass('show_inv')){
+					saveAs(uri, 'Baseline Risk Analysis-Investigations.png');
+				}else if($("#matrix_switch").hasClass('show_record')){
+					saveAs(uri, 'Baseline Risk Analysis-Reports.png');
+				}else if($("#matrix_switch").hasClass('show_report')){
+					saveAs(uri, 'Baseline Risk Analysis-Events.png');
+				}else if($("#matrix_switch").hasClass('show_sra')){
+					saveAs(uri, 'Baseline Risk Analysis-SRAs.png');
+				}else if($("#matrix_switch").hasClass('show_hazard')){
+					saveAs(uri, 'Baseline Risk Analysis-Hazards.png');
+				}
+	            //saveAs(uri, '<%=@matrix_title%>.png');
+	        }
+	    }); 
+	});
+
+
+
+	$("#matrix_switch").on('click',function(){
+		if ($(this).hasClass('show_finding'))
+		{
+			$(this).removeClass("show_finding").addClass("show_inv").text("Findings");
+			$(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Investigations</b>");
+			$('.finding_cell').hide();
+			$('.inv_cell').show();
+		}
+
+		else if($(this).hasClass("show_inv"))
+		{
+			$(this).removeClass("show_inv").addClass("show_finding").text("Investigations");
+			$(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Findings</b>");
+			$('.inv_cell').hide();
+			$('.finding_cell').show();
+			
+		}
+		else if($(this).hasClass("show_record"))
+		{
+			$(this).removeClass("show_record").addClass("show_report").text("Reports");
+			$(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Events</b>");
+			$('.record_cell').hide();
+			$('.report_cell').show();
+		}
+		else if($(this).hasClass("show_report"))
+		{
+			$(this).removeClass("show_report").addClass("show_record").text("Events");
+			$(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Reports</b>");
+			$('.report_cell').hide();
+			$('.record_cell').show();	
+		}
+		else if($(this).hasClass("show_sra"))
+		{
+			$(this).removeClass("show_sra").addClass("show_hazard").text("SRAs");
+			$(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Hazards</b>");
+			$('.sra_cell').hide();
+			$('.hazard_cell').show();	
+		}
+		else if($(this).hasClass("show_hazard"))
+		{
+			$(this).removeClass("show_hazard").addClass("show_sra").text("Hazards");
+			$(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: SRAs</b>");
+			$('.hazard_cell').hide();
+			$('.sra_cell').show();	
+		}
+	});
+	$('.color_cell').on('click',function(){
+		console.log("!!");
+		window.location=$(this).attr('href');
+	});
+</script>

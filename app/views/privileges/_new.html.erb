@@ -1,0 +1,26 @@
+<%=form_for @privilege do |f|%>
+	<div class="panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title">New User Privilege
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+		        <div class="form-group form-inline col-sm-4">
+		          <%=f.label :name, "Name"%>
+		          <%=f.text_field :name,{:class=>"form-control ml5"}%>
+		        </div>
+	            <div class="col-sm-12">
+	              <%=f.label :example, "User Example"%>
+	              <%=f.text_area :example,{:class=>"form-control",:rows=>"2"}%>
+	            </div>
+		        <div class="col-sm-12 mt10">
+		          <%=f.label :description, "Description"%>
+		          <%=f.text_area :description,{:class=>"form-control",:rows=>"3"}%>
+		        </div>
+
+			</div>
+			<%=f.submit "Save",:class=>"btn btn-success pull-right mt5", disable_with: "Saving..."%>
+		</div>
+	</div>
+<%end%>

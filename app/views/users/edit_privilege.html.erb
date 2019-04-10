@@ -1,0 +1,108 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<b>Edit User Privileges for <%=@user.full_name%></b> 
+				</div>
+			</div>
+			<%=form_tag update_privilege_user_path(@user),:method=>"post" do %>
+				<div class="panel-body" id="form_body"> 
+
+					<div class="table-responsive">
+						<table id="candidates"class="table table-bordered table-hover table-striped">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Apply</th>
+									<%@headers.each_pair do |k,v|%>
+										<%if k != "ID"%>
+											<th><%=k%></th>
+										<%end%>
+									<%end%>
+								</tr>
+							</thead>
+							<tbody>
+								<%@roles.each do |r|%>
+									<tr>
+										<%@headers.each_pair do |k,v|%>
+											<%if k == "ID"%>
+												<td><%=r.send(v)%></td>
+											<%end%>
+										<%end%>
+										<td>
+											<%=check_box_tag "roles[]",r.id,(@user.privilege_ids.include? r.id), :class=>"privilege"%>		
+										</td>
+										<%@headers.each_pair do |k,v|%>
+											<%if k != "ID"%>
+												<td><%=r.send(v).gsub(/\n/, '<br/>').html_safe%></td>
+											<%end%>
+										<%end%>
+									</tr>
+								<%end%>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="col-xs-12 mr10 mt10">
+						<%=submit_tag "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
+						<%=link_to "Cancel", user_path(@user), :class => "btn btn-warning pull-right mr5"%>
+						<%=link_to "Uncheck All", "#", :class => "btn btn-default pull-right mr5", :onclick => "uncheckall()"%>
+						<%=link_to "Check All", "#", :class => "btn btn-default pull-right mr5", :onclick => "checkall(true)"%>
+					</div>
+				</div>
+			<%end%> 
+		</div>       
+	</div> 
+</div>
+
+<script>
+
+	function checkall(){
+		$('.privilege').prop("checked",  "checked");
+	}
+
+	function uncheckall(){
+		$('.privilege').prop("checked",false);
+	}
+
+	$(function(){
+
+		$('#candidates tr').click(function(event) {
+			if (event.target.type !== 'checkbox') {
+				$(':checkbox', this).trigger('click');
+			}
+		});
+
+
+		$('#candidates').DataTable({
+			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+			"iDisplayLength": 500,
+			"aaSorting": [[2, "desc"]],
+			initComplete:function(){
+				this.api().columns().every(function(){
+					var column = this;
+					rand_num = new Date().getTime();
+					var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
+						.appendTo($(column.footer()).empty())
+						.on('keyup change input', function(){
+							if (column.search() !== this.value){
+								column.search(this.value).draw();
+							} 
+						});
+					column.data().unique().sort().each( function ( d, j ) {
+						if(d != "" && d != undefined){
+							$('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
+						}
+					});
+				});
+			}
+		});
+
+	});
+
+</script>

@@ -1,0 +1,54 @@
+<div id="yearly_bar_chart_div-<%=@field_name%>" style="width:'100%'"></div>
+<div class="mr5" id="yearly_bar_chart_download" align="right"></div> 
+
+
+<script>
+	
+	google.charts.load("current", {packages:["corechart"]});
+	google.charts.setOnLoadCallback(drawYearlyBarChart);
+	var colorArray = colorInterpolation(<%=@yearly_data.length%>);
+
+
+	function drawYearlyBarChart(){
+		$("#yearly_bar_chart_div-<%=@field_name%>").html("");
+		var data = new google.visualization.DataTable();
+		data.addColumn("string", "Value");
+		data.addColumn("number", "Count");
+		data.addColumn({type: "string", role: "tooltip"});
+		data.addColumn({type: "string", role: "annotationText"});
+		data.addColumn({type: "string", role: "style"});
+		data.addRows([
+			<%@yearly_data.each_with_index do |(k, v), index|%>
+				[<%="'#{k.strftime("%Y")}', #{v}, '#{k.strftime("%Y")}', '#{k.strftime("%Y")}',"%> colorArray[<%=index%>]],
+			<%end%>
+		]);
+		var view = new google.visualization.DataView(data);
+		view.setColumns([0, 1,
+			{	calc: "stringify",
+				sourceColumn: 1,
+				type: "string",
+				role: "annotation"
+			}, 2, 3, 4]);
+		var options = {
+			height: 500,
+			title: "Analytics of <%=raw(@label)%>",
+			titleTextStyle: {color: "black", fontSize: 18, bold: true},
+			legend: { position: 'none'},
+			bar: {groupWidth: "90%"},
+		};
+		var barChartYearly = new google.visualization.ColumnChart(document.getElementById('yearly_bar_chart_div-<%=@field_name%>'));
+
+	
+		google.visualization.events.addListener(barChartYearly, 'ready', function () {
+			document.getElementById('yearly_bar_chart_download').innerHTML = '<a href="' + barChartYearly.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		barChartYearly.draw(view, options);
+	}
+
+
+	$(window).bind('resizeEnd', function(){
+		drawYearlyBarChart();
+		drawYearlyBarChart();
+	});
+
+</script>

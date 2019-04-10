@@ -1,0 +1,2 @@
+module SrmMeetingsHelper
+end

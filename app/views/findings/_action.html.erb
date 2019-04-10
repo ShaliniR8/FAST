@@ -1,0 +1,48 @@
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+
+<div class="panel panel-warning">
+	<div class="panel-heading">
+		<div class="panel-title">
+			New Corrective Action
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="row" style="max-height:500px;overflow-y:auto;">
+			<%=form_for (@finding.type.include? 'Finding' ) ? @finding.becomes(Finding) : @finding do |x|%>
+				<%=x.fields_for :corrective_actions, @action do |f|%>
+					<%=render "sms_actions/form", 
+						:corrective_action => @action,
+						:f => f,
+						:fields => @fields%>
+					<%=x.submit "Save",
+						:class => "btn btn-success pull-right mt5 mr15", 
+						:disable_with => "Saving..."%>
+				<%end%>
+			<%end%>
+
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+	$(document).ready(function(){
+		$('form').on('submit',function(){
+			$(this).find('.required_field').each(function(){
+				if ($(this).val()==""){
+					$(".required_field").css('border-color', 'red');
+					event.preventDefault();
+				}
+			});
+		});
+		$(".basic-datepicker").datepicker({format: "yyyy-mm-dd"}).on('focus', function() {
+			$(this).trigger('blur');
+		});
+	});
+</script>

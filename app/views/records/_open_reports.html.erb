@@ -1,0 +1,106 @@
+
+<div class="panel-success">
+	<div class="panel-heading">
+		<div class="panel-title">Open Reports
+			<button type="button" 
+				class="close pull-right" 
+				data-dismiss="modal" 
+				aria-label="Close">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+		</div>
+	</div>
+	<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="col-xs-12">
+					<div class="well">
+						<b>Select Reports that need to be opened.</b>
+						<%=link_to "Open Reports",
+							"#",
+							:id => "open_reports_btn",
+							:class => "btn btn-success pull-right mb30"%>
+					</h5>
+					<%=link_to "Select All", 
+						"#", 
+						:id => "select_all",
+						:class => "btn btn-default pull-right mr5"%>
+
+				</div>
+				<div class="col-xs-12">
+					<table id="reports_table" class="table table-hover table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Event Title</th>
+								<th>Submitted By</th>
+								<th>Event Date</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<%@records.each do |record|%>
+								<tr record_id="<%=record.id%>">
+									<td><%=record.get_id%></td>
+									<td><%=record.description%></td>
+									<td><%=record.submit_name%></td>
+									<td><%=record.get_event_date%></td>
+									<td><%=record.status%></td>
+								</tr>
+							<%end%>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+
+
+
+<script>
+
+
+	$("#open_reports_btn").on("click", function(){
+		var selected_reports = [];
+		$("#reports_table tbody tr").each(function(){
+			if($(this).css("background-color") == "rgb(173, 216, 230)"){
+				selected_reports.push($(this).attr("record_id"));
+			}
+		});
+		
+	});
+
+
+	$("#select_all").on("click", function(){
+		if($("#select_all").text() == "Select All"){
+			$("#reports_table tbody tr").each(function(){
+				$(this).css("background-color", "lightblue");
+				$("#select_all").text("De-Select All");
+			});
+		}else{
+			$("#reports_table tbody tr").each(function(){
+				$(this).css("background-color", "transparent");
+				$("#select_all").text("Select All");
+			});		
+		}
+	});
+
+
+
+	function clickRecord(row){
+		if($(row).css("background-color") === "rgb(173, 216, 230)"){
+			$(row).css("background-color", "transparent");
+		}else{
+			$(row).css("background-color", "lightblue");
+		}
+	}
+
+	$("#reports_table tbody tr").on("click", function(){
+		clickRecord($(this));
+	});
+
+
+</script>

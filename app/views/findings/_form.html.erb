@@ -1,0 +1,129 @@
+<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="col-xs-12">
+			<div class="panel-warning panel">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<%=action_name.titleize%> Finding
+					</div>
+				</div>
+				<div class="panel-body">
+
+					<%=form_for @finding.becomes(Finding), :html => {:multipart => true} do |f|%>
+
+						<%if action_name == 'new'%>
+							<%=hidden_field_tag :owner_type, params[:owner_type]%>
+							<%=f.hidden_field :audit_id, :value => params[:owner_id]%>
+						<%end%>
+
+						<%=render "/shared/privilege_form", :target => "finding[privileges][]", :owner => @finding, :f => f%>
+						<%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @finding %>
+
+						<%if BaseConfig.airline[:base_risk_matrix]%>
+							<%=render "/shared/matrix", :f => f, :owner => @finding%> 
+						<%else%>
+							<%=render "/shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
+						<%end%>
+
+						<%=render '/forms/attachments_form', :f => f, :owner => @finding%>
+					
+						<div class="mt10 mr10">
+							<%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+								:class => "btn btn-success pull-right mt5", 
+								:disable_with => "Saving..."%>
+							<%=link_to "Cancel",
+								action_name == 'new' ? @owner : @finding.becomes(Finding),
+								:class => "btn btn-warning pull-right mt5 mr5", 
+								:confirm => 'Are you sure?'%>
+							<%=link_to "Group Access",
+								"#", 
+								:class => "mr5 btn btn-info pull-right mt5 ",
+								"data-toggle" => "modal",
+								"data-target" => "#group_access"%>
+						</div>
+					<%end%>
+
+				</div>
+			</div>
+		</div>
+	</div> 
+</div>
+
+
+
+<style>
+	td,th{
+		text-align: center;
+	}
+</style>
+
+<script>
+	function reset_risk(){
+		$(".colorcell").html('');
+		var sev_val=$("#sev").val();
+		var like_val=$("#like").val();
+		var likehood="";
+		switch (like_val){
+			case "A - Improbable":
+				likehood="0";
+				break;
+			case "B - Unlikely":
+				likehood="1";
+				break;
+			case "C - Remote":
+				likehood="2";
+				break;
+			case "D - Probable":
+				likehood="3";
+				break;
+			case "E - Frequent":
+				likehood="4";
+				break;
+			default:
+				likehood="";
+		}
+		switch($("#"+sev_val+"-"+likehood).attr('background')){
+			case "#60FF60":
+				like_val="Green - Acceptable";
+				break;
+			case "yellow":
+				like_val="Yellow - Acceptable with mitigation";
+				break;
+			case "orange":
+				like_val="Orange - Unacceptable";
+				break;
+			default:
+				like_val="";
+		}
+		$("#risk").val(like_val);
+		$("#"+sev_val+"-"+likehood).html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
+	}
+	function checkall(){
+		$('.privilege').prop("checked",  "checked");
+	}
+	function uncheckall(){
+		$('.privilege').prop("checked",false);
+	}
+	$(document).ready(function(){
+		$('#sev').on('change',function(){
+			reset_risk();
+		});
+		$('#like').on('change',function(){
+			reset_risk();
+		});
+	});
+</script>
+

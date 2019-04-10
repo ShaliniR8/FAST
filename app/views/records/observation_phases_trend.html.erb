@@ -1,0 +1,92 @@
+<%= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css" %>
+<%= javascript_include_tag "/javascripts/utility/collapse-panel2.js" %>
+<%= javascript_include_tag "/javascripts/utility/format-builder.js" %>
+<%= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js" %>
+<%= javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js" %>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<b style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">Observation Phases Trend</b>
+					<div class="top_buttons pull-right">
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-xs-12">  
+						<%= render "trend_filter"%>
+					</div>
+
+					<div class="col-xs-12"> 
+						<%= render "trend_in_histogram"%>
+						<%#= render "trend_stats_table"%>
+						<div id="hfactor_section">		<%= render "trend_in_histogram_human_factors"%>	</div>
+					</div>
+
+					<div class="col-xs-12">
+						<div id="threat_section">			<%= render "trend_in_histogram_threat"%>			</div>
+						<div id="subthreat_section">	<%= render "trend_in_histogram_subthreat"%>		</div>
+					</div>
+
+					<div class="col-xs-12">
+						<div id="err_section">				<%= render "trend_in_histogram_err"%>					</div>
+						<div id="suberr_section">			<%= render "trend_in_histogram_suberr"%>			</div>
+					</div>
+
+
+					<div class="col-xs-12" id="record_listing">
+						<%= render "record_listing" %>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<style>
+	#chart_div element { cursor: pointer; }
+	.filter .google-visualization-controls-categoryfilter-selected li {
+	  background-color: #e65100;
+	  border: 1px solid #ff9800;
+	  color: #ffffff;
+	  padding: 6px;
+	}
+</style>
+
+
+
+
+
+<script>
+
+	// Generate color palette
+	function colorInterpolation(steps){
+		var colorArray = [];
+		if(steps == 1){
+			colorArray = ["red"]
+		}else{
+			var colorInterpolator = d3.interpolateRgb("red", "yellow");
+			colorArray = d3.range(0, (1 + 1 / steps), 1 / (steps - 1)).map(function(d) {
+				return colorInterpolator(d)
+			});
+		}
+		return colorArray;
+	}
+
+
+	$(window).resize(function() {
+		if(this.resizeTO) clearTimeout(this.resizeTO);
+		this.resizeTO = setTimeout(function(){
+			$(this).trigger('resizeEnd');
+		},100);
+	});
+
+</script>

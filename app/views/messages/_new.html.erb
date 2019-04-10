@@ -1,0 +1,48 @@
+<div class="panel-body">
+	<%=render "recipients"%>
+	<div class="row mt5">
+
+
+		<%=f.hidden_field :link, :value => params[:link]%>
+		
+
+		<%=f.label :subject,
+			"Subject",
+			:class => "control-label col-xs-2"%>
+		<div class="col-xs-4 col-lg-4">
+			<%=f.text_field :subject,
+				{:class => "form-control",
+				:value => @reply_to.present? ? "Re: "+@reply_to.subject : ""}%>         		
+		</div>
+		<%=f.label :due,"Dues",:class=>"control-label col-xs-1 col-sm-1 col-md-1"%>
+		<div class="col-xs-3 col-lg-2">
+			<%=f.text_field :due,{:class=>"field-date-now form-control"}%>         		
+		</div>
+	</div>
+	<div class="row mt5">
+		<%=f.label :content,"Message",:class=>"control-label col-xs-2 col-sm-1"%>
+		<div class="col-xs-11 col-lg-11">
+			<%=f.text_area :content,{:class=>"form-control",:rows=>"15"}%>         		
+		</div>
+	</div>
+	<div class="row mt5">
+		<%=f.label :attachments,"Attachments",:class=>"control-label col-xs-2 col-sm-1"%>
+		<div class="col-xs-11 col-lg-11 row" id="attachments">        		
+		</div>
+               		<div class="pull-right col-xs-2"><%= link_to_add_fields "Add an attachment", f, :attachments%></div>
+	</div>
+	<%#=f.hidden_field :time, 		:value=>Time.now.utc%>
+	<%=f.hidden_field :link_type, 	:value=>"Sra"%>
+	<%=f.hidden_field :link_id, 	:value=>params[:link_id]%>
+	<%#=f.hidden_field :auditor_id,:id=>"employee-select1"%>
+	<div class="row mt5">
+		<div class="col-sm-12 pull-right">
+			<%=f.submit "Send",:class=>"btn btn-success pull-right"%>
+			<%if params[:link].present?%>
+				<%=link_to "Cancel",params[:link],:class=>"btn btn-warning pull-right mr5", :confirm=>'The message has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+			<%else%>
+				<%=link_to "Cancel",root_url,:class=>"btn btn-warning pull-right mr5", :confirm=>'The message has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+			<%end%>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,40 @@
+<%if owner.transactions.present?%>
+	<div class="col-xs-12">
+		<div class="panel panel-default">
+			<div class="panel-heading click-heading collapsed">
+				<div class="panel-title">
+					Transaction Log
+					<span class="pull-right clickable">
+						<i class="mt5 glyphicon glyphicon-chevron-down"></i>
+					</span>
+				</div> 
+			</div>
+
+			<div class="panel-body" style="display:none">
+				<div class="table-responsive">
+					<table style="width:100%" 
+						class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th style="width:15%">Date/Time</th>
+								<th style="width:15%">User</th>
+								<th style="width:15%">Action</th>
+								<th style="width:55%">Detail</th>
+							</tr>
+						</thead>
+						<tbody>
+							<%owner.transactions.preload(:user).reverse!.each do |t|%>	
+								<tr>
+									<td><%=datetime_to_string(t.stamp)%></td>
+									<td><%=t.user.full_name rescue 'Anonymous'%></td>
+									<td><%=t.action%></td>
+									<td><%=t.content.html_safe rescue ''%></td>
+								</tr>
+							<%end%>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+<%end%>

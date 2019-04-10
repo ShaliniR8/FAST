@@ -1,0 +1,41 @@
+
+
+<div class="panel panel-steelblue">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<b>Recipients</b> 
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="table-responsive">
+					<table id="recipients" class="table table-bordered">
+						<thead>
+							<tr>
+								<%User.invite_headers.each do |header|%>
+									<th class="<%=header[:size]%>">
+										<%=header[:title]%>
+									</th>
+								<%end%>
+									<th class="col-xs-3 col-lg-3">Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<%@users.each do |user|%>
+								<tr user="<%=user.id%>">
+									<%User.invite_headers.each do |header|%>
+										<td><%=user.send(header[:field])%></td>
+									<%end%>
+									<td>
+										<a class="btn btn-transparent send_btn">Send</a>
+									</td>
+								</tr>
+							<%end%>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

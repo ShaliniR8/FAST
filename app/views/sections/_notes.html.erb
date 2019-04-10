@@ -1,0 +1,24 @@
+<%=form_for @owner do |x|%>
+	<%=x.fields_for :comments,@comment do |f|%>
+		<div class="panel-warning">
+			<div class="panel-heading">
+				<div class="panel-title">New Notes
+				<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="form-group col-xs-12">
+						<%=f.label :content,"Notes"%>
+						<%=f.text_area :content,:class=>"form-control",:rows=>10%>
+						<%if @owner.anonymous?%>
+							<%=f.hidden_field :user_id,:value=>''%>
+						<%else%>
+							<%=f.hidden_field :user_id,:value=>current_user.id%>
+						<%end%>
+					</div>
+					<%=x.submit "Submit",:class=>"btn btn-success pull-right mr10", disable_with: "Submitting..."%>
+				</div>
+			</div>
+		</div>
+	<%end%>
+<%end%>

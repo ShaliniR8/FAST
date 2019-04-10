@@ -1,0 +1,57 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<div class="item active mt50" id="test2?" style="height:auto;">
+  <div class="grid per90 center-block">
+    <div class="col-lg-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <b>Users</b>
+          </div>
+        </div>
+        <div class="panel-body">
+          <table id="users_table" class="table table-bordered table-hover" >
+            <thead><tr>  
+              <%@headers.each_key do |header|%>
+                  <th>
+                    <%=header%>
+                  </th>
+              <%end%>
+            </tr></thead>
+            <tbody>
+              <% @users.each do |user|%>
+                <tr user="<%=user.id%>">
+                  <%@headers.each_key do |header|%>
+                    <td><%=(user.send(@headers[header]))%></td>
+                  <%end%>
+                </tr> 
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+.table th {
+  text-align: center;
+}
+
+.table td {
+  text-align: center;
+}
+</style>
+<script>
+  $(document).ready(function(){
+      $('#users_table tbody tr').on('click',function() {
+          window.location = "/groups/"+$(this).children("td").eq(0).html()+"/view_user";
+        });
+        $('#users_table').DataTable({
+            "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+            "iDisplayLength": 5
+      });
+    });
+</script>

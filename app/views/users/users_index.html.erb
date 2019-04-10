@@ -1,0 +1,75 @@
+<div class="content">
+  <script type="text/javascript">
+    function openUserEdit(id)
+    {
+      window.location = "users/edit/"+id;
+    }
+  </script>
+<div class="grid">
+  <div class="white_grid">
+  <% if current_user.level == "Admin" or current_user.level == "Maintenance Supervisor" %>
+  <script type="text/javascript">
+    //<![CDATA[
+        jQuery(document).ready(function () {
+
+            var mydata = [
+              <% i = 0 %>
+              <%unless @users.nil? or @users.size==0 %>
+              <% while i < @users.size-1 %>
+                ["<%= @users[i].id %>", "<%= @users[i].first_name + " " + @users[i].last_name %>","<%= @users[i].username %>","<%= @users[i].email %>","<%= @users[i].level %>","<%= @users[i].access %>"],
+                <% i+=1 %>
+                  <% end %>
+                     ["<%= @users[i].id %>","<%= @users[i].first_name + " " + @users[i].last_name %>","<%= @users[i].username %>","<%= @users[i].email %>","<%= @users[i].level %>","<%= @users[i].access %>"]
+                    <% end %>
+            ];
+            // convert mydata to the standard format
+            var myNewData = [];
+            for (var i=0;i<mydata.length; i++) {
+                var d = mydata[i];
+                myNewData.push({id:d[0],name:d[1],username:d[2],email:d[3],level:d[4], access:d[5]});
+            }
+            var grid = $("#list");
+            grid.jqGrid({
+                datatype: "local",
+                data: myNewData,
+                colNames:['ident','Name','Username','Email','Account Type', 'Access'],
+                colModel:[
+                    {name:'id',index:'id', width:60, sorttype: 'int', hidden:true},
+                    {name:'name',index:'name', width:60},
+                    {name:'username',index:'username', width:60},
+                    {name:'email',index:'email', editable:true, width:60},
+                    {name:'level',index:'level', editable:false, width:60},
+                    {name:'access',index:'access', editable:false, width:60}
+
+
+
+                ],
+                rowNum:25,
+                rowList:[10,25,50],
+                pager: '#pager',
+                sortname: 'ident',
+                viewrecords: true,
+                sortorder: "asc",
+                caption:"<div style='opacity:0'>|</div>",
+                height: "345",
+                multiselect:false,
+                onSelectRow: function(id) {
+                  if(id){
+                    openUserEdit(id);
+                    }
+                },
+                autowidth:true
+
+            });
+            grid.jqGrid('navGrid','#pager',{add:false,edit:false,del:false});
+        });
+    </script>
+    <% else %>
+    <h1>Forbidden: You do not have the required credentials to access this page.</h1>
+    <% end %>
+    <table id="list"><tr><td/></tr></table>
+    &nbsp;
+    <div id="pager"></div>
+</div>
+</div>
+</div>

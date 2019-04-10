@@ -1,0 +1,42 @@
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+   	<div class="panel panel-success">
+     	<div class="panel-heading">
+     		<div class="panel-title">
+       		<b><%=@tax_attribute.label%></b> 
+     		</div>
+     	</div>
+     	<div class="panel-body">
+        <div class="row">
+          <div class="col-sm-12">
+              <%=link_to "Back",tax_attributes_path,:class=>"btn btn-danger pull-right"%>
+          </div>
+          <div class="col-sm-3">
+            <b>Category: </b>
+            <%=@tax_attribute.category%>
+          </div>
+          <div class="col-sm-3">
+            <b>URL: </b>
+            <%if @tax_attribute.url_reference.present?%>
+              <%=link_to "Click Here",@tax_attribute.url_reference,:target=>"_blank"%>
+            <%end%>
+          </div>
+          <div class="col-sm-3">
+            <b>Control Class: </b>
+            <%=@tax_attribute.control_class%>
+          </div>
+          <div class="col-sm-3">
+            <b>Source: </b>
+            <%=@tax_attribute.source%>
+          </div>
+          <div class="col-sm-1">
+            <b>Definition: </b></br>
+          </div>
+          <div class="col-sm-11">
+            <%=@tax_attribute.definition%>
+          </div>
+        </div>
+      </div> 
+    </div>       
+	</div> 
+</div>

@@ -1,0 +1,48 @@
+<style>
+	body {
+		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+		font-size: 12px !important;
+	}
+	.sub_title{
+		margin-bottom: 5px;
+		font: normal 16px Verdana, Arial, sans-serif;
+		font-weight: bold;
+	}
+	.sub_sub_title{
+		margin-top: 5px;
+		margin-bottom: 2px;
+		font: normal 14px Verdana, Arial, sans-serif;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	.title{
+		margin-bottom: 5px;
+		font: normal 18px Verdana, Arial, sans-serif;
+		font-weight: bold;
+	}
+	hr {
+		margin-bottom: 2px!important;
+		margin-top: 5px!important;
+		border-top: 1px solid black;
+	}
+	table{
+		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+		font-size: 12px !important;
+	}
+</style>
+
+
+<%if descriptions.length > 0%>
+	<div class="col-xs-12">
+		<hr>
+		<div class="sub_sub_title">
+			<%=title%>
+		</div>
+		<%descriptions.each do |description|%>
+			<%=description.category%> > 
+			<%=description.get_attr%> > 
+			<%=description.get_value%>
+		</br>
+		<%end%>
+	</div>
+<%end%>

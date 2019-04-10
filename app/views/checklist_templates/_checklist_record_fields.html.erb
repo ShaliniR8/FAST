@@ -1,0 +1,41 @@
+<tr class="to_delete" style="<%=record.header? ? 'font-weight:bold;background-color:whitesmoke' : ''%>">
+	<%headers.each do |h|%>
+		<td width="<%=h[:width]%>">
+			<%case h[:type]%>
+			<%when "checkbox"%>
+				<%=f.check_box h[:field], {:class => "form-control"}%>
+			<%when "text"%>
+				<%=f.text_field h[:field], {:class => "form-control"}%>
+			<%when "select"%>
+				<%if !record.header%>
+					<%=f.select h[:field], 
+						options_for_select(h[:options], record.send(h[:field])), 
+						{:include_blank => ""}, 
+						{:class => "field_select form-control"}%>
+				<%end%>
+			<%when "textarea"%>
+				<%=f.text_area h[:field], {:class => "form-control", :rows => 2}%>
+			<%else%>
+				NOT IMPLEMENTED!
+			<%end%>
+		</td>
+	<%end%>
+	<td>
+		<%=f.hidden_field :_destroy, :id => "delete_field"%>
+		<%=link_to "Remove", "#", :class => "btn btn-danger remove_btn"%>
+	</td>
+</tr>
+
+
+
+<script>
+	$(function(){
+
+		$(".remove_btn").on("click", function(e){
+			e.preventDefault();
+			$(this).closest("td").find("#delete_field").val(true);
+			$(this).closest(".to_delete").hide();
+		})
+
+	});
+</script>

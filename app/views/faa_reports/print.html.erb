@@ -1,0 +1,67 @@
+<style>
+body {
+    font: normal 12px Verdana, Arial, sans-serif;
+}
+.category{
+    border: 1px solid black;
+    margin-bottom:10px;
+    padding:3px;
+}
+.grid_block{
+	display: inline-block;
+    width: 300px;
+    margin-bottom: 3px;
+    margin-top: 2px;
+}
+.line_block{
+	display: inline-block;
+    width: 580px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 5px;
+    margin-top:5px;
+}
+</style>
+<h4><%="FAA Quarterly Report: Year #{@report.year}, #{@report.get_fiscal_quarter}"%></h4>
+<div class="category"> 
+    <h5 style="color:black"><b>Identification</b></h5>
+    <b>Fiscal Year: </b><%=@report.year%></br>
+    <b>Fiscal Year Quarter: </b><%=@report.get_fiscal_quarter%></br>
+    <%@identification.each_pair do |k,v|%>
+        <b><%=k%>:</b> <%=v%></br>
+    <%end%>
+    <b>ASAP MOU Employee Group: </b><%=@report.employee_group%></br>
+</div>
+<div class="category"> 
+    <h5 style="color:black"><b>ASAP ERC Contact Information</b></h5>
+    <b>FAA Member: </b><%=@report.faa%></br>
+    <b>Company Member: </b><%=@report.company%></br>
+    <b>Labor Member: </b><%=@report.labor%></br>
+    <b>ASAP Manager: </b><%=@report.asap%></br>
+</div>
+<div class="category"> 
+    <h5 style="color:black"><b>Statistics</b></h5>
+    <b>Number of ASAP reports submitted present quarter: </b><%=@report.asap_submit%><br>
+    <b>Number of ASAP reports accepted present quarter: </b><%=@report.asap_accept%><br>
+    <b>Number of accepted reports present quarter that were sole source to the FAA: </b><%=@report.sole%><br>
+    <b>Number of accepted reports present quarter closed under ASAP: </b><%=@report.asap_close%><br>
+    <b>Number of accepted reports present quarter (both sole source & non-sole
+source) closed with corrective action under ASAP for the employee: </b><%=@report.asap_emp%><br>
+    <b>Number of reports present quarter, which resulted in recommendations to the
+company for corrective action: </b><%=@report.asap_com%><br>
+
+</div>
+<%if @report.issues.present?%>
+    <div class="category"> 
+        <h5 style="color:black"><b>Description of Safety Enhancements</b></h5>
+        <%@report.issues.each do |r|%>
+            <div class="category"> 
+                <h5><%=r.title%></h5>
+                <b>Entered By: </b><%=r.user.full_name%><br>
+                <b>Date: </b><%=r.issue_date.present? ? r.issue_date.strftime("%Y-%m-%d") : ""%><br>
+                <b>Safety Issue: </b></br><%=r.safety_issue%> <br>
+                <b>Corrective Action: </b></br><%=r.corrective_action%></br> 
+            </div>
+        <%end%>
+    </div>
+<%end%>

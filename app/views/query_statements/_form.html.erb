@@ -1,0 +1,170 @@
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+
+<%=form_for @query do |f|%> 
+  <div class="item active mt50" style="height:auto;">
+    <div class="grid per90 center-block">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <div class="top_text">
+              <b><%=@title%></b> 
+            </div>
+            <div class="top_buttons pull-right">
+              <%=f.submit "Save Query", :class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
+              <%if action_name == "new"%>
+                <%=link_to "Cancel", query_statements_path, :id => "cancel-btn", :class => "mr5 btn btn-warning pull-right"%>
+              <%elsif action_name == "edit"%>
+                <%=link_to "Cancel", query_statement_path(@query), :id => "cancel-btn", :class => "mr5 btn btn-warning pull-right", :confirm => 'The query has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+              <%end%>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body" id="form_body"> 
+          <%=render "shared/privilege_form", {:target => "query_statement[privileges][]", :owner => @query, :f => f}%>
+          <div class="row">
+            <div class="form-group form-inline col-xs-5">
+              <%=f.label :title%>
+              <%=f.text_field :title, :class => "form-control ml5 required_field"%> 
+            </div>
+            <div class="form-group form-inline col-xs-5">
+              <%=f.label :target_class,"Target"%>
+              <%=f.select :target_class, @classes, {:include_blank => ""}, {:class => "form-control ml5 required_field", :id => "class_select"}%> 
+            </div>
+          </div>
+
+          <div class="row">
+            <%#=render "query_conditions"%>
+          </div>
+
+          <div class="alert alert-info alert-dismissible show" role="alert">
+            <h4>
+              <b>Instructions:</b>
+              <button type="button" class="close pull-right mr20" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </h4>
+            - Press <span class="glyphicon glyphicon-plus gs"></span> to add condition. Press <span class="glyphicon glyphicon-minus gs"></span> to remove condition.</br>
+            - Leave selections blank to show all values. (i.e. Select Flight Crew ASAP as template and leave Category and Field blank to pull <b>ALL</b> Flight Crew ASAP reports.)
+          </div>
+
+          <div id="conditions" class="row col-xs-12"> 
+            <div class="row mb10"><b>
+              <div class="col-xs-2" style="text-align:center">Template</div>
+              <div class="col-xs-2" style="text-align:center">Category</div>
+              <div class="col-xs-2" style="text-align:center">Field</div>
+              <div class="col-xs-2" style="text-align:center">Value - seperated by semicolon(;)</div>
+            </b></div>
+            <%@query.query_conditions.each_with_index do |c,uid|%>
+              <%=render 'condition', :condition => c, :f => f, :uid => uid%>
+            <%end%>
+          </div>
+
+          <div class="row col-xs-12">
+            <div class="row">
+              <div class="col-xs-1 pull-right">
+                <%=link_to_fields '<i class="glyphicon glyphicon-plus"></i>'.html_safe, f, :query_conditions, "QueryCondition", "condition_fields", "conditions", {:class=>"btn btn-success",:id=>"condition_button"}%>
+              </div>
+            </div>
+          </div>
+          
+        <%end%>
+      </div> 
+    </div>   
+  </div> 
+</div>
+
+
+
+
+<script>
+  function delete_block(button){
+    $(button).closest('.block_condition').detach();
+  }
+
+  function mark_delete(button){
+    $(button).closest('.block_condition').find('#delete_field').val(true);
+    $(button).closest('.block_condition').hide();
+  }
+
+  function fields_injection(){
+    $('.template_select').on('change',function(){
+      template_id = $(this).val();
+      category_select = $(this).closest('.block_condition').find('.category_select');
+      field_select = $(this).closest('.block_condition').find('.field_select');
+      category_select.val("");
+      field_select.val("");
+      field_select.closest('.block_condition').find("#value_area").html('');
+      field_select.find('option').each(function(){
+        $(this).hide();
+      });
+      category_select.find('option').each(function(){
+        if($(this).data('templates_id') == template_id || $(this).val() == ""){
+          $(this).show();
+        }else{
+          $(this).hide();
+        }
+      });
+    });
+    $('.category_select').on('change',function(){
+      category_id = $(this).val();
+      field_select = $(this).closest('.block_condition').find('.field_select');
+      field_select.val("");
+      field_select.closest('.block_condition').find("#value_area").html('');
+      field_select.find('option').each(function(){
+        if($(this).data('categories_id') == category_id || $(this).val() == ""){
+          $(this).show();
+        }else{
+          $(this).hide();
+        }
+      });
+    });
+    <%if session[:mode] == "ASAP"%>
+      $('.field_select').on('change',function(){
+        if ($(this).val() != ""){
+          field_id = $(this).val();
+          uid = $(this).closest('.block_condition').find('#data_section').data('uid');
+          field_select = $(this);
+          $.get("<%=detailed_values_query_statements_path%>?field_id=" + field_id + "&uid=" + uid, function(data){
+            field_select.closest('.block_condition').find("#value_area").html($.parseHTML(data));
+            $('.field-datetime-autoposition').datetimepicker({
+              format: 'YYYY-MM-DD HH:mm',
+              ignoreReadonly: true
+            });
+          });
+        }else{
+          $(this).closest('.block_condition').find("#value_area").html('');
+        }
+      });
+    <%else%>
+      $('.field_select').on('change',function(){
+      });
+    <%end%>
+  }
+
+
+  $(document).ready(function(){
+    fields_injection();
+
+    $('#condition_button').on('click',function(){
+      fields_injection();
+      <%if session[:mode]!="ASAP"%>
+        $('#class_select').on('change',function(){
+          class_select=$(this).val();
+          console.log(class_select);
+          $('.fd').each(function(){
+            $(this).find('option').each(function(){
+              if($(this).data('class_name')==class_select){
+                $(this).show();
+              }else{
+                $(this).hide();
+              }
+            });
+          });
+        });
+      <%end%>
+    });
+  });
+</script>

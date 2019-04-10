@@ -1,0 +1,114 @@
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				<div class="panel-title"><b>Edit Accesses for <%=@privilege.name%></b> </div>
+			</div>
+			<%=form_for @privilege do |f|%>
+				<div class="panel-body" id="form_body"> 
+					<div class="row">
+						<div class="form-group form-inline col-sm-3">
+							<%=f.label :name, "Privilege Name"%>
+							<%=f.text_field :name, {:class=>"form-control ml5"}%>
+						</div>
+						<div class="col-sm-4">
+							<%=f.label :example, "User Example"%>
+							<%=f.text_area :example,{:class=>"form-control",:rows=>"4"}%>
+						</div>
+						<div class="col-sm-5">
+							<%=f.label :description, "Description"%>
+							<%=f.text_area :description,{:class=>"form-control",:rows=>"4"}%>
+						</div>
+
+						<div class="col-xs-12 mt20">
+							<div class="table-responsive">
+								<table id="candidates" class="table table-bordered table-striped table-hover">
+									<thead>
+										<tr>
+											<th width="5%">Apply</th>
+											<%@headers.each do |h|%>
+												<th width="20%"><%=h[:title]%></th>
+											<%end%>
+											<th>Description</th>
+										</tr>
+									</thead>
+									<tbody>
+										<%@rules.each do |r|%>
+											<tr>
+												<td>
+													<%=check_box_tag "rules[]", 
+														r.id, 
+														(@privilege.control_ids.include? r.id), 
+														:class => "privilege"%>			
+												</td>
+												<%@headers.each do |h|%>
+													<td>
+														<%=r.send(h[:field])%>		
+													</td>
+												<%end%>
+												<td><%=r.find_desc%></td>
+											</tr>
+										<%end%>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div class="col-xs-12">
+							<%=link_to "Uncheck All","#",							:class => "btn btn-info pull-right",					:onclick=>"uncheckall()"%>
+							<%=link_to "Check All","#",								:class => "btn btn-info pull-right mr5 ml5",	:onclick=>"checkall(true)"%>
+							<%=f.submit "Submit",											:class => "btn btn-success pull-right",				:disable_with => "Submitting..."%>
+							<%=link_to "Cancel",	privileges_path,		:class => "btn btn-warning pull-right mr5"%>
+						</div>
+					</div>
+				</div>
+			<%end%> 
+		</div>       
+	</div> 
+</div>
+
+
+
+<script>
+
+	$('#candidates tr').click(function(event) {
+		if (event.target.type !== 'checkbox') {
+			$(':checkbox', this).trigger('click');
+		}
+	});
+
+	
+	$('#candidates').DataTable({
+			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+			"iDisplayLength": 500,
+			"aaSorting": [[1, "asc"]],
+			initComplete: function(){
+				this.api().columns().every(function(){
+					var column = this;
+					rand_num = new Date().getTime();
+					var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
+						.appendTo( $(column.footer()).empty())
+						.on('keyup change input', function(){
+							if (column.search() !== this.value){
+								column.search(this.value).draw();
+							} 
+						});
+					column.data().unique().sort().each(function(d, j){
+						if(d!="" && d!=undefined){
+							$('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
+						}
+					});
+				});
+			}
+	});
+
+	function checkall(){ $('.privilege').prop("checked",  "checked");}
+	function uncheckall(){$('.privilege').prop("checked",false);}
+</script>
+
+

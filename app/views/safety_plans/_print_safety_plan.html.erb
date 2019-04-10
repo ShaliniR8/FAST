@@ -1,0 +1,47 @@
+<style>
+	body {
+		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+		font-size: 12px !important;
+	}
+	.sub_title{
+		margin-bottom: 5px;
+		font: normal 16px Verdana, Arial, sans-serif;
+		font-weight: bold;
+	}
+	.sub_sub_title{
+		margin-top: 5px;
+		margin-bottom: 2px;
+		font: normal 14px Verdana, Arial, sans-serif;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	.title{
+		margin-bottom: 5px;
+		font: normal 18px Verdana, Arial, sans-serif;
+		font-weight: bold;
+	}
+	hr {
+		margin-bottom: 2px!important;
+		margin-top: 5px!important;
+		border-top: 1px solid black;
+	}
+	table{
+		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+		font-size: 12px !important;
+	}
+</style>
+
+
+
+<div class="title">
+	Safety Plan #<%=safety_plan.get_id%>: <%=safety_plan.title%>
+</div>
+
+
+<div class="content">
+	<%=render "forms/print_fields", 
+		:fields => @fields, 
+		:owner => safety_plan, 
+		:deidentified => false%>
+</div>
+

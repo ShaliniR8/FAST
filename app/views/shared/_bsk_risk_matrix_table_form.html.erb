@@ -1,0 +1,28 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">	
+	<hr/>
+	<h4><b>RISK ASSESSMENT MATRIX</b></h4>
+	<table id="risk_matrix" class="table table-bordered table-centered">
+		<tr>
+			<th rowspan="2" colspan="2" bgcolor="lightgray"></th>
+			<th colspan="5" bgcolor="grey" style="color:white">LIKELIHOOD</th>
+		</tr>
+		<tr>
+			<%@like.each do |header|%>
+				<th><%=header%></th>
+			<%end%>
+		</tr>
+		<tr>
+			<th rowspan="6" bgcolor="grey" width="5%" style="color:white">SEVERITY</th>
+			<%@color_matrix.each_index do |row|%>
+				<tr>
+					<td width="5%"><%=@frequency[row]%></td>
+					<%@color_matrix[row].each_index do |cell|%>
+						<td id="<%=4-row%>-<%=cell%>" class="colorcell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>">
+						</td>    
+					<%end%>
+				</tr>
+			<%end%>
+		</tr>
+	</table>
+</div>
+

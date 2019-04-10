@@ -1,0 +1,219 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<div class="item active mt50" style="height:auto;">
+	<div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+   	<div class="panel panel-primary">
+     	<div class="panel-heading">
+     		<div class="panel-title">
+          <div class="top_text">
+            <%if @im.type == "FrameworkIm"%>
+              <b>Framework IM </b>
+            <%elsif @im.type == "VpIm"%>
+              <b>SMS VP/Part 5 IM </b>
+            <%else%>
+              <b>Job Aid </b>
+            <%end%>
+       		 <b>#<%=@im.get_id%>: <%="#{@im.title}"%></b>
+          </div>
+          <div class="top_buttons pull-right">
+            <%if current_user.has_access("ims","destroy")%>
+              <%=link_to "Delete",im_path(@im),:method=>"delete",:confirm=>'Please confirm that you want to delete. The deletion cannot be reverted',:class=>"btn btn-danger pull-right mb5"%>
+            <%end%>
+            <%if @im.status != "Completed" && current_user.has_access("ims","edit")%>
+              <%=link_to "Edit",edit_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
+            <%end%>
+            <%=link_to "PDF",print_im_path(@im,format: :pdf),:class=>"btn btn-info pull-right mr5 mb5"%>
+            <%if current_user.has_access("ims","edit")%>
+              <%=link_to @im.viewer_access ? "Disable Viewer Access" : "Enable Viewer Access",enable_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
+              <%=link_to "Reoccur",reoccur_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
+            <%end%>
+            
+            <%=link_to "Send Message",new_message_path(:link=>im_path(@im), :link_type=>"Im", :link_id=>@im.id),:class=>"btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right ml5 mb5"%>
+          </div>
+     		</div>
+     	</div>
+     	<div class="panel-body">
+        <div class="row">
+          <div class="col-xs-12 mb15">
+           
+            <%if current_user.has_access('ims', 'edit')%>
+
+              <%if @im.status=='New'%>
+                <%=link_to "Open",schedule_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
+              <%end%>
+              <%if @im.type=="FrameworkIm" && @im.status=="New"%>
+                <%=link_to "Transition to VP/Part 5",transit_im_path(@im),:class=>'btn btn-info pull-right mr5 mb5' %>
+              <%end%>
+              <%if @im.status == "Open" && (@im.lead_evaluator==current_user.id || !@im.lead_evaluator.present?) && @im.completable%>                  
+                <%=link_to "Complete",complete_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
+              <%end%>
+            
+              <%if @im.status=="New"||@im.status=="Open"%>
+              <%if @im.items.present?%>
+                <%=link_to "Update Checklist","#",:class=>"btn btn-warning pull-right mr5 mb5",:id=>'update_checklist_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+              <%end%>
+                <%=link_to "Upload Checklist","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'checklist_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+                <%#if @im.type!="VpIm"%>
+                  <%=link_to "Add #{@im.class.display_name} Expectation","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'expectation_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+                <%#end%>
+                <%=link_to "Add Task","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'task_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+                <%=link_to "Add Contact","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'contact_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+                <%=link_to "Add Attachment","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'att_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+              <%end%>
+            <%end%>
+            <%if @im.status=="Pending Review" && current_user.id==@im.pre_reviewer%>
+              <%=link_to "Approve","#",:class=>"btn btn-success pull-right mr5 approve_btn mb5",:id=>'approve',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+              <%=link_to "Reject","#",:class=>"btn btn-danger pull-right mr5 approve_btn mb5",:id=>'reject',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+            <%end%>
+          </div>
+          <%=render "access_controls/new_modal"%>
+          <div class='col-xs-10'>
+            <b>ID: </b><%=@im.get_id%>
+          </div>
+          <div class='col-xs-10'>
+            <b>Status: </b><%=@im.status%>
+          </div>
+          <div class='col-xs-10'>
+            <b>Viewer Access: </b><%=@im.viewer_access ? "Yes": "No"%> 
+          </div>
+          <%if @im.type=="JobAid"%>
+            <div class='col-xs-4'>
+              <b>Job Aid: </b><%=@im.job_aid%>
+            </div>
+          <%end%>
+          <div class='col-xs-4'>
+            <b>Lead Evaluator: </b><%=@im.get_eva%>
+          </div>
+          <div class='col-xs-4'>
+            <b>Preliminary Reviewer: </b><%=@im.get_rev%>
+          </div>
+          <div class='col-xs-4'>
+            <b>Scheduled Completion Date: </b><%=@im.get_completion_date%>
+          </div>
+          <div class='col-xs-4'>
+            <b>Location: </b><%=@im.location%>
+          </div>
+          <div class='col-xs-4'>
+            <b>Plan Applied To: </b><%=@im.apply_to%>
+          </div>
+          <div class='col-xs-4'>
+            <b>Organization Type: </b><%=@im.org_type%>
+          </div>
+          <div class='col-xs-12'>
+            <b>Objective and Scope: </b></br>
+            <div class="col-xs-11 col-xs-offset-1">
+              <%=@im.obj_scope.gsub(/\n/, '<br/>').html_safe%>
+            </div>
+          </div>
+          <div class='col-xs-12'>
+            <b>References and Requirements: </b></br>
+            <div class="col-xs-11 col-xs-offset-1">
+              <%=@im.ref_req.gsub(/\n/, '<br/>').html_safe%>
+            </div>
+          </div>
+          <div class='col-xs-12'>
+            <b>Instructions: </b></br>
+            <div class="col-xs-11 col-xs-offset-1">
+              <%=@im.instruction.gsub(/\n/, '<br/>').html_safe%>
+            </div>
+          </div>
+          <%if @im.comment.present?%>
+            <div class='col-xs-12'>
+              <b>Reviewer Comment: </b></br>
+              <div class="col-xs-11 col-xs-offset-1">
+                <%=@im.comment.gsub(/\n/, '<br/>').html_safe%>
+              </div>
+            </div>
+          <%end%>
+          
+          <!-- Task -->
+          <%=render "/ims/show_task", 
+            :owner=>@im,
+            :fields => ImTask.get_meta_fields('show')
+          %> 
+
+          <%=render "items"%>
+          <!-- Contact -->
+          <%=render "/ims/show_contact", 
+            :owner => @im,
+            :fields => ImContact.get_meta_fields('show')
+          %> 
+          <!-- Attachment -->
+          <%=render "/forms/attachments_show", :owner => @im%>
+          <!-- Transaction -->
+          <%=render "/records/transactions", :owner => @im%>
+        </div>
+      </div> 
+    </div>       
+	</div> 
+</div>
+<style>
+ .datepicker{
+  z-index: 1200!important;
+ }
+</style>
+<script>
+  $(document).ready(function(){
+    $('#task_btn').on('click',function(){
+      $.get("<%=new_task_im_path(@im)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#contact_btn').on('click',function(){
+      $.get("<%=new_contact_im_path(@im)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#checklist_btn').on('click',function(){
+      $.get("<%=new_checklist_im_path(@im)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#expectation_btn').on('click',function(){
+      $.get("<%=new_expectation_im_path(@im)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#update_checklist_btn').on('click',function(){
+      $.get("<%=update_checklist_im_path(@im)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_im_path(@im)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('.new_package_btn').on('click',function(){
+      $.get("<%=new_package_im_path(@im)%>?item_id="+$(this).attr('item_id'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('.show_package_btn').on('click',function(){
+      $.get("<%=show_package_im_path(@im)%>?item_id="+$(this).attr('item_id'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('.approve_btn').on('click',function(){
+      var commit=$(this).attr('id');
+      $.get("<%=approve_im_path(@im)%>"+"?commit="+commit,function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    
+  });
+</script>

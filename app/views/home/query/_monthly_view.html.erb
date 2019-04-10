@@ -1,0 +1,54 @@
+<div id="monthly_bar_chart_div-<%=@field_name%>" style="width:'100%'"></div>
+<div class="mr5" id="monthly_bar_chart_download" align="right"></div> 
+
+
+<script>
+	
+	google.charts.load("current", {packages:["corechart"]});
+	google.charts.setOnLoadCallback(drawMonthlyBarChart);
+	var colorArray = colorInterpolation(<%=@monthly_data.length%>);
+
+
+	function drawMonthlyBarChart(){
+		$("#monthly_bar_chart_div-<%=@field_name%>").html("");
+		var data = new google.visualization.DataTable();
+		data.addColumn("string", "Value");
+		data.addColumn("number", "Count");
+		data.addColumn({type: "string", role: "tooltip"});
+		data.addColumn({type: "string", role: "annotationText"});
+		data.addColumn({type: "string", role: "style"});
+		data.addRows([
+			<%@monthly_data.each_with_index do |(k, v), index|%>
+				[<%="'#{k.strftime("%m-%Y")}', #{v}, '#{k.strftime("%m-%Y")}', '#{k.strftime("%m-%Y")}',"%> colorArray[<%=index%>]],
+			<%end%>
+		]);
+		var view = new google.visualization.DataView(data);
+		view.setColumns([0, 1,
+			{	calc: "stringify",
+				sourceColumn: 1,
+				type: "string",
+				role: "annotation"
+			}, 2, 3, 4]);
+		var options = {
+			height: 500,
+			title: "Analytics of <%=raw(@label)%>",
+			titleTextStyle: {color: "black", fontSize: 18, bold: true},
+			legend: { position: 'none'},
+			bar: {groupWidth: "90%"},
+		};
+		var barChartMonthly = new google.visualization.ColumnChart(document.getElementById('monthly_bar_chart_div-<%=@field_name%>'));
+
+	
+		google.visualization.events.addListener(barChartMonthly, 'ready', function () {
+			document.getElementById('monthly_bar_chart_download').innerHTML = '<a href="' + barChartMonthly.getImageURI() + '"download><u>Download Chart</u></a>';
+		});
+		barChartMonthly.draw(view, options);
+	}
+
+
+	$(window).bind('resizeEnd', function(){
+		drawMonthlyBarChart();
+		drawMonthlyBarChart();
+	});
+
+</script>

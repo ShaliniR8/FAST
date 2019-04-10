@@ -1,0 +1,114 @@
+<%fields.each do |field_hash|%>
+	
+	<%field_type 						= field_hash[:type]%>
+	<%field_description 		= field_hash[:title]%>
+
+	<%field_name 						= field_hash[:field]%>	
+	<%field_value						= field_name.present? ? record.send(field_name) : ''%>
+	<%field_display					= field_hash[:display]%>
+	<%field_col							= field_hash[:num_cols]%>
+	<%field_values					= field_hash[:values].present? ? record.send(field_hash[:values]) : ''%>
+
+	<%if field_type == "newline"%>
+		<div class="col-xs-12"></div>
+	<%elsif field_type == "panel_start"%>
+		<div class="col-xs-12">
+			<div class="panel panel-lightskyblue mt10">
+				<div class="panel-heading click-heading">
+					<div class="panel-title">
+						<b><%=field_description%></b>
+						<span class="pull-right clickable">
+							<i class="mt5 glyphicon glyphicon-chevron-up"></i>
+						</span>
+					</div>
+				</div>
+				<div class="panel-body" style="display:block">
+					<div class="row">
+	<%elsif field_type == "panel_end"%>
+					</div>
+				</div>
+			</div>
+		</div>
+	<%else%>
+
+
+	<%if field_type == 'textarea'%>
+		<div class="form-group col-xs-<%=field_col%> <%=field_name%>">
+			<b><%=field_description%>: </b></br>
+			<%if field_value.present?%>
+				<%=field_value.gsub(/\n/, '<br/>').html_safe%>
+			<%end%>
+		</div>
+
+
+	<%elsif field_type == 'checkbox'%>
+		<div class="form-group col-xs-<%=field_col%> <%=field_name%>">
+			<b><%=field_description%>: </b></br>
+			<%field_value.reject(&:empty?).each do |x|%>
+				<div class="col-xs-6">
+					<span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+					<%=x%>
+				</div>
+			<%end%>
+		</div>
+
+
+	<%else%>
+		<div class="form-group col-xs-<%=field_col%> <%=field_name%>">
+			<b><%=field_description%>: </b>
+			<%if field_value.to_s.present?%>
+				
+				<%case field_type%>
+					<%when "boolean"%>
+						<%boolean_options = {true => "Yes", false => "No"}%>
+						<%=boolean_options[field_value]%>	
+
+					<%when "boolean_box"%>
+						<%=field_value ? "Yes" : ""%>
+
+					<%when "date"%>
+						<%=date_to_string(field_value)%>
+
+					<%when "datetime"%>
+						<%=datetime_to_string(field_value)%>
+
+					<%when "user"%>
+						<%=User.find(field_value).full_name rescue field_value.to_s%>
+
+					<%when "select"%>
+						<%if field_display.present?%>
+							<%=field_display[field_value]%>
+						<%else%>
+							<%=field_value%>
+						<%end%>
+
+					<%else%>
+						<%=field_value%>
+					<%end%>
+					
+				<%end%>
+			</div>
+		<%end%>
+
+
+
+	<%end%>
+
+<%end%>
+
+
+<style type="text/css">
+	.control-label {
+		text-align: left !important;
+	}
+	.showbox {
+		word-break: break-all;
+		min-height: 40px;
+		padding: 9px;
+		background-color: white;
+		border: 1px solid gainsboro;
+	}	
+	.form-group {
+    margin-bottom: 3px;
+
+</style>

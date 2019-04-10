@@ -1,0 +1,36 @@
+<div class="col-lg-12 col-md-12 col-sm-12 mt5 to_delete">
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title"><b>Condition</b><span class="pull-right" onclick="removepanel(this)"><i class="mt5 glyphicon glyphicon-remove"></i></span></div>
+    </div>
+      <div class="panel-body">
+        <div class="col-lg-12 row">
+          <div class="col-lg-2">
+            <b>Logical Type</b> 
+            <%=select_tag  "name_space[logic]", options_for_select(@logical_types), :include_blank => "", :class => "form-control"%>
+          </div>
+          <div id="to_delete_insert_space">
+            <div class="col-lg-2 col-md-2">
+              <b>Template</b> 
+              <%=select_tag  "name_space[temp]", options_from_collection_for_select(@templates,'id','name'), :include_blank => "", :class => "form-control mb5 temp_select", :id => "insert_space"%>
+            </div>
+            <div class="col-lg-2 col-md-2">
+              <b>Category</b> 
+              <%=select_tag  "name_space[cat]",options_from_collection_for_select(@categories, 'custom_id', 'title'), :include_blank => "", :class => "form-control mb5 cat_select", :id => "insert_space"%>
+            </div>
+            <div class="col-lg-2 col-md-2">
+              <b>Field</b>   
+              <%=select_tag  "name_space[field]",options_from_collection_for_select(@fields, 'custom_id', 'label'), :include_blank => "", :class => "form-control mb5 field_select", :id => "insert_space"%>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <b>Value</b> 
+              <%=text_field_tag  "name_space[value]", nil, :class => "form-control mb5"%>
+            </div>
+          </div>
+        </div>
+        <div id="to_insert_insert_space" class="row mt5"></div>
+        <div class="pull-right del"><%=link_to_add_blocks "Add Nested Condition", "name_space", "insert_space"%></div>
+      </div>
+    </div>    
+  </div>
+</div>

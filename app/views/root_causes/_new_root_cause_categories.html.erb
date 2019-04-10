@@ -1,0 +1,41 @@
+<div class="row">
+	<div class="col-xs-12 form-inline form-group">
+		<div class="cat_<%=@categories.first.level%>">
+			<%=label_tag :category, "Select Category"%>
+			<%=select_tag :category, options_for_select(@categories.map{|x| [x.name, x.id]}), {:include_blank => true, :class => "ml5 form-control cat_select required_field"}%>
+		</div>
+		<div class="attributes mt10" id="<%=@categories.first.level%>"></div>
+	</div>
+</div>
+
+
+<script>
+	$(function(){
+
+			<%if second_id.present?%>
+			$(".cat_<%=@categories.first.level%> .cat_select option").each(function(){
+				if($(this).val() == "<%=second_id%>") {
+					$(this).prop("selected", true);
+					$.get("<%=retract_root_cause_categories_hazards_path%>?category=" + $(this).val(), function(data){
+						$("#<%=@categories.first.level%>").html(data);
+					});
+					return true;
+				}
+			});
+		<%end%>
+
+		$('.cat_<%=@categories.first.level%> .cat_select').on('change',function(){
+			var level = parseInt("<%=@categories.first.level%>");
+			$(".attributes").each(function(){
+				if(parseInt($(this).attr("id")) >= level){
+					$(this).html("");
+				}
+			});
+			if ($(this).val() != ""){
+				$.get("<%=retract_root_cause_categories_hazards_path%>?category=" + $(this).val(), function(data){
+					$("#<%=@categories.first.level%>").html(data);
+				});
+			}
+		});
+	});
+</script>

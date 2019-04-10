@@ -1,0 +1,33 @@
+<%=form_for @inspection do |f|%>
+	<div class="panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title"><%=params[:commit].titleize%> Inspection
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="form-group col-xs-12">
+					<%=f.label :comment,"Final Approver Comment",:style=> params[:commit]=="approve"  ?  "" : "color:red"  %>
+					<%=f.text_area :comment,:class=>"form-control ml5 required_field",:rows=>'5'%>
+					<%=f.hidden_field :status,:value=>@status%>
+				</div>
+			</div>
+			<%=f.submit "Submit",:class=>"btn btn-success pull-right mt5"%>
+		</div>
+	</div>
+<%end%>
+<script>
+	<%if params[:commit]=="reject"%>
+		$(document).ready(function(){
+			$('form').on('submit',function(){
+				$(this).find('.required_field').each(function(){
+					if ($(this).val()=="")
+					{
+		        $(".required_field").css('border-color', 'red');
+		        event.preventDefault();
+					}
+				});
+			});
+		});
+	<%end%>
+</script>

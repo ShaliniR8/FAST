@@ -1,0 +1,135 @@
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+<div class="panel panel-lightskyblue">
+	<div class="panel-heading">
+		<div class="panel-title">
+			Advanced Search
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button> 
+		</div>
+	</div>
+	<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">   
+		<%= form_tag @path, :method => "get" do%>	
+			<%=hidden_field_tag :advance_search, true%>
+			<%if @date_filter %>
+				<%=render "shared/date_filter" %>
+			<%end%>
+			<div class="search-group row">
+				<div class="col-xs-6"><b>Term:</b></div>
+				<div class="col-xs-6"><b>Value:</b></div>
+			</div>
+
+
+			<div class="search-group row">
+				<div class="col-xs-6">
+					<%=select_tag :searchterm_1, 
+						options_for_select(@terms.map{|x| [x[:title], x[:field]]}.to_h.sort), 
+						{:include_blank => "", :class => 'form-control term mb5'}%>
+				</div>
+				
+				<div class="col-xs-6 field">
+					<%=text_field_tag :field_1, nil, {:class => 'form-control mb5'}%>
+				</div>
+
+				<div class='col-xs-6 input-group datetimerangepicker'>
+					<%=text_field_tag :start_date_1, nil, :class => "form-control field-date"%>
+					<div class="input-group-addon">TO</div>
+					<%=text_field_tag :end_date_1, nil, :class => "form-control field-date"%>
+				</div>
+			</div>
+
+			<div class="search-group row">
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+					 <%=select_tag :searchterm_2, 
+					 	options_for_select(@terms.map{|x| [x[:title], x[:field]]}.to_h.sort), 
+					 	{:include_blank => "", :class => 'form-control term mb5'}%>
+				</div>
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 field">
+					 <%=text_field_tag :field_2, nil, {:class=>'form-control search_field mb5'}%>
+				</div>
+				<div class='col-xs-6 input-group datetimerangepicker'>
+					<%=text_field_tag :start_date_2, nil, :class => "form-control field-date"%>
+					<div class="input-group-addon">TO</div>
+					<%=text_field_tag :end_date_2, nil, :class => "form-control field-date"%>
+				</div>
+			</div>
+
+			<div class="search-group row">
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+					 <%=select_tag :searchterm_3, 
+					 	options_for_select(@terms.map{|x| [x[:title], x[:field]]}.to_h.sort), 
+					 	{:include_blank=>"", :class=>'form-control term mb5'}%>
+				</div>
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 field">
+					 <%=text_field_tag :field_3, nil, {:class=>'form-control search_field mb5'}%>
+				</div>
+				<div class='col-xs-6 input-group datetimerangepicker'>
+					<%=text_field_tag :start_date_3, nil, :class => "form-control field-date"%>
+					<div class="input-group-addon">TO</div>
+					<%=text_field_tag :end_date_3, nil, :class => "form-control field-date"%>
+				</div>
+			</div>
+
+			<div class="search-group row">
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+					 <%=select_tag :searchterm_4, 
+					 	options_for_select(@terms.map{|x| [x[:title], x[:field]]}.to_h.sort), 
+					 	{:include_blank=>"", :class=>'form-control term mb5'}%>
+				</div>
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 field">
+					 <%=text_field_tag :field_4, nil, {:class=>'form-control search_field mb5'}%>
+				</div>
+				<div class='col-xs-6 input-group datetimerangepicker'>
+					<%=text_field_tag :start_date_4, nil, :class => "form-control field-date"%>
+					<div class="input-group-addon">TO</div>
+					<%=text_field_tag :end_date_4, nil, :class => "form-control field-date"%>
+				</div>
+			</div>
+
+			<%=submit_tag "Search", 
+				:disable_with => 'Searching...',
+				:class => "ml5 btn btn-xl btn-success pull-right mt10" %>
+		<%end%>
+	</div>
+</div>
+
+
+
+<style>
+	.datepicker {
+		z-index: 1200 !important;
+	}
+	.datetimerangepicker{
+		padding-left: 15px!important;
+		padding-right: 15px!important;
+		z-index: 1200 !important;
+	}
+	.field-datetime-autoposition{
+		z-index: 1200 !important;
+		background-color: #ffffff!important;
+	}
+</style>
+
+
+
+<script>
+	$(document).ready(function(){
+		$(".datetimerangepicker").hide();
+		$(".unhide").show();
+		$(".term").on('change', function(){
+			current_value = $(this).val();
+			selected = $('select option:selected').text();
+			if (current_value.indexOf("date") !== -1 || 
+					current_value.indexOf("time") !== -1 || 
+					selected.indexOf("Date") !== -1 || 
+					selected.indexOf("Time") !== -1){
+				$(this).closest(".search-group").find(".field").hide();
+				$(this).closest(".search-group").find(".datetimerangepicker").show();
+			}else{
+				$(this).closest(".search-group").find(".datetimerangepicker").hide();
+				$(this).closest(".search-group").find(".field").show();
+			}
+		});
+	});
+</script>

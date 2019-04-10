@@ -1,0 +1,49 @@
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<%=form_for @owner do |owner_form|%>
+	<%headers = ChecklistRecord.get_meta_fields('form')%>
+	<div class="col-xs-12">
+		<div class="panel panel-lightskyblue">
+			<div class="panel-heading click-heading">
+				<div class="panel-title">
+					Update Checklist
+					<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+						<span class="glyphicon glyphicon-remove"></span>
+					</button>
+				</div>
+			</div>
+			<div class="panel-body" style="max-height:500px;overflow-y:auto;">
+				<table id="checklist_records" class="table table-bordered">
+					<thead>
+						<tr>
+							<%headers.each do |h|%>
+								<th style="width:<%=h[:width]%>%"><%=h[:title]%></th>
+							<%end%>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%@owner.checklist_records.each do |record|%>
+							<%=owner_form.fields_for :checklist_records, record do |f|%>
+								<%=render "checklist_templates/checklist_record_fields", 
+									:f => f,
+									:record => record,
+									:headers => headers%>
+							<%end%>
+						<%end%>
+					</tbody>
+				</table>
+				<%#=link_to_add_fields "Add Question", 
+					owner_form, :checklist_records, 
+					:record => nil, 
+					:headers => headers%>
+				<%=owner_form.submit "Save", 
+					:class => "btn btn-success pull-right mt5 mr5", 
+					:disable_with => "Saving..."%>
+			</div>			
+		</div>
+	</div>
+<%end%>
+
+
+
+

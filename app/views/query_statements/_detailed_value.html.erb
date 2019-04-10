@@ -1,0 +1,110 @@
+<script type="text/javascript" src="/javascripts/utility/employee_select.js"></script>
+<script type="text/javascript" src="/javascripts/utility/airport_select.js"></script>
+
+
+<!-- <div class="col-xs-4 form-group"> -->
+
+	<%if @field.display_type == "text"%>
+
+		<% if @field.data_type == 'date' || @field.data_type == "datetime"%>
+
+			<div class="search_group">
+				<div class="term input-group datetimerangepicker form-inline">
+					<%= text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][start_date]", "", class: "form-control field-datetime-autoposition cursor-pointer search_field", readonly: true %>
+					<div class="input-group-addon">to</div>
+					<%= text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][end_date]", "", class: "form-control field-datetime-autoposition cursor-pointer search_field", readonly: true %>
+				</div>
+			</div>
+
+		<%else%>
+			<%= text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", "", { :class => "form-control " + @field.element_class, :placeholder => @field.label, :id => @field.element_id } %>
+		<%end%>
+
+		
+
+	<!-- Checkbox Search -->
+	<%elsif @field.display_type == "checkbox"%>  
+
+		<%= text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", "", { :class => "form-control " + @field.element_class, :placeholder => @field.label, :id => @field.element_id } %>
+
+		<%if false%>
+		</br>
+		<div class="<%=@field.display_size == 12 && @field.show_label ? '' : 'smallselect'%> row <%=@field.show_label ? 'mt5' : ''%>">
+			<%size=@field.getOptions.length%> 
+			<%@field.getOptions.each do |option|%>
+				<%if size > 5%>
+					<div class="col-sm-4 col-md-3 col-lg-3">
+						<%=check_box_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]=",option%>&nbsp<%=option%>
+					</div>
+				<%else%>
+					<div class="col-sm-<%=(12/size).to_s%> col-md-<%=(12/size).to_s%> col-lg-<%=(12/size).to_s%>">
+						<%=check_box_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]",option%>&nbsp<%=option%>
+					</div>
+				<%end%>
+			<%end%>
+		</div> 
+		<%end%>
+
+
+	<!-- Dropdown Search -->
+	<%elsif @field.display_type == "dropdown"%>
+		<%#=select_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", options_for_select(@field.getOptions),{:include_blank=>"",:class=>'form-control'+" "+@field.element_class,:id=>@field.element_id}%>
+		<%= text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", "", { :class => "form-control " + @field.element_class, :placeholder => @field.label, :id => @field.element_id } %>
+
+
+	<!-- Datalist Search -->
+	<%elsif @field.display_type == "datalist"%>
+		<%=text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", "", {:list=>"#{@field.id}", :class=>"form-control"}%>
+		<datalist id="<%=@field.id%>">
+			<% @field.getOptions.each do |opt|%>
+				<option value="<%=opt%>"></option>
+			<%end%>
+		</datalist>
+
+
+	<!-- Text Area Search -->
+	<%elsif @field.display_type == "textarea"%>
+		<%=text_area_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]","",{:class=>"form-control"}%>
+
+
+	<!-- Employee Search -->
+	<%elsif @field.display_type == "employee"%>
+		<%=text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", "",{:class=> 'form-control' + " " + @field.element_class,:placeholder=>@field.label,:id=>@field.element_id}%>
+
+
+	<!-- Airport Search -->
+	<%elsif @field.display_type == "airport"%>
+		<%=text_field_tag "query_statement[query_conditions_attributes][#{params[:uid]}][value]", "",{:class=> 'form-control' + " " + @field.element_class, :placeholder=>@field.label, :id=>@field.element_id}%>
+		
+
+
+	<%end%>
+
+
+
+<!-- </div> -->
+
+
+<script type="text/javascript">
+
+	$('.field-datetime-autoposition').datetimepicker({
+    format: 'YYYY-MM-DD HH:mm',
+    ignoreReadonly: true
+  });
+
+</script>
+
+
+
+<style type="text/css">
+
+	.datetimerangepicker{
+		padding-left: 15px!important;
+		padding-right: 15px!important;
+	}
+
+	.field-datetime-autoposition{
+		background-color: #ffffff!important;
+	}
+
+</style>

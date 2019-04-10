@@ -1,0 +1,39 @@
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+
+<%=form_for(@option, :html => {:multipart => true}) do |f|%>
+	<div class="panel panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title"><b><%=controller.action_name.titleize%> Category and Sub-Categories</b></div>
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphiconglyphicon-remove"></span></button>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="row" style="max-height:500px;overflow-y:auto;">
+			
+			<div class="form-group col-sm-12">
+				<%=f.label :name, "Category Name", :class => "col-sm-2 col-form-label"%>
+				<div class="col-sm-8">
+					<%=f.text_field :name, :class => "form-control"%>
+				</div>
+			</div>
+
+			<%index = 0%>
+			<%@option.children.each do |x|%>
+				<%if !x.hidden?%>
+					<%index = index + 1%>
+					<%=f.fields_for :cause_options, x do |xf|%>
+						<div class="form-group col-sm-12">
+							<%=xf.label :name, "Sub-Category ##{index}", :class => "col-sm-2 col-form-label"%>
+							<div class="col-sm-6">
+								<%=xf.text_field :name, :class => "form-control"%>
+							</div>
+						</div>
+					<%end%>
+				<%end%>
+			<%end%>
+
+			<%=f.submit "Save", :class => "btn btn-success pull-right mt5 mr15", :disable_with => "Saving...", :confirm => "Are you sure?"%>
+		</div>
+	</div>
+<%end%>

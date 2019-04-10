@@ -1,0 +1,67 @@
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+
+
+	<div class="panel-steelblue">
+		<div class="panel-heading">
+			<div class="panel-title">
+				Address Verification
+				<button type="button" 
+					class="close pull-right" 
+					data-dismiss="modal" 
+					aria-label="Close">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+		</div>
+		<div class="panel-body" style="max-height:calc(100vh - 210px);overflow-y:auto">
+			<%=form_for @verification do |f|%>
+				<div class="row">
+					<div class="col-xs-12">
+						<%=f.hidden_field :address_date, :value => Time.now%>
+						<%=render "forms/form_fields", 
+							:fields => Verification.get_meta_fields('address'), 
+							:record => @verification, 
+							:f => f%>
+					</div>
+
+					<%=f.submit "Save",
+						:class => "btn btn-success pull-right mt10 mb20 mr20", 
+						:disable_with => "Saving..."%>
+					
+				</div>
+			<%end%>
+
+		</div>
+	</div>
+
+
+
+
+<script type="text/javascript">
+
+</script>
+
+
+
+<style>
+	.datepicker {
+		z-index: 1200 !important;
+	}
+	.required_label:after{
+		content: " *";
+		color: red;
+		display: inline;
+  }
+  .checkbox {
+  	cursor: pointer;
+  }
+</style>
+

@@ -1,0 +1,72 @@
+<div class="panel panel-info">
+	
+	<div class="panel-heading click-heading collapsed">
+		<div class="panel-title">
+			<b>Packages</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+		</div>
+	</div>
+
+	<div class="panel-body" style="display:none">
+		<div class="row col-xs-12">
+
+			<table class="table table-striped table-bordered">
+
+				<thead>
+					<tr>
+						<%@package_headers.each do |h|%>
+							<th><%=h[:title]%></th>
+						<%end%>
+						<th>Meeting Minutes</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<%@meeting.packages.each do |package|%>
+						<tr>
+							<%@package_headers.each do |h|%>
+								<td class="<%=h[:html_class].present? ? package.send(h[:html_class]) : ''%>"><%=package.send(h[:field])%></td>
+							<%end%>
+							<td colspan="4"><%if package.minutes.present?%><%=package.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
+							<td>
+								<%=link_to "View", package_path(package), :class=>"btn btn-info mb5", :disable_with => "Redirecting..."%>
+								<%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
+									<%if package.status!="Closed"&&@meeting.status!="Closed"&&package.sms_agendas.blank?%>
+										<%=link_to "Carryover", "#",:class=>"btn btn-danger carryover_btn mb5",:route=>carryover_package_path(package.id), :disable_with => "Removing...", :confirm => "Are you sure?"%>
+									<%end%>
+									<%=link_to "Agenda","#",:class=>"btn btn-warning agenda_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:route=>get_agenda_package_path(package,:meeting=>@meeting.id)%>
+									<%=link_to "Add Minutes","#",:class=>"btn btn-success minutes_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg", :route=>new_minutes_package_path(package, :meeting=>@meeting) %>
+								<%end%>
+							</td>
+						</tr>
+					<%end%>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+	$(document).ready(function(){
+		$('.agenda_btn').on('click',function(){
+			path=$(this).attr('route');
+			$.get(path,function(data){
+				$(".modal-content").html(data);
+			});
+		});
+		$('.carryover_btn').on('click',function(){
+			path=$(this).attr('route');
+			current=$(this).closest('tr');
+			$.get(path,function(data){
+				current.hide();
+			});
+		});
+		$(".minutes_btn").on('click',function(){
+			$.get($(this).attr('route'),function(data){
+				$(".modal-content").html(data);				
+			});
+		});
+	});
+</script>

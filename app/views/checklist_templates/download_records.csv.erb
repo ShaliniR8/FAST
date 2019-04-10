@@ -1,0 +1,6 @@
+<%headers = ChecklistRecord.get_meta_fields('show')%>
+<%=CSV.generate_line(headers.map{|x| x[:title]}).strip %>
+<%@owner.checklist_records.each do |record|%>
+	<%row = headers.map{|h| record.send(h[:field]).present? ? record.send(h[:field]) : nil}%>
+	<%=CSV.generate_line(row).html_safe.strip%>
+<%end%>

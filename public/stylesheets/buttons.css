@@ -1,0 +1,45 @@
+.small.button {
+font-size: 12px;
+font-weight:bold;
+text-align:center;
+margin-left: 10px;
+padding-top: 7px;
+padding-right: 10px;
+padding-bottom: 6px;
+padding-left: 10px;
+min-width: 44px;
+background-image:url(/images/button_gradient.png);
+background-repeat:repeat-x;
+}
+
+.orange.button {
+BACKGROUND-COLOR: #ff9009;
+}
+
+.gray.button {
+BACKGROUND-COLOR: #a0a0a0;
+}
+
+.blue.button {
+BACKGROUND-COLOR: #47afe3;
+}
+
+.button:hover {
+background-image: none;
+}
+
+.purple.button {
+BACKGROUND-COLOR: #ac9eb8;
+}
+
+a.button {
+-webkit-box-shadow: rgba(0, 0, 0, 0.199219) 2px 2px 5px;
+-moz-box-shadow: rgba(0,0,0,0.199219) 2px 2px 5px;
+box-shadow: rgba(0,0,0,0.199219) 2px 2px 5px;
+color: white;
+display: inline-block;
+font-family: Arial, Helvetica, sans-serif;
+text-decoration: none;
+white-space: nowrap;
+}
+

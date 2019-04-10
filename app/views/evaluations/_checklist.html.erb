@@ -1,0 +1,45 @@
+<%=form_tag upload_checklist_evaluation_path(@evaluation),:method=>"post",:multipart => true do%>
+	<div class="panel-warning">
+		<div class="panel-heading">
+			<div class="panel-title">Upload Checklist
+			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="form-inline form-group col-xs-2">
+					<%=label_tag :append%>
+					<%=check_box_tag :append%>
+				</div> 
+				<div class="form-inline form-group col-xs-10">
+					<%=label_tag :checklist%>
+					<%=file_field_tag :checklist,:class=>"ml5 required_field",:style=>"display:inline-block",:accept=>".csv",:id=>"csv"%>
+				</div>                   
+			</div>
+			<%=submit_tag "Save",:class=>"btn btn-success pull-right mt5", disable_with: "Saving..."%>
+		</div>
+	</div>
+<%end%>
+<script>
+	$(document).ready(function(){
+		$("form").on('submit',function(){
+			$(this).find('.required_field').each(function(){
+				if ($(this).val()=="")
+				{
+	        		event.preventDefault();
+				}
+			});
+		});
+		$("#csv").change(function() {
+    		var val = $(this).val();
+
+    		switch(val.substring(val.lastIndexOf('.') + 1).toLowerCase()){
+	        case 'csv':
+	            break;
+	        default:
+	            $(this).val('');
+	            alert("Only CSV Files are accpetable!");
+	            break;
+    		}
+		});
+	});
+</script>

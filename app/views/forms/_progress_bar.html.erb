@@ -1,0 +1,23 @@
+<div class="col-xs-12 mb15">
+	<div class="progress">
+		<div class="progress-bar progress-bar-<%=owner.progress[owner.status][:color]%>" 
+			role="progressbar" 
+			aria-valuenow="<%=owner.progress[owner.status][:score]%>" 
+			aria-valuemin="0" 
+			aria-valuemax="100" 
+			style="width:<%=owner.progress[owner.status][:score]%>%">
+			<%=owner.status%> (<%=owner.progress[owner.status][:score]%>%)
+		</div>
+	</div>
+</div>
+
+<style>
+	.progress .progress-bar {
+		color: black !important;
+		font-weight: bold !important;
+		line-height: 20px!important;
+		height: 20px!important;
+		font-size: 14px!important;
+	}
+</style>
+

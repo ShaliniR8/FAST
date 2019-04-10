@@ -1,0 +1,38 @@
+<div class="title">
+	Audit #<%=@audit.get_id%>: 
+	<%=@audit.title%>
+</div>
+
+<div class="content">
+	<%fields = Audit.get_meta_fields('show')%>
+	<%=render "forms/print_fields", 
+		:fields => fields, 
+		:owner => @audit,
+		:deidentified => @deidentified%>	
+
+	<%@audit.tasks.each do |task|%>
+		<div class="col-xs-12">
+			<hr>
+			<%=render "ims/print_task", :owner => task, 
+				:deidentified => @deidentified%>
+		</div>
+	<%end%>
+
+	<%@audit.contacts.each do |contact|%>
+		<div class="col-xs-12">
+			<hr>
+			<%=render "ims/print_contact", :owner => contact, 
+				:deidentified => @deidentified%>
+		</div>
+	<%end%>
+
+	<%@audit.findings.each do |finding|%>
+		<div class="col-xs-12">
+			<hr>
+			<%=render "findings/print", 
+				:owner => finding, 
+				:deidentified => @deidentified%>
+		</div>
+	<%end%>
+</div>
+
