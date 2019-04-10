@@ -7,13 +7,13 @@ class SCX_Config
       :code                                           => "SCX",
       :base_risk_matrix                               => false,
       :has_analytics_filter                           => true,
-      :enable_message_mailer                          => true,
+      :enable_message_mailer                          => false,
       :enable_message_templates                       => true,
       :event_summary                                  => false,
       :event_tabulation                               => false,
       :enable_custom_options                          => true,
-      :enable_configurable_risk_matrices              => true,
-      :enable_checklist_templates                     => true,
+      :enable_configurable_risk_matrices              => false,
+      :enable_checklist_templates                     => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_extension                                  => false,
@@ -25,17 +25,17 @@ class SCX_Config
       :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => true,  # Notifier will be notified on receiving new submissions
+      :submission_mailer                              => false,  # Notifier will be notified on receiving new submissions
       :allow_multi_submissions                        => true,
       :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
-      :enable_orm                                     => true,
+      :enable_orm                                     => false,
       :observation_phases_trend                       => false,
       :submission_title_required                      => true,
-      :allow_template_nested_fields                   => true,
+      :allow_template_nested_fields                   => false,
       :checklist_version                              => '2',
 
       # Safety Assurance Module
-      :sa_mailer                                      => true,
+      :sa_mailer                                      => false,
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
 
