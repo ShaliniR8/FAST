@@ -29,7 +29,7 @@ class SrasController < ApplicationController
 		handle_search
 
     if !current_user.admin?
-      sras = Sra.where('status in (?) and user_id = ?',
+      cars = Sra.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
         current_user.id)
       cars += Sra.where('approver_id = ? OR reviewer_id = ?',
