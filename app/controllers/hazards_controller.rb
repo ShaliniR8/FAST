@@ -14,6 +14,7 @@ class HazardsController < ApplicationController
 		@adv_only = true
 		@table = Object.const_get("Hazard")
 		@title = "Hazards"
+    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
 		handle_search
 		if params[:status].present?
 			 @records = @records.select{|x| x.status == params[:status]}
@@ -21,6 +22,13 @@ class HazardsController < ApplicationController
 		end
 		@headers = @table.get_meta_fields('index')
 		@table_name = "hazards"
+    if !current_user.admin? && !current_user.has_access('sras','admin')
+      cars = Hazard.includes(:sra).where('sras.status in (?) and sras.responsible_user_id = ?',
+        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'], current_user.id)
+      cars += Hazard.includes(:sra).where('sras.approver_id = ? OR sras.reviewer_id = ?',
+        current_user.id, current_user.id)
+      @records = @records & cars
+    end
 	end
 
 

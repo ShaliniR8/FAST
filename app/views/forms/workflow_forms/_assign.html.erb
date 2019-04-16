@@ -42,7 +42,7 @@
 			</div>
 
 			<%=f.submit "Assign",
-				:class => "btn btn-success pull-right mt5",
+				:class => "btn btn-warning pull-right mt5",
 				:disable_with => "Assigning..."%>
 
 		</div>
@@ -101,7 +101,7 @@
 			$('form').hide();
 			$("#emp_div").show();;
 			$('#users tbody tr' ).unbind();
-			$('.close' ).unbind();	   		
+			$('.close' ).unbind();
 			$('#users').on('click', 'tbody tr', function(){
 				$('#emp_1').val($(this).find('td').eq(3).text());
 				$('#employee-select1').val($(this).find('td').eq(0).text());
