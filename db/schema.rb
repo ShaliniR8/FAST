@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190409165216) do
+ActiveRecord::Schema.define(:version => 20190410235123) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -185,6 +185,36 @@ ActiveRecord::Schema.define(:version => 20190409165216) do
     t.integer  "obj_id"
   end
 
+  create_table "checklist_cells", :force => true do |t|
+    t.integer  "checklist_row_id"
+    t.integer  "checklist_header_item_id"
+    t.integer  "col_index"
+    t.string   "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "checklist_header_items", :force => true do |t|
+    t.integer  "display_order"
+    t.integer  "checklist_header_id"
+    t.string   "title"
+    t.string   "data_type"
+    t.text     "options"
+    t.boolean  "editable",            :default => false
+    t.boolean  "archive",             :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "checklist_headers", :force => true do |t|
+    t.string   "title"
+    t.string   "description"
+    t.integer  "created_by_id"
+    t.boolean  "enabled",       :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "checklist_items", :force => true do |t|
     t.string   "type"
     t.integer  "owner_id"
@@ -235,6 +265,14 @@ ActiveRecord::Schema.define(:version => 20190409165216) do
     t.boolean  "header",            :default => false
   end
 
+  create_table "checklist_rows", :force => true do |t|
+    t.integer  "checklist_id"
+    t.integer  "row_index"
+    t.integer  "created_by_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "checklist_templates", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -242,6 +280,16 @@ ActiveRecord::Schema.define(:version => 20190409165216) do
     t.boolean  "archive",    :default => false
     t.text     "notes"
     t.integer  "created_by"
+  end
+
+  create_table "checklists", :force => true do |t|
+    t.string   "type"
+    t.integer  "owner_id"
+    t.integer  "created_by_id"
+    t.integer  "checklist_header_id"
+    t.boolean  "is_template",         :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "client_applications", :id => false, :force => true do |t|
@@ -923,6 +971,20 @@ ActiveRecord::Schema.define(:version => 20190409165216) do
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+  end
+
+  create_table "recurrences", :force => true do |t|
+    t.string   "title"
+    t.integer  "created_by_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "status"
+    t.string   "form_type"
+    t.integer  "template_id"
+    t.string   "frequency"
+    t.integer  "next_id"
+    t.date     "next_date"
+    t.date     "end_date"
   end
 
   create_table "report_meetings", :force => true do |t|

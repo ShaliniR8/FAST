@@ -1,13 +1,15 @@
-<div class="modal fade emp_modal" 
-	tabindex="-1" 
-	role="dialog" 
-	aria-labelledby="myLargeModalLabel">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-			<%=render '/submissions/emp'%>
-		</div>
-	</div>
-</div>
+<%if !defined?(@base_defined) #for embedding multiple _form_fields renders%>
+  <div class="modal fade emp_modal"
+  	tabindex="-1"
+  	role="dialog"
+  	aria-labelledby="myLargeModalLabel">
+  	<div class="modal-dialog modal-lg" role="document">
+  		<div class="modal-content">
+  			<%=render '/submissions/emp'%>
+  		</div>
+  	</div>
+  </div>
+<%end%>
 
 <%fields.each do |field_hash|%>
 
@@ -44,21 +46,21 @@
 	<%field_name 						= field_hash[:field]%>
 	<%field_required_field 	= field_hash[:required] ? "required_field" : ""%>
 	<%field_required_label 	= field_hash[:required] ? "required_label" : ""%>
-	<%field_options					= field_hash[:options].sort! rescue []%>	
+	<%field_options					= field_hash[:options].sort! rescue []%>
 
 	<%if field_name%>
 		<div class="form-group col-xs-<%=field_num_cols%> <%=field_name%>">
-			
+
 
 			<%case field_type%>
 				<%when "boolean"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
 					<%boolean_options = {"Yes" => true, "No" => false}%>
-					<%=f.select field_name, 
-						options_for_select(boolean_options, record.send(field_name)), 
-						{:include_blank => ""}, 
+					<%=f.select field_name,
+						options_for_select(boolean_options, record.send(field_name)),
+						{:include_blank => ""},
 						{:class => "field_select form-control " + field_required_field}%>
-						
+
 				<%when "boolean_box"%>
 					<div class="col-xs-12">
 						<div class="col-sm-6 col-md-6 col-lg-6">
@@ -75,9 +77,9 @@
 						<%field_options.each do |option|%>
 							<div class="col-sm-6 col-md-6 col-lg-6">
 								<label class="checkbox">
-									<%=f.check_box field_name, 
-										{:multiple => true, :class => "checkbox"}, 
-										option, nil%> 
+									<%=f.check_box field_name,
+										{:multiple => true, :class => "checkbox"},
+										option, nil%>
 									<%=option%>
 								</label>
 							</div>
@@ -86,10 +88,10 @@
 
 				<%when "datalist"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.text_field field_name, 
+					<%=f.text_field field_name,
 						{
-							:list => "#{field_name}", 
-							:class => "field_select form-control " + field_required_field, 
+							:list => "#{field_name}",
+							:class => "field_select form-control " + field_required_field,
 							"data-id" => field_name
 						}
 						%>
@@ -101,56 +103,56 @@
 
 				<%when "date"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.text_field field_name, 
+					<%=f.text_field field_name,
 						:class => "form-control field-date "  + field_required_field%>
 
 				<%when "datetime"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.text_field field_name, 
-						:class => "form-control field-datetime "  + field_required_field%>	
+					<%=f.text_field field_name,
+						:class => "form-control field-datetime "  + field_required_field%>
 
 				<%when "select"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.select field_name, 
-						options_for_select(field_options, record.send(field_name)), 
-						{:include_blank => ""}, 
+					<%=f.select field_name,
+						options_for_select(field_options, record.send(field_name)),
+						{:include_blank => ""},
 						{:class => "field_select form-control " + field_required_field}%>
 
 				<%when 'select_map'%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.select field_name, 
-						options_for_select(field_hash[:options]), 
-						{:include_blank => ""}, 
+					<%=f.select field_name,
+						options_for_select(field_hash[:options]),
+						{:include_blank => ""},
 						{:class => 'field_select form-control'}%>
 
 				<%when "text"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.text_field field_name, 
+					<%=f.text_field field_name,
 						:class => "form-control " + field_required_field%>
 
 				<%when "textarea"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
-					<%=f.text_area 	field_name, 
-						:class => "form-control "  + field_required_field, 
+					<%=f.text_area 	field_name,
+						:class => "form-control "  + field_required_field,
 						:rows => 4%>
 
 				<%when "user"%>
 					<%=f.label(field_name, field_description, :class => field_required_label)%>
 					<div class="input-group">
-						<%=text_field_tag field_description, "", 
+						<%=text_field_tag field_description, "",
 							{
-								:class => "form-control ml5 emp " + field_required_field, 
-								:readonly => true, 
+								:class => "form-control ml5 emp " + field_required_field,
+								:readonly => true,
 								:id => "emp#{field_name}",
 								:value => record.send(field_name).present? ? User.find(record.send(field_name)).full_name : "",
 							}%>
 						<%=f.hidden_field field_name, :id => "employee-select#{field_name}"%>
 						<span class="input-group-btn">
-							<%=link_to 	"...", 
-								"#", 
-								:class => "btn btn-info emp_button", 
-								"data-toggle" => "modal", 
-								"data-target" => ".emp_modal", 
+							<%=link_to 	"...",
+								"#",
+								:class => "btn btn-info emp_button",
+								"data-toggle" => "modal",
+								"data-target" => ".emp_modal",
 								:id => "#{field_name}"%>
 						</span>
 					</div>
@@ -180,81 +182,83 @@
 		cursor: pointer;
 		margin-top: 2px;
 		margin-bottom: 2px;
-	}	
+	}
 	.checkbox:hover {
 		font-weight:bold;
-	}	
+	}
 </style>
 
 
 
+<%if !defined?(@base_defined) %>
+  <script>
 
-<script>
+  	var employee_table;
 
-	var employee_table;
+  	function build_user_table(){
+  		employee_table = $('#users').DataTable({
+  			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+  			"iDisplayLength": 5
+  		});
+  	}
 
-	function build_user_table(){
-		employee_table = $('#users').DataTable({
-			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-			"iDisplayLength": 5
-		});
-	}
+  	function clear_user_table(){
+  		employee_table.destroy();
+  	}
 
-	function clear_user_table(){
-		employee_table.destroy();
-	}
+  	$(function() {
 
-	$(function() {
+  		$(window).resize();
+  		build_user_table();
 
-		$(window).resize();
-		build_user_table();
-
-		$(this).find(".emp_button").each(function(index, item){
-			$(item).on("click", function(){
-				var field_id = $(this).prop('id');
-				$(".emp_modal").show();
-				clear_user_table();
-				$("#users tbody tr").unbind();
-				$(".close").unbind();
-				$("#users tbody tr").on("click", function(){
-					$(item).parent().parent().find("#emp" + field_id).val($(this).find("td").eq(3).text());
-					$(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
-					$('#emp_div').hide();
-					$('.emp_modal').modal('toggle');
-				});
-				$('.close').on('click',function(){
-					console.log("closed");
-					$(item).parent().parent().find("#emp"+field_id).val("");
-					$(item).parent().parent().find("#employee-select"+field_id).val("");
-					$('#emp_div').hide();
-				});
-				build_user_table();
-			});
-		});
-	
-
-		$("form").on('submit', function(){
-			var error = false;
-			var result = true;
-			$(".required_field").css('border-color', '');
-			$(this).find('.required_field').each(function(){
-				if ($(this).val() == ""){
-					error = true;
-					result = false;
-					$(this).css('border-color', 'red');  
-					event.preventDefault();
-				}
-			});
-			if (error){
-				swal({
-					title: "Please fill in all required fields.",
-					type: "error",
-				});
-				return result;
-			}
-		});
-
-	});
+  		$(this).find(".emp_button").each(function(index, item){
+  			$(item).on("click", function(){
+  				var field_id = $(this).prop('id');
+  				$(".emp_modal").show();
+  				clear_user_table();
+  				$("#users tbody tr").unbind();
+  				$(".close").unbind();
+  				$("#users tbody tr").on("click", function(){
+  					$(item).parent().parent().find("#emp" + field_id).val($(this).find("td").eq(3).text());
+  					$(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
+  					$('#emp_div').hide();
+  					$('.emp_modal').modal('toggle');
+  				});
+  				$('.close').on('click',function(){
+  					console.log("closed");
+  					$(item).parent().parent().find("#emp"+field_id).val("");
+  					$(item).parent().parent().find("#employee-select"+field_id).val("");
+  					$('#emp_div').hide();
+  				});
+  				build_user_table();
+  			});
+  		});
 
 
-</script>
+  		$("form").on('submit', function(){
+  			var error = false;
+  			var result = true;
+  			$(".required_field").css('border-color', '');
+  			$(this).find('.required_field').each(function(){
+  				if ($(this).val() == ""){
+  					error = true;
+  					result = false;
+  					$(this).css('border-color', 'red');
+  					event.preventDefault();
+  				}
+  			});
+  			if (error){
+  				swal({
+  					title: "Please fill in all required fields.",
+  					type: "error",
+  				});
+  				return result;
+  			}
+  		});
+
+  	});
+
+
+  </script>
+  <%@base_defined = true%>
+<%end%>

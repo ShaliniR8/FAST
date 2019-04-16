@@ -99,9 +99,10 @@ class Audit < ActiveRecord::Base
 
 	def create_transaction(action)
 		if !self.changes()['viewer_access'].present?
-			AuditTransaction.create(:users_id => session[:user_id],
+			AuditTransaction.create(:users_id => (session[:user_id] rescue nil),
 				:action => action,
 				:owner_id => self.id,
+        :content => defined?(session) ? '' : 'Recurring Audit',
 				:stamp => Time.now)
 		end
 	end
