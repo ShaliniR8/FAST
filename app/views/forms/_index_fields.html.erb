@@ -17,6 +17,13 @@
 				</div>
 				<div class="top_buttons pull-right">
 
+					<%if defined? btns%>
+						<%btns.each do |btn|%>
+							<%=link_to btn[:btn_name], btn[:btn_path], :class => "btn #{btn[:btn_class]} pull-right mr5"%>
+						<%end%>
+					<%end%>
+
+
 					<%=link_to "Advanced Search", '#', 
 						:class => "btn btn-warning pull-right mr5", 
 						:id => "adv", 

@@ -1,0 +1,135 @@
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%= render "shared/alerts" %>
+
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            <%=@record.class.name.titleize%>: <%=@record.title%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%=link_to "Back",
+              checklist_headers_path,
+              :class => "btn btn-default pull-right",
+              :disable_with => "Redirecting..."%>
+            <%=link_to "Export CSV",
+              export_checklist_header_path(@record, :format => "csv"),
+              :class => "btn btn-success pull-right mr5",
+              :target => "_blank"%>
+            <%=link_to "Clone",
+              clone_checklist_header_path(@record),
+              :confirm => 'Are you sure?',
+              :class => "btn btn-success pull-right mr5"%>
+
+            <%if @record.status == 'New'%>
+              <%=link_to "Edit",
+                edit_checklist_header_path(@record),
+                :class => "btn btn-warning pull-right mr5",
+                :disable_with => "Editing..."%>
+              <%=link_to 'Publish',
+                checklist_header_path(@record, checklist_header: {status: 'Published'}),
+                :method => 'put',
+                :disable_with => 'Updating...',
+                :confirm => 'Are you sure?',
+                :class => 'btn btn-danger pull-right mr5'%>
+            <%elsif @record.status == 'Published'%>
+              <%=link_to 'Disable',
+                checklist_header_path(@record, checklist_header: {status: 'Disabled'}),
+                :method => 'put',
+                :disable_with => 'Updating...',
+                :confirm => 'Are you sure?',
+                :class => 'btn btn-danger pull-right mr5'%>
+            <%elsif @record.status == 'Disabled'%>
+              <%=link_to 'Enable',
+                checklist_header_path(@record, checklist_header: {status: 'Published'}),
+                :method => 'put',
+                :disable_with => 'Updating...',
+                :confirm => 'Are you sure?',
+                :class => 'btn btn-danger pull-right mr5'%>
+            <%end%>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <%=render '/forms/show_fields', :fields => @fields, :record => @record%>
+
+        <div class="col-xs-12 mt20">
+          <div class="panel panel-lightskyblue">
+            <div class="panel-heading">
+              <div class="panel-title">Checklist Preview</div>
+            </div>
+            <div class="panel-body">
+
+              <table class="table table-bordered table-striped">
+                <thead>
+                  <%@record.checklist_header_items.where(:archive => false).order(:display_order).each do |item|%>
+                    <th><%=item.title%></th>
+                  <%end%>
+                </thead>
+                <tbody>
+                  <%(1..2).each do |x|%>
+                    <tr>
+                      <%@record.checklist_header_items.where(:archive => false).order(:display_order).each do |item|%>
+                        <td>
+                          <%case item.data_type%>
+                          <%when 'text'%>
+                            <input class="form-control" placeholder="Sample <%=x%>"></input>
+                          <%when 'dropdown'%>
+                            <select class="form-control field_select" id="preview_select" name="preview_select">
+                              <option></option>
+                              <%item.options.split(';').each do |option|%>
+                                <option data-id="<%=item.id%>"><%=option%></option>
+                              <%end%>
+                            </select>
+                          <%when 'radio'%>
+                            <div class="col-xs-12 ml5">
+                              <%item.options.split(";").each do |option|%>
+                                <label class="radio">
+                                  <%=radio_button_tag :value, option%>
+                                  <%=option%>
+                                </label>
+                              <%end%>
+                            </div>
+                          <%end%>
+                        </td>
+                      <%end%>
+                    </tr>
+                  <%end%>
+                </tbody>
+              </table>
+
+
+            </div>
+          </div>
+        </div>
+
+
+        <%#=render "checklist_templates", :owner => @record%>
+
+
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<style>
+  .radio{
+    cursor: pointer;
+  }
+  .radio:hover {
+    font-weight:bold;
+  }
+</style>
+
+
+

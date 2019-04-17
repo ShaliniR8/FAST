@@ -1,0 +1,121 @@
+<div class="col-xs-12">
+  <div class="panel panel-lightskyblue">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        Checklists
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
+      </div>
+    </div>
+    <div class="panel-body" style="display:none">
+
+      <%if owner.status != 'Completed' && (
+        current_user.admin? ||
+        current_user.has_access(owner.class.table_name,'admin') ||
+        current_user.has_access(owner.class.table_name,'edit'))%>
+
+        <%=link_to "Add New Checklist", '#',
+            :class => 'btn btn-success pull-right mr5 mb10',
+            :id => 'upload_btn',
+            'data-toggle' => 'modal',
+            'data-target' => '.bs-example-modal-lg'%>
+      <%end%>
+
+      <div class="col-xs-12">
+
+        <%owner.checklists.each do |checklist|%>
+
+          <%if owner.status != 'Completed' && (
+              current_user.admin? ||
+              current_user.has_access(owner.class.table_name,'admin') ||
+              owner.responsible_user_id == current_user.id)%>
+            <%=link_to "Start", '#',
+              :class => 'btn btn-success pull-right mr5 start_btn',
+              'data-path' => start_checklist_path(checklist),
+              'data-toggle' => 'modal',
+              'data-target' => '.bs-example-modal-lg'%>
+          <%end%>
+
+          <%if owner.status != 'Completed' && (
+              current_user.admin? ||
+              current_user.has_access(owner.class.table_name,'admin') ||
+              current_user.has_access(owner.class.table_name,'edit'))%>
+
+            <%=link_to "Update", '#',
+              :class => 'btn btn-warning pull-right mr5 update_btn',
+              'data-path' => edit_checklist_path(checklist),
+              'data-toggle' => 'modal',
+              'data-target' => '.bs-example-modal-lg'%>
+
+            <%=link_to "Delete", checklist_path(checklist),
+              :method => 'delete',
+              :confirm => 'Are you sure?',
+              :disable_with => 'Deleting...',
+              :class => 'btn btn-danger pull-right mr5'%>
+          <%end%>
+
+          <%=link_to "Export CSV",
+            export_checklist_path(checklist, :format => "csv"),
+            :class => "btn btn-success pull-right mr5",
+            :target => "_blank"%>
+
+          <table id="checklist_records_<%checklist.id%>" class="table table-bordered table-striped mt10">
+            <thead>
+              <tr>
+                <%checklist.checklist_header.checklist_header_items.where(:archive => false).map(&:title).each do |header|%>
+                  <th><%=header%></th>
+                <%end%>
+              </tr>
+            </thead>
+            <tbody>
+              <%checklist.checklist_rows.order(:id).each do |checklist_row|%>
+                <tr>
+                  <%checklist_row.checklist_cells.order(:id).each do |checklist_cell|%>
+                    <%if !checklist_cell.checklist_header_item.archive%>
+                      <td><%=checklist_cell.value%></td>
+                    <%end%>
+                  <%end%>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+
+        <%end%>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $(function(){
+    $('#upload_btn').on('click',function(){
+      $.get("<%=new_checklist_path(
+        :owner_class => owner.class.name,
+        :owner_id => owner.id)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('.start_btn').on('click',function(){
+      var path = $(this).data("path");
+      $.get(path, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('.update_btn').on('click',function(){
+      var path = $(this).data("path");
+      $.get(path, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+  });
+</script>
