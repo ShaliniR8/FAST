@@ -17,26 +17,7 @@ end
 
 class InspectionsController < ApplicationController
 	before_filter :login_required
-	before_filter :check_group, :only => [:show]
-
-
-	def check_group
-		report = Inspection.find(params[:id])
-		if current_user.level == "Admin"
-			return true
-		elsif report.privileges.present?
-			current_user.privileges.each do |p|
-				if report.get_privileges.include? p.id.to_s
-					return true
-				end
-			end
-			redirect_to errors_path
-			return false
-		else
-			return true
-		end
-	end
-
+  before_filter(only: [:show]) { check_group('inspection') }
 
 
 	def new
@@ -180,6 +161,13 @@ class InspectionsController < ApplicationController
 		@headers = @table.get_meta_fields('index')
 		@terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
 		handle_search
+
+    if !current_user.admin? && !current_user.has_access('inspections','admin')
+      cars = Inspection.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+      cars += Inspection.where('approver_id = ?',  current_user.id)
+      @records = @records & cars
+    end
 	end
 
 
@@ -188,11 +176,7 @@ class InspectionsController < ApplicationController
 		@inspection = Inspection.find(params[:id])
 		load_options
 		@fields = Inspection.get_meta_fields('show')
-			if !@inspection.viewer_access && !current_user.has_access('inspections','viewer')
-				redirect_to errors_path
-				return
-			end
-			@checklist_headers = InspectionRequirement.get_meta_fields('show')
+		@checklist_headers = InspectionRequirement.get_meta_fields('show')
 	end
 
 
@@ -215,33 +199,6 @@ class InspectionsController < ApplicationController
 			risk_matrix_initializer
 	end
 	helper_method :load_options
-
-
-
-	# Release button
-	# def release_finding PENDING2
-	# 	@inspection = Inspection.find(params[:id])
-	# 	@finding = Finding.find(params[:finding])
-	# 	if @finding.immediate_action || @inspection.status == "Completed"
-	# 		@finding.status = "Open"
-	# 		notify(
-	# 			@finding.responsible_user,
-	# 			"Finding ##{@finding.get_id} has been scheduled for you." +
-	# 				g_link(@finding),
-	# 			true,
-	# 			"Finding ##{@finding.get_id} Assigned")
-	# 		FindingTransaction.create(:users_id=>current_user.id, :action=>"Open",:owner_id=>@finding.id, :stamp=>Time.now)
-	# 	else
-	# 		@finding.status = "Pending Release"
-	# 		FindingTransaction.create(
-	# 			:users_id => current_user.id,
-	# 			:action => "Pending Release",
-	# 			:owner_id => @finding.id,
-	# 			:stamp => Time.now)
-	# 	end
-	# 	@finding.save
-	# 	redirect_to inspection_path(@inspection)
-	# end
 
 
 

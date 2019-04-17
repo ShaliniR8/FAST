@@ -21,25 +21,7 @@ end
 class SmsActionsController < ApplicationController
 
 	before_filter :load_options
-	before_filter :check_group, :only => [:show]
-
-
-
-	def check_group
-	report = SmsAction.find(params[:id])
-		if report.privileges.present?
-			current_user.privileges.each do |p|
-				if report.get_privileges.include? p.id.to_s
-					return true
-				end
-			end
-			redirect_to errors_path
-			return false
-		else
-			return true
-		end
-	end
-
+  before_filter(only: [:show]) { check_group('sms_action') }
 
 
 	def destroy

@@ -17,26 +17,7 @@ end
 
 class RecommendationsController < ApplicationController
 
-	before_filter :check_group, :only => [:show]
-
-
-
-	def check_group
-		report = Recommendation.find(params[:id])
-		if report.privileges.present?
-			current_user.privileges.each do |p|
-				if report.get_privileges.include? p.id.to_s
-					return true
-				end
-			end
-			redirect_to errors_path
-			return false
-		else
-			return true
-		end
-	end
-
-
+  before_filter(only: [:show]) { check_group('recommendation') }
 
 	def index
 		@table = Object.const_get("Recommendation")
