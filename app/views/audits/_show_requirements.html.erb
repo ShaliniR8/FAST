@@ -4,9 +4,9 @@
 			<div class="panel-heading click-heading collapsed">
 				<div class="panel-title">
 					<b>Requirement Checklist</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-				</div> 
+				</div>
 			</div>
-			<div class="panel-body" style="display:none"> 
+			<div class="panel-body" style="display:none">
 				<%if type == "audit"%>
 					<%=link_to "Download Checklist",download_checklist_audit_path(owner,:format=>"csv"),:class=>"btn btn-success pull-right mb5",:target=>"_blank"%>
 				<%elsif type == "evaluation"%>
@@ -28,7 +28,7 @@
 								<%@checklist_headers.each do |h|%>
 									<%if h[:type] == "user"%>
 										<td>
-											<%=User.find(i.send(h[:field])).full_name%>
+											<%=User.find(i.send(h[:field])).full_name rescue ''%>
 										</td>
 									<%else%>
 										<td><%=i.send(h[:field])%></td>

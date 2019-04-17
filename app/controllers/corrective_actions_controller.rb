@@ -53,13 +53,13 @@ class CorrectiveActionsController < ApplicationController
 		handle_search
 
 		if !current_user.admin?
-			cars = CorrectiveAction.where('status in (?) and users_id = ?', 
+			cars = CorrectiveAction.where('status in (?) and responsible_user_id = ?',
 				['Assigned', 'Pending Approval', 'Completed'], current_user.id)
 			cars += CorrectiveAction.where('approver_id = ?',  current_user.id)
 			@records = @records & cars
 		end
 	end
-	
+
 
 	def create
 		@owner = CorrectiveAction.new(params[:corrective_action])
@@ -87,7 +87,7 @@ class CorrectiveActionsController < ApplicationController
 	def override_status
 		@owner = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
 		render :partial => '/forms/workflow_forms/override_status'
-	end	
+	end
 
 
 	def assign
@@ -114,24 +114,24 @@ class CorrectiveActionsController < ApplicationController
 		case params[:commit]
 		when 'Assign'
 			@owner.assigned_date = Time.now
-			notify(@owner.responsible_user, 
+			notify(@owner.responsible_user,
 				"Corrective Action ##{@owner.id} has been Assigned to you." + g_link(@owner),
 				true, 'Corrective Action Assigned')
 		when 'Complete'
 			if @owner.approver
-				notify(@owner.approver, 
+				notify(@owner.approver,
 					"Corrective Action ##{@owner.id} needs your Approval." + g_link(@owner),
 					true, 'Corrective Action Pending Approval')
 			else
 				@owner.close_date = Time.now
 			end
 		when 'Reject'
-			notify(@owner.responsible_user, 
+			notify(@owner.responsible_user,
 				"Corrective Action ##{@owner.id} has been Rejected by the Final Approver." + g_link(@owner),
 				true, 'Corrective Action Rejected')
 		when 'Approve'
 			@owner.close_date = Time.now
-			notify(@owner.responsible_user, 
+			notify(@owner.responsible_user,
 				"Corrective Action ##{@owner.id} has been Approved by the Final Approver." + g_link(@owner),
 				true, 'Corrective Action Approved')
 		when 'Override Status'
@@ -184,8 +184,8 @@ class CorrectiveActionsController < ApplicationController
 	def new_attachment
 		@owner = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
 		@attachment = CorrectiveActionAttachment.new
-		render :partial => "shared/attachment_modal" 
-	end 
+		render :partial => "shared/attachment_modal"
+	end
 
 
 

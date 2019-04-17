@@ -90,7 +90,7 @@ class User < ActiveRecord::Base
 
   def has_access(con_name, act_name)
 		rule = AccessControl.where('action = ? AND entry = ?', act_name, con_name).first
-		if rule.present? && privileges.present?
+		if rule.present?
 			(rule.privileges & privileges).size > 0
 		else
 			true

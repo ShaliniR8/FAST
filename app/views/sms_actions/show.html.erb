@@ -115,7 +115,7 @@
 					<%elsif corrective_action.status == 'Assigned'%>
 						<%if corrective_action.can_complete? current_user%>
 							<%=link_to "Complete", '#',
-								:class => "btn btn-success pull-right complete_btn mr5 mb5",
+								:class => "btn btn-warning pull-right complete_btn mr5 mb5",
 								:id => 'complete',
 								'data-toggle' => 'modal',
 								'data-target' => '.bs-example-modal-lg'%>

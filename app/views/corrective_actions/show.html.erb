@@ -24,7 +24,7 @@
 						<%end%>
 
 						<%if current_user.admin?%>
-							<%=link_to 'Override Status', '#', 
+							<%=link_to 'Override Status', '#',
 								:class => 'btn btn-danger pull-right mr5 mb5',
 								:id => 'override_status_btn',
 								"data-toggle" => "modal",
@@ -84,7 +84,7 @@
 				<div class="col-xs-12 mb15">
 
 						<%if @corrective_action.status == "New"%>
-							<%if current_user.admin? || @corrective_action.final_approver_id == current_user.id%>
+							<%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
 								<%=link_to 'Assign', '#',
 									:id => 'assign_btn',
 									:class => 'btn btn-warning pull-right mr5',
@@ -93,7 +93,7 @@
 							<%end%>
 
 						<%elsif @corrective_action.status == 'Assigned'%>
-							<%if current_user.admin? || @corrective_action.users_id == current_user.id%>
+							<%if current_user.admin? || @corrective_action.responsible_user_id == current_user.id%>
 								<%=link_to "Complete", '#',
 									:class => "btn btn-warning pull-right complete_btn mr5 mb5",
 									:id => 'complete',
@@ -102,7 +102,7 @@
 							<%end%>
 
 						<%elsif @corrective_action.status == "Pending Approval"%>
-							<%if current_user.admin? || @corrective_action.final_approver_id == current_user.id%>
+							<%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
 								<%=link_to "Approve", "#",
 									:class => "btn btn-success pull-right mr5 approve_btn mb5",
 									:id => 'approve',

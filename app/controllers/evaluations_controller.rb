@@ -17,27 +17,7 @@ end
 
 class EvaluationsController < ApplicationController
 	before_filter :login_required
-	before_filter :check_group,:only=>[:show]
-
-
-
-	def check_group
-		report = Evaluation.find(params[:id])
-		if current_user.level == "Admin"
-			return true
-		elsif report.privileges.present?
-			current_user.privileges.each do |p|
-				if report.get_privileges.include? p.id.to_s
-					return true
-				end
-			end
-			redirect_to errors_path
-			return false
-		else
-			return true
-		end
-	end
-
+  before_filter(only: [:show]) { check_group('evaluation') }
 
 
 	def new
@@ -264,7 +244,7 @@ class EvaluationsController < ApplicationController
 
 	def update_checklist
 		@audit = Evaluation.find(params[:id])
-		@checklist_headers = EvaluationItem.get_headers
+		@checklist_headers = EvaluationItem.get_meta_fields
 		render :partial => "audits/update_checklist"
 	end
 

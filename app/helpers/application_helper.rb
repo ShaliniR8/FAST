@@ -183,8 +183,8 @@ module ApplicationHelper
 			"DARKTURQUOISE"
 		else
 			"lightgray"
-		end 
-			
+		end
+
 	end
 
 
@@ -195,7 +195,7 @@ module ApplicationHelper
 		when 'Submission'
 			entry_url = submission_url(entry)
 		when 'Record'
-			entry_url = record_url(entry)			
+			entry_url = record_url(entry)
 		when 'Report'
 			entry_url = report_url(entry)
 		when 'Meeting'
@@ -204,6 +204,8 @@ module ApplicationHelper
 			entry_url = corrective_action_url(entry)
 		when 'Audit'
 			entry_url = audit_url(entry)
+    when 'Evaluation'
+      entry_url = evaluation_url(entry)
 		when 'Inspection'
 			entry_url = inspection_url(entry)
 		when 'Investigation'
@@ -245,13 +247,13 @@ module ApplicationHelper
 			entry_url = use_url ? report_url(entry) : report_path(entry)
 		when "Record"
 			entry_url = use_url ? record_url(entry) : record_path(entry)
-		when "Meeting" 
+		when "Meeting"
 			entry_url = use_url ? meeting_url(entry) : meeting_path(entry)
-		when "VpMeeting" 
+		when "VpMeeting"
 			entry_url = use_url ? sms_meeting_url(entry) : sms_meeting_path(entry)
-		when "JobMeeting" 
+		when "JobMeeting"
 			entry_url = use_url ? sms_meeting_url(entry) : sms_meeting_path(entry)
-		when "SrmMeeting" 
+		when "SrmMeeting"
 			entry_url = use_url ? srm_meeting_url(entry) : srm_meeting_path(entry)
 		when "Audit"
 			entry_url = use_url ? audit_url(entry) : audit_path(entry)
@@ -265,14 +267,14 @@ module ApplicationHelper
 			entry_url = use_url ? finding_url(entry) : finding_path(entry)
 		when "EvaluationFinding"
 			entry_url = use_url ? finding_url(entry) : finding_path(entry)
-		when "SmsAction"  
+		when "SmsAction"
 			entry_url = use_url ? sms_action_url(entry) : sms_action_path(entry)
 		when "FindingAction"
 			entry_url = use_url ? sms_action_url(entry) : sms_action_path(entry)
 		when "InvestigationAction"
 			entry_url = use_url ? sms_action_url(entry) : sms_action_path(entry)
 		when "Inspection"
-			entry_url = use_url ? inspection_url(entry) : inspection_path(entry)    
+			entry_url = use_url ? inspection_url(entry) : inspection_path(entry)
 		when "Evaluation"
 			entry_url = use_url ? evaluation_url(entry) : evaluation_path(entry)
 		when "Investigation"
@@ -296,7 +298,7 @@ module ApplicationHelper
 		end
 		"    <a href='#{entry_url}'>#{message}</a>"
 	end
-	
+
 	def link_to_add_fields(name, f, association, locals={})
 		target = association.to_s
 		new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
@@ -312,7 +314,7 @@ module ApplicationHelper
 	def link_to_fields(name, form, association, field_class, template, insert_location,options={})
 		new_object = Object.const_get(field_class).new
 		fields = form.fields_for(association,new_object, :child_index => "new_#{association}") do |builder|
-			render(template, :f => builder) 
+			render(template, :f => builder)
 		end
 		link_to_function(name, "add_fields(this, \"#{association}\", \"#{escape_javascript(fields)}\",\"#{insert_location}\")", options)
 	end
@@ -333,7 +335,7 @@ module ApplicationHelper
 			#return '<img src="http://www.clker.com/cliparts/a/6/e/8/119498563188281957tasto_8_architetto_franc_01.svg.med.png" width="20" height="20"/>'
 			return '<p style="font-size:1.2em; color: red; margin:2px 0 0 0;"> N</p>'
 		elsif value =="maint"
-			return '<p style="font-size:1.2em; color: orange; margin:2px 0 0 0;"> M</p>'   
+			return '<p style="font-size:1.2em; color: orange; margin:2px 0 0 0;"> M</p>'
 		else
 			#return '<img src="http://innervationenergy.com/images/ies_check.png" width="20" height="20"/>'
 			return '<p style="font-size:1.2em; color: green; margin:2px 0 0 0"> Y</p>'

@@ -31,15 +31,43 @@ class ApplicationController < ActionController::Base
 		if current_user.blank?
 		else
 			if !current_user.has_access(controller_name,action_name)
-				redirect_to errors_path
+				redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
 			elsif current_user.disable
 				redirect_to logout_path
 			end
 		end
 	end
 
-
-
+	def check_group(form)
+		report = Object.const_get(form.titleize.gsub(/\s+/, '')).find(params[:id])
+		if current_user.level == "Admin" || current_user.has_access("#{form}s",'admin')
+			true
+		else
+			group_validation = false #to reduce calculation of whether user is part of the group if present
+			report_privileges = report.privileges.present? ? report.get_privileges : []
+			if !report.privileges.empty?
+				current_user.privileges.each do |p|
+					if report.get_privileges.include? p.id.to_s
+						group_validation = true
+					end
+				end
+			else
+				group_validation = true
+			end
+			if (current_user.id == report.approver_id ||
+          (current_user.id == report.responsible_user_id && report.status != 'New')) &&
+          current_user.has_access("#{form}s",'view')
+				redirect_to errors_path if !group_validation
+			elsif defined?(report.viewer_access) &&
+          report.viewer_access &&
+          current_user.has_access("#{form}s",'viewer')
+				redirect_to errors_path if !group_validation
+			else
+				false
+        redirect_to errors_path
+			end
+		end
+	end
 
 	def get_message_link(link_type, link_id)
 		if link_type.present?
