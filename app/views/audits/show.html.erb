@@ -198,16 +198,22 @@
 				<%#=render '/forms/progress_bar', :owner => @audit%>
 				<%=render '/forms/show_fields', :fields => @fields, :record => @audit%>
 
-				<%if BaseConfig.airline[:checklist_version] == '2'%>
+				<%if BaseConfig.airline[:checklist_version] == '1'%>
+					<%=render "/audits/items", :owner => @audit, :type => 'audit'%>
+				<%elsif BaseConfig.airline[:checklist_version] == '2'%>
 					<%=render "/checklist_templates/show_checklist_records", :owner => @audit%>
+				<%else%>
+
+				<%end%>
+
+				<%if BaseConfig.airline[:checklist_version] == '3'%>
+					<%=render "/checklists/show", :owner => @audit%>
 				<%end%>
 
 				<%=render "/ims/show_task", :owner => @audit, :fields => AuditTask.get_meta_fields('show')%>
 				<%=render "/ims/show_contact", :owner => @audit, :fields => AuditContact.get_meta_fields('show')%>
 
-				<%if BaseConfig.airline[:checklist_version] == '1'%>
-					<%=render "/audits/items", :owner => @audit, :type => 'audit'%>
-				<%end%>
+
 
 				<%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
 

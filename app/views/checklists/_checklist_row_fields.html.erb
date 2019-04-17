@@ -1,0 +1,101 @@
+<tr class="field_group to_delete">
+
+  <%if source == 'Existing'%>
+    <%checklist_row.checklist_cells.each do |checklist_cell|%>
+      <%if !checklist_cell.checklist_header_item.archive%>
+        <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
+          <td>
+            <%header_item = checklist_cell.checklist_header_item%>
+            <%if header_item.editable || action_name == 'edit'%>
+              <%case header_item.data_type%>
+              <%when 'radio'%>
+                <div class="col-xs-12">
+                  <%header_item.options.split(";").each do |option|%>
+                    <label class="radio">
+                      <%=cell_form.radio_button :value, option%>
+                      <%=option%>
+                    </label>
+                  <%end%>
+                </div>
+              <%when 'dropdown'%>
+                <%=cell_form.select :value,
+                  header_item.options.split(";"),
+                  {:include_blank => ""},
+                  {:class=>'form-control field_select'}%>
+              <%when 'text'%>
+                <%=cell_form.text_field :value, :class => "form-control"%>
+              <%end%>
+            <%else%>
+              <%=checklist_cell.value%>
+            <%end%>
+          </td>
+        <%end%>
+      <%end%>
+    <%end%>
+
+  <%else%>
+    <%locals[:checklist_header].checklist_header_items.where(:archive => false).each do |item|%>
+      <%checklist_cell = ChecklistCell.new%>
+      <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
+        <td>
+          <%case item.data_type%>
+            <%when 'radio'%>
+              <div class="col-xs-12">
+                <%item.options.split(";").each do |option|%>
+                  <label class="radio">
+                    <%=cell_form.radio_button :value, option%>
+                    <%=option%>
+                  </label>
+                <%end%>
+              </div>
+            <%when 'dropdown'%>
+              <%=cell_form.select :value,
+                item.options.split(";"),
+                {:include_blank => ""},
+                {:class=>'form-control field_select'}%>
+            <%when 'text'%>
+              <%=cell_form.text_field :value, :class => "form-control"%>
+            <%end%>
+
+          <%=cell_form.hidden_field :checklist_header_item_id, :value => item.id%>
+        </td>
+      <%end%>
+    <%end%>
+  <%end%>
+
+  <%if action_name == 'edit'%>
+    <td>
+      <%=f.hidden_field :_destroy, :id => "delete_row"%>
+      <%=link_to "Remove", '#', :class => "btn btn-danger remove_btn"%>
+    </td>
+  <%end%>
+
+
+</tr>
+
+
+<style>
+  .radio{
+    display: auto;
+    cursor: pointer;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-right: 2px;
+
+  }
+  .radio:hover {
+    font-weight:bold;
+  }
+</style>
+
+
+<script>
+  $(function(){
+
+    $(".remove_btn").on("click", function(e){
+      e.preventDefault();
+      $(this).closest("td").find("#delete_row").val(true);
+      $(this).closest(".to_delete").hide();
+    });
+  });
+</script>

@@ -1,4 +1,5 @@
 class ChecklistQuestion < ActiveRecord::Base
+	
 	belongs_to :checklist_template, foreign_key: :owner_id, class_name: "ChecklistTemplate"
 
 

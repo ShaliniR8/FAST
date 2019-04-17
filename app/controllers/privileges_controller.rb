@@ -9,7 +9,7 @@ class PrivilegesController < ApplicationController
     @headers=User.get_headers
     render :partial => "users"
   end
-  
+
   def rules
     @privilege=Privilege.find(params[:id])
     @headers=AccessControl.get_headers
@@ -24,7 +24,7 @@ class PrivilegesController < ApplicationController
     privilege=Privilege.new(params[:privilege])
     if privilege.save
       redirect_to privileges_path
-    end 
+    end
   end
 
   def destroy
@@ -33,7 +33,7 @@ class PrivilegesController < ApplicationController
     redirect_to privileges_path
   end
 
-  
+
   def edit
     @privilege=Privilege.find(params[:id])
     @headers=AccessControl.get_headers

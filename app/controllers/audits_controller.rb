@@ -294,7 +294,7 @@ class AuditsController < ApplicationController
 		@fields = Audit.get_meta_fields('show')
 		@recommendation_fields = FindingRecommendation.get_meta_fields('show')
 		@type = 'audits'
-		if !@audit.viewer_access && !current_user.has_access('audits','viewer')
+		if !@audit.viewer_access && current_user.has_access('audits','viewer')
 			redirect_to errors_path
 			return
 		end
