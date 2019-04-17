@@ -22,27 +22,7 @@ class AuditsController < ApplicationController
 
 	before_filter :login_required
 	before_filter :auditor_check, :only => [:edit,:new]
-	before_filter :check_group, :only => [:show]
-
-
-
-	def check_group
-		report = Audit.find(params[:id])
-		if current_user.level == "Admin"
-			true
-		elsif report.privileges.present?
-			current_user.privileges.each do |p|
-				if report.get_privileges.include? p.id.to_s
-					true
-				end
-			end
-			redirect_to errors_path
-			false
-		else
-			true
-		end
-	end
-
+	before_filter(only: [:show]) { check_group('audit') }
 
 
 	def auditor_check
@@ -294,10 +274,6 @@ class AuditsController < ApplicationController
 		@fields = Audit.get_meta_fields('show')
 		@recommendation_fields = FindingRecommendation.get_meta_fields('show')
 		@type = 'audits'
-		if !@audit.viewer_access && !current_user.has_access('audits','viewer')
-			redirect_to errors_path
-			return
-		end
 		@checklist_headers = AuditItem.get_headers
 	end
 

@@ -17,27 +17,7 @@ end
 
 class InvestigationsController < ApplicationController
 	before_filter :login_required
-	before_filter :check_group, :only => [:show]
-
-
-
-	def check_group
-		report = Investigation.find(params[:id])
-		if current_user.level == "Admin"
-			return true
-		elsif report.privileges.present?
-			current_user.privileges.each do |p|
-				if report.get_privileges.include? p.id.to_s
-					return true
-				end
-			end
-			redirect_to errors_path
-			return false
-		else
-			return true
-		end
-	end
-
+  before_filter(only: [:show]) { check_group('investigation') }
 
 
 	def new_recommendation
