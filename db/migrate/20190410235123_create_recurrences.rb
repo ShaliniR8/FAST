@@ -8,7 +8,7 @@ class CreateRecurrences < ActiveRecord::Migration
       t.string :form_type
       t.integer :template_id
       t.string :frequency
-      t.integer :next_id
+      t.integer :newest_id
       t.date :next_date
       t.date :end_date
     end

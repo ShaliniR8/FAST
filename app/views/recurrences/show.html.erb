@@ -34,22 +34,24 @@
         <div class="col-xs-12 mb15">
           <div class="col-xs-12 mb15">
             <%=render 'forms/show_fields', fields: @fields, record: @recurrence%>
-     <!--      </div>
-          <div class="panel panel-lightskyblue">
-            <div class="panel-heading click-heading collapsed">
-              <div class="panel-title">
-                <b>Template</b>
-                <span class="pull-right clickable">
-                  <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                </span>
+          </div>
+          <div class="col-xs-12 mb15">
+            <div class="panel panel-lightskyblue">
+              <div class="panel-heading click-heading">
+                <div class="panel-title">
+                  <b><%= "#{@recurrence.form_type} Template"%></b>
+                  <span class="pull-right clickable">
+                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="panel-body">
+                <%=render 'forms/show_fields', fields: @template_fields, record: @template%>
               </div>
             </div>
-            <div class="panel-body" style="display:none"> -->
-              <%=render 'forms/show_fields', fields: @template_fields, record: @template%>
-            <!-- </div> -->
           </div>
         </div>
-      </div> <!-- End of panel body -->
+      </div>
     </div>
   </div>
 </div>

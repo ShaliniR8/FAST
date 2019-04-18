@@ -9,7 +9,7 @@ class Recurrence < ActiveRecord::Base
       {field: 'title',    title: 'Recurrence Title',  num_cols: 6, type: 'text',          visible: 'index,form,show',  required: true},
       {field: 'form_type',title: 'Type',              num_cols: 6, type: 'text',          visible: 'show',             required: false},
       {field: 'frequency',title: 'Frequency',         num_cols: 6, type: 'select',        visible: 'index,form,show',  required: true, options: get_frequency},
-      {field: 'next_date',title: 'Next Occurence',    num_cols: 6, type: 'date',          visible: 'index,form,show',  required: true},
+      {field: 'next_date',title: 'Next Creation Date',num_cols: 6, type: 'date',          visible: 'index,form,show',  required: true},
       {field: 'end_date', title: 'End Date',          num_cols: 6, type: 'date',          visible: 'index,form,show',  required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end

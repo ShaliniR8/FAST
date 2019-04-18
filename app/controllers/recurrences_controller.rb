@@ -18,14 +18,10 @@ class RecurrencesController < ApplicationController
     template = @table.create(@template)
     # template.template = true #TODO: update each form with a template boolean field
     # @template.save!
-    first_occurrence = template.clone # create the first occurrence of the scheduled event
-    # first_occurrence.template = false
-    first_occurrence.save!
     @recurrence = Recurrence.create(params[:recurrence])
     @recurrence.template_id = template.id
     @recurrence.created_by_id = current_user.id
     @recurrence.form_type = @table.name
-    @recurrence.next_id = first_occurrence.id #list the next occurrence for the recurrence
     @recurrence.save!
     redirect_to recurrence_path(@recurrence), flash: {success: "Recurrent #{@table} created."}
   end

@@ -9,20 +9,18 @@ namespace :recurring do
     puts "Checking #{active_recurring.count} recurrences:"
     active_recurring.each do |recurrence|
       type = Object.const_get(recurrence.form_type)
-      next_form = type.find(recurrence.next_id)
-      if next_form.status == "Completed"
-        puts "Generating #{type.name} for Recurrence ##{recurrence.id}"
-        next_date = recurrence.next_date +
-            (Recurrence.month_count[recurrence.frequency])[:number].months
-        template = type.find(recurrence.template_id)
-        next_form = template.clone
-        next_form.completion = next_date
-        if next_form.save!
-          recurrence.next_date = next_date
-          recurrence.next_id = next_form.id
-          if recurrence.save!
-            puts "New #{type.name} generated: #{type.name} #{next_form.id}: scheduled for completion on #{next_date}"
-          end
+      month_count = (Recurrence.month_count[recurrence.frequency])[:number].months
+      puts "Generating #{type.name} for Recurrence ##{recurrence.id}"
+      template = type.find(recurrence.template_id)
+      next_form = template.clone
+      next_form.completion = template.completion + month_count
+      if next_form.save!
+        recurrence.next_date = recurrence.next_date + month_count
+        recurrence.newest_id = next_form.id
+        template.completion = template.completion + month_count
+        if recurrence.save! && template.save!
+          puts "New #{type.name} generated: #{type.name} #{next_form.id}: scheduled for completion on #{next_form.completion}"
+          puts "Next occurence will generate on #{recurrence.next_date} and be scheduled for completion on #{template.completion}"
         end
       end
     end

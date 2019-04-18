@@ -25,14 +25,26 @@
         <%=form_for @recurrence, html: {multipart: true} do |f|%>
           <%=render '/forms/form_fields', f: f, fields: @fields, record: @recurrence %>
 
-
-          <%=fields_for @template, html: {multipart: true} do |f|%>
-            <%=render "shared/privilege_form",
-            target: "#{@type}[privileges][]",:owner => @template,:f => f%>
-            <%=render '/forms/form_fields', :f => f, :fields => @template_fields, :record => @template %>
-            <%=render '/forms/attachments_form', :f => f, :owner => @template%>
-          <%end%>
-
+          <div class="col-xs-12 mb15">
+            <div class ="panel panel-lightskyblue">
+              <div class="panel-heading click-heading">
+                <div class="panel-title">
+                  <b><%="#{@recurrence.form_type} Template"%></b>
+                  <span class="pull-right clickable">
+                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="panel-body">
+                <%=fields_for @template, html: {multipart: true} do |f|%>
+                  <%=render "shared/privilege_form",
+                  target: "#{@type}[privileges][]",:owner => @template,:f => f%>
+                  <%=render '/forms/form_fields', :f => f, :fields => @template_fields, :record => @template %>
+                  <%=render '/forms/attachments_form', :f => f, :owner => @template%>
+                <%end%>
+              </div>
+            </div>
+          </div>
           <div class="mt10 mr10">
             <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
               :class => "btn btn-success pull-right",
