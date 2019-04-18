@@ -294,15 +294,6 @@ class AuditsController < ApplicationController
 		@privileges = Privilege.find(:all)
 			.keep_if{|p| keep_privileges(p, 'audits')}
 			.sort_by!{|a| a.name}
-		@users = User.find(:all)
-		@users.keep_if{|u| !u.disable && u.has_access('Safety Assurance', 'module')}
-		@headers = User.get_headers
-		# @departments = Audit.get_departments
-		@plan = {"Yes" => true, "No" => false}
-		@supplier = ['External','Internal','Supplier']
-		@types = Audit.select(:audit_type).uniq
-		@station_codes = Audit.select(:station_code).uniq
-		@vendors = Audit.select(:vendor).uniq
 		@frequency = (0..4).to_a.reverse
 		@like = Finding.get_likelihood
 		@cause_headers = FindingCause.get_headers
