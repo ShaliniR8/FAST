@@ -13,7 +13,6 @@ class SCX_Config
       :event_tabulation                               => false,
       :enable_custom_options                          => true,
       :enable_configurable_risk_matrices              => false,
-      :enable_checklist_templates                     => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_extension                                  => false,
@@ -32,7 +31,7 @@ class SCX_Config
       :observation_phases_trend                       => false,
       :submission_title_required                      => true,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '2',
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
       :sa_mailer                                      => false,

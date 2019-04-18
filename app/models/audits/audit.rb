@@ -5,16 +5,18 @@ class Audit < ActiveRecord::Base
 	belongs_to 	:responsible_user,	foreign_key: 'responsible_user_id',		class_name: 'User'
   belongs_to  :created_by,        foreign_key: 'created_by_id',         class_name: 'User'
 
-	has_many 		:findings,					foreign_key: 'audit_id',			class_name: 'AuditFinding',						dependent:  :destroy
-	has_many 		:tasks,							foreign_key: 'owner_id',			class_name: 'AuditTask',							dependent:  :destroy
-	has_many 		:contacts,					foreign_key: 'owner_id',			class_name: 'AuditContact',						dependent:  :destroy
-	has_many 		:attachments,				foreign_key: 'owner_id',			class_name: 'AuditAttachment', 				dependent:  :destroy
-	has_many 		:requirements,			foreign_key: 'owner_id',			class_name: 'AuditRequirement',				dependent:  :destroy
-	has_many 		:items,							foreign_key: 'owner_id',			class_name: 'AuditItem',							dependent:  :destroy
-	has_many 		:transactions,			foreign_key: 'owner_id',			class_name: 'AuditTransaction',				dependent:  :destroy
-	has_many 		:comments,					foreign_key: 'owner_id',			class_name: 'AuditComment',						dependent:  :destroy
-	has_many 		:notices,						foreign_key: 'owner_id',			class_name: 'AuditNotice',						dependent:  :destroy
-	has_many 		:checklist_records, foreign_key: 'owner_id', 			class_name: 'AuditChecklistRecord', 	dependent:  :destroy
+	has_many 		:findings,					foreign_key: 'audit_id',			class_name: 'AuditFinding',						dependent: :destroy
+	has_many 		:tasks,							foreign_key: 'owner_id',			class_name: 'AuditTask',							dependent: :destroy
+	has_many 		:contacts,					foreign_key: 'owner_id',			class_name: 'AuditContact',						dependent: :destroy
+	has_many 		:attachments,				foreign_key: 'owner_id',			class_name: 'AuditAttachment', 				dependent: :destroy
+	has_many 		:requirements,			foreign_key: 'owner_id',			class_name: 'AuditRequirement',				dependent: :destroy
+	has_many 		:items,							foreign_key: 'owner_id',			class_name: 'AuditItem',							dependent: :destroy
+	has_many 		:transactions,			foreign_key: 'owner_id',			class_name: 'AuditTransaction',				dependent: :destroy
+	has_many 		:comments,					foreign_key: 'owner_id',			class_name: 'AuditComment',						dependent: :destroy
+	has_many 		:notices,						foreign_key: 'owner_id',			class_name: 'AuditNotice',						dependent: :destroy
+	has_many 		:checklist_records, foreign_key: 'owner_id', 			class_name: 'AuditChecklistRecord', 	dependent: :destroy
+
+	has_many 		:checklists,				foreign_key: 'owner_id',			class_name: 'AuditChecklist',					dependent: :destroy
 
 	serialize :privileges
 
@@ -47,7 +49,7 @@ class Audit < ActiveRecord::Base
 			{field: 'status', 					    title: 'Status', 											num_cols: 6, 	type: 'text', 				visible: 'index,show', 			required: false},
 			{ 																																						 	    type: 'newline', 			visible: 'show'},
 			{field: 'completion', 			    title: 'Scheduled Completion Date', 	num_cols: 6, 	type: 'date', 				visible: 'index,form,show', required: true},
-			{field: 'responsible_user_id',  title: 'Responsible User', 								num_cols: 6, 	type: 'user', 				visible: 'index,form,show',	required: false},
+			{field: 'responsible_user_id',  title: 'Responsible User', 						num_cols: 6, 	type: 'user', 				visible: 'index,form,show',	required: false},
 			{field: 'approver_id', 			    title: 'Final Approver', 							num_cols: 6, 	type: 'user', 				visible: 'form,show', 			required: false},
 			{field: 'department', 			    title: 'Auditing Department', 				num_cols: 6, 	type: 'select', 			visible: 'index,form,show',	required: false,		options: get_custom_options('Departments')},
 			{field: 'audit_department',     title: 'Department being Audited', 		num_cols: 6, 	type: 'select', 			visible: 'form,show', 			required: false,		options: get_custom_options('Departments')},

@@ -314,9 +314,12 @@
 									<li style="display:<%=BaseConfig.airline[:enable_message_templates] ? 'block' : 'none'%>">
 										<%=link_to "Message Templates", canned_messages_path%>
 									</li>
-									<li style="display:<%=BaseConfig.airline[:enable_checklist_templates] ? 'block' : 'none'%>">
-										<%=link_to "Checklist Templates", checklist_templates_path%>
+									<li style="display:<%=BaseConfig.airline[:checklist_version] == '2' ? 'block' : 'none'%>">
+										<%=link_to "Checklists", checklist_templates_path%>
 									</li>
+									<li style="display:<%=BaseConfig.airline[:checklist_version] == '3' ? 'block' : 'none'%>">
+										<%=link_to "Checklist Header Templates", checklist_headers_path%>
+									</li>									 
 
 									<div class="dropdown-divider"></div>
 									<li><%=link_to "Automated Notifications", automated_notifications_path%></li>

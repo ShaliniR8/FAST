@@ -1,0 +1,10 @@
+<%=CSV.generate_line(@record.checklist_header.checklist_header_items.where(:archive => false).map(&:title)).html_safe.strip%>
+<%@record.checklist_rows.each do |checklist_row|%>
+<%row = []%>
+<%checklist_row.checklist_cells.each do |checklist_cell|%>
+<%if !checklist_cell.checklist_header_item.archive%>
+<%row << checklist_cell.value.html_safe%>
+<%end%>
+<%end%>
+<%=CSV.generate_line(row).html_safe.strip%>
+<%end%>

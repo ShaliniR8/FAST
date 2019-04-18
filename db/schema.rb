@@ -209,8 +209,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
   create_table "checklist_headers", :force => true do |t|
     t.string   "title"
     t.string   "description"
+    t.string   "status"
     t.integer  "created_by_id"
-    t.boolean  "enabled",       :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
