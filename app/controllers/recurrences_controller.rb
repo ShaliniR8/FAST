@@ -88,4 +88,13 @@ class RecurrencesController < ApplicationController
     redirect_to recurrence_path(@recurrence)
   end
 
+  def destroy
+    recurrence = Recurrence.find(params[:id])
+    type = Object.const_get(recurrence.form_type)
+    template = type.find(recurrence.template_id)
+    template.destroy
+    recurrence.destroy
+    redirect_to "/recurrences?form_type=#{type}", flash: {danger: "Recurrence ##{params[:id]} deleted."}
+  end
+
 end
