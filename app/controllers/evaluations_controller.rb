@@ -181,6 +181,7 @@ class EvaluationsController < ApplicationController
       cars += Evaluation.where('approver_id = ?',  current_user.id)
       @records = @records & cars
     end
+      @records = @records.where('template = 0 OR template is NULL')
 	end
 
 

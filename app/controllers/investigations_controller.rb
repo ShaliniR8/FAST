@@ -168,6 +168,7 @@ class InvestigationsController < ApplicationController
       cars += Investigation.where('approver_id = ?',  current_user.id)
       @records = @records & cars
     end
+    @records = @records.where('template = 0 OR template is NULL')
 	end
 
 

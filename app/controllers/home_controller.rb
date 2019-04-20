@@ -316,9 +316,9 @@ class HomeController < ApplicationController
 
 			objects = ['Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation']
 			objects.each do |x|
-				records = Object.const_get(x).where('status in (?) and (responsible_user_id = ? || approver_id = ?)', 
+				records = Object.const_get(x).where('status in (?) and (responsible_user_id = ? || approver_id = ?)',
 					['Assigned', 'Pending Approval'], current_user_id, current_user_id)
-				records.each do |record| 
+				records.each do |record|
 					if (record.get_completion_date.present? rescue false)
 						@calendar_entries.push({
 							:url => "#{records.table_name}/#{record.id}",
@@ -369,7 +369,7 @@ class HomeController < ApplicationController
 		elsif session[:mode] == "SRM"
 
 			sras = Sra.where("status in (?)", ['Assigned', 'Pending Review', 'Pending Approval'])
-			sras = sras.where("responsible_user_id = ? OR approver_id = ? OR reviewer_id = ?", 
+			sras = sras.where("responsible_user_id = ? OR approver_id = ? OR reviewer_id = ?",
 				current_user_id, current_user_id, current_user_id)
 			sras.each do |a|
 				if a.scheduled_completion_date.present?
@@ -384,7 +384,7 @@ class HomeController < ApplicationController
 			end
 
 			risk_controls = RiskControl.where("status in (?)", ['Assigned', 'Pending Review', 'Pending Approval'])
-			risk_controls = risk_controls.where("responsible_user_id = ? OR approver_id = ?", 
+			risk_controls = risk_controls.where("responsible_user_id = ? OR approver_id = ?",
 				current_user_id, current_user_id)
 			risk_controls.each do |a|
 				if a.scheduled_completion_date.present?

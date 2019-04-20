@@ -71,6 +71,7 @@ class AuditsController < ApplicationController
       cars += Audit.where('approver_id = ?',  current_user.id)
       @records = @records & cars
     end
+    @records = @records.where('template = 0 OR template is NULL')
 	end
 
 
