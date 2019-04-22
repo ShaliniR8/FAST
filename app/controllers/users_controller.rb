@@ -296,6 +296,24 @@ class UsersController < ApplicationController
 
 
   # --------- BELOW ARE EVERYTHING ADDED FOR PROSAFET APP
+  # New methods for ProSafeT App 2019 by SM
+  def get_user
+    user = current_token != nil ? current_token.user : current_user
+
+    # Get only the data that we need from the user
+    mobile_user_info = user.as_json(only: [:id, :full_name, :email])['user']
+
+    # Get which modules the user has access to
+    mobile_user_info[:mobile_module_access] = [
+      'ASAP',
+      'Safety Assurance',
+      # 'SMS IM',
+      # 'Safety Risk Management',
+    ].select{|module_name| user.has_access(module_name, 'module')}
+
+    render :json => mobile_user_info
+  end
+
    # following method added. BP Jul 14 2017
   # Added if statement for OAuth compatibiltiy KM Jul 17 2017
   def get_json
