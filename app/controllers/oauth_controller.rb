@@ -22,7 +22,7 @@ class OauthController < ApplicationController
     if user
       Rails.logger.info user.inspect
       session[:user_id] = user.id
-      session[:mode] = "ASAP"
+      #session[:mode] = "ASAP"
       #Rails.logger.info session.inspect
       #flash[:notice] = "Logged in successfully."
       #if current_user.level == "Employee"
@@ -30,14 +30,16 @@ class OauthController < ApplicationController
       #else
         #redirect_to_target_or_default(root_url)
       #end
-      user
     else
-      #Rails.logger.info 'not authenticated'
-
-      flash.now[:error] = "Invalid login or password."
-      render :action => 'new'
-      nil
+      respond_to do |format|
+        format.html do
+          flash.now[:error] = 'Invalid login or password.'
+          render :action => 'new'
+        end
+        format.json {}
+      end
     end
+    user
   end
 
   #alias :login_required :authenticate_user
