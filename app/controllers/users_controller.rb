@@ -311,7 +311,25 @@ class UsersController < ApplicationController
       # 'Safety Risk Management',
     ].select{|module_name| user.has_access(module_name, 'module')}
 
+    # mobile_user_info[:submissions] = user.submissions.as_json(only: [
+    #   :id,
+    #   :templates_id,
+    #   :description,
+    #   :event_date,
+    #   :completed
+    # ]).map {|submission| submission['submission']}
+
     render :json => mobile_user_info
+  end
+
+  def get_audits
+    user = current_token != nil ? current_token.user : current_user
+
+    audits = Audit.where('responsible_user_id = :id OR approver_id = :id', { id: user[:id] })
+      .as_json(only: [:id, :status, :title, :completion])
+      .map {|audit| audit['audit']}
+
+    render :json => audits
   end
 
    # following method added. BP Jul 14 2017
