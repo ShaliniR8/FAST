@@ -51,7 +51,7 @@ class Investigation < ActiveRecord::Base
 			{ 																																						 							type: 'newline', 			visible: 'show'},
 			{field: 'viewer_access',							title: 'Viewer Access',									num_cols: 6,  type: 'boolean_box',	visible: 'show',						required: false},
 			{ 																																						 							type: 'newline', 			visible: 'show'},
-			{field: 'scheduled_completion_date',	title: 'Scheduled Completion Date',		  num_cols: 6,	type: 'date',					visible: 'index,form,show', required: true},
+			{field: 'completion',	title: 'Scheduled Completion Date',		  num_cols: 6,	type: 'date',					visible: 'index,form,show', required: true},
 			{field: 'responsible_user_id',				title: 'Investigator',								  num_cols: 6,	type: 'user',					visible: 'index,form,show', required: false},
 			{field: 'approver_id',       					title: 'Final Approver',								num_cols: 6,	type: 'user',					visible: 'form,show',				required: false},
 			{field: 'event_occured',							title: 'Date/Time When Event Occurred', num_cols: 6,	type: 'datetime',			visible: 'form,show',				required: false},
@@ -137,7 +137,11 @@ class Investigation < ActiveRecord::Base
 
 	def create_transaction(action)
 		if !self.changes()['viewer_access'].present?
-			InvestigationTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+			InvestigationTransaction.create(users_id: (session[:user_id] rescue nil),
+          action: action,
+          owner_id: self.id,
+          content: defined?(session) ? '' : 'Recurring Investigation',
+          stamp: Time.now)
 		end
 	end
 	def investigation_type
@@ -153,11 +157,11 @@ class Investigation < ActiveRecord::Base
 	end
 
 	def get_scheduled_date
-		self.scheduled_completion_date.present? ?  (self.scheduled_completion_date.strftime("%Y-%m-%d")) : ""
+		self.completion.present? ?  (self.completion.strftime("%Y-%m-%d")) : ""
 	end
 
 	def overdue
-		self.scheduled_completion_date.present? ? self.scheduled_completion_date<Time.now.to_date&&self.status!="Completed" : false
+		self.completion.present? ? self.completion<Time.now.to_date&&self.status!="Completed" : false
 	end
 
 	def type

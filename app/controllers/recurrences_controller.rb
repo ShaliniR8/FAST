@@ -16,8 +16,8 @@ class RecurrencesController < ApplicationController
     end
     @template = params[:audit] || params[:investigation] || params[:evaluation] || params[:inspection]
     template = @table.create(@template)
-    # template.template = true #TODO: update each form with a template boolean field
-    # @template.save!
+    template.template = true
+    template.save!
     @recurrence = Recurrence.create(params[:recurrence])
     @recurrence.template_id = template.id
     @recurrence.created_by_id = current_user.id
@@ -37,11 +37,15 @@ class RecurrencesController < ApplicationController
   end
 
   def index
-    #TODO: update variable classes in sms layouts file based on which link clicked
-    @table = Recurrence #.where(type: Object.const_get(params[:type]))
+    if params.key? :form_type
+      @table = Recurrence.where(form_type: Object.const_get(params[:form_type]))
+    elsif current_user.admin?
+      @table = Recurrence
+    else
+      @table = Recurrence.none
+    end
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    #TODO: Filter out only certain form type
     handle_search
   end
 
@@ -76,6 +80,7 @@ class RecurrencesController < ApplicationController
     @type = Object.const_get(@recurrence.form_type)
     @template = @type.find(@recurrence.template_id)
     @template_fields = @type.get_meta_fields('show')
+    @children = @recurrence.children
   end
 
   def update

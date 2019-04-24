@@ -13,7 +13,7 @@
       <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
         <div class="panel-title">
           <div class="top_text">
-            Recurrent <%="#{@recurrence.form_type} ##{@recurrence.get_id}: #{@recurrence.title}"%>
+            Recurrent <%="#{@recurrence.form_type} ##{@recurrence.id}: #{@recurrence.title}"%>
           </div>
           <div class="top_buttons pull-right">
             <%=link_to "Delete",
@@ -41,7 +41,7 @@
                 <div class="panel-title">
                   <b><%= "#{@recurrence.form_type} Template"%></b>
                   <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                    <i class="mt5 glyphicon glyphicon-chevron-up"></i>
                   </span>
                 </div>
               </div>
@@ -50,6 +50,39 @@
               </div>
             </div>
           </div>
+          <%unless @children.empty?%>
+            <div class="col-xs-12 mb15">
+              <div class="panel panel-lightskyblue">
+                <div class="panel-heading click-heading collapsed">
+                  <div class="panel-title">
+                    <b><%= "Recurrence-created #{@recurrence.form_type}s"%></b>
+                    <span class="pull-right clickable">
+                      <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="panel-body" style="display:none">
+                  <%@children.each do |child| %>
+                    <div class="col-xs-12 mb15">
+                      <div class="panel panel-lightskyblue">
+                        <div class="panel-heading click-heading collapsed">
+                          <div class="panel-title">
+                            <b><%= "#{@recurrence.form_type} ##{child.id}: #{child.title}"%></b>
+                            <span class="pull-right clickable">
+                              <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                            </span>
+                          </div>
+                        </div>
+                        <div class="panel-body" style="display:none">
+                          <%=render 'forms/show_fields', fields: @template_fields, record: child%>
+                        </div>
+                      </div>
+                    </div>
+                  <%end%>
+                </div>
+              </div>
+            </div> <!-- end of whole window -->
+          <%end%>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190410235123) do
+ActiveRecord::Schema.define(:version => 20190419231322) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -126,6 +126,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "privileges"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -426,6 +428,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "evaluator_comment"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "expectations", :force => true do |t|
@@ -639,12 +643,14 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "inspector_comment"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "investigations", :force => true do |t|
     t.string   "title"
     t.integer  "responsible_user_id"
-    t.date     "scheduled_completion_date"
+    t.date     "completion"
     t.date     "open_date"
     t.date     "complete_date"
     t.string   "inv_type"
@@ -664,8 +670,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "containment"
     t.text     "description"
     t.text     "statement"
-    t.string   "status",                    :default => "New"
-    t.boolean  "viewer_access",             :default => false
+    t.string   "status",                :default => "New"
+    t.boolean  "viewer_access",         :default => false
     t.integer  "custom_id"
     t.string   "likelihood_after"
     t.string   "severity_after"
@@ -682,6 +688,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.string   "mitigated_probability"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "issues", :force => true do |t|

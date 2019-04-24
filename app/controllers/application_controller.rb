@@ -391,9 +391,8 @@ class ApplicationController < ActionController::Base
 
 	# Deals with Advanced Search for different types of reports, such as Events, Corrective Actions, Audits, SRAs, etc
 	def handle_search
-
 		@records = @table.within_timerange(params[:start_date], params[:end_date])
-		if params[:type].present?
+    if params[:type].present?
 			@records = @records.select{|x| x.type == params[:type]}
 		end
 		if params[:status].present?

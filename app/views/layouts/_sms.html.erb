@@ -25,6 +25,12 @@
 		<ul class="dropdown-menu dropdown-notification" role="menu">
 			<%if inspection_index%><li><a href=<%=inspections_path%>>All</a></li><%end%>
 			<%if inspection_new%><li><a href=<%=new_inspection_path%>>New</a></li><%end%>
+      <%if inspection_index%>
+        <li><a href=<%="#{recurrences_path}?form_type=Inspection"%>>Recurring Inspections</a></li>
+      <%end%>
+      <%if inspection_new%>
+        <li><a href=<%="#{new_recurrence_path}?form_type=Inspection"%>>New Recurring Inspection</a></li>
+      <%end%>
 		</ul>
 	</li>
 <%end%>
@@ -38,6 +44,12 @@
 		<ul class="dropdown-menu dropdown-notification" role="menu">
 			<%if evaluation_index%><li><a href=<%=evaluations_path%>>All</a></li><%end%>
 			<%if evaluation_new%><li><a href=<%=new_evaluation_path%>>New</a></li><%end%>
+      <%if evaluation_index%>
+        <li><a href=<%="#{recurrences_path}?form_type=Evaluation"%>>Recurring Evaluations</a></li>
+      <%end%>
+      <%if evaluation_new%>
+        <li><a href=<%="#{new_recurrence_path}?form_type=Evaluation"%>>New Recurring Evaluation</a></li>
+      <%end%>
 		</ul>
 	</li>
 <%end%>
@@ -51,6 +63,12 @@
 		<ul class="dropdown-menu dropdown-notification" role="menu">
 			<%if investigation_index%><li><a href=<%=investigations_path%>>All</a></li><%end%>
 			<%if investigation_new%><li><a href=<%=new_investigation_path%>>New</a></li><%end%>
+      <%if investigation_index%>
+        <li><a href=<%="#{recurrences_path}?form_type=Investigation"%>>Recurring Investigations</a></li>
+      <%end%>
+      <%if investigation_new%>
+        <li><a href=<%="#{new_recurrence_path}?form_type=Investigation"%>>New Recurring Investigation</a></li>
+      <%end%>
 		</ul>
 	</li>
 <%end%>

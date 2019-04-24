@@ -14,6 +14,8 @@ namespace :recurring do
       template = type.find(recurrence.template_id)
       next_form = template.clone
       next_form.completion = template.completion + month_count
+      next_form.recurrence_id = recurrence.id
+      next_form.template = false;
       if next_form.save!
         recurrence.next_date = recurrence.next_date + month_count
         recurrence.newest_id = next_form.id
