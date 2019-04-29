@@ -1,5 +1,5 @@
 class InvestigationAttachment < Attachment
-	belongs_to :investigation, foreign_key:"owner_id", class_name: "Investigation"
+  belongs_to :investigation, foreign_key:"owner_id", class_name: "Investigation"
 
   after_create :create_transaction
   before_destroy :delete_transaction

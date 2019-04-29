@@ -8,7 +8,7 @@ class ReportReaction < Cause
       {:title=>"Value",:field=>"get_value"}
     ]
   end
-  
+
   def get_value
     if self.value=="true"
       "Yes"

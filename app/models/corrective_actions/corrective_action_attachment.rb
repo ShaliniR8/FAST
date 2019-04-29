@@ -1,5 +1,5 @@
 class CorrectiveActionAttachment < Attachment
-	belongs_to :corrective_action, foreign_key:"owner_id", class_name: "CorrectiveAction"
+  belongs_to :corrective_action, foreign_key:"owner_id", class_name: "CorrectiveAction"
 
 
   # def create_transaction

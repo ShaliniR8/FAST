@@ -68,6 +68,7 @@ class Report < ActiveRecord::Base
       {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
 
+
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

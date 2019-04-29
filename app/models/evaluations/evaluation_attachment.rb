@@ -1,5 +1,5 @@
 class EvaluationAttachment < Attachment
-	belongs_to :evaluation, foreign_key:"owner_id", class_name: "Evaluation"
+  belongs_to :evaluation, foreign_key:"owner_id", class_name: "Evaluation"
 
   after_create :create_transaction
   before_destroy :delete_transaction

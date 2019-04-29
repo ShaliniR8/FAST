@@ -1,5 +1,5 @@
 class PackageAttachment < Attachment
-	belongs_to :package, foreign_key:"owner_id", class_name: "Package"
+  belongs_to :package, foreign_key:"owner_id", class_name: "Package"
 
   after_create :create_transaction
   before_destroy :delete_transaction
