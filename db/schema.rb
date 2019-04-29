@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190410235123) do
+ActiveRecord::Schema.define(:version => 20190419231322) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -126,6 +126,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "privileges"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -188,7 +190,6 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
   create_table "checklist_cells", :force => true do |t|
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
-    t.integer  "col_index"
     t.string   "value"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -201,7 +202,6 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.string   "data_type"
     t.text     "options"
     t.boolean  "editable",            :default => false
-    t.boolean  "archive",             :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -267,8 +267,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
 
   create_table "checklist_rows", :force => true do |t|
     t.integer  "checklist_id"
-    t.integer  "row_index"
     t.integer  "created_by_id"
+    t.boolean  "is_header",     :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -283,11 +283,11 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
   end
 
   create_table "checklists", :force => true do |t|
-    t.string   "type"
+    t.string   "title"
+    t.string   "owner_type"
     t.integer  "owner_id"
     t.integer  "created_by_id"
     t.integer  "checklist_header_id"
-    t.boolean  "is_template",         :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -426,6 +426,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "evaluator_comment"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "expectations", :force => true do |t|
@@ -639,12 +641,14 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "inspector_comment"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "investigations", :force => true do |t|
     t.string   "title"
     t.integer  "responsible_user_id"
-    t.date     "scheduled_completion_date"
+    t.date     "completion"
     t.date     "open_date"
     t.date     "complete_date"
     t.string   "inv_type"
@@ -664,8 +668,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.text     "containment"
     t.text     "description"
     t.text     "statement"
-    t.string   "status",                    :default => "New"
-    t.boolean  "viewer_access",             :default => false
+    t.string   "status",                :default => "New"
+    t.boolean  "viewer_access",         :default => false
     t.integer  "custom_id"
     t.string   "likelihood_after"
     t.string   "severity_after"
@@ -682,6 +686,8 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.string   "mitigated_probability"
     t.text     "final_comment"
     t.integer  "created_by_id"
+    t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "issues", :force => true do |t|
@@ -982,7 +988,7 @@ ActiveRecord::Schema.define(:version => 20190410235123) do
     t.string   "form_type"
     t.integer  "template_id"
     t.string   "frequency"
-    t.integer  "next_id"
+    t.integer  "newest_id"
     t.date     "next_date"
     t.date     "end_date"
   end

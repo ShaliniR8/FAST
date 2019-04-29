@@ -153,11 +153,11 @@ class Investigation < ActiveRecord::Base
 	end
 
 	def get_scheduled_date
-		self.scheduled_completion_date.present? ?  (self.scheduled_completion_date.strftime("%Y-%m-%d")) : ""
+		self.completion.present? ?  (self.completion.strftime("%Y-%m-%d")) : ""
 	end
 
 	def overdue
-		self.scheduled_completion_date.present? ? self.scheduled_completion_date<Time.now.to_date&&self.status!="Completed" : false
+		self.completion.present? ? self.completion < Time.now.to_date&&self.status!="Completed" : false
 	end
 
 	def type

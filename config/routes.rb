@@ -144,7 +144,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'export'
     end
     collection do
-      get 'retract_form'
+      get 'retract_form_upload'
+      get 'retract_form_template'
     end
   end
   resources :checklist_rows

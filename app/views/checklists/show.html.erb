@@ -1,0 +1,75 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            Checklist Template <%=@record.id%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%=link_to "Delete", 
+              checklist_path(@record), 
+              :method => 'delete', 
+              :class => 'btn btn-danger',
+              :confirm => 'Are you sure?'%>
+            <%=link_to "All Templates", checklists_path, :class => 'btn btn-default'%>
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body">
+
+        <%=render '/forms/show_fields', :fields => @fields, :record => @record%>
+
+        <div class="col-xs-12 mt20">
+          <div class="panel panel-lightskyblue">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <div class="top_text">
+                  Preview
+                </div>
+                <div class="top_buttons pull-right">
+                  <%=link_to "Update", '#',
+                    :class => 'btn btn-warning pull-right mr5 update_btn',
+                    'data-path' => edit_checklist_path(@record),
+                    'data-toggle' => 'modal',
+                    'data-target' => '.bs-example-modal-lg'%>
+                </div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <%=render "/checklists/checklist_table", :checklist => @record%>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  $(function(){
+    $('.update_btn').on('click',function(){
+      var path = $(this).data("path");
+      $.get(path, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
+</script>
+

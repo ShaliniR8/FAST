@@ -179,6 +179,7 @@
 				</div>
 
 				<%=render '/forms/show_fields', :fields => @fields, :record => @inspection %>
+        <%=render '/checklists/checklist_types', :owner => @inspection, :type => 'inspection'%>
 				<%=render "/ims/show_task",
 					:owner => @inspection,
 					:fields => InspectionTask.get_meta_fields('show')%>
