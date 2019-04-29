@@ -16,7 +16,7 @@ class Audit < ActiveRecord::Base
 	has_many 		:notices,						foreign_key: 'owner_id',			class_name: 'AuditNotice',						dependent: :destroy
 	has_many 		:checklist_records, foreign_key: 'owner_id', 			class_name: 'AuditChecklistRecord', 	dependent: :destroy
 
-	has_many 		:checklists,				foreign_key: 'owner_id',			class_name: 'AuditChecklist',					dependent: :destroy
+	has_many 		:checklists, as: :owner, dependent: :destroy
 
 	serialize :privileges
 

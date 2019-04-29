@@ -1,0 +1,53 @@
+<%case owner_type%>
+<%when 'Sample'%>
+  <%case item.data_type%>
+  <%when 'text'%>
+    <input class="form-control" value="<%=(defined? cell) ? cell.value : ''%>"></input>
+  <%when 'dropdown'%>
+    <select class="form-control field_select" id="preview_select" name="preview_select">
+      <option></option>
+      <%item.options.split(';').each do |option|%>
+        <option data-id="<%=item.id%>"><%=option%></option>
+      <%end%>
+    </select>
+  <%when 'radio'%>
+    <div class="col-xs-12 ml5">
+      <%item.options.split(";").each do |option|%>
+        <label class="radio radio-inline">
+          <%=radio_button_tag :value, option%>
+          <%=option%>
+        </label>
+      <%end%>
+    </div>
+  <%end%>
+
+<%when 'ChecklistHeader'%>
+  <%case item.data_type%>
+  <%when 'text'%>
+    <%=cell.value%>
+  <%when 'dropdown'%>
+    <select class="form-control field_select" id="preview_select" name="preview_select">
+      <option></option>
+      <%item.options.split(';').each do |option|%>
+        <option data-id="<%=item.id%>"><%=option%></option>
+      <%end%>
+    </select>
+  <%when 'radio'%>
+    <div class="col-xs-12 ml5">
+      <%item.options.split(";").each do |option|%>
+        <label class="radio radio-inline">
+          <%=radio_button_tag "value_#{cell.id}", option, option == cell.value%>
+          <%=option%>
+        </label>
+      <%end%>
+    </div>
+  <%end%>
+
+
+
+<%else%>
+  <%=cell.value%>
+<%end%>
+
+
+

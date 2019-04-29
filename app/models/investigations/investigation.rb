@@ -170,7 +170,7 @@ class Investigation < ActiveRecord::Base
 	end
 
 	def overdue
-		self.completion.present? ? self.completion<Time.now.to_date&&self.status!="Completed" : false
+		self.completion.present? ? self.completion < Time.now.to_date&&self.status!="Completed" : false
 	end
 
 	def type

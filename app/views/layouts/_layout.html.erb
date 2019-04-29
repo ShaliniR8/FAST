@@ -142,9 +142,13 @@
 				background-color: darkturquoise;
 				border-color: darkturquoise;
 			}
-
-
-
+		  .radio{
+		    display: auto;
+		    cursor: pointer;
+		    margin-top: 2px;
+		    margin-bottom: 2px;
+		    margin-right: 2px;
+		  }
 			.panel-title{
 				font-weight: bold!important;
 			}
@@ -318,7 +322,7 @@
 										<%=link_to "Checklists", checklist_templates_path%>
 									</li>
 									<li style="display:<%=BaseConfig.airline[:checklist_version] == '3' ? 'block' : 'none'%>">
-										<%=link_to "Checklist Header Templates", checklist_headers_path%>
+										<%=link_to "Checklist Templates", checklists_path%>
 									</li>									 
 
 									<div class="dropdown-divider"></div>

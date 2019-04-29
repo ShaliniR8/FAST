@@ -30,7 +30,7 @@
               current_user.admin? ||
               current_user.has_access(owner.class.table_name,'admin') ||
               owner.responsible_user_id == current_user.id)%>
-            <%=link_to "Start", '#',
+            <%=link_to "Address", '#',
               :class => 'btn btn-success pull-right mr5 start_btn',
               'data-path' => start_checklist_path(checklist),
               'data-toggle' => 'modal',
@@ -60,26 +60,7 @@
             :class => "btn btn-success pull-right mr5",
             :target => "_blank"%>
 
-          <table id="checklist_records_<%checklist.id%>" class="table table-bordered table-striped mt10">
-            <thead>
-              <tr>
-                <%checklist.checklist_header.checklist_header_items.where(:archive => false).map(&:title).each do |header|%>
-                  <th><%=header%></th>
-                <%end%>
-              </tr>
-            </thead>
-            <tbody>
-              <%checklist.checklist_rows.order(:id).each do |checklist_row|%>
-                <tr>
-                  <%checklist_row.checklist_cells.order(:id).each do |checklist_cell|%>
-                    <%if !checklist_cell.checklist_header_item.archive%>
-                      <td><%=checklist_cell.value%></td>
-                    <%end%>
-                  <%end%>
-                </tr>
-              <%end%>
-            </tbody>
-          </table>
+          <%=render "/checklists/checklist_table", :checklist => checklist%>
 
         <%end%>
       </div>
@@ -93,7 +74,7 @@
   $(function(){
     $('#upload_btn').on('click',function(){
       $.get("<%=new_checklist_path(
-        :owner_class => owner.class.name,
+        :owner_type => owner.class.name,
         :owner_id => owner.id)%>",
         function(data){
         $(".modal-content").html(data);

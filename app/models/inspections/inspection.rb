@@ -11,7 +11,10 @@ class Inspection < ActiveRecord::Base
 	has_many :transactions,						foreign_key: 'owner_id',		        class_name: 'InspectionTransaction',		dependent: :destroy
 	has_many :comments,								foreign_key: 'owner_id',		        class_name: 'InspectionComment',				dependent: :destroy
 	has_many :notices,								foreign_key: 'owner_id',		        class_name: 'InspectionNotice',					dependent: :destroy
-	accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
+
+  has_many :checklists, as: :owner, dependent: :destroy
+
+  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
 	accepts_nested_attributes_for :tasks
 	accepts_nested_attributes_for :contacts

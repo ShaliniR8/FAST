@@ -190,7 +190,6 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
   create_table "checklist_cells", :force => true do |t|
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
-    t.integer  "col_index"
     t.string   "value"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -203,7 +202,6 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.string   "data_type"
     t.text     "options"
     t.boolean  "editable",            :default => false
-    t.boolean  "archive",             :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -269,8 +267,8 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
 
   create_table "checklist_rows", :force => true do |t|
     t.integer  "checklist_id"
-    t.integer  "row_index"
     t.integer  "created_by_id"
+    t.boolean  "is_header",     :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -285,11 +283,11 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
   end
 
   create_table "checklists", :force => true do |t|
-    t.string   "type"
+    t.string   "title"
+    t.string   "owner_type"
     t.integer  "owner_id"
     t.integer  "created_by_id"
     t.integer  "checklist_header_id"
-    t.boolean  "is_template",         :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
