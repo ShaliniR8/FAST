@@ -28,7 +28,7 @@
 
 
 							<%if current_user.admin?%>
-								<%=link_to 'Override Status', '#', 
+								<%=link_to 'Override Status', '#',
 									:class => 'btn btn-danger pull-right ml5 mb5',
 									:id => 'override_status_btn',
 									"data-toggle" => "modal",
@@ -66,7 +66,7 @@
 							<%end%>
 							<%=link_to "Send Message",
 								new_message_path(:link => report_path(@report),
-								:link_type => "Report",
+								:link_type => "Event",
 								:link_id => @report.id),
 								:class => "btn btn-warning pull-right mb5"%>
 							<%=link_to "Expand All",

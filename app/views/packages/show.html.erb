@@ -17,11 +17,11 @@
             <%if current_user.has_access('packages', 'destroy')%>
               <%=link_to "Delete",package_path(@package),:method=>"delete",:confirm=>'Please confirm that you want to delete. The deletion cannot be reverted',:class=>"btn btn-danger pull-right mb5"%>
             <%end%>
-            
+
             <%if current_user.has_access('packages', 'edit')%>
               <%=link_to "Edit",edit_package_path(@package),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%end%>
-            
+
             <%=link_to "PDF",print_package_path(@package,format: :pdf),:class=>"btn btn-info pull-right mr5 mb5"%>
             <%if @package.meeting.present?%>
               <%=link_to "View Meeting",sms_meeting_path(@package.meeting),:class=>"btn btn-info mr5 pull-right mb5"%>
@@ -45,7 +45,6 @@
               <%if @package.status=="Awaiting Review" %>
                 <%=link_to "Complete",close_package_path(@package),:class=>"btn btn-warning mr5 pull-right mb5"%>
               <%end%>
-              <%=link_to "Add Attachment","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'att_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
             <%end%>
           </div>
           <%=render "access_controls/new_modal"%>
@@ -77,9 +76,9 @@
                 <div class="panel-heading click-heading collapsed">
                   <div class="panel-title">
                     <b>Expectation: <%=@package.item.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-                  </div> 
+                  </div>
                 </div>
-                <div class="panel-body mt5" style="display:none"> 
+                <div class="panel-body mt5" style="display:none">
                   <div class="row">
                     <%=render "expectation",:item=>@package.item%>
                   </div>
@@ -90,12 +89,12 @@
           <%if @package.sms_agendas.present?%>
             <%=render "agendas"%>
           <%end%>
-          <%=render "/records/show_attachment",:owner=>@package%>
+          <%=render "/forms/attachments_show", :owner => @package%>
           <%=render "/records/transactions",{:owner=>@package}%>
         </div>
-      </div> 
-    </div>       
-	</div> 
+      </div>
+    </div>
+	</div>
 </div>
 <style>
  .datepicker{

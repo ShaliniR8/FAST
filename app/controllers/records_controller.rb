@@ -125,20 +125,18 @@ class RecordsController < ApplicationController
 		@terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
 		@title = 'Reports'
 		handle_search
-		
+
+    puts "-------------- @records: #{@records.length}"
+
 		@fields = Field.find(:all)
 		@categories = Category.find(:all)
 		@templates = Template.find(:all)
 
 		records = Record.preload(:created_by, :template).can_be_accessed(current_user)
-		puts "98------- #{records.length}"
-		puts "98------- #{@records.length}"		
 		records = Record.filter_array_by_emp_groups(records, params[:emp_groups])
-		puts "99------- #{records.length}"
-		puts "99------- #{@records.length}"
-		@records = @records & records
-		puts "100------- #{records.length}"
-		puts "100------- #{@records.length}"
+
+		@records = @records.to_a & records.to_a
+
 		# handle custom view
 		if params[:custom_view].present?
 			selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []

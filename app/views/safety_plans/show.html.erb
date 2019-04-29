@@ -57,7 +57,7 @@
 					<%if @safety_plan.status == "Evaluated"%>
 						<%=link_to "Complete",
 							complete_safety_plan_path(@safety_plan),
-							:class => "btn btn-danger pull-right mr5 mb5",
+							:class => "btn btn-warning pull-right mr5 mb5",
 							:disable_with => "Completing...",
 							:confirm => "Are you sure?"%>
 					<%end%>

@@ -212,8 +212,20 @@ module ApplicationHelper
 			entry_url = investigation_url(entry)
 		when 'Finding'
 			entry_url = finding_url(entry)
+    when 'AuditFinding'
+      entry_url = finding_url(entry)
+    when 'InspectionFinding'
+      entry_url = finding_url(entry)
+    when 'EvaluationFinding'
+      entry_url = finding_url(entry)
+    when 'InvestigationFinding'
+      entry_url = finding_url(entry)
 		when 'Recommendation'
 			entry_url = recommendation_url(entry)
+    when 'InvestigationRecommendation'
+      entry_url = recommendation_url(entry)
+    when 'FindingRecommendation'
+      entry_url = recommendation_url(entry)
 		when 'Sra'
 			entry_url = sra_url(entry)
 		when 'Hazard'
@@ -222,6 +234,10 @@ module ApplicationHelper
 			entry_url = risk_control_url(entry)
 		when 'SmsAction'
 			entry_url = sms_action_url(entry)
+    when 'FindingAction'
+      entry_url = sms_action_url(entry)
+    when 'InvestigationAction'
+      entry_url = sms_action_url(entry)
 		when 'SafetyPlan'
 			entry_url = safety_plan_url(entry)
 		else

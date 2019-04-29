@@ -56,7 +56,7 @@
 								<%=link_to "Attach in Message",
 									new_message_path(
 										:link => record_path(@record),
-										:link_type => "Record",
+										:link_type => "Report",
 										:link_id => @record.id),
 									:class => "btn btn-warning mb5",
 									:disable_with => "Redirecting..."%>
@@ -120,7 +120,7 @@
 								<%end%>
 
 								<%if current_user.admin?%>
-									<%=link_to 'Override Status', '#', 
+									<%=link_to 'Override Status', '#',
 										:class => 'btn btn-danger mb5',
 										:id => 'override_status_btn',
 										"data-toggle" => "modal",

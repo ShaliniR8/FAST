@@ -67,7 +67,8 @@
                       <div class="panel panel-lightskyblue">
                         <div class="panel-heading click-heading collapsed">
                           <div class="panel-title">
-                            <b><%= "#{@recurrence.form_type} ##{child.id}: #{child.title}"%></b>
+                            <b><%=link_to "#{@recurrence.form_type} ##{child.id}: #{child.title}",
+                              child.becomes(Object.const_get(@recurrence.form_type))%></b>
                             <span class="pull-right clickable">
                               <i class="mt5 glyphicon glyphicon-chevron-down"></i>
                             </span>

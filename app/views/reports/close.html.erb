@@ -12,11 +12,11 @@
    	<div class="panel panel-warning">
      	<div class="panel-heading">
      		<div class="panel-title">
-       		<b>Close Event #<%=@report.id%></b> 
+       		<b>Close Event #<%=@report.id%></b>
      		</div>
      	</div>
-     	<div class="panel-body" id="form_body"> 
-     		<%= form_for @report do |f|%> 
+     	<div class="panel-body" id="form_body">
+     		<%= form_for @report do |f|%>
           <%=f.hidden_field :status,:value=>"Closed"%>
           <%#RecordTransaction.create(:users_id=>current_user.id,:action=>"Close Record",:owner_id=>@,:stamp=>Time.now)%>
           <div class="row">
@@ -56,16 +56,16 @@
               <%=f.label :notes%>
               <%=f.text_area :notes,{:class=>"form-control ml5",:rows=>"5"}%>
             </div>
-          <div class="mt10">
-            <div class="form-actions">
-              <%= f.submit "Submit", :class => "btn btn-success pull-right mr5", :disable_with => "Submitting..."%>
-            </div>
+
+          <div class="mt10 mr10">
+
+              <%= f.submit "Close", :class => "btn btn-success pull-right mr5", :disable_with => "Closing..."%>
             <%=link_to "Cancel", report_path(@report), :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right", :confirm=>'The report has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue?'%>
           </div>
         <%end%>
-      </div> 
-    </div>       
-	</div> 
+      </div>
+    </div>
+	</div>
 </div>
 <script>
   function reset_risk(){

@@ -58,9 +58,9 @@ class MeetingsController < ApplicationController
 	def new_attachment
 		@owner = Meeting.find(params[:id]).becomes(Meeting)
 		@attachment = MeetingAttachment.new
-		render :partial => "shared/attachment_modal" 
+		render :partial => "shared/attachment_modal"
 	end
-	
+
 
 
 
@@ -69,16 +69,16 @@ class MeetingsController < ApplicationController
 		if @meeting.review_end.blank? || @meeting.meeting_end.blank?
 			end_time = Time.now
 		else
-			end_time=@meeting.review_end > @meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end 
+			end_time=@meeting.review_end > @meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
 		end
 
 		send_notices(
 			@meeting.invitations,
-			"Meeting ##{@meeting.get_id} has been cancelled.", 
+			"Meeting ##{@meeting.get_id} has been cancelled.",
 			true,
-			"Cancellation of Meeting ##{@meeting.get_id}") 
+			"Cancellation of Meeting ##{@meeting.get_id}")
 
-		@meeting.reports.each do |x| 
+		@meeting.reports.each do |x|
 			ReportTransaction.create(
 				:users_id => current_user.id,
 				:action => "Meeting Ready",
@@ -117,9 +117,9 @@ class MeetingsController < ApplicationController
 
 	def create
 		if params[:type].present?
-			@meeting = Object.const_get(params[:type]).new(params[:meeting])  
+			@meeting = Object.const_get(params[:type]).new(params[:meeting])
 		else
-			@meeting = Meeting.new(params[:meeting]) 
+			@meeting = Meeting.new(params[:meeting])
 		end
 		if !params[:reports].blank?
 			@meeting.save
@@ -132,25 +132,25 @@ class MeetingsController < ApplicationController
 				ReportTransaction.create(
 					:users_id=>current_user.id,
 					:action=>"Under Review",
-					:content=>"Add to Meeting ##{@meeting.id}", 
+					:content=>"Add to Meeting ##{@meeting.id}",
 					:owner_id=>report.id,:stamp=>Time.now)
 				MeetingTransaction.create(
-					:users_id=>current_user.id, 
+					:users_id=>current_user.id,
 					:action=>"Added Event ##{report.get_id}",
-					:content=>"Event ##{report.get_id}", 
-					:owner_id => @meeting.id, 
+					:content=>"Event ##{report.get_id}",
+					:owner_id => @meeting.id,
 					:stamp=>Time.now)
 				mr.save
 				report.save
 			end
 		end
 		if @meeting.save
-			end_time = @meeting.review_end>@meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end 
+			end_time = @meeting.review_end>@meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
 			send_notices(
 				@meeting.invitations,
-				"You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting), 
+				"You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
 				true,
-				"New Meeting Invitation") 
+				"New Meeting Invitation")
 			redirect_to meeting_path(@meeting), flash: {success: "Meeting created."}
 		else
 			redirect_to new_meeting_path
@@ -177,7 +177,7 @@ class MeetingsController < ApplicationController
 
 	def show
 		@meeting = Meeting.find(params[:id])
-		if @meeting.type.present? 
+		if @meeting.type.present?
 			case @meeting.type
 			when "SrmMeeting"
 				redirect_to srm_meeting_path(@meeting)
@@ -238,14 +238,14 @@ class MeetingsController < ApplicationController
 				ReportTransaction.create(
 					:users_id => current_user.id,
 					:action => "Under Review",
-					:content => "Add to Meeting ##{@owner.id}", 
+					:content => "Add to Meeting ##{@owner.id}",
 					:owner_id => report.id,
 					:stamp => Time.now)
 				MeetingTransaction.create(
-					:users_id => current_user.id, 
+					:users_id => current_user.id,
 					:action => "Added Event ##{report.get_id}",
-					:content => "Event ##{report.get_id}", 
-					:owner_id => @owner.id, 
+					:content => "Event ##{report.get_id}",
+					:owner_id => @owner.id,
 					:stamp => Time.now)
 				mr.save
 				report.save
@@ -256,6 +256,30 @@ class MeetingsController < ApplicationController
 		when 'Override Status'
 			transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
 		end
+
+    if params[:invitations].present?
+      params[:invitations].each_pair do |index,val|
+        inv = @owner.invitations.where("users_id=?",val)
+        if inv.blank?
+          new_inv = Invitation.new()
+          new_inv.users_id = val
+          new_inv.meeting = @owner
+          new_inv.save
+        end
+      end
+    end
+    if params[:cancellation].present?
+      params[:cancellation].each_pair do |index,val|
+        inv = @owner.invitations.where("users_id = ?", val)
+        if inv.present?
+          Rails.logger.debug("Deleting")
+          MeetingMailer.cancel_invitation(inv.first.user, @owner)
+          inv.first.destroy
+        end
+      end
+    end
+
+
 
 		@owner.update_attributes(params[:meeting])
 		MeetingTransaction.create(
@@ -273,7 +297,7 @@ class MeetingsController < ApplicationController
 
 
 	def edit
-		@privileges=Privilege.find(:all)
+		@privileges = Privilege.find(:all)
 		@meeting=Meeting.find(params[:id])
 		@action="edit"
 		@headers=User.invite_headers
@@ -304,7 +328,7 @@ class MeetingsController < ApplicationController
 
 
 	def get_reports
-		@report_headers = Report.get_meta_fields('index') 
+		@report_headers = Report.get_meta_fields('index')
 		@meeting = Meeting.find(params[:id])
 		@reports = Report.find(:all).select{|x| x.status == "Meeting Ready"}
 		render :partial => "reports"
@@ -340,7 +364,7 @@ class MeetingsController < ApplicationController
 			elsif params[:send_to]=="Pen"
 				users+=invitations.select{|x| x.status=="Pending"}.map{|x| x.user}
 			else
-			end        
+			end
 		elsif !params[:message_to].blank?
 			users+=User.find(params[:message_to].values)
 			users.keep_if{|u| !u.disable}
@@ -362,8 +386,8 @@ class MeetingsController < ApplicationController
 		users.each do |u|
 			notify(
 				u,
-				"You have a message sent from Meeting ##{@meeting.get_id}. Please check your email for details." + 
-					g_link(@meeting), 
+				"You have a message sent from Meeting ##{@meeting.get_id}. Please check your email for details." +
+					g_link(@meeting),
 				true,
 				"New Meeting ##{@meeting.get_id} Message")
 		end

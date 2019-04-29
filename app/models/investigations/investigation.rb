@@ -42,7 +42,7 @@ class Investigation < ActiveRecord::Base
 	extend AnalyticsFilters
 
 	def self.get_meta_fields(*args)
-		visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+		visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
 		[
 			{field: 'id', 							        	title: 'ID', 													  num_cols: 6, 	type: 'text', 				visible: 'index,show', 			required: false},
 			{field: 'title', 						        	title: 'Title', 											  num_cols: 6, 	type: 'text', 				visible: 'index,form,show', required: true},
@@ -65,7 +65,16 @@ class Investigation < ActiveRecord::Base
 			{field: 'description',								title: 'Description of Event',					num_cols: 12, type: 'textarea',			visible: 'form,show',				required: false},
 			{field: 'investigator_comment',				title: 'Investigator Comment',					num_cols: 12, type: 'textarea',			visible: 'form,show',				required: false},
       {field: 'final_comment',              title: 'Final Comment',                 num_cols: 12, type: 'text',         visible: 'show',            required: false},
-		].select{|f| (f[:visible].split(',') & visible_fields).any?}
+
+      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+
+      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+
+    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
 	end
 
 	def self.get_custom_options(title)

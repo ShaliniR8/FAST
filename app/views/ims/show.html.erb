@@ -31,7 +31,7 @@
               <%=link_to @im.viewer_access ? "Disable Viewer Access" : "Enable Viewer Access",enable_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
               <%=link_to "Reoccur",reoccur_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%end%>
-            
+
             <%=link_to "Send Message",new_message_path(:link=>im_path(@im), :link_type=>"Im", :link_id=>@im.id),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right ml5 mb5"%>
           </div>
@@ -40,7 +40,7 @@
      	<div class="panel-body">
         <div class="row">
           <div class="col-xs-12 mb15">
-           
+
             <%if current_user.has_access('ims', 'edit')%>
 
               <%if @im.status=='New'%>
@@ -49,10 +49,10 @@
               <%if @im.type=="FrameworkIm" && @im.status=="New"%>
                 <%=link_to "Transition to VP/Part 5",transit_im_path(@im),:class=>'btn btn-info pull-right mr5 mb5' %>
               <%end%>
-              <%if @im.status == "Open" && (@im.lead_evaluator==current_user.id || !@im.lead_evaluator.present?) && @im.completable%>                  
+              <%if @im.status == "Open" && (@im.lead_evaluator==current_user.id || !@im.lead_evaluator.present?) && @im.completable%>
                 <%=link_to "Complete",complete_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
               <%end%>
-            
+
               <%if @im.status=="New"||@im.status=="Open"%>
               <%if @im.items.present?%>
                 <%=link_to "Update Checklist","#",:class=>"btn btn-warning pull-right mr5 mb5",:id=>'update_checklist_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
@@ -63,7 +63,6 @@
                 <%#end%>
                 <%=link_to "Add Task","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'task_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
                 <%=link_to "Add Contact","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'contact_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-                <%=link_to "Add Attachment","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'att_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
               <%end%>
             <%end%>
             <%if @im.status=="Pending Review" && current_user.id==@im.pre_reviewer%>
@@ -79,7 +78,7 @@
             <b>Status: </b><%=@im.status%>
           </div>
           <div class='col-xs-10'>
-            <b>Viewer Access: </b><%=@im.viewer_access ? "Yes": "No"%> 
+            <b>Viewer Access: </b><%=@im.viewer_access ? "Yes": "No"%>
           </div>
           <%if @im.type=="JobAid"%>
             <div class='col-xs-4'>
@@ -130,27 +129,27 @@
               </div>
             </div>
           <%end%>
-          
+
           <!-- Task -->
-          <%=render "/ims/show_task", 
+          <%=render "/ims/show_task",
             :owner=>@im,
             :fields => ImTask.get_meta_fields('show')
-          %> 
+          %>
 
           <%=render "items"%>
           <!-- Contact -->
-          <%=render "/ims/show_contact", 
+          <%=render "/ims/show_contact",
             :owner => @im,
             :fields => ImContact.get_meta_fields('show')
-          %> 
+          %>
           <!-- Attachment -->
           <%=render "/forms/attachments_show", :owner => @im%>
           <!-- Transaction -->
           <%=render "/records/transactions", :owner => @im%>
         </div>
-      </div> 
-    </div>       
-	</div> 
+      </div>
+    </div>
+	</div>
 </div>
 <style>
  .datepicker{
@@ -214,6 +213,6 @@
         $(window).trigger('resize');
       });
     });
-    
+
   });
 </script>

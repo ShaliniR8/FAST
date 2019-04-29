@@ -25,20 +25,20 @@ class SrmMeetingsController < ApplicationController
 		if @meeting.review_end.blank? ||@meeting.meeting_end.blank?
 			end_time=Time.now
 		else
-			end_time=@meeting.review_end > @meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end 
+			end_time=@meeting.review_end > @meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
 		end
 		send_notices(
 			@meeting.invitations,
-			"Meeting ##{@meeting.get_id} has been cancelled.", 
-			@meeting, 
-			true) 
+			"Meeting ##{@meeting.get_id} has been cancelled.",
+			@meeting,
+			true)
 		@meeting.invitations.each do |p|
 			MeetingMailer.cancel_meeting(p.user,@meeting)
 		end
 		MeetingMailer.cancel_meeting(@meeting.host.user,@meeting)
 
 		#change the status of all linked SRAs
-		@meeting.sras.each do |x| 
+		@meeting.sras.each do |x|
 			SraTransaction.create(:users_id=>current_user.id, :action=>"Open", :content=>"Meeting Deleted", :owner_id=>x.id, :stamp=>Time.now)
 			x.status = "Open"
 			x.meeting_id = nil
@@ -53,9 +53,9 @@ class SrmMeetingsController < ApplicationController
 		@table_name = "srm_meetings"
 	end
 
-	
+
 	def create
-		@meeting = SrmMeeting.new(params[:srm_meeting]) 
+		@meeting = SrmMeeting.new(params[:srm_meeting])
 		if !params[:sras].blank?
 			@meeting.save
 			params[:sras].each_pair do |index, value|
@@ -68,13 +68,13 @@ class SrmMeetingsController < ApplicationController
 			end
 		end
 		if @meeting.save
-			end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end 
+			end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
 			send_notices(
 				@meeting.invitations,
-				"You are invited to meeting ##{@meeting.get_id}.  " + 
-					g_link(@meeting), 
-				@meeting, 
-				true) 
+				"You are invited to meeting ##{@meeting.get_id}.  " +
+					g_link(@meeting),
+				@meeting,
+				true)
 			@meeting.invitations.each do |p|
 				MeetingMailer.new_meeting(p.user, @meeting)
 			end
@@ -99,7 +99,7 @@ class SrmMeetingsController < ApplicationController
 	def show
 		begin
 			@meeting=Meeting.find(params[:id])
-		rescue ActiveRecord::RecordNotFound  
+		rescue ActiveRecord::RecordNotFound
 		 redirect_to root_url
 		 return
 		end
@@ -107,7 +107,7 @@ class SrmMeetingsController < ApplicationController
 		@headers=User.invite_headers
 		@users=@meeting.invitations.map{|x| x.user}
 		@current_inv=@meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
-		@sra_headers=Sra.get_headers
+		@sra_headers=Sra.get_meta_fields('index')
 		@fields=SrmMeeting.get_meta_fields('show')
 	end
 
@@ -149,11 +149,11 @@ class SrmMeetingsController < ApplicationController
 					new_inv.meeting=@meeting
 					new_inv.save
 					send_notice(
-						new_inv, 
-						"You are invited to meeting ##{@meeting.get_id}.  " + 
-							g_link(@meeting), 
-						@meeting, 
-						true) 
+						new_inv,
+						"You are invited to meeting ##{@meeting.get_id}.  " +
+							g_link(@meeting),
+						@meeting,
+						true)
 					MeetingMailer.new_meeting(new_inv.user,@meeting)
 				end
 			end
@@ -191,13 +191,13 @@ class SrmMeetingsController < ApplicationController
 				action)
 		end
 	end
-	
+
 	def send_notice(p,message,meeting,action)
 		notify(
-			p.user, 
-			message, 
-			"Meeting", 
-			meeting.id, 
+			p.user,
+			message,
+			"Meeting",
+			meeting.id,
 			action)
 	end
 
@@ -233,7 +233,7 @@ class SrmMeetingsController < ApplicationController
 			elsif params[:send_to]=="Pen"
 				users+=invitations.select{|x| x.status=="Pending"}.map{|x| x.user}
 			else
-			end        
+			end
 		elsif !params[:message_to].blank?
 			users+=User.find(params[:message_to].values)
 		else
@@ -253,9 +253,9 @@ class SrmMeetingsController < ApplicationController
 		users.each do |u|
 			notify(
 				u,
-				"You have a message sent from Meeting ##{@meeting.get_id}. Please check your email for details." + 
+				"You have a message sent from Meeting ##{@meeting.get_id}. Please check your email for details." +
 					g_link(@meeting),
-				"Meeting", 
+				"Meeting",
 				@meeting.id,
 				true)
 			MeetingMailer.meeting_message(u,file_path.to_s,host_header+params[:message],params[:subject])
@@ -277,7 +277,7 @@ class SrmMeetingsController < ApplicationController
 				sra = Sra.find(sid)
 				sra.meeting_id = meeting.id
 				sra.status = "Under Review"
-				sra.save  
+				sra.save
 			end
 		end
 		redirect_to srm_meeting_path(meeting)
@@ -286,7 +286,7 @@ class SrmMeetingsController < ApplicationController
 	def new_attachment
 		@owner=Meeting.find(params[:id]).becomes(Meeting)
 		@attachment=MeetingAttachment.new
-		render :partial=>"shared/attachment_modal" 
+		render :partial=>"shared/attachment_modal"
 	end
 
 

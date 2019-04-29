@@ -13,9 +13,9 @@
 	     	<div class="panel-heading">
 	     		<div class="panel-title">
 
-	       			<b><%=@title%> Meeting: #<%=@meeting.get_id%></b> 
+	       			<b><%=@title%> Meeting: #<%=@meeting.get_id%></b>
 	       			<div class="top_buttons pull-right">
-	       				
+
      					<%if current_user.has_access("meetings","destroy") && @meeting.has_user(current_user)%>
 		            		<%=link_to 'Delete',sms_meeting_path(@meeting),:method=>"delete",:confirm=>'Please confirm that you want to cancel this meeting. The cancellation cannot be reverted',:class=>"btn btn-danger pull-right"%>
 		            	<%end%>
@@ -28,22 +28,19 @@
 	     			</div>
 	     		</div>
 	     	</div>
-	     	
+
 	     	<div class="panel-body">
 	     		<div class="row">
 	     			<div class="col-lg-12">
 	     				<div class="pull-right mb10">
 	     					<%if current_user.has_access("sms_meetings","edit")&&@meeting.status=="Open"&&@meeting.has_user(current_user)%>
 	     					<%=link_to "Add Packages","#",:class=>"btn btn-success",:id=>"package_btn","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:package_type=>@package_type%>
-	     						<%if @meeting.in_review%>
-			            	<%=link_to "Add Attachment","#",:class=>"btn btn-success",:id=>"att_btn","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-			            <%end%>
 	     						<%=link_to "Close",close_sms_meeting_path(@meeting),:class=>"btn btn-warning pull-right ml5"%>
-			            
+
 			            <%=link_to "Add Comment","#",:class=>"btn btn-success",:id=>'comment_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-		            	
-			          <%end%>		
-			        </div>	     				
+
+			          <%end%>
+			        </div>
 	     			</div>
 	     		</div>
 	     		<%if @current_inv.present?%>
@@ -71,20 +68,20 @@
 			     					<%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
 					          			<%=link_to "Send Agenda/Notice","#", :id=>"message-btn", :class=>"btn btn-info drop","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
 					          		<%end%>
-					        </div>	     				
+					        </div>
 			     			</div>
 			     		</div>
 		          <%=render "meetings/invite"%>
 		        </div>
 		      	</div>
 				<div class="row">
-					<%=render "/records/show_attachment",:owner=>@meeting%>
+          <%=render "/forms/attachments_show", :owner => @meeting%>
 					<%=render "records/transactions",{:owner=>@meeting}%>
 				</div>
 
-	      	</div> 
-	    </div>       
-	</div> 
+	      	</div>
+	    </div>
+	</div>
 </div>
 <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
   <div class="modal-dialog modal-lg" role="document">
