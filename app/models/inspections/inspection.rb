@@ -106,7 +106,11 @@ class Inspection < ActiveRecord::Base
 
 	def create_transaction(action)
 		if !self.changes()['viewer_access'].present?
-			InspectionTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+			InspectionTransaction.create(users_id: (session[:user_id] rescue nil),
+          action: action,
+          owner_id: self.id,
+          content: defined?(session) ? '' : 'Recurring Inspection',
+          stamp: Time.now)
 		end
 	end
 

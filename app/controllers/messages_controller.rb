@@ -26,17 +26,17 @@ class MessagesController < ApplicationController
 				if s.user==current_user
 					s.visible=false
 					s.save
-				end        
+				end
 			end
 			@message.cc.each do |s|
 				if s.user==current_user
 					s.visible=false
 					s.save
-				end        
+				end
 			end
 		end
 	end
-	
+
 
 
 	def create
@@ -73,7 +73,7 @@ class MessagesController < ApplicationController
 
 	def show
 		@message = Message.find(params[:id])
-		@report_link = get_message_link(@message.link_type, @message.link_id)
+		@report_link = @message.link
 		if current_user.has_access_to @message
 			need_reply=@message.send_to.map{|x| x.user}.include? current_user
 		else
@@ -134,8 +134,8 @@ class MessagesController < ApplicationController
 
 
 	def inbox
-		@title=params[:source]
-		@message=Message.find(params[:id])
+		@title = params[:source]
+		@message = Message.find(params[:id])
 		@report_link = get_message_link(@message.link_type, @message.link_id)
 		mark_as_read(current_user,@message)
 		render :partial => 'inbox'

@@ -24,7 +24,7 @@
     </div>
     <div class="panel-body">
       <div class="table-responsive">
-        <table id="tabulation_table" class="table table-hover" width="100%">
+        <table id="tabulation_table" class="table table-hover table-striped table-bordered" width="100%">
           <thead>
             <tr>
               <th>Event Type</th>
@@ -74,14 +74,14 @@
             </tr>
           </tfoot>
         </table>
-      </div>          
+      </div>
     </div>
   </div>
 </div>
 <style>
  .datepicker{
   z-index: 1200!important;
- } 
+ }
   tfoot {
     display: table-header-group;
   }
@@ -96,7 +96,7 @@
     $('#tabulation_table').DataTable({
       dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
            "<'row'<'col-sm-12'tr>>" +
-           "<'row'<'col-sm-5'i><'col-sm-7'p>>" + 
+           "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
            "<'row'<'col-sm-12'B>>",
 
       buttons: [

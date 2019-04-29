@@ -50,7 +50,7 @@ class ReportsController < ApplicationController
 		@detection_headers = RecordDetection.get_headers
 		@reaction_headers = RecordReaction.get_headers
 		@users = User.find(:all)
-		@headers = User.get_headers    
+		@headers = User.get_headers
 		@frequency = (0..4).to_a.reverse
 		@like = Record.get_likelihood
 		risk_matrix_initializer
@@ -95,9 +95,9 @@ class ReportsController < ApplicationController
 		report = Report.find(params[:id])
 		report.status = "Meeting Ready"
 		ReportTransaction.create(
-			:users_id => current_user.id, 
-			:action => "Meeting Ready", 
-			:owner_id => report.id, 
+			:users_id => current_user.id,
+			:action => "Meeting Ready",
+			:owner_id => report.id,
 			:stamp => Time.now)
 		if report.save
 			redirect_to report_path(report)
@@ -110,18 +110,18 @@ class ReportsController < ApplicationController
 	def carryover
 		report = Report.find(params[:id])
 		report.agendas.map(&:destroy)
-		report.report_meetings.each do |x| 
+		report.report_meetings.each do |x|
 			MeetingTransaction.create(
-				:users_id => current_user.id, 
-				:action => "Carry Over Event", 
-				:content => "Event ##{report.get_id} Carried Over", 
-				:owner_id => x.meeting_id, 
+				:users_id => current_user.id,
+				:action => "Carry Over Event",
+				:content => "Event ##{report.get_id} Carried Over",
+				:owner_id => x.meeting_id,
 				:stamp => Time.now)
 			ReportTransaction.create(
-				:users_id => current_user.id, 
-				:action => "Carried Over", 
-				:content => "Event Carried Over from Meeting ##{x.meeting_id}", 
-				:owner_id => report.id, 
+				:users_id => current_user.id,
+				:action => "Carried Over",
+				:content => "Event Carried Over from Meeting ##{x.meeting_id}",
+				:owner_id => report.id,
 				:stamp => Time.now)
 			x.destroy
 		end
@@ -158,16 +158,16 @@ class ReportsController < ApplicationController
 		@report = Report.new(params[:report])
 		@report.status = "New"
 		@report.save
-		if !params[:records].blank? 
+		if !params[:records].blank?
 			params[:records].each_pair do |index,value|
 				record = Record.find(value);
 				record.report = @report
 				record.status = "Linked"
 				record.viewer_access = true
 				RecordTransaction.create(
-					:users_id => current_user.id, 
-					:action => "Add to Event", 
-					:owner_id => record.id, 
+					:users_id => current_user.id,
+					:action => "Add to Event",
+					:owner_id => record.id,
 					:stamp => Time.now)
 				record.save
 			end
@@ -213,7 +213,7 @@ class ReportsController < ApplicationController
 		if !params[:privileges].present?
 			@owner.privileges = nil
 		end
-		
+
 		if params[:dettach].present?
 			params[:dettach].each_pair do |index, value|
 				record = Record.find(value)
@@ -258,7 +258,7 @@ class ReportsController < ApplicationController
 		@headers = Record.get_headers
 		@agenda_headers = AsapAgenda.get_headers
 		@title = "Included Reports"
-		@table_name = "reports" 
+		@table_name = "reports"
 		@action_headers = CorrectiveAction.get_meta_fields('index')
 		@corrective_actions = @report.corrective_actions
 		load_special_matrix(@report)
@@ -304,20 +304,21 @@ class ReportsController < ApplicationController
 
 
 	def summary
-		@title="Events Reporting Summary"
-		@action="report"
+    @table = Object.const_get("Report")
+		@title = "Events Reporting Summary"
+		@action = "report"
 		@adv_only = true
 
-		@headers=Report.get_summary_headers
-		@records=Report.within_timerange(params[:start_date], params[:end_date])
-		
+		@headers = Report.get_summary_headers
+		@records = Report.within_timerange(params[:start_date], params[:end_date])
+
 		Rails.logger.debug "records=#{@records.length}"
 		if params[:status].present?
 			if params[:status]=="Overdue"
-				@records=@records.select{|x| x.overdue} 
+				@records=@records.select{|x| x.overdue}
 			else
-				@records=@records.select{|x| x.status==params[:status]} 
-			end  
+				@records=@records.select{|x| x.status==params[:status]}
+			end
 			@title+=" : #{params[:status]}"
 		end
 		handle_search
@@ -336,7 +337,7 @@ class ReportsController < ApplicationController
 
 
 
-	def add    
+	def add
 		@headers = Report.get_headers
 		@records = Report.where(:status => 'New')
 	end
@@ -371,10 +372,10 @@ class ReportsController < ApplicationController
 			:owner_id => @report.id,
 			:stamp => Time.now)
 		MeetingTransaction.create(
-			:users_id => current_user.id, 
-			:action => "Added Event", 
-			:content => "Event ##{@report.get_id}", 
-			:owner_id => @meeting.id, 
+			:users_id => current_user.id,
+			:action => "Added Event",
+			:content => "Event ##{@report.get_id}",
+			:owner_id => @meeting.id,
 			:stamp => Time.now)
 		if mr.save && @report.save
 			render :partial=> "report"
@@ -406,7 +407,7 @@ class ReportsController < ApplicationController
 	def change_privilege
 		@privileges = Privileges.find(:all)
 		@target = Report.find(params[:id])
-		render :partial => "shared/privilege" 
+		render :partial => "shared/privilege"
 	end
 
 	def mitigate

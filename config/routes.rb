@@ -100,6 +100,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'advanced_search'
     end
   end
+  resources :recurrences
 
 
   # Configurations

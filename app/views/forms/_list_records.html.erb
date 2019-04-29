@@ -1,0 +1,40 @@
+<%if records.length > 0%>
+  <div class="col-xs-12">
+    <div class="panel clickable panel-info">
+      <div class="panel-heading click-heading collapsed">
+        <div class="panel-title">
+          <%=title || records.first.class.name%>
+          <span class="pull-right clickable">
+            <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+      <div class="panel-body" style="display:none">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <%records.first.class.get_meta_fields('index').each do |header|%>
+              <th><%=header[:title]%></th>
+            <%end%>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            <%records.each do |record|%>
+              <tr>
+                <%records.first.class.get_meta_fields('index').each do |header|%>
+                  <td>
+                    <%=render '/forms/show_field', :record => record, :field_hash => header%>
+                  </td>
+                <%end%>
+                <td>
+                  <%=link_to 'View', record,
+                    :class => 'btn btn-info',
+                    :disable_with => 'Redirecting...'%>
+                </td>
+              </tr>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<%end%>

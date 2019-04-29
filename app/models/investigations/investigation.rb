@@ -42,7 +42,7 @@ class Investigation < ActiveRecord::Base
 	extend AnalyticsFilters
 
 	def self.get_meta_fields(*args)
-		visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+		visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
 		[
 			{field: 'id', 							        	title: 'ID', 													  num_cols: 6, 	type: 'text', 				visible: 'index,show', 			required: false},
 			{field: 'title', 						        	title: 'Title', 											  num_cols: 6, 	type: 'text', 				visible: 'index,form,show', required: true},
@@ -51,7 +51,7 @@ class Investigation < ActiveRecord::Base
 			{ 																																						 							type: 'newline', 			visible: 'show'},
 			{field: 'viewer_access',							title: 'Viewer Access',									num_cols: 6,  type: 'boolean_box',	visible: 'show',						required: false},
 			{ 																																						 							type: 'newline', 			visible: 'show'},
-			{field: 'scheduled_completion_date',	title: 'Scheduled Completion Date',		  num_cols: 6,	type: 'date',					visible: 'index,form,show', required: true},
+			{field: 'completion',	title: 'Scheduled Completion Date',		  num_cols: 6,	type: 'date',					visible: 'index,form,show', required: true},
 			{field: 'responsible_user_id',				title: 'Investigator',								  num_cols: 6,	type: 'user',					visible: 'index,form,show', required: false},
 			{field: 'approver_id',       					title: 'Final Approver',								num_cols: 6,	type: 'user',					visible: 'form,show',				required: false},
 			{field: 'event_occured',							title: 'Date/Time When Event Occurred', num_cols: 6,	type: 'datetime',			visible: 'form,show',				required: false},
@@ -65,7 +65,16 @@ class Investigation < ActiveRecord::Base
 			{field: 'description',								title: 'Description of Event',					num_cols: 12, type: 'textarea',			visible: 'form,show',				required: false},
 			{field: 'investigator_comment',				title: 'Investigator Comment',					num_cols: 12, type: 'textarea',			visible: 'form,show',				required: false},
       {field: 'final_comment',              title: 'Final Comment',                 num_cols: 12, type: 'text',         visible: 'show',            required: false},
-		].select{|f| (f[:visible].split(',') & visible_fields).any?}
+
+      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+
+      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+
+    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
 	end
 
 	def self.get_custom_options(title)
@@ -137,7 +146,11 @@ class Investigation < ActiveRecord::Base
 
 	def create_transaction(action)
 		if !self.changes()['viewer_access'].present?
-			InvestigationTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+			InvestigationTransaction.create(users_id: (session[:user_id] rescue nil),
+          action: action,
+          owner_id: self.id,
+          content: defined?(session) ? '' : 'Recurring Investigation',
+          stamp: Time.now)
 		end
 	end
 	def investigation_type

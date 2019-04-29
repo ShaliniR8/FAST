@@ -3,7 +3,7 @@ require 'fileutils'
 
 class Submission < ActiveRecord::Base
 	belongs_to :template, 	foreign_key: "templates_id", 	class_name: "Template"
-	belongs_to :created_by,	foreign_key: "user_id",				class_name: "User"  
+	belongs_to :created_by,	foreign_key: "user_id",				class_name: "User"
 	belongs_to :record, 		foreign_key: "records_id", 		class_name: "Record"
 
 	has_many :submission_fields,		foreign_key: "submissions_id",	class_name: "SubmissionField", 				:dependent => :destroy
@@ -14,15 +14,15 @@ class Submission < ActiveRecord::Base
 
 	accepts_nested_attributes_for :comments
 	accepts_nested_attributes_for :submission_fields
-	accepts_nested_attributes_for :attachments, 
-		allow_destroy: true, 
+	accepts_nested_attributes_for :attachments,
+		allow_destroy: true,
 		reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
 
 	after_create :make_report
 	after_create :create_transaction
 	after_update :make_report
-	 
+
 	extend AnalyticsFilters
 	include Rails.application.routes.url_helpers
 
@@ -76,7 +76,7 @@ class Submission < ActiveRecord::Base
 		submissions.keep_if{|x| x.template.report_type == "asap"}
 		submissions.each do |s|
 			employee_group = s.template.emp_group
-			if s.event_date.present? 
+			if s.event_date.present?
 				event_time = s.event_date
 				year = event_time.strftime("%Y")
 				month = event_time.strftime("%b").downcase
@@ -91,8 +91,8 @@ class Submission < ActiveRecord::Base
 			end
 			File.open(temp_file, 'w') do |file|
 				file << ApplicationController.new.render_to_string(
-					:template => "submissions/export_component.xml.erb", 
-					:locals => { :template => s.template, :submission => s})  
+					:template => "submissions/export_component.xml.erb",
+					:locals => { :template => s.template, :submission => s})
 			end
 		end
 	end
@@ -129,7 +129,7 @@ class Submission < ActiveRecord::Base
 	def get_event_date
 		event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
 	end
-	
+
 
 
 	def create_transaction
@@ -206,7 +206,7 @@ class Submission < ActiveRecord::Base
 				self.description[0..50] + "..."
 			else
 				self.description
-			end 
+			end
 		end
 	end
 
@@ -258,8 +258,8 @@ class Submission < ActiveRecord::Base
 				:description        => self.description,
 				:event_date         => self.event_date,
 				:users_id           => self.user_id,
-				:status             => "New", 
-				:anonymous          => self.anonymous, 
+				:status             => "New",
+				:anonymous          => self.anonymous,
 				:event_time_zone    => self.event_time_zone
 			)
 		self.attachments.each do |x|
@@ -283,7 +283,7 @@ class Submission < ActiveRecord::Base
 
 
 
-	def to_asap			
+	def to_asap
 	end
 
 
@@ -355,7 +355,7 @@ class Submission < ActiveRecord::Base
 					elsif field.field.data_type == "datetime"
 						field_val = field.value.present? ? DateTime.parse(field.value) : nil
 					end
-					
+
 					if field_val.present? && c.start_date.present? && c.end_date.present? && field_val.between?(c.start_date, c.end_date)
 						return true
 					else
@@ -363,7 +363,7 @@ class Submission < ActiveRecord::Base
 					end
 
 
-				# all other display types 
+				# all other display types
 				else
 					if (c.value.present?) && (!field.value.downcase.include? c.value.downcase)
 						return false
@@ -391,33 +391,34 @@ class Submission < ActiveRecord::Base
 				:user_id          => self.user_id,
 				:event_time_zone  => self.event_time_zone,
 			})
-			self.submission_fields.each do |f| 
+			self.submission_fields.each do |f|
 				if f.map_field.present?
 					SubmissionField.create({
-						:value => f.value, 
-						:submissions_id => converted.id, 
+						:value => f.value,
+						:submissions_id => converted.id,
 						:fields_id => f.field.map_id})
 				end
 			end
 			new_temp.categories.each do |cat|
-				cat.fields.each do |f| 
+				cat.fields.each do |f|
 					if converted.submission_fields.where('fields_id = ?', f.id).blank?
 						SubmissionField.create({
-							:value => "", 
-							:submissions_id => converted.id, 
+							:value => "",
+							:submissions_id => converted.id,
 							:fields_id => f.id})
 					end
 				end
 			end
 			self.attachments.each do |x|
 				temp = SubmissionAttachment.new(
-					:name => x.name, 
+					:name => x.name,
 					:caption => x.caption)
 				converted.attachments.push(temp)
 			end
 			converted.completed = self.completed
 			converted.save
 		end
+    converted
 	end
 
 

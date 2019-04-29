@@ -1,5 +1,5 @@
 class NotifyMailer < ActionMailer::Base
-	
+
 	include ApplicationHelper
 
 	default :from => "engineering@prosafet.com"
@@ -8,7 +8,7 @@ class NotifyMailer < ActionMailer::Base
 	def notify(user, message, subject)
 		@user = user
 		@message = message
-		subject = "ProSafeT#{subject.nil? ? '' : ": #{subject}"}" 
+		subject = "ProSafeT#{subject.nil? ? '' : ": #{subject}"}"
 		if Rails.env.production?
 			mail(:to => user.email, :subject => subject).deliver
 		else
@@ -24,9 +24,9 @@ class NotifyMailer < ActionMailer::Base
 		@record_url = g_link(record)
 		subject = "ProSafeT: #{subject}"
 		if Rails.env.production?
-			mail(:to => user.email, :subject => subject).deliver	
+			mail(:to => user.email, :subject => subject).deliver
 		else
-			mail(:to => 'noc@prodigiq.com', :subject => subject).deliver			
+			mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
 		end
 	end
 

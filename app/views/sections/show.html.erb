@@ -9,7 +9,7 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<div class="panel-title">
-						<b><%="#{@record.template.name}"%> Submission #<%=@record.get_id%>: <%="#{@record.get_description}"%> </b> 
+						<b><%="#{@record.template.name}"%> Submission #<%=@record.get_id%>: <%="#{@record.get_description}"%> </b>
 						<div class="top_buttons pull-right">
 							<a class="btn btn-warning expandall mb5">Expand All</a>
 							<%if current_user.has_template_access(@record.template.name).include?("full") || current_user.has_template_access(@record.template.name).include?("viewer")%>
@@ -22,7 +22,7 @@
 								<%end%>
 								<%=link_to "PDF", print_full_submission_path(@record,format: :pdf),:class=>'btn btn-info mb5'%>
 								<%=link_to "De-Identified PDF", print_submission_path(@record,format: :pdf),:class=>'btn btn-info mb5'%>
-								
+
 								<%if current_user.has_access("submissions","destroy")%>
 									<%=link_to 'Delete', submission_path(@record), :method=>"delete", :confirm=>'Please confirm that you want to delete this submission. The deletion cannot be reverted',:class=>"btn btn-danger mb5"%>
 								<%end%>
@@ -38,7 +38,7 @@
 											:class=>"btn btn-success pull-right mr10 mb5",:id=>'comment_btn',
 											"data-toggle"=>"tooltip", "data-placement"=>"top", :title=>"Add additional notes. Analysts will be notified when new notes are added."%>
 							</span>
-											
+
 						<%end%>
 
 					</div>
@@ -58,9 +58,9 @@
 									<div class="panel-heading click-heading collapsed">
 										<div class="panel-title">
 											<b>Additional Notes</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-										</div> 
+										</div>
 									</div>
-									<div class="panel-body" style="display:none"> 
+									<div class="panel-body" style="display:none">
 										<div class="row">
 												<%=render "show_notes",:owner=>@record%>
 										</div>
@@ -78,14 +78,14 @@
 							<%end%>
 						<%end%>
 
-						
-						<%=render "/records/show_attachment",:owner=>@record%>
+
+						<%=render "/forms/attachments_show", :owner => @record%>
 						<%=render "/records/transactions",{:owner=>@record}%>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div> 
+	</div>
 </div>
 <script type="text/javascript">
 	$(document).ready(function(){

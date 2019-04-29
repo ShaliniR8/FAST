@@ -12,11 +12,20 @@
 			<%@users.each do |user|%>
 				<tr user="<%=user.id%>">
 					<%User.invite_headers.each do |header|%>
-						<td><%=user.send(header[:field])%></td>
-					<%end%>         
-					<%if @action=="new"%>
+						<td>
+              <%=user.send(header[:field])%>
+            </td>
+					<%end%>
+
+					<%if action_name == "new"%>
 						<td><a class="btn btn-info invite_btn">Invite</a></td>
-					<%elsif @action=="show"%>
+          <%elsif action_name == 'edit'%>
+            <%if (user.get_invitation_status @meeting) == "Not Invited"%>
+              <td><a class="btn btn-info invite_btn">Invite</a></td>
+            <%else%>
+              <td><a class="btn btn-success invite_btn">Invited</a></td>
+            <%end%>
+					<%elsif action_name == "show"%>
 						<td><%=user.get_invitation_status @meeting%></td>
 					<%else%>
 						<%if (user.get_invitation_status @meeting)=="Not Invited"%>
