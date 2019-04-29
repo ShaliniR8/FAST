@@ -20,7 +20,7 @@ class Recurrence < ActiveRecord::Base
       'Quarterly',
       '6 Months',
       'Yearly',
-      'Biannual'
+      'Biennial'
     ]
   end
 
@@ -30,7 +30,7 @@ class Recurrence < ActiveRecord::Base
       'Quarterly'       => { :number => 3   },
       '6 Months'        => { :number => 6   },
       'Yearly'          => { :number => 12  },
-      'Biannual'        => { :number => 24  },
+      'Biennial'        => { :number => 24  },
     }
   end
 

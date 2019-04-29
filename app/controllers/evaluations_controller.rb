@@ -174,8 +174,8 @@ class EvaluationsController < ApplicationController
 		@headers = @table.get_meta_fields('index')
 		@terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
 		handle_search
-
-    if !current_user.admin? || current_user.has_access('evaluations','admin')
+    @records = @records.where('template = 0 OR template IS NULL')
+    if !current_user.admin? && !current_user.has_access('evaluations','admin')
       cars = Evaluation.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += Evaluation.where('approver_id = ?',  current_user.id)
@@ -193,7 +193,6 @@ class EvaluationsController < ApplicationController
       end
       @records = @records & cars
     end
-    @records = @records.keep_if{|x| x.template.nil? || x.template == 0}
 	end
 
 
