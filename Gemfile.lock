@@ -108,6 +108,8 @@ GEM
       thor (~> 0.14.4)
     rake (0.9.6)
     ruby-ole (1.2.11.8)
+    ruby-saml (1.4.2)
+      nokogiri (>= 1.5.10)
     ruby_dig (0.0.2)
     rubyzip (1.1.7)
     sinatra (1.2.9)
@@ -151,6 +153,7 @@ DEPENDENCIES
   rails (= 3.0.5)
   rake (= 0.9.6)
   ruby-ole
+  ruby-saml
   ruby_dig
   sinatra (~> 1.2, >= 1.2.9)
   slim
