@@ -1,155 +1,155 @@
 <div class="col-xs-12">
-	<div class="panel panel-success">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>Visualization</b> 
-			</div>
-		</div>
-		<div class="panel-body">
-			<div class="row">
-				<div class="col-xs-12">
-					<div class="alert alert-info" role="alert">
-  					<h4><b>Instructions:</b></h4> select a Template and a Field to see the trend. 
-					</div>
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Visualization</b>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="alert alert-info" role="alert">
+            <h4><b>Instructions:</b></h4> select a Template and a Field to see the trend.
+          </div>
 
-					<div class="form-group col-xs-4 form-inline">
-						<%=label_tag :select_template, "Select Template"%>
-						<%=select_tag :template_id, 
-							content_tag(:option, "All", :value => "All") + 
-							options_from_collection_for_select(@templates, 'id', 'name'), 
-							{:include_blank => "", 
-								:class => "form-control ml5", 
-								:id => "template_select"}%> 
-					</div>
+          <div class="form-group col-xs-4 form-inline">
+            <%=label_tag :select_template, "Select Template"%>
+            <%=select_tag :template_id,
+              content_tag(:option, "All", :value => "All") +
+              options_from_collection_for_select(@templates, 'id', 'name'),
+              {:include_blank => "",
+                :class => "form-control ml5",
+                :id => "template_select"}%>
+          </div>
 
-					<div class="form-group col-xs-4 form-inline">
-						<%=label_tag :select_field, "Select Field"%>
-						<!-- Field selections from specified template -->
-						<%=select_tag :field_id, 
-							fields_select_with_categories(@fields), 
-							{:include_blank=>"",
-								:class=>"form-control ml5 ", 
-								:id=>"field_select"}%>
-						<!-- Field selections from all templates in the list -->
-						<%=text_field_tag :field_id, nil, 
-							{:list=>"select_field", 
-								:class=>"form-control ml5", 
-								:id=>"field_select_all"}%>
-						<%@fields_options = @fields.map{|x| x.fields}.flatten.map{|x| x.label}.uniq.sort %>
-						<datalist id="select_field">
-							<% @fields_options.each do |x|%>
-								<option value="<%=x%>"></option>
-							<%end%>
-						</datalist>
-					</div>
+          <div class="form-group col-xs-4 form-inline">
+            <%=label_tag :select_field, "Select Field"%>
+            <!-- Field selections from specified template -->
+            <%=select_tag :field_id,
+              fields_select_with_categories(@fields),
+              {:include_blank=>"",
+                :class=>"form-control ml5 ",
+                :id=>"field_select"}%>
+            <!-- Field selections from all templates in the list -->
+            <%=text_field_tag :field_id, nil,
+              {:list=>"select_field",
+                :class=>"form-control ml5",
+                :id=>"field_select_all"}%>
+            <%@fields_options = @fields.map{|x| x.fields}.flatten.map{|x| x.label}.uniq.sort %>
+            <datalist id="select_field">
+              <% @fields_options.each do |x|%>
+                <option value="<%=x%>"></option>
+              <%end%>
+            </datalist>
+          </div>
 
-				</div>
+        </div>
 
-				<div id="chart_and_grid"></div>
+        <div id="chart_and_grid"></div>
 
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 
-	// Generate color interplation
-	function colorInterpolation(steps){
-		var colorArray = [];
-		if(steps == 1){
-			colorArray = ["red"]
-		}else{
-			var colorInterpolator = d3.interpolateRgb("red", "yellow");
-			colorArray = d3.range(0, (1 + 1 / steps), 1 / (steps - 1)).map(function(d) {
-				return colorInterpolator(d)
-			});
-		}
-		return colorArray;
-	}
-
-
-	$(window).resize(function() {
-		if(this.resizeTO) clearTimeout(this.resizeTO);
-		this.resizeTO = setTimeout(function() {
-			$(this).trigger('resizeEnd');
-		}, 100);
-	});
+  // Generate color interplation
+  function colorInterpolation(steps){
+    var colorArray = [];
+    if(steps == 1){
+      colorArray = ["red"]
+    }else{
+      var colorInterpolator = d3.interpolateRgb("red", "yellow");
+      colorArray = d3.range(0, (1 + 1 / steps), 1 / (steps - 1)).map(function(d) {
+        return colorInterpolator(d)
+      });
+    }
+    return colorArray;
+  }
 
 
-
-	function update_analytics(){
-		if(($("#field_select").val() != "" || $("#field_select_all").val() != "" ) && $('#template_select').val()!=""){
-			// Search through all templates
-			if( $('#template_select').val() == "All" ){
-				var all_templates = [];
-				$("#template_select option").each(function(){
-						all_templates.push($(this).val());
-				});
-				var value = encodeURIComponent($("#field_select_all").val());
-				$.get('<%=analytic_data_all_query_statement_path(@query)%>?field_label='+value+"&template_id="+all_templates, function(data){
-					$("#chart_and_grid").html(data)
-				});
-
-			// Search through specified template
-			}else{
-				$.get('<%=analytic_data_query_statement_path(@query)%>?field_id='+$("#field_select").val()+"&template_id="+$('#template_select').val(), function(data){
-					$("#chart_and_grid").html(data)
-				});
-			}
-		}else{
-		}
-	}
-
-	$(document).ready(function(){
-
-		$("#field_select").hide();
-
-		$("#field_select").on('change',function(){
-			update_analytics();
-		});  
-
-		$("#field_select_all").on('change',function(){
-			update_analytics();
-		}); 
+  $(window).resize(function() {
+    if(this.resizeTO) clearTimeout(this.resizeTO);
+    this.resizeTO = setTimeout(function() {
+      $(this).trigger('resizeEnd');
+    }, 100);
+  });
 
 
-		$("#template_select") .on('change',function(){
-			template_id = $(this).val();
-			$("#field_select").val('');
 
-			// Update field select with fields from all templates
-			if(template_id == "All"){
+  function update_analytics(){
+    if(($("#field_select").val() != "" || $("#field_select_all").val() != "" ) && $('#template_select').val()!=""){
+      // Search through all templates
+      if( $('#template_select').val() == "All" ){
+        var all_templates = [];
+        $("#template_select option").each(function(){
+            all_templates.push($(this).val());
+        });
+        var value = encodeURIComponent($("#field_select_all").val());
+        $.get('<%=analytic_data_all_query_statement_path(@query)%>?field_label='+value+"&template_id="+all_templates, function(data){
+          $("#chart_and_grid").html(data)
+        });
 
-				$("#field_select").hide();
-				$("#field_select_all").show();
-				var all_templates = [];
-				$("#template_select option").each(function(){
-						all_templates.push($(this).val());
-				});
-				$("#field_select_all").find("optgroup").each(function(){
-					if ( all_templates.includes($(this).data("template_id").toString()) ){
-						$(this).show();
-					}else{
-						$(this).hide();
-					}
-				});
+      // Search through specified template
+      }else{
+        $.get('<%=analytic_data_query_statement_path(@query)%>?field_id='+$("#field_select").val()+"&template_id="+$('#template_select').val(), function(data){
+          $("#chart_and_grid").html(data)
+        });
+      }
+    }else{
+    }
+  }
 
-			// Update field select with fields from selected template
-			}else{
-				$("#field_select_all").hide();
-				$("#field_select").show();
-				$("#field_select").find('optgroup').each(function(){
-					if ($(this).data('template_id') == template_id){
-						$(this).show();
-					}else{
-						$(this).hide();
-					}
-				});
-			}
-			
-		});
-	});
+  $(document).ready(function(){
+
+    $("#field_select").hide();
+
+    $("#field_select").on('change',function(){
+      update_analytics();
+    });
+
+    $("#field_select_all").on('change',function(){
+      update_analytics();
+    });
+
+
+    $("#template_select") .on('change',function(){
+      template_id = $(this).val();
+      $("#field_select").val('');
+
+      // Update field select with fields from all templates
+      if(template_id == "All"){
+
+        $("#field_select").hide();
+        $("#field_select_all").show();
+        var all_templates = [];
+        $("#template_select option").each(function(){
+            all_templates.push($(this).val());
+        });
+        $("#field_select_all").find("optgroup").each(function(){
+          if ( all_templates.includes($(this).data("template_id").toString()) ){
+            $(this).show();
+          }else{
+            $(this).hide();
+          }
+        });
+
+      // Update field select with fields from selected template
+      }else{
+        $("#field_select_all").hide();
+        $("#field_select").show();
+        $("#field_select").find('optgroup').each(function(){
+          if ($(this).data('template_id') == template_id){
+            $(this).show();
+          }else{
+            $(this).hide();
+          }
+        });
+      }
+
+    });
+  });
 
 </script>

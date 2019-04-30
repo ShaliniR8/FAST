@@ -1,24 +1,24 @@
 <div class="col-xs-12 col-lg-12">
-	<div class="panel panel-success">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>New ORM</b> 
-			</div>
-		</div>
-		<div class="panel-body" style="overflow-y:auto;overflow-x:hidden">    
-			<%@orm_templates.each do |x|%>
-				<div class="col-xs-12 col-lg-4">
-					<%=link_to x.name, 
-										new_orm_submission_path(:template => x), 
-										:class => "btn btn-info ml5 mr5 mb10", 
-										:style => "font-weight: bold", 
-										:disable_with => "#{x.name} ...",
-										"data-toggle" => "tooltip", 
-										"data-placement" => "top", 
-										"title" => "Start a new #{x.name} ORM"
-										%>
-				</div>
-			<%end%>
-		</div>
-	</div>
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>New ORM</b>
+      </div>
+    </div>
+    <div class="panel-body" style="overflow-y:auto;overflow-x:hidden">
+      <%@orm_templates.each do |x|%>
+        <div class="col-xs-12 col-lg-4">
+          <%=link_to x.name,
+                    new_orm_submission_path(:template => x),
+                    :class => "btn btn-info ml5 mr5 mb10",
+                    :style => "font-weight: bold",
+                    :disable_with => "#{x.name} ...",
+                    "data-toggle" => "tooltip",
+                    "data-placement" => "top",
+                    "title" => "Start a new #{x.name} ORM"
+                    %>
+        </div>
+      <%end%>
+    </div>
+  </div>
 </div>

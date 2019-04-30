@@ -1,94 +1,94 @@
 <%=form_tag create_causes_causes_path, :method => "post" do %>
 
-	<%=hidden_field_tag :owner_id, @owner.id%>
-	<%=hidden_field_tag :owner_type, @owner.class.name%>
-	<%=hidden_field_tag :cause_type, @cause_type%>
+  <%=hidden_field_tag :owner_id, @owner.id%>
+  <%=hidden_field_tag :owner_type, @owner.class.name%>
+  <%=hidden_field_tag :cause_type, @cause_type%>
 
-	<div class="panel-warning">
-		<div class="panel-heading">
-			<div class="panel-title">
-				New <%=@cause_type.titleize%>
-				<button type="button" 
-					class="close pull-right" 
-					data-dismiss="modal" 
-					aria-label="Close">
-					<span class="glyphicon glyphicon-remove"></span>
-				</button>
-			</div>
-		</div>
+  <div class="panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">
+        New <%=@cause_type.titleize%>
+        <button type="button"
+          class="close pull-right"
+          data-dismiss="modal"
+          aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
 
-		<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
-			<div class="row">
-				<div class="col-xs-12">
+    <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+      <div class="row">
+        <div class="col-xs-12">
 
-					<div class="col-xs-12">
-						<div class="col-xs-6">
-							<%=label_tag :category%>
-							<%=text_field_tag :category, 
-								'', 
-								:class => "form-control", 
-								:list => "cat_list", 
-								:id => "cat_select"%>
-							<datalist id="cat_list">
-								<%@categories.each do |cat| %>
-									<option value="<%=cat%>">
-										<%=cat%>		
-									</option>
-								<% end %>
-							</datalist>
-						</div>
-					</div>
+          <div class="col-xs-12">
+            <div class="col-xs-6">
+              <%=label_tag :category%>
+              <%=text_field_tag :category,
+                '',
+                :class => "form-control",
+                :list => "cat_list",
+                :id => "cat_select"%>
+              <datalist id="cat_list">
+                <%@categories.each do |cat| %>
+                  <option value="<%=cat%>">
+                    <%=cat%>
+                  </option>
+                <% end %>
+              </datalist>
+            </div>
+          </div>
 
 
-					<div class="col-xs-12 mt10">
-						<hr>
-						<div id="attributes"></div>
-					</div>
+          <div class="col-xs-12 mt10">
+            <hr>
+            <div id="attributes"></div>
+          </div>
 
-					<%=submit_tag "Save",
-						:class => "btn btn-success pull-right mr20 mt20", 
-						:disable_with => "Saving..."%>
+          <%=submit_tag "Save",
+            :class => "btn btn-success pull-right mr20 mt20",
+            :disable_with => "Saving..."%>
 
-				</div>
+        </div>
 
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 
 <%end%>
 
 
 
 <style>
-	.checkbox_label {
-		cursor: pointer;
-		margin-top: 2px;
-		margin-bottom: 2px;
-	}	
-	.checkbox_label:hover {
-		font-weight:bold;
-	}	
+  .checkbox_label {
+    cursor: pointer;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+  .checkbox_label:hover {
+    font-weight:bold;
+  }
 </style>
 
 
 
 
 <script>
-	$(document).ready(function(){
-		$('#cat_select').on('input',function(){
-			if ($(this).val() != ""){
-				$.get('<%=retract_attributes_causes_path(
-					:owner_type => @owner.class.superclass.name == "ActiveRecord::Base" ? @owner.class.name : @owner.class.superclass.name,
-					:cause_type => @cause_type)%>' +
-					'&category=' + $(this).val(), 
-					function(data){
-					$("#attributes").html(data);
-					$(window).trigger('resize');					
-				});
-			}else{
-				$("#attributes").html("");
-				$(window).trigger('resize');
-			}
-		});
-	});
+  $(document).ready(function(){
+    $('#cat_select').on('input',function(){
+      if ($(this).val() != ""){
+        $.get('<%=retract_attributes_causes_path(
+          :owner_type => @owner.class.superclass.name == "ActiveRecord::Base" ? @owner.class.name : @owner.class.superclass.name,
+          :cause_type => @cause_type)%>' +
+          '&category=' + $(this).val(),
+          function(data){
+          $("#attributes").html(data);
+          $(window).trigger('resize');
+        });
+      }else{
+        $("#attributes").html("");
+        $(window).trigger('resize');
+      }
+    });
+  });
 </script>

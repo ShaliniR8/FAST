@@ -1,41 +1,41 @@
 <%=form_for @new_access do |f|%>
-	<div class="panel-warning">
-		<div class="panel-heading">
-			<div class="panel-title">New Rule
-				<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
-					<span class="glyphicon glyphicon-remove"></span>
-				</button>
-			</div>
-		</div>
+  <div class="panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">New Rule
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
 
-		<div class="panel-body">
-			<div class="row col-xs-12">
-				<div class="col-sm-5">
-					<%=f.label :entry, "Report Type"%>
-					<%=f.select :entry, (options_for_select(@entry_options) + options_from_collection_for_select(@templates,'name','name')), {:include_blank => ""}, {:class => 'form-control', :id => "module_select"}%>
-				</div>
-				<div class="col-sm-5">
-					<%=f.label :action,"Action"%>
-					<%=f.select :action, {}, {:include_blank => ""}, {:class => 'form-control', :id => "action_select"}%>
-				</div>
-				<%=f.hidden_field :list_type, :value => 1%>
-			</div>
-			<%=f.submit "Save", :class=>"btn btn-success pull-right mt5", :disable_with => "Saving..."%>
-		</div>
-	</div>
+    <div class="panel-body">
+      <div class="row col-xs-12">
+        <div class="col-sm-5">
+          <%=f.label :entry, "Report Type"%>
+          <%=f.select :entry, (options_for_select(@entry_options) + options_from_collection_for_select(@templates,'name','name')), {:include_blank => ""}, {:class => 'form-control', :id => "module_select"}%>
+        </div>
+        <div class="col-sm-5">
+          <%=f.label :action,"Action"%>
+          <%=f.select :action, {}, {:include_blank => ""}, {:class => 'form-control', :id => "action_select"}%>
+        </div>
+        <%=f.hidden_field :list_type, :value => 1%>
+      </div>
+      <%=f.submit "Save", :class=>"btn btn-success pull-right mt5", :disable_with => "Saving..."%>
+    </div>
+  </div>
 <%end%>
 
 
 
 <script>
-	$(document).ready(function(){
-		$("#module_select").on('change',function(){
-			action = $(this).val();
-			$.get("<%=get_options_access_controls_path%>" + "?opt=" + action, function(data){
-				$("#action_select").html(data);
-				var parsed = $.parseHTML(data);
-				var to_hide = $(parsed).find('#to_hide').attr('tmp');
-			});
-		});
-	});
+  $(document).ready(function(){
+    $("#module_select").on('change',function(){
+      action = $(this).val();
+      $.get("<%=get_options_access_controls_path%>" + "?opt=" + action, function(data){
+        $("#action_select").html(data);
+        var parsed = $.parseHTML(data);
+        var to_hide = $(parsed).find('#to_hide').attr('tmp');
+      });
+    });
+  });
 </script>

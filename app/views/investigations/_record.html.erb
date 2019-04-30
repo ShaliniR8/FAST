@@ -1,9 +1,9 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"%>
-	<div class="panel panel-info">
+  <div class="panel panel-info">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b><%=link_to "#{record.template.name} #{record.get_id}",record_path(record),:target=>"_blank",:style=>"color:white"%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-      </div> 
+      </div>
     </div>
     <div class="panel-body" style="display:none">
       <div class="row" id="fields">
@@ -21,7 +21,7 @@
           <%if cat.not_empty_for(record) && cat.print && current_user.has_access("records","summary")%>
           <%=render "/records/category",:category=>cat,:record=>record%>
           <%end%>
-        <%end%> 
+        <%end%>
         <%if record.descriptions.present?%><%=render 'records/descriptions',:owner=>record, :button=>false%><%end%>
         <%if record.causes.present?%><%=render 'records/causes',:owner=>record, :button=>false%><%end%>
         <%if record.detections.present?%><%=render 'records/detections',:owner=>record, :button=>false%><%end%>
@@ -32,9 +32,9 @@
             <div class="panel-heading click-heading collapsed">
               <div class="panel-title">
                 <b>Risk Matrix</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-              </div> 
+              </div>
             </div>
-            <div class="panel-body" style="display:none"> 
+            <div class="panel-body" style="display:none">
               <div class="row">
                 <div class='col-xs-3'><b>Severity: </b><%=record.severity%></div>
                 <div class='col-xs-3'><b>Likelihood: </b><%=record.likelihood%></div>
@@ -65,7 +65,7 @@
                       <tr>
                         <td><center><b><%=@frequency[row]%></b></center></td>
                         <%@color_matrix[row].each_index do |cell|%>
-                          <td id="<%=4-row%>-<%=cell%>" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>"></td>    
+                          <td id="<%=4-row%>-<%=cell%>" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>"></td>
                         <%end%>
                       </tr>
                     <%end%>
@@ -76,10 +76,10 @@
               </div>
             </div>
           </div>
-        </div>    
-      </div>   
+        </div>
+      </div>
     </div>
-	</div>
+  </div>
 </div>
 <script>
   $(document).ready(function(){

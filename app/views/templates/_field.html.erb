@@ -13,61 +13,61 @@
 <%size = "col-md-" + field.display_size.to_s + " col-xs-" + "12" + " col-sm-" + "6" + " col-lg-" + field.display_size.to_s%>
 
 <div class="<%=size%> form-group">
-	 
-	<label><%=field.label%> <font color="grey">(#<%=field.id%>)</font></label>
-	
-	<%if field.display_type == "text"%>
-		<input type="text" class="form-control <%= (field.data_type=='date'|| field.data_type=='datetime') ? 'field-'+field.data_type : ''%>" placeholder="<%=field.label%>" <%= field.data_type=='date' ? 'Readonly' : ''%>>
-		
 
-	<%elsif field.display_type == "dropdown"%>
-		<select class="form-control field_select" id="preview_select" name="preview_select">
-			<option></option>
-			<%field.getOptions.each do |option|%>
-				<option data-id="<%=field.id%>"><%=option%></option>
-			<%end%>
-		</select>
-		
+  <label><%=field.label%> <font color="grey">(#<%=field.id%>)</font></label>
 
-	<%elsif field.display_type == "checkbox"%>
-		</br>	
-		<div  class="smallselect">	
-			<%field.getOptions.each do |option|%>
-				<input type="checkbox" value="">&nbsp&nbsp&nbsp<%=option%>&nbsp&nbsp&nbsp
-			<%end%>
-		</div>
-		
-
-	<%elsif field.display_type == "radio"%>
-		<div  class="smallselect">
-			<%temp_name=SecureRandom.uuid.to_s%><br>
-			<%field.getOptions.each do |option|%>
-				<input type="radio" name="<%=temp_name%>" value="<%=option%>">&nbsp&nbsp&nbsp<%=option%>&nbsp&nbsp&nbsp
-			<%end%>
-		</div>
+  <%if field.display_type == "text"%>
+    <input type="text" class="form-control <%= (field.data_type=='date'|| field.data_type=='datetime') ? 'field-'+field.data_type : ''%>" placeholder="<%=field.label%>" <%= field.data_type=='date' ? 'Readonly' : ''%>>
 
 
-	<%elsif field.display_type == "textarea"%>
-		<textarea class="form-control" placeholder="<%=field.label%>"></textarea>
-
-	<%elsif field.display_type == "datalist"%>
-		<textfield class="form-control" placeholder="<%=field.label%>"></textfield>
-
-	<%elsif field.display_type == "employee"%>
-		<div class="input-group">
-			<%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp",:readonly=>true,:id=>"emp#{field.id}"}%>
-			<span class="input-group-btn">
-				<%=link_to "...", "#", :class=>"btn btn-info emp_button", "data-toggle"=>"modal", "data-target"=>".bs-example-modal-lg", :id=>"#{field.id}"%>		
-			</span>
-		</div>
+  <%elsif field.display_type == "dropdown"%>
+    <select class="form-control field_select" id="preview_select" name="preview_select">
+      <option></option>
+      <%field.getOptions.each do |option|%>
+        <option data-id="<%=field.id%>"><%=option%></option>
+      <%end%>
+    </select>
 
 
-	<%elsif field.display_type == "airport"%>
-		<div class="input-group">
-			<%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport",:readonly=>true,:id=>"airport#{field.id}"}%>
-			<span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg", :id=>"#{field.id}"%></span>
-		</div>
-	<%end%>
+  <%elsif field.display_type == "checkbox"%>
+    </br>
+    <div  class="smallselect">
+      <%field.getOptions.each do |option|%>
+        <input type="checkbox" value="">&nbsp&nbsp&nbsp<%=option%>&nbsp&nbsp&nbsp
+      <%end%>
+    </div>
+
+
+  <%elsif field.display_type == "radio"%>
+    <div  class="smallselect">
+      <%temp_name=SecureRandom.uuid.to_s%><br>
+      <%field.getOptions.each do |option|%>
+        <input type="radio" name="<%=temp_name%>" value="<%=option%>">&nbsp&nbsp&nbsp<%=option%>&nbsp&nbsp&nbsp
+      <%end%>
+    </div>
+
+
+  <%elsif field.display_type == "textarea"%>
+    <textarea class="form-control" placeholder="<%=field.label%>"></textarea>
+
+  <%elsif field.display_type == "datalist"%>
+    <textfield class="form-control" placeholder="<%=field.label%>"></textfield>
+
+  <%elsif field.display_type == "employee"%>
+    <div class="input-group">
+      <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp",:readonly=>true,:id=>"emp#{field.id}"}%>
+      <span class="input-group-btn">
+        <%=link_to "...", "#", :class=>"btn btn-info emp_button", "data-toggle"=>"modal", "data-target"=>".bs-example-modal-lg", :id=>"#{field.id}"%>
+      </span>
+    </div>
+
+
+  <%elsif field.display_type == "airport"%>
+    <div class="input-group">
+      <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport",:readonly=>true,:id=>"airport#{field.id}"}%>
+      <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg", :id=>"#{field.id}"%></span>
+    </div>
+  <%end%>
 
 </div>
 
@@ -76,9 +76,9 @@
 
 <style>
 .smallselect {
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 </style>
 
@@ -86,44 +86,44 @@
 
 <script>
 
-	var table = new Array();
+  var table = new Array();
 
-	function build_table(){
-		table["<%=field.id%>"] = $('#employees<%=field.id%>').DataTable({
-				"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-				"iDisplayLength": 5
-		});
-	}
+  function build_table(){
+    table["<%=field.id%>"] = $('#employees<%=field.id%>').DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+    });
+  }
 
-	function clear_table(){
-		table["<%=field.id%>"].destroy();
-	}
+  function clear_table(){
+    table["<%=field.id%>"].destroy();
+  }
 
 
-	$(document).ready(function(){
-		<%if field.display_type=="employee"%>
-			build_table();
-			$('#emp<%=field.id%>').on('click',function(){
-				$("#employee_<%=field.id%>").show();
-				$(window).trigger('resize');
-				clear_table();
-				$('tbody tr' ).unbind();
-				$('.close' ).unbind();
-				$('tbody tr').on('click',function(){
-					$('#emp_<%=field.id%>').val($(this).find('td').eq(3).text());
-					$('#employee-select<%=field.id%>').val($(this).find('td').eq(0).text());
-					$('#emp_div').hide();
-					$("#employee_<%=field.id%>").modal('toggle');
-				});
-				$('.close').on('click',function(){
-					$('#emp_<%=field.id%>').val("");
-					$('#employee-select<%=field.id%>').val("");
-					$('#emp_div').hide();
-				});
-				build_table();
-			});
-		<%end%>
-	});
+  $(document).ready(function(){
+    <%if field.display_type=="employee"%>
+      build_table();
+      $('#emp<%=field.id%>').on('click',function(){
+        $("#employee_<%=field.id%>").show();
+        $(window).trigger('resize');
+        clear_table();
+        $('tbody tr' ).unbind();
+        $('.close' ).unbind();
+        $('tbody tr').on('click',function(){
+          $('#emp_<%=field.id%>').val($(this).find('td').eq(3).text());
+          $('#employee-select<%=field.id%>').val($(this).find('td').eq(0).text());
+          $('#emp_div').hide();
+          $("#employee_<%=field.id%>").modal('toggle');
+        });
+        $('.close').on('click',function(){
+          $('#emp_<%=field.id%>').val("");
+          $('#employee-select<%=field.id%>').val("");
+          $('#emp_div').hide();
+        });
+        build_table();
+      });
+    <%end%>
+  });
 
 
 </script>

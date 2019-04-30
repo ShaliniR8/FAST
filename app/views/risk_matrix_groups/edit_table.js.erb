@@ -1,20 +1,20 @@
 swal({
-	title: "EDIT SEVERITY TABLE",
-	<%if @record.name == "severity"%> 
-		html: "<%= escape_javascript render('/risk_matrix_groups/edit_severity_table')%>",
-	<%elsif @record.name == "probability"%>
-		html: "<%= escape_javascript render('/risk_matrix_groups/edit_probability_table')%>",
-	<%elsif @record.name == "risk"%>
-		html: "<%= escape_javascript render('/risk_matrix_groups/edit_risk_table')%>",
-	<%end%>	
-	customClass: "custom-swal",
-	showCancelButton: false,
-	showConfirmButton: false,
-	allowOutsideClick: true,
-	onOpen: function(){
-		
-		$(".color_cell").on("change", function(){
-			$(this).closest("td").attr("bgcolor", $(this).val());
-		});
-	}
+  title: "EDIT SEVERITY TABLE",
+  <%if @record.name == "severity"%>
+    html: "<%= escape_javascript render('/risk_matrix_groups/edit_severity_table')%>",
+  <%elsif @record.name == "probability"%>
+    html: "<%= escape_javascript render('/risk_matrix_groups/edit_probability_table')%>",
+  <%elsif @record.name == "risk"%>
+    html: "<%= escape_javascript render('/risk_matrix_groups/edit_risk_table')%>",
+  <%end%>
+  customClass: "custom-swal",
+  showCancelButton: false,
+  showConfirmButton: false,
+  allowOutsideClick: true,
+  onOpen: function(){
+
+    $(".color_cell").on("change", function(){
+      $(this).closest("td").attr("bgcolor", $(this).val());
+    });
+  }
 }).catch(swal.noop);

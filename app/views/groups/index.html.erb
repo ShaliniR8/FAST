@@ -13,7 +13,7 @@
         </div>
         <div class="panel-body">
           <table id="users_table" class="table table-bordered table-hover" >
-            <thead><tr>  
+            <thead><tr>
               <%@headers.each_key do |header|%>
                   <th>
                     <%=header%>
@@ -26,7 +26,7 @@
                   <%@headers.each_key do |header|%>
                     <td><%=(user.send(@headers[header]))%></td>
                   <%end%>
-                </tr> 
+                </tr>
               <%end%>
             </tbody>
           </table>

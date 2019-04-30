@@ -4,11 +4,11 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
+  <div class="grid per90 center-block">
     <%=render "shared/alerts"%>
-   	<div class="panel panel-primary">
-     	<div class="panel-heading">
-     		<div class="panel-title">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
           <div class="top_text">
             <%if @im.type == "FrameworkIm"%>
               <b>Framework IM </b>
@@ -17,7 +17,7 @@
             <%else%>
               <b>Job Aid </b>
             <%end%>
-       		 <b>#<%=@im.get_id%>: <%="#{@im.title}"%></b>
+           <b>#<%=@im.get_id%>: <%="#{@im.title}"%></b>
           </div>
           <div class="top_buttons pull-right">
             <%if current_user.has_access("ims","destroy")%>
@@ -35,9 +35,9 @@
             <%=link_to "Send Message",new_message_path(:link=>im_path(@im), :link_type=>"Im", :link_id=>@im.id),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right ml5 mb5"%>
           </div>
-     		</div>
-     	</div>
-     	<div class="panel-body">
+        </div>
+      </div>
+      <div class="panel-body">
         <div class="row">
           <div class="col-xs-12 mb15">
 
@@ -149,7 +149,7 @@
         </div>
       </div>
     </div>
-	</div>
+  </div>
 </div>
 <style>
  .datepicker{

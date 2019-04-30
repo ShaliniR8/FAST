@@ -20,7 +20,7 @@ table{
     padding:3px;
 }
 .grid_block{
-	display: inline-block;
+  display: inline-block;
     width: 280px;
     margin-right: 5px;
     margin-left:  5px;
@@ -28,7 +28,7 @@ table{
     margin-top:2px;
 }
 .line_block{
-	display: inline-block;
+  display: inline-block;
     width: 590px;
     margin-right: 5px;
     margin-left:  5px;
@@ -39,55 +39,55 @@ table{
 .table_area{
     width: 600px;
 }
-</style> 
+</style>
 <img src="/ProDIGIQ_small.png" alt="Company Logo"/>
 <h2><b><%=@report.name%></b> </h2></br></br>
 <%if !@report.description.blank?%>
-	<%=@report.description%></br>
+  <%=@report.description%></br>
 <%end%>
 
 <%@categories.each do |cat|%>
-	<%if cat.not_all_empty_for(@records) && cat.print%>
-		<%count=0%>
-		<div class="category">
-			<h3><span style="color:red"><%=cat.title%></span></h3>
-			<%@records.each do |record|%>
-				<%count=count+1%>
-				<%if cat.not_empty_for(record)&&cat.print%>
-					<h4>Event <%=count%></h4>
-			        <%cat.fields.each do |field|%>
-			        	<%if field.print%>
-				        	<%value=record.record_fields.where("fields_id=?",field.id).first.value%>
-				        	<%if value.present?%>
-								<div class="<%= cat.title=='Narratives' ? 'line_block' : 'grid_block'%>"><b><%=field.label%></b>&nbsp&nbsp&nbsp&nbsp<%= (field.display_type=="checkbox" || field.display_type=="radio")? value.split(";").join(",  ") : value%></div>	
-							<%end%>
-						<%end%>
-			        <%end%>
-			    <%end%> 
-		    <%end%>
-		</div>   
-	<%end%>
+  <%if cat.not_all_empty_for(@records) && cat.print%>
+    <%count=0%>
+    <div class="category">
+      <h3><span style="color:red"><%=cat.title%></span></h3>
+      <%@records.each do |record|%>
+        <%count=count+1%>
+        <%if cat.not_empty_for(record)&&cat.print%>
+          <h4>Event <%=count%></h4>
+              <%cat.fields.each do |field|%>
+                <%if field.print%>
+                  <%value=record.record_fields.where("fields_id=?",field.id).first.value%>
+                  <%if value.present?%>
+                <div class="<%= cat.title=='Narratives' ? 'line_block' : 'grid_block'%>"><b><%=field.label%></b>&nbsp&nbsp&nbsp&nbsp<%= (field.display_type=="checkbox" || field.display_type=="radio")? value.split(";").join(",  ") : value%></div>
+              <%end%>
+            <%end%>
+              <%end%>
+          <%end%>
+        <%end%>
+    </div>
+  <%end%>
 <%end%>
 <h3><span style="color:red">Transactions</span><h3>
 <div class="table_area">
-	<table>
-		<thead>
-			<tr>
-				<th>Date/Time</th>
-				<th>User</th>
-				<th>Action</th>
-				<th>Message</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%@report.transactions.each do |t|%>	
-				<tr>
-					<td><%=t.stamp.strftime("%Y-%m-%d %H:%M")%></td>
-					<td><%=t.user.full_name%></td>
-					<td><%=t.action%></td>
-					<td><%=t.content%></td>
-				</tr>
-			<%end%>
-		</tbody>
-	</table>
+  <table>
+    <thead>
+      <tr>
+        <th>Date/Time</th>
+        <th>User</th>
+        <th>Action</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%@report.transactions.each do |t|%>
+        <tr>
+          <td><%=t.stamp.strftime("%Y-%m-%d %H:%M")%></td>
+          <td><%=t.user.full_name%></td>
+          <td><%=t.action%></td>
+          <td><%=t.content%></td>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
 </div>

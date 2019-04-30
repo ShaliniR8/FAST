@@ -1,123 +1,123 @@
 <div class="col-sm-12 col-md-12 col-lg-12" %>
 
-	<!--TR 9/8/18 If the category is deleted then add the deleted_categories class-->
-	<%if defined?(category) && category.deleted?%>
-		<%style = "panel panel-default" + " deleted_categories" %>
-	<%else%>
-		<%style = "panel panel-default"%>
-	<%end%>
+  <!--TR 9/8/18 If the category is deleted then add the deleted_categories class-->
+  <%if defined?(category) && category.deleted?%>
+    <%style = "panel panel-default" + " deleted_categories" %>
+  <%else%>
+    <%style = "panel panel-default"%>
+  <%end%>
 
-	<div class="<%=style%>">
-		<div class="panel-heading click-heading <%= source == 'Existing' ? 'collapsed' : ''%>">
-			<div class="panel-title" style="padding:3px;">
-				<div class="row">
-					<div class="col-lg-8 col-md-6 col-sm-8 col-xs-8 ml5">
-						<span class="drag_and_drop glyphicon glyphicon-move pull-left mt10 mr10"></span>
-						<%if source == 'Existing'%>
-							<%= f.hidden_field :category_order, :value => cat_index, :class => "form-template-order" %>
-						<%else%>
-							<%= f.hidden_field :category_order, :value => 10000, :class => "form-template-order" %>
-						<%end%>
-						<%= f.text_field :title, {:class=> "form-control", :placeholder=>"Category Title", :style=>"max-width:400px"}%>
-					</div>
-					<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right">
-						<span class="pull-right clickable ">
-							<i class="mt10 <%= source == 'Existing' ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-up'%>"></i>
-						</span>
-					</div>
-				</div>
-			</div> 
-		</div>
+  <div class="<%=style%>">
+    <div class="panel-heading click-heading <%= source == 'Existing' ? 'collapsed' : ''%>">
+      <div class="panel-title" style="padding:3px;">
+        <div class="row">
+          <div class="col-lg-8 col-md-6 col-sm-8 col-xs-8 ml5">
+            <span class="drag_and_drop glyphicon glyphicon-move pull-left mt10 mr10"></span>
+            <%if source == 'Existing'%>
+              <%= f.hidden_field :category_order, :value => cat_index, :class => "form-template-order" %>
+            <%else%>
+              <%= f.hidden_field :category_order, :value => 10000, :class => "form-template-order" %>
+            <%end%>
+            <%= f.text_field :title, {:class=> "form-control", :placeholder=>"Category Title", :style=>"max-width:400px"}%>
+          </div>
+          <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right">
+            <span class="pull-right clickable ">
+              <i class="mt10 <%= source == 'Existing' ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-up'%>"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<div class="panel-body" style="<%= source == 'Existing' ? 'display:none' : 'display:block'%>" > 
-					 
-			<div class="col-xs-2">
-				<b>Color</b> 
-				<%=f.select :panel, Category.getColor, {}, {:class=>"form-control"}%><br/>
-			</div>
-			<div class="col-xs-2">
-				<b>Print in De-ID</b> 
-				<%=f.select :print,[["Yes", true], ["No", false]],{},{:class=>"form-control"}%><br/>
-			</div>
-			<div class="col-xs-6">
-				<b>Description</b> <%=f.text_area :description, {:class=>"form-control", :size=>"1"}%><br/>  
-			</div>
-			<div class="col-xs-2">
-				<b>Archive</b><br/><%=f.check_box :deleted%>
-			</div>
-			
-			<div class="col-xs-12">
-				
-				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th>Order</th>
-							<th width="10%">Field Name</th>
-							<th>Field Type</th>
-							<th>Data Type</th>
-							<th>Size</th>
-							<th>Show Lable</th>
-							<th>Required</th>
-							<th>Print in De-ID</th>
-							<th width="30%">Options (split by semicolon)</th>
-							<th>Action</th>
-							<th class="extra_info">HTML ID</th>
-							<th class="extra_info">HTML CLASS</th>
-							<th class="extra_info">Mapped Field</th>
-						</tr>
-					</thead>
-					<tbody class="draggableFieldGroup" id="fields">
-						<%if source == "Existing"%>
-							<%@cat.fields.where(:nested_field_id => nil).order(:field_order).each_with_index do |field, index|%>
-								<%=f.fields_for :fields, field do |ff|%>
-									<%=render "field_fields", :field => field, :f => ff, :source => "Existing", :fld_index => index%>		
-								<%end%>
-							<%end%>
-						<%end%> 
-					</tbody>
-				</table> 
-				<%= link_to_add_fields "Add a Field", f, :fields%></br>
-			</div>  
-		</div>
+    <div class="panel-body" style="<%= source == 'Existing' ? 'display:none' : 'display:block'%>" >
 
-	</div>
+      <div class="col-xs-2">
+        <b>Color</b>
+        <%=f.select :panel, Category.getColor, {}, {:class=>"form-control"}%><br/>
+      </div>
+      <div class="col-xs-2">
+        <b>Print in De-ID</b>
+        <%=f.select :print,[["Yes", true], ["No", false]],{},{:class=>"form-control"}%><br/>
+      </div>
+      <div class="col-xs-6">
+        <b>Description</b> <%=f.text_area :description, {:class=>"form-control", :size=>"1"}%><br/>
+      </div>
+      <div class="col-xs-2">
+        <b>Archive</b><br/><%=f.check_box :deleted%>
+      </div>
+
+      <div class="col-xs-12">
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th width="10%">Field Name</th>
+              <th>Field Type</th>
+              <th>Data Type</th>
+              <th>Size</th>
+              <th>Show Lable</th>
+              <th>Required</th>
+              <th>Print in De-ID</th>
+              <th width="30%">Options (split by semicolon)</th>
+              <th>Action</th>
+              <th class="extra_info">HTML ID</th>
+              <th class="extra_info">HTML CLASS</th>
+              <th class="extra_info">Mapped Field</th>
+            </tr>
+          </thead>
+          <tbody class="draggableFieldGroup" id="fields">
+            <%if source == "Existing"%>
+              <%@cat.fields.where(:nested_field_id => nil).order(:field_order).each_with_index do |field, index|%>
+                <%=f.fields_for :fields, field do |ff|%>
+                  <%=render "field_fields", :field => field, :f => ff, :source => "Existing", :fld_index => index%>
+                <%end%>
+              <%end%>
+            <%end%>
+          </tbody>
+        </table>
+        <%= link_to_add_fields "Add a Field", f, :fields%></br>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 
 <style>
-	.drag_and_drop{
-		cursor: move;
-		color: #3498DB;
-	}
+  .drag_and_drop{
+    cursor: move;
+    color: #3498DB;
+  }
 </style>
 
 
 <script type="text/javascript">
-	$(function(){
-		$(".deleted_categories").hide();   
-	});
+  $(function(){
+    $(".deleted_categories").hide();
+  });
 
 
 
 
-	var fieldList = $(".draggableFieldGroup");
-	fieldList.each(function(){
-		$(this).sortable({ 
-			handle: $(this, ".drag_and_drop"),
-			forcePlaceholderSize: true,
-			cursor: "move",
-			animation: 100,
-			start: function(event, ui){
-				ui.placeholder.height(ui.item.height());
-				ui.placeholder.width(ui.item.width());
-			},
-			update: function(event, ui){
-				$('.field_group', this).each(function(index, elem) {
-					$('.form-field-order', this).val(index);
-				});
-			}
-		});
-	});
+  var fieldList = $(".draggableFieldGroup");
+  fieldList.each(function(){
+    $(this).sortable({
+      handle: $(this, ".drag_and_drop"),
+      forcePlaceholderSize: true,
+      cursor: "move",
+      animation: 100,
+      start: function(event, ui){
+        ui.placeholder.height(ui.item.height());
+        ui.placeholder.width(ui.item.width());
+      },
+      update: function(event, ui){
+        $('.field_group', this).each(function(index, elem) {
+          $('.form-field-order', this).val(index);
+        });
+      }
+    });
+  });
 </script>
 
 

@@ -12,15 +12,15 @@ class UsersController < ApplicationController
 
     @headers = User.get_headers_table
     @records = User.where({airport: current_user.airport})
-    
+
     active_users = @records.where('disable = ? OR disable IS ?', false, nil)
     @statistics = [{ :label => 'Active Users', :value => active_users.count }]
-    
+
     if BaseConfig.airline[:has_mobile_app]
       latest_version = latest_android_version
       android_users = active_users.where('android_version > ?', 0)
       latest_android_users = active_users.where({android_version: latest_version})
-      
+
       @statistics.concat([
         { :label => 'Latest Android Version', :value => latest_version},
         { :label => 'Up-to-Date Android Users', :value => latest_android_users.count },
@@ -105,7 +105,7 @@ class UsersController < ApplicationController
       redirect_to root_url
       return
     end
-    
+
     @user = User.new(params[:user]) do |u|
       u.full_name = u.first_name + " " + u.last_name
       u.module_access = build_module_access
@@ -179,18 +179,18 @@ class UsersController < ApplicationController
 
   def access_level
     @user = User.find(params[:id])
-  end  
+  end
 
 
 
   def update
     @user = User.find(params[:id])
     Rails.logger.debug ("In update")
-    
+
     # User entered wrong password, only works for the self edit page right now
     if !@user.matching_password?(params[:pw])
       if params[:page].present?
-        if params[:page] == "self_edit" 
+        if params[:page] == "self_edit"
           flash[:error] = "Incorrect Password."
           @authorized = true
           @action = "self_edit"
@@ -217,7 +217,7 @@ class UsersController < ApplicationController
           u.full_name = u.first_name + " " + u.last_name
           if params[:page].blank? || (params[:page] != "change_password" && params[:page] != "self_edit")
           end
-          if User.display[:position] 
+          if User.display[:position]
             u.role = params[:user][:role]
           end
         end
@@ -226,7 +226,7 @@ class UsersController < ApplicationController
         format.xml  { head :ok }
       else
         if params[:page].present?
-          if params[:page] == "self_edit" 
+          if params[:page] == "self_edit"
             #redirect_to self_edit_user_path(@user)
             flash[:error] = @user.errors.full_messages
             @authorized = true
@@ -265,7 +265,7 @@ class UsersController < ApplicationController
 
 
 
-  def disable 
+  def disable
     @user = User.find(params[:id])
     @user.disable = @user.disable ? false : true
     @user.save
@@ -306,7 +306,7 @@ class UsersController < ApplicationController
       @user = current_user
     end
     @submissions = current_user.submissions.where("created_at > ?",@date)
-    stream = render_to_string(:template=>"users/get_json.js.erb" )  
+    stream = render_to_string(:template=>"users/get_json.js.erb" )
     send_data(stream, :type=>"json", :disposition => "inline")
   end
 
@@ -318,7 +318,7 @@ class UsersController < ApplicationController
       @user = current_user
     end
     @submissions = Submission.find(:all, :conditions => [ "event_date > ?",'2017-8-11 12:00:00'])
-    stream = render_to_string(:template=>"users/submission_json.js.erb" )  
+    stream = render_to_string(:template=>"users/submission_json.js.erb" )
     send_data(stream, :type=>"json", :disposition => "inline")
   end
 
@@ -330,10 +330,10 @@ class UsersController < ApplicationController
       @user = current_user
     end
     @notices = @user.get_notices
-    stream = render_to_string(:template=>"users/notices_json.js.erb" )  
+    stream = render_to_string(:template=>"users/notices_json.js.erb" )
     send_data(stream, :type=>"json", :disposition => "inline")
   end
- 
+
 
 
 

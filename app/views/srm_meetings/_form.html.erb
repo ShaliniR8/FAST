@@ -13,15 +13,15 @@
 <script type="text/javascript" src=<%=@action=="new" ? "/javascripts/srm_meetings/table-control.js" : "/javascripts/srm_meetings/edit-control.js"%>></script>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-primary">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		<b><%=@action.titleize + " Meeting"%></b> 
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body"> 
-     		<%= form_for @meeting,:html => {:multipart => true} do |f|%>
+  <div class="grid per90 center-block">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%=@action.titleize + " Meeting"%></b>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <%= form_for @meeting,:html => {:multipart => true} do |f|%>
           <%if @action=="new"%>
             <%=f.fields_for :host,Host.new do |ff|%>
               <%=ff.hidden_field :users_id,:value=>current_user.id%>
@@ -29,7 +29,7 @@
           <%end%>
           <%if params[:type].present?%>
             <%=hidden_field_tag :type,params[:type]%>
-          <%end%>  
+          <%end%>
 
           <%=render "meetings/meeting_general_info", :f=>f%>
           <div class="row">
@@ -71,9 +71,9 @@
                 <div class="panel-heading">
                   <div class="panel-title">
                     <b>Attachments</b>
-                  </div> 
+                  </div>
                 </div>
-                <div class="panel-body"> 
+                <div class="panel-body">
                   <div class="row" id="attachments">
                     <%@meeting.attachments.each do |att|%>
                       <%=render "records/existing_attachments_field",:f=>f,:attachment=>att%>
@@ -91,10 +91,10 @@
             <%=link_to "Cancel", action_name=="edit" ? srm_meeting_path(@meeting) : srm_meetings_path, :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right", :confirm=>'The meeting has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue?'%>
           </div>
         <%end%>
-      </div> 
-    </div>       
-	</div> 
-</div>  
+      </div>
+    </div>
+  </div>
+</div>
 
 
 

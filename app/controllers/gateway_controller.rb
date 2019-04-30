@@ -31,4 +31,4 @@ class GatewayController < ApplicationController
   end
 
 
-end 
+end

@@ -40,58 +40,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-  def get_user_id
-    anonymous ? 'Anonymous' : user_id
-  end
-
-
-
-
-  def getEventId
-    if self.record.present? && self.record.report.present?
-      self.record.report.id
-    end
-  end
-
-
-  def self.get_meta_fields(*args)
-    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    [
-      {field: 'get_id',         title: 'Submission ID',   num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
-      {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'description',    title: 'Event Title',     num_cols: 12, type: 'text', visible: 'index,show', required: false},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
-  end
-
-
-  def self.export_all
-    #purify_fields
-    submissions = self.where(:completed => true)
-    submissions.keep_if{|x| x.template.report_type == "asap"}
-    submissions.each do |s|
-      employee_group = s.template.emp_group
-      if s.event_date.present?
-        event_time = s.event_date
-        year = event_time.strftime("%Y")
-        month = event_time.strftime("%b").downcase
-        dirname = Rails.root.join("mitre", year, month, employee_group)
-        temp_file = Rails.root.join('mitre', year, month, employee_group, "#{s.id}.xml")
-      else
-        dirname = Rails.root.join("mitre", "no_date", employee_group)
-        temp_file = Rails.root.join('mitre', "no_date", employee_group, "#{s.id}.xml")
-      end
-      unless File.directory?(dirname)
-        FileUtils.mkdir_p(dirname)
-      end
-      File.open(temp_file, 'w') do |file|
-        file << ApplicationController.new.render_to_string(
-          :template => "submissions/export_component.xml.erb",
-          :locals => { :template => s.template, :submission => s})
-      end
-    end
-  end
 
 
   def get_user_id
@@ -109,8 +57,15 @@ class Submission < ActiveRecord::Base
 
 
 
-  def get_event_date
-    event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
+  def getTimeZone()
+    ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
+     "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
+     "JT","ALMST","WAST","CXT","MMT","ALMT","MAWT","IOT","MVT","TFT","AFT","MUT","RET",
+     "SCT","IRT","IT","EAT","BT","EETDST","HMT","BDST","CEST","CETDST","EET","FWT","IST",
+     "MEST","METDST","SST","BST","CET","DNT","FST","MET","MEWT","MEZ","NOR","SET","SWT",
+     "WETDST","GMT","UT","UTC","ZULU","WET","WAT","FNST","FNT","BRST","NDT","ADT","AWT",
+     "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
+     "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
 
 
@@ -206,17 +161,7 @@ class Submission < ActiveRecord::Base
     f.present? ? f.value : ""
   end
 
-  def get_description
-    if self.description.blank?
-      ""
-    else
-      if self.description.length > 50
-        self.description[0..50] + "..."
-      else
-        self.description
-      end
-    end
-  end
+
 
   def get_field_by_label(label)
     fields = Field.where(:label => label)
@@ -278,6 +223,33 @@ class Submission < ActiveRecord::Base
   end
 
 
+
+  def updated
+    self.updated_at.strftime("%Y-%m-%d")
+  end
+
+
+
+  def self.build(template)
+    record = self.new()
+    record.templates_id = template.id
+    record
+  end
+
+
+
+  def categories
+    self.template.categories
+  end
+
+
+
+  def time_diff(base)
+    diff = ((self.event_date - base.event_date) / (24 * 60 * 60)).abs
+  end
+
+
+
   # Can we find a better way to mass assign values to it?
   def make_report
     if self.completed && self.records_id.blank?
@@ -309,9 +281,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def updated
-    self.updated_at.strftime("%Y-%m-%d")
-  end
+
 
   def to_asap
   end
@@ -450,4 +420,9 @@ class Submission < ActiveRecord::Base
     end
     converted
   end
+
+
+
+
+
 end

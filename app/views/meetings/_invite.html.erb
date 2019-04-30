@@ -1,41 +1,41 @@
 <div class="table-responsive mt10">
-	<table id="participants" class="table table-striped table-bordered">
-		<thead>
-			<tr>
-				<%User.invite_headers.each do |header|%>
-					<th><%=header[:title]%></th>
-				<%end%>
-				<th>Action</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%@users.each do |user|%>
-				<tr user="<%=user.id%>">
-					<%User.invite_headers.each do |header|%>
-						<td>
+  <table id="participants" class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <%User.invite_headers.each do |header|%>
+          <th><%=header[:title]%></th>
+        <%end%>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%@users.each do |user|%>
+        <tr user="<%=user.id%>">
+          <%User.invite_headers.each do |header|%>
+            <td>
               <%=user.send(header[:field])%>
             </td>
-					<%end%>
+          <%end%>
 
-					<%if action_name == "new"%>
-						<td><a class="btn btn-info invite_btn">Invite</a></td>
+          <%if action_name == "new"%>
+            <td><a class="btn btn-info invite_btn">Invite</a></td>
           <%elsif action_name == 'edit'%>
             <%if (user.get_invitation_status @meeting) == "Not Invited"%>
               <td><a class="btn btn-info invite_btn">Invite</a></td>
             <%else%>
               <td><a class="btn btn-success invite_btn">Invited</a></td>
             <%end%>
-					<%elsif action_name == "show"%>
-						<td><%=user.get_invitation_status @meeting%></td>
-					<%else%>
-						<%if (user.get_invitation_status @meeting)=="Not Invited"%>
-							<td><a class="btn btn-info invite_btn">Invite</a></td>
-						<%else%>
-							<td><a class="btn btn-success invite_btn">Invited</a></td>
-						<%end%>
-					<%end%>
-				</tr>
-			<%end%>
-		</tbody>
-	</table>
+          <%elsif action_name == "show"%>
+            <td><%=user.get_invitation_status @meeting%></td>
+          <%else%>
+            <%if (user.get_invitation_status @meeting)=="Not Invited"%>
+              <td><a class="btn btn-info invite_btn">Invite</a></td>
+            <%else%>
+              <td><a class="btn btn-success invite_btn">Invited</a></td>
+            <%end%>
+          <%end%>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
 </div>

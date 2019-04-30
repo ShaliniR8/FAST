@@ -1,14 +1,14 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-success">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		<b><%="#{@tracking.title}"%></b> 
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body">
-        <div class="row">    
+  <div class="grid per90 center-block">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%="#{@tracking.title}"%></b>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <div class="row">
           <div class="col-sm-12">
             <%if current_user.has_access("trackings","destroy")%>
               <%=link_to "Delete",tracking_path(@tracking),:method=>"delete",:confirm=>"Please confirm that you want to delete this tracking. The deletion cannot be reverted.",:class=>"pull-right btn btn-danger ml5"%>
@@ -43,7 +43,7 @@
             <%=@tracking.description%>
           </div>
         </div>
-      </div> 
-    </div>       
-	</div> 
+      </div>
+    </div>
+  </div>
 </div>

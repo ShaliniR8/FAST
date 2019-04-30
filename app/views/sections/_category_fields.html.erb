@@ -1,168 +1,168 @@
 <div class="col-sm-12 col-md-12 col-lg-12"%>
-	<div class="panel <%=@cat.panel%>">
-		
-		<div class="panel-heading click-heading collapsed">
-			<div class="panel-title">
-				<b><%=@cat.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-			</div> 
-		</div>
+  <div class="panel <%=@cat.panel%>">
 
-		<div class="panel-body" style="display:none" > 
-			<h5 class="mb5" style="color:blue; font-weight:bold"><%=@cat.description%></h5><br>
-			<div class="row" id="fields">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b><%=@cat.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div>
+    </div>
 
-				<%@cat.fields.where(deleted: false).order(:field_order).each do |field|%>
+    <div class="panel-body" style="display:none" >
+      <h5 class="mb5" style="color:blue; font-weight:bold"><%=@cat.description%></h5><br>
+      <div class="row" id="fields">
 
-					<%xs_val = field.display_size.to_s%>
-					<%if xs_val.to_i < 6 %>
-						<%xs_val = "6"%>
-					<%end%>
-					<%size = "col-md-"+field.display_size.to_s+" col-xs-" +xs_val+" col-sm-"+field.display_size.to_s+" col-lg-"+field.display_size.to_s%>
+        <%@cat.fields.where(deleted: false).order(:field_order).each do |field|%>
 
-
-					<div class="<%=size%> form-group">
-						<label><%=field.get_label.present? ? field.get_label.html_safe : nil%></label>
-						<% required = field.required? ? "required_field" : "" %>
-						
-							<%@record_field = @section.section_fields.where(:field_id => field.id).first%>
-
-							<%=f.fields_for :section_fields, @record_field do |rf|%>
-
-								<% if field.display_type == "text"%>
-									<% if field.element_id == "duty_on_time" || field.element_id == "duty_off_time"%>
-										<td><%=rf.text_field :value, {:class=> 'form-control'+" "+field.element_class,:placeholder=>field.label,:id=>field.element_id}%></td>
-									<%else%>
-										<td><%=rf.text_field :value, {:class=> "field-"+field.data_type+' form-control'+" "+field.element_class,:placeholder=>field.label,:id=>field.element_id}%></td>
-									<%end%>
-								<%elsif field.display_type == "textarea"%>
-									<%=rf.text_area :value, { :class => required+" form-control"+" "+field.element_class,:size=>"2",:placeholder=>field.label,:id=>field.element_id}%>
-								<%elsif field.display_type == "dropdown"%>
-									<%if field.data_type == "timezone"%>
-										<div class="input-group">
-											<%=rf.select :value, options_for_select(field.getOptions, @record_field.value),{:include_blank=>""},{:class=>'form-control tz atz'+" "+field.element_class,:selected=>@record_field.value}%>
-											<span class="input-group-addon tc">All</span>
-										</div>
-									<%else%>
-										<%=rf.select :value, field.getOptions, {:include_blank=>""},{:class=>'form-control'+" "+field.element_class,:selected=>@record_field.value,:id=>field.element_id}%>
-									<%end%>
-								<%elsif field.display_type == "checkbox"%>
-									</br>
-									<div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
-										<%current_options = @record_field.value.present? ? @record_field.value.split(";") : ""%> 
-										<%size = field.getOptions.length%> 
-										<%field.getOptions.each do |option|%>
-											<%if size > 5%>
-												<div class="col-sm-4 col-md-3 col-lg-3">
-													<%=rf.check_box :value, {:multiple => true, :checked => current_options.include?(option)}, option, nil%>&nbsp<%=option%>
-												</div>
-											<%else%>
-												<div class="col-sm-<%=(12/size).to_s%> col-md-<%=(12/size).to_s%> col-lg-<%=(12/size).to_s%>">
-													<%=rf.check_box :value, {:multiple => true, :checked => current_options.include?(option)}, option, nil%>&nbsp<%=option%>
-												</div>
-											<%end%>
-										<%end%>
-									</div>
+          <%xs_val = field.display_size.to_s%>
+          <%if xs_val.to_i < 6 %>
+            <%xs_val = "6"%>
+          <%end%>
+          <%size = "col-md-"+field.display_size.to_s+" col-xs-" +xs_val+" col-sm-"+field.display_size.to_s+" col-lg-"+field.display_size.to_s%>
 
 
-								<!-- Render Radio button groups -->
-								<%elsif field.display_type == "radio"%>
-									<div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">  
-										<%size = field.getOptions.length%> 
-										<%field.getOptions.each do |option|%>
-											<%if size > 5%>
-												<div class="col-sm-4 col-md-3 col-lg-3">
-													<%=rf.radio_button :value, option%>&nbsp<%=option%>
-												</div>
-											<%else%>
-												<div class="col-sm-<%=(12/size).to_s%> col-md-<%=(12/size).to_s%> col-lg-<%=(12/size).to_s%>">
-													<%=rf.radio_button :value, option%>&nbsp<%=option%>
-												</div>
-											<%end%>
-										<%end%>
-									</div>
+          <div class="<%=size%> form-group">
+            <label><%=field.get_label.present? ? field.get_label.html_safe : nil%></label>
+            <% required = field.required? ? "required_field" : "" %>
+
+              <%@record_field = @section.section_fields.where(:field_id => field.id).first%>
+
+              <%=f.fields_for :section_fields, @record_field do |rf|%>
+
+                <% if field.display_type == "text"%>
+                  <% if field.element_id == "duty_on_time" || field.element_id == "duty_off_time"%>
+                    <td><%=rf.text_field :value, {:class=> 'form-control'+" "+field.element_class,:placeholder=>field.label,:id=>field.element_id}%></td>
+                  <%else%>
+                    <td><%=rf.text_field :value, {:class=> "field-"+field.data_type+' form-control'+" "+field.element_class,:placeholder=>field.label,:id=>field.element_id}%></td>
+                  <%end%>
+                <%elsif field.display_type == "textarea"%>
+                  <%=rf.text_area :value, { :class => required+" form-control"+" "+field.element_class,:size=>"2",:placeholder=>field.label,:id=>field.element_id}%>
+                <%elsif field.display_type == "dropdown"%>
+                  <%if field.data_type == "timezone"%>
+                    <div class="input-group">
+                      <%=rf.select :value, options_for_select(field.getOptions, @record_field.value),{:include_blank=>""},{:class=>'form-control tz atz'+" "+field.element_class,:selected=>@record_field.value}%>
+                      <span class="input-group-addon tc">All</span>
+                    </div>
+                  <%else%>
+                    <%=rf.select :value, field.getOptions, {:include_blank=>""},{:class=>'form-control'+" "+field.element_class,:selected=>@record_field.value,:id=>field.element_id}%>
+                  <%end%>
+                <%elsif field.display_type == "checkbox"%>
+                  </br>
+                  <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+                    <%current_options = @record_field.value.present? ? @record_field.value.split(";") : ""%>
+                    <%size = field.getOptions.length%>
+                    <%field.getOptions.each do |option|%>
+                      <%if size > 5%>
+                        <div class="col-sm-4 col-md-3 col-lg-3">
+                          <%=rf.check_box :value, {:multiple => true, :checked => current_options.include?(option)}, option, nil%>&nbsp<%=option%>
+                        </div>
+                      <%else%>
+                        <div class="col-sm-<%=(12/size).to_s%> col-md-<%=(12/size).to_s%> col-lg-<%=(12/size).to_s%>">
+                          <%=rf.check_box :value, {:multiple => true, :checked => current_options.include?(option)}, option, nil%>&nbsp<%=option%>
+                        </div>
+                      <%end%>
+                    <%end%>
+                  </div>
 
 
-								<!-- Render Employee select fieds -->
-								<%elsif field.display_type == "employee"%>
-									<div class="input-group">
-										<%if @record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-											<%@record_field.value = User.find(@record_field.value).full_name%>
-										<%end%>
-										<%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp",:readonly=>true,:id=>"emp#{field.id}", :value=> @record_field.value}%>
-										<%=rf.hidden_field :value, :id=>"employee-select#{field.id}"%>
-										<span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info emp_button","data-toggle"=>"modal","data-target"=>".emp_modal", :id=>"#{field.id}"%></span>
-									</div>
+                <!-- Render Radio button groups -->
+                <%elsif field.display_type == "radio"%>
+                  <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+                    <%size = field.getOptions.length%>
+                    <%field.getOptions.each do |option|%>
+                      <%if size > 5%>
+                        <div class="col-sm-4 col-md-3 col-lg-3">
+                          <%=rf.radio_button :value, option%>&nbsp<%=option%>
+                        </div>
+                      <%else%>
+                        <div class="col-sm-<%=(12/size).to_s%> col-md-<%=(12/size).to_s%> col-lg-<%=(12/size).to_s%>">
+                          <%=rf.radio_button :value, option%>&nbsp<%=option%>
+                        </div>
+                      <%end%>
+                    <%end%>
+                  </div>
 
 
-								<!-- Render Airport fields -->
-								<%elsif field.display_type == "airport"%>
-									<div class="input-group">
-										<%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport",:readonly=>true,:id=>"airport#{field.id}", :value=> @record_field.value}%>
-										<%=rf.hidden_field :value, :id=>"airport-select#{field.id}"%>
-										<span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".airport_modal", :id=>"#{field.id}"%></span>
-									</div>
+                <!-- Render Employee select fieds -->
+                <%elsif field.display_type == "employee"%>
+                  <div class="input-group">
+                    <%if @record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                      <%@record_field.value = User.find(@record_field.value).full_name%>
+                    <%end%>
+                    <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp",:readonly=>true,:id=>"emp#{field.id}", :value=> @record_field.value}%>
+                    <%=rf.hidden_field :value, :id=>"employee-select#{field.id}"%>
+                    <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info emp_button","data-toggle"=>"modal","data-target"=>".emp_modal", :id=>"#{field.id}"%></span>
+                  </div>
 
 
-								<!-- Render Datalist fields -->
-								<%elsif field.display_type == "datalist"%>
-									<%= rf.text_field :value, {:list=>"#{field.id}", :class=>"form-control"}%>
-									<datalist id="<%=field.id%>">
-										<% field.getOptions.each do |opt|%>
-											<option value="<%=opt%>"></option>
-										<%end%>
-									</datalist>
-
-								<%else%>
-									No!
-								<%end%>
+                <!-- Render Airport fields -->
+                <%elsif field.display_type == "airport"%>
+                  <div class="input-group">
+                    <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport",:readonly=>true,:id=>"airport#{field.id}", :value=> @record_field.value}%>
+                    <%=rf.hidden_field :value, :id=>"airport-select#{field.id}"%>
+                    <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".airport_modal", :id=>"#{field.id}"%></span>
+                  </div>
 
 
-								
+                <!-- Render Datalist fields -->
+                <%elsif field.display_type == "datalist"%>
+                  <%= rf.text_field :value, {:list=>"#{field.id}", :class=>"form-control"}%>
+                  <datalist id="<%=field.id%>">
+                    <% field.getOptions.each do |opt|%>
+                      <option value="<%=opt%>"></option>
+                    <%end%>
+                  </datalist>
 
-						<%end%> 
-					</div>
-				<%end%>      
-			</div>
-		</div>
-	</div>
+                <%else%>
+                  No!
+                <%end%>
+
+
+
+
+            <%end%>
+          </div>
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <style>
-	.smallselect {
-		position: relative;
-		top: 50%;
-/*		transform: translateY(-50%);
-*/	}
+  .smallselect {
+    position: relative;
+    top: 50%;
+/*    transform: translateY(-50%);
+*/  }
 </style>
 
 
 
 <script>
-	$(document).ready(function(){
+  $(document).ready(function(){
 
 
-		$(".required_field").css('border-color', '');
-		$(".required_field").closest('.form-group').find('label').css("color", "red");
-		$(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').css("color", "red");
-		$(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').value = "*" ;
-		$("form").on('submit',function(){
+    $(".required_field").css('border-color', '');
+    $(".required_field").closest('.form-group').find('label').css("color", "red");
+    $(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').css("color", "red");
+    $(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').value = "*" ;
+    $("form").on('submit',function(){
 
-			$(this).find('.required_field').each(function(){
-				$(this).closest('.inputgroup').find('h5').css("color", "red");
-				if ($(this).val() == ""){
-					$(this).css('border-color', 'red');   
-					$(this).closest('div.<%=@cat.panel%>').removeClass('collapsed');
-					$(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-					$(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideDown();
-					event.preventDefault();
-				}else{
-					$(".required_field").css('border-color', '');
-					$(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideUp();
-					$(this).closest('div.<%=@cat.panel%>').addClass('collapsed');
-					$(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-				}
-			});
-		});
-	});
+      $(this).find('.required_field').each(function(){
+        $(this).closest('.inputgroup').find('h5').css("color", "red");
+        if ($(this).val() == ""){
+          $(this).css('border-color', 'red');
+          $(this).closest('div.<%=@cat.panel%>').removeClass('collapsed');
+          $(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+          $(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideDown();
+          event.preventDefault();
+        }else{
+          $(".required_field").css('border-color', '');
+          $(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideUp();
+          $(this).closest('div.<%=@cat.panel%>').addClass('collapsed');
+          $(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+        }
+      });
+    });
+  });
 </script>

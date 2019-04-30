@@ -15,7 +15,7 @@
         <tr package="<%=package.id%>">
           <%@package_headers.each do |header|%>
             <td><%=package.send(header[:field])%></td>
-          <%end%> 
+          <%end%>
           <%if (package.status) == "Open"%>
             <td><a class="btn btn-info add_btn">Add</a></td>
           <%else%>

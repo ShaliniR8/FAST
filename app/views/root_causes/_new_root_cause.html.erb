@@ -1,23 +1,23 @@
 <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 <div class="col-xs-12">
-	<%=form_tag add_root_cause_hazards_path, method: :post, remote: true do %>
-		<%= hidden_field_tag :owner_id, @owner.id %>
-		<div class="panel-warning">
-			<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
-				<%=render "/root_causes/new_root_cause_categories", :second_id => second_id%>
-				<%=submit_tag "Add", :class => "btn btn-success pull-right mr10", :disable_with => "Adding..."%>
-			</div>
-		</div>
-	<%end%>
+  <%=form_tag add_root_cause_hazards_path, method: :post, remote: true do %>
+    <%= hidden_field_tag :owner_id, @owner.id %>
+    <div class="panel-warning">
+      <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+        <%=render "/root_causes/new_root_cause_categories", :second_id => second_id%>
+        <%=submit_tag "Add", :class => "btn btn-success pull-right mr10", :disable_with => "Adding..."%>
+      </div>
+    </div>
+  <%end%>
 </div>
 
 
 <style>
-	.custom-swal {
-		width: 50% !important;
-		max-height: 70% !important;
-		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		font-size: 14px;
-	}
+  .custom-swal {
+    width: 50% !important;
+    max-height: 70% !important;
+    font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
 </style>
 

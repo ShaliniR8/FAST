@@ -149,13 +149,19 @@ class Record < ActiveRecord::Base
     self.probability_extra.present? ?  self.probability_extra : []
   end
 
+
+
   def get_mitigated_probability
     self.mitigated_probability.present? ?  self.mitigated_probability : []
   end
 
+
+
   def get_mitigated_severity
     self.mitigated_severity.present? ?  self.mitigated_severity : []
   end
+
+
 
   def creation_transaction
     RecordTransaction.create(
@@ -166,6 +172,8 @@ class Record < ActiveRecord::Base
       :stamp => Time.now
     )
   end
+
+
 
   def self.get_headers
     if BaseConfig.airline[:submission_description]
@@ -195,6 +203,7 @@ class Record < ActiveRecord::Base
   end
 
 
+
   def get_before_risk_color
     if BaseConfig.airline[:base_risk_matrix]
       BaseConfig::RISK_MATRIX[:risk_factor][display_before_risk_factor]
@@ -202,6 +211,7 @@ class Record < ActiveRecord::Base
       Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].key(display_before_risk_factor)
     end
   end
+
 
 
   def get_after_risk_color
@@ -213,6 +223,7 @@ class Record < ActiveRecord::Base
   end
 
 
+
   def display_before_severity
     if BaseConfig.airline[:base_risk_matrix]
       severity
@@ -220,6 +231,7 @@ class Record < ActiveRecord::Base
       get_risk_values[:severity_1].present? ? get_risk_values[:severity_1] : "N/A"
     end
   end
+
 
 
   def display_before_likelihood
@@ -231,6 +243,7 @@ class Record < ActiveRecord::Base
   end
 
 
+
   def display_before_risk_factor
     if BaseConfig.airline[:base_risk_matrix]
       risk_factor.present? ? risk_factor : "N/A"
@@ -240,13 +253,6 @@ class Record < ActiveRecord::Base
   end
 
 
-  def display_after_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity_after
-    else
-      get_risk_values[:severity_2].present? ? get_risk_values[:severity_2] : "N/A"
-    end
-  end
 
   def display_after_severity
     if BaseConfig.airline[:base_risk_matrix]
@@ -255,6 +261,8 @@ class Record < ActiveRecord::Base
       get_risk_values[:severity_2].present? ? get_risk_values[:severity_2] : "N/A"
     end
   end
+
+
 
   def display_after_likelihood
     if BaseConfig.airline[:base_risk_matrix]
@@ -263,6 +271,7 @@ class Record < ActiveRecord::Base
       get_risk_values[:probability_2].present? ? get_risk_values[:probability_2] : "N/A"
     end
   end
+
 
 
   def display_after_risk_factor
@@ -316,13 +325,6 @@ class Record < ActiveRecord::Base
   end
 
 
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
-  end
 
   def get_id
     if self.custom_id.present?
@@ -331,6 +333,7 @@ class Record < ActiveRecord::Base
       self.id
     end
   end
+
 
 
   def get_event_date
@@ -370,43 +373,6 @@ class Record < ActiveRecord::Base
     }
   end
 
-
-  def get_event_date
-    self.event_date.strftime("%Y-%m-%d %H:%M:%S")
-  end
-
-
-
-
-  def create_transaction(action, content)
-    if !self.changes()['viewer_access'].present?
-      RecordTransaction.create(
-        :users_id => session[:user_id],
-        :action => action,
-        :owner_id => self.id,
-        :content => content,
-        :stamp => Time.now)
-    end
-  end
-
-
-
-  def self.get_terms
-    {
-      "Type"                      =>  "get_template",
-      "Status"                    =>  "status",
-      "Submitted By"              =>  "submit_name",
-      "Last Update"               =>  "updated_date",
-      "Submitted At"              =>  "submitted_date",
-      "Event Date/Time"           =>  "get_event_date",
-      "Title"                     =>  "description",
-      "Likelihood"                =>  "likelihood",
-      "Severity"                  =>  "severity",
-      "Likelihood (Mitigated)"    =>  "likelihood_after",
-      "Severity (Mitigated)"      =>  "severity_after",
-      "Risk Factor (Mitigated)"   =>  "risk_factor_after"
-    }
-  end
 
 
   def get_field(id)

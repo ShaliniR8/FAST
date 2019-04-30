@@ -1,197 +1,197 @@
 <style>
-	.floating {
-		position: fixed;
-		z-index: 100;
-	}
+  .floating {
+    position: fixed;
+    z-index: 100;
+  }
 
-	.b2 {bottom: 2%;}
-	.l2 {left: 2%;}
-	.r2 {right: 2%;}
-	.t2 {top: 2%;}
-	.l6 {left: 7%;}
+  .b2 {bottom: 2%;}
+  .l2 {left: 2%;}
+  .r2 {right: 2%;}
+  .t2 {top: 2%;}
+  .l6 {left: 7%;}
 
-	.box-shadow {
-		box-shadow: 0px 0px 8px #333;
-	}
+  .box-shadow {
+    box-shadow: 0px 0px 8px #333;
+  }
 
-	.no-border {
-		border: 0 !important;
-	}
+  .no-border {
+    border: 0 !important;
+  }
 
-	.mb0 {
-		margin-bottom: 0px;
-	}
+  .mb0 {
+    margin-bottom: 0px;
+  }
 
-	@media screen and (max-width: 768px) {
-		.btn-group-vertical-xs > .btn {
-			display: block;
-			float: none;
-			width: 100%;
-			max-width: 100%;
-		}
+  @media screen and (max-width: 768px) {
+    .btn-group-vertical-xs > .btn {
+      display: block;
+      float: none;
+      width: 100%;
+      max-width: 100%;
+    }
 
-		.r2-xs {
-			right: 2%;
-		}
-	}
+    .r2-xs {
+      right: 2%;
+    }
+  }
 
-	@media screen and (min-width: 768px) {
-		.display-table-sm {
-			display: table;
-		}
-	}
+  @media screen and (min-width: 768px) {
+    .display-table-sm {
+      display: table;
+    }
+  }
 
-	.btn.btn-warning.active.analytics-filter {
-		background-color: #c38341;
-	}
+  .btn.btn-warning.active.analytics-filter {
+    background-color: #c38341;
+  }
 
-	.btn.btn-primary.active.analytics-filter {
-		background-color: #0c728a;
-	}
-	
-	.cursor-pointer {
-		cursor: pointer !important;
-	}
+  .btn.btn-primary.active.analytics-filter {
+    background-color: #0c728a;
+  }
 
-	<% @employee_groups.each do |emp_group| %>
-		<% next if emp_group.nil? %>
-		.<%= emp_group%> {
-			color: <%= group_to_color(emp_group) %>;
-		}
-		.<%= emp_group %>.active {
-			/*background-color: <%= group_to_color(emp_group) %>;*/
-		}
-	<% end %>
+  .cursor-pointer {
+    cursor: pointer !important;
+  }
+
+  <% @employee_groups.each do |emp_group| %>
+    <% next if emp_group.nil? %>
+    .<%= emp_group%> {
+      color: <%= group_to_color(emp_group) %>;
+    }
+    .<%= emp_group %>.active {
+      /*background-color: <%= group_to_color(emp_group) %>;*/
+    }
+  <% end %>
 
 </style>
 
 <div class="panel floating b2 l2 box-shadow">
-	<a id="toggle-select-timerange" title="Filter Analytics">
-		<div class="btn btn-lg">
-			<span class="glyphicon glyphicon-calendar"></span>
-		</div>	
-		<!-- <div class="btn btn-lg">
-			<span class="glyphicon glyphicon-chevron-right"></span>
-		</div> -->
-	</a>
+  <a id="toggle-select-timerange" title="Filter Analytics">
+    <div class="btn btn-lg">
+      <span class="glyphicon glyphicon-calendar"></span>
+    </div>
+    <!-- <div class="btn btn-lg">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+    </div> -->
+  </a>
 
 </div>
 
 <div id="select-timerange" class="hidden floating b2 l2 r2-xs">
-	<div class="row">
-		<div class="col-sm-5">
-			<div class="panel panel-default mb0 box-shadow display-table-sm">
-				<div class="panel-heading">
-					<div class="panel-title">
-						Filter Analytics
-						<span class="pull-right">
-							<button id="hide-analytics-filters" class="btn btn-secondary"><span class="glyphicon glyphicon-minus"></span></button>
-						</span>
-					</div>
-					
-				</div>
-				<div class="panel-body">
-					<%= form_tag update_analytics_timerange_home_index_path, method: :get, remote: true do %>
-					<div class="row">
-						<div class="col-sm-12">
-							<div class="input-group">
-								<div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
-									<% options = {} %>
-									<%= label_tag :all, class: "btn btn-primary analytics-filter no-border time-option active" do %>
-										<%= radio_button_tag :time_range, :all, true, options %> All
-									<% end %>
-									<%= label_tag :last_year, class: "btn btn-primary analytics-filter no-border time-option" do %>
-										<%= radio_button_tag :time_range, :last_year, false, options %> Past Year
-									<% end %>
-									<%= label_tag :last_month, class: "btn btn-primary analytics-filter no-border time-option" do %>
-										<%= radio_button_tag :time_range, :last_month, false, options %> Past Month
-									<% end %>
-									<%= label_tag :last_week, class: "btn btn-primary analytics-filter no-border time-option" do %>
-										<%= radio_button_tag :time_range, :last_week, false, options %> Past Week
-									<% end %>
-									<% if false %>
-										<%= label_tag :last_day, class: "btn btn-primary analytics-filter no-border time-option" do %>
-											<%= radio_button_tag :time_range, :last_day, false, options %> Past Day
-										<% end %>
-									<% end %>
-									<%= label_tag :custom, class: "btn btn-primary analytics-filter no-border custom-time-option" do %>
-										<%= radio_button_tag :time_range, :custom, false, options %> Custom
-									<% end %>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="collapse" id="custom-time-range">
-						<div class="well">
-							<div class="input-group">
-								<% now = Time.zone.now.strftime("%Y-%m-%d %h:%m") %>
-								<%= text_field_tag :start_date, (Time.zone.now - 1.weeks).beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer", readonly: true %>
-								<span class="input-group-addon">to</span>
-								<%= text_field_tag :end_date, Time.zone.now.end_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer", readonly: true %>
-							</div>
-						</div>
-					</div>
-					<% if session[:mode] == "ASAP" %>
-						<div class="row mt10">
-							<div class="col-sm-12">
-								<div class="input-group">
-									<div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
-										<% @employee_groups.each do |emp_group| %>
-											<% next if emp_group.nil? %>
-											<%= label_tag emp_group, class: "btn btn-warning no-border analytics-filter" do %>
-												<%#= hidden_field_tag "emp_groups[]", "" %>
-												<%= check_box_tag "emp_groups[]", emp_group, false %> <%= emp_group.titleize %>
-											<% end %>
-										<% end %>
-									</div>
-								</div>
-							</div>
-						</div>
-					<% end %>
-					<div class="mt10">
-						<%= submit_tag "Submit", class: "form-control btn btn-success"%>
-					</div>
-					<% end %>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="row">
+    <div class="col-sm-5">
+      <div class="panel panel-default mb0 box-shadow display-table-sm">
+        <div class="panel-heading">
+          <div class="panel-title">
+            Filter Analytics
+            <span class="pull-right">
+              <button id="hide-analytics-filters" class="btn btn-secondary"><span class="glyphicon glyphicon-minus"></span></button>
+            </span>
+          </div>
+
+        </div>
+        <div class="panel-body">
+          <%= form_tag update_analytics_timerange_home_index_path, method: :get, remote: true do %>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="input-group">
+                <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
+                  <% options = {} %>
+                  <%= label_tag :all, class: "btn btn-primary analytics-filter no-border time-option active" do %>
+                    <%= radio_button_tag :time_range, :all, true, options %> All
+                  <% end %>
+                  <%= label_tag :last_year, class: "btn btn-primary analytics-filter no-border time-option" do %>
+                    <%= radio_button_tag :time_range, :last_year, false, options %> Past Year
+                  <% end %>
+                  <%= label_tag :last_month, class: "btn btn-primary analytics-filter no-border time-option" do %>
+                    <%= radio_button_tag :time_range, :last_month, false, options %> Past Month
+                  <% end %>
+                  <%= label_tag :last_week, class: "btn btn-primary analytics-filter no-border time-option" do %>
+                    <%= radio_button_tag :time_range, :last_week, false, options %> Past Week
+                  <% end %>
+                  <% if false %>
+                    <%= label_tag :last_day, class: "btn btn-primary analytics-filter no-border time-option" do %>
+                      <%= radio_button_tag :time_range, :last_day, false, options %> Past Day
+                    <% end %>
+                  <% end %>
+                  <%= label_tag :custom, class: "btn btn-primary analytics-filter no-border custom-time-option" do %>
+                    <%= radio_button_tag :time_range, :custom, false, options %> Custom
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="collapse" id="custom-time-range">
+            <div class="well">
+              <div class="input-group">
+                <% now = Time.zone.now.strftime("%Y-%m-%d %h:%m") %>
+                <%= text_field_tag :start_date, (Time.zone.now - 1.weeks).beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer", readonly: true %>
+                <span class="input-group-addon">to</span>
+                <%= text_field_tag :end_date, Time.zone.now.end_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer", readonly: true %>
+              </div>
+            </div>
+          </div>
+          <% if session[:mode] == "ASAP" %>
+            <div class="row mt10">
+              <div class="col-sm-12">
+                <div class="input-group">
+                  <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
+                    <% @employee_groups.each do |emp_group| %>
+                      <% next if emp_group.nil? %>
+                      <%= label_tag emp_group, class: "btn btn-warning no-border analytics-filter" do %>
+                        <%#= hidden_field_tag "emp_groups[]", "" %>
+                        <%= check_box_tag "emp_groups[]", emp_group, false %> <%= emp_group.titleize %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <div class="mt10">
+            <%= submit_tag "Submit", class: "form-control btn btn-success"%>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-	$(function() {
-		
-		$(".custom-time-option").click(function() {
-			$("#custom-time-range").collapse("show");
-		})
+  $(function() {
 
-		$(".time-option").click(function() {
-			$("#custom-time-range").collapse({toggle: false});//there is a bug in the bootstrap js where the first time you call collapse("hide") the element will be shown not hidden. this fixes that.
-			$("#custom-time-range").collapse("hide");
-		})
-		// $(".time-select").click(function() {
-		//   $(".time-select").removeClass("active");
-		//   $("#custom-timerange-toggle").removeClass("active");
-		//   $(this).addClass("active");
-		//   if ($(this).attr("id") !== "custom-timerange-toggle") {
-		//     $(".collapse").collapse("hide");
-		//   }
-		// });
+    $(".custom-time-option").click(function() {
+      $("#custom-time-range").collapse("show");
+    })
 
-		// $("#submit-custom").click(function() {
-		//   $(".time-select").removeClass("active");
-		//   $("#custom-timerange-toggle").addClass("active");
-		// });
+    $(".time-option").click(function() {
+      $("#custom-time-range").collapse({toggle: false});//there is a bug in the bootstrap js where the first time you call collapse("hide") the element will be shown not hidden. this fixes that.
+      $("#custom-time-range").collapse("hide");
+    })
+    // $(".time-select").click(function() {
+    //   $(".time-select").removeClass("active");
+    //   $("#custom-timerange-toggle").removeClass("active");
+    //   $(this).addClass("active");
+    //   if ($(this).attr("id") !== "custom-timerange-toggle") {
+    //     $(".collapse").collapse("hide");
+    //   }
+    // });
 
-		$("#toggle-select-timerange").click(function() {
-			$("#select-timerange").toggleClass("hidden");
-			$("#toggle-select-timerange").toggleClass("hidden");
-			// $(this).find("span").toggleClass("glyphicon-chevron-right").toggleClass("glyphicon-chevron-left");
-		});
+    // $("#submit-custom").click(function() {
+    //   $(".time-select").removeClass("active");
+    //   $("#custom-timerange-toggle").addClass("active");
+    // });
 
-		$("#hide-analytics-filters").click(function() {
-			$("#select-timerange").toggleClass("hidden");
-			$("#toggle-select-timerange").toggleClass("hidden");
-		})
-	})
+    $("#toggle-select-timerange").click(function() {
+      $("#select-timerange").toggleClass("hidden");
+      $("#toggle-select-timerange").toggleClass("hidden");
+      // $(this).find("span").toggleClass("glyphicon-chevron-right").toggleClass("glyphicon-chevron-left");
+    });
+
+    $("#hide-analytics-filters").click(function() {
+      $("#select-timerange").toggleClass("hidden");
+      $("#toggle-select-timerange").toggleClass("hidden");
+    })
+  })
 </script>

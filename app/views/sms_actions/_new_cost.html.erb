@@ -10,38 +10,38 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <div class="col-xs-12 col-lg-12"%>
-	<div class="panel panel-warning">
-		<div class="panel-heading">
-			<div class="panel-title">
-				New Cost
-				<button type="button" 
-					class="close pull-right" 
-					data-dismiss="modal" 
-					aria-label="Close">
-					<span class="glyphicon glyphicon-remove"></span>
-				</button>
-			</div>
-		</div>
-		<div class="panel-body"> 
-			<div class="row">
-				<%#=form_for ((@corrective_action.type.include? "Action") ?  @corrective_action.becomes(SmsAction) : @corrective_action ) do |x|%>
-				<%=form_for @corrective_action do |x|%>
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">
+        New Cost
+        <button type="button"
+          class="close pull-right"
+          data-dismiss="modal"
+          aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <%#=form_for ((@corrective_action.type.include? "Action") ?  @corrective_action.becomes(SmsAction) : @corrective_action ) do |x|%>
+        <%=form_for @corrective_action do |x|%>
 
-					<%=x.fields_for :costs,@cost do |f| %>
+          <%=x.fields_for :costs,@cost do |f| %>
 
-						<%=render "/forms/form_fields", 
-							:fields => Cost.get_meta_fields('form'), 
-							:record => @cost,
-							:f => f%>
+            <%=render "/forms/form_fields",
+              :fields => Cost.get_meta_fields('form'),
+              :record => @cost,
+              :f => f%>
 
-					<%end%>
-					<%=x.submit "Save",
-						:class => "btn btn-success mr10 pull-right", 
-						:disable_with => "Saving..."%>
-				<%end%>
-			</div>
-		</div>
-	</div>
+          <%end%>
+          <%=x.submit "Save",
+            :class => "btn btn-success mr10 pull-right",
+            :disable_with => "Saving..."%>
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 
 

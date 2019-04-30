@@ -1,28 +1,28 @@
 <div class="table-responsive mt10">
-	<table id="sras" class="table table-striped table-bordered">
-		<thead>
-			<tr>
-				<%@sra_headers.each do |header|%>
-					<th><%=header[:title]%></th>
-				<%end%>
-					<th>Action</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%@sras.each do |sra|%>
-				<tr sra="<%=sra.id%>">
-					<%@sra_headers.each do |header|%>
-						<td><%=sra.send(header[:field])%></td>
-					<%end%> 
-					<%if (sra.status) == "Open"%>
-						<td><a class="btn btn-info add_btn">Add</a></td>
-					<%else%>
-						<td>Added</td>
-					<%end%>
-				</tr>
-			<%end%>
-		</tbody>
-	</table>
+  <table id="sras" class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <%@sra_headers.each do |header|%>
+          <th><%=header[:title]%></th>
+        <%end%>
+          <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%@sras.each do |sra|%>
+        <tr sra="<%=sra.id%>">
+          <%@sra_headers.each do |header|%>
+            <td><%=sra.send(header[:field])%></td>
+          <%end%>
+          <%if (sra.status) == "Open"%>
+            <td><a class="btn btn-info add_btn">Add</a></td>
+          <%else%>
+            <td>Added</td>
+          <%end%>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
 </div>
 
 

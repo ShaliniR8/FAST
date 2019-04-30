@@ -12,22 +12,22 @@
     <div class="panel-body">
       <%if @action=="index"%>
         <div class="row mb10">
-          <%=link_to "Advanced Search",'#',:class=>"btn btn-info pull-right mr5",:id=>"adv","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>  
-          <%=link_to "Detailed Search",'#',:class=>"btn btn-info pull-right mr5",:id=>"det","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>  
-          <%=link_to "Reset", "#{@table_name}", :class=>"btn btn-default pull-right mr5"%>          
+          <%=link_to "Advanced Search",'#',:class=>"btn btn-info pull-right mr5",:id=>"adv","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+          <%=link_to "Detailed Search",'#',:class=>"btn btn-info pull-right mr5",:id=>"det","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
+          <%=link_to "Reset", "#{@table_name}", :class=>"btn btn-default pull-right mr5"%>
         </div>
       <%end%>
-    	<div class="table-responsive">
-      	<table id="records_table" class="table table-hover" width="100%">
-      		<thead>
-      			<tr>
-      				<%@headers.each do |header|%>
-      					<th class="<%=header[:size]%>">
-      						<%=header[:title]%>
-      					</th>
-      				<%end%>
-      			</tr>
-      		</thead>
+      <div class="table-responsive">
+        <table id="records_table" class="table table-hover" width="100%">
+          <thead>
+            <tr>
+              <%@headers.each do |header|%>
+                <th class="<%=header[:size]%>">
+                  <%=header[:title]%>
+                </th>
+              <%end%>
+            </tr>
+          </thead>
           <tfoot>
             <tr>
               <%@headers.each do |header|%>
@@ -37,21 +37,21 @@
               <%end%>
             </tr>
           </tfoot>
-      		<tbody>
-      			<%@records.each do |record|%>
-      				<tr record_id="<%=record.id%>">
-      					<%@headers.each do |header|%>
+          <tbody>
+            <%@records.each do |record|%>
+              <tr record_id="<%=record.id%>">
+                <%@headers.each do |header|%>
                   <%if header[:param].present?%>
                     <td><%=record.send(header[:field],header[:param])%></td>
                   <%else%>
-      						  <td><%=record.send(header[:field])%></td>
+                    <td><%=record.send(header[:field])%></td>
                   <%end%>
-      					<%end%>
-      				</tr>
-      			<%end%>
-      		</tbody>
-      	</table>
-      </div>          
+                <%end%>
+              </tr>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -74,23 +74,23 @@
 <script>
     <%if current_user.has_access(@table_name,"show")%>
     <%end%>
-   		$('#records_table tbody tr').on('click',function() {
+      $('#records_table tbody tr').on('click',function() {
         console.log($(this).children("td").eq(0).html());
         window.location ="/<%="#{@table_name}"%>/"+$(this).attr('record_id');
 
       });
-      
+
     $('#records_table').DataTable({
-    	dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
-    	     "<'row'<'col-sm-12'tr>>" +
-    	     "<'row'<'col-sm-5'i><'col-sm-7'p>>" + 
-    	     "<'row'<'col-sm-12'B>>",
-    	buttons: [
-    	  "excel", "copy", "print",
-    	  //"pdf"//bug in pdf button for buttons 1.5.1 https://datatables.net/forums/discussion/46395/pdf-export-button-spinner-not-stopping
-    	],
-  		"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-  		"iDisplayLength": 10,
+      dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+           "<'row'<'col-sm-12'tr>>" +
+           "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
+           "<'row'<'col-sm-12'B>>",
+      buttons: [
+        "excel", "copy", "print",
+        //"pdf"//bug in pdf button for buttons 1.5.1 https://datatables.net/forums/discussion/46395/pdf-export-button-spinner-not-stopping
+      ],
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 10,
       "aaSorting": [[0, "desc"]],
       initComplete : function () {
             this.api().columns().every( function () {
@@ -101,10 +101,10 @@
                     .on( 'keyup change input', function () {
                       if ( column.search() !== this.value ) {
                         column.search( this.value ).draw();
-                      } 
+                      }
                     }
                   );
- 
+
                 column.data().unique().sort().each( function ( d, j ) {
                   if  (d!="" && d!=undefined){
                     $('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
@@ -112,7 +112,7 @@
                 } );
             } );
         }
-		});
+    });
     $('#adv').on('click',function(){
       $.get("<%=advanced_search_submissions_path%>",function(data){
         $(".modal-content").html(data);

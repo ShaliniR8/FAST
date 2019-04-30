@@ -3,167 +3,167 @@
 
 <%=render "access_controls/new_modal"%>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<div class="top_text">
-						Risk Control #<%=@risk_control.get_id%>: <%=@risk_control.title%>
-					</div>
-					<div class="top_buttons pull-right">
-						<%if current_user.admin? ||
+  <div class="grid per90 center-block">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            Risk Control #<%=@risk_control.get_id%>: <%=@risk_control.title%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%if current_user.admin? ||
                   current_user.has_access('sras', 'admin') ||
                   current_user.has_access("sras", "destroy")%>
-							<%=link_to "Delete",
-								risk_control_path(@risk_control),
-								:method => "delete",
-								:confirm => 'Are you sure?',
-								:class => "btn btn-danger pull-right mr5 mb5"%>
-						<%end%>
+              <%=link_to "Delete",
+                risk_control_path(@risk_control),
+                :method => "delete",
+                :confirm => 'Are you sure?',
+                :class => "btn btn-danger pull-right mr5 mb5"%>
+            <%end%>
 
-						<%if current_user.admin? ||
+            <%if current_user.admin? ||
                   current_user.has_access('sras','admin')%>
-							<%=link_to 'Override Status', '#',
-								:class => 'btn btn-danger pull-right mr5 mb5',
-								:id => 'override_status_btn',
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
+              <%=link_to 'Override Status', '#',
+                :class => 'btn btn-danger pull-right mr5 mb5',
+                :id => 'override_status_btn',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
 
-						<%if @risk_control.status != 'Completed' && (
-							      current_user.admin? ||
+            <%if @risk_control.status != 'Completed' && (
+                    current_user.admin? ||
                     current_user.has_access('sras','admin') ||
                     current_user.has_access("sras", "edit"))%>
-							<%=link_to "Edit",
-								edit_risk_control_path(@risk_control),
-								:class => "btn btn-warning pull-right mr5 mb5",
-								:disable_with => "Editing..."%>
-						<%end%>
+              <%=link_to "Edit",
+                edit_risk_control_path(@risk_control),
+                :class => "btn btn-warning pull-right mr5 mb5",
+                :disable_with => "Editing..."%>
+            <%end%>
 
-						<%=link_to "De-ID PDF",
-							print_risk_control_path(
-								@risk_control,
-								:deidentified => true,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "De-ID PDF",
+              print_risk_control_path(
+                @risk_control,
+                :deidentified => true,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-						<%=link_to "PDF",
-							print_risk_control_path(
-								@risk_control,
-								:deidentified => false,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "PDF",
+              print_risk_control_path(
+                @risk_control,
+                :deidentified => false,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-						<%=link_to "View Hazard",
-							hazard_path(@risk_control.hazard),
-							:class => "btn btn-info pull-right mr5 mb5",
-							:disable_with => "Redirecting..."%>
+            <%=link_to "View Hazard",
+              hazard_path(@risk_control.hazard),
+              :class => "btn btn-info pull-right mr5 mb5",
+              :disable_with => "Redirecting..."%>
 
-						<%=link_to "Send Message",
-							new_message_path(
-								:link => risk_control_path(@risk_control),
-								:link_type => "RiskControl",
-								:link_id => @risk_control.id),
-							:class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Send Message",
+              new_message_path(
+                :link => risk_control_path(@risk_control),
+                :link_type => "RiskControl",
+                :link_id => @risk_control.id),
+              :class => "btn btn-warning pull-right mr5 mb5"%>
 
-						<%=link_to "Expand All",
-							"#",
-							:class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>
-					</div>
-				</div>
-			</div>
+            <%=link_to "Expand All",
+              "#",
+              :class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>
+          </div>
+        </div>
+      </div>
 
-			<div class="panel-body">
-				<div class="col-xs-12 mb20">
-					<%case @risk_control.status%>
-						<%when 'New', 'Open'%>
+      <div class="panel-body">
+        <div class="col-xs-12 mb20">
+          <%case @risk_control.status%>
+            <%when 'New', 'Open'%>
               <%if @risk_control.approver == current_user ||
                     current_user.admin? ||
                     current_user.has_access('sras','admin') %>
-  							<%=link_to 	"Assign", '#',
+                <%=link_to  "Assign", '#',
                   :id => 'assign_btn',
-  								:class=>"btn btn-warning pull-right mr5 mb5",
+                  :class=>"btn btn-warning pull-right mr5 mb5",
                   'data-toggle' => 'modal',
                   'data-target' => '.bs-example-modal-lg'%>
               <%end%>
 
-						<%when 'Assigned'%>
-							<%if @risk_control.can_complete? current_user %>
-								<%=link_to 	"Complete", '#',
-									:class=>"btn btn-warning pull-right complete_btn mr5 mb5",
+            <%when 'Assigned'%>
+              <%if @risk_control.can_complete? current_user %>
+                <%=link_to  "Complete", '#',
+                  :class=>"btn btn-warning pull-right complete_btn mr5 mb5",
                   :id => 'complete',
                   'data-toggle' => 'modal',
                   'data-target' => '.bs-example-modal-lg'%>
-							<%end%>
-					<%end%>
+              <%end%>
+          <%end%>
 
-					<%if ['Assigned', 'New', 'Open'].include? @risk_control.status%>
-						<%=link_to "Add Cost",
-							"#",
-							:class => "btn btn-success pull-right mr5 mb5",
-							:id => "cost_btn",
-							"data-toggle" => "modal",
-							"data-target" => ".bs-example-modal-lg"%>
+          <%if ['Assigned', 'New', 'Open'].include? @risk_control.status%>
+            <%=link_to "Add Cost",
+              "#",
+              :class => "btn btn-success pull-right mr5 mb5",
+              :id => "cost_btn",
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
 
-					<%elsif @risk_control.can_approve? current_user %>
-						<%=link_to 	"Approve",
-							"#",
-							:class => "btn btn-success pull-right mr5 mb5 approve_btn",
-							:id => 'approve',
-							"data-toggle" => "modal",
-							"data-target" => ".bs-example-modal-lg"
-							%>
-						<%=link_to "Reject",
-							"#",
-							:class => "btn btn-danger pull-right mr5 mb5 approve_btn",
-							:id => 'reject',
-							"data-toggle" => "modal",
-							"data-target" => ".bs-example-modal-lg"
-							%>
+          <%elsif @risk_control.can_approve? current_user %>
+            <%=link_to  "Approve",
+              "#",
+              :class => "btn btn-success pull-right mr5 mb5 approve_btn",
+              :id => 'approve',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"
+              %>
+            <%=link_to "Reject",
+              "#",
+              :class => "btn btn-danger pull-right mr5 mb5 approve_btn",
+              :id => 'reject',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"
+              %>
 
-					<%elsif @risk_control.status == "Completed"%>
-						<%if @risk_control.can_reopen? current_user %>
-							<%=link_to "Reopen",
-								reopen_risk_control_path(@risk_control),
-								:class => "btn btn-success pull-right mr5",
-								:disable_with => "Reopening...",
-								:confirm => "Are you sure?"%>
-						<%end%>
-					<%end%>
-				</div>
+          <%elsif @risk_control.status == "Completed"%>
+            <%if @risk_control.can_reopen? current_user %>
+              <%=link_to "Reopen",
+                reopen_risk_control_path(@risk_control),
+                :class => "btn btn-success pull-right mr5",
+                :disable_with => "Reopening...",
+                :confirm => "Are you sure?"%>
+            <%end%>
+          <%end%>
+        </div>
 
-				<%=render '/forms/show_fields', :fields => @fields, :record => @risk_control%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @risk_control%>
 
-				<%=render '/causes/all',
-					:owner => @risk_control,
-					:cause_type => 'description',
-					:can_change => (@risk_control.status == "Open" || @risk_control.status == "New") &&
-							current_user.has_access("sras", "edit")%>
+        <%=render '/causes/all',
+          :owner => @risk_control,
+          :cause_type => 'description',
+          :can_change => (@risk_control.status == "Open" || @risk_control.status == "New") &&
+              current_user.has_access("sras", "edit")%>
 
-				<%=render "/sms_actions/cost", :owner => @risk_control%>
-				<%=render "/forms/attachments_show", :owner => @risk_control%>
-				<%=render "/records/transactions", :owner => @risk_control%>
-			</div>
-		</div>
-	</div>
+        <%=render "/sms_actions/cost", :owner => @risk_control%>
+        <%=render "/forms/attachments_show", :owner => @risk_control%>
+        <%=render "/records/transactions", :owner => @risk_control%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-	$(document).ready(function(){
-		$("#cost_btn").on('click',function(){
-			$.get("<%=new_cost_risk_control_path(@risk_control)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('#att_btn').on('click',function(){
-			$.get("<%=new_attachment_risk_control_path(@risk_control)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+  $(document).ready(function(){
+    $("#cost_btn").on('click',function(){
+      $.get("<%=new_cost_risk_control_path(@risk_control)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_risk_control_path(@risk_control)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
     $('#assign_btn').on('click',function(){
       $.get("<%=assign_risk_control_path(@risk_control)%>", function(data){
         $(".modal-content").html(data);
@@ -177,21 +177,21 @@
         $(window).trigger('resize');
       });
     });
-		$('.approve_btn').on('click',function(){
+    $('.approve_btn').on('click',function(){
       var commit = $(this).attr('id');
-			$.get("<%=approve_risk_control_path(@risk_control)%>?commit="+ commit, function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+      $.get("<%=approve_risk_control_path(@risk_control)%>?commit="+ commit, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#override_status_btn').on('click',function(){
-			$.get("<%=override_status_risk_control_path(@risk_control)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_risk_control_path(@risk_control)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
 
-	});
+  });
 </script>

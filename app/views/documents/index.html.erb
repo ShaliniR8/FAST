@@ -1,77 +1,77 @@
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-			<div class="panel panel-steelblue">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<b>Reference Data Center</b> 
+  <div class="grid per90 center-block">
+      <div class="panel panel-steelblue">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <b>Reference Data Center</b>
 
-						<div class="top_buttons pull-right">
-							<%if current_user.has_access("documents","new")%>
-								<%=link_to "New",
-									"#",
-									:class => "btn btn-success pull-right",
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg",
-									:id => "new_doc"%>
-								<%end%>
-							</div>
+            <div class="top_buttons pull-right">
+              <%if current_user.has_access("documents","new")%>
+                <%=link_to "New",
+                  "#",
+                  :class => "btn btn-success pull-right",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg",
+                  :id => "new_doc"%>
+                <%end%>
+              </div>
 
-					</div>
-				</div>
-				<div class="panel-body">
-					<div class="row  row-grid">
-						<%@documents.group_by{|x| x.category}.sort_by{|c, d| c}.each do |cat, docs|%>
-							<div class="col-md-4 col-sm-12">
-								<div class="panel panel-info">
-									<div class="panel-heading">
-										<div class="panel-title">
-											<b><%=cat%></b>
-										</div>
-									</div>
-									<div class="panel-body" style="height:200px;overflow-y:auto">
-										<%docs.each do |d|%>
-											<div class="col-sm-12 mb5">
-												<%if d.attachment.present?%>
-													<%=link_to  "Download #{d.attachment.caption}", 
-														          download_document_path(d, url: d.attachment.name.url), 
-														          :download => d.attachment.name.file.filename%>
-												<%else%>
-													<%=link_to  d.title,
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="row  row-grid">
+            <%@documents.group_by{|x| x.category}.sort_by{|c, d| c}.each do |cat, docs|%>
+              <div class="col-md-4 col-sm-12">
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <div class="panel-title">
+                      <b><%=cat%></b>
+                    </div>
+                  </div>
+                  <div class="panel-body" style="height:200px;overflow-y:auto">
+                    <%docs.each do |d|%>
+                      <div class="col-sm-12 mb5">
+                        <%if d.attachment.present?%>
+                          <%=link_to  "Download #{d.attachment.caption}",
+                                      download_document_path(d, url: d.attachment.name.url),
+                                      :download => d.attachment.name.file.filename%>
+                        <%else%>
+                          <%=link_to  d.title,
                                       download_document_path(d, url: d.link),
                                       :target=>'_blank'%>
-												<%end%>
-												<%if current_user.has_access("documents","destroy")%>
-													<%=link_to "<span class='glyphicon glyphicon-remove' style='color:red'></span>".html_safe,document_path(d),:confirm=>"The deletetion cannot be reverted, please confirm that you want to continue.",:method=>"delete",:class=>"pull-right"%>
-												<%end%>
-											</div>
-										<%end%>
-									</div>
-								</div>
-							</div>
-						<%end%>
-					</div>
-				</div>
-			</div>
-	</div>
+                        <%end%>
+                        <%if current_user.has_access("documents","destroy")%>
+                          <%=link_to "<span class='glyphicon glyphicon-remove' style='color:red'></span>".html_safe,document_path(d),:confirm=>"The deletetion cannot be reverted, please confirm that you want to continue.",:method=>"delete",:class=>"pull-right"%>
+                        <%end%>
+                      </div>
+                    <%end%>
+                  </div>
+                </div>
+              </div>
+            <%end%>
+          </div>
+        </div>
+      </div>
+  </div>
 </div>
 
 <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-		</div>
-	</div>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+    </div>
+  </div>
 </div>
 <script>
 
-	$(document).ready(function() {
+  $(document).ready(function() {
 
-		$('#new_doc').on('click', function() {
-			$.get('<%=new_document_path%>', function(data) {
-				$('.modal-content').html(data)
-				$(window).trigger('resize')
-			})
-		})
+    $('#new_doc').on('click', function() {
+      $.get('<%=new_document_path%>', function(data) {
+        $('.modal-content').html(data)
+        $(window).trigger('resize')
+      })
+    })
 
-	})
+  })
 
 </script>

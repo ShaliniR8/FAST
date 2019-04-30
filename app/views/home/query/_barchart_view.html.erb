@@ -1,52 +1,52 @@
 <div id="bar_chart_div-<%=@field_name%>" style="width:'100%'"></div>
-<div class="mr5" id="bar_chart_download" align="right"></div> 
+<div class="mr5" id="bar_chart_download" align="right"></div>
 
 
 <script>
-	
-	google.charts.load("current", {packages:["corechart"]});
-	google.charts.setOnLoadCallback(drawBarChart);
-	var colorArray = colorInterpolation(<%=@data.length%>);
+
+  google.charts.load("current", {packages:["corechart"]});
+  google.charts.setOnLoadCallback(drawBarChart);
+  var colorArray = colorInterpolation(<%=@data.length%>);
 
 
-	function drawBarChart(){
-		$("bar_chart_div-<%=@field_name%>").html("");
-		var data = new google.visualization.DataTable();
-		data.addColumn("string", "Value");
-		data.addColumn("number", "Count");
-		data.addColumn({type: "string", role: "tooltip"});
-		data.addColumn({type: "string", role: "annotationText"});
-		data.addColumn({type: "string", role: "style"});
-		data.addRows([
-			<%@data.each_with_index do |(k, v), index|%>
-				[<%="'#{index+1}', #{v}, '#{k}', '#{k}',"%> colorArray[<%=index%>]],
-			<%end%>
-		]);
-		var view = new google.visualization.DataView(data);
-		view.setColumns([0, 1,
-			{	calc: "stringify",
-				sourceColumn: 1,
-				type: "string",
-				role: "annotation"
-			}, 2, 3, 4]);
-		var options = {
-			height: 500,
-			title: "Analytics of <%=raw(@label)%>",
-			titleTextStyle: {color: "black", fontSize: 18, bold: true},
-			legend: { position: 'none'},
-			bar: {groupWidth: "90%"},
-		};
-		var barChart = new google.visualization.ColumnChart(document.getElementById('bar_chart_div-<%=@field_name%>'));
-	
-		google.visualization.events.addListener(barChart, 'ready', function () {
-			document.getElementById('bar_chart_download').innerHTML = '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
-		});
-		barChart.draw(view, options);
-	}
+  function drawBarChart(){
+    $("bar_chart_div-<%=@field_name%>").html("");
+    var data = new google.visualization.DataTable();
+    data.addColumn("string", "Value");
+    data.addColumn("number", "Count");
+    data.addColumn({type: "string", role: "tooltip"});
+    data.addColumn({type: "string", role: "annotationText"});
+    data.addColumn({type: "string", role: "style"});
+    data.addRows([
+      <%@data.each_with_index do |(k, v), index|%>
+        [<%="'#{index+1}', #{v}, '#{k}', '#{k}',"%> colorArray[<%=index%>]],
+      <%end%>
+    ]);
+    var view = new google.visualization.DataView(data);
+    view.setColumns([0, 1,
+      { calc: "stringify",
+        sourceColumn: 1,
+        type: "string",
+        role: "annotation"
+      }, 2, 3, 4]);
+    var options = {
+      height: 500,
+      title: "Analytics of <%=raw(@label)%>",
+      titleTextStyle: {color: "black", fontSize: 18, bold: true},
+      legend: { position: 'none'},
+      bar: {groupWidth: "90%"},
+    };
+    var barChart = new google.visualization.ColumnChart(document.getElementById('bar_chart_div-<%=@field_name%>'));
 
-	$(window).bind('resizeEnd', function(){
-		drawBarChart();
-		drawPieChart();
-	});
+    google.visualization.events.addListener(barChart, 'ready', function () {
+      document.getElementById('bar_chart_download').innerHTML = '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
+    });
+    barChart.draw(view, options);
+  }
+
+  $(window).bind('resizeEnd', function(){
+    drawBarChart();
+    drawPieChart();
+  });
 
 </script>

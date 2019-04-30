@@ -1,18 +1,18 @@
 <%=form_for @sra do |x|%>
-	<%=x.fields_for :hazards,@hazard do |f|%>
-		<%=render "hazards/form", :f => f, :hazard => @hazard%>
-		<%=x.submit "Submit", :class => "btn btn-success pull-right mr15 mt5", :disable_with => "Submitting..."%>
-	<%end%>
+  <%=x.fields_for :hazards,@hazard do |f|%>
+    <%=render "hazards/form", :f => f, :hazard => @hazard%>
+    <%=x.submit "Submit", :class => "btn btn-success pull-right mr15 mt5", :disable_with => "Submitting..."%>
+  <%end%>
 <%end%>
 
 
 
 <style>
-	.custom-swal {
-		text-align: left!important;
-		width: 70% !important;
-		max-height: 70% !important;
-		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		font-size: 14px;
-	}
+  .custom-swal {
+    text-align: left!important;
+    width: 70% !important;
+    max-height: 70% !important;
+    font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
 </style>

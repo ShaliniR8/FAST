@@ -1,47 +1,47 @@
 <div class="col-sm-12 col-md-12 col-lg-12"%>
-	<div class="panel panel-info">
-		<div class="panel-heading click-heading collapsed" style="height:2%;">
-			<div class="panel-title">
-				<b><%=option.name%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-			</div> 
-		</div>
-		<div class="panel-body" style="display:none">
-			<div class="row mb10">
-				<div class="col-xs-12" aid="<%=option.id%>" id="<%=option.id%>">
-					<%=link_to "Delete", cause_option_path(option), :class => "btn btn-danger pull-right ml5", :confirm => "Are you sure?", :method => "delete"%>
-					<%=link_to "Edit", "#", :class => "btn btn-warning pull-right ml5 edit_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
-					<%=link_to "Add Sub-Option", "#", :class => "btn btn-success pull-right ml5 add_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
-				</div>
-			</div>
+  <div class="panel panel-info">
+    <div class="panel-heading click-heading collapsed" style="height:2%;">
+      <div class="panel-title">
+        <b><%=option.name%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div>
+    </div>
+    <div class="panel-body" style="display:none">
+      <div class="row mb10">
+        <div class="col-xs-12" aid="<%=option.id%>" id="<%=option.id%>">
+          <%=link_to "Delete", cause_option_path(option), :class => "btn btn-danger pull-right ml5", :confirm => "Are you sure?", :method => "delete"%>
+          <%=link_to "Edit", "#", :class => "btn btn-warning pull-right ml5 edit_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
+          <%=link_to "Add Sub-Option", "#", :class => "btn btn-success pull-right ml5 add_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
+        </div>
+      </div>
 
-			<div class="row" style="max-height:550px;overflow-y:auto; overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
-				<%option.children.each do |x|%>
-					<%if !x.hidden?%>
-						<%=render "sub_options", :option => x, :root => root %>
-					<%end%>
-				<%end%>
-			</div>
-		</div>
-	</div>
+      <div class="row" style="max-height:550px;overflow-y:auto; overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
+        <%option.children.each do |x|%>
+          <%if !x.hidden?%>
+            <%=render "sub_options", :option => x, :root => root %>
+          <%end%>
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <script>
-	$(function(){
-		
-		$("#<%=option.id%> .add_btn").on("click", function(){
-			$.get("/cause_options/new?root_id=<%=root.id%>&parent_id=" + $(this).closest("div").attr("aid"), function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$("#<%=option.id%> .edit_btn").on("click", function(){
-			$.get("/cause_options/" + $(this).closest("div").attr("aid") + "/edit", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-	});
+  $(function(){
+
+    $("#<%=option.id%> .add_btn").on("click", function(){
+      $.get("/cause_options/new?root_id=<%=root.id%>&parent_id=" + $(this).closest("div").attr("aid"), function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#<%=option.id%> .edit_btn").on("click", function(){
+      $.get("/cause_options/" + $(this).closest("div").attr("aid") + "/edit", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
 </script>
 
 

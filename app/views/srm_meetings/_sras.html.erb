@@ -1,73 +1,73 @@
 <div class="panel panel-info">
 
-	<div class="panel-heading click-heading collapsed">
-		<div class="panel-title">
-			<b>Included SRAs</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-		</div>
-	</div>
+  <div class="panel-heading click-heading collapsed">
+    <div class="panel-title">
+      <b>Included SRAs</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+    </div>
+  </div>
 
-	<div class="panel-body" style="display:none">
-		<div class="row col-xs-12">
-			<table class="table table-striped table-bordered" width="100%">
+  <div class="panel-body" style="display:none">
+    <div class="row col-xs-12">
+      <table class="table table-striped table-bordered" width="100%">
 
-				<thead>
-					<tr>
-						<%@sra_headers.each do |h|%>
-							<th><%=h[:title]%></th>
-						<%end%>
-						<th>Meeting Minutes</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
+        <thead>
+          <tr>
+            <%@sra_headers.each do |h|%>
+              <th><%=h[:title]%></th>
+            <%end%>
+            <th>Meeting Minutes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-				<tbody>
-					<%@meeting.sras.each do |sra|%>
-						<tr>
-							<%@sra_headers.each do |h|%>
-								<td class="<%=h[:html_class].present? ? sra.send(h[:html_class]) : ''%>"><%=sra.send(h[:field])%></td>
-							<%end%>
-							<td><%if sra.minutes.present?%><%=sra.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
-							<td>
-								<%=link_to "View", sra_path(sra), :class=>"btn btn-info mb5", :disable_with => "Redirecting..."%>
-								<%if current_user.has_access("sms_meetings","edit") && @meeting.status == "Open" && @meeting.has_user(current_user)%>
-									<%if @meeting.status != "Closed" && sra.srm_agendas.blank?%>
-										<%=link_to "Carryover", "#",:class=>"btn btn-danger carryover_btn mb5",:route=>carryover_sra_path(sra.id), :confirm => "Are you sure?", :disable_with => "Removing..."%>
-									<%end%>
-									<%=link_to "Agenda","#",:class=>"btn btn-warning agenda_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:route=>get_agenda_sra_path(sra,:meeting=>@meeting.id)%>
-									<%=link_to "Add Minutes","#",:class=>"btn btn-success minutes_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg", :route=>new_minutes_sra_path(sra, :meeting=>@meeting) %>
-								<%end%>    		
-							</td>
-						</tr>			
-					<%end%>
-				</tbody>
-			</table>
-			</div>
-	</div>
+        <tbody>
+          <%@meeting.sras.each do |sra|%>
+            <tr>
+              <%@sra_headers.each do |h|%>
+                <td class="<%=h[:html_class].present? ? sra.send(h[:html_class]) : ''%>"><%=sra.send(h[:field])%></td>
+              <%end%>
+              <td><%if sra.minutes.present?%><%=sra.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
+              <td>
+                <%=link_to "View", sra_path(sra), :class=>"btn btn-info mb5", :disable_with => "Redirecting..."%>
+                <%if current_user.has_access("sms_meetings","edit") && @meeting.status == "Open" && @meeting.has_user(current_user)%>
+                  <%if @meeting.status != "Closed" && sra.srm_agendas.blank?%>
+                    <%=link_to "Carryover", "#",:class=>"btn btn-danger carryover_btn mb5",:route=>carryover_sra_path(sra.id), :confirm => "Are you sure?", :disable_with => "Removing..."%>
+                  <%end%>
+                  <%=link_to "Agenda","#",:class=>"btn btn-warning agenda_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:route=>get_agenda_sra_path(sra,:meeting=>@meeting.id)%>
+                  <%=link_to "Add Minutes","#",:class=>"btn btn-success minutes_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg", :route=>new_minutes_sra_path(sra, :meeting=>@meeting) %>
+                <%end%>
+              </td>
+            </tr>
+          <%end%>
+        </tbody>
+      </table>
+      </div>
+  </div>
 </div>
 
 
 
 <script>
-	$(document).ready(function(){
-		$('.agenda_btn').on('click',function(){
-			path=$(this).attr('route');
-			$.get(path,function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('.carryover_btn').on('click',function(){
-			path=$(this).attr('route');
-			current=$(this).closest('tr');
-			$.get(path,function(data){
-				current.hide();
-			});
-		});
-		$(".minutes_btn").on('click',function(){
-			$.get($(this).attr('route'),function(data){
-				$(".modal-content").html(data);	
-				$(window).trigger('resize');			
-			});
-		});
-	});
+  $(document).ready(function(){
+    $('.agenda_btn').on('click',function(){
+      path=$(this).attr('route');
+      $.get(path,function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('.carryover_btn').on('click',function(){
+      path=$(this).attr('route');
+      current=$(this).closest('tr');
+      $.get(path,function(data){
+        current.hide();
+      });
+    });
+    $(".minutes_btn").on('click',function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
 </script>

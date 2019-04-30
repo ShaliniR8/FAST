@@ -3,7 +3,7 @@ class PasswordResetsController < ApplicationController
 
   def create
     user = User.find_by_email(params[:email])
-  	if user
+    if user
       if user.account_status == "Disabled"
         flash.now[:danger] = "This account is diabled, please enter a valid email address."
         render 'new'
@@ -12,10 +12,10 @@ class PasswordResetsController < ApplicationController
         flash[:success] = "Please check your email for password reset instructions."
         redirect_to new_session_path
       end
-  	else
+    else
       flash.now[:danger] = "No account found with this email address."
-  		render 'new'
-  	end
+      render 'new'
+    end
   end
 
 

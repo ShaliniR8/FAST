@@ -3,174 +3,174 @@
 <script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%=render "shared/alerts"%>
-		<%=render "access_controls/new_modal"%>
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<div class="top_text">
-						<%="Corrective Action ##{@corrective_action.get_id}"%>
-					</div>
-					<div class="top_buttons pull-right">
-						<%if current_user.admin? ||
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            <%="Corrective Action ##{@corrective_action.get_id}"%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%if current_user.admin? ||
                   current_user.has_access('corrective_actions', 'admin') ||
                   current_user.has_access('corrective_actions','destroy') %>
-							<%=link_to "Delete",
-								corrective_action_path(@corrective_action),
-								:method => "delete",
-								:confirm => "Are you sure?",
-								:class => "pull-right btn btn-danger mb5"%>
-						<%end%>
+              <%=link_to "Delete",
+                corrective_action_path(@corrective_action),
+                :method => "delete",
+                :confirm => "Are you sure?",
+                :class => "pull-right btn btn-danger mb5"%>
+            <%end%>
 
-						<%if current_user.admin?%>
-							<%=link_to 'Override Status', '#',
-								:class => 'btn btn-danger pull-right mr5 mb5',
-								:id => 'override_status_btn',
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
+            <%if current_user.admin?%>
+              <%=link_to 'Override Status', '#',
+                :class => 'btn btn-danger pull-right mr5 mb5',
+                :id => 'override_status_btn',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
 
-						<%if current_user.has_access("corrective_actions","edit") &&
-								@corrective_action.status != "Completed"%>
-							<%=link_to "Edit",
-								edit_corrective_action_path(@corrective_action),
-								:class => "btn btn-warning pull-right mr5 mb5",
-								:disable_with => "Editing..."
-							%>
-						<%end%>
+            <%if current_user.has_access("corrective_actions","edit") &&
+                @corrective_action.status != "Completed"%>
+              <%=link_to "Edit",
+                edit_corrective_action_path(@corrective_action),
+                :class => "btn btn-warning pull-right mr5 mb5",
+                :disable_with => "Editing..."
+              %>
+            <%end%>
 
-						<%=link_to "De-ID PDF",
-							print_corrective_action_path(
-								@corrective_action,
-								:deidentified => true,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-						<%=link_to "PDF",
-							print_corrective_action_path(
-								@corrective_action,
-								:deidentified => false,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-
-						<%if @report.present?%>
-							<%=link_to "View Event",
-								report_path(@corrective_action.report),
-								:class => "btn btn-info pull-right mr5 mb5",
-								:disable_with => "Redirecting..."%>
-						<%end%>
-						<%if @record.present?%>
-							<%=link_to "View Report",
-								record_path(@corrective_action.record),
-								:class => "btn btn-info pull-right mr5 mb5",
-								:disable_with => "Redirecting..."%>
-						<%end%>
-						<%=link_to "Send Message",
-							new_message_path(
-								:link => corrective_action_path(@correcitve_action),
-								:link_type => "CorrectiveAction",
-								:link_id => @corrective_action.id),
-								:class => "btn btn-warning pull-right mr5 mb5"%>
-						<%=link_to "Expand All",
-							"#",
-							:class => "btn btn-default mr5 expandall pull-right mb5"%>
-					</div>
-				</div>
-			</div>
-
-			<div class="panel-body">
-
-				<div class="col-xs-12 mb15">
-
-						<%if @corrective_action.status == "New"%>
-							<%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
-								<%=link_to 'Assign', '#',
-									:id => 'assign_btn',
-									:class => 'btn btn-warning pull-right mr5',
-									'data-toggle' => 'modal',
-									'data-target' => '.bs-example-modal-lg'%>
-							<%end%>
-
-						<%elsif @corrective_action.status == 'Assigned'%>
-							<%if current_user.admin? || @corrective_action.responsible_user_id == current_user.id%>
-								<%=link_to "Complete", '#',
-									:class => "btn btn-warning pull-right complete_btn mr5 mb5",
-									:id => 'complete',
-									'data-toggle' => 'modal',
-									'data-target' => '.bs-example-modal-lg'%>
-							<%end%>
-
-						<%elsif @corrective_action.status == "Pending Approval"%>
-							<%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
-								<%=link_to "Approve", "#",
-									:class => "btn btn-success pull-right mr5 approve_btn mb5",
-									:id => 'approve',
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
-								<%=link_to "Reject", "#",
-									:class => "btn btn-danger pull-right mr5 approve_btn mb5",
-									:id => 'reject',
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
-							<%end%>
-						<%end%>
-				</div>
+            <%=link_to "De-ID PDF",
+              print_corrective_action_path(
+                @corrective_action,
+                :deidentified => true,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "PDF",
+              print_corrective_action_path(
+                @corrective_action,
+                :deidentified => false,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
 
-				<%=render "/forms/show_fields", :fields => @fields, :record => @corrective_action%>
-				<%=render "/forms/attachments_show", :owner => @corrective_action%>
-				<%=render "records/transactions", :owner => @corrective_action%>
+            <%if @report.present?%>
+              <%=link_to "View Event",
+                report_path(@corrective_action.report),
+                :class => "btn btn-info pull-right mr5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
+            <%if @record.present?%>
+              <%=link_to "View Report",
+                record_path(@corrective_action.record),
+                :class => "btn btn-info pull-right mr5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
+            <%=link_to "Send Message",
+              new_message_path(
+                :link => corrective_action_path(@correcitve_action),
+                :link_type => "CorrectiveAction",
+                :link_id => @corrective_action.id),
+                :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Expand All",
+              "#",
+              :class => "btn btn-default mr5 expandall pull-right mb5"%>
+          </div>
+        </div>
+      </div>
 
-			</div>
-		</div>
-	</div>
+      <div class="panel-body">
+
+        <div class="col-xs-12 mb15">
+
+            <%if @corrective_action.status == "New"%>
+              <%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
+                <%=link_to 'Assign', '#',
+                  :id => 'assign_btn',
+                  :class => 'btn btn-warning pull-right mr5',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg'%>
+              <%end%>
+
+            <%elsif @corrective_action.status == 'Assigned'%>
+              <%if current_user.admin? || @corrective_action.responsible_user_id == current_user.id%>
+                <%=link_to "Complete", '#',
+                  :class => "btn btn-warning pull-right complete_btn mr5 mb5",
+                  :id => 'complete',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg'%>
+              <%end%>
+
+            <%elsif @corrective_action.status == "Pending Approval"%>
+              <%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
+                <%=link_to "Approve", "#",
+                  :class => "btn btn-success pull-right mr5 approve_btn mb5",
+                  :id => 'approve',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+                <%=link_to "Reject", "#",
+                  :class => "btn btn-danger pull-right mr5 approve_btn mb5",
+                  :id => 'reject',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
+            <%end%>
+        </div>
+
+
+        <%=render "/forms/show_fields", :fields => @fields, :record => @corrective_action%>
+        <%=render "/forms/attachments_show", :owner => @corrective_action%>
+        <%=render "records/transactions", :owner => @corrective_action%>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 
 <script>
-	$(function(){
+  $(function(){
 
-		$('#att_btn').on('click',function(){
-			$.get("<%=new_attachment_corrective_action_path(@corrective_action)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_corrective_action_path(@corrective_action)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#override_status_btn').on('click',function(){
-			$.get("<%=override_status_corrective_action_path(@corrective_action)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_corrective_action_path(@corrective_action)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#assign_btn').on('click',function(){
-			$.get("<%=assign_corrective_action_path(@corrective_action)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#assign_btn').on('click',function(){
+      $.get("<%=assign_corrective_action_path(@corrective_action)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$(".complete_btn").on('click', function(){
-			var commit=$(this).attr('id');
-			$.get("<%=complete_corrective_action_path(@corrective_action)%>?commit=" + commit,
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $(".complete_btn").on('click', function(){
+      var commit=$(this).attr('id');
+      $.get("<%=complete_corrective_action_path(@corrective_action)%>?commit=" + commit,
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('.approve_btn').on('click',function(){
-			var commit=$(this).attr('id');
-			$.get("<%=approve_corrective_action_path(@corrective_action)%>?commit=" + commit,
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('.approve_btn').on('click',function(){
+      var commit=$(this).attr('id');
+      $.get("<%=approve_corrective_action_path(@corrective_action)%>?commit=" + commit,
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-	});
+  });
 </script>

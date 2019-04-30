@@ -4,9 +4,9 @@
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b>Risk Matrix</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-      </div> 
+      </div>
     </div>
-    <div class="panel-body" style="display:none"> 
+    <div class="panel-body" style="display:none">
       <div class="row">
         <div class='col-xs-3'>
           <b>Severity: </b><%=owner.severity%>
@@ -61,7 +61,7 @@
                 <%@frequency=(0..4).to_a.reverse%>
                 <td><center><b><%=@frequency[row]%></b></center></td>
                 <%@color_matrix[row].each_index do |cell|%>
-                  <td id="<%=4-row%>-<%=cell%>" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>"></td>    
+                  <td id="<%=4-row%>-<%=cell%>" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>"></td>
                 <%end%>
               </tr>
             <%end%>

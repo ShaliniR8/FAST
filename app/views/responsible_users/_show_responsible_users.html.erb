@@ -1,78 +1,78 @@
 <%if owner.responsible_users.present?%>
-	<%headers = ResponsibleUser.get_headers%>
-	<div class="col-xs-12">
-		<div class="panel panel-green">
+  <%headers = ResponsibleUser.get_headers%>
+  <div class="col-xs-12">
+    <div class="panel panel-green">
 
-			<div class="panel-heading click-heading collapsed">
-				<div class="panel-title">
-					<b>Responsible Users</b>
-					<span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-				</div> 
-			</div>
+      <div class="panel-heading click-heading collapsed">
+        <div class="panel-title">
+          <b>Responsible Users</b>
+          <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+        </div>
+      </div>
 
-			<div class="panel-body" style="display:none">
-				<div class="table-responsive">
-					<table class="table table-bordered table-striped">
-						<thead>
-							<tr>
-								<%headers.each do |header|%>
-									<th><%=header[:title]%></th>
-								<%end%>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody>
-							<%owner.responsible_users.each do |responsible_user|%>	
-								<tr>
-									<%headers.each do |header|%>
-										<td><%=responsible_user.send(header[:field])%></td>
-									<%end%>
-									<td>
-										<%#=link_to "Remove", "#", :class => "btn btn-danger delete_responsible_user_btn", "data-cid" => responsible_user.id%>
-										<%#if responsible_user.get_status_score < 50%>
-											<%=link_to "Assign", "#", :class => "btn btn-success assign_responsible_user_btn", "data-cid" => responsible_user.id%>
-										<%#end%>
-										<%=link_to "Approve", "#", :class => "btn btn-success approve_responsible_user_btn", "data-cid" => responsible_user.id, "data-result" => "approve"%>
-										<%=link_to "Reject", "#", :class => "btn btn-warning approve_responsible_user_btn", "data-cid" => responsible_user.id, "data-result" => "reject"%>
-									</td>
-								</tr>
-							<%end%>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+      <div class="panel-body" style="display:none">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <%headers.each do |header|%>
+                  <th><%=header[:title]%></th>
+                <%end%>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%owner.responsible_users.each do |responsible_user|%>
+                <tr>
+                  <%headers.each do |header|%>
+                    <td><%=responsible_user.send(header[:field])%></td>
+                  <%end%>
+                  <td>
+                    <%#=link_to "Remove", "#", :class => "btn btn-danger delete_responsible_user_btn", "data-cid" => responsible_user.id%>
+                    <%#if responsible_user.get_status_score < 50%>
+                      <%=link_to "Assign", "#", :class => "btn btn-success assign_responsible_user_btn", "data-cid" => responsible_user.id%>
+                    <%#end%>
+                    <%=link_to "Approve", "#", :class => "btn btn-success approve_responsible_user_btn", "data-cid" => responsible_user.id, "data-result" => "approve"%>
+                    <%=link_to "Reject", "#", :class => "btn btn-warning approve_responsible_user_btn", "data-cid" => responsible_user.id, "data-result" => "reject"%>
+                  </td>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 <%end%>
 
 
 
 
 <script>
-	$(function(){
+  $(function(){
 
 
-		$(".approve_responsible_user_btn").on("click", function(){
+    $(".approve_responsible_user_btn").on("click", function(){
 
-			console.log($(this).data("result"));
+      console.log($(this).data("result"));
 
-		});
-
-
-
-		$(".delete_responsible_user_btn").on("click", function(){
-			if(confirm('Are you sure?')){
-				btn = $(this);
-				$.ajax({
-					url: "<%=responsible_users_path%>" + "/" + $(this).data("cid"),
-					type: "delete", 
-					success: function(){
-						btn.closest("tr").detach();
-					}
-				});
-			}
-		});
+    });
 
 
-	});
+
+    $(".delete_responsible_user_btn").on("click", function(){
+      if(confirm('Are you sure?')){
+        btn = $(this);
+        $.ajax({
+          url: "<%=responsible_users_path%>" + "/" + $(this).data("cid"),
+          type: "delete",
+          success: function(){
+            btn.closest("tr").detach();
+          }
+        });
+      }
+    });
+
+
+  });
 </script>

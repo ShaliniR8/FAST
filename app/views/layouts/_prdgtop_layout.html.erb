@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
 
   <%= stylesheet_link_tag 'scaffold' %>
-  
+
   <%= stylesheet_link_tag 'buttons' %>
 
     <title><%= controller.action_name.titleize + " : " + controller.controller_name.titleize %></title>
@@ -19,10 +19,10 @@
   <%= stylesheet_link_tag 'bootstrap/bootstrap.min' %>
 
      <!-- Used for offline notification -->
-  <%= stylesheet_link_tag "offline-theme-chrome", :media=>"all" %>  
+  <%= stylesheet_link_tag "offline-theme-chrome", :media=>"all" %>
   <%= stylesheet_link_tag "offline-language-english", :media=>"all" %>
-  <%= stylesheet_link_tag "offline-language-english-indicator", :media=>"all" %> 
-    
+  <%= stylesheet_link_tag "offline-language-english-indicator", :media=>"all" %>
+
   <%= javascript_include_tag 'offline.min.js' %>
 
     <!-- Custom styles for this template -->
@@ -58,7 +58,7 @@ function refreshPage()
 {
   location.reload(true);
 
-} 
+}
 </script>
 
 
@@ -119,7 +119,7 @@ function refreshPage()
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
 
-    
+
   <%= stylesheet_link_tag 'jqgrid/jquery-ui-1.7.1.custom' %>
   <%= stylesheet_link_tag 'jqgrid/ui.jqgrid' %>
 
@@ -127,12 +127,12 @@ function refreshPage()
   <script type="text/javascript" src="/javascripts/jqgrid2/jquery.min.js"></script>
   <script type="text/javascript" src="/javascripts/jqgrid2/grid.locale-en.js"></script>
   <script type="text/javascript" src="/javascripts/jqgrid2/jquery.jqGrid.min.js"></script>
-  
+
 
 <div class="mainContent">
-	<div>
-		<%= yield %>
-	</div>
+  <div>
+    <%= yield %>
+  </div>
 </div>
 </div>
 

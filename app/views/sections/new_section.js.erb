@@ -1,58 +1,58 @@
 swal({
 
-	title: "Add New Section",
-	html: "<%= escape_javascript render('/sections/new_section')%>",
-	customClass: "custom-swal",
-	showCancelButton: false,
-	showConfirmButton: false,
-	allowOutsideClick: true,
-	onOpen: function(){
+  title: "Add New Section",
+  html: "<%= escape_javascript render('/sections/new_section')%>",
+  customClass: "custom-swal",
+  showCancelButton: false,
+  showConfirmButton: false,
+  allowOutsideClick: true,
+  onOpen: function(){
 
-		var table;
-		build_table();
-		$('#assignee_btn').on('click',function(){
-			$('form').hide();
-			$("#emp_div").show();
-			clear_table();
-			$('#users tbody tr' ).unbind();
-			$('.close' ).unbind();
-			$('#users tbody tr').on('click',function(){
-				$('#assignee_name').val($(this).find('td').eq(3).text());
-				$('#assignee_id').val($(this).find('td').eq(0).text());
-				$('form').show();
-				$('#emp_div').hide();
-			});
-			$('.close').on('click',function(){
-				$('#assignee_name').val("");
-				$('#assignee_id').val("");
-				$('form').show();
-				$('#emp_div').hide();
-			});
-			build_table();
-		});
+    var table;
+    build_table();
+    $('#assignee_btn').on('click',function(){
+      $('form').hide();
+      $("#emp_div").show();
+      clear_table();
+      $('#users tbody tr' ).unbind();
+      $('.close' ).unbind();
+      $('#users tbody tr').on('click',function(){
+        $('#assignee_name').val($(this).find('td').eq(3).text());
+        $('#assignee_id').val($(this).find('td').eq(0).text());
+        $('form').show();
+        $('#emp_div').hide();
+      });
+      $('.close').on('click',function(){
+        $('#assignee_name').val("");
+        $('#assignee_id').val("");
+        $('form').show();
+        $('#emp_div').hide();
+      });
+      build_table();
+    });
 
-		$('#approver_btn').on('click',function(){
-			$('form').hide();
-			$("#emp_div").show();
-			clear_table();
-			$('#users tbody tr' ).unbind();
-			$('.close' ).unbind();
-			$('#users tbody tr').on('click',function(){
-				$('#approver_name').val($(this).find('td').eq(3).text());
-				$('#approver_id').val($(this).find('td').eq(0).text());
-				$('form').show();
-				$('#emp_div').hide();
-			});
-			$('.close').on('click',function(){
-				$('#approver_name').val("");
-				$('#approver_id').val("");
-				$('form').show();
-				$('#emp_div').hide();
-			});
-			build_table();
-		});		
+    $('#approver_btn').on('click',function(){
+      $('form').hide();
+      $("#emp_div").show();
+      clear_table();
+      $('#users tbody tr' ).unbind();
+      $('.close' ).unbind();
+      $('#users tbody tr').on('click',function(){
+        $('#approver_name').val($(this).find('td').eq(3).text());
+        $('#approver_id').val($(this).find('td').eq(0).text());
+        $('form').show();
+        $('#emp_div').hide();
+      });
+      $('.close').on('click',function(){
+        $('#approver_name').val("");
+        $('#approver_id').val("");
+        $('form').show();
+        $('#emp_div').hide();
+      });
+      build_table();
+    });
 
-	}
+  }
 
 
 
@@ -62,14 +62,14 @@ swal({
 
 
 function build_table(){
-	table = $('#users').DataTable({
-		"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-		"iDisplayLength": 5
-	});
+  table = $('#users').DataTable({
+    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+    "iDisplayLength": 5
+  });
 }
 
 
 
 function clear_table(){
-	table.destroy();
+  table.destroy();
 }

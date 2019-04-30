@@ -1,28 +1,28 @@
 <style>
-	.simulation-bottom-bar {
-		background-color: mediumseagreen !important;
-	}
+  .simulation-bottom-bar {
+    background-color: mediumseagreen !important;
+  }
 
-	.simulation-bottom-item a {
-		color: white;
-	}
+  .simulation-bottom-item a {
+    color: white;
+  }
 
-	.simulation-bottom-item a:hover {
-		background-color: crimson !important;
-	}
+  .simulation-bottom-item a:hover {
+    background-color: crimson !important;
+  }
 </style>
 
 <nav class="navbar simulation-bottom-bar navbar-fixed-bottom center">
-	<ul class="nav navbar-nav">
-		<li class="simulation-bottom-item">
-			<a>Simulating As 
-				<b><%= current_user.full_name %></b>
-			</a>
-		</li>
-		<li class="bottom-item">
-			<%= link_to 'Stop Simulation', 
-				stop_simulation_user_path(current_user), 
-				:class=>"btn btn-danger" %>		
-			</li>
-	</ul>
+  <ul class="nav navbar-nav">
+    <li class="simulation-bottom-item">
+      <a>Simulating As
+        <b><%= current_user.full_name %></b>
+      </a>
+    </li>
+    <li class="bottom-item">
+      <%= link_to 'Stop Simulation',
+        stop_simulation_user_path(current_user),
+        :class=>"btn btn-danger" %>
+      </li>
+  </ul>
 </nav>

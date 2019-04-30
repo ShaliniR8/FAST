@@ -13,136 +13,136 @@
 
 
 <%if action_name == 'new'%>
-	<script type="text/javascript" src="/javascripts/meetings/table-control.js"></script>
+  <script type="text/javascript" src="/javascripts/meetings/table-control.js"></script>
 <%else%>
-	<script type="text/javascript" src="/javascripts/meetings/edit-control.js"></script>
+  <script type="text/javascript" src="/javascripts/meetings/edit-control.js"></script>
 <%end%>
 
 
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="panel panel-warning">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<b><%=action_name.titleize + " Meeting"%></b> 
-				</div>
-			</div>
+  <div class="grid per90 center-block">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%=action_name.titleize + " Meeting"%></b>
+        </div>
+      </div>
 
-			<div class="panel-body" id="form_body"> 
+      <div class="panel-body" id="form_body">
 
-				<%= form_for session[:mode] == "ASAP" ? @meeting : @meeting.becomes(SmsMeeting),
-					:html => {:multipart => true} do |f|%>
+        <%= form_for session[:mode] == "ASAP" ? @meeting : @meeting.becomes(SmsMeeting),
+          :html => {:multipart => true} do |f|%>
 
-					<%=render "shared/privilege_form", :target => "meeting[privileges][]", :owner => @meeting, :f => f%>
+          <%=render "shared/privilege_form", :target => "meeting[privileges][]", :owner => @meeting, :f => f%>
 
-					<%if @action == "new"%>
-						<%=f.fields_for :host, Host.new do |ff|%>
-							<%=ff.hidden_field :users_id, :value => current_user.id%>
-						<%end%>
-					<%end%>
+          <%if @action == "new"%>
+            <%=f.fields_for :host, Host.new do |ff|%>
+              <%=ff.hidden_field :users_id, :value => current_user.id%>
+            <%end%>
+          <%end%>
 
-					<%if params[:type].present?%>
-						<%=hidden_field_tag :type, params[:type]%>
-					<%end%>
+          <%if params[:type].present?%>
+            <%=hidden_field_tag :type, params[:type]%>
+          <%end%>
 
-					<%=render "forms/form_fields", 
-						:f => f, 
-						:record => @meeting, 
-						:fields => Meeting.get_meta_fields('form')%>
- 
-						
-					<!-- Events -->
-					<div class="col-sm-12 col-md-12 col-lg-12">
-						<div class="panel panel-lightskyblue mt10">
-							<div class="panel-heading">
-								<div class="panel-title">
-									<b>Events</b>
-								</div>
-							</div>
-							<div class="panel-body">
-								<div class="col-sm-12 col-md-12 col-lg-12">
-									<%=render "meetings/add_report"%>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Participants -->
-					<div class="col-sm-12 col-md-12 col-lg-12">
-						<div class="panel panel-lightskyblue mt10">
-							<div class="panel-heading">
-								<div class="panel-title">
-									<b>Participants</b>
-								</div>
-							</div>
-							<div class="panel-body">
-								<div class="col-sm-12 col-md-12 col-lg-12">
-									<%=render "meetings/invite"%>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<%=render '/forms/attachments_form', :f => f, :owner => @meeting%>
+          <%=render "forms/form_fields",
+            :f => f,
+            :record => @meeting,
+            :fields => Meeting.get_meta_fields('form')%>
 
 
-					<div class="col-xs-12 mr10 mt10">
-						<%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
-							:class => "btn btn-success pull-right", 
-							:disable_with => "Saving..."%>
-						<%=link_to "Cancel", 
-							action_name == "edit" ? meeting_path(@meeting) : meetings_path, 
-							:id => "cancel-btn", 
-							:class => "mr5 btn btn-warning pull-right", 
-							:confirm => 'Are you sure?'%>
-						<%=link_to "Group Access",
-							"#", 
-							:class => "mr5 btn btn-info pull-right",
-							"data-toggle" => "modal",
-							"data-target" => "#group_access"%>
-					</div>
+          <!-- Events -->
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-lightskyblue mt10">
+              <div class="panel-heading">
+                <div class="panel-title">
+                  <b>Events</b>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <%=render "meetings/add_report"%>
+                </div>
+              </div>
+            </div>
+          </div>
 
-				<%end%>
-			</div> 
-		</div>       
-	</div> 
-</div>  
+          <!-- Participants -->
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-lightskyblue mt10">
+              <div class="panel-heading">
+                <div class="panel-title">
+                  <b>Participants</b>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <%=render "meetings/invite"%>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <%=render '/forms/attachments_form', :f => f, :owner => @meeting%>
+
+
+          <div class="col-xs-12 mr10 mt10">
+            <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+              :class => "btn btn-success pull-right",
+              :disable_with => "Saving..."%>
+            <%=link_to "Cancel",
+              action_name == "edit" ? meeting_path(@meeting) : meetings_path,
+              :id => "cancel-btn",
+              :class => "mr5 btn btn-warning pull-right",
+              :confirm => 'Are you sure?'%>
+            <%=link_to "Group Access",
+              "#",
+              :class => "mr5 btn btn-info pull-right",
+              "data-toggle" => "modal",
+              "data-target" => "#group_access"%>
+          </div>
+
+        <%end%>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
-	$(document).ready(function(){
+  $(document).ready(function(){
 
-			$(".add_btn").on("click",function(){
-				if ($(this).text()=="Add"){
-					$(this).text("Added");
-					$(this).removeClass("btn-info").addClass("btn-success");
-				}else{
-					$(this).text("Add");
-					$(this).removeClass("btn-success").addClass("btn-info");
-				}
-			});
+      $(".add_btn").on("click",function(){
+        if ($(this).text()=="Add"){
+          $(this).text("Added");
+          $(this).removeClass("btn-info").addClass("btn-success");
+        }else{
+          $(this).text("Add");
+          $(this).removeClass("btn-success").addClass("btn-info");
+        }
+      });
 
-			var dt=$('#reports').DataTable({
-				"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-				"iDisplayLength": 5
-			});
+      var dt=$('#reports').DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
 
-			$('form').on('submit',function(){
-				var count=0;
-				var form=$(this);
-				dt.rows().nodes().to$().each(function(){
-					//console.log(count+"="+$(this).attr("report"));
-					if ($(this).find(".add_btn").text()=="Added"){
-						form.append('<input type="hidden" name=reports['+count+ '] value='+$(this).attr("report")+'>');
-						count++;
-					}
-				});
-				return true;
-			});
+      $('form').on('submit',function(){
+        var count=0;
+        var form=$(this);
+        dt.rows().nodes().to$().each(function(){
+          //console.log(count+"="+$(this).attr("report"));
+          if ($(this).find(".add_btn").text()=="Added"){
+            form.append('<input type="hidden" name=reports['+count+ '] value='+$(this).attr("report")+'>');
+            count++;
+          }
+        });
+        return true;
+      });
 
-		}
-	);
+    }
+  );
 </script>
 
 

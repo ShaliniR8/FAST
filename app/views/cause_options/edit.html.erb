@@ -5,82 +5,82 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%=render "shared/alerts"%>
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
 
-		<div class="panel panel-warning">
-			<div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
-				<div class="panel-title">
-					<div class="top_text">
-						<b>Edit <%=@option.name%></b><span class="pull-right clickable"></span>
-					</div>
-				</div>
-			</div>
-			
-			<div class="panel-body">
+    <div class="panel panel-warning">
+      <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
+        <div class="panel-title">
+          <div class="top_text">
+            <b>Edit <%=@option.name%></b><span class="pull-right clickable"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body">
 
 
-				<%=render "shared/instructions", :instruction => 
-				"
-					Please note that <b>editing</b> existing categories and options will affect the root causes that have been added to hazards. If there are changes made to the list of options or categories, it is suggested to <b>archive the old options first and then add new ones</b>. </br></br>
-  				Please note that <b>archiving</b> a category will also archive all of its nested sub-categories, use this with caution.
-  			"%>
+        <%=render "shared/instructions", :instruction =>
+        "
+          Please note that <b>editing</b> existing categories and options will affect the root causes that have been added to hazards. If there are changes made to the list of options or categories, it is suggested to <b>archive the old options first and then add new ones</b>. </br></br>
+          Please note that <b>archiving</b> a category will also archive all of its nested sub-categories, use this with caution.
+        "%>
 
-				<%=form_for(@option, :html => {:multipart => true}) do |f|%>
-					<%@option.children.each do |cur|%>
-						<%=render "edit_categories", :cur => cur, :f => f%>
-					<%end%>
-					<%=f.submit "Save", :class => "btn btn-success form-actions pull-right", :disable_with => "Saving..."%>
-					<%=link_to "Cancel", cause_option_path(@option), :class => "btn btn-warning form-actions pull-right mr5", :disable_with => "Redirecting...", :confirm => "Are you sure?"%>
-				<%end%>
+        <%=form_for(@option, :html => {:multipart => true}) do |f|%>
+          <%@option.children.each do |cur|%>
+            <%=render "edit_categories", :cur => cur, :f => f%>
+          <%end%>
+          <%=f.submit "Save", :class => "btn btn-success form-actions pull-right", :disable_with => "Saving..."%>
+          <%=link_to "Cancel", cause_option_path(@option), :class => "btn btn-warning form-actions pull-right mr5", :disable_with => "Redirecting...", :confirm => "Are you sure?"%>
+        <%end%>
 
-			</div> 
-		</div>       
-	</div> 
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-	.just-padding {
-			padding: 5px;
-	}
-	.list-group.list-group-root {
-			padding: 0;
-			overflow: hidden;
-	}
-	.list-group.list-group-root .list-group {
-			margin-bottom: 0;
-	}
-	.list-group.list-group-root .list-group-item {
-			border-radius: 0;
-			border-width: 1px 0 0 0;
-	}
-	.list-group.list-group-root > .list-group-item:first-child {
-			border-top-width: 0;
-	}
-	.list-group.list-group-root > .list-group > .list-group-item {
-			padding-left: 30px;
-	}
-	.list-group.list-group-root > .list-group > .list-group > .list-group-item {
-			padding-left: 45px;
-	}
-	.list-group-item .glyphicon {
-			margin-right: 5px;
-	}
+  .just-padding {
+      padding: 5px;
+  }
+  .list-group.list-group-root {
+      padding: 0;
+      overflow: hidden;
+  }
+  .list-group.list-group-root .list-group {
+      margin-bottom: 0;
+  }
+  .list-group.list-group-root .list-group-item {
+      border-radius: 0;
+      border-width: 1px 0 0 0;
+  }
+  .list-group.list-group-root > .list-group-item:first-child {
+      border-top-width: 0;
+  }
+  .list-group.list-group-root > .list-group > .list-group-item {
+      padding-left: 30px;
+  }
+  .list-group.list-group-root > .list-group > .list-group > .list-group-item {
+      padding-left: 45px;
+  }
+  .list-group-item .glyphicon {
+      margin-right: 5px;
+  }
 
-	.datepicker{
-		z-index: 1200!important;
-	}
-	th{
-		text-align: center;
-	}
-	.panel {
- 		min-height: 8!important;
- 		max-height: 8!important;
-	}
+  .datepicker{
+    z-index: 1200!important;
+  }
+  th{
+    text-align: center;
+  }
+  .panel {
+    min-height: 8!important;
+    max-height: 8!important;
+  }
 
-	.form-control{
-		display: inline !important;
-	}
+  .form-control{
+    display: inline !important;
+  }
 </style>
 
 

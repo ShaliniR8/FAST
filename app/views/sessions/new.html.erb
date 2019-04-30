@@ -1,151 +1,151 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-			 "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+       "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-	<title>Log In</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>Log In</title>
 
-	<!-- Mobile specific metas -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 user-scalable=no">
-	<!-- Force IE9 to render in normal mode -->
-	<!--[if IE]><meta http-equiv="x-ua-compatible" content="IE=9" /><![endif]-->
-	<meta name="author" content="" />
-	<meta name="description" content="" />
-	<meta name="keywords" content="" />
-	<meta name="application-name" content="" />
-	<!-- Import google fonts - Heading first/ text second -->
-	<link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700' rel='stylesheet' type='text/css'>
-	<!-- Css files -->
-	<!-- Icons -->
-	<link href="/css/icons.css" rel="stylesheet" />
-	<!-- Bootstrap stylesheets (included template modifications) -->
-	<link href="/css/bootstrap.css" rel="stylesheet" />
-	<!-- Plugins stylesheets (all plugin custom css) -->
-	<link href="/css/plugins.css" rel="stylesheet" />
-	<!-- Main stylesheets (template main css file) -->
-	<link href="/css/main.css" rel="stylesheet" />
-	<!-- Fav and touch icons -->
-	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/ico/apple-touch-icon-144-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/ico/apple-touch-icon-114-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/ico/apple-touch-icon-72-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" href="/img/ico/apple-touch-icon-57-precomposed.png">
+  <!-- Mobile specific metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 user-scalable=no">
+  <!-- Force IE9 to render in normal mode -->
+  <!--[if IE]><meta http-equiv="x-ua-compatible" content="IE=9" /><![endif]-->
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+  <meta name="application-name" content="" />
+  <!-- Import google fonts - Heading first/ text second -->
+  <link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700' rel='stylesheet' type='text/css'>
+  <!-- Css files -->
+  <!-- Icons -->
+  <link href="/css/icons.css" rel="stylesheet" />
+  <!-- Bootstrap stylesheets (included template modifications) -->
+  <link href="/css/bootstrap.css" rel="stylesheet" />
+  <!-- Plugins stylesheets (all plugin custom css) -->
+  <link href="/css/plugins.css" rel="stylesheet" />
+  <!-- Main stylesheets (template main css file) -->
+  <link href="/css/main.css" rel="stylesheet" />
+  <!-- Fav and touch icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/ico/apple-touch-icon-144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/ico/apple-touch-icon-114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/ico/apple-touch-icon-72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="/img/ico/apple-touch-icon-57-precomposed.png">
 
-	<link rel="icon" href="/img/ico/favicon.ico" type="image/png">
-	<!-- Windows8 touch icon ( http://www.buildmypinnedsite.com/ )-->
-	<meta name="msapplication-TileColor" content="#3399cc" />
-	<%= stylesheet_link_tag 'enterprise', media: 'all' %>
+  <link rel="icon" href="/img/ico/favicon.ico" type="image/png">
+  <!-- Windows8 touch icon ( http://www.buildmypinnedsite.com/ )-->
+  <meta name="msapplication-TileColor" content="#3399cc" />
+  <%= stylesheet_link_tag 'enterprise', media: 'all' %>
 
-	<style>
-		@media (min-width: 768px!important){
-			.submit-holder { 
-				margin-top: 27px !important; 
-			}
-		}
-		body {
-			padding: 20px !important;
-			background: url('/images/portal_background5.gif') repeat-x scroll 0 0 #E6EFF7;
-			color: #666;
-		}
-		.MainContent {
-			margin-top: 10px;
-			height: 500px;
-			border: 1px solid #999999;
-			border-bottom: none;
-			border-top: none;
-			background-image: url(/images/login_background.png);
-			background-repeat: repeat-x;
-		}
-		.TopPicture img { width: 80%; }
-		.alert { width: 80% !important; }
-		.submit-btn {
-			background-image: url(/images/button_gradient.png);
-			background-repeat: repeat-x;
-		};
-	</style>
+  <style>
+    @media (min-width: 768px!important){
+      .submit-holder {
+        margin-top: 27px !important;
+      }
+    }
+    body {
+      padding: 20px !important;
+      background: url('/images/portal_background5.gif') repeat-x scroll 0 0 #E6EFF7;
+      color: #666;
+    }
+    .MainContent {
+      margin-top: 10px;
+      height: 500px;
+      border: 1px solid #999999;
+      border-bottom: none;
+      border-top: none;
+      background-image: url(/images/login_background.png);
+      background-repeat: repeat-x;
+    }
+    .TopPicture img { width: 80%; }
+    .alert { width: 80% !important; }
+    .submit-btn {
+      background-image: url(/images/button_gradient.png);
+      background-repeat: repeat-x;
+    };
+  </style>
 </head>
 
 <body>
-	<div class="col-sm-8 col-sm-offset-2 mb20">
+  <div class="col-sm-8 col-sm-offset-2 mb20">
 
-		<!-- ProSafeT Logo -->
-		<div class="ProSafeTLogo mb20">
-			<a href="http://www.prosafet.com/site/aviation-software">
-				<img style="border:none" alt="ProSafeT Website" src="/images/ProSafeT_logo_final.png" width="253" height="60" />
-			</a>
-		</div>
-
-
-		<div class="MainContent">
-
-			<!-- Portal Design -->
-			<div class="TopPicture mb20 text-center col-xs-12" >
-				<img src="/images/ProSafeT Portal Design v1.png"/>
-			</div> 
-
-				<!-- Login form -->
-				<%= form_tag sessions_path, :name=>"mainForm" do %>
-
-					<!-- Alert -->
-					<div class="col-xs-12 mb20">
-						<%=render "shared/alerts"%>
-					</div>
-
-					<!-- Login form -->
-					<div class="col-md-8">
-						<div class="row form-group">
-							<%= label_tag :login, "Username", :class=>'control-label col-sm-2 col-sm-offset-2', style: "padding-top:7px" %>
-							<div class="col-sm-6">
-								<%= text_field_tag :login, params[:login], :class=>"form-control", autofocus: true %>
-							</div>
-						</div>
-						<div class="row form-group">
-							<%= label_tag :password, "Password", :class=>'control-label col-sm-2 col-sm-offset-2', style: "padding-top:7px" %>
-							<div class="col-sm-6">
-								<%= password_field_tag 'password', '', :onKeypress => "return handleKey(event)", :class=>"form-control", autofocus: true %></p>
-							</div>
-						</div>
-						<div class="row form-group col-sm-offset-2">
-							<p><%= link_to "Forgot your password?", new_password_reset_path %></p>
-						</div>
-					</div>
-
-					<!-- Submit button -->
-					<div class="submit-holder col-md-2 col-md-offset-0 col-xs-offset-2 col-xs-8 mb20">
-						<a href="#" onclick="submitForm()" class="submit-btn pull-right btn btn-block btn-warning">
-							<span><b>Log In</b></span>
-						</a>
-					</div>
-
-				<%end%>
+    <!-- ProSafeT Logo -->
+    <div class="ProSafeTLogo mb20">
+      <a href="http://www.prosafet.com/site/aviation-software">
+        <img style="border:none" alt="ProSafeT Website" src="/images/ProSafeT_logo_final.png" width="253" height="60" />
+      </a>
+    </div>
 
 
-			</div>
-		</div>
+    <div class="MainContent">
+
+      <!-- Portal Design -->
+      <div class="TopPicture mb20 text-center col-xs-12" >
+        <img src="/images/ProSafeT Portal Design v1.png"/>
+      </div>
+
+        <!-- Login form -->
+        <%= form_tag sessions_path, :name=>"mainForm" do %>
+
+          <!-- Alert -->
+          <div class="col-xs-12 mb20">
+            <%=render "shared/alerts"%>
+          </div>
+
+          <!-- Login form -->
+          <div class="col-md-8">
+            <div class="row form-group">
+              <%= label_tag :login, "Username", :class=>'control-label col-sm-2 col-sm-offset-2', style: "padding-top:7px" %>
+              <div class="col-sm-6">
+                <%= text_field_tag :login, params[:login], :class=>"form-control", autofocus: true %>
+              </div>
+            </div>
+            <div class="row form-group">
+              <%= label_tag :password, "Password", :class=>'control-label col-sm-2 col-sm-offset-2', style: "padding-top:7px" %>
+              <div class="col-sm-6">
+                <%= password_field_tag 'password', '', :onKeypress => "return handleKey(event)", :class=>"form-control", autofocus: true %></p>
+              </div>
+            </div>
+            <div class="row form-group col-sm-offset-2">
+              <p><%= link_to "Forgot your password?", new_password_reset_path %></p>
+            </div>
+          </div>
+
+          <!-- Submit button -->
+          <div class="submit-holder col-md-2 col-md-offset-0 col-xs-offset-2 col-xs-8 mb20">
+            <a href="#" onclick="submitForm()" class="submit-btn pull-right btn btn-block btn-warning">
+              <span><b>Log In</b></span>
+            </a>
+          </div>
+
+        <%end%>
+
+
+      </div>
+    </div>
 
 <script src="/js/libs/jquery-2.1.1.min.js"></script>
 <script>jQuery.noConflict();</script>
 <script src="/js/libs/jquery-ui-1.10.4.min.js"></script>
 <!-- Bootstrap plugins -->
-	<script src="/js/bootstrap/bootstrap.min.js"></script>
+  <script src="/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript">
-	function submitForm() {
-		document.mainForm.submit();
-	}
-	function handleKey (evt) {
-		evt = (evt) ? evt : event;
-		var target = (evt.target) ? evt.target : evt.srcElement;
-		var form = target.form;
-		var charCode = (evt.charCode) ? evt.charCode :
-				((evt.which) ? evt.which : evt.keyCode);
-		if (charCode == 13) {
-				submitForm();
-		}
-		return true;
-	}
+  function submitForm() {
+    document.mainForm.submit();
+  }
+  function handleKey (evt) {
+    evt = (evt) ? evt : event;
+    var target = (evt.target) ? evt.target : evt.srcElement;
+    var form = target.form;
+    var charCode = (evt.charCode) ? evt.charCode :
+        ((evt.which) ? evt.which : evt.keyCode);
+    if (charCode == 13) {
+        submitForm();
+    }
+    return true;
+  }
 </script>
 
 
-	<script src="/js/bootstrap/bootstrap.min.js"></script>
+  <script src="/js/bootstrap/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,16 +1,16 @@
 <div class="col-xs-12">
-	<table class="table table-striped table-bordered">
-		<thead>
-			<th>Content</th>
-			<th width="15%">Submit Date</th>
-		</thead>
-		<tbody>
-			<%owner.comments.each do |c|%>
-				<tr>
-					<td><%=c.get_content%></td>
-					<td><%=c.get_subnmission_time%></td>
-				</tr>
-			<%end%>
-		</tbody>
-	</table>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <th>Content</th>
+      <th width="15%">Submit Date</th>
+    </thead>
+    <tbody>
+      <%owner.comments.each do |c|%>
+        <tr>
+          <td><%=c.get_content%></td>
+          <td><%=c.get_subnmission_time%></td>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
 </div>

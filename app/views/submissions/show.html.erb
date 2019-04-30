@@ -4,135 +4,135 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
+  <div class="grid per90 center-block">
 
-		<%=render "shared/alerts"%>
-		<%=render "access_controls/new_modal"%>
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
 
-		<div class="col-xs-12">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<div class="top_text">
-							<%="#{@record.template.name}"%> Submission #<%=@record.get_id%>: <%="#{@record.get_description}"%>
-						</div>
-						<div class="top_buttons pull-right">
-							<a class="btn btn-default expandall mb5">Expand All</a>
-							<%if current_user.has_template_access(@record.template.name).include?("full") ||
-									current_user.has_template_access(@record.template.name).include?("viewer")%>
-								<%if !@record.anonymous?%>
-									<%=link_to "Message Submitter",
-										new_message_path(
-											:send_to => @record.created_by.id,
-											:link => submission_path(@record),
+    <div class="col-xs-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <div class="top_text">
+              <%="#{@record.template.name}"%> Submission #<%=@record.get_id%>: <%="#{@record.get_description}"%>
+            </div>
+            <div class="top_buttons pull-right">
+              <a class="btn btn-default expandall mb5">Expand All</a>
+              <%if current_user.has_template_access(@record.template.name).include?("full") ||
+                  current_user.has_template_access(@record.template.name).include?("viewer")%>
+                <%if !@record.anonymous?%>
+                  <%=link_to "Message Submitter",
+                    new_message_path(
+                      :send_to => @record.created_by.id,
+                      :link => submission_path(@record),
                       :link_type=>"Submission",
                       :link_id => @record.id),
-										:id=>"index-btn",
-										:class=>"btn btn-warning mb5"%>
-								<%end%>
-								<%=link_to "Send Message",
-									new_message_path(
-										:link => submission_path(@record),
-										:link_type=>"Submission",
-										:link_id => @record.id),
-									:class => "btn btn-warning mb5"%>
-								<%if @record.record.present?%>
-									<%=link_to "View Report",
-										record_path(@record.record),
-										:class => "btn btn-info mb5",
-										:disable_with => "Redirecting..."%>
-								<%end%>
+                    :id=>"index-btn",
+                    :class=>"btn btn-warning mb5"%>
+                <%end%>
+                <%=link_to "Send Message",
+                  new_message_path(
+                    :link => submission_path(@record),
+                    :link_type=>"Submission",
+                    :link_id => @record.id),
+                  :class => "btn btn-warning mb5"%>
+                <%if @record.record.present?%>
+                  <%=link_to "View Report",
+                    record_path(@record.record),
+                    :class => "btn btn-info mb5",
+                    :disable_with => "Redirecting..."%>
+                <%end%>
 
-								<%=link_to "PDF",
-									print_submission_path(
-										@record,
-										:deidentified => false,
-										:format => :pdf),
-									:class=>'btn btn-darkturquoise mb5'%>
-								<%=link_to "De-ID PDF",
-									print_submission_path(
-										@record,
-										:deidentified => true,
-										:format => :pdf),
-									:class=>'btn btn-darkturquoise mb5'%>
+                <%=link_to "PDF",
+                  print_submission_path(
+                    @record,
+                    :deidentified => false,
+                    :format => :pdf),
+                  :class=>'btn btn-darkturquoise mb5'%>
+                <%=link_to "De-ID PDF",
+                  print_submission_path(
+                    @record,
+                    :deidentified => true,
+                    :format => :pdf),
+                  :class=>'btn btn-darkturquoise mb5'%>
 
-								<%if current_user.has_access("submissions","destroy")%>
-									<%=link_to 'Delete',
-										submission_path(@record),
-										:method => "delete",
-										:confirm => 'Are you sure?',
-										:class => "btn btn-danger mb5"%>
-								<%end%>
-							<%end%>
-						</div>
-					</div>
-				</div>
+                <%if current_user.has_access("submissions","destroy")%>
+                  <%=link_to 'Delete',
+                    submission_path(@record),
+                    :method => "delete",
+                    :confirm => 'Are you sure?',
+                    :class => "btn btn-danger mb5"%>
+                <%end%>
+              <%end%>
+            </div>
+          </div>
+        </div>
 
-				<div class="panel-body collapse in" id="form_body">
-					<div class="col-xs-12 mb20">
-						<%if current_user.id == @record.created_by.id%>
-							<span data-toggle="modal" data-target=".bs-example-modal-lg">
-								<%=link_to "Add Additional Notes","#",
-									:class => "btn btn-success pull-right mr10 mb5",
-									:id => 'comment_btn',
-									"data-toggle"=>"tooltip",
-									"data-placement"=>"top",
-									:title => "Add additional notes. Analysts will be notified when new notes are added."%>
-							</span>
-						<%end%>
-					</div>
-
-
-					<%=render "forms/show_fields", :fields => Submission.get_meta_fields('show'), :record => @record%>
+        <div class="panel-body collapse in" id="form_body">
+          <div class="col-xs-12 mb20">
+            <%if current_user.id == @record.created_by.id%>
+              <span data-toggle="modal" data-target=".bs-example-modal-lg">
+                <%=link_to "Add Additional Notes","#",
+                  :class => "btn btn-success pull-right mr10 mb5",
+                  :id => 'comment_btn',
+                  "data-toggle"=>"tooltip",
+                  "data-placement"=>"top",
+                  :title => "Add additional notes. Analysts will be notified when new notes are added."%>
+              </span>
+            <%end%>
+          </div>
 
 
-					<%if @record.comments.present?%>
-						<div class="col-xs-12 col-lg-12"%>
-							<div class="panel panel-lightskyblue">
-								<div class="panel-heading click-heading collapsed">
-									<div class="panel-title">
-										<b>Additional Notes</b>
-										<span class="pull-right clickable">
-											<i class="mt5 glyphicon glyphicon-chevron-down"></i>
-										</span>
-									</div>
-								</div>
-								<div class="panel-body" style="display:none">
-									<div class="row">
-										<%=render "show_notes", :owner => @record%>
-									</div>
-								</div>
-							</div>
-						</div>
-					<%end%>
+          <%=render "forms/show_fields", :fields => Submission.get_meta_fields('show'), :record => @record%>
 
-					<%@template.categories.order(:category_order).each do |c|%>
-						<%@cat = c%>
-						<%if @cat.id == 338%>
-							<%=render "show_observation_phases_category"%>
-						<%elsif @cat.not_empty_for(@record)%>
-							<%=render "category"%>
-						<%end%>
-					<%end%>
 
-					<%=render "/forms/attachments_show", :owner => @record, :show_btn => false%>
-					<%=render "/records/transactions", :owner => @record%>
+          <%if @record.comments.present?%>
+            <div class="col-xs-12 col-lg-12"%>
+              <div class="panel panel-lightskyblue">
+                <div class="panel-heading click-heading collapsed">
+                  <div class="panel-title">
+                    <b>Additional Notes</b>
+                    <span class="pull-right clickable">
+                      <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="panel-body" style="display:none">
+                  <div class="row">
+                    <%=render "show_notes", :owner => @record%>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <%end%>
 
-				</div>
-			</div>
-		</div>
-	</div>
+          <%@template.categories.order(:category_order).each do |c|%>
+            <%@cat = c%>
+            <%if @cat.id == 338%>
+              <%=render "show_observation_phases_category"%>
+            <%elsif @cat.not_empty_for(@record)%>
+              <%=render "category"%>
+            <%end%>
+          <%end%>
+
+          <%=render "/forms/attachments_show", :owner => @record, :show_btn => false%>
+          <%=render "/records/transactions", :owner => @record%>
+
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script type="text/javascript">
-	$(document).ready(function(){
-		$('#comment_btn').on('click',function(){
-			$.get("<%=comment_submission_path(@record)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-	});
+  $(document).ready(function(){
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_submission_path(@record)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
 </script>

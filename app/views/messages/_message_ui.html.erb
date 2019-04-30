@@ -3,70 +3,70 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <div class="item active mt20" style="height:auto;">
-	<div class="grid per90 center-block">		
-		<div class="panel panel-steelblue">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<%=@title%> 
-				</div>
-			</div>
-			<div class="panel-body">
+  <div class="grid per90 center-block">
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <%=@title%>
+        </div>
+      </div>
+      <div class="panel-body">
 
-				<div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height: 400px">
-					<div class="table-responsive">
-					  <table id="users" class="table table-hover table-bordered">
-					  	<thead style="display:none"><tr><th></th></tr><thead>
-					    <tbody>
-					      <%@messages.each do |m|%>
-					        <tr message="<%=inbox_message_path(m, {:source => @title})%>">
-					        	<td>
-					        		<%messages=MessageAccess.where("users_id=? AND messages_id=?",current_user.id,m.id)%>
-					        		<%@status = false%>
-					        		<%messages.each do |x|%>
-					        			<%if x.status == "Unread"%>
-					        				<%@status = true%>
-					        			<%end%> 
-					        		<%end%>
-					        		<%if @status%>
-					        			<div class="pull-right"><b><%=m.get_time%></b></div>
-					        			<b><%=m.send_from.user.full_name%></b></br>
-					        			<%=m.subject%></br>
-					        			
-					        		<%else%>
-					        			<div class="pull-right"><%=m.get_time%></div>
-					        			<%=m.send_from.user.full_name%></br>
-					        			<%=m.subject%></br>
-					        		<%end%>
-					        	</td>
-					        </tr>
-					      <%end%>
-					    </tbody>
-					  </table>
-					</div>
-				</div>
-				<div class="col-xs-8">
-					<div class="panel-body" id="view_message"></div>
-				</div>
+        <div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height: 400px">
+          <div class="table-responsive">
+            <table id="users" class="table table-hover table-bordered">
+              <thead style="display:none"><tr><th></th></tr><thead>
+              <tbody>
+                <%@messages.each do |m|%>
+                  <tr message="<%=inbox_message_path(m, {:source => @title})%>">
+                    <td>
+                      <%messages=MessageAccess.where("users_id=? AND messages_id=?",current_user.id,m.id)%>
+                      <%@status = false%>
+                      <%messages.each do |x|%>
+                        <%if x.status == "Unread"%>
+                          <%@status = true%>
+                        <%end%>
+                      <%end%>
+                      <%if @status%>
+                        <div class="pull-right"><b><%=m.get_time%></b></div>
+                        <b><%=m.send_from.user.full_name%></b></br>
+                        <%=m.subject%></br>
 
-			</div>
-		</div>
-	</div>
+                      <%else%>
+                        <div class="pull-right"><%=m.get_time%></div>
+                        <%=m.send_from.user.full_name%></br>
+                        <%=m.subject%></br>
+                      <%end%>
+                    </td>
+                  </tr>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-xs-8">
+          <div class="panel-body" id="view_message"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-	$(document).ready(function(){
-		$("tr").on("click",function(){
-			$("tr").css('background-color', 'white');
-			$(this).css('background-color', '#96D7FE');
-			$.get($(this).attr("message"),function(data){
-				$("#view_message").html(data);
-			});
-		});
-		var dt=$('#users').DataTable({
-			'bPaginate':false,
-			"bInfo":false,
-			"dom": 'flpt',
-			"aaSorting": [[0, "desc"]]
-		});
-	});
+  $(document).ready(function(){
+    $("tr").on("click",function(){
+      $("tr").css('background-color', 'white');
+      $(this).css('background-color', '#96D7FE');
+      $.get($(this).attr("message"),function(data){
+        $("#view_message").html(data);
+      });
+    });
+    var dt=$('#users').DataTable({
+      'bPaginate':false,
+      "bInfo":false,
+      "dom": 'flpt',
+      "aaSorting": [[0, "desc"]]
+    });
+  });
 </script>

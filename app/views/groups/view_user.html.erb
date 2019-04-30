@@ -1,34 +1,34 @@
 <script type="text/javascript" src="/javascripts/access/table-control.js"></script>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-info">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		<b><%="Access of #{@user.full_name}"%></b> 
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body"> 
-     		<%= form_tag update_access_group_path(@user),{:method=>"post"} do%>  
+  <div class="grid per90 center-block">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%="Access of #{@user.full_name}"%></b>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <%= form_tag update_access_group_path(@user),{:method=>"post"} do%>
           <div class="row">
             <div class="col-sm-6 col-md-6 col-lg-6">
               <div class="panel panel-success">
                 <div class="panel-heading">
                   <div class="panel-title">
-                    <b>Applied Rules</b> 
+                    <b>Applied Rules</b>
                   </div>
                 </div>
-                <div class="panel-body"> 
+                <div class="panel-body">
                   <div class="table-responsive">
                     <table id="included"class="table table-bordered">
                       <thead><tr>
                         <%@headers.each do |header|%>
                           <th><%=header[:title]%></th>
-                        <%end%>    
+                        <%end%>
                         <th>Edit</th>
                       </tr></thead>
                       <tbody>
                         <%@access.each do |a|%>
-                          <tr aid="<%=a.id%>">     
+                          <tr aid="<%=a.id%>">
                             <%@headers.each do |header|%>
                               <td><%=a.send(header[:field])%></td>
                             <%end%>
@@ -45,21 +45,21 @@
               <div class="panel panel-danger">
                 <div class="panel-heading">
                   <div class="panel-title">
-                    <b>Unapplied Rules</b> 
+                    <b>Unapplied Rules</b>
                   </div>
                 </div>
-                <div class="panel-body"> 
+                <div class="panel-body">
                   <div class="table-responsive">
                     <table id="candidates"class="table table-bordered">
                       <thead><tr>
                         <%@headers.each do |header|%>
                           <th><%=header[:title]%></th>
-                        <%end%>    
+                        <%end%>
                         <th>Action</th>
                       </tr></thead>
                       <tbody>
                         <%@unapplied.each do |a|%>
-                          <tr aid="<%=a.id%>">     
+                          <tr aid="<%=a.id%>">
                             <%@headers.each do |header|%>
                               <td><%=a.send(header[:field])%></td>
                             <%end%>
@@ -80,10 +80,10 @@
             <%=link_to "Cancel", groups_path, :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right"%>
           </div>
         <%end%>
-      </div> 
-    </div>       
-	</div> 
-</div>  
+      </div>
+    </div>
+  </div>
+</div>
 <style>
 .table th {
   text-align: center;

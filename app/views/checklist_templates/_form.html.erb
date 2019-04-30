@@ -4,59 +4,59 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%=render "shared/alerts" %>
-		<%=form_for @checklist_template, :html => {:multipart => true} do |f|%>
-			<div class="panel panel-steelblue">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<%=@title%>
-					</div>
-				</div>
-				<div class="panel-body">
-					<%=f.hidden_field :created_by, :value => current_user.id%>
-					<%=render '/forms/form_fields', 
-						:f => f, 
-						:fields => @fields, 
-						:record => @checklist_template%>
-				</div>
-			</div>
-			<%=render "upload_checklist_questions"%>
-			<div class="panel panel-lightskyblue">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<div class="top_text">Questions</div>
-					</div>
-				</div>
-				<div class="panel-body">
-					<table class="table table-bordered">
-						<thead>
-							<th style="width: 1%;">Header?</th>
-							<th style="width: 9%;">#</th>
-							<th style="width: 70%;">Question</th>
-							<th style="width: 10%;">FAA Reference</th>
-							<th style="width: 10%;">Airline Reference</th>
-							<th style="width: 5%;">Action</th>
-						</thead>
-						<tbody class="sortable" id="checklist_questions">
-							<%@checklist_template.checklist_questions.where(archive: 0).each_with_index do |question, index|%>
-								<%=f.fields_for :checklist_questions, question do |question_form| %>
-									<%=render "checklist_question_fields", 
-										:checklist_question => question, 
-										:f => question_form, 
-										:source => "Existing"%>
-								<%end%>
-							<%end%>
-						</tbody>
-					</table>
-					<%=link_to_add_fields "Add Question", f, :checklist_questions%>
-					<%=submit_tag "Save Template", 
-						:class => "btn btn-success pull-right mt20",
-						:disable_with => "Saving..."%>
-				</div>
-			</div>
-		<%end%>
-	</div>
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts" %>
+    <%=form_for @checklist_template, :html => {:multipart => true} do |f|%>
+      <div class="panel panel-steelblue">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <%=@title%>
+          </div>
+        </div>
+        <div class="panel-body">
+          <%=f.hidden_field :created_by, :value => current_user.id%>
+          <%=render '/forms/form_fields',
+            :f => f,
+            :fields => @fields,
+            :record => @checklist_template%>
+        </div>
+      </div>
+      <%=render "upload_checklist_questions"%>
+      <div class="panel panel-lightskyblue">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <div class="top_text">Questions</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <table class="table table-bordered">
+            <thead>
+              <th style="width: 1%;">Header?</th>
+              <th style="width: 9%;">#</th>
+              <th style="width: 70%;">Question</th>
+              <th style="width: 10%;">FAA Reference</th>
+              <th style="width: 10%;">Airline Reference</th>
+              <th style="width: 5%;">Action</th>
+            </thead>
+            <tbody class="sortable" id="checklist_questions">
+              <%@checklist_template.checklist_questions.where(archive: 0).each_with_index do |question, index|%>
+                <%=f.fields_for :checklist_questions, question do |question_form| %>
+                  <%=render "checklist_question_fields",
+                    :checklist_question => question,
+                    :f => question_form,
+                    :source => "Existing"%>
+                <%end%>
+              <%end%>
+            </tbody>
+          </table>
+          <%=link_to_add_fields "Add Question", f, :checklist_questions%>
+          <%=submit_tag "Save Template",
+            :class => "btn btn-success pull-right mt20",
+            :disable_with => "Saving..."%>
+        </div>
+      </div>
+    <%end%>
+  </div>
 </div>
 
 

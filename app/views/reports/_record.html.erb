@@ -1,26 +1,26 @@
 <%@record = record%>
 
 <div class="panel panel-lightskyblue">
-	<div class="panel-heading">
-		<div class="panel-title">
-			<b><%=@record.template.name%> Report #<%=@record.get_id%></b>
-			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
-				<span class="glyphicon glyphicon-remove"></span>
-			</button>
-		</div> 
-	</div>
-	<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
-		<div class="row" id="fields">
-			<div class="col-xs-12">
-				<%=render "/records/show_template_fields", :record => @record%>
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b><%=@record.template.name%> Report #<%=@record.get_id%></b>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
+  </div>
+  <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+    <div class="row" id="fields">
+      <div class="col-xs-12">
+        <%=render "/records/show_template_fields", :record => @record%>
 
-				<%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => false%>
-				<%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => false%>
-				<%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => false%>
-				<%=render '/causes/all', :owner => @record, :cause_type => 'reaction', :can_change => false%>
-				<%=render '/causes/all', :owner => @record, :cause_type => 'suggestion', :can_change => false%>
-		
-			</div>
-		</div>   
-	</div>
+        <%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => false%>
+        <%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => false%>
+        <%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => false%>
+        <%=render '/causes/all', :owner => @record, :cause_type => 'reaction', :can_change => false%>
+        <%=render '/causes/all', :owner => @record, :cause_type => 'suggestion', :can_change => false%>
+
+      </div>
+    </div>
+  </div>
 </div>

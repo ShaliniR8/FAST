@@ -23,10 +23,10 @@
       margin: 40px 0px 0px 100px;
     }
   }
-  
+
   <% if @modules && @modules.size % 2 == 0 %>
     .gatewayModules{
-      float: left; 
+      float: left;
       width: 49%;
     }
   <% end %>
@@ -82,7 +82,7 @@
           <br/> <br/>
           <br/> <br/>
           <br/> <br/>
-          <br/> <br/>   
+          <br/> <br/>
           <div style="text-align: center">
             <a href="/water_home" class="gatewayModules"><img src="/images/storm_icon_square.png" alt="" width="150px" /></a>
             <a href="/notam_home" class="gatewayModules"><img src="/images/notams_icon_square.png" alt="" width="150px" /></a>
@@ -92,8 +92,8 @@
           <br/> <br/>
           <br/> <br/>
           <br/> <br/>
-          <br/> <br/> 
-        <%end%>              
+          <br/> <br/>
+        <%end%>
       </fieldset>
     <% end %>
 
@@ -101,7 +101,7 @@
       <!-- Do not combine this if to ensure if custom but dont have access to systems -->
       <% if @systems.present? %>
         <fieldset class="greyFields">
-          <legend>SYSTEMS</legend> 
+          <legend>SYSTEMS</legend>
           <div style="text-align: center">
             <div>
               <% @systems.each do |s| %>
@@ -113,7 +113,7 @@
       <% end %>
     <% else %>
       <fieldset class="greyFields">
-        <legend>SYSTEMS</legend> 
+        <legend>SYSTEMS</legend>
         <div style="text-align: center">
           <div><a href="https://smsdemo.prodigiq.com/" class="gatewaySystems"><img src="/images/smsBackground_small.jpg"  class="systemImage" alt="" height="110px"/><p>Safety Management</p></a></div>
           <div><a href="https://leasedemo.prodigiq.com/" class="gatewaySystems"><img src="/images/leasePortalImage_small.gif" class="systemImage" alt="" height="110px"/><p>Lease Management</p></a></div>
@@ -122,6 +122,6 @@
         </div>
       </fieldset>
     <% end %>
-    <br/> 
+    <br/>
   </div>
 </html>

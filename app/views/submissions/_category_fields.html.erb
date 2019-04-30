@@ -1,84 +1,84 @@
 <div class="col-sm-12 col-md-12 col-lg-12"%>
-	<div class="panel <%=@cat.panel%>">
-		<div class="panel-heading click-heading collapsed">
-			<div class="panel-title">
-				<%=@cat.title%>
-				<span class="pull-right clickable">
-					<i class="mt5 glyphicon glyphicon-chevron-down"></i>
-				</span>
-			</div> 
-		</div>
-		<div class="panel-body" style="display:none">
+  <div class="panel <%=@cat.panel%>">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <%=@cat.title%>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
+      </div>
+    </div>
+    <div class="panel-body" style="display:none">
 
-			<div class="row" id="fields">
+      <div class="row" id="fields">
 
-				<div class="col-xs-12">
-					<font style="color:blue;font-weight:bold"><%=@cat.description%></font>
-				</div>
+        <div class="col-xs-12">
+          <font style="color:blue;font-weight:bold"><%=@cat.description%></font>
+        </div>
 
-				<%@cat.fields.where(deleted: false, :nested_field_id => nil).order(:field_order).each do |field|%>
+        <%@cat.fields.where(deleted: false, :nested_field_id => nil).order(:field_order).each do |field|%>
 
-					<%=render "/submissions/field", :field => field, :f => f%>
+          <%=render "/submissions/field", :field => field, :f => f%>
 
-					<%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-						<div class="form-group nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>" 
-							style="display:none;">
-							<%=f.fields_for :submission_fields do |nf|%>
-								<%=render "/submissions/field", :field => nested_field, :f => nf%>
-							<%end%>
-						</div>
-					<%end%>
+          <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+            <div class="form-group nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+              style="display:none;">
+              <%=f.fields_for :submission_fields do |nf|%>
+                <%=render "/submissions/field", :field => nested_field, :f => nf%>
+              <%end%>
+            </div>
+          <%end%>
 
-				<%end%>      
-			</div>
-		</div>
-	</div>
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <style>
-	.smallselect {
-		position: relative;
-		top: 50%;
-	}
+  .smallselect {
+    position: relative;
+    top: 50%;
+  }
 </style>
 
 
 
 <script>
-	$(document).ready(function(){
+  $(document).ready(function(){
 
 
-		$(".field_select").on("change", function(){
-			var field_id = $(this).attr("data-id");
-			var field_value = $(this).val();
-			$(".nested_field_" + field_id).hide();
-			$(".nested_field_" + field_id + "_" + field_value).show();
-		});
+    $(".field_select").on("change", function(){
+      var field_id = $(this).attr("data-id");
+      var field_value = $(this).val();
+      $(".nested_field_" + field_id).hide();
+      $(".nested_field_" + field_id + "_" + field_value).show();
+    });
 
 
 
-		$(".required_field").css('border-color', '');
-		$(".required_field").closest('.form-group').find('label').css("color", "red");
-		$(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').css("color", "red");
-		$(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').value = "*" ;
-		$("form").on('submit',function(){
+    $(".required_field").css('border-color', '');
+    $(".required_field").closest('.form-group').find('label').css("color", "red");
+    $(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').css("color", "red");
+    $(".required_field").closest('div.<%=@cat.panel%>').find('.panel-title').value = "*" ;
+    $("form").on('submit',function(){
 
-			$(this).find('.required_field').each(function(){
-				$(this).closest('.inputgroup').find('h5').css("color", "red");
-				if ($(this).val() == ""){
-					$(this).css('border-color', 'red');   
-					$(this).closest('div.<%=@cat.panel%>').removeClass('collapsed');
-					$(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-					$(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideDown();
-					event.preventDefault();
-				}else{
-					$(".required_field").css('border-color', '');
-					$(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideUp();
-					$(this).closest('div.<%=@cat.panel%>').addClass('collapsed');
-					$(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-				}
-			});
-		});
-	});
+      $(this).find('.required_field').each(function(){
+        $(this).closest('.inputgroup').find('h5').css("color", "red");
+        if ($(this).val() == ""){
+          $(this).css('border-color', 'red');
+          $(this).closest('div.<%=@cat.panel%>').removeClass('collapsed');
+          $(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+          $(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideDown();
+          event.preventDefault();
+        }else{
+          $(".required_field").css('border-color', '');
+          $(this).closest('div.<%=@cat.panel%>').find('.panel-body').slideUp();
+          $(this).closest('div.<%=@cat.panel%>').addClass('collapsed');
+          $(this).closest('div.<%=@cat.panel%>').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+        }
+      });
+    });
+  });
 </script>

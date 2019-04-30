@@ -2,9 +2,9 @@
 <%= render partial: "analytics_data.js.erb", locals: {type: :all} %>
 // console.log("<%=session[:mode]%>");
 var params = {
-  	startDate: "<%= @start_date %>",
-  	endDate: "<%= @end_date %>",
-  	<% if @emp_groups && @emp_groups.length > 0 %>employeeGroups: ['<%= @emp_groups.join("','") %>'] <% end %>
+    startDate: "<%= @start_date %>",
+    endDate: "<%= @end_date %>",
+    <% if @emp_groups && @emp_groups.length > 0 %>employeeGroups: ['<%= @emp_groups.join("','") %>'] <% end %>
     <% if @feeder_operators && @feeder_operators.length > 0 %>feederOperators: ['<%= @feeder_operators.join("','") %>'] <% end %>
 }
 
@@ -12,35 +12,35 @@ $("#calendar-parent").html("<%= escape_javascript(render('calendar')) %>");
 
 // console.log("params=", params);
 <% if session[:mode] == "ASAP" %>
-  	drawChartsubs(submissionData,   params);
-  	drawChart(recordData,           params, "records",         "records_download",         "<%= records_path %>");
-  	drawChart(reportData,           params, "reports",         "reports_download",         "<%= reports_path %>");
-  	drawChart(correctiveActionData, params, "cas",             "cas_download",             "<%= corrective_actions_path %>");
+    drawChartsubs(submissionData,   params);
+    drawChart(recordData,           params, "records",         "records_download",         "<%= records_path %>");
+    drawChart(reportData,           params, "reports",         "reports_download",         "<%= reports_path %>");
+    drawChart(correctiveActionData, params, "cas",             "cas_download",             "<%= corrective_actions_path %>");
 <% elsif session[:mode] == "SMS IM" %>
-  	drawChart(frameworkData,        params, "frameworks",      "frameworks_download",      "<%= ims_path %>", "FrameworkIm");
-  	drawChart(vpData,               params, "vps",             "vps_download",             "<%= ims_path %>", "VpIm");
-  	drawChart(jobaidData,           params, "jobaids",         "jobaids_download",         "<%= ims_path %>", "JobAid");
-  	drawChart(fpData,               params, "fp",              "fp_download",              "<%= packages_path %>", "FrameworkImPackage");
-  	drawChart(vppData,              params, "vpp",             "vpp_download",             "<%= packages_path%>", "VpImPackage");
-  	drawChart(japData,              params, "jap",             "jap_download",             "<%= packages_path %>", "JobAidPackage");
+    drawChart(frameworkData,        params, "frameworks",      "frameworks_download",      "<%= ims_path %>", "FrameworkIm");
+    drawChart(vpData,               params, "vps",             "vps_download",             "<%= ims_path %>", "VpIm");
+    drawChart(jobaidData,           params, "jobaids",         "jobaids_download",         "<%= ims_path %>", "JobAid");
+    drawChart(fpData,               params, "fp",              "fp_download",              "<%= packages_path %>", "FrameworkImPackage");
+    drawChart(vppData,              params, "vpp",             "vpp_download",             "<%= packages_path%>", "VpImPackage");
+    drawChart(japData,              params, "jap",             "jap_download",             "<%= packages_path %>", "JobAidPackage");
 <% elsif session[:mode] == "SMS" %>
-  	drawChart(auditData,            params, "audits",          "audits_download",          "<%= audits_path %>");
-  	drawChart(inspectionData,       params, "inspections",     "inspections_download",     "<%= inspections_path %>");
-  	drawChart(evaluationData,       params, "evaluations",     "evaluations_download",     "<%= evaluations_path %>");
-  	drawChart(investigationData,    params, "investigations",  "investigations_download",  "<%= investigations_path %>");
-  	drawChart(findingData,          params, "findings",        "findings_download",        "<%= findings_path %>");
-  	drawChart(correctiveActionData, params, "actions",         "actions_download",         "<%= sms_actions_path %>");
-  	drawChart(recommendationData,   params, "recommendations", "recommendations_download", "<%= recommendations_path %>");
+    drawChart(auditData,            params, "audits",          "audits_download",          "<%= audits_path %>");
+    drawChart(inspectionData,       params, "inspections",     "inspections_download",     "<%= inspections_path %>");
+    drawChart(evaluationData,       params, "evaluations",     "evaluations_download",     "<%= evaluations_path %>");
+    drawChart(investigationData,    params, "investigations",  "investigations_download",  "<%= investigations_path %>");
+    drawChart(findingData,          params, "findings",        "findings_download",        "<%= findings_path %>");
+    drawChart(correctiveActionData, params, "actions",         "actions_download",         "<%= sms_actions_path %>");
+    drawChart(recommendationData,   params, "recommendations", "recommendations_download", "<%= recommendations_path %>");
 <% elsif session[:mode] == "SRM" %>
-  	drawChart(sraData,              params, "sras",            "sras_download",            "<%= sras_path %>");
-  	drawChart(hazardData,           params, "hazards",         "hazards_download",         "<%= hazards_path %>");
-  	drawChart(riskControlData,          params, "risk_controls",   "risk_controls_download",   "<%= risk_controls_path %>");
-  	drawChart(safetyPlanData,       params, "safety_plans",    "safety_plans_download",    "<%= safety_plans_path %>");
+    drawChart(sraData,              params, "sras",            "sras_download",            "<%= sras_path %>");
+    drawChart(hazardData,           params, "hazards",         "hazards_download",         "<%= hazards_path %>");
+    drawChart(riskControlData,          params, "risk_controls",   "risk_controls_download",   "<%= risk_controls_path %>");
+    drawChart(safetyPlanData,       params, "safety_plans",    "safety_plans_download",    "<%= safety_plans_path %>");
 <% end %>
 // console.log("start-date=", "<%=@start_date%>");
 <% Rails.logger.debug "before render, start_date=#{@start_date}" %>
 <% if BaseConfig.airline[:base_risk_matrix] %>
-  	$("#risk-matrix-parent").html("<%= escape_javascript(render('risk_matrix'))%><%= escape_javascript(render('after_matrix')) %>")
+    $("#risk-matrix-parent").html("<%= escape_javascript(render('risk_matrix'))%><%= escape_javascript(render('after_matrix')) %>")
 <% else %>
-  	$("#risk-matrix-parent").html('<%= escape_javascript(render("shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"))%><%= escape_javascript(render("shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix")) %>')
+    $("#risk-matrix-parent").html('<%= escape_javascript(render("shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"))%><%= escape_javascript(render("shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix")) %>')
 <% end %>

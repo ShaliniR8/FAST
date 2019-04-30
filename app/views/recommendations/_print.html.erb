@@ -1,10 +1,10 @@
 <div class="title">
-	Recommendation #<%=owner.get_id%>: <%=owner.title%>
+  Recommendation #<%=owner.get_id%>: <%=owner.title%>
 </div>
 
 <%=render "/forms/print_fields",
-	:fields => Recommendation.get_meta_fields('show'),
-	:owner => owner,
-	:deidentified => deidentified%>
+  :fields => Recommendation.get_meta_fields('show'),
+  :owner => owner,
+  :deidentified => deidentified%>
 
 <%=render '/forms/print_descriptions', :descriptions => owner.descriptions, :title => "Descriptions"%>

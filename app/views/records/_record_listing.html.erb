@@ -1,64 +1,64 @@
 <div class="col-xs-12 col-sm-12">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>Reports Table</b>
-			</div>
-		</div>
-		<div class="panel-body">
-			<div class="table-responsive">
-				<table id="records_table" class="table table-hover table-striped table-bordered" width="100%">
-					<thead>
-						<tr>
-							<%@headers.each do |header|%>
-								<th class="<%=header[:size]%>">
-									<%=header[:title]%>
-								</th>
-							<%end%>
-						</tr>
-					</thead>
-					<tbody>
-						<%@records.each do |record|%>
-							<tr record_id="<%=record.id%>">
-								<%@headers.each do |header|%>
-									<%if header[:param].present?%>
-										<td><%=record.send(header[:field],header[:param])%></td>
-									<%else%>
-										<td><%=record.send(header[:field])%></td>
-									<%end%>
-								<%end%>
-							</tr>
-						<%end%>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Reports Table</b>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="table-responsive">
+        <table id="records_table" class="table table-hover table-striped table-bordered" width="100%">
+          <thead>
+            <tr>
+              <%@headers.each do |header|%>
+                <th class="<%=header[:size]%>">
+                  <%=header[:title]%>
+                </th>
+              <%end%>
+            </tr>
+          </thead>
+          <tbody>
+            <%@records.each do |record|%>
+              <tr record_id="<%=record.id%>">
+                <%@headers.each do |header|%>
+                  <%if header[:param].present?%>
+                    <td><%=record.send(header[:field],header[:param])%></td>
+                  <%else%>
+                    <td><%=record.send(header[:field])%></td>
+                  <%end%>
+                <%end%>
+              </tr>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-	$(function(){
+  $(function(){
 
-		$('#records_table tbody tr').on('click',function() {     
-			window.open("/<%="#{@table_name}"%>/" + $(this).attr('record_id'), '_blank');
-		});
-		
-		$('#records_table').DataTable({
-			dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
-					 "<'row'<'col-sm-12'tr>>" +
-					 "<'row'<'col-sm-5'i><'col-sm-7'p>>" + 
-					 "<'row'<'col-sm-12'B>>",
-			buttons: [
-				'copy', 'csv', 'excel', 'print'
-				//"pdf"//bug in pdf button for buttons 1.5.1 https://datatables.net/forums/discussion/46395/pdf-export-button-spinner-not-stopping
-			],
-			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-			"iDisplayLength": 10,
-			"aaSorting": [[0, "desc"]],
-			"columnDefs": [{ type: 'natural', targets: 0 }],
-		});
-	});
-		
+    $('#records_table tbody tr').on('click',function() {
+      window.open("/<%="#{@table_name}"%>/" + $(this).attr('record_id'), '_blank');
+    });
+
+    $('#records_table').DataTable({
+      dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+           "<'row'<'col-sm-12'tr>>" +
+           "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
+           "<'row'<'col-sm-12'B>>",
+      buttons: [
+        'copy', 'csv', 'excel', 'print'
+        //"pdf"//bug in pdf button for buttons 1.5.1 https://datatables.net/forums/discussion/46395/pdf-export-button-spinner-not-stopping
+      ],
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 10,
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+    });
+  });
+
 </script>

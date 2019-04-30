@@ -1,36 +1,36 @@
 <div class="col-xs-12">
-	<div class="panel panel-warning">
-		<div class="panel-heading">
-			<div class="panel-title">News</div>
-		</div>
-		<div class="panel-body" style="height:250px;overflow-y:auto;overflow-x:hidden">
-			<%current_user.notices.reverse.each do |notice|%>
-				<p>
-					<b><%=datetime_to_string(notice.created_at.in_time_zone)%></b>
-					<%=notice.content.html_safe%>
-					<%=link_to '<i style="color:tomato;text-decoration:underline" class="glyphicon glyphicon-remove warning"></i>'.html_safe, 
-						'#',
-						:class => 'remove_btn',
-						"data-id" => notice.id%>
-				</p>
-			<%end%>
-		</div>
-	</div>
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">News</div>
+    </div>
+    <div class="panel-body" style="height:250px;overflow-y:auto;overflow-x:hidden">
+      <%current_user.notices.reverse.each do |notice|%>
+        <p>
+          <b><%=datetime_to_string(notice.created_at.in_time_zone)%></b>
+          <%=notice.content.html_safe%>
+          <%=link_to '<i style="color:tomato;text-decoration:underline" class="glyphicon glyphicon-remove warning"></i>'.html_safe,
+            '#',
+            :class => 'remove_btn',
+            "data-id" => notice.id%>
+        </p>
+      <%end%>
+    </div>
+  </div>
 </div>
 
 
 <script>
-	$(function(){
-		$('.remove_btn').on('click',function(){
-			btn = $(this);
-			$.ajax({
-				url: "<%=notices_path%>" + "/" + $(this).data('id'),
-				type: "delete",
-				success: function(){
-					btn.closest('p').detach();
-				}
-			});
-		});
+  $(function(){
+    $('.remove_btn').on('click',function(){
+      btn = $(this);
+      $.ajax({
+        url: "<%=notices_path%>" + "/" + $(this).data('id'),
+        type: "delete",
+        success: function(){
+          btn.closest('p').detach();
+        }
+      });
+    });
 
-	});
+  });
 </script>
