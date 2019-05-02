@@ -1,63 +1,60 @@
 <div class="col-xs-12">
-  <div class="panel panel-info">
+  <div class="panel clickable panel-lightskyblue">
 
-    <div class="panel-heading">
-      <div class="panel-title"><b>Baseline Risk Assessment</b></div>
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b>Baseline Risk Assessment</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div>
     </div>
 
-    <div class="panel-body">
+    <div class="panel-body" style="display:none">
 
-      <%=f.hidden_field :severity, :value => "", :id => "sev"%>
-      <%=f.hidden_field :likelihood, :value => "", :id => "like"%>
+      <%=f.hidden_field :severity,    :value => "", :id => "sev"%>
+      <%=f.hidden_field :likelihood,  :value => "", :id => "like"%>
+      <%=f.hidden_field :risk_factor, :value => "", :id => "risk_fact"%>
 
-      <div class="row">
+      <%=render "shared/instructions", :instruction =>
+        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."%>
 
-        <div class="form-group col-xs-12">
-          <%=f.label :statement, "Notes"%>
-          <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
-        </div>
-
-        <div class="col-xs-12">
-          <div class="col-xs-12 alert alert-info alert-dismissible show" role="alert">
-            <h4>
-              <b>Instructions:</b>
-              <button type="button" class="close pull-right mr20" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </h4>
-            <p>
-              Select the <b>Baseline Severity</b> and the <b>Baseline Probability</b> from the tables to see Risk.
-            </p>
-          </div>
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-6">
-          <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_risk"%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_probability"%>
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-6">
-          <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_severity"%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/risk_rating"%>
-        </div>
-
+      <div class="form-group col-xs-12">
+        <%=f.label :statement, "Notes"%>
+        <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
       </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_risk"%>
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_probability"%>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_severity"%>
+        <%=render "shared/#{BaseConfig.airline[:code]}/risk_rating"%>
+      </div>
+
     </div>
   </div>
 </div>
 
 <style>
+  .table-centered td,th{
+    text-align: center;
+  }
+  .table-centered th{
+    font-size: 14px;
+  }
   .table-cursor td:hover {
     opacity: 0.8;
     cursor: pointer;
     background-color: #F0F8FF;
   }
-  .table-centered th{
-    font-size: 16px;
+  .table-small th{
+    font-size: 13px !important;
   }
-  .table-fixed { table-layout: fixed; }
+  .table-small td{
+    text-align: left !important;
+    font-size: 12px !important;
+  }
 </style>
-
 
 
 <script>
@@ -152,11 +149,14 @@
 
   function set_risk(row_index,column_index){
     clear_risk();
+    risk_table_def = <%=SCX_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=SCX_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.baseline_risk_td').each(function(){
       if($(this).data("row")==row_index && $(this).data("column")==column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
         $('#sev').val(row_index);
         $('#like').val(column_index);
+        $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
       }
     });
   }
