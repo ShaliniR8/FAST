@@ -3,7 +3,7 @@ class SmsAction < ActiveRecord::Base
   belongs_to  :responsible_user,        foreign_key: "responsible_user_id",       class_name: "User"
   belongs_to  :created_by,              foreign_key: 'created_by_id',             class_name: 'User'
   has_many    :costs,                   foreign_key: "owner_id",                  class_name: "ActionCost",               :dependent => :destroy
-  has_many    :transactions,            foreign_key: "owner_id",                  class_name: "SmsActionTransaction",     :dependent => :destroy
+  has_many    :transactions,            as: :owner,                               :dependent => :destroy
   has_many    :attachments,             foreign_key: 'owner_id',                  class_name: 'SmsActionAttachment',      :dependent => :destroy
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
   has_many    :notices,                 foreign_key: "owner_id",                  class_name: "SmsActionNotice",          :dependent => :destroy
@@ -50,13 +50,13 @@ class SmsAction < ActiveRecord::Base
       {field: 'sms_actions_comment',            title: 'Corrective Action Comment',         num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'final_comment',                  title: 'Final Comment',                     num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
 
-      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',                     title: 'Baseline Likelihood',               num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity',                       title: 'Baseline Severity',                 num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor',                    title: 'Baseline Risk',                     num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',               title: 'Mitigated Likelihood',              num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity_after',                 title: 'Mitigated Severity',                num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor_after',              title: 'Mitigated Risk',                    num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
@@ -110,31 +110,22 @@ class SmsAction < ActiveRecord::Base
 
 
   def create_transaction(action)
-    SmsActionTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
   end
 
 
 
-  def owner_transaction
-    if self.type == "FindingAction"
-      FindingTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.get_id} - #{self.title}",
-        :owner_id => self.finding.id,
-        :stamp => Time.now)
-    elsif self.type == "InvestigationAction"
-      InvestigationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.get_id} - #{self.title}",
-        :owner_id => self.investigation.id,
-        :stamp => Time.now)
-    end
+  def owner_transaction #TODO Ensure polymorphism cooperates with sms_action
+    Transaction.build_for(
+      self.owner,
+      'Add Corrective Action',
+      (session[:simulated_id] || session[:user_id]),
+      :content => "##{self.get_id} - #{self.title}"
+    )
   end
 
 

@@ -137,12 +137,12 @@ class RecommendationsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
     end
     @owner.update_attributes(params[:recommendation])
-    RecommendationTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to recommendation_path(@owner)
   end

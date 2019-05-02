@@ -79,13 +79,12 @@ class HazardsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
     end
     @owner.update_attributes(params[:hazard])
-    HazardTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        stamp:      Time.now,
-        content:    transaction_content
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     redirect_to hazard_path(@owner)
   end
 
@@ -95,7 +94,11 @@ class HazardsController < ApplicationController
     hazard = Hazard.find(params[:id])
     hazard.status = params[:status]
     hazard.close_date = Time.now
-    HazardTransaction.create(:users_id => current_user.id, :action => params[:status], :owner_id => params[:id], :stamp => Time.now)
+    Transaction.build_for(
+      hazard,
+      params[:status],
+      current_user.id,
+    )
     hazard.save
     redirect_to hazard_path(hazard)
   end

@@ -168,13 +168,12 @@ class SmsActionsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
     end
     @owner.update_attributes(params[:sms_action])
-    SmsActionTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to sms_action_path(@owner)
   end

@@ -2,7 +2,7 @@ class Sra < ActiveRecord::Base
 
   has_many :attachments,              :foreign_key => "owner_id",   :class_name => "SraAttachment",       :dependent => :destroy
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
-  has_many :transactions,             :foreign_key => "owner_id",   :class_name => "SraTransaction",      :dependent => :destroy
+  has_many :transactions,             as: :owner,                   :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy
   has_many :notices,                  :foreign_key => "owner_id",   :class_name => "SraNotice",           :dependent => :destroy
   has_many :responsible_users,        :foreign_key => "owner_id",   :class_name => "SraResponsibleUser",  :dependent => :destroy
@@ -148,7 +148,11 @@ class Sra < ActiveRecord::Base
     self.mitigated_severity.present? ?  self.mitigated_severity : []
   end
   def create_transaction(action)
-    SraTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
   end
 
   def approver_name

@@ -2,7 +2,7 @@ class Report < ActiveRecord::Base
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :report_meetings,    foreign_key: 'report_id',   class_name: 'ReportMeeting',      dependent: :destroy
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
-  has_many :transactions,       foreign_key: 'owner_id',    class_name: 'ReportTransaction',  dependent: :destroy
+  has_many :transactions,       as: :owner,  dependent: :destroy
   has_many :attachments,        foreign_key: 'owner_id',    class_name: 'ReportAttachment',   dependent: :destroy
   has_many :agendas,            foreign_key: 'event_id',    class_name: 'AsapAgenda',         dependent: :destroy
   has_many :suggestions,        foreign_key: 'owner_id',    class_name: 'ReportSuggestion',   dependent: :destroy
@@ -86,11 +86,11 @@ class Report < ActiveRecord::Base
   def reopen(new_status)
     self.status = new_status
     self.records.each{|x| x.reopen("Linked");}
-    ReportTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Reopen",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Reopen',
+      (session[:simulated_id] || session[:user_id])
+    )
     self.save
   end
 

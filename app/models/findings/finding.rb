@@ -2,10 +2,11 @@ class Finding < ActiveRecord::Base
   belongs_to  :responsible_user,          foreign_key: "responsible_user_id",     class_name: "User"
   belongs_to  :approver,                  foreign_key: "approver_id",             class_name: "User"
   belongs_to  :created_by,                foreign_key: 'created_by_id',           class_name: 'User'
+  # belongs_to  :owner,                     polymorphic: true
   has_many    :causes,                    foreign_key: "owner_id",                class_name: "FindingCause",             :dependent => :destroy
   has_many    :descriptions,              foreign_key: "owner_id",                class_name: "FindingDescription",       :dependent => :destroy
   has_many    :corrective_actions,        foreign_key: "owner_id",                class_name: "FindingAction",            :dependent => :destroy
-  has_many    :transactions,              foreign_key: "owner_id",                class_name: "FindingTransaction",       :dependent => :destroy
+  has_many    :transactions,              as: :owner,                             dependent: :destroy
   has_many    :recommendations,           foreign_key: "owner_id",                class_name: "FindingRecommendation",    :dependent => :destroy
   has_many    :comments,                  foreign_key: "owner_id",                class_name: "FindingComment",           :dependent => :destroy
   has_many    :attachments,               foreign_key: 'owner_id',                class_name: 'FindingAttachment',        :dependent => :destroy
@@ -145,54 +146,25 @@ class Finding < ActiveRecord::Base
 
 
   def create_finding_transaction
-    FindingTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      'Create',
+      session[:user_id]
     )
-    if self.type == "AuditFinding"
-      AuditTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    elsif self.type == "InspectionFinding"
-      InspectionTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    elsif self.type == "InvestigationFinding"
-      InvestigationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    elsif self.type == "EvaluationFinding"
-      EvaluationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    end
+    Transaction.build_for( #TODO: Ensure Polymorphism for Findings works here
+      self.owner,
+      'Add Finding',
+      (session[:simulated_id] || session[:user_id]),
+      "##{self.get_id} #{self.title}"
+    )
   end
 
 
   def create_transaction(action)
-    FindingTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
     )
   end
 
@@ -212,48 +184,6 @@ class Finding < ActiveRecord::Base
     self.responsible_user.present? ? self.responsible_user.full_name : ""
   end
 
-  def release_actions
-    self.corrective_actions.each do |corrective_action|
-      if corrective_action.status == "Pending Release"
-        CorrectiveActionTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open",
-          :owner_id => corrective_action.id,
-          :stamp => Time.now
-        )
-        FindingTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open Corrective Action",
-          :content => "Corrective Action ##{corrective_action.get_id} #{corrective_action.title}",
-          :owner_id => self.id,
-          :stamp => Time.now
-        )
-        corrective_action.status = "Open"
-        corrective_action.open_date = Time.now.to_date
-        corrective_action.save
-      end
-    end
-    self.recommendations.each do |corrective_action|
-      if corrective_action.status == "Pending Release"
-        RecommendationTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open",
-          :owner_id => corrective_action.id,
-          :stamp => Time.now
-        )
-        FindingTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open Recommendation",
-          :content => "Recommendation ##{corrective_action.get_id} #{corrective_action.title}",
-          :owner_id => self.id,
-          :stamp => Time.now
-        )
-        corrective_action.status = "Open"
-        corrective_action.open_date = Time.now.to_date
-        corrective_action.save
-      end
-    end
-  end
 
   def self.get_yesno
     ['Yes', 'No']

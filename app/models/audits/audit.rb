@@ -10,7 +10,7 @@ class Audit < ActiveRecord::Base
   has_many    :attachments,       foreign_key: 'owner_id',      class_name: 'AuditAttachment',        dependent: :destroy
   has_many    :requirements,      foreign_key: 'owner_id',      class_name: 'AuditRequirement',       dependent: :destroy
   has_many    :items,             foreign_key: 'owner_id',      class_name: 'AuditItem',              dependent: :destroy
-  has_many    :transactions,      foreign_key: 'owner_id',      class_name: 'AuditTransaction',       dependent: :destroy
+  has_many    :transactions,      as: :owner,  dependent: :destroy
   has_many    :comments,          foreign_key: 'owner_id',      class_name: 'AuditComment',           dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',      class_name: 'AuditNotice',            dependent: :destroy
   has_many    :checklist_records, foreign_key: 'owner_id',      class_name: 'AuditChecklistRecord',   dependent: :destroy
@@ -96,11 +96,11 @@ class Audit < ActiveRecord::Base
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      AuditTransaction.create(users_id: (session[:user_id] rescue nil),
-        action: action,
-        owner_id: self.id,
-        content: defined?(session) ? '' : 'Recurring Audit',
-        stamp: Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil),
+        (defined?(session) ? '' : 'Recurring Audit'))
     end
   end
 

@@ -118,13 +118,12 @@ class RiskControlsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
     end
     @owner.update_attributes(params[:risk_control])
-    RiskControlTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to risk_control_path(@owner)
   end

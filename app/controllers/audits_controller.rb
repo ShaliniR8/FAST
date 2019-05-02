@@ -42,18 +42,18 @@ class AuditsController < ApplicationController
       @audit.attachments.push(temp)
     end
     @audit.save
-    AuditTransaction.create(
-      :users_id => current_user.id,
-      :action => "Reoccur",
-      :owner_id => @base.id,
-      :content => "Make Reoccurring Audit: ##{@audit.get_id}",
-      :stamp => Time.now)
-    AuditTransaction.create(
-      :users_id => current_user.id,
-      :action => "Create",
-      :owner_id => @audit.id,
-      :content => "Reoccur Audit: ##{@base.get_id}",
-      :stamp => Time.now)
+    Transaction.build_for(
+      @base,
+      'Reoccur',
+      current_user.id,
+      "Make Reoccurring Audit: ##{@audit.get_id}"
+    )
+    Transaction.build_for(
+      @audit,
+      'Create',
+      current_user.id,
+      "Reoccur Audit: ##{@base.get_id}"
+    )
     redirect_to edit_audit_path(@audit), flash: {success: "This is a reoccurance of #{@base.id}. Update fields as needed"}
   end
 
@@ -127,12 +127,11 @@ class AuditsController < ApplicationController
     else
       content = "Viewer Access Disabled"
     end
-    AuditTransaction.create(
-      :users_id => current_user.id,
-      :action => "Viewer Access",
-      :owner_id => audit.id,
-      :content => content,
-      :stamp => Time.now)
+    Transaction.build_for(
+      @audit,
+      'Viewer Access',
+      current_user.id, content
+    )
     audit.save
     redirect_to audit_path(audit)
   end
@@ -141,7 +140,7 @@ class AuditsController < ApplicationController
 
   def new_contact
     @audit = Audit.find(params[:id])
-    @contact = AuditContact.new
+    @contact = Contact.new
     render :partial => 'contact'
   end
 
@@ -176,11 +175,11 @@ class AuditsController < ApplicationController
         return
       end
     end
-    AuditTransaction.create(
-      :users_id => current_user.id,
-      :action => "Upload Checklist",
-      :owner_id => params[:id],
-      :stamp => Time.now)
+    Transaction.build_for(
+      audit,
+      'Upload Checklist',
+      current_user.id
+    )
     redirect_to audit_path(audit)
   end
 
@@ -237,12 +236,11 @@ class AuditsController < ApplicationController
     end
     @owner.update_attributes(params[:audit])
     @owner.status = update_status || @owner.status
-    AuditTransaction.create(
-      users_id:   current_user.id,
-      action:     params[:commit],
-      owner_id:   @owner.id,
-      content:    transaction_content,
-      stamp:      Time.now
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
     )
     @owner.save
     redirect_to audit_path(@owner)

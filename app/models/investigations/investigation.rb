@@ -15,7 +15,7 @@ class Investigation < ActiveRecord::Base
   has_many :tasks,                      :foreign_key => "owner_id",             :class_name => "InvestigationTask",             :dependent => :destroy
   has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
-  has_many :transactions,               :foreign_key => "owner_id",             :class_name => "InvestigationTransaction",      :dependent => :destroy
+  has_many :transactions,               as: :owner,                             dependent: :destroy
 
   accepts_nested_attributes_for :corrective_actions
   accepts_nested_attributes_for :contacts
@@ -145,11 +145,12 @@ class Investigation < ActiveRecord::Base
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      InvestigationTransaction.create(users_id: (session[:user_id] rescue nil),
-          action: action,
-          owner_id: self.id,
-          content: defined?(session) ? '' : 'Recurring Investigation',
-          stamp: Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil),
+        defined?(session) ? '' : 'Recurring Investigation'
+      )
     end
   end
   def investigation_type

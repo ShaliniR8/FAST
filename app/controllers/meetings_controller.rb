@@ -48,7 +48,11 @@ class MeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id]).becomes(Meeting)
     @meeting.status = "Open"
     @meeting.save
-    MeetingTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id => @meeting.id, :stamp=>Time.now)
+    Transaction.build_for(
+      @meeting.id,
+      'Reopen',
+      current_user.id
+    )
     redirect_to meeting_path(@meeting)
   end
 
@@ -79,12 +83,12 @@ class MeetingsController < ApplicationController
       "Cancellation of Meeting ##{@meeting.get_id}")
 
     @meeting.reports.each do |x|
-      ReportTransaction.create(
-        :users_id => current_user.id,
-        :action => "Meeting Ready",
-        :content => "Meeting Deleted",
-        :owner_id => x.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        x,
+        'Meeting Ready',
+        current_user.id,
+        'Meeting Deleted'
+      )
       x.status = "Meeting Ready"
       x.records.each do |y|
         y.status = "Linked"
@@ -129,17 +133,18 @@ class MeetingsController < ApplicationController
         mr.report=report
         mr.meeting=@meeting
         report.status = "Under Review"
-        ReportTransaction.create(
-          :users_id=>current_user.id,
-          :action=>"Under Review",
-          :content=>"Add to Meeting ##{@meeting.id}",
-          :owner_id=>report.id,:stamp=>Time.now)
-        MeetingTransaction.create(
-          :users_id=>current_user.id,
-          :action=>"Added Event ##{report.get_id}",
-          :content=>"Event ##{report.get_id}",
-          :owner_id => @meeting.id,
-          :stamp=>Time.now)
+        Transaction.build_for(
+          report,
+          'Under Review',
+          current_user.id,
+          "Add to Meeting ##{@meeting.id}"
+        )
+        Transaction.build_for(
+          @meeting,
+          "Added Event ##{report.get_id}",
+          current_user.id,
+          "Event ##{report.get_id}"
+        )
         mr.save
         report.save
       end
@@ -213,7 +218,11 @@ class MeetingsController < ApplicationController
     meeting = Meeting.find(params[:id])
     meeting.status = "Closed"
     meeting.closing_date = Time.now
-    MeetingTransaction.create(:users_id=>current_user.id,:action=>"Meeting Closed",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      meeting,
+      'Meeting Closed',
+      current_user.id
+    )
     if meeting.save
       redirect_to meeting_path(meeting)
     end
@@ -235,18 +244,18 @@ class MeetingsController < ApplicationController
         mr.report = report
         mr.meeting = @owner
         report.status = "Under Review"
-        ReportTransaction.create(
-          :users_id => current_user.id,
-          :action => "Under Review",
-          :content => "Add to Meeting ##{@owner.id}",
-          :owner_id => report.id,
-          :stamp => Time.now)
-        MeetingTransaction.create(
-          :users_id => current_user.id,
-          :action => "Added Event ##{report.get_id}",
-          :content => "Event ##{report.get_id}",
-          :owner_id => @owner.id,
-          :stamp => Time.now)
+        Transaction.build_for(
+          report,
+          'Under Review',
+          current_user.id,
+          "Add to Meeting ##{@owner.id}"
+        )
+        Transaction.build_for(
+          @owner,
+          "Added Event ##{report.get_id}",
+          current_user.id,
+          "Event ##{report.get_id}"
+        )
         mr.save
         report.save
       end
@@ -282,12 +291,12 @@ class MeetingsController < ApplicationController
 
 
     @owner.update_attributes(params[:meeting])
-    MeetingTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to meeting_path(@owner)
 

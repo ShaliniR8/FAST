@@ -44,12 +44,12 @@ class SafetyPlansController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:safety_plan][:status]}"
     end
     @owner.update_attributes(params[:safety_plan])
-    SafetyPlanTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     redirect_to @owner
   end
 
@@ -91,7 +91,11 @@ class SafetyPlansController < ApplicationController
 
   def complete
     safety_plan=SafetyPlan.find(params[:id])
-    SafetyPlanTransaction.create(:users_id=>current_user.id,:action=>"Complete",:owner_id=>safety_plan.id,:stamp=>Time.now)
+    Transaction.build_for(
+      safety_plan,
+      'Complete',
+      current_user.id
+    )
     safety_plan.status="Completed"
     safety_plan.date_completed = Time.now
     if safety_plan.save

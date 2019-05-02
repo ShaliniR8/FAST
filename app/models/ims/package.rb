@@ -12,7 +12,11 @@ class Package < ActiveRecord::Base
   extend AnalyticsFilters
 
   def create_transaction(action)
-    PackageTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      session[:user_id]
+    )
     #ImTransaction.create(:users_id=>session[:user_id],:action=>"Add Package", :content=>"Add Package ##{self.get_id}", :onwer_id=>self.im.id,:stamp=>Time.now)
   end
 

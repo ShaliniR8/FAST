@@ -51,12 +51,12 @@ class EvaluationsController < ApplicationController
     else
       content = "Viewer Access Disabled"
     end
-    EvaluationTransaction.create(
-      :users_id => current_user.id,
-      :action => "Viewer Access",
-      :owner_id => evaluation.id,
-      :content => content,
-      :stamp => Time.now)
+    Transaction.build_for(
+      evaluation,
+      'Viewer Access',
+      current_user.id,
+      content
+    )
     evaluation.save
     redirect_to evaluation_path(evaluation)
   end
@@ -108,12 +108,11 @@ class EvaluationsController < ApplicationController
     end
     @owner.update_attributes(params[:evaluation])
     @owner.status = update_status || @owner.status
-    EvaluationTransaction.create(
-      users_id:   current_user.id,
-      action:     params[:commit],
-      owner_id:   @owner.id,
-      content:    transaction_content,
-      stamp:      Time.now
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
     )
     @owner.save
     redirect_to evaluation_path(@owner)
@@ -236,11 +235,11 @@ class EvaluationsController < ApplicationController
         EvaluationItem.create(row.to_hash.merge({:owner_id => evaluation.id}))
       end
     end
-    EvaluationTransaction.create(
-      :users_id => current_user.id,
-      :action => "Upload Checklist",
-      :owner_id => params[:id],
-      :stamp => Time.now)
+    Transaction.build_for(
+      evaluation,
+      'Upload Checklist',
+      current_user.id
+    )
     redirect_to evaluation_path(evaluation)
   end
 

@@ -6,7 +6,7 @@ class Im < ActiveRecord::Base
   has_many :tasks,foreign_key:'owner_id',class_name:'ImTask', :dependent => :destroy
   has_many :expectations,foreign_key:"owner_id",class_name:"FrameworkExpectation",:dependent => :destroy
   has_many :items,foreign_key:'owner_id',class_name:"ChecklistItem",:dependent => :destroy
-  has_many :transactions,foreign_key:"owner_id",class_name:"ImTransaction",:dependent=>:destroy
+  has_many :transactions,as: :owner,:dependent=>:destroy
   has_many :notices,foreign_key:"owner_id",class_name:"ImNotice",:dependent=>:destroy
   accepts_nested_attributes_for :expectations
   accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
@@ -20,7 +20,11 @@ class Im < ActiveRecord::Base
   extend AnalyticsFilters
 
   def create_transaction(action)
-    ImTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
   end
 
   def completable

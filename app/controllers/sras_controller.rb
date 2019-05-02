@@ -141,13 +141,12 @@ class SrasController < ApplicationController
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
-    SraTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        stamp:      Time.now,
-        content:    transaction_content || ''
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to sra_path(@owner)
   end
@@ -274,8 +273,18 @@ class SrasController < ApplicationController
 
   def carryover
     sra = Sra.find(params[:id])
-    MeetingTransaction.create(:users_id=>current_user.id, :action=>"Carry Over SRA", :content=> "SRA ##{sra.get_id} Carried Over", :owner_id=>sra.meeting.id, :stamp=>Time.now)
-    SraTransaction.create(:users_id=>current_user.id, :action=>"Carried Over", :content=>"SRA Carried Over from Meeting ##{sra.meeting.get_id}", :owner_id=>sra.id, :stamp=>Time.now)
+    Transaction.build_for(
+      sra.meeting,
+      'Carry Over SRA',
+      current_user.id,
+      "SRA ##{sra.get_id} Carried Over"
+    )
+    Transaction.build_for(
+      sra,
+      'Carried Over',
+      current_user.id,
+      "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
+    )
     sra.meeting_id = nil
     sra.status = "New"
     sra.save
@@ -315,7 +324,11 @@ class SrasController < ApplicationController
   def enable
     @sra=Sra.find(params[:id])
     @sra.viewer_access=!@sra.viewer_access
-    SraTransaction.create(:users_id=>current_user.id,:action=>"#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      @sra,
+      "#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
+      current_user.id
+    )
     @sra.save
     redirect_to sra_path(@sra)
   end

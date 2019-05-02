@@ -51,12 +51,12 @@ class InspectionsController < ApplicationController
     else
       content = "Viewer Access Disabled"
     end
-    InspectionTransaction.create(
-      :users_id => current_user.id,
-      :action => "Viewer Access",
-      :owner_id => inspection.id,
-      :content => content,
-      :stamp => Time.now)
+    Transaction.build_for(
+      inspection,
+      'Viewer Access',
+      current_user.id,
+      content
+    )
     inspection.save
     redirect_to inspection_path(inspection)
   end
@@ -104,17 +104,16 @@ class InspectionsController < ApplicationController
         "Inspection ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Inspection Approved')
     when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:inspection][:status]}"
+      transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
     end
     @owner.update_attributes(params[:inspection])
     @owner.status = update_status || @owner.status
-    InspectionTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to inspection_path(@owner)
   end
@@ -228,11 +227,11 @@ class InspectionsController < ApplicationController
         InspectionItem.create(row.to_hash.merge({:owner_id=>inspection.id}))
       end
     end
-    InspectionTransaction.create(
-      :users_id => current_user.id,
-      :action => "Upload Checklist",
-      :owner_id => params[:id],
-      :stamp => Time.now)
+    Transaction.build_for(
+      inspection,
+      'Upload Checklist',
+      current_user.id
+    )
     redirect_to inspection_path(inspection)
   end
 

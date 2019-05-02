@@ -72,10 +72,10 @@ class RecordsController < ApplicationController
   def enable
     record = Record.find(params[:id])
     record.viewer_access = !record.viewer_access
-    RecordTransaction.create(:users_id => current_user.id,
-      :action => "#{(record.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
-      :owner_id => params[:id],
-      :stamp => Time.now)
+    Transaction.build_for(
+      record,
+      "#{(record.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
+      current_user.id)
     record.save
     redirect_to record_path(record)
   end
@@ -95,18 +95,17 @@ class RecordsController < ApplicationController
   def open
     @record = Record.find(params[:id])
     @record.status = 'Open'
-    SubmissionTransaction.create(
-      :users_id => current_user.id,
-      :action => "Open",
-      :content => "Report has been opened.",
-      :owner_id => @record.submission.id,
-      :stamp => Time.now)
-    RecordTransaction.create(
-      :users_id => current_user.id,
-      :action => "Open",
-      :content => "Report Opened.",
-      :owner_id => @record.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      @record.submission,
+      'Open', current_user.id,
+      'Report has been opened.'
+    )
+    Transaction.build_for(
+      @record,
+      'Open',
+      current_user.id,
+      'Report Opened.'
+    )
     notify(
       @record.submission.created_by,
       "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
@@ -201,18 +200,18 @@ class RecordsController < ApplicationController
     end
     if @record.status == "New"
       @record.status = "Open"
-      RecordTransaction.create(
-        :users_id => current_user.id,
-        :action => "Open",
-        :owner_id => params[:id],
-        :stamp => Time.now)
+      Transaction.build_for(
+        @record,
+        'Open',
+        current_user.id
+      )
       if @record.submission.present?
-        SubmissionTransaction.create(
-          :users_id => current_user.id,
-          :action => "Open",
-          :content => "Report has been opened.",
-          :owner_id => @record.submission.id,
-          :stamp => Time.now)
+        Transaction.build_for(
+          @record.submission,
+          'Open',
+          current_user.id,
+          'Report has been opened.'
+        )
         notify(
           @record.submission.created_by,
           "The Report for Submission ##{@record.submission.get_id} has been opened by analyst." +
@@ -437,12 +436,12 @@ class RecordsController < ApplicationController
     end
 
     @owner.update_attributes(params[:record])
-    RecordTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to record_path(@owner)
   end
@@ -535,18 +534,18 @@ class RecordsController < ApplicationController
   def close
     @owner = Record.find(params[:id])
     @owner.status = "Closed"
-    RecordTransaction.create(
-      :users_id => current_user.id,
-      :action => "Close",
-      :owner_id => @owner.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      @owner,
+      'Close',
+      current_user.id
+    )
     if @owner.submission.present?
-      SubmissionTransaction.create(
-        :users_id => current_user.id,
-        :action => "Close",
-        :content => "Report has been closed.",
-        :owner_id => @owner.submission.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        @owner.submission,
+        'Close',
+        current_user.id,
+        'Report has been closed.'
+      )
     end
     @owner.save
     redirect_to record_path(@owner), flash: {success: "Report ##{@owner.id} closed."}

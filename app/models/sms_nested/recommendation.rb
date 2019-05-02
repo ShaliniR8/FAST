@@ -4,7 +4,7 @@ class Recommendation < ActiveRecord::Base
   belongs_to :approver,            foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :created_by,          foreign_key: 'created_by_id',       class_name: 'User'
 
-  has_many :transactions, foreign_key: 'owner_id', class_name: 'RecommendationTransaction', dependent: :destroy
+  has_many :transactions, as: :owner, dependent: :destroy
   has_many :attachments,  foreign_key: 'owner_id', class_name: 'RecommendationAttachment',  dependent: :destroy
   has_many :descriptions, foreign_key: 'owner_id', class_name: 'RecommendationDescription', dependent: :destroy
   has_many :notices,      foreign_key: 'owner_id', class_name: 'RecommendationNotice',      dependent: :destroy
@@ -82,39 +82,26 @@ class Recommendation < ActiveRecord::Base
 
 
   def create_transaction(action)
-    RecommendationTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
     )
   end
 
 
   def create_recommendation_transaction
-    RecommendationTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      'Create',
+      (session[:simulated_id] || session[:user_id])
     )
-    if self.type == "FindingRecommendation"
-      FindingTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Recommendation",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.finding.id,
-        :stamp => Time.now
-      )
-    else
-      InvestigationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Recommendation",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.investigation.id,
-        :stamp => Time.now
-      )
-    end
+    Transaction.build_for(
+      self.owner,
+      'Add Recommendation',
+      (session[:simulated_id] || session[:user_id]),
+      "##{self.get_id} #{self.title}"
+    )
   end
 
 

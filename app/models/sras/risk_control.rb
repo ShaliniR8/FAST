@@ -4,7 +4,7 @@ class RiskControl < ActiveRecord::Base
   belongs_to  :responsible_user,  foreign_key: 'responsible_user_id',   class_name: 'User'
   belongs_to  :hazard,            foreign_key: 'hazard_id'
   has_many    :costs,             foreign_key: 'owner_id',              class_name: 'ControlCost'
-  has_many    :transactions,      foreign_key: 'owner_id',              class_name: 'RiskControlTransaction',   dependent: :destroy
+  has_many    :transactions,      as: :owner,  dependent: :destroy
   has_many    :attachments,       foreign_key: 'owner_id',              class_name: 'RiskControlAttachment',    dependent: :destroy
   has_many    :descriptions,      foreign_key: 'owner_id',              class_name: 'RiskControlDescription',   dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',              class_name: 'RiskControlNotice',        dependent: :destroy
@@ -49,8 +49,17 @@ class RiskControl < ActiveRecord::Base
 
 
   def create_transaction(action)
-    RiskControlTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
-    HazardTransaction.create(:users_id=>session[:user_id], :action=>"Add Risk Control", :content=>"##{self.get_id} #{self.title}",:owner_id=>self.hazard.id, :stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      session[:user_id]
+    )
+    Transaction.build_for(
+      self.hazard,
+      'Add Risk Control',
+      session[:user_id],
+      "##{self.get_id} #{self.title}"
+    )
   end
 
   def release

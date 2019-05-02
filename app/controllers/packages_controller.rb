@@ -47,7 +47,11 @@ class PackagesController < ApplicationController
 
   def close
     package=Package.find(params[:id])
-    PackageTransaction.create(:users_id=>current_user.id,:action=>"Complete",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      package,
+      'Complete',
+      current_user.id
+    )
     package.status="Completed"
     package.date_complete=Time.now.to_date
     if package.save

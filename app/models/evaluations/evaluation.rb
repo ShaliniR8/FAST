@@ -99,11 +99,12 @@ class Evaluation < ActiveRecord::Base
   end
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      EvaluationTransaction.create(users_id: (session[:user_id] rescue nil),
-          action: action,
-          owner_id: self.id,
-          content: defined?(session) ? '' : 'Recurring Evaluation',
-          stamp: Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil),
+        defined?(session) ? '' : 'Recurring Evaluation'
+      )
     end
   end
 

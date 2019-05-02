@@ -39,7 +39,12 @@ class SrmMeetingsController < ApplicationController
 
     #change the status of all linked SRAs
     @meeting.sras.each do |x|
-      SraTransaction.create(:users_id=>current_user.id, :action=>"Open", :content=>"Meeting Deleted", :owner_id=>x.id, :stamp=>Time.now)
+      Transaction.build_for(
+        x,
+        'Open',
+        current_user.id,
+        'Meeting Deleted',
+      )
       x.status = "Open"
       x.meeting_id = nil
       x.save
@@ -92,7 +97,7 @@ class SrmMeetingsController < ApplicationController
     @headers = User.invite_headers
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
-    @sra_headers = Sra.get_headers
+    @sra_headers = Sra.get_meta_fields('form')
     @sras = Sra.where('meeting_id is ? and status = ?', nil, 'Open')
   end
 
@@ -119,7 +124,11 @@ class SrmMeetingsController < ApplicationController
 
   def close
     meeting=Meeting.find(params[:id])
-    MeetingTransaction.create(:users_id=>current_user.id,:action=>"Close",:owner_id=>meeting.id,:stamp=>Time.now)
+    Transaction.build_for(
+      meeting,
+      'Close',
+      current_user.id
+    )
     meeting.status="Closed"
     if meeting.save
       redirect_to srm_meeting_path(meeting)
@@ -135,8 +144,18 @@ class SrmMeetingsController < ApplicationController
         sra = Sra.find(value)
         sra.meeting_id=@meeting.id
         sra.status = "Under Review"
-        SraTransaction.create(:users_id=>current_user.id,:action=>"Under Review",:content=>"Add to Meeting ##{@meeting.id}", :owner_id=>sra.id,:stamp=>Time.now)
-        MeetingTransaction.create(:users_id=>current_user.id, :action=>"Added SRA ##{sra.get_id}",:content=>"SRA ##{sra.get_id}", :owner_id => @meeting.id, :stamp=>Time.now)
+        Transaction.build_for(
+          sra,
+          'Under Review',
+          current_user.id,
+          "Add to Meeting ##{@meeting.id}"
+        )
+        Transaction.build_for(
+          @meeting,
+          "Added SRA ##{sra.get_id}",
+          current_user.id,
+          "SRA ##{sra.get_id}"
+        )
         sra.save
       end
     end
@@ -205,7 +224,11 @@ class SrmMeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id]).becomes(Meeting)
     @meeting.status = "Open"
     @meeting.save
-    MeetingTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id => @meeting.id, :stamp=>Time.now)
+    Transaction.build_for(
+      @meeting,
+      'Reopen',
+      current_user.id
+    )
     redirect_to meeting_path(@meeting)
   end
 

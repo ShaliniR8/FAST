@@ -8,7 +8,7 @@ class Inspection < ActiveRecord::Base
   has_many :requirements,           foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
   has_many :items,                  foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
   has_many :attachments,            foreign_key: 'owner_id',            class_name: 'InspectionAttachment',     dependent: :destroy
-  has_many :transactions,           foreign_key: 'owner_id',            class_name: 'InspectionTransaction',    dependent: :destroy
+  has_many :transactions,           as: :owner,                         dependent: :destroy
   has_many :comments,               foreign_key: 'owner_id',            class_name: 'InspectionComment',        dependent: :destroy
   has_many :notices,                foreign_key: 'owner_id',            class_name: 'InspectionNotice',         dependent: :destroy
 
@@ -106,11 +106,12 @@ class Inspection < ActiveRecord::Base
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      InspectionTransaction.create(users_id: (session[:user_id] rescue nil),
-          action: action,
-          owner_id: self.id,
-          content: defined?(session) ? '' : 'Recurring Inspection',
-          stamp: Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil),
+        defined?(session) ? '' : 'Recurring Inspection'
+      )
     end
   end
 

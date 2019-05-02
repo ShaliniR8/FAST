@@ -8,7 +8,7 @@ class Submission < ActiveRecord::Base
 
   has_many :submission_fields,    foreign_key: "submissions_id",  class_name: "SubmissionField",        :dependent => :destroy
   has_many :attachments,          foreign_key: "owner_id",        class_name: "SubmissionAttachment",   :dependent => :destroy
-  has_many :transactions,         foreign_key: "owner_id",        class_name: "SubmissionTransaction",  :dependent => :destroy
+  has_many :transactions,         as: :owner,                     :dependent => :destroy
   has_many :comments,             foreign_key: "owner_id",        class_name: "SubmissionNote",         :dependent => :destroy
   has_many :notices,              foreign_key: "owner_id",        class_name: "SubmissionNotice",       :dependent => :destroy
 
@@ -133,12 +133,12 @@ class Submission < ActiveRecord::Base
 
 
   def create_transaction
-    SubmissionTransaction.create(
-      :users_id => self.anonymous? ? '' : session[:user_id],
-      :content => "User Submitted Report.",
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Create',
+      self.anonymous? ? '' : (session[:simulated_id] || session[:user_id]),
+      'User Submitted Report.'
+    )
   end
 
 

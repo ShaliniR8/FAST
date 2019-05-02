@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190419231322) do
+ActiveRecord::Schema.define(:version => 20190430155652) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -1341,7 +1341,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.datetime "stamp"
     t.text     "content"
     t.string   "action"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "user_poc_id"
     t.integer  "owner_obj_id"
     t.string   "poc_first_name"

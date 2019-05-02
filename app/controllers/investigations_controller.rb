@@ -128,13 +128,12 @@ class InvestigationsController < ApplicationController
     end
     @owner.update_attributes(params[:investigation])
     @owner.status = update_status || @owner.status
-    InvestigationTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to investigation_path(@owner)
   end
@@ -290,12 +289,11 @@ class InvestigationsController < ApplicationController
       else
         content = "Viewer Access Disabled"
       end
-      InvestigationTransaction.create(
-        :users_id => current_user.id,
-        :action => "Viewer Access",
-        :owner_id => investigation.id,
-        :content => content,
-        :stamp => Time.now
+      Transaction.build_for(
+        investigation,
+        'Viewer Access',
+        current_user.id,
+        content
       )
     investigation.save
     redirect_to investigation_path(investigation)

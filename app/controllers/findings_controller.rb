@@ -80,11 +80,10 @@ class FindingsController < ApplicationController
 
   def open
     f = Finding.find(params[:id])
-    FindingTransaction.create(
-      :users_id => current_user.id,
-      :action => "Open",
-      :owner_id => f.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      f,
+      'Open',
+      current_user.id
     )
     notify(
       f.responsible_user,
@@ -187,12 +186,12 @@ class FindingsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:finding][:status]}"
     end
     @owner.update_attributes(params[:finding])
-    FindingTransaction.create(
-        users_id:     current_user.id,
-        action:       params[:commit],
-        owner_id:     @owner.id,
-        content:    transaction_content,
-        stamp:        Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content,
+    )
     @owner.save
     redirect_to finding_path(@owner)
   end

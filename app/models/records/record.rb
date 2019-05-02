@@ -9,7 +9,7 @@ class Record < ActiveRecord::Base
 
   has_many    :record_fields,       :foreign_key => "records_id",       :class_name => "RecordField",           :dependent => :destroy
   has_many    :attachments,         :foreign_key => "owner_id",         :class_name => "RecordAttachment",      :dependent => :destroy
-  has_many    :transactions,        :foreign_key => "owner_id",         :class_name => "RecordTransaction",     :dependent => :destroy
+  has_many    :transactions,        as: :owner,                         :dependent => :destroy
   has_many    :comments,            :foreign_key => "owner_id",         :class_name => "RecordComment",         :dependent => :destroy
   has_many    :suggestions,         :foreign_key => "owner_id",         :class_name => "RecordSuggestion",      :dependent => :destroy
   has_many    :descriptions,        :foreign_key => "owner_id",         :class_name => "RecordDescription",     :dependent => :destroy
@@ -83,11 +83,11 @@ class Record < ActiveRecord::Base
 
   def reopen(new_status)
     self.status = new_status
-    RecordTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Reopen",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Reopen',
+      (session[:simulated_id] || session[:user_id])
+    )
     self.save
   end
 
@@ -164,12 +164,11 @@ class Record < ActiveRecord::Base
 
 
   def creation_transaction
-    RecordTransaction.create(
-      :users_id => self.anonymous? ? '' : session[:user_id],
-      :action => 'Create',
-      :owner_id => self.id,
-      :content => 'Generated report from user submission',
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      'Create',
+      (self.anonymous? ? '' : session[:user_id]),
+      'Generated report from user submission'
     )
   end
 
@@ -345,12 +344,12 @@ class Record < ActiveRecord::Base
 
   def create_transaction(action, content)
     if !self.changes()['viewer_access'].present?
-      RecordTransaction.create(
-        :users_id => session[:user_id],
-        :action => action,
-        :owner_id => self.id,
-        :content => content,
-        :stamp => Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        (session[:simulated_id] || session[:user_id]),
+        content
+      )
     end
   end
 
