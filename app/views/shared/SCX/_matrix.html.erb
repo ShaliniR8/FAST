@@ -1,4 +1,4 @@
-<div class="col-xs-12 col-lg-12"%>
+<div class="col-xs-12 col-lg-12">
   <div class="panel clickable panel-lightskyblue">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
@@ -12,8 +12,7 @@
       <%=f.hidden_field :risk_factor,:value=>"",:id=>"risk_fact"%>
 
       <%=render "shared/instructions", :instruction =>
-        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."
-      %>
+        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."%>
 
       <div class="form-group col-xs-12">
         <%=f.label :statement, "Notes"%>
