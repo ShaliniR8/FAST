@@ -10,15 +10,12 @@
     <%checklist.checklist_rows.order(:id).each do |checklist_row|%>
       <tr>
         <%checklist_row.checklist_cells.order{|x| x.checklist_header_item.display_order}.each do |checklist_cell|%>
-          <%if checklist_row.is_header && checklist_cell.checklist_header_item.editable%>
-          <%else%>
-            <td>
-              <%=render 'checklist_headers/preview_field',
-                :owner_type => checklist.owner_type,
-                :cell => checklist_cell,
-                :item => checklist_cell.checklist_header_item%>
-            </td>
-          <%end%>
+          <td>
+            <%=render 'checklist_headers/preview_field',
+              :owner_type => checklist.owner_type,
+              :cell => checklist_cell,
+              :item => checklist_cell.checklist_header_item%>
+          </td>
         <%end%>
       </tr>
     <%end%>
