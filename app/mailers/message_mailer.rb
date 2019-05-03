@@ -11,7 +11,7 @@ class MessageMailer < ActionMailer::Base
       if Rails.env.production?
         mail(:to => @user.email,:subject=> "ProSafeT: New Internal Message").deliver
       else
-        puts "New Internal Message @ #{@user.email}"
+        mail(:to => 'noc@prodigiq.com', :subject => "ProSafeT: New Internal Message").deliver
       end
     end
   end
