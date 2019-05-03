@@ -19,41 +19,50 @@
           <%end%>
           <%=f.hidden_field :created_by_id, :value => current_user.id%>
 
-          <p>
-            // TREVOR TODO <br>
-            Define these terms: 
-            Title, Description, Order, Column Name, Input Type, Options, Allow Input, Actions
-          </p>
 
 
         <div class="span4 collapse-group">
-          <a class="btn" data-toggle="collapse" data-target="#viewinstruction">View Instructions &raquo;</a>
-          <div class="collapse" id="viewinstruction">
+          <a class="btn" data-toggle="collapse" data-target="#viewinstructionChecklist">View Instructions &raquo;</a>
+          <div class="collapse" id="viewinstructionChecklist">
             <div class="col-xs-12">
               <div class="col-xs-12 well">
                 <ul>
                   <li>
-                    Re-arrange the order of the columns by sliding the order symbol <span class= "glyphicon glyphicon-move"></span>
+                    Title - label for the Checklist Header that is used for reference.
                   </li>
                   <li>
-                    Select Allow Input to determine whether or not the User can add input to a column.
+                    Description - details information about the checklist header.
                   </li>
                   <li>
-                    Select the Input Type to choose how the options are presented.
+                    <span class= "glyphicon glyphicon-move"></span> - 
+                    Re-arranges the order of the columns.
+                  </li>  
+                  <li>
+                    Column Name - describes the column fields.
+                  </li>                  
+                  <li>
+                    Input Type - choose how the options are presented.
                     <ul>
                       <li>
-                        Text allows the user to input text.
+                        Text - allows the user to input text.
                       </li>
                       <li>
-                        Dropdown allows the user to select from a dropdown field
+                        Dropdown - allows the user to select from a dropdown field.
                       </li>
                       <li>
-                        Radio allows the user to select from buttons
+                        Radio - allows the user to select from buttons.
                       </li>
                     </ul>
                   <li>
-                  </li>
-                  </li>
+                    Options - choices for the input field (options split by semicolon). 
+                  <li>
+                    Allow Input - determines if the User can add input to a column.
+                  </li> 
+                  <li>
+                    <span class= "glyphicon glyphicon-trash"></span> - 
+                    Removes a column.
+                  </li>         
+                </li>
                 </ul>
               </div>
             </div>
