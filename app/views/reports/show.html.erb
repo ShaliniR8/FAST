@@ -105,22 +105,17 @@
                   :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
               <%end%>
               <%if @report.status != "Closed"%>
-                <%=link_to "Close Event",
-                  close_report_path(@report),
-                  :id=>"edit-btn",
-                  :class=>"btn btn-danger pull-right mb5 ml5",
-                  :confirm => "Are you sure?",
-                  :disable_with => "Closing...",
-                  "data-toggle" => "tooltip",
-                  "data-placement" => "top",
-                  :title => "This will close the Event and all the included Reports. No changes can be made after the Event is closed"%>
+                <%=link_to 'Close Event', '#',
+                  :class => 'btn btn-danger close_event_btn pull-right ml5 mb5',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg',
+                  :route => close_report_path(@report, :redirect_path => report_path(@report))%>
               <%end%>
             <%end%>
           </div>
 
           <%=render "closing_note"%>
           <%=render "record_table"%>
-
 
           <%if BaseConfig.airline[:base_risk_matrix]%>
             <%=render "shared/bsk_risk_matrix_show",
@@ -136,8 +131,6 @@
               :owner => @report,
               :show_btns => true %>
           <%end%>
-
-
 
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'description', :can_change => can_change%>
@@ -213,7 +206,12 @@
         $(window).trigger('resize');
       });
     });
-
+    $(".close_event_btn").on('click',function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
   });
 </script>
 

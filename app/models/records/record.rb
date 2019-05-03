@@ -53,6 +53,7 @@ class Record < ActiveRecord::Base
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
       {field: 'get_event_date',        title: 'Event Date/Time',      num_cols: 6,  type: 'text',     visible: 'form,index,show', required: false},
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
+      {field: 'final_comment',         title: 'Final Comment',        num_cols: 12, type: 'text',     visible: 'show',            required: false},
 
       {field: 'likelihood',           title: 'Baseline Likelihood',   num_cols: 12, type: 'text',     visible: 'adv',             required: false},
       {field: 'severity',             title: 'Baseline Severity',     num_cols: 12, type: 'text',     visible: 'adv',             required: false},

@@ -234,6 +234,16 @@ class ReportsController < ApplicationController
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:report][:status]}"
+    when 'Add Meeting Minutes'
+      redirect_path = meeting_path(@owner.meetings.first)
+      MeetingTransaction.create(
+        users_id: current_user.id,
+        action:   params[:commit],
+        owner_id: @owner.meetings.first.id,
+        content:  "#{params[:commit]} - ##{@owner.id}",
+        stamp:    Time.now)
+    when 'Close Event'
+      redirect_path = params[:redirect_path]
     end
 
     @owner.update_attributes(params[:report])
@@ -244,7 +254,7 @@ class ReportsController < ApplicationController
       content:  transaction_content,
       stamp:    Time.now)
     @owner.save
-    redirect_to report_path(@owner)
+    redirect_to redirect_path || report_path(@owner)
   end
 
 
@@ -265,7 +275,9 @@ class ReportsController < ApplicationController
     @fields = Report.get_meta_fields('show')
   end
 
+
   def close
+    @fields = Report.get_meta_fields('close')
     @report = Report.find(params[:id])
     @dispositions = Report.dispositions
     @company_dis = Report.company_dis
@@ -273,9 +285,7 @@ class ReportsController < ApplicationController
     @like = Record.get_likelihood
     risk_matrix_initializer
     form_special_matrix(@report, "report", "severity_extra", "probability_extra")
-    #@report.status="Closed"
-    #@report.save
-    #redirect_to report_path(@report)
+    render :partial => 'reports/close'
   end
 
 

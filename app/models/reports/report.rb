@@ -42,13 +42,13 @@ class Report < ActiveRecord::Base
       {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show', required: true  },
       {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show', required: true  },
       {                                                                                   type: 'newline',  visible: 'form,show'                        },
-      {field: 'num_records',          title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',           required: false },
+      {field: 'included_reports',          title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',           required: false },
 
       {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_label_options },
       {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_venue_options },
       {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'form,show',       required: false },
       {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show', required: true  },
-      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'index,form,show', required: false },
+      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'form,show', required: false },
 
       {field: 'eir',                  title: 'EIR Number',                num_cols: 6,    type: 'text',     visible: 'close',           required: false },
       {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
@@ -80,6 +80,19 @@ class Report < ActiveRecord::Base
       "Under Review"    => { :score => 75,  :color => "warning"},
       "Closed"          => { :score => 100, :color => "success"},
     }
+  end
+
+
+  def included_reports
+    result = ""
+    self.records.each do |record|
+      result += "
+        <a style='font-weight:bold' href='/records/#{record.id}'>
+          ##{record.id}
+          (#{record.created_by.disable ? '<font color="red">Inactive</font>' : '<font color="green">Active</font>'})
+        </a><br>"
+    end
+    result.html_safe
   end
 
 
