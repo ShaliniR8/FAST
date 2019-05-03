@@ -20,7 +20,6 @@
         <div class="col-xs-6"><b>Value:</b></div>
       </div>
 
-
       <div class="search-group row">
         <div class="col-xs-6">
           <%=select_tag :searchterm_1,
@@ -75,7 +74,7 @@
         <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
            <%=select_tag :searchterm_4,
             options_for_select(@terms.map{|x| [x[:title], x[:field]]}.to_h.sort),
-            {:include_blank=>"", :class=>'form-control term mb5'}%>
+            {:include_blank => "", :class => 'form-control term mb5'}%>
         </div>
         <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 field">
            <%=text_field_tag :field_4, nil, {:class=>'form-control search_field mb5'}%>
@@ -118,15 +117,17 @@
     $(".datetimerangepicker").hide();
     $(".unhide").show();
     $(".term").on('change', function(){
-      current_value = $(this).val();
-      selected = $('select option:selected').text();
+      var current_value = $(this).val();
+      var selected = $(this).find('option:selected').text();
       if (current_value.indexOf("date") !== -1 ||
           current_value.indexOf("time") !== -1 ||
           selected.indexOf("Date") !== -1 ||
           selected.indexOf("Time") !== -1){
+        console.log("if");
         $(this).closest(".search-group").find(".field").hide();
         $(this).closest(".search-group").find(".datetimerangepicker").show();
       }else{
+        console.log("else");
         $(this).closest(".search-group").find(".datetimerangepicker").hide();
         $(this).closest(".search-group").find(".field").show();
       }
