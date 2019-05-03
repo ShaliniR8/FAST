@@ -349,49 +349,49 @@ class MeetingsController < ApplicationController
 
 
   def send_message
-    @meeting=Meeting.find(params[:id])
-    invitations=@meeting.invitations
-    users=[]
+    @meeting = Meeting.find(params[:id])
+    invitations = @meeting.invitations
+    users = []
     if !params[:send_to].blank?
-      if params[:send_to]=="All"
-        users+=invitations.map{|x| x.user}
-      elsif params[:send_to]=="Par"
-        users+=invitations.select{|x| x.status!="Rejected"}.map{|x| x.user}
-      elsif params[:send_to]=="Rej"
-        users+=invitations.select{|x| x.status=="Rejected"}.map{|x| x.user}
-      elsif params[:send_to]=="Acp"
-        users+=invitations.select{|x| x.status!="Accepted"}.map{|x| x.user}
-      elsif params[:send_to]=="Pen"
-        users+=invitations.select{|x| x.status=="Pending"}.map{|x| x.user}
+      if params[:send_to] == "All"
+        users += invitations.map{|x| x.user}
+      elsif params[:send_to] == "Par"
+        users += invitations.select{|x| x.status != "Rejected"}.map{|x| x.user}
+      elsif params[:send_to] == "Rej"
+        users += invitations.select{|x| x.status == "Rejected"}.map{|x| x.user}
+      elsif params[:send_to] == "Acp"
+        users += invitations.select{|x| x.status == "Accepted"}.map{|x| x.user}
+      elsif params[:send_to] == "Pen"
+        users += invitations.select{|x| x.status == "Pending"}.map{|x| x.user}
       else
       end
     elsif !params[:message_to].blank?
-      users+=User.find(params[:message_to].values)
+      users += User.find(params[:message_to].values)
       users.keep_if{|u| !u.disable}
     else
     end
     users.push(@meeting.host.user)
     users.uniq!{|x| x.id}
-    file_path=""
-    if !params[:att].blank?
-      uploaded_io = params[:att]
-      file_path=Rails.root.join('public', 'uploads',"message_attachment", SecureRandom.uuid.to_s+ "_"+uploaded_io.original_filename)
-      Rails.logger.debug(file_path)
-      File.open(file_path, 'wb') do |file|
-        file.write(uploaded_io.read)
-      end
+
+    message = Message.create(
+      :subject => params[:subject],
+      :content => params[:message],
+      :link => meeting_path(@meeting),
+      :link_type => 'Meeting',
+      :link_id => @meeting.id,
+      :time => Time.now)
+    sent_from = SendFrom.create(
+      :messages_id => message.id,
+      :users_id => current_user.id)
+    users.each do |user|
+      SendTo.create(
+        :messages_id => message.id,
+        :users_id => user.id)
+      notify(User.find(user),
+        "You have a new internal message sent from Meeting. " + g_link(message),
+        true, 'New Internal Meeting Message')
     end
-    #host_header="From "+@meeting.host.user.full_name+":<br>"
-    host_header = "From " + current_user.full_name + ":<br>"
-    users.each do |u|
-      notify(
-        u,
-        "You have a message sent from Meeting ##{@meeting.get_id}. Please check your email for details." +
-          g_link(@meeting),
-        true,
-        "New Meeting ##{@meeting.get_id} Message")
-    end
-    redirect_to send_success_meetings_path(:meeting=>@meeting)
+    redirect_to meeting_path(@meeting)
   end
 
 

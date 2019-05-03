@@ -14,7 +14,9 @@
     <div class="panel panel-primary">
       <div class="panel-heading">
         <div class="panel-title">
-          <b>Meeting #<%=@meeting.get_id%></b>
+          <div class="top_text">
+            Meeting #<%=@meeting.get_id%>
+          </div>
           <div class="top_buttons pull-right">
             <%if current_user.has_access("meetings","destroy")%>
               <%=link_to 'Delete',srm_meeting_path(@meeting),:method=>"delete",:confirm=>'Please confirm that you want to cancel this meeting. The cancellation cannot be reverted',:class=>"btn btn-danger pull-right"%>
@@ -22,8 +24,10 @@
             <%if current_user.has_access("sms_meetings","edit")&&@meeting.status=="Open"&&@meeting.has_user(current_user)%>
               <%=link_to "Edit", edit_srm_meeting_path(@meeting), :id=>"edit-btn", :class=>"btn btn-warning pull-right mr5", :disable_with => "Editing..."%>
             <%end%>
-            <%=link_to "PDF",print_srm_meeting_path(@meeting,format: :pdf),:class=>"btn btn-info pull-right mr5"%>
-            <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right"%>
+            <%=link_to "PDF",
+              print_srm_meeting_path(@meeting, format: :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5"%>
+            <%=link_to "Expand All","#",:class=>"btn btn-default mr5 expandall pull-right"%>
           </div>
         </div>
       </div>
@@ -61,38 +65,38 @@
             </div>
           </div>
 
-
-
         <%=render "sras"%>
-        <div class="row">
-          <%=render "/audits/show_comment",:owner=>@meeting%>
-        </div>
 
+        <%=render "/audits/show_comment",:owner=>@meeting%>
 
-
-
-        <div class="panel panel-info">
+        <div class="panel panel-lightskyblue">
           <div class="panel-heading click-heading collapsed">
             <div class="panel-title">
-              <b>Participants</b> <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+              <b>Participants</b>
+              <span class="pull-right clickable">
+                <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+              </span>
             </div>
           </div>
-          <div class="panel-body"style="display:none">
-            <div class="row">
-              <div class="col-lg-12">
-                <div class="pull-right mb10">
-                  <%if current_user.has_access("meetings", "edit")%>
-                    <%=link_to "Send Agenda/Notice","#", :id=>"message-btn", :class=>"btn btn-info drop","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-                  <%end%>
-                </div>
-              </div>
+          <div class="panel-body" style="display:none">
+            <div class="pull-right mb10">
+              <%if current_user.has_access("meetings","edit") &&
+                @meeting.status == "Open" &&
+                @meeting.has_user(current_user)%>
+                <%=link_to "Send Agenda/Notice", "#",
+                  :id => "message-btn",
+                  :class => "btn btn-info drop",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
             </div>
-            <%=render "meetings/invite"%>
+            <%=render "/meetings/invite"%>
           </div>
         </div>
+
         <div class="row">
           <%=render "/forms/attachments_show", :owner => @meeting%>
-          <%=render "records/transactions",{:owner=>@meeting}%>
+          <%=render "records/transactions", :owner => @meeting%>
         </div>
       </div>
     </div>

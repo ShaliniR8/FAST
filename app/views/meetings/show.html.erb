@@ -25,7 +25,6 @@
                 :class => "btn btn-danger pull-right"%>
             <%end%>
 
-
             <%if current_user.admin?%>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
@@ -33,7 +32,6 @@
                 "data-toggle" => "modal",
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
-
 
             <%if @meeting.has_user(current_user) && @meeting.status != "Closed"%>
               <%=link_to "Edit",
@@ -115,7 +113,6 @@
 
           <%=render "/audits/show_comment", :owner => @meeting%>
 
-
           <div class="panel panel-lightskyblue">
             <div class="panel-heading click-heading collapsed">
               <div class="panel-title">
@@ -126,21 +123,16 @@
               </div>
             </div>
             <div class="panel-body" style="display:none">
-              <div class="row">
-                <div class="col-xs-12">
-                  <div class="pull-right mb10">
-                    <%if current_user.has_access("meetings","edit") &&
-                      @meeting.status == "Open" &&
-                      @meeting.has_user(current_user)%>
-                      <%=link_to "Send Agenda/Notice",
-                        "#",
-                        :id => "message-btn",
-                        :class => "btn btn-info drop",
-                        "data-toggle" => "modal",
-                        "data-target" => ".bs-example-modal-lg"%>
-                    <%end%>
-                  </div>
-                </div>
+              <div class="pull-right mb10">
+                <%if current_user.has_access("meetings","edit") &&
+                  @meeting.status == "Open" &&
+                  @meeting.has_user(current_user)%>
+                  <%=link_to "Send Agenda/Notice", "#",
+                    :id => "message-btn",
+                    :class => "btn btn-info drop",
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg"%>
+                <%end%>
               </div>
               <%=render "invite"%>
             </div>
