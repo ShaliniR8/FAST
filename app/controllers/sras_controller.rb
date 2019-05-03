@@ -274,8 +274,18 @@ class SrasController < ApplicationController
 
   def carryover
     sra = Sra.find(params[:id])
-    MeetingTransaction.create(:users_id=>current_user.id, :action=>"Carry Over SRA", :content=> "SRA ##{sra.get_id} Carried Over", :owner_id=>sra.meeting.id, :stamp=>Time.now)
-    SraTransaction.create(:users_id=>current_user.id, :action=>"Carried Over", :content=>"SRA Carried Over from Meeting ##{sra.meeting.get_id}", :owner_id=>sra.id, :stamp=>Time.now)
+    MeetingTransaction.create(
+      :users_id => current_user.id,
+      :action => "Carry Over SRA",
+      :content=> "SRA ##{sra.get_id} Carried Over",
+      :owner_id => sra.meeting.id,
+      :stamp => Time.now)
+    SraTransaction.create(
+      :users_id => current_user.id,
+      :action => "Carried Over",
+      :content => "SRA Carried Over from Meeting ##{sra.meeting.get_id}",
+      :owner_id => sra.id,
+      :stamp => Time.now)
     sra.meeting_id = nil
     sra.status = "New"
     sra.save

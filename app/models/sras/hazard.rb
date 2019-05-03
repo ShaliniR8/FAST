@@ -28,16 +28,22 @@ class Hazard < ActiveRecord::Base
 
 
   def self.get_meta_fields(*args)
-    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     return [
-      {field: "get_id",                     title: "Hazard ID",             num_cols: 6,  type: "text",     visible: 'index,show',      required: false},
-      {field: "status",                     title: "Status",                num_cols: 4,  type: "text",     visible: 'index,show',      required: false},
-      {field: "title",                      title: "Hazard Title",          num_cols: 6,  type: "text",     visible: 'form,index,show', required: true},
-      {field: 'get_source',                 title: 'Source of Input',       num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: "description",                title: "Description",           num_cols: 12, type: "textarea", visible: 'form,show'},
-      {field: "get_root_causes",            title: "Root Causes",                         type: "text",     visible: 'index'},
-      {field: "display_before_risk_factor", title: "Baseline Risk",                       type: "text",     visible: 'index',   html_class: "get_before_risk_color" },
-      {field: "display_after_risk_factor",  title: "Mitigated Risk",                      type: "text",     visible: 'index', html_class: "get_after_risk_color"    },
+      {field: "get_id",             title: "Hazard ID",             num_cols: 6,  type: "text",     visible: 'index,show',      required: false},
+      {field: "status",             title: "Status",                num_cols: 4,  type: "text",     visible: 'index,show',      required: false},
+      {field: "title",              title: "Hazard Title",          num_cols: 6,  type: "text",     visible: 'form,index,show', required: true},
+      {field: 'get_source',         title: 'Source of Input',       num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: "description",        title: "Description",           num_cols: 12, type: "textarea", visible: 'form,show'},
+      {field: "get_root_causes",    title: "Root Causes",                         type: "text",     visible: 'index'},
+
+      {field: 'likelihood',         title: 'Baseline Likelihood',   num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity',           title: 'Baseline Severity',     num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor',        title: 'Baseline Risk',         num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+
+      {field: 'likelihood_after',   title: 'Mitigated Likelihood',  num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity_after',     title: 'Mitigated Severity',    num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor_after',  title: 'Mitigated Risk',        num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

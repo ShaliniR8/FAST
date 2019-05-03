@@ -40,9 +40,9 @@ class Sra < ActiveRecord::Base
   def self.progress
     {
       "Assigned"                => { :score => 25,  :color => "default"},
-      "Pending Review"      => { :score => 50,  :color => "warning"},
-      "Pending Approval"    => { :score => 75,  :color => "warning"},
-      "Completed"           => { :score => 100, :color => "success"},
+      "Pending Review"          => { :score => 50,  :color => "warning"},
+      "Pending Approval"        => { :score => 75,  :color => "warning"},
+      "Completed"               => { :score => 100, :color => "success"},
     }
   end
 
@@ -66,7 +66,7 @@ class Sra < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     return [
-      { field: "get_id",                    title: "SRA ID",                                   num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
+      { field: "get_id",                    title: "ID",                                       num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
       { field: "status",                    title: "Status",                                   num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
       {                                                                                                       type: "newline",     visible: 'form,show'},
       { field: "title",                     title: "SRA Title",                                num_cols: 6,   type: "text",        visible: 'index,form,show',   required: false},
