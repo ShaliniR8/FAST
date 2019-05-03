@@ -12,7 +12,9 @@
       <div class="panel panel-steelblue">
         <div class="panel-heading">
           <div class="panel-title">
-            <b>Year <%=@report.year%>, <%=@report.get_fiscal_quarter%></b>
+            <div class="top_text">
+              Year <%=@report.year%>, <%=@report.get_fiscal_quarter%>
+            </div>
             <div class="top_buttons pull-right">
               <%if current_user.has_access("faa_reports","edit")%>
                 <%=link_to "Delete",
@@ -21,12 +23,12 @@
                   :confirm => 'Are you sure?',
                   :class => "btn btn-danger pull-right mr5 mb5"%>
               <%end%>
-              <%=link_to "Download PDF",
+              <%=link_to "PDF",
                 print_faa_report_path(@report,format: :pdf),
-                :class => 'btn btn-info mr5 mb5 pull-right'%>
-              <%=link_to "Download Word",
+                :class => 'btn btn-darkturquoise mr5 mb5 pull-right'%>
+              <%=link_to "Word",
                 export_word_faa_report_path(@report, :format => "docx" ),
-                :class => "btn btn-primary mb5 mr5 pull-right"%>
+                :class => "btn btn-darkturquoise mb5 mr5 pull-right"%>
               <%if current_user.has_access("faa_reports","edit")%>
                 <%=link_to "Edit",
                   "#",
@@ -44,8 +46,7 @@
         <div class="panel-body">
           <div class="row">
             <%if current_user.has_access("faa_reports","enhance")%>
-              <%=link_to 'Add Safety Enhancement',
-                "#",
+              <%=link_to 'Add Safety Enhancement', "#",
                 :class => "pull-right btn btn-success mr20 mb10",
                 "data-toggle" => "modal",
                 "data-target" => ".bs-example-modal-lg",
@@ -56,7 +57,8 @@
           <%=render "member"%>
           <%=render "stats"%>
           <%=render "enhancement"%>
-          </div>
+
+        </div>
       </div>
   </div>
 </div>
