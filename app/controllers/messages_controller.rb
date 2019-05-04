@@ -12,6 +12,7 @@ class MessagesController < ApplicationController
     @users = User.find(:all)
     @users.keep_if{|u| !u.disable}
     @headers = User.invite_headers
+    #render :partial => 'messages/new'
   end
 
 
@@ -72,6 +73,9 @@ class MessagesController < ApplicationController
         @send_to.status = "Replied"
       end
     end
+    # respond_to do |format|
+    #   format.js
+    # end
     redirect_to message_path(@message), flash: {success: "Message sent."}
   end
 

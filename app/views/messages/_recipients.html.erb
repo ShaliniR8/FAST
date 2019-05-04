@@ -32,20 +32,20 @@
               <td>
                 <%if @reply_to.present?%>
                   <%if @reply_to.send_from.user.id==user.id%>
-                    <a class="btn btn-danger send_btn disabled">Send</a>
+                    <a class="btn btn-danger send_btn disabled">TO</a>
                   <%else%>
                     <%if @send_to==user.id%>
-                      <a class="btn btn-danger send_btn disabled">Send</a>
+                      <a class="btn btn-danger send_btn disabled">TO</a>
                     <%else%>
-                      <a class="btn btn-transparent send_btn">Send</a>
+                      <a class="btn btn-transparent send_btn">TO</a>
                       <a class="btn btn-transparent cc_btn">CC</a>
                     <%end%>
                   <%end%>
                 <%else%>
                   <%if @send_to==user.id%>
-                    <a class="btn btn-danger send_btn disabled">Send</a>
+                    <a class="btn btn-danger send_btn disabled">TO</a>
                   <%else%>
-                    <a class="btn btn-transparent send_btn">Send</a>
+                    <a class="btn btn-transparent send_btn">TO</a>
                     <a class="btn btn-transparent cc_btn">CC</a>
                   <%end%>
                 <%end%>

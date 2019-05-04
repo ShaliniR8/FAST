@@ -18,7 +18,9 @@ $(document).ready(function(){
 		}
 	});
 
-	var dt = $('#recipients').DataTable();
+    var dt = $('#recipients').DataTable({
+      "iDisplayLength": 5
+    });
 
 	$('form').on('submit',function(){
 		var count = 0;
@@ -40,7 +42,7 @@ $(document).ready(function(){
 				type: "error",
 			});
 			return false;
-		}	
+		}
 		return true;
 	});
 });

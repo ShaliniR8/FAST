@@ -353,9 +353,7 @@
                 <li>
                   <a href=<%=sent_messages_path%>>Sent</a>
                 </li>
-                <li>
-                  <a href=<%=new_message_path%>>New</a>
-                </li>
+                <li><%=link_to "New", new_message_path%></li>
               </ul>
             </li>
 
@@ -476,9 +474,6 @@
     <script src="/audit_module_public/main_alt.js"></script>
     <script type="text/javascript" src="/javascripts/jQuery-ujs.js"></script>
     <script src="/javascripts/utility/bootstrap.file-input.js"></script>
-
-
-
 
     <%= yield %>
 

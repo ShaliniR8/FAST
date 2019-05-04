@@ -34,12 +34,12 @@
                     Description - details information about the checklist header.
                   </li>
                   <li>
-                    <span class= "glyphicon glyphicon-move"></span> - 
+                    <span class= "glyphicon glyphicon-move"></span> -
                     Re-arranges the order of the columns.
-                  </li>  
+                  </li>
                   <li>
                     Column Name - describes the column fields.
-                  </li>                  
+                  </li>
                   <li>
                     Input Type - choose how the options are presented.
                     <ul>
@@ -54,14 +54,14 @@
                       </li>
                     </ul>
                   <li>
-                    Options - choices for the input field (options split by semicolon). 
+                    Options - choices for the input field (options split by semicolon).
                   <li>
                     Allow Input - determines if the User can add input to a column.
-                  </li> 
+                  </li>
                   <li>
-                    <span class= "glyphicon glyphicon-trash"></span> - 
+                    <span class= "glyphicon glyphicon-trash"></span> -
                     Removes a column.
-                  </li>         
+                  </li>
                 </li>
                 </ul>
               </div>
@@ -127,37 +127,21 @@
 
 <script>
   $(function(){
-
-    $(".archive_btn").on("click", function(){
-      if($(this).text() == "Archive"){
-        $(this).closest("td").find("#archive_field").val(true);
-        $(this).text("Unarchive");
-        $(this).removeClass("btn-warning").addClass("btn-default");
-      }else{
-        $(this).closest("td").find("#archive_field").val(false);
-        $(this).text("Archive");
-        $(this).removeClass("btn-default").addClass("btn-warning");
+    $(".draggableFieldGroup").sortable({
+      handle: $(this, ".drag_and_drop"),
+      forcePlaceholderSize: true,
+      cursor: "move",
+      animation: 100,
+      start: function(event, ui){
+        ui.placeholder.height(ui.item.height());
+        ui.placeholder.width(ui.item.width());
+      },
+      update: function(event, ui){
+        $('.field_group', this).each(function(index, elem) {
+          $('.form-field-order', this).val(index);
+        });
       }
     });
-
-
-
-      $(".draggableFieldGroup").sortable({
-        handle: $(this, ".drag_and_drop"),
-        forcePlaceholderSize: true,
-        cursor: "move",
-        animation: 100,
-        start: function(event, ui){
-          ui.placeholder.height(ui.item.height());
-          ui.placeholder.width(ui.item.width());
-        },
-        update: function(event, ui){
-          $('.field_group', this).each(function(index, elem) {
-            $('.form-field-order', this).val(index);
-          });
-        }
-      });
-
   })
 </script>
 
