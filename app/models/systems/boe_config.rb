@@ -5,6 +5,8 @@ class BOE_Config
       :version                                        => "1.0.2",
 
       :code                                           => "BOE",
+      :time_zone                                      => "Central Time (US & Canada)",
+
       :base_risk_matrix                               => false,
       :has_analytics_filter                           => true,
       :enable_message_mailer                          => true,

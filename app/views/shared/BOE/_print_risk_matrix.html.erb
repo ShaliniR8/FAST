@@ -4,16 +4,16 @@
     <div class="content">
       <%if owner.risk_factor.present? %>
         <div class="col-xs-6">
-          <b>Severity: </b><%= airport_config.print_severity(owner, owner.severity.to_i) %></br>
-          <b>Probability: </b><%= airport_config.print_probability(owner, owner.likelihood.to_i) %></br>
-          <b>Risk: </b><%= owner.risk_factor %></br></br>
+          <b>Baseline Severity: </b><%= airport_config.print_severity(owner, owner.severity.to_i) %></br>
+          <b>Baseline Probability: </b><%= airport_config.print_probability(owner, owner.likelihood.to_i) %></br>
+          <b>Baseline Risk: </b><%= owner.risk_factor %></br></br>
         </div>
       <%end%>
       <%if owner.risk_factor_after.present? %>
         <div class="col-xs-6">
-          <b>Severity after mitigation: </b><%= airport_config.print_severity(owner, owner.severity_after.to_i) %></br>
-          <b>Probability after mitigation: </b><%= airport_config.print_probability(owner, owner.likelihood_after.to_i) %></br>
-          <b>Risk after mitigation: </b><%= owner.risk_factor_after %></br>
+          <b>Mitigated Severity: </b><%= airport_config.print_severity(owner, owner.severity_after.to_i) %></br>
+          <b>Mitigated Probability: </b><%= airport_config.print_probability(owner, owner.likelihood_after.to_i) %></br>
+          <b>Mitigated Risk: </b><%= owner.risk_factor_after %></br>
         </div>
       <%end%>
       <%if owner.statement.present? %>
