@@ -19,6 +19,7 @@
             <%Report.get_meta_fields('index').each do |h|%>
               <th><%=h[:title]%></th>
             <%end%>
+            <th>Meeting Minutes</th>
           </tr>
         </thead>
         <tbody>
@@ -26,18 +27,10 @@
             <tr>
               <%Report.get_meta_fields('index').each do |h|%>
                 <td class="<%=h[:html_class].present? ? report.send(h[:html_class]) : ''%>">
-                  <%case h[:type]%>
-                  <%when 'date'%>
-                    <%=report.send(h[:field]).strftime("%Y-%m-%d") rescue ''%>
-                  <%when 'datetime'%>
-                    <%=report.send(h[:field]).strftime("%Y-%m-%d %H:%M") rescue ''%>
-                  <%when 'textarea'%>
-                    <%=report.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue ''%>
-                  <%else%>
-                    <%=report.send(h[:field])%>
-                  <%end%>
+                  <%=render 'forms/show_field', :field_hash => h, :record => report%>
                 </td>
               <%end%>
+              <td><%=report.minutes%></td>
             </tr>
           <%end%>
         </tbody>

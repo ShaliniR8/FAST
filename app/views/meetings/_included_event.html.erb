@@ -4,6 +4,7 @@
       <%=render "forms/show_field", :record => event, :field_hash => h%>
     </td>
   <%end%>
+  <td><%=event.minutes%></td>
   <td>
     <%if BaseConfig.airline[:view_narrative_from_meeting]%>
       <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
