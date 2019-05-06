@@ -56,24 +56,11 @@
             <div class="pull-right mb10">
               <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
                 <%if @meeting.status == "Open"%>
-
-
-
                   <%=link_to 'Close Meeting', '#',
                     :class => 'btn btn-danger pull-right mr5 mb5',
                     :id => 'close',
                     "data-toggle" => "modal",
                     "data-target" => ".bs-example-modal-lg"%>
-
-                  <%#=link_to "Close Meeting",
-                    close_meeting_path(@meeting),
-                    :class=>"btn btn-danger pull-right mb5",
-                    :confirm => "Are you sure?",
-                    :disable_with => "Closing...",
-                    "data-toggle" => "tooltip",
-                    "data-placement" => "top",
-                    :title => "This will close the current Meeting. No changes can be made after the Meeting is closed"%>
-
                   <%=link_to "Add Comment",
                     "#",
                     :class => "btn btn-success mb5 pull-right mr5",

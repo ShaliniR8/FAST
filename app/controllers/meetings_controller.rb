@@ -252,7 +252,7 @@ class MeetingsController < ApplicationController
     when 'Close'
       send_notices(
         @owner.invitations,
-        "Meeting ##{@owner.get_id} has been Closed.",
+        "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
         true,
         "Meeting ##{@owner.get_id} Closed")
     end

@@ -2,21 +2,22 @@
 # This method is a "monkey patch" that can fix the issue (tested for Rails 3.0.x)
 # Source: https://github.com/rails/rails/issues/11026
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "2.0.0"
-    module ActiveRecord
-        module Associations
-            class AssociationProxy
-                def send(method, *args)
-                    if proxy_respond_to?(method, true)
-                        super
-                    else
-                        load_target
-                        @target.send(method, *args)
-                    end
-                end
-            end
+  module ActiveRecord
+    module Associations
+      class AssociationProxy
+        def send(method, *args)
+          if proxy_respond_to?(method, true)
+            super
+          else
+            load_target
+            @target.send(method, *args)
+          end
         end
+      end
     end
+  end
 end
+
 class SrmMeetingsController < ApplicationController
   before_filter :set_table_name,:login_required
 
@@ -32,10 +33,6 @@ class SrmMeetingsController < ApplicationController
       "Meeting ##{@meeting.get_id} has been cancelled.",
       true,
       "Cancellation of Meeting ##{@meeting.get_id}")
-    @meeting.invitations.each do |p|
-      MeetingMailer.cancel_meeting(p.user,@meeting)
-    end
-    MeetingMailer.cancel_meeting(@meeting.host.user,@meeting)
 
     #change the status of all linked SRAs
     @meeting.sras.each do |x|
@@ -87,10 +84,6 @@ class SrmMeetingsController < ApplicationController
         "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
         true,
         "New Meeting Invitation")
-      @meeting.invitations.each do |p|
-        MeetingMailer.new_meeting(p.user, @meeting)
-      end
-      MeetingMailer.new_meeting(@meeting.host.user, @meeting)
       redirect_to srm_meeting_path(@meeting), flash: {success: "Meeting created."}
     else
       redirect_to new_srm_meeting_path(:type=>params[:type])
@@ -126,78 +119,90 @@ class SrmMeetingsController < ApplicationController
     @fields = SrmMeeting.get_meta_fields('show')
   end
 
+
   def index
     @records=SrmMeeting.find(:all)
     @headers=SrmMeeting.get_headers
     @title="Meetings"
   end
 
+
   def close
-    meeting=Meeting.find(params[:id])
-    MeetingTransaction.create(
-      :users_id => current_user.id,
-      :action => "Close",
-      :owner_id => meeting.id,
-      :stamp => Time.now)
-    meeting.status="Closed"
-    if meeting.save
-      redirect_to srm_meeting_path(meeting)
-    end
+    @owner = Meeting.find(params[:id])
+    render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
   end
 
+
+
   def update
-    @meeting=Meeting.find(params[:id])
-    @meeting.update_attributes(params[:srm_meeting])
+    @owner = Meeting.find(params[:id])
+
     if !params[:sras].blank?
-      @meeting.save
       params[:sras].each_pair do |index, value|
         sra = Sra.find(value)
-        sra.meeting_id=@meeting.id
+        sra.meeting_id = @owner.id
         SraTransaction.create(
           :users_id => current_user.id,
           :action => "Add to Meeting",
-          :content => "Add to Meeting ##{@meeting.id}",
+          :content => "Add to Meeting ##{@owner.id}",
           :owner_id => sra.id,
           :stamp=>Time.now)
         MeetingTransaction.create(
           :users_id => current_user.id,
           :action => "Added SRA",
           :content => "SRA ##{sra.get_id}",
-          :owner_id => @meeting.id,
+          :owner_id => @owner.id,
           :stamp => Time.now)
         sra.save
       end
     end
+
+    case params[:commit]
+    when 'Override Status'
+      transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
+    when 'Close'
+      send_notices(
+        @owner.invitations,
+        "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
+        true,
+        "Meeting ##{@owner.get_id} Closed")
+    end
+
     if params[:invitations].present?
       params[:invitations].each_pair do |index,val|
-        inv=@meeting.invitations.where("users_id=?",val)
+        inv = @owner.invitations.where("users_id=?",val)
         if inv.blank?
-          new_inv=Invitation.new()
-          new_inv.users_id=val
-          new_inv.meeting=@meeting
+          new_inv = Invitation.new()
+          new_inv.users_id = val
+          new_inv.meeting = @owner
           new_inv.save
-          send_notice(
-            new_inv,
-            "You are invited to meeting ##{@meeting.get_id}.  " +
-              g_link(@meeting),
-            @meeting,
-            true)
-          MeetingMailer.new_meeting(new_inv.user,@meeting)
+          send_notice(new_inv,
+            "You are invited to Meeting ##{@owner.get_id}.  " + g_link(@owner),
+            true, "New Meeting Invitation")
         end
       end
     end
     if params[:cancellation].present?
       params[:cancellation].each_pair do |index,val|
-        inv=@meeting.invitations.where("users_id=?",val)
+        inv = @owner.invitations.where("users_id=?",val)
         if inv.present?
-          Rails.logger.debug("Deleting")
-          MeetingMailer.cancel_invitation(inv.first.user,@meeting)
+          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}.", true, "Removed from Meeting")
           inv.first.destroy
         end
       end
     end
-    redirect_to srm_meeting_path(@meeting), flash: {success: "Meeting updated."}
+
+    @owner.update_attributes(params[:meeting])
+    MeetingTransaction.create(
+      users_id: current_user.id,
+      action:   params[:commit],
+      owner_id: @owner.id,
+      content:  transaction_content,
+      stamp:    Time.now)
+    @owner.save
+    redirect_to srm_meeting_path(@owner)
   end
+
 
   def edit
     @meeting = Meeting.find(params[:id])
@@ -244,49 +249,49 @@ class SrmMeetingsController < ApplicationController
   end
 
   def send_message
-    @meeting=Meeting.find(params[:id])
-    invitations=@meeting.invitations
-    users=[]
+    @meeting = Meeting.find(params[:id])
+    invitations = @meeting.invitations
+    users = []
     if !params[:send_to].blank?
-      if params[:send_to]=="All"
-        users+=invitations.map{|x| x.user}
-      elsif params[:send_to]=="Par"
-        users+=invitations.select{|x| x.status!="Rejected"}.map{|x| x.user}
-      elsif params[:send_to]=="Rej"
-        users+=invitations.select{|x| x.status=="Rejected"}.map{|x| x.user}
-      elsif params[:send_to]=="Acp"
-        users+=invitations.select{|x| x.status!="Accepted"}.map{|x| x.user}
-      elsif params[:send_to]=="Pen"
-        users+=invitations.select{|x| x.status=="Pending"}.map{|x| x.user}
+      if params[:send_to] == "All"
+        users += invitations.map{|x| x.user}
+      elsif params[:send_to] == "Par"
+        users += invitations.select{|x| x.status != "Rejected"}.map{|x| x.user}
+      elsif params[:send_to] == "Rej"
+        users += invitations.select{|x| x.status == "Rejected"}.map{|x| x.user}
+      elsif params[:send_to] == "Acp"
+        users += invitations.select{|x| x.status == "Accepted"}.map{|x| x.user}
+      elsif params[:send_to] == "Pen"
+        users += invitations.select{|x| x.status == "Pending"}.map{|x| x.user}
       else
       end
     elsif !params[:message_to].blank?
-      users+=User.find(params[:message_to].values)
+      users += User.find(params[:message_to].values)
+      users.keep_if{|u| !u.disable}
     else
     end
     users.push(@meeting.host.user)
     users.uniq!{|x| x.id}
-    file_path=""
-    if !params[:att].blank?
-      uploaded_io = params[:att]
-      file_path=Rails.root.join('public', 'uploads',"message_attachment", SecureRandom.uuid.to_s+ "_"+uploaded_io.original_filename)
-      Rails.logger.debug(file_path)
-      File.open(file_path, 'wb') do |file|
-        file.write(uploaded_io.read)
-      end
+
+    message = Message.create(
+      :subject => params[:subject],
+      :content => params[:message],
+      :link => srm_meeting_path(@meeting),
+      :link_type => 'Meeting',
+      :link_id => @meeting.id,
+      :time => Time.now)
+    sent_from = SendFrom.create(
+      :messages_id => message.id,
+      :users_id => current_user.id)
+    users.each do |user|
+      SendTo.create(
+        :messages_id => message.id,
+        :users_id => user.id)
+      notify(User.find(user),
+        "You have a new internal message sent from Meeting. " + g_link(message),
+        true, 'New Internal Meeting Message')
     end
-    host_header="From "+@meeting.host.user.full_name+":<br>"
-    users.each do |u|
-      notify(
-        u,
-        "You have a message sent from Meeting ##{@meeting.get_id}. Please check your email for details." +
-          g_link(@meeting),
-        "Meeting",
-        @meeting.id,
-        true)
-      MeetingMailer.meeting_message(u,file_path.to_s,host_header+params[:message],params[:subject])
-    end
-    redirect_to send_success_srm_meetings_path
+    redirect_to srm_meeting_path(@meeting)
   end
 
 
