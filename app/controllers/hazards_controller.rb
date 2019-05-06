@@ -23,10 +23,12 @@ class HazardsController < ApplicationController
     @headers = @table.get_meta_fields('index')
     @table_name = "hazards"
     if !current_user.admin? && !current_user.has_access('sras','admin')
-      cars = Hazard.includes(:sra).where('sras.status in (?) and sras.responsible_user_id = ?',
+      hazards = Hazard.includes(:sra)
+      cars = hazards.where('sras.status in (?) and sras.responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Hazard.includes(:sra).where('sras.approver_id = ? OR sras.reviewer_id = ?',
+      cars += hazards.where('sras.approver_id = ? OR sras.reviewer_id = ?',
         current_user.id, current_user.id)
+      cars += hazards.where('sras.viewer_access = 1') if current_user.has_access('sras','viewer')
       @records = @records & cars
     end
   end
