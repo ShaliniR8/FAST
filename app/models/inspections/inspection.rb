@@ -1,14 +1,16 @@
 class Inspection < ActiveRecord::Base
+
+  include Transactionable
+  include Contactable
+
   belongs_to :approver,             foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :responsible_user,     foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to :created_by,           foreign_key: 'created_by_id',       class_name: 'User'
   has_many :findings,               foreign_key: 'audit_id',            class_name: 'InspectionFinding',        dependent: :destroy
   has_many :tasks,                  foreign_key: 'owner_id',            class_name: 'InspectionTask',           dependent: :destroy
-  has_many :contacts,               foreign_key: 'owner_id',            class_name: 'InspectionContact',        dependent: :destroy
   has_many :requirements,           foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
   has_many :items,                  foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
   has_many :attachments,            foreign_key: 'owner_id',            class_name: 'InspectionAttachment',     dependent: :destroy
-  has_many :transactions,           as: :owner,                         dependent: :destroy
   has_many :comments,               foreign_key: 'owner_id',            class_name: 'InspectionComment',        dependent: :destroy
   has_many :notices,                foreign_key: 'owner_id',            class_name: 'InspectionNotice',         dependent: :destroy
 

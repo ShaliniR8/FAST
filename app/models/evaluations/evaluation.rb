@@ -1,15 +1,17 @@
 class Evaluation < ActiveRecord::Base
+
+  include Transactionable
+  include Contactable
+
   belongs_to  :approver,          foreign_key: 'approver_id',             class_name: 'User'
   belongs_to  :responsible_user,  foreign_key: 'responsible_user_id',     class_name: 'User'
   belongs_to  :created_by,        foreign_key: 'created_by_id',           class_name: 'User'
 
   has_many    :findings,          foreign_key: 'audit_id',                class_name: 'EvaluationFinding',        dependent: :destroy
   has_many    :tasks,             foreign_key: 'owner_id',                class_name: 'EvaluationTask',           dependent: :destroy
-  has_many    :contacts,          foreign_key: 'owner_id',                class_name: 'EvaluationContact',        dependent: :destroy
   has_many    :requirements,      foreign_key: 'owner_id',                class_name: 'EvaluationRequirement',    dependent: :destroy
   has_many    :items,             foreign_key: 'owner_id',                class_name: 'EvaluationItem',           dependent: :destroy
   has_many    :attachments,       foreign_key: 'owner_id',                class_name: 'EvaluationAttachment',     dependent: :destroy
-  has_many    :transactions,      foreign_key: 'owner_id',                class_name: 'EvaluationTransaction',    dependent: :destroy
   has_many    :comments,          foreign_key: 'owner_id',                class_name: 'EvaluationComment',        dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',                class_name: 'EvaluationNotice',         dependent: :destroy
 
@@ -97,16 +99,7 @@ class Evaluation < ActiveRecord::Base
       self.privileges=[]
     end
   end
-  def create_transaction(action)
-    if !self.changes()['viewer_access'].present?
-      Transaction.build_for(
-        self,
-        action,
-        ((session[:simulated_id] || session[:user_id]) rescue nil),
-        defined?(session) ? '' : 'Recurring Evaluation'
-      )
-    end
-  end
+
 
   def clear_checklist
     self.items.each {|x| x.destroy}

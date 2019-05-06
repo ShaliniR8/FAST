@@ -33,9 +33,9 @@ class InvestigationsController < ApplicationController
 
 
   def new_contact
-    @audit = Investigation.find(params[:id])
-    @contact = InvestigationContact.new
-    render :partial => 'audits/contact'
+    @owner = Investigation.find(params[:id])
+    @contact = Contact.new
+    render :partial => 'forms/contact_form'
   end
 
 

@@ -1,5 +1,8 @@
 class Investigation < ActiveRecord::Base
 
+  include Transactionable
+  include Contactable
+
   belongs_to :responsible_user,         :foreign_key => "responsible_user_id",  :class_name => "User"
   belongs_to :approver,                 :foreign_key => "approver_id",          :class_name => "User"
   belongs_to :record,                   :foreign_key => "record_id",            :class_name => "Record"
@@ -10,12 +13,10 @@ class Investigation < ActiveRecord::Base
   has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
   has_many :comments,                   :foreign_key => "owner_id",             :class_name => "InvestigationComment",          :dependent => :destroy
   has_many :recommendations,            :foreign_key => "owner_id",             :class_name => "InvestigationRecommendation",   :dependent => :destroy
-  has_many :contacts,                   :foreign_key => "owner_id",             :class_name => "InvestigationContact",          :dependent => :destroy
   has_many :findings,                   :foreign_key => "audit_id",             :class_name => "InvestigationFinding",          :dependent => :destroy
   has_many :tasks,                      :foreign_key => "owner_id",             :class_name => "InvestigationTask",             :dependent => :destroy
   has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
-  has_many :transactions,               as: :owner,                             dependent: :destroy
 
   accepts_nested_attributes_for :corrective_actions
   accepts_nested_attributes_for :contacts

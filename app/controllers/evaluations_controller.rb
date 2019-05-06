@@ -130,9 +130,9 @@ class EvaluationsController < ApplicationController
 
 
   def new_contact
-    @audit = Evaluation.find(params[:id])
-    @contact = EvaluationContact.new
-    render :partial => 'audits/contact'
+    @owner = Evaluation.find(params[:id])
+    @contact = Contact.new
+    render :partial => 'forms/contact_form'
   end
 
 

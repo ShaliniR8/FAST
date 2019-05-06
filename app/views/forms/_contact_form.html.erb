@@ -1,5 +1,5 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<%=form_for @audit do |x|%>
+<%=form_for @owner do |x|%>
   <%=x.fields_for :contacts,@contact do |f|%>
     <div class="panel-warning">
       <div class="panel-heading">
@@ -11,11 +11,11 @@
       </div>
       <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
         <div class="row">
-          <%fields = AuditContact.get_meta_fields('form')%>
-          <%=render '/forms/form_fields', :f=> f,
-            :fields => fields,
-            :record => @contact
-          %>
+          <% fields = Contact.get_meta_fields('form') %>
+          <%= render '/forms/form_fields',
+                     :f=> f,
+                     :fields => fields,
+                     :record => @contact %>
         </div>
         <%=x.submit "Save",:class=>"btn btn-success pull-right mt5", disable_with: "Saving..."%>
       </div>

@@ -508,39 +508,33 @@ class ApplicationController < ActionController::Base
     owner_class = owner.class.name
     owner.status = "New"
     owner.save
+    Transaction.build_for(
+      owner,
+      'Reopen',
+      current_user.id
+    )
     case owner_class
     when "Audit"
-      AuditTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to audit_path(owner)
     when "Inspection"
-      InspectionTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to inspection_path(owner)
     when "Evaluation"
-      EvaluationTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to evaluation_path(owner)
     when "Investigation"
-      InvestigationTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to investigation_path(owner)
     when "Finding"
-      FindingTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to finding_path(owner)
     when "SmsAction"
-      SmsActionTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to sms_action_path(owner)
     when "Recommendation"
-      RecommendationTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to recommendation_path(owner)
     when "Sra"
-      SraTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to sra_path(owner)
     when "Hazard"
-      HazardTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to hazard_path(owner)
     when "RiskControl"
-      RiskControlTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to risk_control_path(owner)
     when "SafetyPlan"
-      SafetyPlanTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
       redirect_to safety_plan_path(owner)
     else
       return

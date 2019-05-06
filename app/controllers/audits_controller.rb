@@ -139,9 +139,9 @@ class AuditsController < ApplicationController
 
 
   def new_contact
-    @audit = Audit.find(params[:id])
+    @owner = Audit.find(params[:id])
     @contact = Contact.new
-    render :partial => 'contact'
+    render :partial => 'forms/contact_form'
   end
 
 
