@@ -56,7 +56,16 @@
             <div class="pull-right mb10">
               <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
                 <%if @meeting.status == "Open"%>
-                  <%=link_to "Close Meeting",
+
+
+
+                  <%=link_to 'Close Meeting', '#',
+                    :class => 'btn btn-danger pull-right mr5 mb5',
+                    :id => 'close',
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg"%>
+
+                  <%#=link_to "Close Meeting",
                     close_meeting_path(@meeting),
                     :class=>"btn btn-danger pull-right mb5",
                     :confirm => "Are you sure?",
@@ -64,6 +73,7 @@
                     "data-toggle" => "tooltip",
                     "data-placement" => "top",
                     :title => "This will close the current Meeting. No changes can be made after the Meeting is closed"%>
+
                   <%=link_to "Add Comment",
                     "#",
                     :class => "btn btn-success mb5 pull-right mr5",
@@ -183,6 +193,13 @@
     });
     $('#override_status_btn').on('click',function(){
       $.get("<%=override_status_meeting_path(@meeting)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#close').on('click',function(){
+      var commit=$(this).attr('id');
+      $.get("<%=close_meeting_path(@meeting)%>?commit="+commit, function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

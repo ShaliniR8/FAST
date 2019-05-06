@@ -45,6 +45,7 @@ class Meeting < ActiveRecord::Base
       {field: 'meeting_start',    title: 'Meeting Start',     num_cols: 6,  type: 'datetime',   visible: 'index,form,show', required: true},
       {field: 'meeting_end',      title: 'Meeting End',       num_cols: 6,  type: 'datetime',   visible: 'index,form,show', required: true},
       {field: 'notes',            title: 'Notes',             num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
+      {field: 'final_comment',    title: 'Final Comment',     num_cols: 12, type: 'textarea',   visible: 'show',            required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

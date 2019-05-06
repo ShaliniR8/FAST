@@ -208,15 +208,9 @@ class MeetingsController < ApplicationController
 
 
 
-
   def close
-    meeting = Meeting.find(params[:id])
-    meeting.status = "Closed"
-    meeting.closing_date = Time.now
-    MeetingTransaction.create(:users_id=>current_user.id,:action=>"Meeting Closed",:owner_id=>params[:id],:stamp=>Time.now)
-    if meeting.save
-      redirect_to meeting_path(meeting)
-    end
+    @owner = Meeting.find(params[:id])
+    render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
   end
 
   def override_status
@@ -255,31 +249,37 @@ class MeetingsController < ApplicationController
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
+    when 'Close'
+      send_notices(
+        @owner.invitations,
+        "Meeting ##{@owner.get_id} has been Closed.",
+        true,
+        "Meeting ##{@owner.get_id} Closed")
     end
 
     if params[:invitations].present?
-      params[:invitations].each_pair do |index,val|
-        inv = @owner.invitations.where("users_id=?",val)
+      params[:invitations].each_pair do |index, val|
+        inv = @owner.invitations.where("users_id = ?", val)
         if inv.blank?
           new_inv = Invitation.new()
           new_inv.users_id = val
           new_inv.meeting = @owner
           new_inv.save
+          send_notice(new_inv,
+            "You are invited to Meeting ##{@owner.get_id}.  " + g_link(@owner),
+            true, "New Meeting Invitation")
         end
       end
     end
     if params[:cancellation].present?
-      params[:cancellation].each_pair do |index,val|
+      params[:cancellation].each_pair do |index, val|
         inv = @owner.invitations.where("users_id = ?", val)
         if inv.present?
-          Rails.logger.debug("Deleting")
-          MeetingMailer.cancel_invitation(inv.first.user, @owner)
+          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}.", true, "Removed from Meeting")
           inv.first.destroy
         end
       end
     end
-
-
 
     @owner.update_attributes(params[:meeting])
     MeetingTransaction.create(
