@@ -3,13 +3,19 @@
   <%if source == 'Existing'%>
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
       <%if checklist_row.is_header && checklist_cell.checklist_header_item.editable%>
-        <td></td>
+        <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
+          <%header_item = checklist_cell.checklist_header_item%>
+          <%=render 'checklist_row_fields_td',
+            :header_item => header_item,
+            :checklist_cell => checklist_cell,
+            :f => cell_form%>
+        <%end%>
       <%else%>
         <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
           <%header_item = checklist_cell.checklist_header_item%>
-          <%=render 'checklist_row_fields_td', 
-            :header_item => header_item, 
-            :checklist_cell => checklist_cell, 
+          <%=render 'checklist_row_fields_td',
+            :header_item => header_item,
+            :checklist_cell => checklist_cell,
             :f => cell_form%>
         <%end%>
       <%end%>
@@ -21,9 +27,9 @@
       <%new_checklist_cell = new_checklist_row.checklist_cells.build(checklist_cell.attributes)%>
       <%=f.fields_for :checklist_cells, new_checklist_cell do |cell_form|%>
         <%header_item = checklist_cell.checklist_header_item%>
-        <%=render 'checklist_row_fields_td', 
-          :header_item => header_item, 
-          :checklist_cell => checklist_cell, 
+        <%=render 'checklist_row_fields_td',
+          :header_item => header_item,
+          :checklist_cell => checklist_cell,
           :f => cell_form%>
       <%end%>
     <%end%>
@@ -33,9 +39,9 @@
     <%locals[:checklist_header].checklist_header_items.each do |header_item|%>
       <%checklist_cell = ChecklistCell.new%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
-        <%=render 'checklist_row_fields_td', 
-          :header_item => header_item, 
-          :checklist_cell => checklist_cell, 
+        <%=render 'checklist_row_fields_td',
+          :header_item => header_item,
+          :checklist_cell => checklist_cell,
           :f => cell_form%>
       <%end%>
     <%end%>

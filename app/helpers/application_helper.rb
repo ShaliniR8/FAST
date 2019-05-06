@@ -192,6 +192,8 @@ module ApplicationHelper
 
   def g_link(entry)
     case entry.class.name.demodulize
+    when 'Message'
+      entry_url = message_url(entry)
     when 'Submission'
       entry_url = submission_url(entry)
     when 'Record'
@@ -200,6 +202,8 @@ module ApplicationHelper
       entry_url = report_url(entry)
     when 'Meeting'
       entry_url = meeting_url(entry)
+    when 'SrmMeeting'
+      entry_url = srm_meeting_url(entry)
     when 'CorrectiveAction'
       entry_url = corrective_action_url(entry)
     when 'Audit'

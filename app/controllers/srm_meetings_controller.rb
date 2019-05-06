@@ -21,17 +21,17 @@ class SrmMeetingsController < ApplicationController
   before_filter :set_table_name,:login_required
 
   def destroy
-    @meeting=Meeting.find(params[:id])
-    if @meeting.review_end.blank? ||@meeting.meeting_end.blank?
-      end_time=Time.now
+    @meeting = Meeting.find(params[:id])
+    if @meeting.review_end.blank? || @meeting.meeting_end.blank?
+      end_time = Time.now
     else
-      end_time=@meeting.review_end > @meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
+      end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
     end
     send_notices(
       @meeting.invitations,
       "Meeting ##{@meeting.get_id} has been cancelled.",
-      @meeting,
-      true)
+      true,
+      "Cancellation of Meeting ##{@meeting.get_id}")
     @meeting.invitations.each do |p|
       MeetingMailer.cancel_meeting(p.user,@meeting)
     end
@@ -41,7 +41,7 @@ class SrmMeetingsController < ApplicationController
     @meeting.sras.each do |x|
       Transaction.build_for(
         x,
-        'Open',
+        'Remove from Meeting',
         current_user.id,
         'Meeting Deleted',
       )
@@ -60,15 +60,23 @@ class SrmMeetingsController < ApplicationController
 
 
   def create
-    @meeting = SrmMeeting.new(params[:srm_meeting])
+    @meeting = SrmMeeting.create(params[:srm_meeting])
     if !params[:sras].blank?
-      @meeting.save
       params[:sras].each_pair do |index, value|
         sra = Sra.find(value)
-        sra.meeting_id=@meeting.id
-        sra.status = "Under Review"
-        #SraTransaction.create(:users_id=>current_user.id,:action=>"Under Review",:content=>"Add to Meeting ##{@meeting.id}", :owner_id=>report.id,:stamp=>Time.now)
-        #MeetingTransaction.create(:users_id=>current_user.id, :action=>"Added SRA ##{sra.get_id}",:content=>"SRA ##{sra.get_id}", :owner_id => @meeting.id, :stamp=>Time.now)
+        sra.meeting_id = @meeting.id
+        SraTransaction.create(
+          :users_id => current_user.id,
+          :action => "Add to Meeting",
+          :content => "Add to Meeting ##{@meeting.id}",
+          :owner_id => sra.id,
+          :stamp => Time.now)
+        MeetingTransaction.create(
+          :users_id => current_user.id,
+          :action => "Added SRA",
+          :content => "SRA ##{sra.get_id}",
+          :owner_id => @meeting.id,
+          :stamp => Time.now)
         sra.save
       end
     end
@@ -76,10 +84,9 @@ class SrmMeetingsController < ApplicationController
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       send_notices(
         @meeting.invitations,
-        "You are invited to meeting ##{@meeting.get_id}.  " +
-          g_link(@meeting),
-        @meeting,
-        true)
+        "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
+        true,
+        "New Meeting Invitation")
       @meeting.invitations.each do |p|
         MeetingMailer.new_meeting(p.user, @meeting)
       end
@@ -90,30 +97,33 @@ class SrmMeetingsController < ApplicationController
     end
   end
 
+
   def new
+    @privileges = Privilege.find(:all)
     @meeting = SrmMeeting.new
     @action = "new"
     @timezones = Meeting.get_timezones
     @headers = User.invite_headers
     @users = User.find(:all) - [current_user]
-    @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
-    @sra_headers = Sra.get_meta_fields('form')
+    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+    @sra_headers = Sra.get_meta_fields('index')
     @sras = Sra.where('meeting_id is ? and status = ?', nil, 'Open')
   end
 
+
   def show
     begin
-      @meeting=Meeting.find(params[:id])
+      @meeting = Meeting.find(params[:id])
     rescue ActiveRecord::RecordNotFound
      redirect_to root_url
      return
     end
-    @action="show"
-    @headers=User.invite_headers
-    @users=@meeting.invitations.map{|x| x.user}
-    @current_inv=@meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
-    @sra_headers=Sra.get_meta_fields('index')
-    @fields=SrmMeeting.get_meta_fields('show')
+    @action = "show"
+    @headers = User.invite_headers
+    @users = @meeting.invitations.map{|x| x.user}
+    @current_inv = @meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
+    @sra_headers = Sra.get_meta_fields('index')
+    @fields = SrmMeeting.get_meta_fields('show')
   end
 
   def index
@@ -143,16 +153,15 @@ class SrmMeetingsController < ApplicationController
       params[:sras].each_pair do |index, value|
         sra = Sra.find(value)
         sra.meeting_id=@meeting.id
-        sra.status = "Under Review"
         Transaction.build_for(
           sra,
-          'Under Review',
+          'Add to Meeting',
           current_user.id,
           "Add to Meeting ##{@meeting.id}"
         )
         Transaction.build_for(
           @meeting,
-          "Added SRA ##{sra.get_id}",
+          'Added SRA',
           current_user.id,
           "SRA ##{sra.get_id}"
         )
@@ -197,28 +206,22 @@ class SrmMeetingsController < ApplicationController
     @users = User.find(:all) - [@meeting.host.user]
     @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
     @timezones = Meeting.get_timezones
-    @sra_headers = Sra.get_headers
+    @sra_headers = Sra.get_meta_fields('index')
     @sras = @meeting.sras + Sra.where("status = 'Open'")
   end
 
-  def send_notices(participations, message, meeting, action)
+
+  def send_notices(participations, message, mailer, subject)
     participations.each do |p|
-      send_notice(
-        p,
-        message,
-        meeting,
-        action)
+      send_notice(p, message, true, subject)
     end
   end
 
-  def send_notice(p,message,meeting,action)
-    notify(
-      p.user,
-      message,
-      "Meeting",
-      meeting.id,
-      action)
+
+  def send_notice(p, message, mailer, subject=nil)
+    notify(p.user, message, mailer, subject)
   end
+
 
   def reopen
     @meeting = Meeting.find(params[:id]).becomes(Meeting)
@@ -286,12 +289,14 @@ class SrmMeetingsController < ApplicationController
     redirect_to send_success_srm_meetings_path
   end
 
+
   def add_sras
-    @meeting=Meeting.find(params[:id])
-    @sras=Sra.where('meeting_id is ? and status !=?',nil,'Completed')
-    @sra_headers=Sra.get_headers
-    render :partial=>"add_sras"
+    @meeting = Meeting.find(params[:id])
+    @sras = Sra.where('meeting_id is ? and status != ?', nil, 'Completed')
+    @sra_headers = Sra.get_meta_fields('index')
+    render :partial => "add_sras"
   end
+
 
   def sras
     meeting = Meeting.find(params[:id])
@@ -299,12 +304,24 @@ class SrmMeetingsController < ApplicationController
       params[:sras].each do |sid|
         sra = Sra.find(sid)
         sra.meeting_id = meeting.id
-        sra.status = "Under Review"
+        SraTransaction.create(
+          :users_id => current_user.id,
+          :action => "Add to Meeting",
+          :content => "Add to Meeting ##{meeting.id}",
+          :owner_id => sra.id,
+          :stamp => Time.now)
+        MeetingTransaction.create(
+          :users_id => current_user.id,
+          :action => "Added SRA",
+          :content => "SRA ##{sra.get_id}",
+          :owner_id => meeting.id,
+          :stamp => Time.now)
         sra.save
       end
     end
     redirect_to srm_meeting_path(meeting)
   end
+
 
   def new_attachment
     @owner=Meeting.find(params[:id]).becomes(Meeting)
@@ -314,10 +331,11 @@ class SrmMeetingsController < ApplicationController
 
 
   def print
-    @meeting=Meeting.find(params[:id])
-    html=render_to_string(:template=>"/srm_meetings/print.html.erb")
-    pdf=PDFKit.new(html)
-    pdf.stylesheets <<("#{Rails.root}/public/css/bootstrap.css")
+    @meeting = Meeting.find(params[:id])
+    html = render_to_string(:template=>"/srm_meetings/print.html.erb")
+    pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     send_data pdf.to_pdf, :filename => "Meeting_##{@meeting.get_id}.pdf"
   end
 end

@@ -348,6 +348,7 @@ class HomeController < ApplicationController
           })
         end
       end
+
       if current_user.has_access("submissions", "index")
         submissions = Submission.preload(:template).where("completed = ? and event_date is not ?", true, nil)
           .can_be_accessed(current_user)
@@ -364,6 +365,22 @@ class HomeController < ApplicationController
         end
       end
 
+      objects = ['CorrectiveAction']
+      objects.each do |x|
+        records = Object.const_get(x).where('status in (?) and (responsible_user_id = ? || approver_id = ?)',
+          ['Assigned', 'Pending Approval'], current_user_id, current_user_id)
+        records.each do |record|
+          if (record.due_date.present? rescue false)
+            @calendar_entries.push({
+              :url => "#{records.table_name}/#{record.id}",
+              :start => record.due_date,
+              :color => "lightcoral",
+              :textColor => "darkslategrey",
+              :title => "#{x.titleize} ##{record.id}: (#{record.status})"
+            })
+          end
+        end
+      end
 
 
     elsif session[:mode] == "SRM"

@@ -184,14 +184,13 @@
               :disable_with => "Adding..."%>
           <%end%>
 
-          <%if !current_user.has_access('audits','viewer')%>
-            <%=link_to "Add Comment",
-              "#",
-              :class=>"btn btn-success pull-right mr5 mb5",
-              :id=>'comment_btn',
-              "data-toggle"=>"modal",
-              "data-target"=>".bs-example-modal-lg"%>
-          <%end%>
+          <%=link_to "Add Comment",
+            "#",
+            :class=>"btn btn-success pull-right mr5 mb5",
+            :id=>'comment_btn',
+            "data-toggle"=>"modal",
+            "data-target"=>".bs-example-modal-lg"%>
+
         </div>
 
 
@@ -210,7 +209,7 @@
 
         <%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
 
-        <%=render "/audits/show_comment", :owner => @audit%>
+        <div class="col-xs-12"><%=render "/audits/show_comment", :owner => @audit%></div>
         <%=render "/forms/attachments_show", :owner => @audit%>
         <%=render "/records/transactions", :owner => @audit%>
 

@@ -3,11 +3,11 @@ class SendTo < MessageAccess
   after_create :notify_user
 
   def set_unread
-    self.status="Unread"
-    self.visible=true
+    self.status = "Unread"
+    self.visible = true
   end
 
   def notify_user
-    MessageMailer.new_message(self.user)
+    #MessageMailer.new_message(self.user)
   end
 end

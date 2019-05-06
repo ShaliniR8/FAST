@@ -347,12 +347,14 @@ class SmsMeetingsController < ApplicationController
     redirect_to sms_meeting_path(meeting)
   end
 
+
   def print
-    @meeting=Meeting.find(params[:id])
-    html=render_to_string(:template=>"/sms_meetings/print.html.erb")
-    pdf=PDFKit.new(html)
-    pdf.stylesheets <<("#{Rails.root}/public/css/bootstrap.css")
-    send_data pdf.to_pdf,  :filename => "Meeting_##{@meeting.get_id}.pdf"
+    @meeting = Meeting.find(params[:id])
+    html = render_to_string(:template=>"/sms_meetings/print.html.erb")
+    pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    send_data pdf.to_pdf, :filename => "Meeting_##{@meeting.get_id}.pdf"
   end
 
 end

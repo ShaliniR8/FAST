@@ -32,9 +32,11 @@ class RiskControlsController < ApplicationController
     handle_search
 
     if !current_user.admin? && !current_user.has_access('sras','admin')
-      cars = RiskControl.where('status in (?) and responsible_user_id = ?',
+      rcs = RiskControl.includes(hazard: :sra)
+      cars = rcs.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += RiskControl.where('approver_id = ?',  current_user.id)
+      cars += rcs.where('approver_id = ?',  current_user.id)
+      cars += rcs.where('sras.viewer_access = 1') if current_user.has_access('sras','viewer')
       @records = @records & cars
     end
   end

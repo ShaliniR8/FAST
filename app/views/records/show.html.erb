@@ -155,7 +155,14 @@
               <%end%>
 
               <%if @record.status != "Closed"%>
-                <%=link_to "Close Report",
+
+                <%=link_to "Close Report", "#",
+                  :class => "btn btn-danger pull-right close_btn mr5 mb5",
+                  :id => 'close',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+
+                <%#=link_to "Close Report",
                   close_record_path(@record),
                   :class=>"btn btn-danger pull-right mr5 mb5",
                   :confirm => "Are you sure?",
@@ -337,7 +344,13 @@
 
 <script>
   $(document).ready(function(){
-
+    $('.close_btn').on('click',function(){
+      var commit = $(this).attr('id');
+      $.get("<%=close_record_path(@record)%>?commit="+commit, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
     $('#comment_btn').on('click',function(){
       $.get("<%=comment_record_path(@record)%>",function(data){
         $(".modal-content").html(data);

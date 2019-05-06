@@ -431,6 +431,17 @@ class RecordsController < ApplicationController
     end
 
     case params[:commit]
+    when 'Close'
+      if @owner.submission.present?
+        notify(@owner.submission.created_by,
+          "Your submission ##{@owner.submission.id} has been closed by analyst." + g_link(@owner.submission),
+          true, "Submission ##{@owner.submission.id} Closed")
+        SubmissionTransaction.create(
+          users_id: current_user.id,
+          action:   params[:commit],
+          owner_id: @owner.submission.id,
+          stamp:    Time.now)
+        end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
     end
@@ -533,22 +544,7 @@ class RecordsController < ApplicationController
 
   def close
     @owner = Record.find(params[:id])
-    @owner.status = "Closed"
-    Transaction.build_for(
-      @owner,
-      'Close',
-      current_user.id
-    )
-    if @owner.submission.present?
-      Transaction.build_for(
-        @owner.submission,
-        'Close',
-        current_user.id,
-        'Report has been closed.'
-      )
-    end
-    @owner.save
-    redirect_to record_path(@owner), flash: {success: "Report ##{@owner.id} closed."}
+    render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
   end
 
 

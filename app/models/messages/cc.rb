@@ -8,6 +8,6 @@ class CC < MessageAccess
   end
 
   def notify_user
-    MessageMailer.new_message(self.user)
+    #MessageMailer.new_message(self.user)
   end
 end

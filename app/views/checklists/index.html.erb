@@ -1,11 +1,6 @@
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
-    <div class="col-xs-12">
-      <p>
-        // TREVOR TODO <br>
-        What is checklist template? What is checklist header?
-      </p>
-    </div>
+    <%=render "/checklists/instructions"%>
     <%=render "/forms/index_fields", :btns => [
       {btn_name: 'New', btn_class: 'btn-success', modal: true, class_id: 'new_template_btn'},
       {btn_name: 'Checklist Headers', btn_path: checklist_headers_path, btn_class: 'btn-info'},

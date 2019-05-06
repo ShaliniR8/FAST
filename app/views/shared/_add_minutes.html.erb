@@ -2,16 +2,19 @@
   <div class="panel-warning">
     <div class="panel-heading">
       <div class="panel-title">Add Meeting Minutes
-      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
     </div>
     <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
       <div class="row">
         <div class="form-group col-xs-12">
-          <%=f.label :minutes,"Meeting Minutes"%>
-          <%=f.text_area :minutes,:class=>"form-control ml5 required_field",:rows=>'5'%>
+          <%=f.label :minutes, "Meeting Minutes"%>
+          <%=f.text_area :minutes, :class => "form-control ml5 required_field", :rows => '5'%>
         </div>
       </div>
-      <%=f.submit "Add",:class=>"btn btn-success pull-right mt5", :disable_with => "Adding..."%>
+      <%=f.submit "Add Meeting Minutes",:class=>"btn btn-success pull-right mt5", :disable_with => "Adding..."%>
     </div>
   </div>
 <%end%>

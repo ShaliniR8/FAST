@@ -1,8 +1,9 @@
-<div class="panel panel-info">
+<div class="panel panel-lightskyblue">
 
   <div class="panel-heading click-heading collapsed">
     <div class="panel-title">
-      <b>Included SRAs</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      <b>Included SRAs</b>
+      <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
     </div>
   </div>
 
@@ -24,7 +25,9 @@
           <%@meeting.sras.each do |sra|%>
             <tr>
               <%@sra_headers.each do |h|%>
-                <td class="<%=h[:html_class].present? ? sra.send(h[:html_class]) : ''%>"><%=sra.send(h[:field])%></td>
+                <td class="<%=h[:html_class].present? ? sra.send(h[:html_class]) : ''%>">
+                  <%=render '/forms/show_field', :field_hash => h, :record => sra%>
+                </td>
               <%end%>
               <td><%if sra.minutes.present?%><%=sra.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
               <td>

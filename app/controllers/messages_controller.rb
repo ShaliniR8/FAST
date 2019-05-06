@@ -12,6 +12,7 @@ class MessagesController < ApplicationController
     @users = User.find(:all)
     @users.keep_if{|u| !u.disable}
     @headers = User.invite_headers
+    #render :partial => 'messages/new'
   end
 
 
@@ -48,12 +49,18 @@ class MessagesController < ApplicationController
     if params[:send_to].present?
       params[:send_to].values.each do |v|
         ma = SendTo.new(:messages_id => @message.id, :users_id => v)
+        notify(User.find(v),
+          "You have a new internal message. " + g_link(@message),
+          true, 'New Internal Message')
         ma.save
       end
     end
     if params[:cc_to].present?
       params[:cc_to].values.each do |v|
-        ma = CC.new(:messages_id=>@message.id,:users_id=>v)
+        ma = CC.new(:messages_id => @message.id, :users_id => v)
+        notify(User.find(v),
+          "You have a new internal message. " + g_link(@message),
+          true, 'New Internal Message')
         ma.save
       end
     end
@@ -61,11 +68,14 @@ class MessagesController < ApplicationController
       @reply_to = Message.find(params[:reply_to])
       @message.response = @reply_to
       @message.save
-      @send_to = SendTo.where("messages_id=? and users_id=?",@reply_to.id,current_user.id).first
+      @send_to = SendTo.where("messages_id = ? and users_id = ?", @reply_to.id, current_user.id).first
       if @send_to.present?
         @send_to.status = "Replied"
       end
     end
+    # respond_to do |format|
+    #   format.js
+    # end
     redirect_to message_path(@message), flash: {success: "Message sent."}
   end
 
@@ -84,8 +94,8 @@ class MessagesController < ApplicationController
 
 
   def sent
-    @messages=current_user.sent_messages.select{|x| x.visible}.map{|x| x.message}
-    @title="Sent"
+    @messages = current_user.sent_messages.select{|x| x.visible}.map{|x| x.message}
+    @title = "Sent"
   end
 
 

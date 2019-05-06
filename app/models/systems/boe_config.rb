@@ -12,10 +12,10 @@ class BOE_Config
       :event_summary                                  => true,
       :event_tabulation                               => true,
       :enable_custom_options                          => true,
-      :enable_configurable_risk_matrices              => true,
+      :enable_configurable_risk_matrices              => false,
       :enable_checklist_templates                     => true,
-      :allow_set_alert                                => true,
-      :has_verification                               => true,
+      :allow_set_alert                                => false,
+      :has_verification                               => false,
       :has_mobile_app                                 => false,
 
 
@@ -24,24 +24,24 @@ class BOE_Config
       :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => true,  # Notifier will be notified on receiving new submissions
+      :submission_mailer                              => false,  # Notifier will be notified on receiving new submissions
       :allow_multi_submissions                        => true,
       :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
-      :enable_orm                                     => true,
-      :observation_phases_trend                       => true,
+      :enable_orm                                     => false,
+      :observation_phases_trend                       => false,
       :submission_title_required                      => true,
-      :allow_template_nested_fields                   => true,
-      :checklist_version                              => '2',
+      :allow_template_nested_fields                   => false,
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
-      :sa_mailer                                      => true,
+      :sa_mailer                                      => false,
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
 
 
       # SMS IM Module
       :has_framework                                  => false,
-      :sra_mailers                                    => true,
+      :sra_mailers                                    => false,
     }
   end
 
@@ -58,7 +58,12 @@ class BOE_Config
     severity_table: {
       starting_space: true,
       row_header: ['5','4','3','2','1'],
-      column_header: ['Safety (Impact)', 'People (Injury)', 'Security (Threat)', 'Environment (Effect)', 'Assets (Damage)'],
+      column_header: [
+        'Safety (Impact)',
+        'People (Injury)',
+        'Security (Threat)',
+        'Environment (Effect)',
+        'Assets (Damage)'],
       rows: [
         [
           'Massive',
@@ -144,15 +149,21 @@ class BOE_Config
     },
 
     risk_definitions: {
-      red:            {rating: "HIGH",        cells: "A4, A3, B4",          description: "Unacceptable",                color: "#ff3333" },
-      yellow:         {rating: "MODERATE",    cells: "A2, B2, C4",          description: "Acceptable with Mitigation"  },
-      limegreen:        {rating: "LOW",         cells: "A1, B2, C3, D4",      description: "Acceptable"  },
+      red:       {rating: "HIGH",     cells: "A4, A3, B4",     description: "Unacceptable"                 },
+      yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
+      limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
+    },
+
+    risk_table_index: {
+      red:        "High",
+      yellow:     "Moderate",
+      limegreen:  "Low"
     },
 
     risk_table_dict: {
-      red: "Unacceptable",
-      yellow: "Acceptable with Mitigation",
-      limegreen: "Acceptable"
+      red:        "High",
+      yellow:     "Moderate",
+      limegreen:  "Low"
     }
   }
 

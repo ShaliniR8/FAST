@@ -1,17 +1,27 @@
-<%print_special_matrix(owner)%>
-
-<%if @print_risk.present? || @print_sub_risk.present? %>
-  <div class="category">
-    <h5><b>Risk Assessment</b></h5>
-    <%if !@print_risk.nil?%>
-      <b>Severity: </b><%= @print_severity %></br>
-      <b>Probability: </b><%= @print_probability %></br>
-      <b>Risk: </b><%= @print_risk %></br></br>
-    <%end%>
-    <%if !@print_sub_risk.nil?%>
-      <b>Severity after mitigation: </b><%= @print_sub_severity %></br>
-      <b>Probability after mitigation: </b><%= @print_sub_probability %></br>
-      <b>Risk after mitigation: </b><%= @print_sub_risk %></br>
-    <%end%>
+<%if owner.risk_factor.present? || owner.risk_factor_after.present? %>
+  <div class="col-xs-12">
+    <div class="sub_sub_title">Risk Assessment</div>
+    <div class="content">
+      <%if owner.risk_factor.present? %>
+        <div class="col-xs-6">
+          <b>Severity: </b><%= airport_config.print_severity(owner, owner.severity.to_i) %></br>
+          <b>Probability: </b><%= airport_config.print_probability(owner, owner.likelihood.to_i) %></br>
+          <b>Risk: </b><%= owner.risk_factor %></br></br>
+        </div>
+      <%end%>
+      <%if owner.risk_factor_after.present? %>
+        <div class="col-xs-6">
+          <b>Severity after mitigation: </b><%= airport_config.print_severity(owner, owner.severity_after.to_i) %></br>
+          <b>Probability after mitigation: </b><%= airport_config.print_probability(owner, owner.likelihood_after.to_i) %></br>
+          <b>Risk after mitigation: </b><%= owner.risk_factor_after %></br>
+        </div>
+      <%end%>
+      <%if owner.statement.present? %>
+        <div class="col-xs-12">
+          <b>Risk Assessment Notes: </b></br>
+          <%=simple_format(owner.statement)%>
+        </div>
+      <%end%>
+    </div>
   </div>
 <%end%>
