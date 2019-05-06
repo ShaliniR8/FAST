@@ -30,9 +30,7 @@
             :route => close_report_path(event, :redirect_path => meeting_path(meeting))%>
           <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
             :class=>"btn btn-danger mb5",
-            :onclick=>"delete_report(#{event.id},this)",
-            :disable_with => "Removing...",
-            :confirm => "Are you sure?"%>
+            :onclick=>"delete_report(#{event.id},this)"%>
           <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
             :class => "btn btn-warning agenda_btn mb5",
             "data-toggle" => "modal",

@@ -149,9 +149,12 @@
 
 <script>
   function delete_report(report_id,btn){
-    $.get("/reports/"+report_id+"/carryover",function(data){
-      $(btn).closest('tr').hide();
-    });
+    var result = confirm("Are you sure?");
+    if(result){
+      $.get("/reports/" + report_id + "/carryover", function(data){
+        $(btn).closest('tr').hide();
+      });
+    }
   }
   $(document).ready(function(){
     $("#message-btn").on('click',function(){
