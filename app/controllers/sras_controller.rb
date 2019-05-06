@@ -219,7 +219,7 @@ class SrasController < ApplicationController
 
   def new_attachment
     @owner=Sra.find(params[:id])
-    @attachment=SraAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

@@ -162,7 +162,7 @@ class RiskControlsController < ApplicationController
 
   def new_attachment
     @owner=RiskControl.find(params[:id])
-    @attachment=RiskControlAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

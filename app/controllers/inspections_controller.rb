@@ -275,7 +275,7 @@ class InspectionsController < ApplicationController
 
   def new_attachment
       @owner = Inspection.find(params[:id])
-      @attachment = InspectionAttachment.new
+      @attachment = Attachment.new
       render :partial => "shared/attachment_modal"
   end
 

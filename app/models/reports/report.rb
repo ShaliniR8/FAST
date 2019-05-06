@@ -1,9 +1,12 @@
 class Report < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :report_meetings,    foreign_key: 'report_id',   class_name: 'ReportMeeting',      dependent: :destroy
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
-  has_many :transactions,       as: :owner,  dependent: :destroy
-  has_many :attachments,        foreign_key: 'owner_id',    class_name: 'ReportAttachment',   dependent: :destroy
   has_many :agendas,            foreign_key: 'event_id',    class_name: 'AsapAgenda',         dependent: :destroy
   has_many :suggestions,        foreign_key: 'owner_id',    class_name: 'ReportSuggestion',   dependent: :destroy
   has_many :descriptions,       foreign_key: 'owner_id',    class_name: 'ReportDescription',  dependent: :destroy
@@ -12,10 +15,6 @@ class Report < ActiveRecord::Base
   has_many :reactions,          foreign_key: 'owner_id',    class_name: 'ReportReaction',     dependent: :destroy
 
   belongs_to :meeting, foreign_key:"meeting_id", class_name:"Meeting"
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
 
   serialize :privileges
   serialize :severity_extra

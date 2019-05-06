@@ -1,15 +1,19 @@
 class Im < ActiveRecord::Base
-  belongs_to :evaluator,foreign_key:"lead_evaluator",class_name:"User"
-  belongs_to :reviewer,foreign_key:"pre_reviewer",class_name:"User"
-  has_many :contacts,foreign_key:"owner_id",class_name:"ImContact",:dependent => :destroy
-  has_many :attachments,foreign_key:'owner_id',class_name:'ImAttachment', :dependent => :destroy
-  has_many :tasks,foreign_key:'owner_id',class_name:'ImTask', :dependent => :destroy
-  has_many :expectations,foreign_key:"owner_id",class_name:"FrameworkExpectation",:dependent => :destroy
-  has_many :items,foreign_key:'owner_id',class_name:"ChecklistItem",:dependent => :destroy
-  has_many :transactions,as: :owner,:dependent=>:destroy
-  has_many :notices,foreign_key:"owner_id",class_name:"ImNotice",:dependent=>:destroy
+
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Associations List
+  belongs_to :evaluator,      foreign_key:"lead_evaluator",   class_name:"User"
+  belongs_to :reviewer,       foreign_key:"pre_reviewer",     class_name:"User"
+  has_many :contacts,         foreign_key:"owner_id",         class_name:"ImContact",             :dependent => :destroy
+  has_many :tasks,            foreign_key:'owner_id',         class_name:'ImTask',                :dependent => :destroy
+  has_many :expectations,     foreign_key:"owner_id",         class_name:"FrameworkExpectation",  :dependent => :destroy
+  has_many :items,            foreign_key:'owner_id',         class_name:"ChecklistItem",         :dependent => :destroy
+  has_many :notices,          foreign_key:"owner_id",         class_name:"ImNotice",              :dependent => :destroy
+
   accepts_nested_attributes_for :expectations
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
   accepts_nested_attributes_for :tasks
   accepts_nested_attributes_for :contacts
   accepts_nested_attributes_for :items

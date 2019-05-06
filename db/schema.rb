@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190430155652) do
+ActiveRecord::Schema.define(:version => 20190506170220) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(:version => 20190430155652) do
   end
 
   create_table "attachments", :force => true do |t|
-    t.string  "type"
+    t.string  "owner_type"
     t.string  "name"
     t.string  "caption"
     t.integer "owner_id"
@@ -321,7 +321,7 @@ ActiveRecord::Schema.define(:version => 20190430155652) do
     t.text     "notes"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "obj_id"
   end
 
@@ -724,6 +724,7 @@ ActiveRecord::Schema.define(:version => 20190430155652) do
     t.integer  "custom_id"
     t.integer  "obj_id"
     t.text     "privileges"
+    t.text     "final_comment"
   end
 
   create_table "message_accesses", :force => true do |t|
@@ -977,6 +978,7 @@ ActiveRecord::Schema.define(:version => 20190430155652) do
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+    t.text     "final_comment"
   end
 
   create_table "recurrences", :force => true do |t|

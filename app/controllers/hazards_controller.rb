@@ -144,7 +144,7 @@ class HazardsController < ApplicationController
 
   def new_attachment
     @owner=Hazard.find(params[:id])
-    @attachment=HazardAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

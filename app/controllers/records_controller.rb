@@ -502,7 +502,7 @@ class RecordsController < ApplicationController
 
   def new_attachment
     @owner = Record.find(params[:id])
-    @attachment = RecordAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

@@ -406,7 +406,7 @@ class ReportsController < ApplicationController
 
   def new_attachment
     @owner = Report.find(params[:id])
-    @attachment = ReportAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

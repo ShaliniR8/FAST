@@ -58,7 +58,7 @@ class InvestigationsController < ApplicationController
 
   def new_attachment
     @owner = Investigation.find(params[:id])
-    @attachment = InvestigationAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

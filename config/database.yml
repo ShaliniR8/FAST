@@ -13,7 +13,7 @@
 production:
   adapter: mysql2
   encoding: utf8
-  database: wbat_asapdev_bskdata_db
+  database: wbat_dev_db
   username: devuser
   password: jaguar1995
   host: localhost
@@ -22,7 +22,7 @@ production:
 audit_production:
   adapter: mysql2
   encoding: utf8
-  database: wbat_asapdev_bskdata_db
+  database: wbat_dev_db
   username: devuser
   password: jaguar1995
   host: localhost
@@ -35,7 +35,7 @@ audit_production:
 development:
   adapter: mysql2
   encoding: utf8
-  database: wbat_asapdev_bskdata_db
+  database: wbat_dev_db
   username: devuser
   password: jaguar1995
   host: localhost
@@ -44,7 +44,7 @@ development:
 audit_development:
   adapter: mysql2
   encoding: utf8
-  database: wbat_asapdev_bskdata_db
+  database: wbat_dev_db
   username: devuser
   password: jaguar1995
   host: localhost

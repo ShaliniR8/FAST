@@ -1,18 +1,19 @@
 class RiskControl < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"
   belongs_to  :approver,          foreign_key: 'approver_id',           class_name: 'User'
   belongs_to  :responsible_user,  foreign_key: 'responsible_user_id',   class_name: 'User'
   belongs_to  :hazard,            foreign_key: 'hazard_id'
   has_many    :costs,             foreign_key: 'owner_id',              class_name: 'ControlCost'
-  has_many    :transactions,      as: :owner,  dependent: :destroy
-  has_many    :attachments,       foreign_key: 'owner_id',              class_name: 'RiskControlAttachment',    dependent: :destroy
   has_many    :descriptions,      foreign_key: 'owner_id',              class_name: 'RiskControlDescription',   dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',              class_name: 'RiskControlNotice',        dependent: :destroy
 
   accepts_nested_attributes_for :descriptions
   accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
-
 
   after_create -> { create_transaction('Create') }
 

@@ -281,7 +281,7 @@ class FindingsController < ApplicationController
 
   def new_attachment
     @owner = Finding.find(params[:id]).becomes(Finding)
-    @attachment = FindingAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

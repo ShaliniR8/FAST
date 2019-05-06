@@ -17,10 +17,3 @@ class Transaction < ActiveRecord::Base
   end
 
 end
-
-# Transaction.build_for(audit, 'Upload Checklist', current_user.id)
-
-# Transaction.build_for(self,
-#   action,
-#   ((session[:simulated_id] || session[:user_id]) rescue nil),
-#   (defined?(session) ? '' : 'Recurring Audit'))

@@ -1,17 +1,17 @@
 class CorrectiveAction < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Associations List
   belongs_to  :report,                foreign_key: 'reports_id',          class_name: 'Report'
   belongs_to  :record,                foreign_key: 'records_id',          class_name: 'Record'
   belongs_to  :responsible_user,      foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to  :approver,              foreign_key: 'approver_id',         class_name: 'User'
   belongs_to  :created_by,            foreign_key: 'created_by_id',       class_name: 'User'
 
-  has_many :attachments,    foreign_key: 'owner_id',  class_name: 'CorrectiveActionAttachment',   dependent: :destroy
-  has_many :transactions,   as: :owner,   dependent: :destroy
   has_many :notices,        foreign_key: 'owner_id',  class_name: 'CorrectiveActionNotice',       dependent: :destroy
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
 
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }

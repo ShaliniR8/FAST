@@ -61,7 +61,7 @@ class MeetingsController < ApplicationController
 
   def new_attachment
     @owner = Meeting.find(params[:id]).becomes(Meeting)
-    @attachment = MeetingAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 
@@ -173,7 +173,7 @@ class MeetingsController < ApplicationController
     @headers = User.invite_headers
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
-    @report_headers = Report.get_headers
+    @report_headers = Report.get_meta_fields('form')
     @reports = Report.where("status = 'Meeting Ready'")
   end
 

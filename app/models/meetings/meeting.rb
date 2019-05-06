@@ -1,11 +1,14 @@
 class Meeting < ActiveRecord::Base
 
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Associations List
   has_many :invitations,        foreign_key: "meetings_id",    class_name: "Invitation",         :dependent => :destroy
   has_many :report_meetings,    foreign_key: "meeting_id",     class_name: "ReportMeeting",      :dependent => :destroy
-  has_many :attachments,        foreign_key: "owner_id",       class_name: "MeetingAttachment",  :dependent => :destroy
   has_many :comments,           foreign_key:"owner_id",        class_name: "MeetingComment",     :dependent=>:destroy
   has_many :agendas,            foreign_key: "owner_id",       class_name: "AsapAgenda",         :dependent=>:destroy
-  has_many :transactions,       as: :owner,                    :dependent=>:destroy
   has_many :reports,            foreign_key:"owner_id",        class_name: "Reports"
   has_many :notices,            foreign_key:"owner_id",        class_name:"MeetingNotice",       :dependent=>:destroy
 
@@ -18,8 +21,8 @@ class Meeting < ActiveRecord::Base
   accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :agendas
   accepts_nested_attributes_for :reports
+
   before_create :init_status
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
   validates :review_start, presence: true
   validates :review_end, presence: true
   validates :meeting_start, presence: true

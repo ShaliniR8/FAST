@@ -152,7 +152,7 @@ class RecommendationsController < ApplicationController
 
   def new_attachment
     @owner = Recommendation.find(params[:id]).becomes(Recommendation)
-    @attachment = RecommendationAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

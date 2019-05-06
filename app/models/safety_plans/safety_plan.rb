@@ -1,13 +1,11 @@
 class SafetyPlan < ActiveRecord::Base
 
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Associations List
   belongs_to :created_by, foreign_key: "created_by_id", class_name: "User"
-
-  has_many :transactions, as: :owner, dependent: :destroy
-  has_many :attachments,  foreign_key: 'owner_id', class_name: 'SafetyPlanAttachment',  dependent: :destroy
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
 
   after_create -> { create_transaction('Create') }

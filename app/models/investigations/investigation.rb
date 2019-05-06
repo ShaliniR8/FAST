@@ -1,13 +1,15 @@
 class Investigation < ActiveRecord::Base
 
-  include Transactionable
+#Concerns List
+  include Attachmentable
   include Contactable
+  include Transactionable
 
+#Associations List
   belongs_to :responsible_user,         :foreign_key => "responsible_user_id",  :class_name => "User"
   belongs_to :approver,                 :foreign_key => "approver_id",          :class_name => "User"
   belongs_to :record,                   :foreign_key => "record_id",            :class_name => "Record"
-  belongs_to :created_by,              foreign_key: 'created_by_id',           class_name: 'User'
-  has_many :attachments,                :foreign_key => 'owner_id',             :class_name => "InvestigationAttachment",       :dependent => :destroy
+  belongs_to :created_by,               foreign_key: 'created_by_id',           class_name: 'User'
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
   has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
@@ -19,7 +21,6 @@ class Investigation < ActiveRecord::Base
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
 
   accepts_nested_attributes_for :corrective_actions
-  accepts_nested_attributes_for :contacts
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
   accepts_nested_attributes_for :tasks
@@ -27,7 +28,6 @@ class Investigation < ActiveRecord::Base
   accepts_nested_attributes_for :recommendations
   accepts_nested_attributes_for :findings
   accepts_nested_attributes_for :comments
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
   after_create -> { create_transaction('Create') }
   before_create :set_priveleges

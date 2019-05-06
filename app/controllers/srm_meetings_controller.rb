@@ -325,7 +325,7 @@ class SrmMeetingsController < ApplicationController
 
   def new_attachment
     @owner=Meeting.find(params[:id]).becomes(Meeting)
-    @attachment=MeetingAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

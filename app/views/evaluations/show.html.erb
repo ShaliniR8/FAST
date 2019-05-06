@@ -198,7 +198,7 @@
         <%=render "/ims/show_contact",
           :owner => @evaluation,
           :type=>'evaluation',
-          :fields => EvaluationContact.get_meta_fields('show')%>
+          :fields => Contact.get_meta_fields('show')%>
         <%=render "/audits/show_requirements",
           :owner => @evaluation,
           :type => 'evaluation'%>

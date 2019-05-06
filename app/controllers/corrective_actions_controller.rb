@@ -183,7 +183,7 @@ class CorrectiveActionsController < ApplicationController
 
   def new_attachment
     @owner = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
-    @attachment = CorrectiveActionAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

@@ -1,4 +1,10 @@
 class Record < ActiveRecord::Base
+
+#Concerns List
+include Attachmentable
+include Transactionable
+
+#Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
   has_one     :investigation,       :foreign_key => "record_id",        :class_name => "Investigation"
   has_one     :sra,                 :foreign_key => "record_id",        :class_name => "Sra"
@@ -8,8 +14,6 @@ class Record < ActiveRecord::Base
   belongs_to  :report,              :foreign_key => "reports_id",       :class_name => "Report"
 
   has_many    :record_fields,       :foreign_key => "records_id",       :class_name => "RecordField",           :dependent => :destroy
-  has_many    :attachments,         :foreign_key => "owner_id",         :class_name => "RecordAttachment",      :dependent => :destroy
-  has_many    :transactions,        as: :owner,                         :dependent => :destroy
   has_many    :comments,            :foreign_key => "owner_id",         :class_name => "RecordComment",         :dependent => :destroy
   has_many    :suggestions,         :foreign_key => "owner_id",         :class_name => "RecordSuggestion",      :dependent => :destroy
   has_many    :descriptions,        :foreign_key => "owner_id",         :class_name => "RecordDescription",     :dependent => :destroy
@@ -31,7 +35,6 @@ class Record < ActiveRecord::Base
   accepts_nested_attributes_for :record_fields
   accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
 
   after_create -> { creation_transaction }

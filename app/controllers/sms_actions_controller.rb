@@ -196,7 +196,7 @@ class SmsActionsController < ApplicationController
 
   def new_attachment
       @owner = SmsAction.find(params[:id]).becomes(SmsAction)
-      @attachment = SmsActionAttachment.new
+      @attachment = Attachment.new
       render :partial => "shared/attachment_modal"
   end
 

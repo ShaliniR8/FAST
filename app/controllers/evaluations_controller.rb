@@ -283,7 +283,7 @@ class EvaluationsController < ApplicationController
 
   def new_attachment
       @owner = Evaluation.find(params[:id])
-      @attachment=EvaluationAttachment.new
+      @attachment=Attachment.new
       render :partial => "shared/attachment_modal"
   end
 

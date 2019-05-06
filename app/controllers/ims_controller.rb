@@ -163,7 +163,7 @@ class ImsController < ApplicationController
     load_options
     @im = @base.clone
     @base.attachments.each do |x|
-      temp = ImAttachment.new(:name=>x.name, :caption=>x.caption)
+      temp = Attachment.new(:name=>x.name, :caption=>x.caption)
       @im.attachments.push(temp)
     end
     @im.save
@@ -249,7 +249,7 @@ class ImsController < ApplicationController
 
   def new_attachment
     @owner=Im.find(params[:id]).becomes(Im)
-    @attachment=ImAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

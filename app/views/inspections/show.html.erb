@@ -185,7 +185,7 @@
           :fields => InspectionTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact",
           :owner=>@inspection,
-          :fields => InspectionContact.get_meta_fields('show')%>
+          :fields => Contact.get_meta_fields('show')%>
         <%=render "/audits/show_requirements",
           :owner => @inspection,
           :type => 'inspection'%>

@@ -1,8 +1,11 @@
 class Sra < ActiveRecord::Base
 
-  has_many :attachments,              :foreign_key => "owner_id",   :class_name => "SraAttachment",       :dependent => :destroy
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Association List
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
-  has_many :transactions,             as: :owner,                   :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy
   has_many :notices,                  :foreign_key => "owner_id",   :class_name => "SraNotice",           :dependent => :destroy
   has_many :responsible_users,        :foreign_key => "owner_id",   :class_name => "SraResponsibleUser",  :dependent => :destroy
@@ -27,7 +30,6 @@ class Sra < ActiveRecord::Base
   serialize :mitigated_severity
   serialize :mitigated_probability
 
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
   accepts_nested_attributes_for :hazards
 
 

@@ -41,7 +41,7 @@ class PackagesController < ApplicationController
 
   def new_attachment
     @owner=Package.find(params[:id]).becomes(Package)
-    @attachment=PackageAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

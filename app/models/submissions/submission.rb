@@ -2,22 +2,22 @@ require 'open-uri'
 require 'fileutils'
 
 class Submission < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Association List
   belongs_to :template,   foreign_key: "templates_id",  class_name: "Template"
   belongs_to :created_by, foreign_key: "user_id",       class_name: "User"
   belongs_to :record,     foreign_key: "records_id",    class_name: "Record"
 
   has_many :submission_fields,    foreign_key: "submissions_id",  class_name: "SubmissionField",        :dependent => :destroy
-  has_many :attachments,          foreign_key: "owner_id",        class_name: "SubmissionAttachment",   :dependent => :destroy
-  has_many :transactions,         as: :owner,                     :dependent => :destroy
   has_many :comments,             foreign_key: "owner_id",        class_name: "SubmissionNote",         :dependent => :destroy
   has_many :notices,              foreign_key: "owner_id",        class_name: "SubmissionNotice",       :dependent => :destroy
 
   accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :submission_fields
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
-
 
   after_create :make_report
   after_create :create_transaction
@@ -263,7 +263,7 @@ class Submission < ActiveRecord::Base
         :event_time_zone    => self.event_time_zone
       )
     self.attachments.each do |x|
-      temp = RecordAttachment.new(
+      temp = Attachment.new(
         :name => x.name,
         :caption => x.caption)
       record.attachments.push(temp)
@@ -410,7 +410,7 @@ class Submission < ActiveRecord::Base
         end
       end
       self.attachments.each do |x|
-        temp = SubmissionAttachment.new(
+        temp = Attachment.new(
           :name => x.name,
           :caption => x.caption)
         converted.attachments.push(temp)

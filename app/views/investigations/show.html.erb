@@ -218,7 +218,7 @@
 
           <%=render "/ims/show_contact",
             :owner => @investigation,
-            :fields => InvestigationContact.get_meta_fields('show')%>
+            :fields => Contact.get_meta_fields('show')%>
 
           <%=render "/ims/show_task",
             :owner=>@investigation,

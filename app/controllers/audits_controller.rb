@@ -30,35 +30,6 @@ class AuditsController < ApplicationController
   end
 
 
-
-  def reoccur
-    @base = Audit.find(params[:id])
-    load_options
-    @audit = @base.clone
-    @base.attachments.each do |x|
-      temp = AuditAttachment.new(
-        :name => x.name,
-        :caption => x.caption)
-      @audit.attachments.push(temp)
-    end
-    @audit.save
-    Transaction.build_for(
-      @base,
-      'Reoccur',
-      current_user.id,
-      "Make Reoccurring Audit: ##{@audit.get_id}"
-    )
-    Transaction.build_for(
-      @audit,
-      'Create',
-      current_user.id,
-      "Reoccur Audit: ##{@base.get_id}"
-    )
-    redirect_to edit_audit_path(@audit), flash: {success: "This is a reoccurance of #{@base.id}. Update fields as needed"}
-  end
-
-
-
   def index
     @table = Object.const_get("Audit")
     @headers = @table.get_meta_fields('index')
@@ -84,8 +55,6 @@ class AuditsController < ApplicationController
       @records = @records & cars
     end
   end
-
-
 
 
   def new
@@ -358,7 +327,7 @@ class AuditsController < ApplicationController
 
   def new_attachment
     @owner = Audit.find(params[:id])
-    @attachment = AuditAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 

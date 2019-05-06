@@ -1,19 +1,23 @@
 class SmsAction < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Transactionable
+
+#Associations List
   belongs_to  :approver,                foreign_key: "approver_id",               class_name: "User"
   belongs_to  :responsible_user,        foreign_key: "responsible_user_id",       class_name: "User"
   belongs_to  :created_by,              foreign_key: 'created_by_id',             class_name: 'User'
   has_many    :costs,                   foreign_key: "owner_id",                  class_name: "ActionCost",               :dependent => :destroy
-  has_many    :transactions,            as: :owner,                               :dependent => :destroy
-  has_many    :attachments,             foreign_key: 'owner_id',                  class_name: 'SmsActionAttachment',      :dependent => :destroy
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
   has_many    :notices,                 foreign_key: "owner_id",                  class_name: "SmsActionNotice",          :dependent => :destroy
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
   has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
+
   accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
+
+
   after_create -> { create_transaction('Create') }
-
-
   after_create    :owner_transaction
   before_create   :set_priveleges
   serialize :privileges
