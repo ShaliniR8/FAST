@@ -4,13 +4,13 @@ class Audit < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Contactable
+  include Findingable
   include Transactionable
 
 #Associations List
   belongs_to  :approver,            foreign_key: 'approver_id',           class_name: 'User'
   belongs_to  :responsible_user,    foreign_key: 'responsible_user_id',   class_name: 'User'
   belongs_to  :created_by,          foreign_key: 'created_by_id',         class_name: 'User'
-  has_many    :findings,            foreign_key: 'audit_id',      class_name: 'AuditFinding',           dependent: :destroy
   has_many    :tasks,               foreign_key: 'owner_id',      class_name: 'AuditTask',              dependent: :destroy
   has_many    :requirements,        foreign_key: 'owner_id',      class_name: 'AuditRequirement',       dependent: :destroy
   has_many    :items,               foreign_key: 'owner_id',      class_name: 'AuditItem',              dependent: :destroy
@@ -23,7 +23,6 @@ class Audit < ActiveRecord::Base
   serialize :privileges
 
   accepts_nested_attributes_for :tasks
-  accepts_nested_attributes_for :findings
   accepts_nested_attributes_for :items
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :comments

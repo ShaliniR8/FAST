@@ -26,7 +26,7 @@
 
             <%if action_name == 'new'%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
-              <%=f.hidden_field :audit_id, :value => params[:owner_id]%>
+              <%=hidden_field_tag :owner_id,  params[:owner_id]%>
             <%end%>
 
             <%=render "/shared/privilege_form", :target => "finding[privileges][]", :owner => @finding, :f => f%>

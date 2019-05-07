@@ -61,22 +61,22 @@
                 :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
 
-              <%if @finding.type == "AuditFinding"%>
+              <%if @finding.owner_type == "Audit"%>
                 <%=link_to "View Audit",
                   audit_path(@finding.owner),
                   :class => "btn btn-info pull-right mr5 mb5",
                   :disable_with => "Redirecting..."%>
-              <%elsif @finding.type == "InspectionFinding"%>
+              <%elsif @finding.owner_type == "Inspection"%>
                 <%=link_to "View Inspection",
                   inspection_path(@finding.owner),
                   :class => "btn btn-info pull-right mr5 mb5",
                   :disable_with => "Redirecting..."%>
-              <%elsif @finding.type == "InvestigationFinding"%>
+              <%elsif @finding.owner_type == "Investigation"%>
                 <%=link_to "View Investigation",
                   investigation_path(@finding.owner),
                   :class => "btn btn-info pull-right mr5 mb5",
                   :disable_with => "Redirecting..."%>
-              <%elsif @finding.type == "EvaluationFinding"%>
+              <%elsif @finding.owner_type == "Evaluation"%>
                 <%=link_to "View Evaluation",
                   evaluation_path(@finding.owner),
                   :class => "btn btn-info pull-right mr5 mb5",

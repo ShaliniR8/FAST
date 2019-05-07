@@ -24,15 +24,16 @@ class FindingsController < ApplicationController
   def new
     load_options
     @fields = Finding.get_meta_fields('form')
-    @finding = Object.const_get("#{params[:owner_type]}Finding").new
     @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    @finding = @owner.findings.new
     form_special_matrix(@finding, "finding", "severity_extra", "probability_extra")
   end
 
 
 
   def create
-    @finding = Object.const_get("#{params[:owner_type]}Finding").create(params[:finding])
+    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    @finding = @owner.findings.create(params[:finding])
     redirect_to @finding.becomes(Finding), flash: {success: "Finding created."}
   end
 

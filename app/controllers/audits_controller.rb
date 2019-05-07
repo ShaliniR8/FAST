@@ -251,7 +251,7 @@ class AuditsController < ApplicationController
     load_options
     @audit = Audit.find(params[:id])
     @fields = Audit.get_meta_fields('show')
-    @recommendation_fields = FindingRecommendation.get_meta_fields('show')
+    @recommendation_fields = Recommendation.get_meta_fields('show')
     @type = 'audits'
     @checklist_headers = AuditItem.get_headers
   end
@@ -260,7 +260,7 @@ class AuditsController < ApplicationController
 
   def new_finding
     @audit = Audit.find(params[:id])
-    @finding = AuditFinding.new
+    @audit.findings.new
     @classifications = Finding.get_classifications
     load_options
     form_special_matrix(@finding, "audit[findings_attributes][0]", "severity_extra", "probability_extra")

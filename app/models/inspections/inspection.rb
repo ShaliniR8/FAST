@@ -3,13 +3,13 @@ class Inspection < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Contactable
+  include Findingable
   include Transactionable
 
 #Associations List
   belongs_to :approver,             foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :responsible_user,     foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to :created_by,           foreign_key: 'created_by_id',       class_name: 'User'
-  has_many :findings,               foreign_key: 'audit_id',            class_name: 'InspectionFinding',        dependent: :destroy
   has_many :tasks,                  foreign_key: 'owner_id',            class_name: 'InspectionTask',           dependent: :destroy
   has_many :requirements,           foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
   has_many :items,                  foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
@@ -19,7 +19,6 @@ class Inspection < ActiveRecord::Base
   has_many :checklists, as: :owner, dependent: :destroy
 
   accepts_nested_attributes_for :tasks
-  accepts_nested_attributes_for :findings
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :items

@@ -9,7 +9,7 @@ class Finding < ActiveRecord::Base
   belongs_to  :responsible_user,          foreign_key: "responsible_user_id",     class_name: "User"
   belongs_to  :approver,                  foreign_key: "approver_id",             class_name: "User"
   belongs_to  :created_by,                foreign_key: 'created_by_id',           class_name: 'User'
-  # belongs_to  :owner,                     polymorphic: true
+  belongs_to  :owner,                     polymorphic: true
   has_many    :causes,                    foreign_key: "owner_id",                class_name: "FindingCause",             :dependent => :destroy
   has_many    :descriptions,              foreign_key: "owner_id",                class_name: "FindingDescription",       :dependent => :destroy
   has_many    :corrective_actions,        foreign_key: "owner_id",                class_name: "FindingAction",            :dependent => :destroy
@@ -395,4 +395,31 @@ class Finding < ActiveRecord::Base
       "N/A"
     end
   end
+
+  def get_source
+    case owner.class.name
+    when 'Audit'
+      "<a style='font-weight:bold' href='/audits/#{owner.id}'>
+        Audit ##{owner.id}
+      </a>".html_safe
+    when 'Inspection'
+      "<a style='font-weight:bold' href='/inspections/#{owner.id}'>
+        Inspection ##{owner.id}
+      </a>".html_safe
+    when 'Evaluation'
+      "<a style='font-weight:bold' href='/evaluations/#{owner.id}'>
+        Evaluation ##{owner.id}
+      </a>".html_safe
+    when 'Investigation'
+      "<a style='font-weight:bold' href='/investigations/#{owner.id}'>
+        Investigation ##{owner.id}
+      </a>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+
+  end
+
+
+
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190506232740) do
+ActiveRecord::Schema.define(:version => 20190507154845) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -504,7 +504,7 @@ ActiveRecord::Schema.define(:version => 20190506232740) do
   end
 
   create_table "findings", :force => true do |t|
-    t.integer  "audit_id"
+    t.integer  "owner_id"
     t.string   "title"
     t.integer  "responsible_user_id"
     t.date     "completion_date"
@@ -538,7 +538,7 @@ ActiveRecord::Schema.define(:version => 20190506232740) do
     t.date     "open_date"
     t.date     "complete_date"
     t.text     "narrative"
-    t.string   "type"
+    t.string   "owner_type"
     t.text     "analysis_result"
     t.integer  "custom_id"
     t.string   "likelihood_after"

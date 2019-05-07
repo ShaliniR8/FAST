@@ -171,15 +171,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_finding_owner(finding)
-    if finding.type == "AuditFinding"
-      return 'audits'
-    elsif finding.type == "InspectionFinding"
-      return 'inspections'
-    elsif finding.type == "EvaluationFinding"
-      return 'evaluations'
-    elsif finding.type == "InvestigationFinding"
-      return 'investigations'
-    end
+    "#{finding.owner.class.name.downcase}s"
   end
 
   def get_car_owner(car)
