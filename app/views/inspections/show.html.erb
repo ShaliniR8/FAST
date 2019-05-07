@@ -103,14 +103,6 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <%if @inspection.items.present?%>
-              <%=link_to "Update Checklist",
-                "#",
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :id => 'update_checklist_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
 
           <%elsif @inspection.status == "Pending Approval"%>
             <%if @inspection.can_approve? current_user %>
@@ -137,12 +129,6 @@
           <%end%>
 
           <%if !['Completed', 'Pending Approval'].include? @inspection.status%>
-            <%=link_to "Upload Checklist", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'checklist_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
             <%=link_to "Add Task", "#",
               :class => "btn btn-success pull-right mr5 mb5",
               :id => 'task_btn',
@@ -154,13 +140,6 @@
               :id => 'contact_btn',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>
-
-            <%=link_to "Add Requirement", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'requirement_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
             <%=link_to "Add Finding",
               new_finding_path(
                 :owner_id => @inspection.id,
@@ -168,30 +147,16 @@
               :class => "btn btn-success pull-right mr5 mb5",
               :disable_with => "Adding..."%>
           <%end%>
-
-          <%if !current_user.has_access('inspections','viewer')%>
-            <%=link_to "Add Comment", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'comment_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-          <%end%>
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @inspection %>
         <%=render '/checklists/checklist_types', :owner => @inspection, :type => 'inspection'%>
-        <%=render "/ims/show_task",
-          :owner => @inspection,
-          :fields => InspectionTask.get_meta_fields('show')%>
-        <%=render "/ims/show_contact",
-          :owner=>@inspection,
-          :fields => InspectionContact.get_meta_fields('show')%>
-        <%=render "/audits/show_requirements",
-          :owner => @inspection,
-          :type => 'inspection'%>
-        <%=render '/findings/show_all',
-          :owner => @inspection,
-          :show_btn => false%>
+        <%=render "/ims/show_task", :owner => @inspection, :fields => InspectionTask.get_meta_fields('show')%>
+        <%=render "/ims/show_contact", :owner=>@inspection, :fields => InspectionContact.get_meta_fields('show')%>
+        <%=render '/findings/show_all', :owner => @inspection, :show_btn => false%>
+
+        <div class="col-xs-12"><%=render "/audits/show_comment", :owner => @inspection%></div>
+
         <%=render "/forms/attachments_show", :owner => @inspection%>
         <%=render "/records/transactions", :owner => @inspection%>
       </div>
@@ -278,8 +243,6 @@
         $(window).trigger('resize');
       });
     });
-
-
     $('#item_table').dataTable();
   });
 </script>

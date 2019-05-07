@@ -107,14 +107,6 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <%if BaseConfig.airline[:checklist_version] == '1' && @audit.items.present?%>
-              <%=link_to "Update Checklist", "#",
-                :class=>"btn btn-warning pull-right mr5 mb5",
-                :id=>'update_checklist_btn',
-                "data-toggle"=>"modal",
-                "data-target"=>".bs-example-modal-lg"%>
-            <%end%>
-
           <%elsif @audit.status=="Pending Approval" %>
             <% if @audit.can_approve? current_user %>
               <%=link_to "Approve", "#",
@@ -139,21 +131,6 @@
           <%end%>
 
           <%if !['Pending Approval', 'Completed'].include? @audit.status%>
-            <%if BaseConfig.airline[:checklist_version] == '2'%>
-              <%=link_to "Add Checklist", "#",
-                :class => "btn btn-info pull-right mr5 mb5",
-                :id => "select_checklist_btn",
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-            <%if BaseConfig.airline[:checklist_version] == '1'%>
-              <%=link_to "Upload Checklist", "#",
-                :class => "btn btn-success pull-right mr5 mb5",
-                :id => 'checklist_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
 
             <%=link_to "Add Task",
               "#",
@@ -166,13 +143,6 @@
               "#",
               :class=>"btn btn-success pull-right mr5 mb5",
               :id=>'contact_btn',
-              "data-toggle"=>"modal",
-              "data-target"=>".bs-example-modal-lg"%>
-
-            <%#=link_to "Add Requirement",
-              "#",
-              :class=>"btn btn-success pull-right mr5 mb5",
-              :id=>'requirement_btn',
               "data-toggle"=>"modal",
               "data-target"=>".bs-example-modal-lg"%>
 
@@ -193,20 +163,10 @@
 
         </div>
 
-
-        <%#=render '/forms/progress_bar', :owner => @audit%>
         <%=render '/forms/show_fields', :fields => @fields, :record => @audit%>
-
-
         <%=render '/checklists/checklist_types', :owner => @audit, :type => 'audit'%>
-
-
-
         <%=render "/ims/show_task", :owner => @audit, :fields => AuditTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact", :owner => @audit, :fields => AuditContact.get_meta_fields('show')%>
-
-
-
         <%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
 
         <div class="col-xs-12"><%=render "/audits/show_comment", :owner => @audit%></div>

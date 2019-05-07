@@ -32,7 +32,7 @@ class BOE_Config
       :observation_phases_trend                       => false,
       :submission_title_required                      => true,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '1',
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,

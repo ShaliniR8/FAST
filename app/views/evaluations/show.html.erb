@@ -107,15 +107,6 @@
                 'data-target' => '.bs-example-modal-lg' %>
             <%end%>
 
-            <%if @evaluation.items.present?%>
-              <%=link_to 'Update Checklist',
-                "#",
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :id => 'update_checklist_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
           <%elsif @evaluation.status == "Pending Approval"%>
             <%if @evaluation.can_approve? current_user %>
               <%=link_to "Approve",
@@ -145,13 +136,6 @@
 
 
           <% if !['Completed', 'Pending Approval'].include? @evaluation.status %>
-            <%=link_to "Upload Checklist",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'checklist_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
             <%=link_to "Add Task",
               "#",
               :class => "btn btn-success pull-right mr5 mb5",
@@ -163,13 +147,6 @@
               "#",
               :class => "btn btn-success pull-right mr5 mb5",
               :id => 'contact_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
-            <%=link_to "Add Requirement",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'requirement_btn',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>
 
@@ -192,6 +169,7 @@
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @evaluation%>
+        <%=render '/checklists/checklist_types', :owner => @evaluation, :type => 'evaluation'%>
         <%=render "/ims/show_task",
           :owner => @evaluation,
           :fields => EvaluationTask.get_meta_fields('show')%>
@@ -199,9 +177,6 @@
           :owner => @evaluation,
           :type=>'evaluation',
           :fields => EvaluationContact.get_meta_fields('show')%>
-        <%=render "/audits/show_requirements",
-          :owner => @evaluation,
-          :type => 'evaluation'%>
         <%=render "/findings/show_all",
           :owner => @evaluation,
           :type => 'evaluations',
