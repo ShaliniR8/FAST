@@ -9,29 +9,25 @@ class NAC_Config
       :base_risk_matrix                               => false,
       :event_summary                                  => true,
       :event_tabulation                               => true,
-      :enable_configurable_risk_matrices              => true,
-      :allow_set_alert                                => true,
-      :has_verification                               => true,
+      :enable_configurable_risk_matrices              => false,
+      :allow_set_alert                                => false,
+      :has_verification                               => false,
       :has_mobile_app                                 => false,
       :enable_mailer                                  => true,
 
 
 
       # Safety Reporting Module
-      :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :allow_multi_submissions                        => true,
-      :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
-      :enable_orm                                     => true,
-      :observation_phases_trend                       => true,
-      :submission_title_required                      => true,
-      :allow_template_nested_fields                   => true,
+      :enable_orm                                     => false,
+      :observation_phases_trend                       => false,
+      :allow_template_nested_fields                   => false,
       :checklist_version                              => '2',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
-      :has_root_causes                                => true,
+      :has_root_causes                                => false,
 
 
       # SMS IM Module

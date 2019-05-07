@@ -6,14 +6,12 @@
   <%end%>
   <td><%=event.minutes%></td>
   <td>
-    <%if BaseConfig.airline[:view_narrative_from_meeting]%>
-      <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
-        "#",
-        :class => "btn btn-info mb5 view_narrative_btn",
-        "data-toggle" => "modal",
-        "data-target" => ".bs-example-modal-lg",
-        :route => show_narrative_report_path(event, :meeting => meeting.id)%>
-    <%end%>
+    <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
+      "#",
+      :class => "btn btn-info mb5 view_narrative_btn",
+      "data-toggle" => "modal",
+      "data-target" => ".bs-example-modal-lg",
+      :route => show_narrative_report_path(event, :meeting => meeting.id)%>
     <%=link_to "<i class='glyphicon glyphicon-search'></i>".html_safe,
       report_path(event),
       :class => "btn btn-info mb5",

@@ -16,14 +16,10 @@ class Demo_Config
 
 
       # Safety Reporting Module
-      :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :allow_multi_submissions                        => true,
-      :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
       :enable_orm                                     => true,
       :observation_phases_trend                       => true,
-      :submission_title_required                      => true,
       :allow_template_nested_fields                   => true,
       :checklist_version                              => '3',
 
