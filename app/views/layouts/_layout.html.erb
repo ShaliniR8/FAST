@@ -315,12 +315,8 @@
                   <li style="display:<%=BaseConfig.airline[:has_root_causes] ? 'block' : 'none'%>">
                     <%=link_to "Root Causes Templates", cause_options_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:enable_custom_options] ? 'block' : 'none'%>">
-                    <%=link_to "Custom Options", custom_options_path%>
-                  </li>
-                  <li style="display:<%=BaseConfig.airline[:enable_message_templates] ? 'block' : 'none'%>">
-                    <%=link_to "Message Templates", canned_messages_path%>
-                  </li>
+                  <li><%=link_to "Custom Options", custom_options_path%></li>
+                  <li><%=link_to "Message Templates", canned_messages_path%></li>
                   <li style="display:<%=BaseConfig.airline[:checklist_version] == '2' ? 'block' : 'none'%>">
                     <%=link_to "Checklists", checklist_templates_path%>
                   </li>

@@ -6,13 +6,9 @@ class TMC_Config
 
       :code                                           => "TMC",
       :base_risk_matrix                               => true,
-      :has_analytics_filter                           => true,
-      :enable_message_templates                       => true,
       :event_summary                                  => false,
       :event_tabulation                               => false,
-      :enable_custom_options                          => true,
       :enable_configurable_risk_matrices              => false,
-      :enable_checklist_templates                     => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_mobile_app                                 => false,

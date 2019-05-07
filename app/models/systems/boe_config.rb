@@ -8,13 +8,9 @@ class BOE_Config
       :time_zone                                      => "Central Time (US & Canada)",
 
       :base_risk_matrix                               => false,
-      :has_analytics_filter                           => true,
-      :enable_message_templates                       => true,
       :event_summary                                  => true,
       :event_tabulation                               => true,
-      :enable_custom_options                          => true,
       :enable_configurable_risk_matrices              => false,
-      :enable_checklist_templates                     => true,
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_mobile_app                                 => false,
