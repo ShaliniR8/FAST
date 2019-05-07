@@ -8,7 +8,6 @@ class JUS_Config
       :code                                           => "JUS",
       :base_risk_matrix                               => true,
       :has_analytics_filter                           => true,
-      :enable_message_mailer                          => true,
       :enable_message_templates                       => true,
       :event_summary                                  => true,
       :event_tabulation                               => true,
@@ -25,7 +24,6 @@ class JUS_Config
       :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => true,  # Notifier will be notified on receiving new submissions
       :allow_multi_submissions                        => true,
       :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
       :enable_orm                                     => true,
@@ -35,14 +33,12 @@ class JUS_Config
       :checklist_version                              => '2',
 
       # Safety Assurance Module
-      :sa_mailer                                      => true,
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
 
 
       # SMS IM Module
       :has_framework                                  => false,
-      :sra_mailers                                    => true,
     }
   end
 

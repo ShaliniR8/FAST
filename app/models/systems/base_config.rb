@@ -13,7 +13,7 @@ class BaseConfig
 
 
   def self.airline_code
-    'BOE'
+    'TMC'
   end
 
   def self.airline

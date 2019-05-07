@@ -9,7 +9,6 @@ class BOE_Config
 
       :base_risk_matrix                               => false,
       :has_analytics_filter                           => true,
-      :enable_message_mailer                          => true,
       :enable_message_templates                       => true,
       :event_summary                                  => true,
       :event_tabulation                               => true,
@@ -26,7 +25,6 @@ class BOE_Config
       :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => false,  # Notifier will be notified on receiving new submissions
       :allow_multi_submissions                        => true,
       :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
       :enable_orm                                     => false,
@@ -36,14 +34,12 @@ class BOE_Config
       :checklist_version                              => '3',
 
       # Safety Assurance Module
-      :sa_mailer                                      => false,
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
 
 
       # SMS IM Module
       :has_framework                                  => false,
-      :sra_mailers                                    => false,
     }
   end
 

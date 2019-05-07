@@ -7,16 +7,16 @@ class TMC_Config
       :code                                           => "TMC",
       :base_risk_matrix                               => true,
       :has_analytics_filter                           => true,
-      :enable_message_mailer                          => true,
       :enable_message_templates                       => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_custom_options                          => true,
-      :enable_configurable_risk_matrices              => true,
-      :enable_checklist_templates                     => true,
-      :allow_set_alert                                => true,
-      :has_verification                               => true,
+      :enable_configurable_risk_matrices              => false,
+      :enable_checklist_templates                     => false,
+      :allow_set_alert                                => false,
+      :has_verification                               => false,
       :has_mobile_app                                 => false,
+      :enable_mailer                                  => true,
 
 
 
@@ -24,24 +24,21 @@ class TMC_Config
       :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => true,  # Notifier will be notified on receiving new submissions
       :allow_multi_submissions                        => true,
       :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
-      :enable_orm                                     => true,
-      :observation_phases_trend                       => true,
+      :enable_orm                                     => false,
+      :observation_phases_trend                       => false,
       :submission_title_required                      => true,
-      :allow_template_nested_fields                   => true,
-      :checklist_version                              => '2',
+      :allow_template_nested_fields                   => false,
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
-      :sa_mailer                                      => true,
       :allow_reopen_report                            => true,
-      :has_root_causes                                => true,
+      :has_root_causes                                => false,
 
 
       # SMS IM Module
       :has_framework                                  => false,
-      :sra_mailers                                    => true,
     }
   end
 
@@ -49,8 +46,8 @@ class TMC_Config
   FAA_INFO = {
     "CHDO"=>"ACE-FSDO-09",
     "Region"=>"Central",
-    "ASAP MOU Holder Name"=>"Boeing",
-    "ASAP MOU Holder FAA Designator"=>"BASE"
+    "ASAP MOU Holder Name"=>"Travel Management Company",
+    "ASAP MOU Holder FAA Designator"=>"TMC"
   }
 
 
