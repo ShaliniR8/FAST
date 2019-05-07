@@ -2,7 +2,7 @@ class WAA_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.2",
+      :version                                        => "1.0.3",
 
       :code                                           => "WAA",
       :base_risk_matrix                               => true,

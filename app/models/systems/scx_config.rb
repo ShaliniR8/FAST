@@ -2,7 +2,7 @@ class SCX_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.2",
+      :version                                        => "1.0.3",
 
       :code                                           => "SCX",
       :base_risk_matrix                               => false,
