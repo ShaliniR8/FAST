@@ -209,7 +209,7 @@
 
         <%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
 
-        <div class="col-xs-12"><%=render "/audits/show_comment", :owner => @audit%></div>
+        <%=render "/forms/show_comment", :owner => @audit%>
         <%=render "/forms/attachments_show", :owner => @audit%>
         <%=render "/records/transactions", :owner => @audit%>
 

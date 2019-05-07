@@ -181,14 +181,13 @@
               :disable_with => "Adding..."%>
           <%end%>
 
-          <%if !current_user.has_access('evaluations','viewer')%>
-            <%=link_to "Add Comment",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'comment_btn',
-              "data-toggle" => "modal",
-              "data-target"=>".bs-example-modal-lg"%>
-          <%end%>
+          <%=link_to "Add Comment",
+            "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target"=>".bs-example-modal-lg"%>
+
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @evaluation%>
@@ -207,6 +206,7 @@
           :type => 'evaluations',
           :show_btn => false%>
 
+        <%=render "/forms/show_comment", :owner => @evaluation%>
         <%=render "/forms/attachments_show", :owner => @evaluation%>
         <%=render "/records/transactions", :owner => @evaluation%>
       </div>

@@ -129,13 +129,6 @@
                   :class => "btn btn-success pull-right mr5 mb5",
                   :disable_with => "Adding..."%>
 
-                <%=link_to "Add Comment",
-                  "#",
-                  :class => "btn btn-success pull-right mr5 mb5",
-                  :id => 'comment_btn',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-
                 <%=link_to "Add Corrective Action",
                   new_sms_action_path(
                     :owner_id => @finding.id,
@@ -170,7 +163,12 @@
               <%end%>
             <%end%>
 
-
+            <%=link_to "Add Comment",
+              "#",
+              :class => "btn btn-success pull-right mr5 mb5",
+              :id => 'comment_btn',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
 
           </div>
 

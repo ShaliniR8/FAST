@@ -3,6 +3,7 @@ class Audit < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Contactable
   include Findingable
   include Transactionable
@@ -14,7 +15,6 @@ class Audit < ActiveRecord::Base
   has_many    :tasks,               foreign_key: 'owner_id',      class_name: 'AuditTask',              dependent: :destroy
   has_many    :requirements,        foreign_key: 'owner_id',      class_name: 'AuditRequirement',       dependent: :destroy
   has_many    :items,               foreign_key: 'owner_id',      class_name: 'AuditItem',              dependent: :destroy
-  has_many    :comments,            foreign_key: 'owner_id',      class_name: 'AuditComment',           dependent: :destroy
   has_many    :notices,             foreign_key: 'owner_id',      class_name: 'AuditNotice',            dependent: :destroy
   has_many    :checklist_records,   foreign_key: 'owner_id',      class_name: 'AuditChecklistRecord',   dependent: :destroy
 
@@ -25,7 +25,6 @@ class Audit < ActiveRecord::Base
   accepts_nested_attributes_for :tasks
   accepts_nested_attributes_for :items
   accepts_nested_attributes_for :requirements
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true
 
   after_create -> { create_transaction('Create') }

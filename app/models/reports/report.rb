@@ -2,6 +2,7 @@ class Report < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Transactionable
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'

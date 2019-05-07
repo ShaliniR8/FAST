@@ -115,10 +115,17 @@
                   "data-target" => ".bs-example-modal-lg"%>
               <%end%>
             <%end%>
+            <%=link_to "Add Comment", "#",
+              :class => "btn btn-success pull-right mr5 mb5",
+              :id => 'comment_btn',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
         </div>
 
 
         <%=render "/forms/show_fields", :fields => @fields, :record => @corrective_action%>
+
+        <%=render "/forms/show_comment", :owner => @corrective_action%>
         <%=render "/forms/attachments_show", :owner => @corrective_action%>
         <%=render "records/transactions", :owner => @corrective_action%>
 
@@ -135,6 +142,13 @@
 
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_corrective_action_path(@corrective_action)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_inspection_path(@inspection)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

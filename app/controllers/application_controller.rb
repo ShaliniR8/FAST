@@ -216,6 +216,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def get_recommendation_owner(rec)
+    case rec.owner_type
+    when 'Finding'
+      return get_finding_owner(rec.owner)
+    else
+      return "#{rec.owner_type.downcase}s"
+    end
+  end
+
 
   def submission_display(report)
     true
@@ -376,7 +385,7 @@ class ApplicationController < ActionController::Base
     @terms = @table.get_meta_fields()
     @records = @table.within_timerange(params[:start_date], params[:end_date])
     if params[:type].present?
-      @records = @records.select{|x| x.type == params[:type]}
+      @records = @records.select{|x| x.owner_type == params[:type]}
     end
     if params[:status].present?
       if params[:status] == "Overdue"

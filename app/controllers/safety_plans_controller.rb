@@ -87,7 +87,11 @@ class SafetyPlansController < ApplicationController
     send_data pdf.to_pdf, :filename => "Safety_Plan_##{@safety_plan.get_id}.pdf"
   end
 
-
+  def comment
+    @owner = SafetyPlan.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
   def complete
     safety_plan=SafetyPlan.find(params[:id])

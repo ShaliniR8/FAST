@@ -2,6 +2,7 @@ class RiskControl < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Transactionable
 
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"

@@ -2,6 +2,7 @@ class Record < ActiveRecord::Base
 
 #Concerns List
 include Attachmentable
+include Commentable
 include Transactionable
 
 #Associations List
@@ -14,7 +15,6 @@ include Transactionable
   belongs_to  :report,              :foreign_key => "reports_id",       :class_name => "Report"
 
   has_many    :record_fields,       :foreign_key => "records_id",       :class_name => "RecordField",           :dependent => :destroy
-  has_many    :comments,            :foreign_key => "owner_id",         :class_name => "RecordComment",         :dependent => :destroy
   has_many    :suggestions,         :foreign_key => "owner_id",         :class_name => "RecordSuggestion",      :dependent => :destroy
   has_many    :descriptions,        :foreign_key => "owner_id",         :class_name => "RecordDescription",     :dependent => :destroy
   has_many    :causes,              :foreign_key => "owner_id",         :class_name => "RecordCause",           :dependent => :destroy
@@ -33,7 +33,6 @@ include Transactionable
   accepts_nested_attributes_for :detections
   accepts_nested_attributes_for :suggestions
   accepts_nested_attributes_for :record_fields
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :descriptions
 
 

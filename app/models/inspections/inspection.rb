@@ -2,6 +2,7 @@ class Inspection < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Contactable
   include Findingable
   include Transactionable
@@ -13,14 +14,12 @@ class Inspection < ActiveRecord::Base
   has_many :tasks,                  foreign_key: 'owner_id',            class_name: 'InspectionTask',           dependent: :destroy
   has_many :requirements,           foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
   has_many :items,                  foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
-  has_many :comments,               foreign_key: 'owner_id',            class_name: 'InspectionComment',        dependent: :destroy
   has_many :notices,                foreign_key: 'owner_id',            class_name: 'InspectionNotice',         dependent: :destroy
 
   has_many :checklists, as: :owner, dependent: :destroy
 
   accepts_nested_attributes_for :tasks
   accepts_nested_attributes_for :requirements
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :items
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }

@@ -136,6 +136,12 @@ class EvaluationsController < ApplicationController
   end
 
 
+  def comment
+    @owner = Evaluation.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
+
 
   def new_requirement
     @audit = Evaluation.find(params[:id])

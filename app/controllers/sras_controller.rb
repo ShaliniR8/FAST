@@ -257,7 +257,11 @@ class SrasController < ApplicationController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
+  def comment
+    @owner = Sra.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def get_agenda

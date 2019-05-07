@@ -299,8 +299,8 @@ class AuditsController < ApplicationController
 
   def comment
     @owner = Audit.find(params[:id])
-    @comment = AuditComment.new
-    render :partial => "viewer_comment"
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
   end
 
 

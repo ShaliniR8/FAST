@@ -2,6 +2,7 @@ class Finding < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Recommendationable
   include Transactionable
 
@@ -13,13 +14,11 @@ class Finding < ActiveRecord::Base
   has_many    :causes,                    foreign_key: "owner_id",                class_name: "FindingCause",             :dependent => :destroy
   has_many    :descriptions,              foreign_key: "owner_id",                class_name: "FindingDescription",       :dependent => :destroy
   has_many    :corrective_actions,        foreign_key: "owner_id",                class_name: "FindingAction",            :dependent => :destroy
-  has_many    :comments,                  foreign_key: "owner_id",                class_name: "FindingComment",           :dependent => :destroy
   has_many    :notices,                   foreign_key: "owner_id",                class_name: "FindingNotice",            :dependent => :destroy
 
   accepts_nested_attributes_for :corrective_actions
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :comments
 
   after_create    :create_finding_transaction
   before_create   :set_priveleges

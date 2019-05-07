@@ -153,7 +153,11 @@ class InvestigationsController < ApplicationController
     end
   end
 
-
+  def comment
+    @owner = Investigation.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
   def index
     @table = Object.const_get("Investigation")

@@ -266,8 +266,8 @@ class FindingsController < ApplicationController
 
   def comment
     @owner = Finding.find(params[:id])
-    @comment = FindingComment.new
-    render :partial => "audits/viewer_comment"
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
   end
 
 

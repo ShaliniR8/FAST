@@ -2,6 +2,7 @@ class Evaluation < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Contactable
   include Findingable
   include Transactionable
@@ -14,13 +15,11 @@ class Evaluation < ActiveRecord::Base
   has_many    :tasks,             foreign_key: 'owner_id',                class_name: 'EvaluationTask',           dependent: :destroy
   has_many    :requirements,      foreign_key: 'owner_id',                class_name: 'EvaluationRequirement',    dependent: :destroy
   has_many    :items,             foreign_key: 'owner_id',                class_name: 'EvaluationItem',           dependent: :destroy
-  has_many    :comments,          foreign_key: 'owner_id',                class_name: 'EvaluationComment',        dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',                class_name: 'EvaluationNotice',         dependent: :destroy
 
 
   accepts_nested_attributes_for :tasks
   accepts_nested_attributes_for :requirements
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :items
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }

@@ -1,6 +1,3 @@
-<%if @owner.type.present?%>
-  <%@owner = (@owner.type.include? "Finding") ? @owner.becomes(Finding): @owner%>
-<%end%>
 <%=form_for @owner do |x|%>
   <%=x.fields_for :comments,@comment do |f|%>
     <div class="panel-warning">

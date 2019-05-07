@@ -166,9 +166,15 @@
                 :confirm => "Are you sure?"%>
             <%end%>
           <%end%>
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
         </div>
 
         <%=render "/sms_actions/show", :owner => @corrective_action, :show_btn => true%>
+        <%=render "/forms/show_comment", :owner => @corrective_action%>
         <%=render "/forms/attachments_show", :owner => @corrective_action%>
         <%=render "/records/transactions", :owner => @corrective_action%>
 
@@ -211,6 +217,12 @@
       });
     });
 
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_sms_action_path(@corrective_action)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
     $("#alert_btn").on('click', function(){
       $.get("<%=new_notification_path(

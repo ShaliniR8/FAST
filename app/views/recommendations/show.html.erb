@@ -132,9 +132,15 @@
                   :confirm => "Are you sure?"%>
               <%end%>
             <%end%>
+            <%=link_to "Add Comment", "#",
+              :class => "btn btn-success pull-right mr5 mb5",
+              :id => 'comment_btn',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
           </div>
 
           <%=render '/recommendations/show', :owner => @recommendation, :show_btn => true%>
+          <%=render "/forms/show_comment", :owner => @recommendation%>
           <%=render "/forms/attachments_show", :owner => @recommendation%>
           <%=render "/records/transactions", :owner => @recommendation%>
         </div>
@@ -149,6 +155,13 @@
   $(document).ready(function(){
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_recommendation_path(@recommendation)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_recommendation_path(@recommendation)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

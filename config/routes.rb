@@ -294,6 +294,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'show_narrative'
       get "reopen"
       get 'override_status'
+      get 'comment'
     end
   end
   resources :meetings do
@@ -523,6 +524,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'baseline'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :finding_action, :controller => 'sms_actions'
@@ -537,6 +539,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -566,6 +569,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'get_agenda'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -588,6 +592,7 @@ PrdgSession::Application.routes.draw do |map|
       get "new_root_cause"
       get "reload_root_causes"
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -613,6 +618,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :safety_plans do
@@ -625,6 +631,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :srm_meetings do

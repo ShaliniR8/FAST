@@ -26,7 +26,11 @@ class InspectionsController < ApplicationController
     @fields = Inspection.get_meta_fields('form')
   end
 
-
+  def comment
+    @owner = Inspection.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
   def edit
     @inspection = Inspection.find(params[:id])

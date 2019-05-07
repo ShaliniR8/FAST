@@ -5,6 +5,7 @@ class Submission < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Transactionable
 
 #Association List
@@ -13,10 +14,8 @@ class Submission < ActiveRecord::Base
   belongs_to :record,     foreign_key: "records_id",    class_name: "Record"
 
   has_many :submission_fields,    foreign_key: "submissions_id",  class_name: "SubmissionField",        :dependent => :destroy
-  has_many :comments,             foreign_key: "owner_id",        class_name: "SubmissionNote",         :dependent => :destroy
   has_many :notices,              foreign_key: "owner_id",        class_name: "SubmissionNotice",       :dependent => :destroy
 
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :submission_fields
 
   after_create :make_report

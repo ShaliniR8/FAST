@@ -104,8 +104,8 @@ class MeetingsController < ApplicationController
 
   def comment
     @owner=Meeting.find(params[:id]).becomes(Meeting)
-    @comment=MeetingComment.new
-    render :partial=>"audits/viewer_comment"
+    @comment=@owner.comments.new
+    render :partial=>"forms/viewer_comment"
   end
 
 

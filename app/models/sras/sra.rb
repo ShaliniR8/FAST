@@ -2,6 +2,7 @@ class Sra < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Transactionable
 
 #Association List

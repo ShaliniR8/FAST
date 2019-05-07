@@ -288,6 +288,12 @@ class ReportsController < ApplicationController
   end
 
 
+  def comment
+    @owner = Report.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
+
 
   def print
     @deidentified = params[:deidentified]

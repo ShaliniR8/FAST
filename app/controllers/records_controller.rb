@@ -63,8 +63,8 @@ class RecordsController < ApplicationController
 
   def comment
     @owner = Record.find(params[:id])
-    @comment = RecordComment.new
-    render :partial => "viewer_comment"
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
   end
 
 

@@ -20,6 +20,7 @@ class RecommendationsController < ApplicationController
   before_filter(only: [:show]) { check_group('recommendation') }
 
   def index
+    @table = Object.const_get('Recommendation')
     @headers = Recommendation.get_meta_fields('index')
     @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
@@ -67,6 +68,12 @@ class RecommendationsController < ApplicationController
     @fields = Recommendation.get_meta_fields('show')
   end
 
+
+  def comment
+    @owner = Recommendation.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def edit

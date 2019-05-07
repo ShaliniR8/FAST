@@ -150,7 +150,7 @@ class SubmissionsController < ApplicationController
 
   def comment
     @owner = Submission.find(params[:id])
-    @comment = SubmissionNote.new
+    @comment = @owner.comments.new
     render :partial => "notes"
   end
 

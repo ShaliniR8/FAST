@@ -134,7 +134,11 @@ class SmsActionsController < ApplicationController
     render :partial => '/forms/workflow_forms/process', locals: {status: status}
   end
 
-
+  def comment
+    @owner = SmsAction.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
   def update
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)

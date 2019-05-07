@@ -103,6 +103,11 @@
                 :confirm => "Are you sure?"%>
             <%end%>
           <%end%>
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
         </div>
 
         <%=render "/forms/show_fields",
@@ -159,6 +164,7 @@
           </div>
         <%end%>
 
+        <%=render "/forms/show_comment", :owner => @hazard%>
         <%=render "/forms/attachments_show", :owner => @hazard%>
         <%=render "/records/transactions", :owner => @hazard%>
 
@@ -172,6 +178,12 @@
 
 <script>
   $(document).ready(function(){
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_hazard_path(@hazard)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
     $('#mitigate_btn').on('click',function(){
       $.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
         $(".modal-content").html(data);

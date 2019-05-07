@@ -33,23 +33,41 @@
       </div>
 
       <div class="panel-body">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="pull-right mb10">
-              <%if current_user.has_access("sms_meetings","edit") && @meeting.status == "Open" && @meeting.has_user(current_user)%>
-                <%=link_to "Close", close_srm_meeting_path(@meeting), :class=>"btn btn-danger pull-right ml5", :disable_with => "Closing...", :confirm => "Are you sure?"%>
-                <%=link_to "Add SRAs","#",:class=>"btn btn-success",:id=>"sra_btn","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-                <%=link_to "Add Comment","#",:class=>"btn btn-success",:id=>'comment_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-              <%elsif @meeting.status == "Closed"%>
-                <%=link_to "Reopen Meeting", reopen_srm_meeting_path(@meeting), :class=>"btn btn-warning pull-right mr5 mb5", :confirm => "Are you sure?", :disable_with => "Reopening..."%>
-              <%end%>
-            </div>
-          </div>
+        <div class="col-xs-12 mb15">
+
+          <%if current_user.has_access("sms_meetings","edit") &&
+                @meeting.status == "Open" &&
+                @meeting.has_user(current_user)%>
+            <%=link_to "Close",
+              close_srm_meeting_path(@meeting),
+              :class=>"btn btn-danger pull-right mr5 mb5",
+              :disable_with => "Closing...",
+              :confirm => "Are you sure?"%>
+            <%=link_to "Add SRAs","#",
+              :class=>"btn btn-success pull-right mr5 mb5",
+              :id=>"sra_btn",
+              "data-toggle"=>"modal",
+              "data-target"=>".bs-example-modal-lg"%>
+            <%=link_to "Add Comment","#",
+              :class=>"btn btn-success pull-right mr5 mb5",
+              :id=>'comment_btn',
+              "data-toggle"=>"modal",
+              "data-target"=>".bs-example-modal-lg"%>
+
+          <%elsif @meeting.status == "Closed"%>
+            <%=link_to "Reopen Meeting",
+              reopen_srm_meeting_path(@meeting),
+              :class=>"btn btn-warning pull-right mr5 mb5",
+              :confirm => "Are you sure?",
+              :disable_with => "Reopening..."%>
+          <%end%>
         </div>
+
         <%if @current_inv.present?%>
           <%=render "meetings/invitation_form"%>
         <%end%>
 
+        <div class="col-xs-12">
           <div class="panel panel-lightskyblue">
             <div class="panel-heading">
               <div class="panel-title">
@@ -64,39 +82,47 @@
               </div>
             </div>
           </div>
+        </div>
 
-        <%=render "sras"%>
+        <div class="col-xs-12">
+          <%=render "sras"%>
+        </div>
 
-        <%=render "/audits/show_comment",:owner=>@meeting%>
-
-        <div class="panel panel-lightskyblue">
-          <div class="panel-heading click-heading collapsed">
-            <div class="panel-title">
-              <b>Participants</b>
-              <span class="pull-right clickable">
-                <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-              </span>
+        <%=render "/forms/show_comment",:owner=>@meeting%>
+        <div class="col-xs-12">
+          <div class="panel panel-lightskyblue">
+            <div class="panel-heading click-heading collapsed">
+              <div class="panel-title">
+                <b>Participants</b>
+                <span class="pull-right clickable">
+                  <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                </span>
+              </div>
             </div>
-          </div>
-          <div class="panel-body" style="display:none">
-            <div class="pull-right mb10">
-              <%if current_user.has_access("meetings","edit") &&
-                @meeting.status == "Open" &&
-                @meeting.has_user(current_user)%>
-                <%=link_to "Send Agenda/Notice", "#",
-                  :id => "message-btn",
-                  :class => "btn btn-info drop",
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-              <%end%>
+            <div class="panel-body" style="display:none">
+              <div class="pull-right mb10">
+                <%if current_user.has_access("meetings","edit") &&
+                  @meeting.status == "Open" &&
+                  @meeting.has_user(current_user)%>
+                  <%=link_to "Send Agenda/Notice", "#",
+                    :id => "message-btn",
+                    :class => "btn btn-info drop",
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg"%>
+                <%end%>
+              </div>
+              <%=render "/meetings/invite"%>
             </div>
-            <%=render "/meetings/invite"%>
           </div>
         </div>
 
         <div class="row">
-          <%=render "/forms/attachments_show", :owner => @meeting%>
-          <%=render "records/transactions", :owner => @meeting%>
+          <div class="col-xs-12">
+            <%=render "/forms/attachments_show", :owner => @meeting%>
+          </div>
+          <div class="col-xs-12">
+            <%=render "records/transactions", :owner => @meeting%>
+          </div>
         </div>
       </div>
     </div>

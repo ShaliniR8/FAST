@@ -130,6 +130,11 @@
                 :confirm => "Are you sure?"%>
             <%end%>
           <%end%>
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @risk_control%>
@@ -141,6 +146,7 @@
               current_user.has_access("sras", "edit")%>
 
         <%=render "/sms_actions/cost", :owner => @risk_control%>
+        <%=render "/forms/show_comment", :owner => @risk_control%>
         <%=render "/forms/attachments_show", :owner => @risk_control%>
         <%=render "/records/transactions", :owner => @risk_control%>
       </div>
@@ -154,6 +160,12 @@
   $(document).ready(function(){
     $("#cost_btn").on('click',function(){
       $.get("<%=new_cost_risk_control_path(@risk_control)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_risk_control_path(@risk_control)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

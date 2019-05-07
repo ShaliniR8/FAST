@@ -2,6 +2,7 @@ class CorrectiveAction < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Commentable
   include Transactionable
 
 #Associations List

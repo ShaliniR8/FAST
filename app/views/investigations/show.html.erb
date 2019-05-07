@@ -179,6 +179,12 @@
                 :disable_with => "Adding..."%>
             <%end%>
 
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
+
           </div>
 
           <%=render '/forms/show_fields', :fields => @fields, :record => @investigation %>
@@ -229,6 +235,7 @@
 
           <%#=render "/records/show_template_fields", :record => @investigation.record%>
 
+          <%=render "/forms/show_comment", :owner => @investigation%>
           <%=render "/forms/attachments_show", :owner => @investigation%>
           <%=render "/records/transactions", :owner => @investigation%>
         </div>
@@ -251,6 +258,12 @@
   $(document).ready(function(){
     $('#contact_btn').on('click',function(){
       $.get("<%=new_contact_investigation_path(@investigation)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_inspection_path(@inspection)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

@@ -317,7 +317,11 @@ class HazardsController < ApplicationController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
+  def comment
+    @owner = Hazard.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def mitigate

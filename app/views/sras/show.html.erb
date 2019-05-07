@@ -163,6 +163,12 @@
             <%end%>
           <%end%>
 
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
+
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @sra%>
@@ -222,6 +228,7 @@
 
         <%=render '/forms/list_records', :records => Array(@sra.record), :title => 'Report'%>
 
+        <%=render "/forms/show_comment", :owner => @sra%>
         <%=render "/forms/attachments_show", :owner => @sra%>
         <%=render "/records/transactions", :owner => @sra%>
 
@@ -250,6 +257,12 @@
 
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_sra_path(@sra)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_sra_path(@sra)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
