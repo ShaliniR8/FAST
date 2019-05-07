@@ -109,18 +109,16 @@ class MessagesController < ApplicationController
 
 
   def prev
-    @message=Message.find(params[:id])
-    @dialogs=@message.getPrev.delete_if{|x| x.id==@message.id}
-    Rails.logger.debug @dialogs.inspect
+    @message = Message.find(params[:id])
+    @dialogs = @message.getPrev.delete_if{|x| x.id == @message.id}
     render :partial =>"dialogs"
   end
 
 
 
   def reply
-    @message=Message.find(params[:id])
-    @dialogs=@message.getDialogs.delete_if{|x| x.id==@message.id}
-    Rails.logger.debug @dialogs.inspect
+    @message = Message.find(params[:id])
+    @dialogs = @message.getDialogs.delete_if{|x| x.id == @message.id}
     render :partial =>"dialogs"
   end
 
