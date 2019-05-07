@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190506170220) do
+ActiveRecord::Schema.define(:version => 20190506232740) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -908,7 +908,7 @@ ActiveRecord::Schema.define(:version => 20190506170220) do
   create_table "recommendations", :force => true do |t|
     t.integer  "owner_id"
     t.string   "status",                  :default => "New"
-    t.string   "type"
+    t.string   "owner_type"
     t.string   "title"
     t.string   "department"
     t.integer  "responsible_user_id"

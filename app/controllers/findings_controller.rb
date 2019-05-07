@@ -55,8 +55,8 @@ class FindingsController < ApplicationController
     @departments = SmsAction.departments
     load_options
     @finding = Finding.find(params[:id])
-    @recommendation = FindingRecommendation.new
-    @fields = FindingRecommendation.get_meta_fields('form')
+    @recommendation = Recommendation.new
+    @fields = Recommendation.get_meta_fields('form')
     render :partial => "new_recommendation"
   end
 

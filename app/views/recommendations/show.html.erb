@@ -58,14 +58,14 @@
                   :format => :pdf),
                 :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-              <%if @recommendation.type == "FindingRecommendation"%>
+              <%if @recommendation.owner_type == 'Finding'%>
                 <%=link_to "View Finding",
-                  finding_path(@recommendation.finding),
+                  finding_path(@recommendation.owner),
                   :class => "btn btn-info mr5 pull-right mb5",
                   :disable_with => "Redirecting..."%>
               <%else%>
                 <%=link_to "View Investigation",
-                  investigation_path(@recommendation.investigation),
+                  investigation_path(@recommendation.owner),
                   :class => "btn btn-info mr5 pull-right mb5",
                   :disable_with => "Redirecting..."%>
               <%end%>

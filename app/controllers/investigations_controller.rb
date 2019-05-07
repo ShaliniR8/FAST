@@ -25,8 +25,8 @@ class InvestigationsController < ApplicationController
     @departments = SmsAction.departments
     load_options
     @finding = Investigation.find(params[:id])
-    @recommendation = InvestigationRecommendation.new
-    @fields = InvestigationRecommendation.get_meta_fields('form')
+    @recommendation = Recommendation.new
+    @fields = Recommendation.get_meta_fields('form')
     render :partial => "findings/new_recommendation"
   end
 
@@ -208,7 +208,7 @@ class InvestigationsController < ApplicationController
     @desc_headers = InvestigationDescription.get_headers
     load_options
     @fields = Investigation.get_meta_fields('show')
-    @recommendation_fields = InvestigationRecommendation.get_meta_fields('show')
+    @recommendation_fields = Recommendation.get_meta_fields('show')
     load_special_matrix(@investigation)
   end
 

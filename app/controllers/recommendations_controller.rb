@@ -20,9 +20,8 @@ class RecommendationsController < ApplicationController
   before_filter(only: [:show]) { check_group('recommendation') }
 
   def index
-    @table = Object.const_get("Recommendation")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    @headers = Recommendation.get_meta_fields('index')
+    @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
 
     if !current_user.admin? && !current_user.has_access('recommendations','admin')
@@ -38,18 +37,17 @@ class RecommendationsController < ApplicationController
 
   def new
     @privileges = Privilege.find(:all)
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Recommendation" : "Recommendation"
     @owner = Object.const_get(params[:owner_type])
       .find(params[:owner_id])
       .becomes(Object.const_get(params[:owner_type])) rescue nil
-    @recommendation = Object.const_get(@table).new
+    @recommendation = @owner.recommendations.new
     @fields = Recommendation.get_meta_fields('form')
   end
 
 
   def create
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Recommendation" : "Recommendation"
-    recommendation = Object.const_get(@table).create(params[:recommendation])
+    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    recommendation = @owner.recommendations.create(params[:recommendation])
     redirect_to recommendation.becomes(Recommendation), flash: {success: "Recommendation created."}
   end
 
@@ -65,7 +63,7 @@ class RecommendationsController < ApplicationController
 
   def show
     @recommendation = Recommendation.find(params[:id])
-    @type = get_recommendation_owner(@recommendation)
+    @type = @recommendation.owner_type
     @fields = Recommendation.get_meta_fields('show')
   end
 

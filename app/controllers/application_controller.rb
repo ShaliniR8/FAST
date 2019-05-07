@@ -190,14 +190,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def get_recommendation_owner(rec)
-    if rec.type == "FindingRecommendation"
-      return get_finding_owner(rec.finding)
-    elsif rec.type == "InvestigationRecommendation"
-      return 'investigations'
-    end
-  end
-
   def display_finding(finding)
     if finding.type == "AuditFinding"
       return current_user.has_access("audits", "index")

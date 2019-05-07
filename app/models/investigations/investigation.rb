@@ -3,6 +3,7 @@ class Investigation < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Contactable
+  include Recommendationable
   include Transactionable
 
 #Associations List
@@ -14,7 +15,6 @@ class Investigation < ActiveRecord::Base
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
   has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
   has_many :comments,                   :foreign_key => "owner_id",             :class_name => "InvestigationComment",          :dependent => :destroy
-  has_many :recommendations,            :foreign_key => "owner_id",             :class_name => "InvestigationRecommendation",   :dependent => :destroy
   has_many :findings,                   :foreign_key => "audit_id",             :class_name => "InvestigationFinding",          :dependent => :destroy
   has_many :tasks,                      :foreign_key => "owner_id",             :class_name => "InvestigationTask",             :dependent => :destroy
   has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
@@ -25,7 +25,6 @@ class Investigation < ActiveRecord::Base
   accepts_nested_attributes_for :descriptions
   accepts_nested_attributes_for :tasks
   accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :recommendations
   accepts_nested_attributes_for :findings
   accepts_nested_attributes_for :comments
 

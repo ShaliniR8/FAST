@@ -8,6 +8,7 @@ class Recommendation < ActiveRecord::Base
   belongs_to :responsible_user,    foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to :approver,            foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :created_by,          foreign_key: 'created_by_id',       class_name: 'User'
+  belongs_to :owner,               polymorphic: true
 
   has_many :descriptions, foreign_key: 'owner_id', class_name: 'RecommendationDescription', dependent: :destroy
   has_many :notices,      foreign_key: 'owner_id', class_name: 'RecommendationNotice',      dependent: :destroy
@@ -185,4 +186,20 @@ class Recommendation < ActiveRecord::Base
       "N/A"
     end
   end
+
+  def get_source
+    case owner.class.name
+    when 'Investigation'
+      "<a style='font-weight:bold' href='/investigations/#{owner.id}'>
+        Investigation ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    when 'Finding'
+      "<a style='font-weight:bold' href='/findings/#{owner.id}'>
+        Finding ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+  end
+
 end

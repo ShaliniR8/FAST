@@ -24,7 +24,7 @@
 
             <%if params[:owner_type].present?%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
-              <%=f.hidden_field :owner_id, :value => params[:owner_id]%>
+              <%=hidden_field_tag :owner_id, params[:owner_id]%>
             <%end%>
 
             <%=render "shared/privilege_form",:target => "recommendation[privileges][]",:owner => @recommendation,:f => f%>
