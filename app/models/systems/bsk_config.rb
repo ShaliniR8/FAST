@@ -16,6 +16,7 @@ class BSK_Config
       :allow_set_alert                                => true,
       :has_verification                               => true,
       :has_mobile_app                                 => false,
+      :enable_mailer                                  => true,
 
 
 

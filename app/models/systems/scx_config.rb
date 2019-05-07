@@ -16,6 +16,7 @@ class SCX_Config
       :has_verification                               => false,
       :has_extension                                  => false,
       :has_mobile_app                                 => false,
+      :enable_mailer                                  => true,
 
 
 

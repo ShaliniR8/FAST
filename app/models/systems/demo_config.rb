@@ -16,6 +16,7 @@ class Demo_Config
       :allow_set_alert                                => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
+      :enable_mailer                                  => true,
 
 
       # Safety Reporting Module

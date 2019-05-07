@@ -18,6 +18,7 @@ class BOE_Config
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_mobile_app                                 => false,
+      :enable_mailer                                  => true,
 
 
 
@@ -31,7 +32,7 @@ class BOE_Config
       :observation_phases_trend                       => false,
       :submission_title_required                      => true,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '3',
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
