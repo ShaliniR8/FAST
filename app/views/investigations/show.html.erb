@@ -228,7 +228,7 @@
 
           <%=render "/ims/show_task",
             :owner=>@investigation,
-            :fields=> InvestigationTask.get_meta_fields('show')%>
+            :fields=> SmsTask.get_meta_fields('show')%>
 
           <%=render "/sms_actions/cost", :owner => @investigation%>
 

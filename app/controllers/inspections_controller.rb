@@ -125,10 +125,10 @@ class InspectionsController < ApplicationController
 
 
   def new_task
-    @audit = Inspection.find(params[:id])
+    @owner = Inspection.find(params[:id])
     load_options
-    @task = InspectionTask.new
-    render :partial => 'audits/task'
+    @task = @owner.tasks.new
+    render :partial => 'forms/task'
   end
 
 

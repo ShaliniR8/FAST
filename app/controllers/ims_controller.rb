@@ -173,13 +173,13 @@ class ImsController < ApplicationController
   def new_task
     @im = Im.find(params[:id])
     load_options
-    @task = ImTask.new
+    @task = @im.tasks.new
     render :partial => 'task'
   end
 
   def new_contact
     @im = Im.find(params[:id])
-    @contact = Contact.new
+    @contact = @im.contacts.new
     render :partial => 'contact'
   end
 

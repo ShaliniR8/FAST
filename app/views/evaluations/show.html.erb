@@ -193,7 +193,7 @@
         <%=render '/forms/show_fields', :fields => @fields, :record => @evaluation%>
         <%=render "/ims/show_task",
           :owner => @evaluation,
-          :fields => EvaluationTask.get_meta_fields('show')%>
+          :fields => SmsTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact",
           :owner => @evaluation,
           :type=>'evaluation',

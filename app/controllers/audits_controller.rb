@@ -80,10 +80,10 @@ class AuditsController < ApplicationController
 
 
   def new_task
-    @audit = Audit.find(params[:id])
+    @owner = Audit.find(params[:id])
     load_options
-    @task = AuditTask.new
-    render :partial => 'task'
+    @task = @owner.tasks.new
+    render :partial => 'forms/task'
   end
 
 

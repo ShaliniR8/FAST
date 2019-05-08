@@ -181,7 +181,7 @@
         <%=render '/checklists/checklist_types', :owner => @inspection, :type => 'inspection'%>
         <%=render "/ims/show_task",
           :owner => @inspection,
-          :fields => InspectionTask.get_meta_fields('show')%>
+          :fields => SmsTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact",
           :owner=>@inspection,
           :fields => Contact.get_meta_fields('show')%>

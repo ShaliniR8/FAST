@@ -6,6 +6,7 @@ class Investigation < ActiveRecord::Base
   include Contactable
   include Findingable
   include Recommendationable
+  include SmsTaskable
   include Transactionable
 
 #Associations List
@@ -16,14 +17,12 @@ class Investigation < ActiveRecord::Base
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
   has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
-  has_many :tasks,                      :foreign_key => "owner_id",             :class_name => "InvestigationTask",             :dependent => :destroy
   has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
 
   accepts_nested_attributes_for :corrective_actions
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :tasks
   accepts_nested_attributes_for :costs
 
   after_create -> { create_transaction('Create') }

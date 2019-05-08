@@ -121,10 +121,10 @@ class EvaluationsController < ApplicationController
 
 
   def new_task
-    @audit = Evaluation.find(params[:id])
+    @owner = Evaluation.find(params[:id])
     load_options
-    @task = EvaluationTask.new
-    render :partial => 'audits/task'
+    @task = @owner.tasks.new
+    render :partial => 'forms/task'
   end
 
 

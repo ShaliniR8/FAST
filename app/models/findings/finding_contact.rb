@@ -1,2 +1,0 @@
-class FindingContact < Contact
-end

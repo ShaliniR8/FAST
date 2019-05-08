@@ -251,10 +251,10 @@ class InvestigationsController < ApplicationController
 
 
   def new_task
-    @audit = Investigation.find(params[:id])
+    @owner = Investigation.find(params[:id])
     load_options
-    @task = InvestigationTask.new
-    render :partial=>'audits/task'
+    @task = @owner.tasks.new
+    render :partial=>'forms/task'
   end
 
 
