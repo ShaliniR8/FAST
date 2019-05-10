@@ -21,6 +21,20 @@ class Im < ActiveRecord::Base
 
   extend AnalyticsFilters
 
+  def self.get_meta_fields(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    [
+      { field: 'id',                title: 'ID',                num_cols: 6, type: 'text',      visible: 'index,show',       required: false },
+      { field: 'title',             title: 'Title',             num_cols: 6, type: 'text',      visible: 'index,form,show',  required: true },
+      { field: 'completion_date',   title: 'Completion Date',   num_cols: 6, type: 'date',      visible: 'index,form,show',  required: false },
+      { field: 'lead_evaluator',    title: 'Lead Evaluator',    num_cols: 6, type: 'user',      visible: 'index,form,show',  required: false },
+      { field: 'pre_reviewer',      title: 'Reviewer',          num_cols: 6, type: 'user',      visible: 'index,form,show',  required: false },
+      { field: 'apply_to',          title: 'Plan Applies To',   num_cols: 6, type: 'text',      visible: 'form,show',        required: false },
+      { field: 'org_type',          title: 'Organization Type', num_cols: 6, type: 'text',      visible: 'form,show',        required: false },
+      { field: 'status',            title: 'Status',            num_cols: 6, type: 'text',      visible: 'index,show',       required: false }
+    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
   def create_transaction(action)
     Transaction.build_for(
       self,

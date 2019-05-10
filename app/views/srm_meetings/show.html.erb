@@ -38,11 +38,11 @@
           <%if current_user.has_access("sms_meetings","edit") &&
                 @meeting.status == "Open" &&
                 @meeting.has_user(current_user)%>
-            <%=link_to "Close",
-              close_srm_meeting_path(@meeting),
-              :class=>"btn btn-danger pull-right mr5 mb5",
-              :disable_with => "Closing...",
-              :confirm => "Are you sure?"%>
+            <%=link_to 'Close Meeting', '#',
+              :class => 'btn btn-danger',
+              :id => 'close',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
             <%=link_to "Add SRAs","#",
               :class=>"btn btn-success pull-right mr5 mb5",
               :id=>"sra_btn",
@@ -61,6 +61,7 @@
               :confirm => "Are you sure?",
               :disable_with => "Reopening..."%>
           <%end%>
+
         </div>
 
         <%if @current_inv.present?%>
@@ -161,6 +162,13 @@
     $('#sra_btn').on('click',function(){
       path="<%=add_sras_srm_meeting_path(@meeting)%>";
       $.get(path,function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#close').on('click',function(){
+      var commit=$(this).attr('id');
+      $.get("<%=close_srm_meeting_path(@meeting)%>?commit="+commit, function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

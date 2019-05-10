@@ -36,9 +36,8 @@
             :f => f,
             :record => @report%>
 
-
-          <div class="col-xs-6">
-            <div class="panel panel-info">
+          <div class="col-xs-12 mt10">
+            <div class="panel panel-success">
               <div class="panel-heading">
                 <div class="panel-title"><b>Included Reports</b></div>
               </div>
@@ -50,18 +49,20 @@
                         <%@report_fields.each do |header|%>
                           <th><%=header[:title]%></th>
                         <%end%>
-                        <th class="col-xs-3 col-lg-3">Action</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       <%@report.records.each do |record|%>
                         <tr record="<%=record.id%>">
                           <%@report_fields.each do |header|%>
-                            <td><%=record.send(header[:field])%></td>
+                            <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                              <%=render 'forms/show_field', :record => record, :field_hash => header%>
+                            </td>
                           <%end%>
                           <td>
                             <div class="btn-group">
-                              <a class="btn btn-info view_btn">
+                              <a class="btn btn-info view_btn mr5">
                                 <span class="glyphicon glyphicon-search"></span>
                               </a>
                               <a class="btn btn-danger action-btn">
@@ -78,7 +79,7 @@
             </div>
           </div>
 
-          <div class="col-xs-6">
+          <div class="col-xs-12">
             <div class="panel panel-info">
               <div class="panel-heading">
                 <div class="panel-title"><b>Available Reports</b></div>
@@ -91,21 +92,23 @@
                         <%@report_fields.each do |header|%>
                           <th><%=header[:title]%></th>
                         <%end%>
-                        <th class="col-xs-3 col-lg-3">Action</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       <%@candidates.each do |record|%>
                         <tr record="<%=record.id%>">
                           <%@report_fields.each do |header|%>
-                            <td><%=record.send(header[:field])%></td>
+                            <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                              <%=render 'forms/show_field', :record => record, :field_hash => header%>
+                            </td>
                           <%end%>
                           <td>
                             <div class="btn-group">
-                              <a class="btn btn-info view_btn">
+                              <a class="btn btn-info view_btn mr5">
                                 <span class="glyphicon glyphicon-search"></span>
                               </a>
-                              <a class="btn btn-success action-btn">
+                              <a class="btn btn-warning action-btn">
                                 <span class="glyphicon glyphicon-plus"></span>
                               </a>
                             </div>
@@ -118,6 +121,7 @@
               </div>
             </div>
           </div>
+
 
           <%=render '/forms/attachments_form', :f => f, :owner => @report%>
 
@@ -163,6 +167,9 @@
   var airport_table;
   $(document).ready(function(){
 
+
+    $("#included").dataTable();
+    $("#candidates").dataTable();
 
     $(".view_btn").on('click',function(){
       window.open("/records/" + $(this).closest("tr").children("td").eq(0).html());

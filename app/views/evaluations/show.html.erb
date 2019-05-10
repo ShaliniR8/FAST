@@ -52,6 +52,7 @@
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @evaluation%>
+        <%=render '/checklists/checklist_types', :owner => @evaluation, :type => 'evaluation'%>
         <%=render "/ims/show_task",
           :owner => @evaluation,
           :fields => SmsTask.get_meta_fields('show')%>
@@ -62,6 +63,7 @@
         <%=render "/audits/show_requirements",
           :owner => @evaluation,
           :type => 'evaluation'%>
+
         <%=render "/findings/show_all",
           :owner => @evaluation,
           :type => 'evaluations',

@@ -54,19 +54,11 @@
 
         </div>
 
-
-        <%#=render '/forms/progress_bar', :owner => @audit%>
         <%=render '/forms/show_fields', :fields => @fields, :record => @audit%>
-
-
         <%=render '/checklists/checklist_types', :owner => @audit, :type => 'audit'%>
-
-
 
         <%=render "/ims/show_task", :owner => @audit, :fields => SmsTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact", :owner => @audit, :fields => Contact.get_meta_fields('show')%>
-
-
 
         <%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
 

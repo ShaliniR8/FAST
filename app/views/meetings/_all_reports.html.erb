@@ -51,6 +51,7 @@
           <%@report_headers.each do |h|%>
             <th><%=h[:title]%></th>
           <%end%>
+          <th>Meeting Minutes</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -63,18 +64,6 @@
   </div>
 </div>
 
-
-<style>
-  .table tbody tr > td.red {
-    background-color: red !important;
-  }
-  .table tbody tr > td.yellow {
-    background-color: yellow !important;
-  }
-  .table tbody tr > td.green {
-    background-color: mediumseagreen !important;
-  }
-</style>
 
 <script>
   $(document).ready(function(){

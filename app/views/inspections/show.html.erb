@@ -51,10 +51,12 @@
             ],
             owner: @inspection %>
 
+
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @inspection %>
         <%=render '/checklists/checklist_types', :owner => @inspection, :type => 'inspection'%>
+
         <%=render "/ims/show_task",
           :owner => @inspection,
           :fields => SmsTask.get_meta_fields('show')%>
@@ -68,6 +70,7 @@
           :owner => @inspection,
           :show_btn => false%>
         <%=render "/forms/show_comment", :owner => @inspection%>
+
         <%=render "/forms/attachments_show", :owner => @inspection%>
         <%=render "/records/transactions", :owner => @inspection%>
       </div>
@@ -92,6 +95,7 @@
         $(window).trigger('resize');
       });
     });
+
     $('#item_table').dataTable();
   });
 </script>

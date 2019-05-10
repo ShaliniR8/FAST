@@ -12,6 +12,9 @@
         <%=f.label :cause_option_value, "Enter Value"%>
         <%=f.text_field :cause_option_value, :class => "ml5 form-control selected_value"%>
       </div>
+      <div class="col-xs-12 mt10">
+        <%=submit_tag "Add", :class => "btn btn-success pull-right mr10", :disable_with => "Adding..."%>
+      </div>
     <%end%>
   </div>
 </div>

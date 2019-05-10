@@ -46,8 +46,16 @@ class FaaReportsController < ApplicationController
   def print
     @report = FaaReport.find(params[:id])
     @identification = BaseConfig.faa_info
+    asap_reports = Record
+      .where("event_date >= ? and event_date <= ?",
+        @report.get_start_date, @report.get_end_date)
+      .select{|x|
+        (x.template.name.include? "ASAP") &&
+        (x.template.name.include? "#{@report.employee_group}")}
+    @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     html = render_to_string(:template=>"/faa_reports/print.html.erb")
     pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     send_data pdf.to_pdf, :filename => "FAA_Quarterly_Report_#{@report.year}_Quarter#{@report.quarter}.pdf"
   end
@@ -119,7 +127,13 @@ class FaaReportsController < ApplicationController
 
   def show
     @report = FaaReport.find(params[:id])
-    build_stats
+    asap_reports = Record
+      .where("event_date >= ? and event_date <= ?",
+        @report.get_start_date, @report.get_end_date)
+      .select{|x|
+        (x.template.name.include? "ASAP") &&
+        (x.template.name.include? "#{@report.employee_group}")}
+    @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     @identification = BaseConfig.faa_info
   end
 
@@ -133,60 +147,11 @@ class FaaReportsController < ApplicationController
   end
 
 
-
-  def build_stats
-    asap_reports = Record.where("event_date >= ? and event_date <= ?", @report.get_start_date, @report.get_end_date).select{|x| (x.template.name.include? "ASAP") && (x.template.name.include? "#{@report.employee_group}")}
-    asap_events = asap_reports.map{|x| x.report}.uniq.compact
-    # Number of ASAP reports submitted present quarter
-    @report.asap_submit = asap_reports.length
-    # Number of ASAP reports accepted present quarter
-    @report.asap_accept = asap_events.select{|x| x.asap}.map{|x| x.records.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}}.flatten.length
-    # Number of accepted reports present quarter that were sole source to the FAA
-    @report.sole = asap_events.select{|x| x.asap && x.sole}.map{|x| x.records.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}}.flatten.length
-    # Number of accepted reports present quarter closed under ASAP
-    @report.asap_close = asap_events.select{|x| x.asap && x.status == "Closed"}.map{|x| x.records.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}}.flatten.length
-
-
-    # Number of accepted reports present quarter (both sole source & non-sole source) closed with corrective action under ASAP for the employee
-    @report.asap_emp = asap_reports.select{|x| (x.report.present? && x.report.asap && x.report.has_emp) || (x.has_emp)}.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}.flatten.length
-
-
-    # Number of reports present quarter, which resulted in recommendations to the company for corrective action
-    @report.asap_com = asap_reports.select{|x| (x.report.present? && x.report.asap && x.report.has_com) || (x.has_com)}.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}.flatten.length
-
-
-    @report.save
-  end
-
-
-
   def reports_table
     @headers = Record.get_headers
     @report = FaaReport.find(params[:id])
-
-    asap_reports = Record.where("event_date >= ? and event_date <= ?", @report.get_start_date, @report.get_end_date).select{|x| (x.template.name.include? "ASAP") && (x.template.name.include? "#{@report.employee_group}")}
-    asap_events = asap_reports.map{|x| x.report}.uniq.compact
-
-    case params[:mode].to_i
-    when 1
-      @result = asap_reports
-      @title = "ASAP Reports Submitted"
-    when 2
-      @result = asap_events.select{|x| x.asap}.map{|x| x.records.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}}.flatten
-      @title = "ASAP Reports Accepted"
-    when 3
-      @result = asap_events.select{|x| x.asap && x.sole}.map{|x| x.records.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}}.flatten
-      @title = "Accepted Reports Sole Source to the FAA:"
-    when 4
-      @result = asap_reports.select{|x| (x.report.present? && x.report.asap && x.report.has_emp) || (x.has_emp)}.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}.flatten
-      @title = "Accepted Reports present (both sole source & non-sole source) with Corrective Action under ASAP for the Employee"
-    when 5
-      @result = asap_events.select{|x| x.asap && x.status == "Closed"}.map{|x| x.records.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}}.flatten
-      @title = "Accepted Reports Closed under ASAP"
-    when 6
-      @title = "Reports present with Recommendations to the Company for Corrective Action"
-      @result = asap_reports.select{|x| (x.report.present? && x.report.asap && x.report.has_com) || (x.has_com)}.keep_if{|y| (y.template.name.include? "ASAP") && (y.template.name.include? "#{@report.employee_group}")}.flatten
-    end
+    @title = params[:title]
+    @result = Record.where(:id => params[:reports].split)
     render :partial => "table"
   end
 
@@ -219,6 +184,9 @@ class FaaReportsController < ApplicationController
       p.text = p.to_s.sub("$sole$", @report.sole.to_s)
       p.text = p.to_s.sub("$asap_emp$", @report.asap_emp.to_s)
       p.text = p.to_s.sub("$asap_com$", @report.asap_com.to_s)
+
+      # Corrective Actions
+      # p.text = p.to_s.sub("$corrective_actions$", @report.car_docx)
 
       # Safety Enhancement
       p.text = p.to_s.sub("$safety_enhancements$", @report.safety_enhencement)

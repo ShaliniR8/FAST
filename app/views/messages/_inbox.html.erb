@@ -26,13 +26,11 @@
   </div>
 
   <div class="panel-body">
-
-    <%=render "message", :message => @message%>
-
+    <div id="view_dialog"></div>
+    <div id="current_message">
+      <%=render "message", :message => @message%>
+    </div>
     <div id="view_prev"></div>
-    <div class="row" id="view_dialog"></div>
-    <div class="row" id="reply_message"></div>
-
   </div>
 </div>
 
@@ -48,11 +46,11 @@
     $('#rep-btn').on("click",function(){
       window.document.location = "<%=new_message_path(:reply_to=>@message.id)%>";
     });
-    $("#dialog-btn").on("click",function(){
-      $.get("<%=reply_message_path(@message.id)%>",function(data){
+    $("#dialog-btn").on("click", function(){
+      $.get("<%=reply_message_path(@message.id)%>", function(data){
         $("#view_dialog").html(data);
       });
-      $.get("<%=prev_message_path(@message.id)%>",function(data){
+      $.get("<%=prev_message_path(@message.id)%>", function(data){
         $("#view_prev").html(data);
       });
     });

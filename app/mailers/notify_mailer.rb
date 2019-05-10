@@ -9,10 +9,12 @@ class NotifyMailer < ActionMailer::Base
     @user = user
     @message = message
     subject = "ProSafeT#{subject.nil? ? '' : ": #{subject}"}"
-    if Rails.env.production?
-      mail(:to => user.email, :subject => subject).deliver
-    else
-      mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
+    if BaseConfig.airline[:enable_mailer]
+      if Rails.env.production?
+        mail(:to => user.email, :subject => subject).deliver
+      else
+        mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
+      end
     end
   end
 
@@ -23,10 +25,12 @@ class NotifyMailer < ActionMailer::Base
     @record = record
     @record_url = g_link(record)
     subject = "ProSafeT: #{subject}"
-    if Rails.env.production?
-      mail(:to => user.email, :subject => subject).deliver
-    else
-      mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
+    if BaseConfig.airline_config[:enable_mailer]
+      if Rails.env.production?
+        mail(:to => user.email, :subject => subject).deliver
+      else
+        mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
+      end
     end
   end
 

@@ -39,6 +39,8 @@ class CorrectiveAction < ActiveRecord::Base
       { field: 'responsible_user_id',     title: 'Responsible User',               num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
       { field: 'approver_id',             title: 'Final Approver',                 num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
       {                                                                                          type: 'newline',  visible: 'form,show'},
+      { field: 'company',                 title: 'Company Corrective Action',      num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
+      { field: 'employee',                title: 'Employee Corrective Action',     num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
       { field: 'bimmediate_action',       title: 'Immediate Action',               num_cols: 2,  type: 'boolean',  visible: 'form,show',       required: false},
       { field: 'immediate_action',        title: 'Immediate Action',               num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
       {                                                                                          type: 'newline',  visible: 'form,show'},

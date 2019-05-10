@@ -46,17 +46,32 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def self.get_meta_fields(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    [
+      { field: 'id',                  title: 'ID',                            num_cols: 6,  type: 'text',      visible: 'index,show',      required: false },
+      { field: 'title',               title: 'Title',                         num_cols: 6,  type: 'text',      visible: 'index,form,show', required: true },
+      { field: 'level_of_compliance', title: 'Requested Level of Compliance', num_cols: 6,  type: 'select',    visible: 'index,form,show', required: true, options:['Note Performed','Planned','Documented','Implemented','Demonstrated','Not Applicable'] },
+      { field: 'statement',           title: 'Statement of Compliance',       num_cols: 12, type: 'textarea',  visible: 'form,show',       required: false },
+      { field: 'description',         title: 'Gap Description',               num_cols: 12, type: 'textarea',  visible: 'form,show',       required: false },
+      { field: 'plan',                title: 'Plan',                          num_cols: 12, type: 'textarea',  visible: 'form,show',       required: false },
+      { field: 'responsibility',      title: 'Responsibility',                num_cols: 12, type: 'textarea',  visible: 'form,show',       required: false },
+      { field: 'plan_due_date',       title: 'Plan Due Date',                 num_cols: 6,  type: 'date',      visible: 'form,show',       required: false },
+      { field: 'comment',             title: 'Evaluator Comment',             num_cols: 12, type: 'textarea',  visible: 'form,show',       required: false }
+    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
 
   def self.get_fields
     [
-      {:title=>"Title",:field=>"title",:type=>"text_field",:class=>"form-control",:size=>"8"},
-      {:title=>"Requested Level of Compliance",:field=>"level_of_compliance",:type=>"select",:class=>"form-control",:options=>["Not Performed",'Planned','Documented','Implemented','Demonstrated','Not Applicable'],:size=>"4"},
-      {:title=>"Statement of Compliance",:field=>"statement",:type=>"text",:class=>"form-control"},
-      {:title=>"Gap Description",:field=>"description",:type=>"text",:class=>"form-control"},
-      {:title=>"Plan",:field=>"plan",:type=>"text",:class=>"form-control"},
-      {:title=>"Responsibility",:field=>"responsibility",:type=>"text",:class=>"form-control"},
-      {:title=>"Plan Due Date",:field=>"plan_due_date",:type=>"text_field",:class=>"form-control field-date",:size=>"4"},
-      {:title=>"Evaluator Comment",:field=>"comment",:type=>"text",:class=>"form-control"}
+      {:title=>"Title",                           :field=>"title",                :type=>"text_field",    :class=>"form-control",:size=>"8"},
+      {:title=>"Requested Level of Compliance",   :field=>"level_of_compliance",  :type=>"select",        :class=>"form-control",:options=>["Not Performed",'Planned','Documented','Implemented','Demonstrated','Not Applicable'],:size=>"4"},
+      {:title=>"Statement of Compliance",         :field=>"statement",            :type=>"text",          :class=>"form-control"},
+      {:title=>"Gap Description",                 :field=>"description",          :type=>"text",          :class=>"form-control"},
+      {:title=>"Plan",                            :field=>"plan",                 :type=>"text",          :class=>"form-control"},
+      {:title=>"Responsibility",                  :field=>"responsibility",       :type=>"text",          :class=>"form-control"},
+      {:title=>"Plan Due Date",                   :field=>"plan_due_date",        :type=>"text_field",    :class=>"form-control field-date",:size=>"4"},
+      {:title=>"Evaluator Comment",               :field=>"comment",              :type=>"text",          :class=>"form-control"}
     ]
   end
 

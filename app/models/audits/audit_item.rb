@@ -5,7 +5,6 @@ class AuditItem < ChecklistItem
 
   def self.get_headers
     [
-
       {:field=>"title",:title=>"Title"},
       {:field=>"department",:title=>"Department"},
       {:field=>"reference_number",:title=>"Reference Number"},

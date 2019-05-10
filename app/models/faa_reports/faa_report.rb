@@ -29,6 +29,84 @@ class FaaReport < ActiveRecord::Base
   end
 
 
+  def self.get_members
+    [
+      {title: 'FAA Member',     value: 'faa'},
+      {title: 'Company Member', value: 'company'},
+      {title: 'Labor Member',   value: 'labor'},
+      {title: 'ASAP Manager',   value: 'asap'},
+    ]
+  end
+
+
+  def self.get_stats
+    [
+      {title: 'Date Range', link: false, value: 'get_range'},
+      {title: 'Number of ASAP reports submitted present quarter',
+        link: true, mode: 1, value: 'statistics', value_key: 'asap_submitted'},
+      {title: 'Number of ASAP reports accepted present quarter',
+        link: true, mode: 2, value: 'statistics', value_key: 'asap_accepted'},
+      {title: 'Number of accepted reports present quarter that were sole source to the FAA',
+        link: true, mode: 3, value: 'statistics', value_key: 'asap_accepted_sole_source'},
+      {title: 'Number of accepted reports present quarter closed under ASAP',
+        link: true, mode: 4, value: 'statistics', value_key: 'asap_accepted_closed'},
+      {title: 'Number of accepted reports present quarter (both sole source & non-sole source) closed with corrective action under ASAP for the employee',
+        link: true, mode: 5, value: 'statistics', value_key: 'asap_accepted_employee_car'},
+      {title: 'Number of reports present quarter, which resulted in recommendations to the company for corrective action',
+        link: true, mode: 6, value: 'statistics', value_key: 'asap_aceepted_company_car'},
+    ]
+  end
+
+
+  def statistics
+    asap_reports = Record
+      .where("event_date >= ? and event_date <= ?",
+        self.get_start_date, self.get_end_date)
+      .select{|x|
+        (x.template.name.include? "ASAP") &&
+        (x.template.name.include? "#{self.employee_group}")}
+    asap_events = asap_reports.map{|x| x.report}.uniq.compact
+
+    result = {}
+
+    result[:asap_submitted] = asap_reports.map(&:id)
+    result[:asap_accepted] = asap_events
+      .select{|x| x.asap}
+      .map{|x| x.records.keep_if{|y|
+        (y.template.name.include? "ASAP") &&
+        (y.template.name.include? "#{self.employee_group}")}}
+      .flatten.map(&:id)
+    result[:asap_accepted_sole_source] = asap_events
+      .select{|x| x.asap && x.sole}.map{|x| x.records.keep_if{|y|
+        (y.template.name.include? "ASAP") &&
+        (y.template.name.include? "#{self.employee_group}")}}
+      .flatten.map(&:id)
+    result[:asap_accepted_closed] = asap_events
+      .select{|x| x.asap && x.status == "Closed"}
+      .map{|x| x.records.keep_if{|y|
+        (y.template.name.include? "ASAP") &&
+        (y.template.name.include? "#{self.employee_group}")}}
+      .flatten.map(&:id)
+    result[:asap_accepted_employee_car] = asap_reports
+      .select{|x|
+        (x.report.present? && x.report.asap && x.report.has_emp) || (x.has_emp)}
+      .keep_if{|y|
+        (y.template.name.include? "ASAP") &&
+        (y.template.name.include? "#{self.employee_group}")}
+      .flatten.map(&:id)
+    result[:asap_aceepted_company_car] = asap_reports
+      .select{|x|
+        (x.report.present? && x.report.asap && x.report.has_com) ||
+        (x.has_com)}
+      .keep_if{|y|
+        (y.template.name.include? "ASAP") &&
+        (y.template.name.include? "#{self.employee_group}")}
+      .flatten.map(&:id)
+
+    result
+  end
+
+
 
   def self.get_new(y,q)
     result = FaaReport.new
@@ -100,8 +178,6 @@ class FaaReport < ActiveRecord::Base
   end
 
 
-
-
   def safety_enhencement
     result = ""
     if self.issues.present?
@@ -115,5 +191,24 @@ class FaaReport < ActiveRecord::Base
   end
 
 
+  def car_docx
+    result = ""
+    asap_reports = Record
+      .where("event_date >= ? and event_date <= ?",
+        self.get_start_date, self.get_end_date)
+      .select{|x|
+        (x.template.name.include? "ASAP") &&
+        (x.template.name.include? "#{self.employee_group}")}
+    asap_events = asap_reports.map{|x| x.report}.uniq.compact
+    asap_events.each do |event|
+      if event.corrective_actions.length > 0
+        result << "Event ##{event.id}, #{event.name} - #{event.narrative} \n"
+        event.corrective_actions.each do |car|
+          result << "Corrective Action ##{car.id}, #{car.action} - #{car.description} \n"
+        end
+      end
+    end
+    result
+  end
 
 end

@@ -40,7 +40,7 @@
     $("#add_root_cause_btn").on("click", function(){
       $.get("<%=new_root_cause2_hazards_path%>", {'owner_id' : <%=owner.id%>});
     });
-    $('.delete_root_cause_btn').on('click',function(){
+    $('#root_causes_table').on('click', ".delete_root_cause_btn", function(){
       if(confirm("Are you sure?")){
         btn = $(this);
         $.ajax({

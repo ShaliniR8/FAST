@@ -90,7 +90,7 @@
             </div>
           <%end%>
 
-          <%if @template.map_template.present? && BaseConfig.airline[:allow_multi_submissions]%>
+          <%if @template.map_template.present?%>
             <div class="col-xs-12" style="margin-top:10px; margin-bottom:10px">
               <div class="col-xs-1">
                 <%=select_tag :create_copy,
@@ -126,9 +126,9 @@
               <div class="col-xs-12 col-sm-4 mb5">
                 <%=label_tag :description,
                   "Event Title",
-                  :style => "#{BaseConfig.airline[:submission_title_required] ? 'color:red' : ''}" %>
+                  :style => "color:red" %>
                   <%=f.text_field :description,
-                    {:class => "form-control #{BaseConfig.airline[:submission_title_required] ? 'required_field' : ''} ",
+                    {:class => "form-control required_field",
                     :maxlength => "30",
                     :placeholder => "please limit to 30 characters"}%>
               </div>

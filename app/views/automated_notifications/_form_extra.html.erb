@@ -37,13 +37,11 @@
   </div>
 
   <div class="col-xs-6 mt10">
-    <%if BaseConfig.airline[:enable_message_templates]%>
-      <%=label_tag "template", "Template"%>
-      <%=select_tag "template",
-        options_for_select(CannedMessage.all.collect{|p| [p["name"], p["id"]]}),
-        {:include_blank => true,
-        :class => "form-control template"}%>
-    <%end%>
+    <%=label_tag "template", "Template"%>
+    <%=select_tag "template",
+      options_for_select(CannedMessage.all.collect{|p| [p["name"], p["id"]]}),
+      {:include_blank => true,
+      :class => "form-control template"}%>
   </div>
 
 

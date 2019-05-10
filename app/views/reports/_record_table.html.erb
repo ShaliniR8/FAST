@@ -16,49 +16,64 @@
     </div>
     <div class="panel-body">
       <div class="table-responsive">
+
+        <table>
+          <tr>
+            <td>
+              <i class='glyphicon glyphicon-paperclip btn btn-sm btn-success mb5 mr5 ml5'></i>
+              <b>Add Corrective Action </b>- Add new Corrective Action to this report.
+            </td>
+            <td>
+              <i class='glyphicon glyphicon-eye-open btn btn-sm btn-info mb5 mr5 ml5'></i>
+              <b>View Full Report </b>- View full Report.
+            </td>
+            <td>
+              <i class='glyphicon glyphicon-eye-close btn btn-sm btn-default mb5 mr5 ml5'></i>
+              <b>View De-id Report </b>- View de-identified Report.
+            </td>
+          </tr>
+        </table>
+
         <table id="records_table" class="table table-bordered table-striped">
           <thead>
             <tr>
-              <%@headers.each do |header|%>
-                <%if header[:title] != "Submitted By"%>
-                  <th class="<%=header[:size]%>">
-                    <%=header[:title]%>
-                  </th>
-                <%end%>
+              <%Record.get_meta_fields('index').each do |header|%>
+                <th class="<%=header[:size]%>">
+                  <%=header[:title]%>
+                </th>
               <%end%>
-              <th>Action</th>
+              <th width="15%">Action</th>
             </tr>
           </thead>
           <tbody>
             <%@records.each do |record|%>
               <tr record_id="<%=record.id%>">
-                <%@headers.each do |header|%>
+                <%Record.get_meta_fields('index').each do |header|%>
                   <%if header[:title] != "Submitted By"%>
-                    <%if header[:param].present?%>
-                      <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
-                        <%=record.send(header[:field],header[:param])%>
-                      </td>
-                    <%else%>
-                      <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
-                        <%=record.send(header[:field])%>
-                      </td>
-                    <%end%>
+                    <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                      <%=render "forms/show_field", :record => record, :field_hash => header%>
+                    </td>
+                  <%else%>
+                    <td>
+                      <%=(record.created_by.disable ?
+                      "<font color='red'>Inactive User</font>" :
+                      "<font color='green'>Active User</font>").html_safe%></td>
                   <%end%>
                 <%end%>
                 <td>
                   <%if @report.status != "Closed" &&
                     record.status != "Closed" &&
                     current_user.has_access("corrective_actions","new")%>
-                    <%=link_to "Add Corrective Action",
+                    <%=link_to "<i class='glyphicon glyphicon-paperclip'></i>".html_safe,
                       new_corrective_action_path(:record => record.id),
                       :class => "btn btn-success ml5 mt5",
                       :disable_with => "Redirecting..."%>
                   <%end%>
-                  <%=link_to "Go To Report",
+                  <%=link_to "<i class='glyphicon glyphicon-eye-open'></i>".html_safe,
                     record_path(record),
                     :class => "btn btn-info mt5",
                     :disable_with => "Redirecting..."%>
-                  <%=link_to "View Report",
+                  <%=link_to "<i class='glyphicon glyphicon-eye-close'></i>".html_safe,
                     "#",
                     "data-toggle" => "modal",
                     "data-target" => ".bs-example-modal-lg",

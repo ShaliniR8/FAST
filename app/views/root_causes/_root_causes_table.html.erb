@@ -24,8 +24,7 @@
             owner.status != "Rejected" &&
             current_user.has_access("Hazard","edit"))%>
             <td>
-              <%=link_to "Delete",
-                "#",
+              <%=link_to "Delete", "#",
                 :class => "btn btn-danger delete_root_cause_btn",
                 "data-cid" => x.id%>
             </td>

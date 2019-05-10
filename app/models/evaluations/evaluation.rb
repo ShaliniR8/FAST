@@ -17,6 +17,8 @@ class Evaluation < ActiveRecord::Base
   has_many    :items,             foreign_key: 'owner_id',                class_name: 'EvaluationItem',           dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',                class_name: 'EvaluationNotice',         dependent: :destroy
 
+  has_many    :checklists, as: :owner, dependent: :destroy
+
 
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :items

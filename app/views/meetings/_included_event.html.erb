@@ -4,15 +4,14 @@
       <%=render "forms/show_field", :record => event, :field_hash => h%>
     </td>
   <%end%>
+  <td><%=event.minutes%></td>
   <td>
-    <%if BaseConfig.airline[:view_narrative_from_meeting]%>
-      <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
-        "#",
-        :class => "btn btn-info mb5 view_narrative_btn",
-        "data-toggle" => "modal",
-        "data-target" => ".bs-example-modal-lg",
-        :route => show_narrative_report_path(event, :meeting => meeting.id)%>
-    <%end%>
+    <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
+      "#",
+      :class => "btn btn-info mb5 view_narrative_btn",
+      "data-toggle" => "modal",
+      "data-target" => ".bs-example-modal-lg",
+      :route => show_narrative_report_path(event, :meeting => meeting.id)%>
     <%=link_to "<i class='glyphicon glyphicon-search'></i>".html_safe,
       report_path(event),
       :class => "btn btn-info mb5",
@@ -30,9 +29,7 @@
             :route => close_report_path(event, :redirect_path => meeting_path(meeting))%>
           <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
             :class=>"btn btn-danger mb5",
-            :onclick=>"delete_report(#{event.id},this)",
-            :disable_with => "Removing...",
-            :confirm => "Are you sure?"%>
+            :onclick=>"delete_report(#{event.id},this)"%>
           <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
             :class => "btn btn-warning agenda_btn mb5",
             "data-toggle" => "modal",

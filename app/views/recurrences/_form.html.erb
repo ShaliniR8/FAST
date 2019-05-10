@@ -22,6 +22,19 @@
       </div>
 
       <div class="panel-body" id="form_body">
+        <div class="col-xs-12">
+          <a class="btn"
+            data-toggle="collapse"
+            data-target="#view_instructions">
+            View Instructions &raquo;
+          </a>
+          <div class="collapse well" id="view_instructions">
+            <ol>
+              <b>// TODO: Trevor- Please fill in recurrence instructions</b>
+            </ol>
+          </div>
+        </div>
+
         <%=form_for @recurrence, html: {multipart: true} do |f|%>
           <%=render '/forms/form_fields', f: f, fields: @fields, record: @recurrence %>
 

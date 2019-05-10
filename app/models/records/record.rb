@@ -48,7 +48,7 @@ include Transactionable
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     [
-      {field: 'get_id',                title: 'Report ID',            num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',          title: 'Type',                 num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_user_id',           title: 'Submitted By',         num_cols: 6,  type: 'user',     visible: 'index,show',      required: false},
