@@ -1,0 +1,15 @@
+- if !['Completed', 'Pending Approval'].include? owner.status
+  = link_to 'Add Cost',
+    '#',
+    class: 'btn btn-success pull-right mr5 mb5',
+    id: 'cost_btn',
+    'data-toggle' => 'modal',
+    'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $('#cost_btn').on('click',function(){
+    $.get('#{eval("new_cost_#{owner_class}_path(owner)")}',function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });

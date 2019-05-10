@@ -475,6 +475,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'download_checklist'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'retract_cause_attributes'

@@ -1,0 +1,5 @@
+= link_to 'Send Message',
+  new_message_path(link:eval("#{owner_class}_path(owner)"),
+    link_type: owner.class.name,
+    link_id: owner.id),
+    class: 'btn btn-warning pull-right mr5 mb5'

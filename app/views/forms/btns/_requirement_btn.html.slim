@@ -1,0 +1,15 @@
+- if !['Pending Approval', 'Completed'].include? owner.status
+  = link_to 'Add Requirement',
+    '#',
+    class: 'btn btn-success pull-right mr5 mb5',
+    id: 'requirement_btn',
+    'data-toggle' => 'modal',
+    'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $('#requirement_btn').on('click',function(){
+    $.get('#{eval("new_requirement_#{owner_class}_path(owner)")}',function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });

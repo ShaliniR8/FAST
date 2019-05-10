@@ -1,0 +1,8 @@
+- if !['Completed', 'Pending Approval'].include? owner.status
+  = link_to 'Add Corrective Action',
+    new_sms_action_path( \
+      owner_id: owner.id,
+      owner_type: owner.class.name\
+    ),
+    class: 'btn btn-success pull-right mr5 mb5',
+    disable_with: 'Adding...'

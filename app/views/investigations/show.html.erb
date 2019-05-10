@@ -19,171 +19,42 @@
               <%=@investigation.title%>
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.admin? ||
-                  current_user.has_access('investigations','admin') ||
-                  current_user.has_access('investigations',"destroy")%>
-                <%=link_to "Delete",
-                  investigation_path(@investigation),
-                  :method => "delete",
-                  :confirm => 'Are you sure?',
-                  :class => "btn btn-danger pull-right mr5 mb5"%>
-              <%end%>
 
-              <%if current_user.admin? ||
-                    current_user.has_access('investigations','admin')%>
-                <%=link_to 'Override Status', '#',
-                  :class => 'btn btn-danger pull-right mr5 mb5',
-                  :id => 'override_status_btn',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-              <%end%>
+              <%= render '/forms/btns/render_btns',
+                btns: [
+                  'delete',
+                  'override_status',
+                  'edit',
+                  'deid_pdf',
+                  'pdf',
+                  'view_report'
+                  'viewer_access',
+                  'send_message',
+                  'expand_all'
+                ],
+                owner: @investigation %>
 
-              <%if @investigation.status != "Completed" && (
-                    current_user.admin? ||
-                    current_user.has_access('investigations','admin') ||
-                    current_user.has_access('investigations','edit'))%>
-                <%=link_to "Edit",
-                  edit_investigation_path(@investigation),
-                  :class => "btn btn-warning pull-right mr5 mb5",
-                  :disable_with => "Editing..."%>
-              <%end%>
-
-              <%=link_to "De-ID PDF",
-                print_investigation_path(
-                  @investigation,
-                  :deidentified => true,
-                  :format => :pdf),
-                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-              <%=link_to "PDF",
-                print_investigation_path(
-                  @investigation,
-                  :deidentified => false,
-                  :format => :pdf),
-                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-              <%if @investigation.record.present? && current_user.has_access('ASAP','module')%>
-                <%=link_to "View Report",
-                  record_path(@investigation.record),
-                  :class => "btn btn-info pull-right mr5 mb5",
-                  :disable_with => "Redirecting..."%>
-              <%end%>
-
-              <%if current_user.admin? ||
-                    current_user.has_access('investigations','admin') ||
-                    current_user.has_access("investigations","edit")%>
-                <%=link_to @investigation.viewer_access ? "Disable Viewer Access" : "Enable Viewer Access",
-                  viewer_access_investigation_path(@investigation),
-                  :class => "btn btn-warning pull-right mr5 mb5"%>
-              <%end%>
-
-              <%=link_to "Send Message",
-                new_message_path(
-                  :link => investigation_path(@investigation),
-                  :link_type => "Investigation",
-                  :link_id => @investigation.id),
-                  :class => "btn btn-warning pull-right mr5 mb5"%>
-
-              <%=link_to "Expand All",
-                "#",
-                :class => "btn btn-default mr5 expandall pull-right mb5"%>
             </div>
           </div>
         </div>
         <div class="panel-body">
           <div class="col-xs-12 mb15">
 
-            <% if @investigation.status == 'New' %>
-              <%if @investigation.approver == current_user ||
-                    current_user.admin? ||
-                    current_user.has_access('investigations','admin')%>
-                <%=link_to 'Assign', "#",
-                  :id => 'assign_btn',
-                  :class => 'btn btn-warning pull-right mr5 mb5',
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-              <%end%>
-
-            <% elsif @investigation.status == 'Assigned' %>
-              <% if @investigation.can_complete? current_user %>
-                <%=link_to 'Complete', "#",
-                  :id => 'complete',
-                  :class => 'btn btn-warning pull-right complete_btn mr5 mb5',
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-              <%end%>
-
-            <% elsif @investigation.status == "Pending Approval" %>
-              <% if @investigation.can_approve? current_user %>
-                <%=link_to "Approve", "#",
-                  :id => "approve",
-                  :class => "btn btn-success pull-right approve_btn mr5 mb5",
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-
-                <%=link_to 'Reject', '#',
-                  :id => 'reject',
-                  :class => 'btn btn-danger pull-right approve_btn mr5 mb5',
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-              <%end%>
-
-            <% elsif @investigation.status == 'Completed'%>
-              <%if @investigation.can_reopen? current_user %>
-                <%= link_to "Reopen",
-                  reopen_investigation_path(@investigation),
-                  :class => "btn btn-success pull-right mr5",
-                  :disable_with => "Reopening...",
-                  :confirm => "Are you sure?"%>
-              <%end%>
-            <%end%>
-
-            <% if !['Completed', 'Pending Approval'].include? @investigation.status %>
-              <%=link_to "Add Recommendation",
-                new_recommendation_path(
-                  :owner_id => @investigation.id,
-                  :owner_type => @investigation.becomes(Investigation).class.name),
-                :class => "btn btn-success pull-right mr5 mb5",
-                :disable_with => "Adding..."%>
-
-              <%=link_to "Add Contact", "#",
-                :class => "btn btn-success pull-right mr5 mb5",
-                :id => "contact_btn",
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-
-              <%=link_to "Add Task", "#",
-                :class => "btn btn-success pull-right mr5 mb5",
-                :id => "task_btn",
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-
-              <%=link_to "Add Cost", "#",
-                :class => "btn btn-success pull-right mr5 mb5",
-                :id => "cost_btn",
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-
-              <%=link_to "Add Corrective Action",
-                new_sms_action_path(
-                  :owner_id => @investigation,
-                  :owner_type => @investigation.becomes(Investigation).class.name),
-                :class => "btn btn-success pull-right mr5 mb5",
-                :disable_with => "Adding..."%>
-
-              <%=link_to "Add Finding",
-                new_finding_path(
-                  :owner_id => @investigation.id,
-                  :owner_type => @investigation.class.name),
-                :class => "btn btn-success pull-right mr5 mb5",
-                :disable_with => "Adding..."%>
-            <%end%>
-
-          <%=link_to "Add Comment", "#",
-            :class => "btn btn-success pull-right mr5 mb5",
-            :id => 'comment_btn',
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg"%>
+            <%= render '/forms/btns/render_btns',
+              btns: [
+                'assign',
+                'complete',
+                'approve_reject',
+                'reopen',
+                'recommendation',
+                'contact',
+                'task',
+                'cost',
+                'sms_action',
+                'finding',
+                'comment'
+              ],
+              owner: @investigation %>
 
           </div>
 
@@ -256,63 +127,12 @@
 
 <script>
   $(document).ready(function(){
-    $('#contact_btn').on('click',function(){
-      $.get("<%=new_contact_investigation_path(@investigation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#action_btn').on('click',function(){
-      $.get("<%=new_action_investigation_path(@investigation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#task_btn').on('click',function(){
-      $.get("<%=new_task_investigation_path(@investigation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#cost_btn').on('click',function(){
-      $.get("<%=new_cost_investigation_path(@investigation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_investigation_path(@investigation)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.complete_btn').on('click',function(){
-      var commit = $(this).attr('id');
-      $.get("<%=complete_investigation_path(@investigation)%>?commit=" + commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      var commit = $(this).attr('id');
-      $.get("<%=approve_investigation_path(@investigation)%>?commit=" + commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_investigation_path(@investigation)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
-
     $('#mitigate_btn').on('click',function(){
       $.get("<%=mitigate_investigation_path(@investigation)%>",function(data){
         $(".modal-content").html(data);
@@ -325,14 +145,6 @@
         $(window).trigger('resize');
       });
     });
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_investigation_path(@investigation)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
-
     $('#item_table').dataTable();
   });
 </script>
