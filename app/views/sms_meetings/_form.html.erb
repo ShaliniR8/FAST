@@ -30,7 +30,12 @@
           <%if params[:type].present?%>
             <%=hidden_field_tag :type,params[:type]%>
           <%end%>
-          <%=render "meetings/meeting_general_info", :f=>f%>
+
+          <%=render "forms/form_fields",
+            :f => f,
+            :record => @meeting,
+            :fields => Meeting.get_meta_fields('form')%>
+
           <div class="row">
 
             <!-- Packages -->
@@ -51,10 +56,10 @@
 
 
             <div class="col-sm-12 col-md-12 col-lg-12">
-              <div class="panel panel-default mt10">
+              <div class="panel panel-lightskyblue mt10">
                 <div class="panel-heading">
                   <div class="panel-title">
-                    <b>Users</b>
+                    <b>Participants</b>
                   </div>
                 </div>
                 <div class="panel-body">
@@ -65,30 +70,13 @@
               </div>
             </div>
 
-
-
-            <div class="col-sm-12 col-md-12 col-lg-12"%>
-              <div class="panel panel-default">
-                <div class="panel-heading">
-                  <div class="panel-title">
-                    <b>Attachments</b>
-                  </div>
-                </div>
-                <div class="panel-body">
-                  <div class="row" id="attachments">
-                    <%@meeting.attachments.each do |att|%>
-                      <%=render "records/existing_attachments_field",:f=>f,:attachment=>att%>
-                    <%end%>
-                  </div>
-                  <div class="pull-right"><%= link_to_add_fields "Add an attachment", f, :attachments%></div>
-                </div>
-              </div>
-            </div>
+            <%=render '/forms/attachments_form', :f => f, :owner => @meeting%>
           </div>
-          <div class="mt10">
-            <div class="form-actions">
-              <%= f.submit "Save", class:"btn btn-success pull-right", disable_with: "Saving..."%>
-            </div>
+
+          <div class="col-xs-12 mr10 mt10">
+            <%=f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+              :class => "btn btn-success pull-right",
+              :disable_with => "Saving..."%>
             <%=link_to "Cancel",
               action_name == "edit" ? sms_meeting_path(@meeting) : sms_meetings_path(:type=>params[:type]),
               :id=>"cancel-btn",
