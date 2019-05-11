@@ -386,29 +386,30 @@ class Submission < ActiveRecord::Base
       converted = self.class.create({
         :anonymous        => self.anonymous,
         :templates_id     => temp_id,
-        :description      => self.description,
+        :description      => self.description + " --Copy of ##{self.id}",
         :event_date       => self.event_date,
         :user_id          => self.user_id,
         :event_time_zone  => self.event_time_zone,
       })
-      self.submission_fields.each do |f|
-        if f.map_field.present?
-          SubmissionField.create({
-            :value => f.value,
-            :submissions_id => converted.id,
-            :fields_id => f.field.map_id})
-        end
+
+      mapped_fields = self.submission_fields.map{|x| [x.field.map_id, x.value]}.to_h
+
+      columns = [:value, :fields_id, :submissions_id]
+      values = []
+      new_temp.fields.each do |field|
+        values << [mapped_fields[field.id] || "", field.id, converted.id]
       end
-      new_temp.categories.each do |cat|
-        cat.fields.each do |f|
-          if converted.submission_fields.where('fields_id = ?', f.id).blank?
-            SubmissionField.create({
-              :value => "",
-              :submissions_id => converted.id,
-              :fields_id => f.id})
-          end
-        end
+
+      values.each do |value|
+        SubmissionField.create({
+          :value => value[0],
+          :fields_id => value[1],
+          :submissions_id => value[2],
+        })
       end
+
+      #SubmissionField.import columns, values, validate: false
+
       self.attachments.each do |x|
         temp = SubmissionAttachment.new(
           :name => x.name,
@@ -420,8 +421,6 @@ class Submission < ActiveRecord::Base
     end
     converted
   end
-
-
 
 
 
