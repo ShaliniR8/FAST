@@ -149,6 +149,7 @@ class SmsMeetingsController < ApplicationController
     @current_inv=@meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
     @package_type=@meeting.class.package_type
     @package_headers=Package.get_headers
+    @fields = Meeting.get_meta_fields('show')
   end
 
   def index

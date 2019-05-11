@@ -28,6 +28,8 @@ class RecordField < ActiveRecord::Base
   end
 
   def print_value
-    (self.display_type=="checkbox" || self.display_type=="radio")? self.value.split(";").select{|x| x.present?}.join(",  ") : self.value.gsub(/\n/, '<br/>').html_safe
+    (self.display_type == "checkbox" || self.display_type == "radio") ? 
+      (self.value.split(";").select{|x| x.present?}.join(",  ") rescue '') : 
+      self.value.gsub(/\n/, '<br/>').html_safe
   end
 end

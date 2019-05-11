@@ -125,8 +125,6 @@ class RecordsController < ApplicationController
     @title = 'Reports'
     handle_search
 
-    puts "-------------- @records: #{@records.length}"
-
     @fields = Field.find(:all)
     @categories = Category.find(:all)
     @templates = Template.find(:all)
@@ -976,76 +974,80 @@ class RecordsController < ApplicationController
         return []
       end
 
-      #  get result from logic
-      if expr['logic'] == "Equals To"
-        base.keep_if{|x|
-          (x.record_fields.where(:fields_id => fields_id).present?) &&
-          (x.record_fields.where(:fields_id => fields_id).first.value.downcase.include? expr['value'].downcase)}
+      if fields_id.length > 0
+        #  get result from logic
+        if expr['logic'] == "Equals To"
+          base.keep_if{|x|
+            (x.record_fields.where(:fields_id => fields_id).present?) &&
+            (x.record_fields.where(:fields_id => fields_id).first.value.downcase.include? expr['value'].downcase)}
 
-      elsif expr['logic'] == "Not equal to"
-        base.keep_if{|x|
-          ((x.record_fields.where(:fields_id => fields_id).present?)) &&
-          (!(x.record_fields.where(:fields_id => fields_id).first.value.downcase.include? expr['value'].downcase))}
+        elsif expr['logic'] == "Not equal to"
+          base.keep_if{|x|
+            ((x.record_fields.where(:fields_id => fields_id).present?)) &&
+            (!(x.record_fields.where(:fields_id => fields_id).first.value.downcase.include? expr['value'].downcase))}
 
-      elsif expr['logic'] == "Greater than"
-        @field = Field.where(:id => fields_id).first
-        if @field.data_type == "datetime" || @field.data_type == "date"
-          base.keep_if{ |x|
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .to_time > expr['value'].to_time}
-        else
-          base.keep_if{ |x|
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .to_f > expr['value'].to_f}
+        elsif expr['logic'] == "Greater than"
+          @field = Field.where(:id => fields_id).first
+          if @field.data_type == "datetime" || @field.data_type == "date"
+            base.keep_if{ |x|
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .to_time > expr['value'].to_time}
+          else
+            base.keep_if{ |x|
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .to_f > expr['value'].to_f}
+          end
+
+        elsif expr['logic'] == "Less than"
+          @field = Field.where(:id => fields_id).first
+          if @field.data_type == "datetime" || @field.data_type == "date"
+            base.keep_if{ |x|
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .to_time < expr['value'].to_time}
+          else
+            base.keep_if{ |x|
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .present? &&
+              x.record_fields
+                .where(:fields_id => fields_id)
+                .first.value
+                .to_f < expr['value'].to_f}
+          end
         end
-
-      elsif expr['logic'] == "Less than"
-        @field = Field.where(:id => fields_id).first
-        if @field.data_type == "datetime" || @field.data_type == "date"
-          base.keep_if{ |x|
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .to_time < expr['value'].to_time}
-        else
-          base.keep_if{ |x|
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .present? &&
-            x.record_fields
-              .where(:fields_id => fields_id)
-              .first.value
-              .to_f < expr['value'].to_f}
-        end
+      else
+        return []
       end
 
       base.map(&:id)

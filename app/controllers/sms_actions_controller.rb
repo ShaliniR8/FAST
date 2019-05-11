@@ -66,7 +66,7 @@ class SmsActionsController < ApplicationController
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
     @title = 'Corrective Actions'
-    if !current_user.admin?
+    if !current_user.admin? && !current_user.has_access('sms_actions','admin')
       cars = SmsAction.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += SmsAction.where('approver_id = ?',  current_user.id)

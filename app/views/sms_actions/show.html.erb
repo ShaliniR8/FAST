@@ -198,7 +198,7 @@
       $.get("<%=new_extension_request_path(
           :owner_type => corrective_action.class.base_class.name,
           :owner_id => corrective_action,
-          :user_id => corrective_action.approver.id)%>",
+          :user_id => (corrective_action.approver.id rescue nil))%>",
           function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
@@ -210,7 +210,7 @@
       $.get("<%=new_verification_path(
           :owner_type => corrective_action.class.base_class.name,
           :owner_id => corrective_action,
-          :user_id => corrective_action.approver.id)%>",
+          :user_id => (corrective_action.approver.id rescue nil))%>",
           function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');

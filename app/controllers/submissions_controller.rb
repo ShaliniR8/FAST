@@ -24,8 +24,6 @@ class SubmissionsController < ApplicationController
   # before_filter :set_table_name,:login_required
   before_filter :set_table_name, :oauth_load # Kaushik Mahorker KM
 
-
-
   def set_table_name
     @table_name = "submissions"
   end
@@ -53,26 +51,14 @@ class SubmissionsController < ApplicationController
       .preload(:template, :created_by)
       .can_be_accessed(current_user)
 
-    puts "-------------- @records: #{@records.length}"
-    puts "-------------- records: #{records.length}"
     @records = @records.to_a & records.to_a
-
-    puts "-------------- @records: #{@records.length}"
-    puts "-------------- records: #{records.length}"
     records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
     @records = @records.to_a & records.to_a
 
-
-    puts "-------------- @records: #{@records.length}"
-    puts "-------------- records: #{records.length}"
     if params[:template]
       records = @records.select{|x| x.template.name == params[:template]}
     end
     @records = @records.to_a & records.to_a
-
-
-    puts "-------------- @records: #{@records.length}"
-    puts "-------------- records: #{records.length}"
 
     # handle custom view
     if params[:custom_view].present?
@@ -218,51 +204,25 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.new(params[:submission])
 
-    mailer_privileges = AccessControl.where(
-      :action => 'notifier',
-      :entry => @record.template.name)
-      .map{|x| x.privileges.map(&:id)}.flatten
-
-    notify_users = User.preload(:privileges)
-      .where("disable is null or disable = 0")
-      .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
-
     if @record.save
+      notify_notifiers(@record)
       if params[:commit] == "Submit"
-        notify_users.each do |u|
-          notify(u, "A new #{@record.template.name} submission ##{@record.id} is submitted. " + g_link(@record),
-            true, "New #{@record.template.name} Submission")
-        end
-        # if crew wants to submit asap/incident as the same time
         if params[:create_copy] == "1"
           converted = @record.convert
-          convert_privileges = AccessControl.where(
-            :action => 'notifier',
-            :entry => converted.template.name)
-            .map{|x| x.privileges.map(&:id)}.flatten
-          convert_notify_users = User.preload(:privileges)
-            .where("disable is null or disable = 0")
-            .keep_if{|x| x.privileges.map(&:id) & convert_privileges != []}
-          notify_users.each do |u|
-            notify(u, "A new #{converted.template.name} submission ##{converted.id} is submitted. " + g_link(converted),
-              true, "New #{converted.template.name} Submission")
-          end
+          notify_notifiers(converted)
         end
         respond_to do |format|
           format.html { redirect_to submission_path(@record), flash: {success: "Submission submitted."} }
           format.json
         end
+
       else
-        notify(
-          current_user,
-          "You have a #{@record.template.name} Submission in progress." + g_link(@record),
-          false,
-          "#{@record.template.name} Submission In Progress")
         respond_to do |format|
           format.html { redirect_to incomplete_submissions_path, flash: {success: "Submission created in progress."} }
           format.json
         end
       end
+
     else
       respond_to do |format|
         format.html { redirect_to new_submission_path(:template => @record.template), flash: {danger: @record.errors.full_messages.first} }
@@ -632,6 +592,34 @@ class SubmissionsController < ApplicationController
     send_data(stream, :type => "json", :disposition => "inline")
   end
 
+
+
+  private
+
+  def notify_notifiers(owner)
+    if owner.completed
+      mailer_privileges = AccessControl.where(
+        :action => 'notifier',
+        :entry => owner.template.name)
+        .map{|x| x.privileges.map(&:id)}.flatten
+      notifiers = User.preload(:privileges)
+        .where("disable is null or disable = 0")
+        .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
+      notifiers.each do |user|
+        notify(
+          user,
+          "A new #{owner.template.name} submission ##{owner.id} is submitted. " + g_link(owner),
+          true,
+          "New #{owner.template.name} Submission")
+      end
+    else
+      notify(
+        owner.created_by,
+        "You have a #{owner.template.name} Submission in progress." + g_link(owner),
+        false,
+        "#{owner.template.name} Submission In Progress")
+    end
+  end
 
 
 
