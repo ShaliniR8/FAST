@@ -199,11 +199,16 @@ class MeetingsController < ApplicationController
 
 
   def index
-    @records=Meeting.where("type is null")
+    @records=Meeting.where('type is null')
+    @records = @records
+                .includes(:invitations)
+                .where('invitations.id = current_user.id AND (invitations.status = ? OR type = "Host")',
+                  ['Pending','Accepted']
+                )
     @records.keep_if{|r| display_in_table(r)}
     @headers=Meeting.get_headers
-    @title="Meetings"
-    @action="meeting"
+    @title='Meetings'
+    @action='meeting'
   end
 
 
