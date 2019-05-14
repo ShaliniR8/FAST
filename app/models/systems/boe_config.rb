@@ -29,6 +29,7 @@ class BOE_Config
       # Safety Assurance Module
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module

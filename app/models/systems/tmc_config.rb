@@ -27,6 +27,7 @@ class TMC_Config
       # Safety Assurance Module
       :allow_reopen_report                            => true,
       :has_root_causes                                => false,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
