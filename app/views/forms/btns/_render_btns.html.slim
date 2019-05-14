@@ -1,5 +1,5 @@
 ruby:
-  owner_class = "#{owner.class.name.downcase}"
+  owner_class = "#{owner.class.name.underscore}"
   permission = "#{owner_class}s"
 - btns.each do |btn|
   = render "/forms/btns/#{btn}_btn", owner: owner, owner_class: owner_class, permission: permission

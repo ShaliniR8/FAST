@@ -326,6 +326,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'assign'
       get 'complete'
       get 'approve'
+      get 'comment'
     end
   end
   resources :query_statements do
