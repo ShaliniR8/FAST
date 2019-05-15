@@ -39,6 +39,11 @@ class SafetyAssuranceController < ApplicationController
     render :partial => '/forms/workflow_forms/process'
   end
 
+  def destroy
+    @owner.destroy
+    redirect_to eval("#{@class.name.underscore}s_path"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
+  end
+
   def new_attachment
     @attachment = Attachment.new
     render :partial => "shared/attachment_modal"

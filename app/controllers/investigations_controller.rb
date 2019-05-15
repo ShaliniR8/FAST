@@ -23,6 +23,7 @@ class InvestigationsController < SafetyAssuranceController
     :assign,
     :comment,
     :complete,
+    :destroy,
     :edit,
     :new_attachment,
     :new_contact,
@@ -52,7 +53,7 @@ class InvestigationsController < SafetyAssuranceController
 
 
   def new
-    @investigation = Investigation.new
+    @owner = Investigation.new
     if params[:record].present?
       @record = Record.find(params[:record])
     end
@@ -62,14 +63,14 @@ class InvestigationsController < SafetyAssuranceController
     end
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@investigation, "investigation", "severity_extra", "probability_extra")
+    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
   end
 
 
   def edit
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@investigation, "investigation", "severity_extra", "probability_extra")
+    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
   end
 
 
@@ -227,12 +228,6 @@ class InvestigationsController < SafetyAssuranceController
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Investigation_##{@investigation.get_id}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
-  def destroy
-    Investigation.find(params[:id]).destroy
-    redirect_to investigations_path, flash: {danger: "Investigation ##{params[:id]} deleted."}
   end
 
 

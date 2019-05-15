@@ -25,6 +25,7 @@ class AuditsController < SafetyAssuranceController
     :assign,
     :comment,
     :complete,
+    :destroy,
     :edit,
     :new_attachment,
     :new_contact,
@@ -189,12 +190,6 @@ class AuditsController < SafetyAssuranceController
     )
     @owner.save
     redirect_to audit_path(@owner)
-  end
-
-
-  def destroy
-    Audit.find(params[:id]).destroy
-    redirect_to audits_path, flash: {danger: "Audit ##{params[:id]} deleted."}
   end
 
 

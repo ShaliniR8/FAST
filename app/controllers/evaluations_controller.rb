@@ -23,6 +23,7 @@ class EvaluationsController < SafetyAssuranceController
     :assign,
     :comment,
     :complete,
+    :destroy,
     :edit,
     :new_attachment,
     :new_contact,
@@ -41,7 +42,7 @@ class EvaluationsController < SafetyAssuranceController
   end
 
   def new
-    @evaluation = Evaluation.new
+    @owner = Evaluation.new
     load_options
     @fields = Evaluation.get_meta_fields('form')
   end
@@ -50,12 +51,6 @@ class EvaluationsController < SafetyAssuranceController
   def edit
     load_options
     @fields = Evaluation.get_meta_fields('form')
-  end
-
-
-  def destroy
-    Evaluation.find(params[:id]).destroy
-    redirect_to evaluations_path, flash: {danger: "Evaluation ##{params[:id]} deleted."}
   end
 
 

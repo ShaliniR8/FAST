@@ -23,6 +23,7 @@ class InspectionsController < SafetyAssuranceController
     :assign,
     :comment,
     :complete,
+    :destroy,
     :edit,
     :new_attachment,
     :new_contact,
@@ -42,7 +43,7 @@ class InspectionsController < SafetyAssuranceController
 
 
   def new
-    @inspection = Inspection.new
+    @owner = Inspection.new
     load_options
     @fields = Inspection.get_meta_fields('form')
   end
@@ -51,12 +52,6 @@ class InspectionsController < SafetyAssuranceController
   def edit
     load_options
     @fields = Inspection.get_meta_fields('form')
-  end
-
-
-  def destroy
-    Inspection.find(params[:id]).destroy
-    redirect_to inspections_path, flash: {danger: "Inspection ##{params[:id]} deleted."}
   end
 
 
