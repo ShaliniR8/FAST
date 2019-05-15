@@ -14,8 +14,8 @@
       <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
         <div class="panel-title">
           <div class="top_text">
-            Audit #<%=@audit.get_id%>:
-            <%="#{@audit.title}"%>
+            Audit #<%=@owner.get_id%>:
+            <%="#{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
             <%= render '/forms/btns/render_btns',
@@ -29,7 +29,7 @@
                 'send_message',
                 'expand_all'
               ],
-              owner: @audit %>
+              owner: @owner %>
 
           </div>
         </div>
@@ -50,21 +50,21 @@
               'finding',
               'comment'
             ],
-            owner: @audit %>
+            owner: @owner %>
 
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @audit%>
-        <%=render '/checklists/checklist_types', :owner => @audit, :type => 'audit'%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
 
-        <%=render "/ims/show_task", :owner => @audit, :fields => SmsTask.get_meta_fields('show')%>
-        <%=render "/ims/show_contact", :owner => @audit, :fields => Contact.get_meta_fields('show')%>
+        <%=render "/ims/show_task", :owner => @owner, :fields => SmsTask.get_meta_fields('show')%>
+        <%=render "/ims/show_contact", :owner => @owner, :fields => Contact.get_meta_fields('show')%>
 
-        <%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
+        <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
 
-        <%=render "/forms/show_comment", :owner => @audit%>
-        <%=render "/forms/attachments_show", :owner => @audit%>
-        <%=render "/records/transactions", :owner => @audit%>
+        <%=render "/forms/show_comment", :owner => @owner%>
+        <%=render "/forms/attachments_show", :owner => @owner%>
+        <%=render "/records/transactions", :owner => @owner%>
 
       </div>
     </div>
@@ -82,7 +82,7 @@
   $(document).ready(function(){
 
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_audit_path(@audit)%>",function(data){
+      $.get("<%=new_attachment_audit_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

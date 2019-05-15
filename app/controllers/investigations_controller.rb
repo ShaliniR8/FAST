@@ -15,10 +15,30 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-class InvestigationsController < ApplicationController
+class InvestigationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('investigation') }
+  before_filter :define_owner, only:[
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :edit,
+    :new_attachment,
+    :new_contact,
+    :new_task,
+    :override_status,
+    :reopen,
+    :show,
+    :update,
+    :viewer_access
 
+  ]
+
+  def define_owner
+    @class = Object.const_get('Investigation')
+    @owner = Investigation.find(params[:id])
+  end
 
   def new_recommendation
     @predefined_actions = SmsAction.get_actions
@@ -29,15 +49,6 @@ class InvestigationsController < ApplicationController
     @fields = Recommendation.get_meta_fields('form')
     render :partial => "findings/new_recommendation"
   end
-
-
-
-  def new_contact
-    @owner = Investigation.find(params[:id])
-    @contact = Contact.new
-    render :partial => 'forms/contact_form'
-  end
-
 
 
   def new
@@ -55,49 +66,14 @@ class InvestigationsController < ApplicationController
   end
 
 
-
-  def new_attachment
-    @owner = Investigation.find(params[:id])
-    @attachment = Attachment.new
-    render :partial => "shared/attachment_modal"
-  end
-
-
-
-  def assign
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def complete
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    render :partial => '/forms/workflow_forms/process'
-  end
-
-  def approve
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def override_status
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    render :partial => '/forms/workflow_forms/override_status'
-  end
-
-
   def edit
-    @investigation = Investigation.find(params[:id])
     load_options
     @fields = Investigation.get_meta_fields('form')
     form_special_matrix(@investigation, "investigation", "severity_extra", "probability_extra")
   end
 
 
-
   def update
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -139,7 +115,6 @@ class InvestigationsController < ApplicationController
   end
 
 
-
   def create
     investigation = Investigation.new(params[:investigation])
     if investigation.record_id.present?
@@ -151,12 +126,6 @@ class InvestigationsController < ApplicationController
       redirect_to investigation_path(investigation), flash: {success: "Investigation created."}
 
     end
-  end
-
-  def comment
-    @owner = Investigation.find(params[:id])
-    @comment = @owner.comments.new
-    render :partial => "forms/viewer_comment"
   end
 
   def index
@@ -204,9 +173,7 @@ class InvestigationsController < ApplicationController
   helper_method :load_options
 
 
-
   def show
-    @investigation = Investigation.find(params[:id])
     @type = 'investigations'
     @cause_headers = InvestigationCause.get_headers
     @desc_headers = InvestigationDescription.get_headers
@@ -214,10 +181,6 @@ class InvestigationsController < ApplicationController
     @fields = Investigation.get_meta_fields('show')
     @recommendation_fields = Recommendation.get_meta_fields('show')
     load_special_matrix(@investigation)
-  end
-
-
-  def new_cause
   end
 
 
@@ -230,7 +193,6 @@ class InvestigationsController < ApplicationController
     @fields = Finding.get_meta_fields('form')
     render :partial => "audits/finding"
   end
-
 
 
   def new_action
@@ -246,15 +208,6 @@ class InvestigationsController < ApplicationController
     @fields = SmsAction.get_meta_fields('form')
     form_special_matrix(@action, "investigation[corrective_actions_attributes][0]", "severity_extra", "probability_extra")
     render :partial => "findings/action"
-  end
-
-
-
-  def new_task
-    @owner = Investigation.find(params[:id])
-    load_options
-    @task = @owner.tasks.new
-    render :partial=>'forms/task'
   end
 
 
@@ -277,32 +230,10 @@ class InvestigationsController < ApplicationController
   end
 
 
-
   def destroy
     Investigation.find(params[:id]).destroy
     redirect_to investigations_path, flash: {danger: "Investigation ##{params[:id]} deleted."}
   end
-
-
-
-  def viewer_access
-    investigation = Investigation.find(params[:id])
-    investigation.viewer_access = !investigation.viewer_access
-      if investigation.viewer_access
-        content = "Viewer Access Enabled"
-      else
-        content = "Viewer Access Disabled"
-      end
-      Transaction.build_for(
-        investigation,
-        'Viewer Access',
-        current_user.id,
-        content
-      )
-    investigation.save
-    redirect_to investigation_path(investigation)
-  end
-
 
 
   def new_cause
@@ -312,13 +243,11 @@ class InvestigationsController < ApplicationController
   end
 
 
-
   def new_desc
     @finding = Investigation.find(params[:id])
     @categories = InvestigationDescription.categories.keys
     render :partial => "new_desc"
   end
-
 
 
   def add_causes
@@ -338,7 +267,6 @@ class InvestigationsController < ApplicationController
   end
 
 
-
   def add_desc
     if params[:causes].present?
       params[:causes].each_pair do |k,v|
@@ -355,19 +283,16 @@ class InvestigationsController < ApplicationController
   end
 
 
-
   def retract_cause_attributes
     @attributes = InvestigationCause.categories[params[:category]]
     render :partial => "/findings/attributes"
   end
 
 
-
   def retract_desc_attributes
     @attributes = InvestigationDescription.categories[params[:category]]
     render :partial => "/findings/attributes"
   end
-
 
 
   def mitigate
@@ -381,7 +306,7 @@ class InvestigationsController < ApplicationController
     end
   end
 
-   def baseline
+  def baseline
     @owner = Investigation.find(params[:id])
     load_options
     form_special_matrix(@owner, "investigation", "severity_extra", "probability_extra")
@@ -391,14 +316,6 @@ class InvestigationsController < ApplicationController
       render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
     end
   end
-
-
-
-  def reopen
-    @investigation = Investigation.find(params[:id])
-    reopen_report(@investigation)
-  end
-
 
 
 end

@@ -20,6 +20,7 @@
 
   - if BaseConfig.airline[:checklist_version] == '1' || owner_class != 'audit'
     = link_to 'Upload Checklist',
+      '#',
       class: 'btn btn-success pull-right mr5 mb5',
       id: 'checklist_btn',
       'data-toggle' => 'modal',

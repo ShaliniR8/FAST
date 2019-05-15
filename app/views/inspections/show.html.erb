@@ -12,8 +12,8 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            Inspection #<%=@inspection.get_id%>:
-            <%="#{@inspection.title}"%>
+            Inspection #<%=@owner.get_id%>:
+            <%="#{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
 
@@ -28,7 +28,7 @@
                 'send_message',
                 'expand_all'
               ],
-              owner: @inspection %>
+              owner: @owner %>
 
           </div>
         </div>
@@ -49,30 +49,30 @@
               'finding',
               'comment'
             ],
-            owner: @inspection %>
+            owner: @owner %>
 
 
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @inspection %>
-        <%=render '/checklists/checklist_types', :owner => @inspection, :type => 'inspection'%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @owner %>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'inspection'%>
 
         <%=render "/ims/show_task",
-          :owner => @inspection,
+          :owner => @owner,
           :fields => SmsTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact",
-          :owner=>@inspection,
+          :owner=>@owner,
           :fields => Contact.get_meta_fields('show')%>
         <%=render "/audits/show_requirements",
-          :owner => @inspection,
+          :owner => @owner,
           :type => 'inspection'%>
         <%=render '/findings/show_all',
-          :owner => @inspection,
+          :owner => @owner,
           :show_btn => false%>
-        <%=render "/forms/show_comment", :owner => @inspection%>
+        <%=render "/forms/show_comment", :owner => @owner%>
 
-        <%=render "/forms/attachments_show", :owner => @inspection%>
-        <%=render "/records/transactions", :owner => @inspection%>
+        <%=render "/forms/attachments_show", :owner => @owner%>
+        <%=render "/records/transactions", :owner => @owner%>
       </div>
     </div>
   </div>
@@ -90,7 +90,7 @@
 <script>
   $(document).ready(function(){
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_inspection_path(@inspection)%>",function(data){
+      $.get("<%=new_attachment_inspection_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

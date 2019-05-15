@@ -20,6 +20,11 @@ class FindingsController < ApplicationController
 
   before_filter(only: [:show]) { check_group('finding') }
 
+  def define_owner
+    @class = Object.const_get(params[:owner_type])
+    @owner = @class.find(params[:owner_id])
+  end
+
 
   def new
     load_options

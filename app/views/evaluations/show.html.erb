@@ -12,8 +12,8 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            Evaluation #<%=@evaluation.get_id%>:
-            <%="#{@evaluation.title}"%>
+            Evaluation #<%=@owner.get_id%>:
+            <%="#{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
             <%= render '/forms/btns/render_btns',
@@ -27,7 +27,7 @@
                 'send_message',
                 'expand_all'
               ],
-              owner: @evaluation %>
+              owner: @owner %>
           </div>
         </div>
       </div>
@@ -47,31 +47,31 @@
               'finding',
               'comment'
             ],
-            owner: @evaluation %>
+            owner: @owner %>
 
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @evaluation%>
-        <%=render '/checklists/checklist_types', :owner => @evaluation, :type => 'evaluation'%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'evaluation'%>
         <%=render "/ims/show_task",
-          :owner => @evaluation,
+          :owner => @owner,
           :fields => SmsTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact",
-          :owner => @evaluation,
+          :owner => @owner,
           :type=>'evaluation',
           :fields => Contact.get_meta_fields('show')%>
         <%=render "/audits/show_requirements",
-          :owner => @evaluation,
+          :owner => @owner,
           :type => 'evaluation'%>
 
         <%=render "/findings/show_all",
-          :owner => @evaluation,
+          :owner => @owner,
           :type => 'evaluations',
           :show_btn => false%>
 
-        <%=render "/forms/show_comment", :owner => @evaluation%>
-        <%=render "/forms/attachments_show", :owner => @evaluation%>
-        <%=render "/records/transactions", :owner => @evaluation%>
+        <%=render "/forms/show_comment", :owner => @owner%>
+        <%=render "/forms/attachments_show", :owner => @owner%>
+        <%=render "/records/transactions", :owner => @owner%>
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@
 <script>
   $(document).ready(function(){
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_evaluation_path(@evaluation)%>",function(data){
+      $.get("<%=new_attachment_evaluation_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

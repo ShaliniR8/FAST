@@ -506,32 +506,7 @@ class ApplicationController < ActionController::Base
       'Reopen',
       current_user.id
     )
-    case owner_class
-    when "Audit"
-      redirect_to audit_path(owner)
-    when "Inspection"
-      redirect_to inspection_path(owner)
-    when "Evaluation"
-      redirect_to evaluation_path(owner)
-    when "Investigation"
-      redirect_to investigation_path(owner)
-    when "Finding"
-      redirect_to finding_path(owner)
-    when "SmsAction"
-      redirect_to sms_action_path(owner)
-    when "Recommendation"
-      redirect_to recommendation_path(owner)
-    when "Sra"
-      redirect_to sra_path(owner)
-    when "Hazard"
-      redirect_to hazard_path(owner)
-    when "RiskControl"
-      redirect_to risk_control_path(owner)
-    when "SafetyPlan"
-      redirect_to safety_plan_path(owner)
-    else
-      return
-    end
+    redirect_to eval("#{owner_class.underscore}_path(owner)") rescue return
   end
 
 

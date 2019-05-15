@@ -15,15 +15,34 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-
-
-class AuditsController < ApplicationController
+class AuditsController < SafetyAssuranceController
   require 'csv'
-
   before_filter :login_required
   before_filter :auditor_check, :only => [:edit,:new]
   before_filter(only: [:show]) { check_group('audit') }
+  before_filter :define_owner, only: [
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :edit,
+    :new_attachment,
+    :new_contact,
+    :new_task,
+    :override_status,
+    :reopen,
+    :show,
+    :update,
+    :update_checklist_records,
+    :upload_checklist,
+    :viewer_access
+  ]
 
+
+  def define_owner
+    @class = Object.const_get('Audit')
+    @owner = Audit.find(params[:id])
+  end
 
   def auditor_check
     Rails.logger.info "Check if current user is an auditor of this audit."
@@ -58,11 +77,10 @@ class AuditsController < ApplicationController
 
 
   def new
-    @audit = Audit.new
+    @owner = Audit.new
     load_options
     @fields = Audit.get_meta_fields('form')
   end
-
 
 
   def create
@@ -72,47 +90,9 @@ class AuditsController < ApplicationController
 
 
   def edit
-    @audit = Audit.find(params[:id])
     load_options
     @fields = Audit.get_meta_fields('form')
   end
-
-
-
-  def new_task
-    @owner = Audit.find(params[:id])
-    load_options
-    @task = @owner.tasks.new
-    render :partial => 'forms/task'
-  end
-
-
-
-  def viewer_access
-    audit = Audit.find(params[:id])
-    audit.viewer_access = !audit.viewer_access
-    if audit.viewer_access
-      content = "Viewer Access Enabled"
-    else
-      content = "Viewer Access Disabled"
-    end
-    Transaction.build_for(
-      @audit,
-      'Viewer Access',
-      current_user.id, content
-    )
-    audit.save
-    redirect_to audit_path(audit)
-  end
-
-
-
-  def new_contact
-    @owner = Audit.find(params[:id])
-    @contact = Contact.new
-    render :partial => 'forms/contact_form'
-  end
-
 
 
   def new_requirement
@@ -124,11 +104,9 @@ class AuditsController < ApplicationController
   end
 
 
-
   def upload_checklist
-    audit = Audit.find(params[:id])
     if !params[:append].present?
-      audit.clear_checklist
+      @owner.clear_checklist
     end
     if params[:checklist].present?
       upload = File.open(params[:checklist].tempfile)
@@ -137,19 +115,19 @@ class AuditsController < ApplicationController
           :headers => :true,
           :header_converters => lambda { |h| h.downcase.gsub(' ', '_') }
           }) do |row|
-          AuditItem.create(row.to_hash.merge({:owner_id => audit.id}))
+          AuditItem.create(row.to_hash.merge({:owner_id => @owner.id}))
         end
       rescue Exception => e
-        redirect_to audit_path(audit)
+        redirect_to audit_path(@owner)
         return
       end
     end
     Transaction.build_for(
-      audit,
+      @owner,
       'Upload Checklist',
       current_user.id
     )
-    redirect_to audit_path(audit)
+    redirect_to audit_path(@owner)
   end
 
 
@@ -172,9 +150,7 @@ class AuditsController < ApplicationController
   end
 
 
-
   def update
-    @owner = Audit.find(params[:id]).becomes(Audit)
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -216,46 +192,19 @@ class AuditsController < ApplicationController
   end
 
 
-  def override_status
-    @owner = Audit.find(params[:id]).becomes(Audit)
-    render :partial => '/forms/workflow_forms/override_status'
-  end
-
-  def assign
-    @owner = Audit.find(params[:id]).becomes(Audit)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def complete
-    @owner = Audit.find(params[:id]).becomes(Audit)
-    render :partial => '/forms/workflow_forms/process'
-  end
-
-  def approve
-    @owner = Audit.find(params[:id]).becomes(Audit)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
   def destroy
     Audit.find(params[:id]).destroy
     redirect_to audits_path, flash: {danger: "Audit ##{params[:id]} deleted."}
   end
 
 
-
-
-
-
   def show
     load_options
-    @audit = Audit.find(params[:id])
     @fields = Audit.get_meta_fields('show')
     @recommendation_fields = Recommendation.get_meta_fields('show')
     @type = 'audits'
     @checklist_headers = AuditItem.get_headers
   end
-
 
 
   def new_finding
@@ -282,7 +231,6 @@ class AuditsController < ApplicationController
   helper_method :load_options
 
 
-
   def update_checklist
     @audit = Audit.find(params[:id])
     @checklist_headers = AuditItem.get_headers
@@ -291,19 +239,8 @@ class AuditsController < ApplicationController
 
 
   def update_checklist_records
-    @owner = Audit.find(params[:id])
     render :partial => "checklist_templates/update_checklist_records"
   end
-
-
-
-  def comment
-    @owner = Audit.find(params[:id])
-    @comment = @owner.comments.new
-    render :partial => "forms/viewer_comment"
-  end
-
-
 
 
   def print
@@ -318,23 +255,8 @@ class AuditsController < ApplicationController
   end
 
 
-
   def download_checklist
     @audit = Audit.find(params[:id])
   end
 
-
-
-  def new_attachment
-    @owner = Audit.find(params[:id])
-    @attachment = Attachment.new
-    render :partial => "shared/attachment_modal"
-  end
-
-
-
-  def reopen
-    @audit = Audit.find(params[:id])
-    reopen_report(@audit)
-  end
 end

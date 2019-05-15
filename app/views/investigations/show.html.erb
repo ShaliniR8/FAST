@@ -15,8 +15,8 @@
           <div class="panel-title">
             <div class="top_text">
               Investigation #
-              <%=@investigation.get_id%>:
-              <%=@investigation.title%>
+              <%=@owner.get_id%>:
+              <%=@owner.title%>
             </div>
             <div class="top_buttons pull-right">
 
@@ -32,7 +32,7 @@
                   'send_message',
                   'expand_all'
                 ],
-                owner: @investigation %>
+                owner: @owner %>
 
             </div>
           </div>
@@ -54,15 +54,15 @@
                 'finding',
                 'comment'
               ],
-              owner: @investigation %>
+              owner: @owner %>
 
           </div>
 
-          <%=render '/forms/show_fields', :fields => @fields, :record => @investigation %>
+          <%=render '/forms/show_fields', :fields => @fields, :record => @owner %>
 
           <%if BaseConfig.airline[:base_risk_matrix]%>
             <%=render "shared/bsk_risk_matrix_show",
-            :owner => @investigation,
+            :owner => @owner,
             :type => "investigations",
             :like => @like,
             :color_matrix => @color_matrix,
@@ -71,44 +71,44 @@
             :show_btns => true%>
           <%else%>
             <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-            :owner=>@investigation,
+            :owner=>@owner,
             :allow_mitigate => true,
             :show_btns => true%>
           <%end%>
 
 
-          <%can_change = @investigation.status != "Completed" &&
-            @investigation.status != "Pending Approval" &&
+          <%can_change = @owner.status != "Completed" &&
+            @owner.status != "Pending Approval" &&
             current_user.has_access("investigations","edit")%>
           <%=render '/causes/all',
-            :owner => @investigation,
+            :owner => @owner,
             :cause_type => 'description',
             :can_change => can_change%>
           <%=render '/causes/all',
-            :owner => @investigation,
+            :owner => @owner,
             :cause_type => 'cause',
             :can_change => can_change%>
 
-          <%=render '/findings/show_all', :owner => @investigation, :show_btn => false%>
-          <%=render '/sms_actions/show_all', :owner => @investigation, :show_btn => false%>
-          <%=render '/recommendations/show_all', :owner => @investigation, :show_btn => false%>
+          <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
+          <%=render '/sms_actions/show_all', :owner => @owner, :show_btn => false%>
+          <%=render '/recommendations/show_all', :owner => @owner, :show_btn => false%>
 
           <%=render "/ims/show_contact",
-            :owner => @investigation,
+            :owner => @owner,
             :fields => Contact.get_meta_fields('show')%>
 
           <%=render "/ims/show_task",
-            :owner=>@investigation,
+            :owner=>@owner,
             :fields=> SmsTask.get_meta_fields('show')%>
 
-          <%=render "/sms_actions/cost", :owner => @investigation%>
+          <%=render "/sms_actions/cost", :owner => @owner%>
 
 
-          <%#=render "/records/show_template_fields", :record => @investigation.record%>
+          <%#=render "/records/show_template_fields", :record => @owner.record%>
 
-          <%=render "/forms/show_comment", :owner => @investigation%>
-          <%=render "/forms/attachments_show", :owner => @investigation%>
-          <%=render "/records/transactions", :owner => @investigation%>
+          <%=render "/forms/show_comment", :owner => @owner%>
+          <%=render "/forms/attachments_show", :owner => @owner%>
+          <%=render "/records/transactions", :owner => @owner%>
         </div>
       </div>
     </div>
@@ -128,19 +128,19 @@
 <script>
   $(document).ready(function(){
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_investigation_path(@investigation)%>",function(data){
+      $.get("<%=new_attachment_investigation_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#mitigate_btn').on('click',function(){
-      $.get("<%=mitigate_investigation_path(@investigation)%>",function(data){
+      $.get("<%=mitigate_investigation_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#baseline_btn').on('click',function(){
-      $.get("<%=baseline_investigation_path(@investigation)%>",function(data){
+      $.get("<%=baseline_investigation_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
