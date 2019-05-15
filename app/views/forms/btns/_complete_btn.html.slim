@@ -1,5 +1,5 @@
 - if owner.status == 'Assigned' && \
-  owner.can_complete?(current_user)
+  (!owner.respond_to?('can_complete?') || owner.can_complete?(current_user))
   = link_to 'Complete',
     '#',
     class: 'btn btn-warning pull-right complete_btn mr5 mb5',

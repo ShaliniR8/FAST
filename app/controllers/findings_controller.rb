@@ -19,44 +19,45 @@ end
 class FindingsController < ApplicationController
 
   before_filter(only: [:show]) { check_group('finding') }
+  before_filter :define_owner, only: [
+    :edit,
+
+  ]
 
   def define_owner
-    @class = Object.const_get(params[:owner_type])
-    @owner = @class.find(params[:owner_id])
+    @class = Object.const_get('Finding')
+    @owner = @class.find(params[:id])
   end
 
 
   def new
     load_options
     @fields = Finding.get_meta_fields('form')
-    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @finding = @owner.findings.new
-    form_special_matrix(@finding, "finding", "severity_extra", "probability_extra")
+    @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    @owner = @parent.findings.new
+    form_special_matrix(@owner, 'finding', 'severity_extra', 'probability_extra')
   end
-
 
 
   def create
-    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @finding = @owner.findings.create(params[:finding])
-    redirect_to @finding.becomes(Finding), flash: {success: "Finding created."}
+    @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    @owner = @parent.findings.create(params[:finding])
+    redirect_to @owner, flash: {success: 'Finding created.'}
   end
-
 
 
   def edit
     load_options
     @fields = Finding.get_meta_fields('form')
-    @finding = Finding.find(params[:id])
-    form_special_matrix(@finding, "finding", "severity_extra", "probability_extra")
-    @type = get_finding_owner(@finding)
+    @owner = Finding.find(params[:id])
+    form_special_matrix(@owner, 'finding', 'severity_extra', 'probability_extra')
+    @type = @owner.get_owner
     @users.keep_if{|u| u.has_access(@type, 'edit')}
   end
 
 
-
   def new_recommendation
-    @namespace = "finding"
+    @namespace = 'finding'
     @predefined_actions = SmsAction.get_actions
     @departments = SmsAction.departments
     load_options
@@ -65,7 +66,6 @@ class FindingsController < ApplicationController
     @fields = Recommendation.get_meta_fields('form')
     render :partial => "new_recommendation"
   end
-
 
 
   def index
@@ -81,7 +81,6 @@ class FindingsController < ApplicationController
       @records = @records & cars
     end
   end
-
 
 
   def open
@@ -104,19 +103,11 @@ class FindingsController < ApplicationController
   end
 
 
-
-  def step
-  end
-
-
-
   def show
-    @finding = Finding.find(params[:id])
-    load_special_matrix(@finding)
-    @type = get_finding_owner(@finding)
+    @owner = Finding.find(params[:id])
+    load_special_matrix(@owner)
+    @type = @owner.get_owner
   end
-
-
 
 
   def load_options
@@ -129,9 +120,6 @@ class FindingsController < ApplicationController
     risk_matrix_initializer
   end
   helper_method :load_options
-
-
-
 
 
   def assign

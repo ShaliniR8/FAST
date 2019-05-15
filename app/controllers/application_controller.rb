@@ -170,13 +170,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def get_finding_owner(finding)
-    "#{finding.owner.class.name.downcase}s"
-  end
-
   def get_car_owner(car)
     if car.type == "FindingAction"
-      return get_finding_owner(car.finding)
+      return car.finding.get_owner
     elsif car.type == "InvestigationAction"
       return 'investigations'
     end
@@ -219,7 +215,7 @@ class ApplicationController < ActionController::Base
   def get_recommendation_owner(rec)
     case rec.owner_type
     when 'Finding'
-      return get_finding_owner(rec.owner)
+      return rec.owner.get_owner
     else
       return "#{rec.owner_type.downcase}s"
     end

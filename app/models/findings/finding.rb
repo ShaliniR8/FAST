@@ -99,6 +99,9 @@ class Finding < ActiveRecord::Base
     }
   end
 
+  def get_owner
+    "#{self.owner_type.underscore}s"
+  end
 
 
   def get_type
@@ -306,10 +309,6 @@ class Finding < ActiveRecord::Base
     end
   end
 
-  def get_owner
-    self.type.gsub("Finding","")
-  end
-
   def self.get_likelihood
     ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
   end
@@ -320,21 +319,21 @@ class Finding < ActiveRecord::Base
     self.immediate_action || self.owner.status == 'Completed'
   end
 
-  def can_complete?
+  def can_complete? current_user
     current_user_id = session[:simulated_id] || session[:user_id]
     (current_user_id == self.responsible_user.id rescue false) ||
       current_user.admin? ||
       current_user.has_access('findings','admin')
   end
 
-  def can_approve?
+  def can_approve? current_user
     current_user_id = session[:simulated_id] || session[:user_id]
     (current_user_id == self.approver.id rescue true) ||
       current_user.admin? ||
       current_user.has_access('findings','admin')
   end
 
-  def can_reopen?(current_user)
+  def can_reopen? current_user
     BaseConfig.airline[:allow_reopen_report] && (
       current_user.admin? ||
       current_user.has_access('findings','admin'))
