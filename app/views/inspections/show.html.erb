@@ -12,8 +12,7 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            Inspection #<%=@owner.get_id%>:
-            <%="#{@owner.title}"%>
+            <%="Inspection ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
 
@@ -40,7 +39,6 @@
             btns: [
               'assign',
               'complete',
-              'checklist',
               'approve_reject',
               'reopen',
               'task',

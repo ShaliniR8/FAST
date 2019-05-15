@@ -14,8 +14,7 @@
       <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
         <div class="panel-title">
           <div class="top_text">
-            Audit #<%=@owner.get_id%>:
-            <%="#{@owner.title}"%>
+            <%="Audit ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
             <%= render '/forms/btns/render_btns',
@@ -41,7 +40,6 @@
             btns: [
               'assign',
               'complete',
-              'checklist',
               'approve_reject',
               'reopen',
               'task',
