@@ -18,7 +18,6 @@ end
 class AuditsController < SafetyAssuranceController
   require 'csv'
   before_filter :login_required
-  before_filter :auditor_check, :only => [:edit,:new]
   before_filter(only: [:show]) { check_group('audit') }
   before_filter :define_owner, only: [
     :approve,
@@ -43,10 +42,6 @@ class AuditsController < SafetyAssuranceController
   def define_owner
     @class = Object.const_get('Audit')
     @owner = Audit.find(params[:id])
-  end
-
-  def auditor_check
-    Rails.logger.info "Check if current user is an auditor of this audit."
   end
 
 
@@ -199,17 +194,6 @@ class AuditsController < SafetyAssuranceController
     @recommendation_fields = Recommendation.get_meta_fields('show')
     @type = 'audits'
     @checklist_headers = AuditItem.get_headers
-  end
-
-
-  def new_finding
-    @audit = Audit.find(params[:id])
-    @audit.findings.new
-    @classifications = Finding.get_classifications
-    load_options
-    form_special_matrix(@finding, "audit[findings_attributes][0]", "severity_extra", "probability_extra")
-    @fields = Finding.get_meta_fields('form')
-    render :partial => "finding"
   end
 
 

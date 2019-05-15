@@ -118,17 +118,6 @@ class EvaluationsController < SafetyAssuranceController
   end
 
 
-  def new_finding
-    @audit = Evaluation.find(params[:id])
-    @finding = EvaluationFinding.new
-    @classifications = Finding.get_classifications
-    form_special_matrix(@finding, "evaluation[findings_attributes][0]", "severity_extra", "probability_extra")
-    load_options
-    @fields = Finding.get_meta_fields('form')
-    render :partial => "audits/finding"
-  end
-
-
   def create
     evaluation = Evaluation.new(params[:evaluation])
     if evaluation.save

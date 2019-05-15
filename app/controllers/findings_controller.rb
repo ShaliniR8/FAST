@@ -20,8 +20,18 @@ class FindingsController < ApplicationController
 
   before_filter(only: [:show]) { check_group('finding') }
   before_filter :define_owner, only: [
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :destroy,
     :edit,
-
+    :new_attachment,
+    :new_contact,
+    :override_status,
+    :reopen,
+    :show,
+    :update_checklist
   ]
 
   def define_owner
@@ -49,7 +59,6 @@ class FindingsController < ApplicationController
   def edit
     load_options
     @fields = Finding.get_meta_fields('form')
-    @owner = Finding.find(params[:id])
     form_special_matrix(@owner, 'finding', 'severity_extra', 'probability_extra')
     @type = @owner.get_owner
     @users.keep_if{|u| u.has_access(@type, 'edit')}
@@ -104,7 +113,6 @@ class FindingsController < ApplicationController
 
 
   def show
-    @owner = Finding.find(params[:id])
     load_special_matrix(@owner)
     @type = @owner.get_owner
   end
@@ -122,27 +130,6 @@ class FindingsController < ApplicationController
   helper_method :load_options
 
 
-  def assign
-    @owner = Finding.find(params[:id]).becomes(Finding)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def complete
-    @owner = Finding.find(params[:id]).becomes(Finding)
-    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
-    render :partial=> '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def approve
-    @owner = Finding.find(params[:id]).becomes(Finding)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def override_status
-    @owner = Finding.find(params[:id]).becomes(Finding)
-    render :partial => '/forms/workflow_forms/override_status'
-  end
 
   def reassign
     @finding = Finding.find(params[:id])
@@ -152,7 +139,6 @@ class FindingsController < ApplicationController
 
 
   def update
-    @owner = Finding.find(params[:id]).becomes(Finding)
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -191,95 +177,6 @@ class FindingsController < ApplicationController
   end
 
 
-
-  def new_cause
-    @finding = Finding.find(params[:id])
-    @categories = FindingCause.categories.keys
-    render :partial => "new_cause"
-  end
-
-
-
-  def new_desc
-    @finding = Finding.find(params[:id])
-    @categories=FindingDescription.categories.keys
-    render :partial=>"new_desc"
-  end
-
-
-
-  def add_causes
-    if params[:causes].present?
-      params[:causes].each_pair do |k,v|
-        if v.present?
-          FindingCause.create(:owner_id=>params[:id],:category=>params[:category],:attr=>k,:value=>v)
-        end
-      end
-    end
-    redirect_to finding_path(params[:id])
-  end
-
-
-
-  def add_desc
-    if params[:causes].present?
-      params[:causes].each_pair do |k,v|
-        if v.present?
-          FindingDescription.create(
-            :owner_id => params[:id],
-            :category => params[:category],
-            :attr => k,
-            :value => v
-          )
-        end
-      end
-    end
-    redirect_to finding_path(params[:id])
-  end
-
-
-
-  def new_action
-    @namespace = "finding"
-    @privileges = Privilege.find(:all)
-    @finding = Finding.find(params[:id])
-    @action = FindingAction.new
-    @action.open_date = Time.now
-    @departments = SmsAction.departments
-    @users = User.find(:all).keep_if{|u| !u.disable}
-    @headers = User.get_headers
-    @predefined_actions = SmsAction.get_actions
-    load_options
-    @fields = SmsAction.get_meta_fields('form')
-    form_special_matrix(@action, "finding[corrective_actions_attributes][0]", "severity_extra", "probability_extra")
-    render :partial => "action"
-  end
-
-
-
-  def comment
-    @owner = Finding.find(params[:id])
-    @comment = @owner.comments.new
-    render :partial => "forms/viewer_comment"
-  end
-
-
-
-  def destroy
-    finding = Finding.find(params[:id])
-    finding.destroy
-    redirect_to findings_path, flash: {danger: "Finding ##{params[:id]} deleted."}
-  end
-
-
-
-  def new_attachment
-    @owner = Finding.find(params[:id]).becomes(Finding)
-    @attachment = Attachment.new
-    render :partial => "shared/attachment_modal"
-  end
-
-
   def print
     @deidentified = params[:deidentified]
     @finding = Finding.find(params[:id])
@@ -290,21 +187,6 @@ class FindingsController < ApplicationController
     filename = "Finding##{@finding.get_id}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
-
-
-
-  def retract_cause_attributes
-    @attributes = FindingCause.categories[params[:category]]
-    render :partial => "/findings/attributes"
-  end
-
-
-
-  def retract_desc_attributes
-    @attributes = FindingDescription.categories[params[:category]]
-    render :partial => "/findings/attributes"
-  end
-
 
 
   def mitigate
@@ -319,7 +201,6 @@ class FindingsController < ApplicationController
   end
 
 
-
   def baseline
     @owner = Finding.find(params[:id]).becomes(Finding)
     load_options
@@ -330,14 +211,6 @@ class FindingsController < ApplicationController
       render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
     end
   end
-
-
-
-  def reopen
-    @finding = Finding.find(params[:id]).becomes(Finding)
-    reopen_report(@finding)
-  end
-
 
 
 end

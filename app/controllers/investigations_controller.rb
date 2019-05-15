@@ -185,33 +185,6 @@ class InvestigationsController < SafetyAssuranceController
   end
 
 
-  def  new_finding
-    @audit = Investigation.find(params[:id])
-    @finding = InvestigationFinding.new
-    @classifications = Finding.get_classifications
-    form_special_matrix(@finding, "investigation[findings_attributes][0]", "severity_extra", "probability_extra")
-    load_options
-    @fields = Finding.get_meta_fields('form')
-    render :partial => "audits/finding"
-  end
-
-
-  def new_action
-    @namespace = "finding"
-    @privileges = Privilege.find(:all)
-    @finding = Investigation.find(params[:id])
-    @action = SmsAction.new
-    @departments = SmsAction.departments
-    @users = User.find(:all).keep_if{|u| !u.disable}
-    @headers = User.get_headers
-    @predefined_actions = SmsAction.get_actions
-    load_options
-    @fields = SmsAction.get_meta_fields('form')
-    form_special_matrix(@action, "investigation[corrective_actions_attributes][0]", "severity_extra", "probability_extra")
-    render :partial => "findings/action"
-  end
-
-
   def new_cost
     @cost = InvestigationCost.new
     @corrective_action = Investigation.find(params[:id])
@@ -228,65 +201,6 @@ class InvestigationsController < SafetyAssuranceController
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Investigation_##{@investigation.get_id}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
-  def new_cause
-    @investigation = Investigation.find(params[:id])
-    @categories = InvestigationCause.categories.keys
-    render :partial => "new_cause"
-  end
-
-
-  def new_desc
-    @finding = Investigation.find(params[:id])
-    @categories = InvestigationDescription.categories.keys
-    render :partial => "new_desc"
-  end
-
-
-  def add_causes
-    if params[:causes].present?
-      params[:causes].each_pair do |k,v|
-        if v.present?
-          InvestigationCause.create(
-            :owner_id => params[:id],
-            :category => params[:category],
-            :attr => k,
-            :value => v
-          )
-        end
-      end
-    end
-    redirect_to investigation_path(params[:id])
-  end
-
-
-  def add_desc
-    if params[:causes].present?
-      params[:causes].each_pair do |k,v|
-        if v.present?
-          InvestigationDescription.create(
-            :owner_id => params[:id],
-            :category => params[:category],
-            :attr => k,
-            :value => v)
-        end
-      end
-    end
-    redirect_to investigation_path(params[:id])
-  end
-
-
-  def retract_cause_attributes
-    @attributes = InvestigationCause.categories[params[:category]]
-    render :partial => "/findings/attributes"
-  end
-
-
-  def retract_desc_attributes
-    @attributes = InvestigationDescription.categories[params[:category]]
-    render :partial => "/findings/attributes"
   end
 
 
