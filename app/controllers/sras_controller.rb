@@ -124,18 +124,21 @@ class SrasController < ApplicationController
       if !@owner.approver #Approved by reviewer with absent approver case
         update_status = 'Completed'
         notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Approved by the Reviewer." + g_link(@owner),
+          "SRA ##{@owner.id} was Approved by the Quality Reviewer." + g_link(@owner),
           true, 'SRA Approved')
+        transaction_content = 'Approved by the Quality Reviewer'
       elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
         update_status = 'Pending Approval'
         notify(@owner.approver,
           "SRA ##{@owner.id} needs your Approval." + g_link(@owner),
           true, 'SRA Pending Approval')
+        transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.date_complete = Time.now
         notify(@owner.responsible_user,
           "SRA ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
           true, 'SRA Approved')
+        transaction_content = 'Approved by the Final Approver'
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
