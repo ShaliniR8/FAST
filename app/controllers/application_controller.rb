@@ -171,10 +171,11 @@ class ApplicationController < ActionController::Base
   end
 
   def get_car_owner(car)
-    if car.type == "FindingAction"
-      return car.finding.get_owner
-    elsif car.type == "InvestigationAction"
-      return 'investigations'
+    case car.owner_type
+      when 'Finding'
+        return car.owner.get_owner
+      when 'Investigation'
+        return 'investigations'
     end
   end
 

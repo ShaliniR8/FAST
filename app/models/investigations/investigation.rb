@@ -6,6 +6,7 @@ class Investigation < ActiveRecord::Base
   include Contactable
   include Findingable
   include Recommendationable
+  include SmsActionable
   include SmsTaskable
   include Transactionable
 
@@ -16,11 +17,9 @@ class Investigation < ActiveRecord::Base
   belongs_to :created_by,               foreign_key: 'created_by_id',           class_name: 'User'
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
-  has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
   has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
 
-  accepts_nested_attributes_for :corrective_actions
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
   accepts_nested_attributes_for :costs

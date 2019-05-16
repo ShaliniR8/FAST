@@ -1,6 +1,6 @@
 - if owner.owner.present?
   - parent_class = owner.owner.class.name
   = link_to "View #{parent_class.titleize}",
-    eval("#{parent_class.underscore}_path(@owner.owner)"),
+    eval("#{parent_class.underscore}_path(owner.owner)"),
     class: 'btn btn-info pull-right mr5 mb5',
     disable_with: 'Redirecting...'
