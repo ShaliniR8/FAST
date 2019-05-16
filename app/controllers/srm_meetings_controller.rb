@@ -121,7 +121,11 @@ class SrmMeetingsController < ApplicationController
 
 
   def index
-    @records=SrmMeeting.find(:all)
+    @records=SrmMeeting.includes(:invitations, :host)
+    unless current_user.admin?
+      @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+        current_user.id, ['Pending', 'Accepted'], current_user.id)
+    end
     @headers=SrmMeeting.get_headers
     @title="Meetings"
   end

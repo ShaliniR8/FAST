@@ -190,7 +190,7 @@ class MeetingsController < ApplicationController
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
     @report_headers = Report.get_meta_fields('index')
-    @reports = @meeting.reports
+    @reports = @meeting.reports.sort_by{|x| x.id}
     @users = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user == current_user && x.status == "Pending"}.first
   end
@@ -199,16 +199,15 @@ class MeetingsController < ApplicationController
 
 
   def index
-    @records=Meeting.where('type is null')
-    @records = @records
-                .includes(:invitations)
-                .where('invitations.id = current_user.id AND (invitations.status = ? OR type = "Host")',
-                  ['Pending','Accepted']
-                )
+    @records = Meeting.includes(:invitations, :host).where('meetings.type is null')
+    unless current_user.admin?
+      @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+        current_user.id, ['Pending', 'Accepted'], current_user.id)
+    end
     @records.keep_if{|r| display_in_table(r)}
-    @headers=Meeting.get_headers
-    @title='Meetings'
-    @action='meeting'
+    @headers = Meeting.get_headers
+    @title = 'Meetings'
+    @action = 'meeting'
   end
 
 
