@@ -386,7 +386,7 @@ class Submission < ActiveRecord::Base
       converted = self.class.create({
         :anonymous        => self.anonymous,
         :templates_id     => temp_id,
-        :description      => self.description + " --Copy of ##{self.id}",
+        :description      => self.description + " -- dual report of ##{self.id}",
         :event_date       => self.event_date,
         :user_id          => self.user_id,
         :event_time_zone  => self.event_time_zone,
@@ -397,15 +397,16 @@ class Submission < ActiveRecord::Base
       columns = [:value, :fields_id, :submissions_id]
       values = []
       new_temp.fields.each do |field|
-        values << [mapped_fields[field.id] || "", field.id, converted.id]
+        values << [mapped_fields[field.id], field.id, converted.id]
       end
-
-      values.each do |value|
-        SubmissionField.create({
-          :value => value[0],
-          :fields_id => value[1],
-          :submissions_id => value[2],
-        })
+      SubmissionField.transaction do
+        values.each do |value|
+          SubmissionField.create({
+            :value => value[0],
+            :fields_id => value[1],
+            :submissions_id => value[2]
+          })
+        end
       end
 
       #SubmissionField.import columns, values, validate: false
