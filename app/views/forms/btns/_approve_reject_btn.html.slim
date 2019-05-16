@@ -1,5 +1,5 @@
 - if owner.status == 'Pending Approval' && \
-  (!owner.respond_to?(can_approve?) || owner.can_approve?(current_user))
+  (!owner.respond_to?('can_approve?') || owner.can_approve?(current_user))
   = link_to 'Approve',
     '#',
     class: 'btn btn-success pull-right approve_btn mr5 mb5',

@@ -20,23 +20,23 @@
           </div>
         </div>
         <div class="panel-body">
-          <%=form_for @recommendation.becomes(Recommendation), :html => {:multipart => true} do |f|%>
+          <%=form_for @owner.becomes(Recommendation), :html => {:multipart => true} do |f|%>
 
             <%if params[:owner_type].present?%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
               <%=hidden_field_tag :owner_id, params[:owner_id]%>
             <%end%>
 
-            <%=render "shared/privilege_form",:target => "recommendation[privileges][]",:owner => @recommendation,:f => f%>
-            <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @recommendation %>
-            <%=render '/forms/attachments_form', :f => f, :owner => @recommendation%>
+            <%=render "shared/privilege_form",:target => "recommendation[privileges][]",:owner => @owner,:f => f%>
+            <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
+            <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
 
             <div class="mt10 mr10">
               <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
                 :class=>"btn btn-success pull-right mt5 mr5",
                 :disable_with => "Saving..."%>
               <%=link_to "Cancel",
-                @owner.present? ? @owner : @recommendation.becomes(Recommendation),
+                @parent.present? ? @parent : @owner.becomes(Recommendation),
                 :class => "btn btn-warning pull-right mt5 mr5",
                 :confirm => 'Are you sure?'%>
               <%#=link_to "Group Access",
