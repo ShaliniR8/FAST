@@ -17,7 +17,7 @@
             Hazard #<%=@hazard.get_id%>: <%=@hazard.title%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access("sras", "destroy")%>
+            <%if current_user.has_access("hazards", "destroy")%>
               <%=link_to "Delete",
                 hazard_path(@hazard),
                 :method => "delete",
@@ -35,7 +35,7 @@
 
 
             <%if @hazard.status == "New" &&
-              current_user.has_access("sras", "edit")%>
+              current_user.has_access("hazards", "edit")%>
               <%=link_to "Edit",
                 edit_hazard_path(@hazard),
                 :class => "btn btn-warning pull-right mr5 mb5",
@@ -135,7 +135,7 @@
         <%=render '/causes/all',
           :owner => @hazard,
           :cause_type => 'description',
-          :can_change => @hazard.status == "New" && current_user.has_access("sras", "edit")%>
+          :can_change => @hazard.status == "New" && current_user.has_access("hazards", "edit")%>
 
         <%if @hazard.risk_controls.present?%>
           <div class="col-xs-12">
