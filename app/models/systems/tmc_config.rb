@@ -25,9 +25,9 @@ class TMC_Config
       :checklist_version                              => '1',
 
       # Safety Assurance Module
-      :allow_reopen_report                            => true,
+      :allow_reopen_report                            => false,
       :has_root_causes                                => false,
-      :enable_recurrence                              => true,
+      :enable_recurrence                              => false,
 
 
       # SMS IM Module

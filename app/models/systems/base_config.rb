@@ -13,7 +13,7 @@ class BaseConfig
 
 
   def self.airline_code
-    'BSK'
+    'NAC'
   end
 
   def self.airline

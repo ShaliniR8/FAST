@@ -72,12 +72,6 @@ class SrasController < ApplicationController
       connection.save
     end
     if sra.save
-      notify(
-        sra.responsible_user,
-        "SRA ##{sra.get_id} has been scheduled for you." +
-          g_link(sra),
-        true,
-        "SRA ##{sra.get_id} Assigned")
       redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
     end
   end
