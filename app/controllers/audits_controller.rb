@@ -369,10 +369,10 @@ class AuditsController < ApplicationController
     reopen_report(@audit)
   end
 
-# For ProSafeT App
+# For ProSafeT App 2019
   def get_audit
     audit = Audit.where(id: params[:id]).includes({
-      checklists: {
+      checklists: { # Preload checklists to prevent N+1 queries
         checklist_header: :checklist_header_items,
         checklist_rows: :checklist_cells
       }
@@ -385,10 +385,9 @@ class AuditsController < ApplicationController
     # Array of fields to whitelist for the JSON
     json_fields = fields.map{ |field| field[:field].to_sym }
 
-    # Filter out all empty and not whitelisted audit fields
     audit_json = audit.as_json(
-      only: json_fields,
-      include: {
+      only: json_fields, # Filter out audit fields that aren't whitelisted
+      include: { # Include checklist data required for mobile
         checklists: {
           only: :id,
           include: {
@@ -411,7 +410,11 @@ class AuditsController < ApplicationController
           }
         }
       }
-    )['audit'].delete_if{ |key, value| value.blank? }
+    )['audit']
+    .delete_if{ |key, value| value.blank? } # Remove empty audit fields
+
+    # Default checklists to an empty array
+    audit_json[:checklists] = [] if audit_json[:checklists].blank?
 
     # Takes the id of each user field and replaces it with the
     # full name of the user corresponding to that id
