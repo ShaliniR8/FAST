@@ -27,6 +27,7 @@ class InspectionsController < SafetyAssuranceController
     :edit,
     :new_attachment,
     :new_contact,
+    :new_cost,
     :new_task,
     :override_status,
     :reopen,

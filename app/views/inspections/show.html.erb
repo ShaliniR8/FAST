@@ -42,6 +42,7 @@
               'approve_reject',
               'reopen',
               'task',
+              'cost',
               'contact',
               'requirement',
               'finding',
@@ -67,6 +68,8 @@
         <%=render '/findings/show_all',
           :owner => @owner,
           :show_btn => false%>
+
+        <%=render "/forms/cost", :owner => @owner%>
         <%=render "/forms/show_comment", :owner => @owner%>
 
         <%=render "/forms/attachments_show", :owner => @owner%>

@@ -3,6 +3,7 @@ class SmsAction < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Costable
   include Transactionable
 
 #Associations List
@@ -10,14 +11,10 @@ class SmsAction < ActiveRecord::Base
   belongs_to  :responsible_user,        foreign_key: "responsible_user_id",       class_name: "User"
   belongs_to  :created_by,              foreign_key: 'created_by_id',             class_name: 'User'
   belongs_to  :owner,                   polymorphic: true
-  has_many    :costs,                   foreign_key: "owner_id",                  class_name: "ActionCost",               :dependent => :destroy
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
   has_many    :notices,                 foreign_key: "owner_id",                  class_name: "SmsActionNotice",          :dependent => :destroy
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
   has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
-
-  accepts_nested_attributes_for :costs
-
 
   after_create -> { create_transaction('Create') }
   after_create    :owner_transaction
@@ -333,41 +330,6 @@ class SmsAction < ActiveRecord::Base
       self.id
     end
   end
-
-
-
-  def self.get_search_terms
-    {
-      'Title' => :title,
-      'Status'=> :status,
-      'Responsible Department' => :responsible_department,
-      'Resonsible User' => "responsible_user_name",
-      'Employee Corrective Action (Yes/No)' => 'emp_action',
-      'Company Correctvie Action (Yes/No)' => 'dep_action',
-      'Immediate Action Taken (Yes/No)' => 'im_action',
-      'Immediate Action Comment' => :immediate_action_comment,
-      'Comprehensive Action' => 'com_action',
-      'Comprehensive Action Comment' => :comprehensive_action_comment,
-      'Scheduled Completion Date' => 'schedule_date',
-      'Final Approver' => 'approver_name',
-      'Action' => :action_taken,
-      'Description' => :description
-    }.sort.to_h
-  end
-
-
-
-  def self.terms
-    {
-      :status => {:type => "select", :options => ['New', 'Assigned', 'Completed', 'Pending Approval']},
-      :recommendation => {:type => "select", :options => {'Yes' => true,'No' => false}},
-      :description => {:type => "text"},
-      :responsible_department => {:type => "select", :options => self.departments},
-      :action_taken => {:type => "datalist", :options => self.get_actions}
-    }
-  end
-
-
 
   def self.get_avg_complete
     candidates = self.where("status = ? and complete_date is not ? and open_date is not ? ",

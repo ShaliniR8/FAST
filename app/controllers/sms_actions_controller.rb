@@ -30,6 +30,7 @@ class SmsActionsController < SafetyAssuranceController
     :destroy,
     :edit,
     :new_attachment,
+    :new_cost,
     :override_status,
     :reopen,
     :show,
@@ -157,21 +158,6 @@ class SmsActionsController < SafetyAssuranceController
     )
     @owner.save
     redirect_to sms_action_path(@owner)
-  end
-
-
-
-  def get_term
-    all_terms = SmsAction.terms
-    @item = all_terms[params[:term].to_sym]
-    render :partial => "corrective_actions/term"
-  end
-
-
-  def new_cost
-    @cost = ActionCost.new
-    @corrective_action = SmsAction.find(params[:id]).becomes(SmsAction)
-    render :partial => "new_cost"
   end
 
 

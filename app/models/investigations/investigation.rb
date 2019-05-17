@@ -4,6 +4,7 @@ class Investigation < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Contactable
+  include Costable
   include Findingable
   include Recommendationable
   include SmsActionable
@@ -17,12 +18,10 @@ class Investigation < ActiveRecord::Base
   belongs_to :created_by,               foreign_key: 'created_by_id',           class_name: 'User'
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
-  has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
 
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :costs
 
   after_create -> { create_transaction('Create') }
   before_create :set_priveleges

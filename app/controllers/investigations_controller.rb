@@ -27,6 +27,7 @@ class InvestigationsController < SafetyAssuranceController
     :edit,
     :new_attachment,
     :new_contact,
+    :new_cost,
     :new_task,
     :override_status,
     :reopen,
@@ -182,13 +183,6 @@ class InvestigationsController < SafetyAssuranceController
     @fields = Investigation.get_meta_fields('show')
     @recommendation_fields = Recommendation.get_meta_fields('show')
     load_special_matrix(@investigation)
-  end
-
-
-  def new_cost
-    @cost = InvestigationCost.new
-    @corrective_action = Investigation.find(params[:id])
-    render :partial => "sms_actions/new_cost"
   end
 
 

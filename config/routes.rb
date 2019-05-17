@@ -380,6 +380,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'download_checklist'
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
       get 'new_checklist'
       post 'upload_checklist'
@@ -404,6 +405,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
       get 'new_finding'
       get 'new_checklist'
@@ -430,6 +432,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
       get 'new_finding'
       get 'new_checklist'

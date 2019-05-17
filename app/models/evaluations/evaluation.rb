@@ -4,6 +4,7 @@ class Evaluation < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Contactable
+  include Costable
   include Findingable
   include SmsTaskable
   include Transactionable

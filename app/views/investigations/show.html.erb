@@ -99,7 +99,7 @@
             :owner=>@owner,
             :fields=> SmsTask.get_meta_fields('show')%>
 
-          <%=render "/sms_actions/cost", :owner => @owner%>
+          <%=render "/forms/cost", :owner => @owner%>
 
 
           <%#=render "/records/show_template_fields", :record => @owner.record%>

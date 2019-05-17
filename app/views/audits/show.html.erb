@@ -42,8 +42,9 @@
               'complete',
               'approve_reject',
               'reopen',
-              'task',
               'contact',
+              'task',
+              'cost',
               'requirement',
               'finding',
               'comment'
@@ -59,6 +60,8 @@
         <%=render "/ims/show_contact", :owner => @owner, :fields => Contact.get_meta_fields('show')%>
 
         <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
+        <%=render "/forms/cost", :owner => @owner%>
+
 
         <%=render "/forms/show_comment", :owner => @owner%>
         <%=render "/forms/attachments_show", :owner => @owner%>

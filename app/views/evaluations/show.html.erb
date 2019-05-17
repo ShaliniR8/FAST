@@ -40,6 +40,7 @@
               'approve_reject',
               'reopen',
               'task',
+              'cost',
               'contact',
               'requirement',
               'finding',
@@ -67,6 +68,7 @@
           :type => 'evaluations',
           :show_btn => false%>
 
+        <%=render "/forms/cost", :owner => @owner%>
         <%=render "/forms/show_comment", :owner => @owner%>
         <%=render "/forms/attachments_show", :owner => @owner%>
         <%=render "/records/transactions", :owner => @owner%>

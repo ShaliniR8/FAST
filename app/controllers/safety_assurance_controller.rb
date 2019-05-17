@@ -54,6 +54,11 @@ class SafetyAssuranceController < ApplicationController
     render :partial => 'forms/contact_form'
   end
 
+  def new_cost
+    @cost = @owner.costs.new
+    render :partial => 'forms/new_cost'
+  end
+
   def new_task
     load_options
     @task = @owner.tasks.new

@@ -24,8 +24,7 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <%#=form_for ((@corrective_action.type.include? "Action") ?  @corrective_action.becomes(SmsAction) : @corrective_action ) do |x|%>
-        <%=form_for @corrective_action do |x|%>
+        <%=form_for @owner do |x|%>
 
           <%=x.fields_for :costs,@cost do |f| %>
 
