@@ -315,6 +315,8 @@ class UsersController < ApplicationController
       :content,
     ]).map do |notice|
       notice = notice['notice']
+      notice['owner_id'] = nil
+      notice['type'] = nil
       content = notice['content']
       extracted_uri = URI.extract(content, /http(s)?/)[0]
       if extracted_uri.present?

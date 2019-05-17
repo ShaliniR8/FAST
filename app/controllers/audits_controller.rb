@@ -382,7 +382,32 @@ class AuditsController < ApplicationController
 
     # Filter out all empty and not whitelisted audit fields
     audit_json = audit
-      .as_json(:only => json_fields)['audit']
+      .as_json(
+        only: json_fields,
+        include: {
+          checklists: {
+            only: :id,
+            include: {
+              checklist_header: {
+                only: :id,
+                include: {
+                  checklist_header_items: {
+                    only: [:id, :title, :data_type, :options, :editable, :display_order]
+                  }
+                }
+              },
+              checklist_rows: {
+                only: [:id, :is_header],
+                include: {
+                  checklist_cells: {
+                    only: [:id, :value, :checklist_header_item_id],
+                  }
+                }
+              }
+            }
+          }
+        }
+      )['audit']
       .delete_if{ |key, value| value.blank? }
 
     # Takes the id of each user field and replaces it with the
