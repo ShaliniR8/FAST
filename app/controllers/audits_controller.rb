@@ -391,4 +391,41 @@ class AuditsController < ApplicationController
 		@audit = Audit.find(params[:id])
 		reopen_report(@audit)
 	end
+
+# For ProSafeT App
+  def get_audit
+    audit = Audit.find(params[:id])
+
+    # Get all fields that will be shown
+    fields = Audit.get_meta_fields('show')
+      .select{ |field| field[:field].present? }
+
+    # Array of fields to whitelist for the JSON
+    json_fields = fields.map{ |field| field[:field].to_sym }
+
+    # Filter out all empty and not whitelisted audit fields
+    audit_json = audit
+      .as_json(:only => json_fields)['audit']
+      .delete_if{ |key, value| value.blank? }
+
+    # Takes the id of each user field and replaces it with the
+    # full name of the user corresponding to that id
+    user_fields = fields.select{ |field| field[:type] == 'user' }
+    user_fields.map do |field|
+      key = field[:field]
+      user_id = audit_json[key]
+      if user_id
+        audit_json[key] = User.find(user_id).full_name rescue ''
+      end
+    end
+
+    fields.each do |field|
+      key = field[:field]
+      if audit_json[key]
+        audit_json[key] = { :title => field[:title], :value => audit_json[key] }
+      end
+    end
+
+    render :json => audit_json
+  end
 end

@@ -374,6 +374,7 @@ PrdgSession::Application.routes.draw do |map|
 			get 'reopen'
 			get 'update_checklist_records'
 			get 'override_status'
+      get 'get_audit'
 		end
 		collection do
 			get "advanced_search"
