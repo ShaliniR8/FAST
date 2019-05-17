@@ -1,205 +1,204 @@
-<div class="col-xs-12 col-lg-12"%>
-	<div class="panel clickable panel-lightskyblue">
-		<div class="panel-heading click-heading collapsed">
-			<div class="panel-title">
-				<b>Baseline Risk Assessment</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-			</div>
-		</div>
-		<div class="panel-body" style="display:none">
+<div class="col-xs-12 col-lg-12">
+  <div class="panel clickable panel-lightskyblue">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b>Baseline Risk Assessment</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div>
+    </div>
+    <div class="panel-body" style="display:none">
 
-			<%=f.hidden_field :severity,:value=>"",:id=>"sev"%>
-			<%=f.hidden_field :likelihood,:value=>"",:id=>"like"%>
+      <%=f.hidden_field :severity,:value=>"",:id=>"sev"%>
+      <%=f.hidden_field :likelihood,:value=>"",:id=>"like"%>
       <%=f.hidden_field :risk_factor,:value=>"",:id=>"risk_fact"%>
 
       <%=render "shared/instructions", :instruction =>
-        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."
-      %>
+        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."%>
 
-			<div class="form-group col-xs-12">
-				<%=f.label :statement, "Notes"%>
-				<%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
-			</div>
+      <div class="form-group col-xs-12">
+        <%=f.label :statement, "Notes"%>
+        <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
+      </div>
 
-			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
-				<%=render "shared/#{BaseConfig.airline[:code]}/form_severity"%>
-			</div>
-			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<%=render "shared/#{BaseConfig.airline[:code]}/form_probability"%>
-				<%=render "shared/#{BaseConfig.airline[:code]}/form_risk_table"%>
-			</div>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_severity"%>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_probability"%>
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_risk_table"%>
+      </div>
 
-		</div>
-	</div>
+    </div>
+  </div>
 </div>
 
 
 <style>
-	.table-centered td,th{
-		text-align: center;
-	}
-	.table-centered th{
-		font-size: 14px;
-	}
-	.table-cursor td:hover {
-		opacity: 0.8;
-		cursor: pointer;
-		background-color: #F0F8FF;
-	}
-	.table-small th{
-		font-size: 13px !important;
-	}
-	.table-small td{
-		text-align: left !important;
-		font-size: 12px !important;
-	}
+  .table-centered td,th{
+    text-align: center;
+  }
+  .table-centered th{
+    font-size: 14px;
+  }
+  .table-cursor td:hover {
+    opacity: 0.8;
+    cursor: pointer;
+    background-color: #F0F8FF;
+  }
+  .table-small th{
+    font-size: 13px !important;
+  }
+  .table-small td{
+    text-align: left !important;
+    font-size: 12px !important;
+  }
 </style>
 
 
 
 <script>
-	function load_data(){
-		<%if @target.get_extra_severity.present? && @target.get_extra_probability.present?%>
-			$('.severity_td').each(function(){
-				<%(0..@severity_table[:row_header].size - 1).each do |i|%>
-					if($(this).data('row') == <%=i%>){
-						if($(this).data('column') == <%=@target.get_extra_severity[i]%>){
-							$(this).data("status", "checked");
-							$(this).css('background', '#AFEEFC');
-						}
-					}
-				<%end%>
-			});
-			$('.probability_td').each(function(){
-				<%(0..@probability_table[:column_header].size-1).each do |i|%>
-					if ($(this).data('column') == <%=i%>){
-						if($(this).data('row') == <%=@target.get_extra_probability[i]%>){
-							$(this).data("status","checked");
-							$(this).css('background','#AFEEFC');
-						}
-					}
-				<%end%>
-			});
-			calculate_risk();
-		<%end%>
-	}
+  function load_data(){
+    <%if @target.get_extra_severity.present? && @target.get_extra_probability.present?%>
+      $('.severity_td').each(function(){
+        <%(0..@severity_table[:row_header].size - 1).each do |i|%>
+          if($(this).data('row') == <%=i%>){
+            if($(this).data('column') == <%=@target.get_extra_severity[i]%>){
+              $(this).data("status", "checked");
+              $(this).css('background', '#AFEEFC');
+            }
+          }
+        <%end%>
+      });
+      $('.probability_td').each(function(){
+        <%(0..@probability_table[:column_header].size-1).each do |i|%>
+          if ($(this).data('column') == <%=i%>){
+            if($(this).data('row') == <%=@target.get_extra_probability[i]%>){
+              $(this).data("status","checked");
+              $(this).css('background','#AFEEFC');
+            }
+          }
+        <%end%>
+      });
+      calculate_risk();
+    <%end%>
+  }
 
 
 
-	function initialize() {
-		$('.severity_td').on('click',function(){
-			if ($(this).data("status") === "checked"){
-				$(this).data("status", "");
-				$(this).css('background', 'none');
-			}else{
-				$(this).data("status", "checked");
-				$(this).css('background', '#AFEEFC');
-				row_id = $(this).data("row");
-				column_id = $(this).data("column");
-				$('.severity_td').each(function(){
-					if ($(this).data("row") == row_id && $(this).data("column") != column_id){
-						$(this).data("status", "");
-						$(this).css('background', 'none');
-					}
-				});
-			}
-			calculate_risk();
-		});
-		$('.probability_td').on('click',function(){
-			if ($(this).data("status") === "checked"){
-				$(this).data("status", "");
-				$(this).css('background', 'none');
-			}else{
-				$(this).data("status", "checked");
-				$(this).css('background', '#AFEEFC');
-				row_id = $(this).data("row");
-				column_id = $(this).data("column");
-				$('.probability_td').each(function(){
-					if ($(this).data("row") != row_id && $(this).data("column") == column_id){
-						$(this).data("status", "");
-						$(this).css('background', 'none');
-					}
-				});
-			}
-			calculate_risk();
-		});
-	}
+  function initialize() {
+    $('.severity_td').on('click',function(){
+      if ($(this).data("status") === "checked"){
+        $(this).data("status", "");
+        $(this).css('background', 'none');
+      }else{
+        $(this).data("status", "checked");
+        $(this).css('background', '#AFEEFC');
+        row_id = $(this).data("row");
+        column_id = $(this).data("column");
+        $('.severity_td').each(function(){
+          if ($(this).data("row") == row_id && $(this).data("column") != column_id){
+            $(this).data("status", "");
+            $(this).css('background', 'none');
+          }
+        });
+      }
+      calculate_risk();
+    });
+    $('.probability_td').on('click',function(){
+      if ($(this).data("status") === "checked"){
+        $(this).data("status", "");
+        $(this).css('background', 'none');
+      }else{
+        $(this).data("status", "checked");
+        $(this).css('background', '#AFEEFC');
+        row_id = $(this).data("row");
+        column_id = $(this).data("column");
+        $('.probability_td').each(function(){
+          if ($(this).data("row") != row_id && $(this).data("column") == column_id){
+            $(this).data("status", "");
+            $(this).css('background', 'none');
+          }
+        });
+      }
+      calculate_risk();
+    });
+  }
 
 
 
-	function calculate_risk(){
-		severities = []
-		probabilities = []
-		severity_checked = 0
-		probability_checked = 0
-		$('.severity_td').each(function(){
-			if ($(this).data("status") === "checked"){
-				severities.push($(this).data("column"));
-				severity_checked++;
-			}
-		});
-		$('.probability_td').each(function(){
-			if ($(this).data("status") === "checked"){
-				probabilities.push($(this).data("row"));
-				probability_checked++;
-			}
-		});
-		if (probability_checked > 0 && severity_checked > 0){
-			set_risk(Math.min(...probabilities), Math.min(...severities));
-		}else{
-			clear_risk();
-		}
-	}
+  function calculate_risk(){
+    severities = []
+    probabilities = []
+    severity_checked = 0
+    probability_checked = 0
+    $('.severity_td').each(function(){
+      if ($(this).data("status") === "checked"){
+        severities.push($(this).data("column"));
+        severity_checked++;
+      }
+    });
+    $('.probability_td').each(function(){
+      if ($(this).data("status") === "checked"){
+        probabilities.push($(this).data("row"));
+        probability_checked++;
+      }
+    });
+    if (probability_checked > 0 && severity_checked > 0){
+      set_risk(Math.min(...probabilities), Math.min(...severities));
+    }else{
+      clear_risk();
+    }
+  }
 
 
-	function set_risk(row_index,column_index){
-		clear_risk();
+  function set_risk(row_index,column_index){
+    clear_risk();
     risk_table_def = <%=SCX_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
     risk_table_dic = <%=SCX_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
-		$('.risk_td').each(function(){
-			if($(this).data("row") == row_index && $(this).data("column") == column_index){
-				$(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
-				$('#sev').val(row_index);
-				$('#like').val(column_index);
+    $('.risk_td').each(function(){
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
+        $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
+        $('#sev').val(row_index);
+        $('#like').val(column_index);
         $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
-			}
-		});
-	}
+      }
+    });
+  }
 
 
-	function clear_risk(){
-		$('.risk_td').each(function(){
-			$(this).text("");
-		});
-	}
+  function clear_risk(){
+    $('.risk_td').each(function(){
+      $(this).text("");
+    });
+  }
 
 
-	$(document).ready(function(){
-		initialize();
-		load_data();
-		$('form').on('submit',function(){
-			var severity_result = new Array(<%= @severity_table[:row_header].size %>);
-			var probability_result = new Array(<%= @probability_table[:column_header].size %>);
-			$('.severity_td').each(function(){
-				if ($(this).data('status') === "checked"){
-					severity_result[$(this).data("row")] = $(this).data("column");
-				}
-			});
+  $(document).ready(function(){
+    initialize();
+    load_data();
+    $('form').on('submit',function(){
+      var severity_result = new Array(<%= @severity_table[:row_header].size %>);
+      var probability_result = new Array(<%= @probability_table[:column_header].size %>);
+      $('.severity_td').each(function(){
+        if ($(this).data('status') === "checked"){
+          severity_result[$(this).data("row")] = $(this).data("column");
+        }
+      });
 
-			$('.probability_td').each(function(){
-				if ($(this).data('status') === "checked"){
-					probability_result[$(this).data("column")] = $(this).data("row");
-				}
-			});
+      $('.probability_td').each(function(){
+        if ($(this).data('status') === "checked"){
+          probability_result[$(this).data("column")] = $(this).data("row");
+        }
+      });
 
-			for(i = 0; i < severity_result.length; i++){
-				$('form').append("<input name='<%=@target_name%>[<%=@severity_field%>][]' value=" + severity_result[i]+" hidden></input>");
-			}
+      for(i = 0; i < severity_result.length; i++){
+        $('form').append("<input name='<%=@target_name%>[<%=@severity_field%>][]' value=" + severity_result[i]+" hidden></input>");
+      }
 
-			for (i = 0; i < probability_result.length; i++){
-				$('form').append("<input name='<%=@target_name%>[<%=@probability_field%>][]' value=" + probability_result[i]+" hidden></input>");
-			}
-			return true;
-		});
-	});
+      for (i = 0; i < probability_result.length; i++){
+        $('form').append("<input name='<%=@target_name%>[<%=@probability_field%>][]' value=" + probability_result[i]+" hidden></input>");
+      }
+      return true;
+    });
+  });
 </script>

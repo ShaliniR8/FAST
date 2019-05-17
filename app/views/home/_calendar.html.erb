@@ -3,53 +3,53 @@
 <%= javascript_include_tag "utility/fullcalendar.min.js"%>
 
 <script>
-	$(document).ready(function() {
-		$('#calendar').fullCalendar({
-			header: {
-				left: 'prevYear,prev',
-				center: 'title',
-				right: "today,month,basicWeek,listWeek, next,nextYear"
-			}, 
-			height: 450,
-			defaultDate: '<%=Time.now.to_date%>',
-			timezone: "local",
-			editable: false,
-			events: <%=raw(@calendar_entries.to_json)%>,
-			eventRender: function(event, element) {
-				$(element).tooltip({
-					title: (event.description!=undefined) ? event.description : event.title,
-					container: 'body'
-				});             
-			}
-		});	
-	});
+  $(document).ready(function() {
+    $('#calendar').fullCalendar({
+      header: {
+        left: 'prevYear,prev',
+        center: 'title',
+        right: "today,month,basicWeek,listWeek, next,nextYear"
+      },
+      height: 450,
+      defaultDate: '<%=Time.now.to_date%>',
+      timezone: "local",
+      editable: false,
+      events: <%=raw(@calendar_entries.to_json)%>,
+      eventRender: function(event, element) {
+        $(element).tooltip({
+          title: (event.description!=undefined) ? event.description : event.title,
+          container: 'body'
+        });
+      }
+    });
+  });
 </script>
 
 
 <style>
-	#calendar {
-		margin: 20px 10px;
-		padding: 0;
-		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
-		font-size: 15px;
-	}
-	.fc-button-group,
-	.fc button {
-		display: block;
-	}
+  #calendar {
+    margin: 20px 10px;
+    padding: 0;
+    font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+    font-size: 15px;
+  }
+  .fc-button-group,
+  .fc button {
+    display: block;
+  }
 </style>
 
 
 <div class="col-xs-12 col-lg-12">
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>Calendar</b>
-			</div>
-		</div>
-		<div class="panel-body">
-			<div id="calendar"></div>
-		</div>
-	</div>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Calendar</b>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div id="calendar"></div>
+    </div>
+  </div>
 </div>
 

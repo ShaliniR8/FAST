@@ -1,13 +1,13 @@
 <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 <div class="panel panel-info">
-	<div class="panel-heading">
-		<div class="panel-title">
-   		<b>New Document</b>
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b>New Document</b>
       <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
-		</div>
-	</div>
-	<div class="panel-body" id="form_body"> 
-		<%= form_for @document,:html => {:multipart => true} do |f|%>
+    </div>
+  </div>
+  <div class="panel-body" id="form_body">
+    <%= form_for @document,:html => {:multipart => true} do |f|%>
       <div class="row">
         <div class="col-sm-3 mb10">
           <b>Document Type:</b><br>
@@ -18,11 +18,11 @@
           <%=f.select :category,@category_options,{:include_blank=>""},{:class=>"form-control required_field"}%>
         </div>
         <div class="col-sm-12" style="display:none" id="file_upload">
-          <%=f.fields_for :attachment,DocumentAttachment.new do |ff|%> 
+          <%=f.fields_for :attachment,DocumentAttachment.new do |ff|%>
             <b>Select File to Upload:</b><br>
             <%=ff.file_field :name, class: "required_field_file"%>
             <b>Title:</b><br>
-            <%=ff.text_field :caption, class: "form-control required_field_file_title"%>      
+            <%=ff.text_field :caption, class: "form-control required_field_file_title"%>
           <%end%>
         </div>
         <div class="col-sm-12" style="display:none" id="link_upload">
@@ -45,8 +45,8 @@
         <%=link_to "Cancel", documents_path, :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right"%>
       </div>
     <%end%>
-  </div> 
-</div> 
+  </div>
+</div>
 
 <script>
 
@@ -100,7 +100,7 @@
 
           $('#link_upload').hide()
           $('#link_upload input').val(null)
-          
+
           $('#tracked_upload').hide()
           $('#tracked_upload input').val(null)
           break
@@ -131,7 +131,7 @@
 
           $('#link_upload').hide()
           $('#link_upload input').val(null)
-          
+
           $('#tracked_upload').hide()
           $('#tracked_upload input').val(null)
       }

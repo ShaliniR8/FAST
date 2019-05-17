@@ -1,111 +1,111 @@
 <body>
 
-	<div id="page" class="item active mt50" style="height:auto;">
-		<div class="grid per90 center-block">
+  <div id="page" class="item active mt50" style="height:auto;">
+    <div class="grid per90 center-block">
 
-			<div class="row">	   
-				<%if current_user.has_access('ASAP','module')%>
-					<div class="<%=@size%> module_block">
-						<a href="<%=choose_module_home_index_path(:mode => 'ASAP')%>" style="border:none;text-decoration:none;">
-							<img style="border:none" src="/Safety_Reporting.png" width="150" height="150" />
-						</a>
-						<div id="asap">Safety Reporting</div>
-					</div>
-				<%end%>
-				<%if current_user.has_access('SMS IM','module')%>
-					<div class="<%=@size%> module_block">
-						<a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
-							<img style="border:none" src="/SMSIM.png" width="150" height="150" />
-						</a>
-						<div id="smsim">SMS IM</div>
-					</div>
-				<%end%>
-				<%if current_user.has_access('Safety Assurance','module')%>
-					<div class="<%=@size%> module_block">
-						<a href="<%=choose_module_home_index_path(:mode => 'SMS')%>" style="border:none;text-decoration:none;">
-							<img style="border:none" src="/SA.png" width="150" height="150" />
-						</a>
-						<div id="sa">Safety Assurance</div>
-					</div>
-				<%end%>
-				<%if current_user.has_access('Safety Risk Management','module')%>
-					<div class="<%=@size%> module_block">
-						<a href="<%=choose_module_home_index_path(:mode => 'SRM')%>" style="border:none;text-decoration:none;">
-							<img style="border:none" src="/SRA.png" width="150" height="150" />
-						</a>
-						<div id="srm">SRA (SRM)</div>
-					</div>
-				<%end%>
-			</div>
+      <div class="row">
+        <%if current_user.has_access('ASAP','module')%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'ASAP')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/Safety_Reporting.png" width="150" height="150" />
+            </a>
+            <div id="asap">Safety Reporting</div>
+          </div>
+        <%end%>
+        <%if current_user.has_access('SMS IM','module')%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/SMSIM.png" width="150" height="150" />
+            </a>
+            <div id="smsim">SMS IM</div>
+          </div>
+        <%end%>
+        <%if current_user.has_access('Safety Assurance','module')%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'SMS')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/SA.png" width="150" height="150" />
+            </a>
+            <div id="sa">Safety Assurance</div>
+          </div>
+        <%end%>
+        <%if current_user.has_access('Safety Risk Management','module')%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'SRM')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/SRA.png" width="150" height="150" />
+            </a>
+            <div id="srm">SRA (SRM)</div>
+          </div>
+        <%end%>
+      </div>
 
 
-		</div>
-	</div>
-		
-	<%=render "shared/version_footer"%>
+    </div>
+  </div>
+
+  <%=render "shared/version_footer"%>
 </body>
 
 
 <style>
-	
-	footer {
-		position: relative;
-		height: 300px;
-		width: 100%;
-	}
 
-	.version {
-		position: absolute;
-		width: 100%;
-		text-align: center;
-		bottom:0;
-		font-weight: bold;
-		color: #6b6b6b;
-	}
+  footer {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
 
-	html{
-		height: 100%;
-	}
+  .version {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom:0;
+    font-weight: bold;
+    color: #6b6b6b;
+  }
 
-	body{
-	 	background-image: url("/rain-drops.jpg");
-	 	background-size: cover;
-	 	height: 100%;
-		/* overflow: scroll;*/
-	 
-	 
-	}
-	.module_block:hover{
-			opacity: 0.6;
-	}
-	.module_block{
-		height:250px;
-		text-align: center;
-		vertical-align:middle;
-		font-family: "Arial", Verdana, Sans-serif;
-			border-color: #f2f2f2;
-			font-weight: bold;
-			text-shadow: 0 0 3px #A9A9A9;
-	}
-	#asap{
-		font-size: 180%;
-		padding-top: 10px;
-		color: #42960b;
-	}
-	#smsim{
-		font-size: 180%;
-		padding-top: 10px;
-		color: #74b1c7;
-	}
-	#sa{
-		font-size: 180%;
-		padding-top: 10px;
-		color: #9f3cef;
-	}
-	#srm{
-		font-size: 180%;
-		padding-top: 10px;
-		color: #e84e10;
-	}
+  html{
+    height: 100%;
+  }
+
+  body{
+    background-image: url("/rain-drops.jpg");
+    background-size: cover;
+    height: 100%;
+    /* overflow: scroll;*/
+
+
+  }
+  .module_block:hover{
+      opacity: 0.6;
+  }
+  .module_block{
+    height:250px;
+    text-align: center;
+    vertical-align:middle;
+    font-family: "Arial", Verdana, Sans-serif;
+      border-color: #f2f2f2;
+      font-weight: bold;
+      text-shadow: 0 0 3px #A9A9A9;
+  }
+  #asap{
+    font-size: 180%;
+    padding-top: 10px;
+    color: #42960b;
+  }
+  #smsim{
+    font-size: 180%;
+    padding-top: 10px;
+    color: #74b1c7;
+  }
+  #sa{
+    font-size: 180%;
+    padding-top: 10px;
+    color: #9f3cef;
+  }
+  #srm{
+    font-size: 180%;
+    padding-top: 10px;
+    color: #e84e10;
+  }
 </style>
 

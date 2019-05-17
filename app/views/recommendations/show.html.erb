@@ -4,178 +4,178 @@
 
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="col-xs-12">
-			<%=render "shared/alerts" %>
-			<%=render "access_controls/new_modal"%>
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<div class="top_text">
-							Recommendation #<%=@recommendation.get_id%>: <%=@recommendation.title%>
-						</div>
-						<div class="top_buttons pull-right">
-							<%if current_user.admin? ||
+  <div class="grid per90 center-block">
+    <div class="col-xs-12">
+      <%=render "shared/alerts" %>
+      <%=render "access_controls/new_modal"%>
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <div class="top_text">
+              Recommendation #<%=@recommendation.get_id%>: <%=@recommendation.title%>
+            </div>
+            <div class="top_buttons pull-right">
+              <%if current_user.admin? ||
                     current_user.has_access(@type,'admin') ||
                     current_user.has_access(@type,"destroy")%>
-								<%=link_to "Delete",
-									recommendation_path(@recommendation),
-									:method => "delete",
-									:confirm => 'Are you sure?',
-									:class => "btn btn-danger pull-right mr5 mb5"%>
-							<%end%>
+                <%=link_to "Delete",
+                  recommendation_path(@recommendation),
+                  :method => "delete",
+                  :confirm => 'Are you sure?',
+                  :class => "btn btn-danger pull-right mr5 mb5"%>
+              <%end%>
 
-							<%if current_user.admin? ||
+              <%if current_user.admin? ||
                     current_user.has_access(@type,'admin')%>
-								<%=link_to 'Override Status', '#',
-									:class => 'btn btn-danger pull-right mr5 mb5',
-									:id => 'override_status_btn',
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
-							<%end%>
+                <%=link_to 'Override Status', '#',
+                  :class => 'btn btn-danger pull-right mr5 mb5',
+                  :id => 'override_status_btn',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
 
-							<%if @recommendation.status != 'Completed' && (
+              <%if @recommendation.status != 'Completed' && (
                     current_user.admin? ||
                     current_user.has_access(@type,'admin') ||
                     current_user.has_access(@type,"edit"))%>
-								<%=link_to "Edit",
-									edit_recommendation_path(@recommendation),
-									:class => "btn btn-warning pull-right mr5 mb5",
-									:disable_with => "Editing..."%>
-							<%end%>
+                <%=link_to "Edit",
+                  edit_recommendation_path(@recommendation),
+                  :class => "btn btn-warning pull-right mr5 mb5",
+                  :disable_with => "Editing..."%>
+              <%end%>
 
-							<%=link_to "De-ID PDF",
-								print_recommendation_path(
-									@recommendation,
-									:deidentified => true,
-									:format => :pdf),
-								:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+              <%=link_to "De-ID PDF",
+                print_recommendation_path(
+                  @recommendation,
+                  :deidentified => true,
+                  :format => :pdf),
+                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-							<%=link_to "PDF",
-								print_recommendation_path(
-									@recommendation,
-									:deidentified => false,
-									:format => :pdf),
-								:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+              <%=link_to "PDF",
+                print_recommendation_path(
+                  @recommendation,
+                  :deidentified => false,
+                  :format => :pdf),
+                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-							<%if @recommendation.type == "FindingRecommendation"%>
-								<%=link_to "View Finding",
-									finding_path(@recommendation.finding),
-									:class => "btn btn-info mr5 pull-right mb5",
-									:disable_with => "Redirecting..."%>
-							<%else%>
-								<%=link_to "View Investigation",
-									investigation_path(@recommendation.investigation),
-									:class => "btn btn-info mr5 pull-right mb5",
-									:disable_with => "Redirecting..."%>
-							<%end%>
-							<%=link_to "Send Message",
-								new_message_path(
-									:link => recommendation_path(@recommendation),
-									:link_type => "Recommendation",
-									:link_id => @recommendation.id),
-								:class => "btn btn-warning pull-right mr5 mb5"%>
-							<%=link_to "Expand All", "#",
-								:class => "btn btn-default mr5 expandall pull-right mb5"%>
-						</div>
-					</div>
-				</div>
-				<div class="panel-body">
-					<div class="col-xs-12 mb15">
+              <%if @recommendation.type == "FindingRecommendation"%>
+                <%=link_to "View Finding",
+                  finding_path(@recommendation.finding),
+                  :class => "btn btn-info mr5 pull-right mb5",
+                  :disable_with => "Redirecting..."%>
+              <%else%>
+                <%=link_to "View Investigation",
+                  investigation_path(@recommendation.investigation),
+                  :class => "btn btn-info mr5 pull-right mb5",
+                  :disable_with => "Redirecting..."%>
+              <%end%>
+              <%=link_to "Send Message",
+                new_message_path(
+                  :link => recommendation_path(@recommendation),
+                  :link_type => "Recommendation",
+                  :link_id => @recommendation.id),
+                :class => "btn btn-warning pull-right mr5 mb5"%>
+              <%=link_to "Expand All", "#",
+                :class => "btn btn-default mr5 expandall pull-right mb5"%>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="col-xs-12 mb15">
 
-						<%if @recommendation.status == 'New'%>
-							<%if @recommendation.can_assign? %>
+            <%if @recommendation.status == 'New'%>
+              <%if @recommendation.can_assign? %>
                 <%if @recommendation.approver == current_user ||
                         current_user.admin? ||
                         current_user.has_access(@type,'admin')%>
-    							<%=link_to 'Assign', '#',
-    								:id => 'assign_btn',
-    								:class => 'btn btn-success pull-right mr5',
-    								'data-toggle' => 'modal',
-    								'data-target' => '.bs-example-modal-lg'%>
+                  <%=link_to 'Assign', '#',
+                    :id => 'assign_btn',
+                    :class => 'btn btn-success pull-right mr5',
+                    'data-toggle' => 'modal',
+                    'data-target' => '.bs-example-modal-lg'%>
                 <%end%>
-							<%else%>
-								<b style='color:red;'>*Please complete the Source of Input before assigning the Recommendation.</b>
-							<%end%>
+              <%else%>
+                <b style='color:red;'>*Please complete the Source of Input before assigning the Recommendation.</b>
+              <%end%>
 
-						<%elsif @recommendation.status == 'Assigned'%>
-							<%if @recommendation.can_complete? current_user %>
-								<%=link_to "Complete", '#',
-									:class => "btn btn-success pull-right complete_btn mb5",
-									:id => 'complete',
-									'data-toggle' => 'modal',
-									'data-target' => '.bs-example-modal-lg'%>
-							<%end%>
+            <%elsif @recommendation.status == 'Assigned'%>
+              <%if @recommendation.can_complete? current_user %>
+                <%=link_to "Complete", '#',
+                  :class => "btn btn-success pull-right complete_btn mb5",
+                  :id => 'complete',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg'%>
+              <%end%>
 
-						<%elsif @recommendation.status == 'Pending Approval'%>
-							<%if @recommendation.can_approve? current_user %>
-								<%=link_to "Approve", "#",
-									:class => "btn btn-success pull-right mr5 approve_btn mb5",
-									:id => 'approve',
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
+            <%elsif @recommendation.status == 'Pending Approval'%>
+              <%if @recommendation.can_approve? current_user %>
+                <%=link_to "Approve", "#",
+                  :class => "btn btn-success pull-right mr5 approve_btn mb5",
+                  :id => 'approve',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
 
-								<%=link_to "Reject", "#",
-									:class => "btn btn-danger pull-right mr5 approve_btn mb5",
-									:id => 'reject',
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
-							<%end%>
+                <%=link_to "Reject", "#",
+                  :class => "btn btn-danger pull-right mr5 approve_btn mb5",
+                  :id => 'reject',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
 
 
-						<%elsif @recommendation.status == 'Completed'%>
-							<%if @recommendation.can_reopen?(current_user)%>
-								<%=link_to "Reopen",
-									reopen_recommendation_path(@recommendation),
-									:class => "btn btn-success pull-right mr5",
-									:disable_with => "Reopening...",
-									:confirm => "Are you sure?"%>
-							<%end%>
-						<%end%>
-					</div>
+            <%elsif @recommendation.status == 'Completed'%>
+              <%if @recommendation.can_reopen?(current_user)%>
+                <%=link_to "Reopen",
+                  reopen_recommendation_path(@recommendation),
+                  :class => "btn btn-success pull-right mr5",
+                  :disable_with => "Reopening...",
+                  :confirm => "Are you sure?"%>
+              <%end%>
+            <%end%>
+          </div>
 
-					<%=render '/recommendations/show', :owner => @recommendation, :show_btn => true%>
+          <%=render '/recommendations/show', :owner => @recommendation, :show_btn => true%>
           <%=render "/forms/attachments_show", :owner => @recommendation%>
-					<%=render "/records/transactions", :owner => @recommendation%>
-				</div>
-			</div>
-		</div>
-	</div>
+          <%=render "/records/transactions", :owner => @recommendation%>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-	$(document).ready(function(){
-		$('#att_btn').on('click',function(){
-			$.get("<%=new_attachment_recommendation_path(@recommendation)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+  $(document).ready(function(){
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_recommendation_path(@recommendation)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#assign_btn').on('click',function(){
-			$.get("<%=assign_recommendation_path(@recommendation)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#assign_btn').on('click',function(){
+      $.get("<%=assign_recommendation_path(@recommendation)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('.complete_btn').on('click',function(){
+    $('.complete_btn').on('click',function(){
       var commit = $(this).attr('id');
-			$.get("<%=complete_recommendation_path(@recommendation)%>" + "?commit=" + commit, function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+      $.get("<%=complete_recommendation_path(@recommendation)%>" + "?commit=" + commit, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('.approve_btn').on('click',function(){
-			var commit = $(this).attr('id');
-			$.get("<%=approve_recommendation_path(@recommendation)%>" + "?commit=" + commit, function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('.approve_btn').on('click',function(){
+      var commit = $(this).attr('id');
+      $.get("<%=approve_recommendation_path(@recommendation)%>" + "?commit=" + commit, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
     $('#override_status_btn').on('click',function(){
       $.get("<%=override_status_recommendation_path(@recommendation)%>", function(data){
         $(".modal-content").html(data);
@@ -183,5 +183,5 @@
       });
     });
 
-	});
+  });
 </script>

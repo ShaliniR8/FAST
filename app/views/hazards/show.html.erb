@@ -9,195 +9,195 @@
 <%=render "access_controls/new_modal"%>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<div class="top_text">
-						Hazard #<%=@hazard.get_id%>: <%=@hazard.title%>
-					</div>
-					<div class="top_buttons pull-right">
-						<%if current_user.has_access("sras", "destroy")%>
-							<%=link_to "Delete",
-								hazard_path(@hazard),
-								:method => "delete",
-								:confirm => 'Are you sure?',
-								:class => "btn btn-danger pull-right mr5 mb5"%>
-						<%end%>
+  <div class="grid per90 center-block">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            Hazard #<%=@hazard.get_id%>: <%=@hazard.title%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%if current_user.has_access("sras", "destroy")%>
+              <%=link_to "Delete",
+                hazard_path(@hazard),
+                :method => "delete",
+                :confirm => 'Are you sure?',
+                :class => "btn btn-danger pull-right mr5 mb5"%>
+            <%end%>
 
-						<%if current_user.admin?%>
-							<%=link_to 'Override Status', '#',
-								:class => 'btn btn-danger pull-right mr5 mb5',
-								:id => 'override_status_btn',
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
+            <%if current_user.admin?%>
+              <%=link_to 'Override Status', '#',
+                :class => 'btn btn-danger pull-right mr5 mb5',
+                :id => 'override_status_btn',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
 
 
-						<%if @hazard.status == "New" &&
-							current_user.has_access("sras", "edit")%>
-							<%=link_to "Edit",
-								edit_hazard_path(@hazard),
-								:class => "btn btn-warning pull-right mr5 mb5",
-								:disable_with => "Editing..."%>
-						<%end%>
+            <%if @hazard.status == "New" &&
+              current_user.has_access("sras", "edit")%>
+              <%=link_to "Edit",
+                edit_hazard_path(@hazard),
+                :class => "btn btn-warning pull-right mr5 mb5",
+                :disable_with => "Editing..."%>
+            <%end%>
 
-						<%=link_to "De-ID PDF",
-							print_hazard_path(
-								@hazard,
-								:deidentified => true,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-						<%=link_to "PDF",
-							print_hazard_path(
-								@hazard,
-								:deidentified => false,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "De-ID PDF",
+              print_hazard_path(
+                @hazard,
+                :deidentified => true,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "PDF",
+              print_hazard_path(
+                @hazard,
+                :deidentified => false,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-						<%=link_to "View SRA(SRM)",
-							sra_path(@hazard.sra),
-							:class => "btn btn-info pull-right mr5 mb5",
-							:disable_with => "Redirecting..."%>
-						<%=link_to "Send Message",
-							new_message_path(
-								:link => hazard_path(@hazard),
-								:link_type => "Hazard",
-								:link_id => @hazard.id),
-							:class => "btn btn-warning pull-right mr5 mb5"%>
-						<%=link_to "Expand All",
-							"#",
-							:class => "btn btn-default mr5 mb5 expandall pull-right ml5"%>
-					</div>
-				</div>
-			</div>
+            <%=link_to "View SRA(SRM)",
+              sra_path(@hazard.sra),
+              :class => "btn btn-info pull-right mr5 mb5",
+              :disable_with => "Redirecting..."%>
+            <%=link_to "Send Message",
+              new_message_path(
+                :link => hazard_path(@hazard),
+                :link_type => "Hazard",
+                :link_id => @hazard.id),
+              :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Expand All",
+              "#",
+              :class => "btn btn-default mr5 mb5 expandall pull-right ml5"%>
+          </div>
+        </div>
+      </div>
 
-			<div class="panel-body">
-				<div class="col-xs-12 mb20">
-					<%if @hazard.status == "New"%>
-						<%=link_to "Reject",
-							complete_hazard_path(@hazard, :status => "Rejected"),
-							:class => "btn btn-danger pull-right mr5 mb5",
-							:disable_with => "Rejecting...",
-							:confirm => "Are you sure?"%>
-						<%=link_to "Complete",
-							complete_hazard_path(@hazard, :status => "Completed"),
-							:class => "btn btn-warning pull-right mr5 mb5",
-							:disable_with => "Completing...",
-							:confirm => "Are you sure?"%>
-					<%end%>
-					<%if @hazard.status != "Completed" && @hazard.status != "Rejected"%>
-						<%=link_to "Add Risk Control",
-							new_risk_control_path(
-								:owner_id => @hazard.id,
-								:owner_type => @hazard.class.name),
-							:class => "btn btn-success pull-right mr5 mb5",
-							:disable_with => "Adding..."%>
-					<%end%>
-					<%if ['Completed', 'Rejected'].include? @hazard.status%>
-						<%if @hazard.can_reopen? current_user%>
-							<%= link_to "Reopen",
-								reopen_hazard_path(@hazard),
-								:class => "btn btn-success pull-right mr5",
-								:disable_with => "Reopening...",
-								:confirm => "Are you sure?"%>
-						<%end%>
-					<%end%>
-				</div>
+      <div class="panel-body">
+        <div class="col-xs-12 mb20">
+          <%if @hazard.status == "New"%>
+            <%=link_to "Reject",
+              complete_hazard_path(@hazard, :status => "Rejected"),
+              :class => "btn btn-danger pull-right mr5 mb5",
+              :disable_with => "Rejecting...",
+              :confirm => "Are you sure?"%>
+            <%=link_to "Complete",
+              complete_hazard_path(@hazard, :status => "Completed"),
+              :class => "btn btn-warning pull-right mr5 mb5",
+              :disable_with => "Completing...",
+              :confirm => "Are you sure?"%>
+          <%end%>
+          <%if @hazard.status != "Completed" && @hazard.status != "Rejected"%>
+            <%=link_to "Add Risk Control",
+              new_risk_control_path(
+                :owner_id => @hazard.id,
+                :owner_type => @hazard.class.name),
+              :class => "btn btn-success pull-right mr5 mb5",
+              :disable_with => "Adding..."%>
+          <%end%>
+          <%if ['Completed', 'Rejected'].include? @hazard.status%>
+            <%if @hazard.can_reopen? current_user%>
+              <%= link_to "Reopen",
+                reopen_hazard_path(@hazard),
+                :class => "btn btn-success pull-right mr5",
+                :disable_with => "Reopening...",
+                :confirm => "Are you sure?"%>
+            <%end%>
+          <%end%>
+        </div>
 
-				<%=render "/forms/show_fields",
-					:fields => Hazard.get_meta_fields('show'),
-					:record => @hazard%>
+        <%=render "/forms/show_fields",
+          :fields => Hazard.get_meta_fields('show'),
+          :record => @hazard%>
 
-				<%if BaseConfig.airline[:base_risk_matrix]%>
-					<%=render "shared/bsk_risk_matrix_show",
-						:owner => @hazard,
-						:type => "hazards",
-						:like => @like,
-						:show_btns => true,
-						:color_matrix => @color_matrix,
-						:frequency => @frequency,
-						:allow_mitigate => true %>
-				<%else%>
-					<%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-						:owner => @hazard,
+        <%if BaseConfig.airline[:base_risk_matrix]%>
+          <%=render "shared/bsk_risk_matrix_show",
+            :owner => @hazard,
+            :type => "hazards",
+            :like => @like,
             :show_btns => true,
-						:allow_mitigate => true%>
-				<%end%>
+            :color_matrix => @color_matrix,
+            :frequency => @frequency,
+            :allow_mitigate => true %>
+        <%else%>
+          <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+            :owner => @hazard,
+            :show_btns => true,
+            :allow_mitigate => true%>
+        <%end%>
 
-				<%if BaseConfig.airline[:has_root_causes]%>
-					<%=render '/root_causes/root_causes',
-						:owner => @hazard,
-						:show_btns => true,
-						:headers => HazardRootCause.get_headers%>
-				<%end%>
+        <%if BaseConfig.airline[:has_root_causes]%>
+          <%=render '/root_causes/root_causes',
+            :owner => @hazard,
+            :show_btns => true,
+            :headers => HazardRootCause.get_headers%>
+        <%end%>
 
-				<%=render '/causes/all',
-					:owner => @hazard,
-					:cause_type => 'description',
-					:can_change => @hazard.status == "New" && current_user.has_access("sras", "edit")%>
+        <%=render '/causes/all',
+          :owner => @hazard,
+          :cause_type => 'description',
+          :can_change => @hazard.status == "New" && current_user.has_access("sras", "edit")%>
 
-				<%if @hazard.risk_controls.present?%>
-					<div class="col-xs-12">
-						<div class="panel clickable panel-info">
-							<div class="panel-heading click-heading collapsed">
-								<div class="panel-title">
-									<b>Risk Controls</b>
-									<span class="pull-right clickable">
-										<i class="mt5 glyphicon glyphicon-chevron-down"></i>
-									</span>
-								</div>
-							</div>
-							<div class="panel-body" style="display:none">
-								<div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
-									<%@hazard.risk_controls.each do |risk_control|%>
-										<%=render "show_risk_control", :risk_control => risk_control%>
-									<%end%>
-								</div>
-							</div>
-						</div>
-					</div>
-				<%end%>
+        <%if @hazard.risk_controls.present?%>
+          <div class="col-xs-12">
+            <div class="panel clickable panel-info">
+              <div class="panel-heading click-heading collapsed">
+                <div class="panel-title">
+                  <b>Risk Controls</b>
+                  <span class="pull-right clickable">
+                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="panel-body" style="display:none">
+                <div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
+                  <%@hazard.risk_controls.each do |risk_control|%>
+                    <%=render "show_risk_control", :risk_control => risk_control%>
+                  <%end%>
+                </div>
+              </div>
+            </div>
+          </div>
+        <%end%>
 
-				<%=render "/forms/attachments_show", :owner => @hazard%>
-				<%=render "/records/transactions", :owner => @hazard%>
+        <%=render "/forms/attachments_show", :owner => @hazard%>
+        <%=render "/records/transactions", :owner => @hazard%>
 
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 
 <script>
-	$(document).ready(function(){
-		$('#mitigate_btn').on('click',function(){
-			$.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('#baseline_btn').on('click',function(){
-			$.get("<%=baseline_hazard_path(@hazard)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('#att_btn').on('click',function(){
-			$.get("<%=new_attachment_hazard_path(@hazard)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+  $(document).ready(function(){
+    $('#mitigate_btn').on('click',function(){
+      $.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#baseline_btn').on('click',function(){
+      $.get("<%=baseline_hazard_path(@hazard)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_hazard_path(@hazard)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#override_status_btn').on('click',function(){
-			$.get("<%=override_status_hazard_path(@hazard)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_hazard_path(@hazard)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
 
-	});
+  });
 </script>

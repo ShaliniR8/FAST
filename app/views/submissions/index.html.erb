@@ -1,23 +1,23 @@
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%=render "/forms/index_fields"%>
-	</div>
+  <div class="grid per90 center-block">
+    <%=render "/forms/index_fields"%>
+  </div>
 </div>
 
 
 <script>
-	$(document).ready(function(){
-		$('#det').on('click',function(){
-			$.get("<%=detailed_search_submissions_path%>",function(data){
-				$(".modal-content").html(data);
-				$(window).resize();
-			});
-		});
-		$('#cus').on('click', function(){
-			$.get("<%=custom_view_submissions_path%>",function(data){
-				$(".modal-content").html(data);
-				$(window).resize();
-			});
-		});
-	});
+  $(document).ready(function(){
+    $('#det').on('click',function(){
+      $.get("<%=detailed_search_submissions_path%>",function(data){
+        $(".modal-content").html(data);
+        $(window).resize();
+      });
+    });
+    $('#cus').on('click', function(){
+      $.get("<%=custom_view_submissions_path%>",function(data){
+        $(".modal-content").html(data);
+        $(window).resize();
+      });
+    });
+  });
 </script>

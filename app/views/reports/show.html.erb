@@ -7,213 +7,211 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%=render "shared/alerts"%>
-		<%=render "access_controls/new_modal"%>
-		<div class="col-lg-12">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<div class="top_text">
-							Event #<%=@report.get_id%>: <%=@report.name%>
-						</div>
-						<div class="top_buttons pull-right">
-							<%if current_user.has_access("reports","destroy")%>
-								<%=link_to 'Delete',
-									report_path(@report),
-									:method=>"delete",
-									:confirm=>'Are you sure?',
-									:class=>"btn btn-danger pull-right ml5 mb5"%>
-							<%end%>
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
+    <div class="col-lg-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <div class="top_text">
+              Event #<%=@report.get_id%>: <%=@report.name%>
+            </div>
+            <div class="top_buttons pull-right">
+              <%if current_user.has_access("reports","destroy")%>
+                <%=link_to 'Delete',
+                  report_path(@report),
+                  :method=>"delete",
+                  :confirm=>'Are you sure?',
+                  :class=>"btn btn-danger pull-right ml5 mb5"%>
+              <%end%>
 
 
-							<%if current_user.admin?%>
-								<%=link_to 'Override Status', '#', 
-									:class => 'btn btn-danger pull-right ml5 mb5',
-									:id => 'override_status_btn',
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
-							<%end%>
+              <%if current_user.admin?%>
+                <%=link_to 'Override Status', '#',
+                  :class => 'btn btn-danger pull-right ml5 mb5',
+                  :id => 'override_status_btn',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
 
-							<%if @report.status != "Closed" &&
-								current_user.has_access("reports", "edit")%>
-								<%=link_to "Edit",
-									edit_report_path(@report),
-									:id => "edit-btn",
-									:class => "btn btn-warning pull-right ml5 mb5",
-									:disable_with => "Editing..."%>
-							<%end%>
+              <%if @report.status != "Closed" &&
+                current_user.has_access("reports", "edit")%>
+                <%=link_to "Edit",
+                  edit_report_path(@report),
+                  :id => "edit-btn",
+                  :class => "btn btn-warning pull-right ml5 mb5",
+                  :disable_with => "Editing..."%>
+              <%end%>
 
-							<%=link_to "De-ID PDF",
-								print_report_path(
-									@report,
-									:deidentified => true,
-									:format => :pdf),
-								:class=>'btn btn-darkturquoise pull-right ml5 mb5'%>
-							<%=link_to "PDF",
-								print_report_path(
-									@report,
-									:deidentified => false,
-									:format => :pdf),
-								:class => 'btn btn-darkturquoise pull-right ml5 mb5'%>
+              <%=link_to "De-ID PDF",
+                print_report_path(
+                  @report,
+                  :deidentified => true,
+                  :format => :pdf),
+                :class=>'btn btn-darkturquoise pull-right ml5 mb5'%>
+              <%=link_to "PDF",
+                print_report_path(
+                  @report,
+                  :deidentified => false,
+                  :format => :pdf),
+                :class => 'btn btn-darkturquoise pull-right ml5 mb5'%>
 
-							<%if @report.meetings.present? &&
-								current_user.has_access("meetings", "show")%>
-								<%=link_to "View Meeting",
-									meeting_path(@report.meetings.first),
-									:class => "btn btn-info pull-right mb5 ml5",
-									:disable_with => "Redirecting..."%>
-							<%end%>
-							<%=link_to "Send Message",
-								new_message_path(:link => report_path(@report),
-								:link_type => "Report",
-								:link_id => @report.id),
-								:class => "btn btn-warning pull-right mb5"%>
-							<%=link_to "Expand All",
-								"#",
-								:class => "btn btn-default expandall pull-right ml5 mr5 mb5"%>
-						</div>
-					</div>
-				</div>
-				<div class="panel-body collapse in" id="form_body">
-					<div class="col-xs-12 mb20">
-						<%if current_user.has_access("reports","edit")%>
-							<%if @report.status == "Closed"%>
-								<%=link_to "Reopen Event",
-									reopen_report_path(@report),
-									:class=>"btn btn-success pull-right mr5 mb5",
-									:confirm => "Are you sure?",
-									:disable_with => "Reopening...",
-									"data-toggle" => "tooltip",
-									"data-placement" => "top",
-									:title => "This will the Event and all the included Reports"%>
-							<%end%>
-							<%if @report.status != "Closed" &&
-								current_user.has_access("corrective_actions","new")%>
-								<%=link_to "Add Corrective Action",
-									new_corrective_action_path(:report => @report.id),
-									:class => "btn btn-success pull-right ml5 mb5",
-									:disable_with => "Adding..."%>
-							<%end%>
-							<%if @report.status == "New"%>
-								<%=link_to "ERC Meeting Ready",
-									meeting_ready_report_path(@report),
-									:class=>"btn btn-warning pull-right mb5 ml5",
-									:disable_with => "Preparing...",
-									"data-toggle" => "tooltip",
-									"data-placement" => "top",
-									:title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
-							<%end%>
-							<%if @report.status != "Closed"%>
-								<%=link_to "Close Event",
-									close_report_path(@report),
-									:id=>"edit-btn",
-									:class=>"btn btn-danger pull-right mb5 ml5",
-									:confirm => "Are you sure?",
-									:disable_with => "Closing...",
-									"data-toggle" => "tooltip",
-									"data-placement" => "top",
-									:title => "This will close the Event and all the included Reports. No changes can be made after the Event is closed"%>
-							<%end%>
-						<%end%>
-					</div>
+              <%if @report.meetings.present? &&
+                current_user.has_access("meetings", "show")%>
+                <%=link_to "View Meeting",
+                  meeting_path(@report.meetings.first),
+                  :class => "btn btn-info pull-right mb5 ml5",
+                  :disable_with => "Redirecting..."%>
+              <%end%>
+              <%=link_to "Send Message",
+                new_message_path(:link => report_path(@report),
+                :link_type => "Event",
+                :link_id => @report.id),
+                :class => "btn btn-warning pull-right mb5"%>
+              <%=link_to "Expand All",
+                "#",
+                :class => "btn btn-default expandall pull-right ml5 mr5 mb5"%>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body collapse in" id="form_body">
+          <div class="col-xs-12 mb20">
+            <%if current_user.has_access("reports","edit")%>
+              <%if @report.status == "Closed"%>
+                <%=link_to "Reopen Event",
+                  reopen_report_path(@report),
+                  :class=>"btn btn-success pull-right mr5 mb5",
+                  :confirm => "Are you sure?",
+                  :disable_with => "Reopening...",
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  :title => "This will the Event and all the included Reports"%>
+              <%end%>
+              <%if @report.status != "Closed" &&
+                current_user.has_access("corrective_actions","new")%>
+                <%=link_to "Add Corrective Action",
+                  new_corrective_action_path(:report => @report.id),
+                  :class => "btn btn-success pull-right ml5 mb5",
+                  :disable_with => "Adding..."%>
+              <%end%>
+              <%if @report.status == "New"%>
+                <%=link_to "ERC Meeting Ready",
+                  meeting_ready_report_path(@report),
+                  :class=>"btn btn-warning pull-right mb5 ml5",
+                  :disable_with => "Preparing...",
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
+              <%end%>
+              <%if @report.status != "Closed"%>
+                <%=link_to 'Close Event', '#',
+                  :class => 'btn btn-danger close_event_btn pull-right ml5 mb5',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg',
+                  :route => close_report_path(@report, :redirect_path => report_path(@report))%>
+              <%end%>
+            <%end%>
+          </div>
 
-					<%=render "closing_note"%>
-					<%=render "record_table"%>
+          <%=render "closing_note"%>
+          <%=render "record_table"%>
 
-
-					<%if BaseConfig.airline[:base_risk_matrix]%>
-						<%=render "shared/bsk_risk_matrix_show",
-							:owner=>@report,
-							:type=>"reports",
-							:like=>@like,
-							:show_btns => true,
-							:color_matrix=>@color_matrix,
-							:frequency=>@frequency,
-							:allow_mitigate => true %>
-					<%else%>
-						<%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+          <%if BaseConfig.airline[:base_risk_matrix]%>
+            <%=render "shared/bsk_risk_matrix_show",
+              :owner=>@report,
+              :type=>"reports",
+              :like=>@like,
+              :show_btns => true,
+              :color_matrix=>@color_matrix,
+              :frequency=>@frequency,
+              :allow_mitigate => true %>
+          <%else%>
+            <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
               :owner => @report,
               :show_btns => true %>
-					<%end%>
+          <%end%>
+
+          <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
+          <%=render '/causes/all', :owner => @report, :cause_type => 'description', :can_change => can_change%>
+          <%=render '/causes/all', :owner => @report, :cause_type => 'cause', :can_change => can_change%>
+          <%=render '/causes/all', :owner => @report, :cause_type => 'detection', :can_change => can_change%>
+          <%=render '/causes/all', :owner => @report, :cause_type => 'reaction', :can_change => can_change%>
+          <%=render '/causes/all', :owner => @report, :cause_type => 'suggestion', :can_change => can_change%>
+
+          <%if @report.agendas.present?%>
+            <%=render "agendas"%>
+          <%end%>
+
+
+          <%if @report.corrective_actions.present?%>
+            <div class="col-xs-12 col-md-12 col-lg-12"%>
+              <div class="panel panel-info">
+                <div class="panel-heading click-heading collapsed">
+                  <div class="panel-title">
+                    <b>Corrective Actions</b>
+                    <span class="pull-right clickable">
+                      <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="panel-body" style="display:none">
+                  <div class="row">
+                    <%@no_footer = true%>
+                    <%=render "/corrective_actions/actions"%>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <%end%>
 
 
 
-					<%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
-					<%=render '/causes/all', :owner => @report, :cause_type => 'description', :can_change => can_change%>
-					<%=render '/causes/all', :owner => @report, :cause_type => 'cause', :can_change => can_change%>
-					<%=render '/causes/all', :owner => @report, :cause_type => 'detection', :can_change => can_change%>
-					<%=render '/causes/all', :owner => @report, :cause_type => 'reaction', :can_change => can_change%>
-					<%=render '/causes/all', :owner => @report, :cause_type => 'suggestion', :can_change => can_change%>
+          <%=render "/forms/attachments_show", :owner => @report%>
+          <%=render "/records/transactions", :owner => @report%>
 
-					<%if @report.agendas.present?%>
-						<%=render "agendas"%>
-					<%end%>
-
-
-					<%if @report.corrective_actions.present?%>
-						<div class="col-xs-12 col-md-12 col-lg-12"%>
-							<div class="panel panel-info">
-								<div class="panel-heading click-heading collapsed">
-									<div class="panel-title">
-										<b>Corrective Actions</b>
-										<span class="pull-right clickable">
-											<i class="mt5 glyphicon glyphicon-chevron-down"></i>
-										</span>
-									</div>
-								</div>
-								<div class="panel-body" style="display:none">
-									<div class="row">
-										<%@no_footer = true%>
-										<%=render "/corrective_actions/actions"%>
-									</div>
-								</div>
-							</div>
-						</div>
-					<%end%>
-
-
-
-					<%=render "/forms/attachments_show", :owner => @report%>
-					<%=render "/records/transactions", :owner => @report%>
-
-				</div>
-			</div>
-		</div>
-	</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-	$(document).ready(function(){
-		$("#report<%=@report.id%> > tbody > tr > #<%=@report.severity%>-<%=Finding.get_likelihood.index(@report.likelihood)%>").append("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
-		$("#report<%=@report.id%> > tbody > tr > #<%=@report.severity_after%>-<%=Finding.get_likelihood.index(@report.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
-		$('#att_btn').on('click',function(){
-			$.get("<%=new_attachment_report_path(@report)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('#mitigate_btn').on('click',function(){
-			$.get("<%=mitigate_report_path(@report)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('#baseline_btn').on('click',function(){
-			$.get("<%=baseline_report_path(@report)%>",function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$('#override_status_btn').on('click',function(){
-			$.get("<%=override_status_report_path(@report)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-
-	});
+  $(document).ready(function(){
+    $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity%>-<%=Finding.get_likelihood.index(@report.likelihood)%>").append("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
+    $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity_after%>-<%=Finding.get_likelihood.index(@report.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_report_path(@report)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#mitigate_btn').on('click',function(){
+      $.get("<%=mitigate_report_path(@report)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#baseline_btn').on('click',function(){
+      $.get("<%=baseline_report_path(@report)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_report_path(@report)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $(".close_event_btn").on('click',function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
 </script>
 

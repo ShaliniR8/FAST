@@ -1,12 +1,12 @@
 <div class="title">
-	Corrective Action: #<%=owner.id%>
+  Corrective Action: #<%=owner.id%>
 </div>
 
 
 <div class="content">
-	<%=render "forms/print_fields", 
-		:fields => CorrectiveAction.get_meta_fields('show'), 
-		:owner => owner, 
-		:deidentified => deidentified%>
+  <%=render "forms/print_fields",
+    :fields => CorrectiveAction.get_meta_fields('show'),
+    :owner => owner,
+    :deidentified => deidentified%>
 </div>
 

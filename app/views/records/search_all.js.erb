@@ -4,8 +4,8 @@
 $("#search_all_result").html('<%= escape_javascript(render("search_all"))%>');
 
 
-	$("#add_btn").on("click", function(){
-		$(".query_result").prepend(`
-			<%=escape_javascript("#{render 'visualize'}").html_safe%>
-		`);
-	});
+  $("#add_btn").on("click", function(){
+    $(".query_result").prepend(`
+      <%=escape_javascript("#{render 'visualize'}").html_safe%>
+    `);
+  });

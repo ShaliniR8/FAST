@@ -1,0 +1,47 @@
+<tr>
+  <%Report.get_meta_fields('index').each do |h|%>
+    <td class="<%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
+      <%=render "forms/show_field", :record => event, :field_hash => h%>
+    </td>
+  <%end%>
+  <td><%=event.minutes%></td>
+  <td>
+    <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
+      "#",
+      :class => "btn btn-info mb5 view_narrative_btn",
+      "data-toggle" => "modal",
+      "data-target" => ".bs-example-modal-lg",
+      :route => show_narrative_report_path(event, :meeting => meeting.id)%>
+    <%=link_to "<i class='glyphicon glyphicon-search'></i>".html_safe,
+      report_path(event),
+      :class => "btn btn-info mb5",
+      :disable_with => "Redirecting..."%>
+    <%if meeting.has_user(current_user) ||
+      meeting.host.users_id == current_user.id%>
+      <%if current_user.has_access("meetings","edit") &&
+        meeting.has_user(current_user) &&
+        meeting.in_review %>
+        <%if event.status != "Closed" && meeting.status != "Closed"%>
+          <%=link_to "<i class='glyphicon glyphicon-ok-circle'></i>".html_safe, '#',
+            :class => 'btn btn-danger close_event_btn mb5',
+            'data-toggle' => 'modal',
+            'data-target' => '.bs-example-modal-lg',
+            :route => close_report_path(event, :redirect_path => meeting_path(meeting))%>
+          <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
+            :class=>"btn btn-danger mb5",
+            :onclick=>"delete_report(#{event.id},this)"%>
+          <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
+            :class => "btn btn-warning agenda_btn mb5",
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg",
+            :route => get_agenda_report_path(event, :meeting => meeting.id)%>
+        <%end%>
+        <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
+          :class => "btn btn-success minutes_btn mb5",
+          "data-toggle" => "modal",
+          "data-target" => ".bs-example-modal-lg",
+          :route => new_minutes_report_path(event, :meeting => meeting) %>
+      <%end%>
+    <%end%>
+  </td>
+</tr>

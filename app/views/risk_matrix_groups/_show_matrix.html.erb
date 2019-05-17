@@ -1,57 +1,57 @@
 <%if @risk_group.present?%>
 <div class="col-xs-12">
-	<div class="panel panel-green">
-		<div class="panel-heading">
-			<div class="panel-title"><b>Risk Ananlysis</b></div>
-		</div>
-		<div class="panel-body">
+  <div class="panel panel-green">
+    <div class="panel-heading">
+      <div class="panel-title"><b>Risk Ananlysis</b></div>
+    </div>
+    <div class="panel-body">
 
 
-			<div class="col-xs-12">
-				<%if !local_assigns.has_key?(:allow_mitigate) || allow_mitigate %>
-					<span data-toggle="modal" data-target=".bs-example-modal-lg">
-						<%=link_to "Mitigate Risk","#",
-										:class=>"btn btn-warning pull-right ml5",
-										:id=>"mitigate_btn",
-										"data-toggle"=>"tooltip", "data-placement"=>"top", :title=>"Assess Mitigated Risk"%>
-					</span>
-				<%end%>
-				<%if !local_assigns.has_key?(:allow_baseline) || allow_baseline %>
-					<span data-toggle="modal" data-target=".bs-example-modal-lg">
-						<%=link_to "Baseline Risk","#",
-										:class=>"btn btn-info pull-right",:id=>"baseline_btn",
-										"data-toggle"=>"tooltip", "data-placement"=>"top", :title=>"Assess Baseline Risk"%>
-					</span>
-				<%end%>
-			</div>
+      <div class="col-xs-12">
+        <%if !local_assigns.has_key?(:allow_mitigate) || allow_mitigate %>
+          <span data-toggle="modal" data-target=".bs-example-modal-lg">
+            <%=link_to "Mitigate Risk","#",
+                    :class=>"btn btn-warning pull-right ml5",
+                    :id=>"mitigate_btn",
+                    "data-toggle"=>"tooltip", "data-placement"=>"top", :title=>"Assess Mitigated Risk"%>
+          </span>
+        <%end%>
+        <%if !local_assigns.has_key?(:allow_baseline) || allow_baseline %>
+          <span data-toggle="modal" data-target=".bs-example-modal-lg">
+            <%=link_to "Baseline Risk","#",
+                    :class=>"btn btn-info pull-right",:id=>"baseline_btn",
+                    "data-toggle"=>"tooltip", "data-placement"=>"top", :title=>"Assess Baseline Risk"%>
+          </span>
+        <%end%>
+      </div>
 
-			<div class='col-xs-12 mb20'>
-				<b>Notes:</b>
-				<div class="col-xs-11 col-xs-offset-1">
-					<%if @owner.statement.present?%>
-						<%=@owner.statement.gsub(/\n/, '<br/>').html_safe%>
-					<%end%>
-				</div>
-			</div>
+      <div class='col-xs-12 mb20'>
+        <b>Notes:</b>
+        <div class="col-xs-11 col-xs-offset-1">
+          <%if @owner.statement.present?%>
+            <%=@owner.statement.gsub(/\n/, '<br/>').html_safe%>
+          <%end%>
+        </div>
+      </div>
 
-			<div class="col-xs-12">
-				<h4>
-					<span class="label label-baseline">Baseline</span>
-					<span class="label label-mitigated">Mitigated</span>
-					<span class="label label-overlapped">Overlapped</span>
-				</h4>
-				<span class='glyphicon glyphicon-remove'></span><b> Baseline Risk Assessment</b>
-				<span class='glyphicon glyphicon-ok'></span><b> Mitigated Risk Assessment</b>
-			</div>
+      <div class="col-xs-12">
+        <h4>
+          <span class="label label-baseline">Baseline</span>
+          <span class="label label-mitigated">Mitigated</span>
+          <span class="label label-overlapped">Overlapped</span>
+        </h4>
+        <span class='glyphicon glyphicon-remove'></span><b> Baseline Risk Assessment</b>
+        <span class='glyphicon glyphicon-ok'></span><b> Mitigated Risk Assessment</b>
+      </div>
 
 
 
-			<%=render "/risk_matrix_groups/show_risk"%>
-			<%=render "/risk_matrix_groups/show_severity"%>
-			<%=render "/risk_matrix_groups/show_probability"%>
+      <%=render "/risk_matrix_groups/show_risk"%>
+      <%=render "/risk_matrix_groups/show_severity"%>
+      <%=render "/risk_matrix_groups/show_probability"%>
 
-		</div>
-	</div>
+    </div>
+  </div>
 </div>
 
 <%end%>
@@ -60,18 +60,18 @@
 
 
 <style>
-	.label-baseline{
-		background-color: #AFEEFC;
-		color: #404040;
-	}
-	.label-mitigated{
-		background-color: #FCAFCB;
-		color: #404040;
-	}
-	.label-overlapped{
-		background-color: #CABCF6;
-		color: #404040;
-	}
+  .label-baseline{
+    background-color: #AFEEFC;
+    color: #404040;
+  }
+  .label-mitigated{
+    background-color: #FCAFCB;
+    color: #404040;
+  }
+  .label-overlapped{
+    background-color: #CABCF6;
+    color: #404040;
+  }
 </style>
 
 
@@ -79,124 +79,124 @@
 
 <script>
 
-	// Paint severity, probability, and risk table
-	function load_data(){
-		console.log("here");
-		<%if @owner.severity_extra.present? && @owner.probability_extra.present?%>
-			var severities = <%=raw @owner.severity_extra[0].split(",")%>;
-			var probabilities = <%=raw @owner.probability_extra[0].split(",")%>;
-			$('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-				var id = $(this).data("id").toString();
-				if(severities.indexOf(id) > -1 ){
-					$(this).data("status", "checked");
-					$(this).css('background', '#AFEEFC');
-				}
-			});
-			$('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-				var id = $(this).data("id").toString();
-				if(probabilities.indexOf(id) > -1 ){
-					$(this).data("status", "checked");
-					$(this).css('background', '#AFEEFC');
-				}
-			});		
-		<%end%>
+  // Paint severity, probability, and risk table
+  function load_data(){
+    console.log("here");
+    <%if @owner.severity_extra.present? && @owner.probability_extra.present?%>
+      var severities = <%=raw @owner.severity_extra[0].split(",")%>;
+      var probabilities = <%=raw @owner.probability_extra[0].split(",")%>;
+      $('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+        var id = $(this).data("id").toString();
+        if(severities.indexOf(id) > -1 ){
+          $(this).data("status", "checked");
+          $(this).css('background', '#AFEEFC');
+        }
+      });
+      $('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+        var id = $(this).data("id").toString();
+        if(probabilities.indexOf(id) > -1 ){
+          $(this).data("status", "checked");
+          $(this).css('background', '#AFEEFC');
+        }
+      });
+    <%end%>
 
-		<%if @owner.mitigated_severity.present? && @owner.mitigated_probability.present?%>
-			var severities = <%=raw @owner.mitigated_severity[0].split(",")%>;
-			var probabilities = <%=raw @owner.mitigated_probability[0].split(",")%>;
-			$('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-				var id = $(this).data("id").toString();
-				if(severities.indexOf(id) > -1 ){
-					if($(this).data("status") == "checked"){
-						$(this).data("mitigated", "checked");
-						$(this).css('background', '#CABCF6');
-					}else{
-						$(this).data("mitigated", "checked");
-						$(this).css('background', '#FCAFCB');
-					}
-				}
-			});
-			$('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-				var id = $(this).data("id").toString();
-				if(probabilities.indexOf(id) > -1 ){
-					if($(this).data("status") == "checked"){
-						$(this).data("mitigated", "checked");
-						$(this).css('background', '#CABCF6');
-					}else{
-						$(this).data("mitigated", "checked");
-						$(this).css('background', '#FCAFCB');
-					}
-				}
-			});	
-		<%end%>
-		calculate_risk();				
-	}
-
-
-	// Calculate risk based on severity and probability cells
-	function calculate_risk(){
-		console.log("calculate risk");
-		severities = [];
-		probabilities = [];
-		s_rows = [];
-		p_columns = [];
-		$('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-			if ($(this).data("status") === "checked"){
-				severities.push($(this).data("id"));
-				s_rows.push($(this).data("row"));
-			}
-		});    
-		$('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-			if ($(this).data("status") === "checked"){			
-				probabilities.push($(this).data("id"));
-				p_columns.push($(this).data("column"));
-			}   
-		});
-		if (severities.length > 0 && probabilities.length > 0){     
-			set_risk(Math.min.apply(null, s_rows), Math.max.apply(null, p_columns));
-		}
-
-		mitigated_severities = [];
-		mitigated_probabilities = [];
-		mitigated_s_rows = [];
-		mitigated_p_columns = [];
-		$('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-			if ($(this).data("mitigated") === "checked"){
-				mitigated_severities.push($(this).data("id"));
-				mitigated_s_rows.push($(this).data("row"));
-			}
-		});    
-		$('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-			if ($(this).data("mitigated") === "checked"){			
-				mitigated_probabilities.push($(this).data("id"));
-				mitigated_p_columns.push($(this).data("column"));
-			}   
-		});
-		if (mitigated_severities.length > 0 && mitigated_probabilities.length > 0){     
-			set_mitigated(Math.min.apply(null, mitigated_s_rows), Math.max.apply(null, mitigated_p_columns));
-		}		
-	}
+    <%if @owner.mitigated_severity.present? && @owner.mitigated_probability.present?%>
+      var severities = <%=raw @owner.mitigated_severity[0].split(",")%>;
+      var probabilities = <%=raw @owner.mitigated_probability[0].split(",")%>;
+      $('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+        var id = $(this).data("id").toString();
+        if(severities.indexOf(id) > -1 ){
+          if($(this).data("status") == "checked"){
+            $(this).data("mitigated", "checked");
+            $(this).css('background', '#CABCF6');
+          }else{
+            $(this).data("mitigated", "checked");
+            $(this).css('background', '#FCAFCB');
+          }
+        }
+      });
+      $('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+        var id = $(this).data("id").toString();
+        if(probabilities.indexOf(id) > -1 ){
+          if($(this).data("status") == "checked"){
+            $(this).data("mitigated", "checked");
+            $(this).css('background', '#CABCF6');
+          }else{
+            $(this).data("mitigated", "checked");
+            $(this).css('background', '#FCAFCB');
+          }
+        }
+      });
+    <%end%>
+    calculate_risk();
+  }
 
 
-	// Paint risk matrix
-	function set_risk(row_index, column_index){   
-		$('.risk_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-			if($(this).data("row") == row_index && $(this).data("column") == column_index){          
-				$(this).html("<span class = 'glyphicon glyphicon-remove' style = 'color:black'></span>");
-			}    
-		});
-	}
+  // Calculate risk based on severity and probability cells
+  function calculate_risk(){
+    console.log("calculate risk");
+    severities = [];
+    probabilities = [];
+    s_rows = [];
+    p_columns = [];
+    $('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+      if ($(this).data("status") === "checked"){
+        severities.push($(this).data("id"));
+        s_rows.push($(this).data("row"));
+      }
+    });
+    $('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+      if ($(this).data("status") === "checked"){
+        probabilities.push($(this).data("id"));
+        p_columns.push($(this).data("column"));
+      }
+    });
+    if (severities.length > 0 && probabilities.length > 0){
+      set_risk(Math.min.apply(null, s_rows), Math.max.apply(null, p_columns));
+    }
 
-	function set_mitigated(row_index, column_index){   
-		$('.risk_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
-			if($(this).data("row") == row_index && $(this).data("column") == column_index){          
-				$(this).html("<span class = 'glyphicon glyphicon-ok' style = 'color:black'></span>");
-			}    
-		});
-	}	
+    mitigated_severities = [];
+    mitigated_probabilities = [];
+    mitigated_s_rows = [];
+    mitigated_p_columns = [];
+    $('.severity_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+      if ($(this).data("mitigated") === "checked"){
+        mitigated_severities.push($(this).data("id"));
+        mitigated_s_rows.push($(this).data("row"));
+      }
+    });
+    $('.probability_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+      if ($(this).data("mitigated") === "checked"){
+        mitigated_probabilities.push($(this).data("id"));
+        mitigated_p_columns.push($(this).data("column"));
+      }
+    });
+    if (mitigated_severities.length > 0 && mitigated_probabilities.length > 0){
+      set_mitigated(Math.min.apply(null, mitigated_s_rows), Math.max.apply(null, mitigated_p_columns));
+    }
+  }
 
 
-	load_data();
+  // Paint risk matrix
+  function set_risk(row_index, column_index){
+    $('.risk_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
+        $(this).html("<span class = 'glyphicon glyphicon-remove' style = 'color:black'></span>");
+      }
+    });
+  }
+
+  function set_mitigated(row_index, column_index){
+    $('.risk_td<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
+        $(this).html("<span class = 'glyphicon glyphicon-ok' style = 'color:black'></span>");
+      }
+    });
+  }
+
+
+  load_data();
 
 
 

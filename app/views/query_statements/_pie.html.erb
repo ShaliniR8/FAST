@@ -1,60 +1,60 @@
-<div id="chart" style="width: 100%"></div>  
+<div id="chart" style="width: 100%"></div>
 <div id="chart_download" style="width: 100%" align="right"></div>
 <script>
 google.charts.setOnLoadCallback(drawPie());
 function drawPie() {
-	var colorArray = colorInterpolation(<%=@data.length%>);
-	var data = google.visualization.arrayToDataTable(
-		[
-			['Value', 'Number'],
-			<%if @data.present?%>
-				<%@data.each_with_index do |(k,v),index|%>
-					[<%="'#{k}', #{v}]"%>],
-				<%end%>
-			<%end%>
-		]);
+  var colorArray = colorInterpolation(<%=@data.length%>);
+  var data = google.visualization.arrayToDataTable(
+    [
+      ['Value', 'Number'],
+      <%if @data.present?%>
+        <%@data.each_with_index do |(k,v),index|%>
+          [<%="'#{k}', #{v}]"%>],
+        <%end%>
+      <%end%>
+    ]);
 
-	var options = {
-		titleTextStyle: {color: "black", fontSize: 18, bold: true},
-		title: 'Analytics of <%=@field.label%>' ,      
-		height: 400,
-		pieSliceTextStyle: { color: 'black'},
-		colors: colorArray,
-		legend: {position: 'labeled'},
-		tooltip: {textStyle: {color: 'black'}, showColorCode: true},
-		chartArea: {  height: "50%", width: "95%" },
-	};
-	var db_chart = new google.visualization.PieChart(document.getElementById('chart'));
-	google.visualization.events.addListener(db_chart, 'onmouseover', uselessHandler2);
-	google.visualization.events.addListener(db_chart, 'onmouseout', uselessHandler3);
+  var options = {
+    titleTextStyle: {color: "black", fontSize: 18, bold: true},
+    title: 'Analytics of <%=@field.label%>' ,
+    height: 400,
+    pieSliceTextStyle: { color: 'black'},
+    colors: colorArray,
+    legend: {position: 'labeled'},
+    tooltip: {textStyle: {color: 'black'}, showColorCode: true},
+    chartArea: {  height: "50%", width: "95%" },
+  };
+  var db_chart = new google.visualization.PieChart(document.getElementById('chart'));
+  google.visualization.events.addListener(db_chart, 'onmouseover', uselessHandler2);
+  google.visualization.events.addListener(db_chart, 'onmouseout', uselessHandler3);
 
 
-	google.visualization.events.addListener(db_chart, "select", function(){
-		// URI Encode
-		var selections = db_chart.getSelection();
-		if(selections.length > 0){
-			var row = selections[0].row;
-			var value = encodeURIComponent(data.getValue(row, 0));
-	
-			// If "All" is selected, search based on label 
-			if ($("#template_select").val() == "All"){ 
-				var field_label = "<%=URI.encode(@label, /\W/)%>";
-				window.open("<%=visualization_table_all_query_statement_path(@query)%>?value=" + value + "&field_label=" + field_label, "_blank").focus;
-			// If template is specified, search based on field ID
-			}else{
-				window.open("<%=visualization_table_query_statement_path(@query)%>?value=" + value + "&field_id=<%=@field.id%>", "_blank").focus;
-			}
-		}
-	});
-	google.visualization.events.addListener(db_chart, 'ready', function () {
-		document.getElementById('chart_download').innerHTML = '<a href="' + db_chart.getImageURI() + '"download><u>Download Chart</u></a>';
-	});
+  google.visualization.events.addListener(db_chart, "select", function(){
+    // URI Encode
+    var selections = db_chart.getSelection();
+    if(selections.length > 0){
+      var row = selections[0].row;
+      var value = encodeURIComponent(data.getValue(row, 0));
 
-	db_chart.draw(data, options);  
-	$('#chart_download').html('<a href="' + db_chart.getImageURI() + '"download><u>Download Chart</u></a>');
+      // If "All" is selected, search based on label
+      if ($("#template_select").val() == "All"){
+        var field_label = "<%=URI.encode(@label, /\W/)%>";
+        window.open("<%=visualization_table_all_query_statement_path(@query)%>?value=" + value + "&field_label=" + field_label, "_blank").focus;
+      // If template is specified, search based on field ID
+      }else{
+        window.open("<%=visualization_table_query_statement_path(@query)%>?value=" + value + "&field_id=<%=@field.id%>", "_blank").focus;
+      }
+    }
+  });
+  google.visualization.events.addListener(db_chart, 'ready', function () {
+    document.getElementById('chart_download').innerHTML = '<a href="' + db_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+  });
+
+  db_chart.draw(data, options);
+  $('#chart_download').html('<a href="' + db_chart.getImageURI() + '"download><u>Download Chart</u></a>');
 
 }
 $(window).bind('resizeEnd', function() {
-	drawPie();
+  drawPie();
 });
 </script>

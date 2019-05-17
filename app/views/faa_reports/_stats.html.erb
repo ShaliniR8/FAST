@@ -1,4 +1,4 @@
-<div class="col-sm-12 col-md-12 col-lg-12"%>
+<div class="col-sm-12 col-md-12 col-lg-12">
   <div class="panel panel-lightskyblue">
     <div class="panel-heading click-heading">
       <div class="panel-title">
@@ -6,34 +6,43 @@
         <span class="pull-right clickable">
           <i class="mt5 glyphicon glyphicon-chevron-up"></i>
         </span>
-      </div> 
+      </div>
     </div>
-    <div class="panel-body"> 
+    <div class="panel-body">
       <div class="row">
-        <div class="col-xs-12">
-          <b>Date Range: </b><%=@report.get_range%>
-        </div>
-        <div class="col-xs-12">
-          <b>Number of ASAP reports submitted present quarter: </b><%=link_to @report.asap_submit,"#",:class=>"report_link","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:mode=>"1"%>
-        </div>
-        <div class="col-xs-12">
-          <b>Number of ASAP reports accepted present quarter: </b><%=link_to @report.asap_accept,"#",:class=>"report_link","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:mode=>"2"%>
-        </div>
-        <div class="col-xs-12">
-          <b>Number of accepted reports present quarter that were sole source to the FAA: </b><%=link_to @report.sole,"#",:class=>"report_link","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:mode=>"3"%>
-        </div>
-        <div class="col-xs-12">
-          <b>Number of accepted reports present quarter closed under ASAP: </b><%=link_to @report.asap_close,"#",:class=>"report_link","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:mode=>"5"%>
-        </div>
-        <div class="col-xs-12">
-          <b>Number of accepted reports present quarter (both sole source & non-sole
-source) closed with corrective action under ASAP for the employee: </b><%=link_to @report.asap_emp,"#",:class=>"report_link","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:mode=>"4"%>
-        </div>
-        <div class="col-xs-12">
-          <b>Number of reports present quarter, which resulted in recommendations to the
-company for corrective action: </b><%=link_to @report.asap_com,"#",:class=>"report_link","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:mode=>"6"%>
-        </div>
+        <%FaaReport.get_stats.each do |stat|%>
+          <div class="col-xs-12">
+            <b><%=stat[:title]%>:</b>
+            <%if stat[:link]%>
+              <b>
+                <%result = @report.send(stat[:value])[stat[:value_key].to_sym]%>
+                <%=link_to "#{result.length}",
+                  '#',
+                  :class => 'report_link',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg',
+                  'data-title' => stat[:title],
+                  'data-reports' => result,
+                  :mode => stat[:mode]%></b>
+            <%else%>
+              <%=@report.send(stat[:value])%>
+            <%end%>
+          </div>
+        <%end%>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  $(function(){
+    $(".report_link").on("click",function(){
+      $.get("<%=reports_table_faa_report_path(@report)%>?" +
+        "title=" + $(this).data('title') +
+        "&reports=" + $(this).data('reports'), function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
+</script>

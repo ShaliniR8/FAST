@@ -1,78 +1,78 @@
 <%fields.each do |field|%>
-	<%if field[:type] == 'newline'%>
-		</br>
-	<%elsif field[:type] == 'panel_start'%>
-		<div class="col-xs-12">
-			<div class="sub_sub_title">
-				<%=field[:title]%>
-			</div>
-	<%elsif field[:type] == 'panel_end'%>
-		</div>
-	<%else%>
-		<%value = owner.send(field[:field])%>
-		<%if value.present?%>
-			<%case field[:type]%>
-				<%when 'textarea'%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b></br>
-						<%=value.gsub(/\n/, '<br/>').html_safe%>
-					</div>
-				<%when 'checkbox'%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%=value.reject(&:empty?).join(", ")%>
-					</div>
+  <%if field[:type] == 'newline'%>
+    </br>
+  <%elsif field[:type] == 'panel_start'%>
+    <div class="col-xs-12">
+      <div class="sub_sub_title">
+        <%=field[:title]%>
+      </div>
+  <%elsif field[:type] == 'panel_end'%>
+    </div>
+  <%else%>
+    <%value = owner.send(field[:field])%>
+    <%if value.present?%>
+      <%case field[:type]%>
+        <%when 'textarea'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b></br>
+            <%=value.gsub(/\n/, '<br/>').html_safe%>
+          </div>
+        <%when 'checkbox'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=value.reject(&:empty?).join(", ")%>
+          </div>
 
-				<%when 'boolean'%>
-					<%boolean_options = {true => "Yes", false => "No"}%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%=boolean_options[value]%>
-					</div>
+        <%when 'boolean'%>
+          <%boolean_options = {true => "Yes", false => "No"}%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=boolean_options[value]%>
+          </div>
 
-				<%when 'boolean_box'%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%=value ? 'Yes' : 'No'%>
-					</div>
+        <%when 'boolean_box'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=value ? 'Yes' : 'No'%>
+          </div>
 
-				<%when 'date'%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%=date_to_string(value)%>
-					</div>
+        <%when 'date'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=date_to_string(value)%>
+          </div>
 
-				<%when 'datetime'%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%=datetime_to_string(value)%>
-					</div>	
+        <%when 'datetime'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=datetime_to_string(value)%>
+          </div>
 
-				<!-- if deidentified is true then skip user fields -->
-				<%when 'user'%>
-					<%if !deidentified%>
-						<div class="col-xs-<%=field[:num_cols]%>">
-							<b><%=field[:title]%>: </b>
-							<%=User.find(value).full_name rescue value.to_s%>
-						</div>						
-					<%end%>
+        <!-- if deidentified is true then skip user fields -->
+        <%when 'user'%>
+          <%if !deidentified%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=User.find(value).full_name rescue value.to_s%>
+            </div>
+          <%end%>
 
-				<%when 'select'%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%if field[:display].present?%>
-							<%=field[:display][value]%>
-						<%else%>
-							<%=value%>
-						<%end%>
-					</div>
-					
-				<%else%>
-					<div class="col-xs-<%=field[:num_cols]%>">
-						<b><%=field[:title]%>: </b>
-						<%=value%>
-					</div>
-			<%end%>						
-		<%end%>
-	<%end%>
+        <%when 'select'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%if field[:display].present?%>
+              <%=field[:display][value]%>
+            <%else%>
+              <%=value%>
+            <%end%>
+          </div>
+
+        <%else%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=value%>
+          </div>
+      <%end%>
+    <%end%>
+  <%end%>
 <%end%>

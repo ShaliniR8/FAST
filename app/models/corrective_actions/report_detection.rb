@@ -8,7 +8,7 @@ class ReportDetection < Cause
       {:title=>"Value",:field=>"get_value"}
     ]
   end
-  
+
   def get_value
     if self.value=="true"
       "Yes"
@@ -30,14 +30,14 @@ class ReportDetection < Cause
           {name: "Other Aircraft Equipment Specifics",          type: "text_field"}
         ],
         "ATC Equipment" => [
-          {name: "ATC Equipment",                               type: "check_box"},            
+          {name: "ATC Equipment",                               type: "check_box"},
           {name: "Conflict Alert",                              type: "check_box"},
           {name: "MSAW",                                        type: "check_box"},
           {name: "Other ATC Equipment",                         type: "text_field"}
         ],
         "H When Event Detected" => [
-          {name: "When Event Detected" ,                         type: "check_box"},                                     
-          {name: "Aircraft Cleaning" ,                           type: "check_box"},               
+          {name: "When Event Detected" ,                         type: "check_box"},
+          {name: "Aircraft Cleaning" ,                           type: "check_box"},
           {name: "Aircraft De-Ice" ,                             type: "check_box"},
           {name: "At Receiving Facility" ,                       type: "check_box"},
           {name: "At Sending Facility" ,                         type: "check_box"},

@@ -1,108 +1,108 @@
 <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 <%=form_for @audit do |x|%>
-	<%=x.fields_for :findings,@finding do |f|%>
-		<div class="panel-warning">
-			<div class="panel-heading">
-				<div class="panel-title">Release Finding
-				<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-			</div>
-			<div class="panel-body">
-				<div class="row" style="max-height:450px;overflow-y:auto;">
-			        <div class="form-group form-inline col-xs-6">
-			          <%=label_tag :app, "Responsible User", :style=>"color:red"%>
-			          <div class="input-group">
-			          	<%=text_field_tag :app,@finding.get_responsible_user_name,{:class=>"form-control ml5 emp required_field",:readonly=>true,:id=>"emp_2"}%>
-			          	<%=f.hidden_field :responsible_user_id,:id=>"employee-select2"%>
-			          	<span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info",:id=>"emp2"%></span>
-			          </div>                
-			        </div>
-			        <%=f.hidden_field :status,:value=> @finding.immediate_action || @audit.status == "Completed" ?  "Open" : "Pending Release" %>
-			        <%if @finding.immediate_action%>
-			        	<%=f.hidden_field :open_date,:value=>Time.now.to_date %>
-			        <%end%>
-				</div>
-				<%=x.submit "Save",:class=>"btn btn-success pull-right mt5"%>
-			</div>
-		</div>
-	<%end%>
+  <%=x.fields_for :findings,@finding do |f|%>
+    <div class="panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">Release Finding
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+      </div>
+      <div class="panel-body">
+        <div class="row" style="max-height:450px;overflow-y:auto;">
+              <div class="form-group form-inline col-xs-6">
+                <%=label_tag :app, "Responsible User", :style=>"color:red"%>
+                <div class="input-group">
+                  <%=text_field_tag :app,@finding.get_responsible_user_name,{:class=>"form-control ml5 emp required_field",:readonly=>true,:id=>"emp_2"}%>
+                  <%=f.hidden_field :responsible_user_id,:id=>"employee-select2"%>
+                  <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info",:id=>"emp2"%></span>
+                </div>
+              </div>
+              <%=f.hidden_field :status,:value=> @finding.immediate_action || @audit.status == "Completed" ?  "Open" : "Pending Release" %>
+              <%if @finding.immediate_action%>
+                <%=f.hidden_field :open_date,:value=>Time.now.to_date %>
+              <%end%>
+        </div>
+        <%=x.submit "Save",:class=>"btn btn-success pull-right mt5"%>
+      </div>
+    </div>
+  <%end%>
 <%end%>
 <div style="display:none" id="emp_div">
-	<div class="panel panel-info">
- 		<div class="panel-heading">
-    		<div class="panel-title"><b>Employee Search</b>
-    			<button type="button" class="close pull-right" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
-    		</div>
-  		</div>
-		<div class="panel-body">
-			<div class="row">
-			  <div class='col-xs-12'>
-			    <table class="table table-hover" id="users">
-			      <thead>
-			          <tr>
-			            <%@headers.keys.each do |k|%>
-			                <th><%=k%></th>
-			            <%end%>  
-			          </tr>
-			      </thead>
-			      <tbody>
-			        <%@users.each do |u|%>
-			          <tr uid="<%=u.id%>" class="list_tr">
-			            <%@headers.values.each do |v|%>
-			              <td><%=u.send(v)%></td>
-			            <%end%>
-			          </tr>
-			        <%end%>
-			      </tbody>
-			    </table>
-			  </div>
-			</div>
-		</div>
-	</div>
+  <div class="panel panel-info">
+    <div class="panel-heading">
+        <div class="panel-title"><b>Employee Search</b>
+          <button type="button" class="close pull-right" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+        </div>
+      </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class='col-xs-12'>
+          <table class="table table-hover" id="users">
+            <thead>
+                <tr>
+                  <%@headers.keys.each do |k|%>
+                      <th><%=k%></th>
+                  <%end%>
+                </tr>
+            </thead>
+            <tbody>
+              <%@users.each do |u|%>
+                <tr uid="<%=u.id%>" class="list_tr">
+                  <%@headers.values.each do |v|%>
+                    <td><%=u.send(v)%></td>
+                  <%end%>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
-	var table;
-  	function build_table(){
-  	  table=$('#users').DataTable({
-  	    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-  	    "iDisplayLength": 5
-  	  });
-  	}
-  	function clear_table(){
-  	  table.destroy();
-  	}
-	$(document).ready(function(){
-		build_table();
-	    $('#emp2').on('click',function(){
-	   		$('form').hide();
-	   		$("#emp_div").show();
-	   		clear_table();
-      		$('tbody tr' ).unbind();
-      		$('.close' ).unbind();
-	   		
-			$('tbody tr').on('click',function(){
-				$('#emp_2').val($(this).find('td').eq(3).text());
-				$('#employee-select2').val($(this).find('td').eq(0).text());
-	   			$('form').show();
-	   			$('#emp_div').hide();
-			});
-		    $('.close').on('click',function(){
-		    	$('#emp_2').val("");
-		    	$('#employee-select2').val("");
-	   			$('form').show();
-	   			$('#emp_div').hide();
-	    	});
-	    	build_table();
-	   	});  
-	   	$('form').on('submit',function(){
-	   		$(this).find('.required_field').each(function(){
-				if ($(this).val()==""){
-					$(".required_field").css('border-color', 'red');
-	        		event.preventDefault();
-				}else{
-					$.get("<%=release_finding_transaction_finding_path(@finding, :responsible_user_id=>params[:responsible_user_id])%>",function(data){
-        			});
-				}
-			});			
-	   	});
-	});
+  var table;
+    function build_table(){
+      table=$('#users').DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
+    }
+    function clear_table(){
+      table.destroy();
+    }
+  $(document).ready(function(){
+    build_table();
+      $('#emp2').on('click',function(){
+        $('form').hide();
+        $("#emp_div").show();
+        clear_table();
+          $('tbody tr' ).unbind();
+          $('.close' ).unbind();
+
+      $('tbody tr').on('click',function(){
+        $('#emp_2').val($(this).find('td').eq(3).text());
+        $('#employee-select2').val($(this).find('td').eq(0).text());
+          $('form').show();
+          $('#emp_div').hide();
+      });
+        $('.close').on('click',function(){
+          $('#emp_2').val("");
+          $('#employee-select2').val("");
+          $('form').show();
+          $('#emp_div').hide();
+        });
+        build_table();
+      });
+      $('form').on('submit',function(){
+        $(this).find('.required_field').each(function(){
+        if ($(this).val()==""){
+          $(".required_field").css('border-color', 'red');
+              event.preventDefault();
+        }else{
+          $.get("<%=release_finding_transaction_finding_path(@finding, :responsible_user_id=>params[:responsible_user_id])%>",function(data){
+              });
+        }
+      });
+      });
+  });
 </script>

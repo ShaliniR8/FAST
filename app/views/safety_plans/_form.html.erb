@@ -11,37 +11,37 @@
 
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="panel panel-warning">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<%if @evaluate%>
-						<b><%="Evaluate Safety Plan"%></b> 
-					<%else%>
-						<b><%="#{action_name.titleize} Safety Plan"%></b>
-					<%end%> 
-				</div>
-			</div>
-			<div class="panel-body"> 
-				<%=form_for @safety_plan, :html => {:multipart => true} do |f|%> 
-					<%=f.hidden_field :status, :value => params[:evaluate] ? 'Evaluated' : 'New'%>
+  <div class="grid per90 center-block">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <%if @evaluate%>
+            <b><%="Evaluate Safety Plan"%></b>
+          <%else%>
+            <b><%="#{action_name.titleize} Safety Plan"%></b>
+          <%end%>
+        </div>
+      </div>
+      <div class="panel-body">
+        <%=form_for @safety_plan, :html => {:multipart => true} do |f|%>
+          <%=f.hidden_field :status, :value => params[:evaluate] ? 'Evaluated' : 'New'%>
 
-					<%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @safety_plan%>
-					<%=render '/forms/attachments_form', :f => f, :owner => @safety_plan%>
-					
-					<div class="mt10 mr10">
-						<%=f.submit "#{action_name == 'new' ? 'Submit' : (params[:evaluate] ? 'Evaluate' : 'Update')}",
-							:class => "pull-right btn btn-success", 
-							:disable_with => "Saving..."%>
-						<%=link_to "Cancel", 
-							action_name == "new" ? root_url : safety_plan_path(@safety_plan),
-							:class => "pull-right btn btn-warning mr5", 
-							:confirm => 'Are you sure?'%>
-					</div>
+          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @safety_plan%>
+          <%=render '/forms/attachments_form', :f => f, :owner => @safety_plan%>
 
-				<%end%>
-			</div> 
-		</div>       
-	</div> 
+          <div class="mt10 mr10">
+            <%=f.submit "#{action_name == 'new' ? 'Submit' : (params[:evaluate] ? 'Evaluate' : 'Update')}",
+              :class => "pull-right btn btn-success",
+              :disable_with => "Saving..."%>
+            <%=link_to "Cancel",
+              action_name == "new" ? root_url : safety_plan_path(@safety_plan),
+              :class => "pull-right btn btn-warning mr5",
+              :confirm => 'Are you sure?'%>
+          </div>
+
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 </div>

@@ -1,60 +1,60 @@
 <div class="panel-info panel">
-	<div class="panel-heading">
-		<div class="panel-title">Advanced Search
-		<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-	</div>
-	<div class="panel-body">
-		<div class="row" style="max-height:450px;overflow-y:auto;">
-			<%=form_tag corrective_actions_path,:method=>"get" do%>
-				<div class="col-xs-6">
-					<%=label_tag :term%>
-				</div>
-				<div class="col-xs-6">
-					<%=label_tag :value%>
-				</div>
-				<div class="col-xs-6">
-					<%=select_tag "term[0][field]",options_for_select(@terms),{:include_blank=>true,:class=>"form-control term_select",:term=>"0"}%>
-				</div>
+  <div class="panel-heading">
+    <div class="panel-title">Advanced Search
+    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+  </div>
+  <div class="panel-body">
+    <div class="row" style="max-height:450px;overflow-y:auto;">
+      <%=form_tag corrective_actions_path,:method=>"get" do%>
+        <div class="col-xs-6">
+          <%=label_tag :term%>
+        </div>
+        <div class="col-xs-6">
+          <%=label_tag :value%>
+        </div>
+        <div class="col-xs-6">
+          <%=select_tag "term[0][field]",options_for_select(@terms),{:include_blank=>true,:class=>"form-control term_select",:term=>"0"}%>
+        </div>
 
-				<div class="col-xs-6" id="0">
-					<%=text_field_tag :default,nil,{:class=>"form-control "}%>
-				</div>
+        <div class="col-xs-6" id="0">
+          <%=text_field_tag :default,nil,{:class=>"form-control "}%>
+        </div>
 
-				<div class="col-xs-6 mt5">
-					<%=select_tag "term[1][field]",options_for_select(@terms),{:include_blank=>true,:class=>"form-control term_select",:term=>"1"}%>
-				</div>
+        <div class="col-xs-6 mt5">
+          <%=select_tag "term[1][field]",options_for_select(@terms),{:include_blank=>true,:class=>"form-control term_select",:term=>"1"}%>
+        </div>
 
-				<div class="col-xs-6 mt5" id="1">
-					<%=text_field_tag :default,nil,{:class=>"form-control "}%>
-				</div
-				>
-				<div class="col-xs-6  mt5">
-					<%=select_tag "term[2][field]",options_for_select(@terms),{:include_blank=>true,:class=>"form-control term_select",:term=>"2"}%>
-				</div>
+        <div class="col-xs-6 mt5" id="1">
+          <%=text_field_tag :default,nil,{:class=>"form-control "}%>
+        </div
+        >
+        <div class="col-xs-6  mt5">
+          <%=select_tag "term[2][field]",options_for_select(@terms),{:include_blank=>true,:class=>"form-control term_select",:term=>"2"}%>
+        </div>
 
-				<div class="col-xs-6 mt5" id="2">
-					<%=text_field_tag :default,nil,{:class=>"form-control "}%>
-				</div>
-				<%=submit_tag "Search",:class=>"pull-right btn btn-info mr5 mt5"%>
-			<%end%>
-		</div>
-	</div>
+        <div class="col-xs-6 mt5" id="2">
+          <%=text_field_tag :default,nil,{:class=>"form-control "}%>
+        </div>
+        <%=submit_tag "Search",:class=>"pull-right btn btn-info mr5 mt5"%>
+      <%end%>
+    </div>
+  </div>
 </div>
 <script>
-	$(document).ready(function(){
-		$('.term_select').on('change',function(){
-			if ($(this).val()!="")
-			{
-				var term=$(this).attr('term')
-				$.get("<%=get_term_corrective_actions_path%>?term="+$(this).val()+"&id="+term,function(data){
-        			$("#"+term).html(data);
-				});
-			}
-			else
-			{
+  $(document).ready(function(){
+    $('.term_select').on('change',function(){
+      if ($(this).val()!="")
+      {
+        var term=$(this).attr('term')
+        $.get("<%=get_term_corrective_actions_path%>?term="+$(this).val()+"&id="+term,function(data){
+              $("#"+term).html(data);
+        });
+      }
+      else
+      {
 
-        		$("#"+$(this).attr('term')).html("<%=escape_javascript(text_field_tag :default,nil,{:class=>'form-control mr'})%>");
-			}
-		});
-	});
+            $("#"+$(this).attr('term')).html("<%=escape_javascript(text_field_tag :default,nil,{:class=>'form-control mr'})%>");
+      }
+    });
+  });
 </script>

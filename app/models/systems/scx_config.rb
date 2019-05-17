@@ -2,47 +2,36 @@ class SCX_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.2",
+      :version                                        => "1.0.3",
 
       :code                                           => "SCX",
       :base_risk_matrix                               => false,
-      :has_analytics_filter                           => true,
-      :enable_message_mailer                          => false,
-      :enable_message_templates                       => true,
       :event_summary                                  => false,
       :event_tabulation                               => false,
-      :enable_custom_options                          => true,
       :enable_configurable_risk_matrices              => false,
-      :enable_checklist_templates                     => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_extension                                  => false,
       :has_mobile_app                                 => false,
+      :enable_mailer                                  => true,
 
 
 
       # Safety Reporting Module
-      :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => false,  # Notifier will be notified on receiving new submissions
-      :allow_multi_submissions                        => true,
-      :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
       :enable_orm                                     => false,
       :observation_phases_trend                       => false,
-      :submission_title_required                      => true,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '2',
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
-      :sa_mailer                                      => false,
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
 
 
       # SMS IM Module
       :has_framework                                  => false,
-      :sra_mailers                                    => true,
     }
   end
 

@@ -1,98 +1,98 @@
 <style>
 body {
-	font: normal 12px Verdana, Arial, sans-serif;
+  font: normal 12px Verdana, Arial, sans-serif;
 }
 table{
-	font: normal 11px Verdana, Arial, sans-serif;
+  font: normal 11px Verdana, Arial, sans-serif;
 }
 .category{
-	border: 1px solid black;
-	margin-bottom:10px;
-	padding:3px;
+  border: 1px solid black;
+  margin-bottom:10px;
+  padding:3px;
 }
 .grid_block{
-	display: inline-block;
-	width: 300px;
-	margin-bottom: 3px;
-	margin-top: 2px;
+  display: inline-block;
+  width: 300px;
+  margin-bottom: 3px;
+  margin-top: 2px;
 }
 .line_block{
-	display: inline-block;
-	width: 580px;
-	margin-right: 5px;
-	margin-left:  5px;
-	margin-bottom: 5px;
-	margin-top:5px;
+  display: inline-block;
+  width: 580px;
+  margin-right: 5px;
+  margin-left:  5px;
+  margin-bottom: 5px;
+  margin-top:5px;
 }
 </style>
 
 
 <h4><b>Submission: <%="#{@record.template.name} ##{@record.get_id}"%></b></h4>
 <div class="category">
-	<b>Submission ID: </b><%=@record.get_id%></br>
-	<%if !@record.anonymous?%><%if @record.created_by.full_name.present?%><b>Submitted By: </b><%=@record.created_by.full_name%></br><%end%><%end%>
-	<%if @record.get_event_date.present?%><b>Date/Time of Event: </b><%=@record.get_event_date%></br><%end%>
-	<%if BaseConfig.airline[:submission_description]%><%if !@record.description.blank?%><b>General Description: </b><%=@record.description%></br><%end%><%end%>
-	
-	<%@template.categories.order(:category_order).each do |cat|%>
-		<%if cat.id == 338%>
-			<div class="category">
-				<h5><span style="color:black"><%=cat.title%></span></h5>
-				<table id="observation_phases_table" class="table table-bordered" width="100%">
-					<thead>
-						<tr>
-							<th>Observation Phase</th>
-							<th>Condition</th>
-							<th>Threat</th>
-							<th>Sub Threat</th>
-							<th>Error</th>
-							<th>Sub Error</th>
-							<th>Human Factor</th>
-							<th>Comment</th>
-						</tr>
-					</thead>
-					<tbody>
-						<%cat.fields.group_by(&:element_id).each do |element_id, arr|%>
-							<%if @record.submission_fields.where(:fields_id => arr.first.id).present? && @record.submission_fields.where(:fields_id => arr.first.id).first.value.present?%>
-								<tr>
-									<th><%=arr.first.label%></th>
-									<%arr.each do |x|%>
-										<%submission_fields = @record.submission_fields.where(:fields_id => x.id).first%>
-										<td><%=submission_fields.value%></td>
-									<%end%>
-								</tr>
-							<%end%>
-						<%end%>
-					</tbody>
-				</table>
-			</div>
-		<%elsif cat.not_empty_for(@record)%>
-			<div class="category">
-				<h5><span style="color:black"><%=cat.title%></span></h5>
-				<%cat.fields.order(:field_order).each do |field|%>
-					<%value=@record.submission_fields.where("fields_id=?",field.id).first%>
-					<%if value.present?%>
-						<%value=value.print_value%>
-						<%if value.present?%>
-							<%if cat.title == "Narratives" %>
-								<b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
-							<%else%>
-								<b><%=field.label%>: </b>
-								<%if field.display_type == "employee"%>
-									<%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-										<%=User.find(value).full_name%>
-									<%else%>
-										<%=value%>
-									<%end%>
-								<%else%>
-									<%=value%>
-								<%end%>
-								</br>
-							<%end%>
-						<%end%>
-					<%end%>
-				<%end%>
-			</div>    
-		<%end%>
-	<%end%>
+  <b>Submission ID: </b><%=@record.get_id%></br>
+  <%if !@record.anonymous?%><%if @record.created_by.full_name.present?%><b>Submitted By: </b><%=@record.created_by.full_name%></br><%end%><%end%>
+  <%if @record.get_event_date.present?%><b>Date/Time of Event: </b><%=@record.get_event_date%></br><%end%>
+  <%if BaseConfig.airline[:submission_description]%><%if !@record.description.blank?%><b>General Description: </b><%=@record.description%></br><%end%><%end%>
+
+  <%@template.categories.order(:category_order).each do |cat|%>
+    <%if cat.id == 338%>
+      <div class="category">
+        <h5><span style="color:black"><%=cat.title%></span></h5>
+        <table id="observation_phases_table" class="table table-bordered" width="100%">
+          <thead>
+            <tr>
+              <th>Observation Phase</th>
+              <th>Condition</th>
+              <th>Threat</th>
+              <th>Sub Threat</th>
+              <th>Error</th>
+              <th>Sub Error</th>
+              <th>Human Factor</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%cat.fields.group_by(&:element_id).each do |element_id, arr|%>
+              <%if @record.submission_fields.where(:fields_id => arr.first.id).present? && @record.submission_fields.where(:fields_id => arr.first.id).first.value.present?%>
+                <tr>
+                  <th><%=arr.first.label%></th>
+                  <%arr.each do |x|%>
+                    <%submission_fields = @record.submission_fields.where(:fields_id => x.id).first%>
+                    <td><%=submission_fields.value%></td>
+                  <%end%>
+                </tr>
+              <%end%>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
+    <%elsif cat.not_empty_for(@record)%>
+      <div class="category">
+        <h5><span style="color:black"><%=cat.title%></span></h5>
+        <%cat.fields.order(:field_order).each do |field|%>
+          <%value=@record.submission_fields.where("fields_id=?",field.id).first%>
+          <%if value.present?%>
+            <%value=value.print_value%>
+            <%if value.present?%>
+              <%if cat.title == "Narratives" %>
+                <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+              <%else%>
+                <b><%=field.label%>: </b>
+                <%if field.display_type == "employee"%>
+                  <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                    <%=User.find(value).full_name%>
+                  <%else%>
+                    <%=value%>
+                  <%end%>
+                <%else%>
+                  <%=value%>
+                <%end%>
+                </br>
+              <%end%>
+            <%end%>
+          <%end%>
+        <%end%>
+      </div>
+    <%end%>
+  <%end%>
 </div>

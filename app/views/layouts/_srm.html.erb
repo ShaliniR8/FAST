@@ -1,65 +1,65 @@
 <li class="dropdown">
-	<a href="#" data-toggle="dropdown">SRA (SRM)<b class="caret"></b></a>
-	<ul class="dropdown-menu dropdown-notification" role="menu">
-		<%if current_user.has_access("sras","index")%>
-			<li><a href=<%=sras_path%>>All</a></li>
-		<%end%>
-		<%if current_user.has_access("sras","new")%>
-			<li><a href=<%=new_sra_path%>>New</a></li>
-		<%end%>
-	</ul>
+  <a href="#" data-toggle="dropdown">SRA (SRM)<b class="caret"></b></a>
+  <ul class="dropdown-menu dropdown-notification" role="menu">
+    <%if current_user.has_access("sras","index")%>
+      <li><a href=<%=sras_path%>>All</a></li>
+    <%end%>
+    <%if current_user.has_access("sras","new")%>
+      <li><a href=<%=new_sra_path%>>New</a></li>
+    <%end%>
+  </ul>
 </li>
 
 
 
 <%if current_user.has_access("hazards","index")%>
-	<li class="dropdown">
-		<a href="#" data-toggle="dropdown">Hazards<b class="caret"></b></a>
-		<ul class="dropdown-menu dropdown-notification" role="menu">
-			<li><a href=<%=hazards_path%>>All Hazards</a></li>
-			<%if BaseConfig.airline[:has_root_causes]%>
-				<li><a href=<%=root_cause_trend_hazards_path%>>Root Cause Trend</a></li>
-			<%end%>
-		</ul>
-	</li>
+  <li class="dropdown">
+    <a href="#" data-toggle="dropdown">Hazards<b class="caret"></b></a>
+    <ul class="dropdown-menu dropdown-notification" role="menu">
+      <li><a href=<%=hazards_path%>>All Hazards</a></li>
+      <%if BaseConfig.airline[:has_root_causes]%>
+        <li><a href=<%=root_cause_trend_hazards_path%>>Root Cause Trend</a></li>
+      <%end%>
+    </ul>
+  </li>
 <%end%>
 
 
 
 <%if current_user.has_access("hazards","index")%>
-	<li><a href=<%=risk_controls_path%>>Risk Controls</a></li>
+  <li><a href=<%=risk_controls_path%>>Risk Controls</a></li>
 <%end%>
 <li class="dropdown">
-	<a href="#" data-toggle="dropdown">Safety Plans<b class="caret"></b></a>
-	<ul class="dropdown-menu dropdown-notification" role="menu">
-		<%if current_user.has_access("safety_plans","index")%>
-			<li><a href=<%=safety_plans_path%>>All</a></li>
-		<%end%>
-		<%if current_user.has_access("safety_plans","new")%>
-			<li><a href=<%=new_safety_plan_path%>>New</a></li>
-		<%end%>
-	</ul>
+  <a href="#" data-toggle="dropdown">Safety Plans<b class="caret"></b></a>
+  <ul class="dropdown-menu dropdown-notification" role="menu">
+    <%if current_user.has_access("safety_plans","index")%>
+      <li><a href=<%=safety_plans_path%>>All</a></li>
+    <%end%>
+    <%if current_user.has_access("safety_plans","new")%>
+      <li><a href=<%=new_safety_plan_path%>>New</a></li>
+    <%end%>
+  </ul>
 </li>
 
 
 <li class="dropdown">
-	<a href="#" data-toggle="dropdown">Meetings<b class="caret"></b></a>
-	<ul class="dropdown-menu dropdown-notification" role="menu">
-		<%if current_user.has_access("srm_meetings","index")%>
-			<li><a href=<%=srm_meetings_path%>>All</a></li>
-		<%end%>
-		<%if current_user.has_access("srms_meetings","new")%>
-			<li><a href=<%=new_srm_meeting_path%>>New</a></li>
-		<%end%>
-	</ul>
+  <a href="#" data-toggle="dropdown">Meetings<b class="caret"></b></a>
+  <ul class="dropdown-menu dropdown-notification" role="menu">
+    <%if current_user.has_access("srm_meetings","index")%>
+      <li><a href=<%=srm_meetings_path%>>All</a></li>
+    <%end%>
+    <%if current_user.has_access("srms_meetings","new")%>
+      <li><a href=<%=new_srm_meeting_path%>>New</a></li>
+    <%end%>
+  </ul>
 </li>
 
 
 
 <% if current_user.level == 'Admin' || current_user.has_access('home','query_all') %>
   <li>
-  	<%=link_to "Query Center",
-  		query_all_home_index_path
-  		%>
+    <%=link_to "Query Center",
+      query_all_home_index_path
+      %>
   </li>
 <%end%>

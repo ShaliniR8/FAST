@@ -1,14 +1,14 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-warning">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		<b><%="#{action_name.titleize} Tracking #{@tracking.title}"%></b> 
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body"> 
-     		<%= form_for @tracking do |f|%> 
+  <div class="grid per90 center-block">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%="#{action_name.titleize} Tracking #{@tracking.title}"%></b>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <%= form_for @tracking do |f|%>
           <div class="row">
             <div class="form-group form-inline col-sm-12">
               <%=f.label :title, "Title"%>
@@ -24,11 +24,11 @@
             </div>
             <div class="form-group form-inline col-sm-5">
               <%=f.label :start_date, "Date to Start Tracking"%>
-              <%=f.text_field :start_date,{:class=>"form-control ml5 field-date"}%>                  
+              <%=f.text_field :start_date,{:class=>"form-control ml5 field-date"}%>
             </div>
             <div class="form-group form-inline col-sm-5">
               <%=f.label :due_date, "Due Date"%>
-              <%=f.text_field :due_date,{:class=>"form-control ml5 field-date"}%>                  
+              <%=f.text_field :due_date,{:class=>"form-control ml5 field-date"}%>
             </div>
             <div class="col-sm-12">
               <%=f.label :description, "Description"%>
@@ -42,7 +42,7 @@
             <%=link_to "Cancel", trackings_path, :id=>"cancel-btn", :class=>"mr5 btn btn-danger pull-right"%>
           </div>
         <%end%>
-      </div> 
-    </div>       
-	</div> 
+      </div>
+    </div>
+  </div>
 </div>

@@ -20,14 +20,14 @@
   </flight_info>
   <event_info>
     <date><%=@submission.get_date%></date>   <!-- Date of occurrence -->
-    <time><%=@submission.get_time%></time>   
+    <time><%=@submission.get_time%></time>
     <%@submission.template.categories.each do |category|%>
       <%if category.title=="Narratives"%>
         <%next%>
       <%end%>
       <%category.fields.each do |field|%>
         <%sub_field=@submission.submission_fields.find_by_fields_id(field.id)%>
-        <%if sub_field.present?%> 
+        <%if sub_field.present?%>
           <%if sub_field.export.present?%>
             <%=sub_field.export%>
           <%end%>

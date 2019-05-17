@@ -1,0 +1,9 @@
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "/checklists/instructions"%>
+    <%=render "/forms/index_fields", :btns => [
+      {btn_name: 'New', btn_path: new_checklist_header_path, btn_class: 'btn-success'},
+      {btn_name: 'Checklist Templates', btn_path: checklists_path, btn_class: 'btn-info'},
+      ]%>
+  </div>
+</div>

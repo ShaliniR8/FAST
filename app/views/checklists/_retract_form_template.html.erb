@@ -1,0 +1,41 @@
+<script type="text/javascript" src="/javascripts/utility/checklist-control.js"></script>
+
+<div class="col-xs-12">
+  <div class="col-xs-12">
+    <%=f.hidden_field :title, :value => @template.title%>
+    <table class="table table-bordered table-striped mt10">
+      <thead>
+        <tr>
+          <%@template.checklist_header.checklist_header_items.order(:display_order).each do |item|%>
+            <th><%=item.title%></th>
+          <%end%>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="checklist_rows">
+        <%@template.checklist_rows.each do |checklist_row|%>
+          <%new_checklist_row = @record.checklist_rows.build(checklist_row.attributes)%>
+          <%=f.fields_for :checklist_rows, new_checklist_row do |row_form|%>
+            <%=render 'checklist_row_fields',
+              :checklist_row => checklist_row,
+              :checklist_cells => checklist_row.checklist_cells,
+              :new_checklist_row => new_checklist_row,
+              :f => row_form,
+              :source => 'Template',
+              :locals => {:checklist_header => @template.checklist_header}%>
+          <%end%>
+        <%end%>
+      </tbody>
+    </table>
+    <%=link_to_add_fields "Add a Row", f, :checklist_rows, {:checklist_header => @template.checklist_header}%>
+  </div>
+
+  <div class="mr10 mt10">
+    <%=f.submit "Add",
+      :class => "btn btn-success pull-right mt5 mr5",
+      :disable_with => "Adding..."%>
+  </div>
+</div>
+
+
+

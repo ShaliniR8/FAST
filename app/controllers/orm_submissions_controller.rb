@@ -20,7 +20,7 @@ end
 class OrmSubmissionsController < ApplicationController
 
   before_filter :login_required
-  
+
   def index
     @title = "ORM Submissions"
     @table_name = "orm_submissions"
@@ -52,7 +52,7 @@ class OrmSubmissionsController < ApplicationController
     @fields = @record.orm_submission_fields
     @template = @record.orm_template
   end
- 
+
   def destroy
     @record = OrmSubmission.find(params[:id])
     @record.destroy

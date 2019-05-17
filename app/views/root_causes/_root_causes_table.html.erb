@@ -1,37 +1,36 @@
 <table class="table table-striped table-bordered" id="root_causes">
-	<thead>
-		<tr>
-			<%headers.each do |h|%>
-				<th><%=h[:title]%></th>
-			<%end%>
-			<%if show_btns && 
-				(owner.status != "Completed"  && 
-				owner.status != "Rejected" && 
-				current_user.has_access("Hazard","edit"))%>
-				<th>Action</th>
-			<%end%>
-		</tr>
-	</thead>
-	<tbody>
-		<%owner.root_causes.each do |x|%>
-			<%if x.cause_option.present?%>
-				<tr>
-					<%headers.each do |h|%>
-						<td><%=x.send(h[:field])%></td>
-					<%end%>
-					<%if show_btns && 
-						(owner.status != "Completed" && 
-						owner.status != "Rejected" && 
-						current_user.has_access("Hazard","edit"))%>
-						<td>
-							<%=link_to "Delete", 
-								"#", 
-								:class => "btn btn-danger delete_root_cause_btn", 
-								"data-cid" => x.id%>			
-						</td>
-					<%end%>
-				</tr>
-			<%end%>
-		<%end%>
-	</tbody>
+  <thead>
+    <tr>
+      <%headers.each do |h|%>
+        <th><%=h[:title]%></th>
+      <%end%>
+      <%if show_btns &&
+        (owner.status != "Completed"  &&
+        owner.status != "Rejected" &&
+        current_user.has_access("Hazard","edit"))%>
+        <th>Action</th>
+      <%end%>
+    </tr>
+  </thead>
+  <tbody>
+    <%owner.root_causes.each do |x|%>
+      <%if x.cause_option.present?%>
+        <tr>
+          <%headers.each do |h|%>
+            <td><%=x.send(h[:field])%></td>
+          <%end%>
+          <%if show_btns &&
+            (owner.status != "Completed" &&
+            owner.status != "Rejected" &&
+            current_user.has_access("Hazard","edit"))%>
+            <td>
+              <%=link_to "Delete", "#",
+                :class => "btn btn-danger delete_root_cause_btn",
+                "data-cid" => x.id%>
+            </td>
+          <%end%>
+        </tr>
+      <%end%>
+    <%end%>
+  </tbody>
 </table>

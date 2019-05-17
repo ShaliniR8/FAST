@@ -1,36 +1,36 @@
 swal({
 
-	title: "<%=@field.label%>",
-	html: "<%=escape_javascript render('/templates/show_nested_fields')%>",
-	customClass: "custom-swal",
-	showCancelButton: false,
-	showConfirmButton: false,
-	allowOutsideClick: true,
-	onOpen: function(){
+  title: "<%=@field.label%>",
+  html: "<%=escape_javascript render('/templates/show_nested_fields')%>",
+  customClass: "custom-swal",
+  showCancelButton: false,
+  showConfirmButton: false,
+  allowOutsideClick: true,
+  onOpen: function(){
 
 
-		// Archive/Unarchive button
-		$(".archive_btn").on("click", function(){
-			if($(this).text() == "Archive"){
-				$(this).closest("td").find("#delete_field").val(true);
-				$(this).text("Unarchive");
-				$(this).removeClass("btn-warning").addClass("btn-default");
-			}else{
-				$(this).closest("td").find("#delete_field").val(false);
-				$(this).text("Archive");
-				$(this).removeClass("btn-default").addClass("btn-warning");
-			}
-		});
+    // Archive/Unarchive button
+    $(".archive_btn").on("click", function(){
+      if($(this).text() == "Archive"){
+        $(this).closest("td").find("#delete_field").val(true);
+        $(this).text("Unarchive");
+        $(this).removeClass("btn-warning").addClass("btn-default");
+      }else{
+        $(this).closest("td").find("#delete_field").val(false);
+        $(this).text("Archive");
+        $(this).removeClass("btn-default").addClass("btn-warning");
+      }
+    });
 
 
-	}
+  }
 
 }).catch(swal.noop);
 
 
 
 function removeField(deletable){
-	$(deletable).closest('.to_delete').remove();
+  $(deletable).closest('.to_delete').remove();
 }
 
 //function to add nested attributes

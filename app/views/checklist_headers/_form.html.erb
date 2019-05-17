@@ -1,0 +1,148 @@
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts" %>
+    <%=form_for @record, :html => {:multipart => true} do |f|%>
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <%=action_name.titleize%> <%=@record.class.name.titleize%>
+          </div>
+        </div>
+        <div class="panel-body">
+          <%if action_name == 'new'%>
+            <%=f.hidden_field :status, :value => 'New'%>
+          <%end%>
+          <%=f.hidden_field :created_by_id, :value => current_user.id%>
+
+
+
+        <div class="span4 collapse-group">
+          <a class="btn" data-toggle="collapse" data-target="#viewinstructionChecklist">View Instructions &raquo;</a>
+          <div class="collapse" id="viewinstructionChecklist">
+            <div class="col-xs-12">
+              <div class="col-xs-12 well">
+                <ul>
+                  <li>
+                    Title - label for the Checklist Header that is used for reference.
+                  </li>
+                  <li>
+                    Description - details information about the checklist header.
+                  </li>
+                  <li>
+                    <span class= "glyphicon glyphicon-move"></span> -
+                    Re-arranges the order of the columns.
+                  </li>
+                  <li>
+                    Column Name - describes the column fields.
+                  </li>
+                  <li>
+                    Input Type - choose how the options are presented.
+                    <ul>
+                      <li>
+                        Text - allows the user to input text.
+                      </li>
+                      <li>
+                        Dropdown - allows the user to select from a dropdown field.
+                      </li>
+                      <li>
+                        Radio - allows the user to select from buttons.
+                      </li>
+                    </ul>
+                  <li>
+                    Options - choices for the input field (options split by semicolon).
+                  <li>
+                    Allow Input - determines if the User can add input to a column.
+                  </li>
+                  <li>
+                    <span class= "glyphicon glyphicon-trash"></span> -
+                    Removes a column.
+                  </li>
+                </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @record%>
+
+          <div class="col-xs-12">
+            <div class="panel panel-lightskyblue">
+              <div class="panel-heading">
+                <div class="panel-title">
+                  <div class="top_text">Columns</div>
+                </div>
+              </div>
+
+              <div class="panel-body">
+                <table class="table table-bordered">
+                  <thead>
+                    <th>Order</th>
+                    <%ChecklistHeaderItem.get_meta_fields('form').each do |header|%>
+                      <th><%=header[:title]%></th>
+                    <%end%>
+                    <th>Actions</th>
+                  </thead>
+                  <tbody class="draggableFieldGroup" id="checklist_header_items">
+                    <%@record.checklist_header_items.order(:display_order).each_with_index do |item, index|%>
+                      <%=f.fields_for :checklist_header_items, item do |item_form| %>
+                        <%=render "checklist_header_item_fields",
+                          :checklist_header_item => item,
+                          :f => item_form,
+                          :display_order => index,
+                          :source => "Existing"%>
+                      <%end%>
+                    <%end%>
+                  </tbody>
+                </table>
+                <%=link_to_add_fields "Add Column", f, :checklist_header_items%>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="mr10 mt10">
+            <%=submit_tag "Save", :class => "btn btn-success pull-right", :disable_with => "Saving..."%>
+            <%=link_to "Cancel",
+              action_name == 'new' ? checklist_headers_path : checklist_header_path(@record),
+              :class => "mr5 btn btn-warning pull-right",
+              :confirm => 'Are you sure?'%>
+          </div>
+
+
+
+
+        </div>
+      </div>
+    <%end%>
+  </div>
+</div>
+
+
+
+<script>
+  $(function(){
+    $(".draggableFieldGroup").sortable({
+      handle: $(this, ".drag_and_drop"),
+      forcePlaceholderSize: true,
+      cursor: "move",
+      animation: 100,
+      start: function(event, ui){
+        ui.placeholder.height(ui.item.height());
+        ui.placeholder.width(ui.item.width());
+      },
+      update: function(event, ui){
+        $('.field_group', this).each(function(index, elem) {
+          $('.form-field-order', this).val(index);
+        });
+      }
+    });
+  })
+</script>
+
+

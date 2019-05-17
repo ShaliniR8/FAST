@@ -1,5 +1,5 @@
 class AuditAttachment < Attachment
-	belongs_to :audit, foreign_key:"owner_id", class_name: "Audit"
+  belongs_to :audit, foreign_key:"owner_id", class_name: "Audit"
 
   after_create :create_transaction
   before_destroy :delete_transaction

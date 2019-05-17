@@ -42,7 +42,7 @@
   <style type="text/css">
   .module_label {
   margin-top: 40px;
-  margin-right:30px; 
+  margin-right:30px;
   margin-bottom: 0px;
   height: 30px;
   padding: 10px;
@@ -61,7 +61,7 @@
   </style>
   <div class="module_label">
     <span class="pull-right">
-      <%= case session[:mode] 
+      <%= case session[:mode]
           when "SMS"
             "Safety Assurance"
           when "SMS IM"
@@ -143,9 +143,9 @@
         <li><a href ="<%=logout_path%>">Logout</a></li>
       </ul>
     </div><!--/.nav-collapse -->
-    
+
   </div> <!-- End #header  -->
-  <div id="page-header"> 
+  <div id="page-header">
   </div>
 
   <!-- Javascripts -->
@@ -208,7 +208,7 @@
     //       debugger;
     //     }
     // });
-  
+
     $(".basic-datepicker").datepicker({
         format: "yyyy-mm-dd"}).on('focus', function() {
       $(this).trigger('blur');

@@ -14,145 +14,149 @@
 
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="panel panel-warning">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<b><%=action_name.titleize + " Event"%></b> 
-				</div>
-			</div>
+  <div class="grid per90 center-block">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%=action_name.titleize + " Event"%></b>
+        </div>
+      </div>
 
 
-			<div class="panel-body" id="form_body">
-				<%=form_for @report, :html => {:multipart => true} do |f|%>
+      <div class="panel-body" id="form_body">
+        <%=form_for @report, :html => {:multipart => true} do |f|%>
 
-					<%=render "shared/privilege_form", 
-						:target => "report[privileges][]", 
-						:owner => @report, 
-						:f => f%>
+          <%=render "shared/privilege_form",
+            :target => "report[privileges][]",
+            :owner => @report,
+            :f => f%>
 
-					<%=render '/forms/form_fields', 
-						:fields => Report.get_meta_fields('form'), 
-						:f => f, 
-						:record => @report%>
+          <%=render '/forms/form_fields',
+            :fields => Report.get_meta_fields('form'),
+            :f => f,
+            :record => @report%>
+
+          <div class="col-xs-12 mt10">
+            <div class="panel panel-success">
+              <div class="panel-heading">
+                <div class="panel-title"><b>Included Reports</b></div>
+              </div>
+              <div class="panel-body">
+                <div class="table-responsive">
+                  <table id="included" class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <%@report_fields.each do |header|%>
+                          <th><%=header[:title]%></th>
+                        <%end%>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%@report.records.each do |record|%>
+                        <tr record="<%=record.id%>">
+                          <%@report_fields.each do |header|%>
+                            <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                              <%=render 'forms/show_field', :record => record, :field_hash => header%>
+                            </td>
+                          <%end%>
+                          <td>
+                            <div class="btn-group">
+                              <a class="btn btn-info view_btn mr5">
+                                <span class="glyphicon glyphicon-search"></span>
+                              </a>
+                              <a class="btn btn-danger action-btn">
+                                <span class="glyphicon glyphicon-remove"></span>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      <%end%>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xs-12">
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <div class="panel-title"><b>Available Reports</b></div>
+              </div>
+              <div class="panel-body">
+                <div class="table-responsive">
+                  <table id="candidates" class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <%@report_fields.each do |header|%>
+                          <th><%=header[:title]%></th>
+                        <%end%>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%@candidates.each do |record|%>
+                        <tr record="<%=record.id%>">
+                          <%@report_fields.each do |header|%>
+                            <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                              <%=render 'forms/show_field', :record => record, :field_hash => header%>
+                            </td>
+                          <%end%>
+                          <td>
+                            <div class="btn-group">
+                              <a class="btn btn-info view_btn mr5">
+                                <span class="glyphicon glyphicon-search"></span>
+                              </a>
+                              <a class="btn btn-warning action-btn">
+                                <span class="glyphicon glyphicon-plus"></span>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      <%end%>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
 
 
-					<div class="col-xs-6">
-						<div class="panel panel-info">
-							<div class="panel-heading">
-								<div class="panel-title"><b>Included Reports</b></div> 
-							</div>
-							<div class="panel-body">
-								<div class="table-responsive">
-									<table id="included" class="table table-bordered">
-										<thead>
-											<tr>
-												<%@report_fields.each do |header|%>
-													<th><%=header[:title]%></th>
-												<%end%>
-												<th class="col-xs-3 col-lg-3">Action</th>
-											</tr>
-										</thead>
-										<tbody>
-											<%@report.records.each do |record|%>
-												<tr record="<%=record.id%>">
-													<%@report_fields.each do |header|%>
-														<td><%=record.send(header[:field])%></td>
-													<%end%>
-													<td>
-														<div class="btn-group">
-															<a class="btn btn-info view_btn">
-																<span class="glyphicon glyphicon-search"></span>
-															</a>
-															<a class="btn btn-danger action-btn">
-																<span class="glyphicon glyphicon-remove"></span>
-															</a>
-														</div>
-													</td>
-												</tr>
-											<%end%>
-										</tbody>
-									</table>
-								</div> 
-							</div>
-						</div>
-					</div>
-						
-					<div class="col-xs-6">
-						<div class="panel panel-info">
-							<div class="panel-heading">
-								<div class="panel-title"><b>Available Reports</b></div>
-							</div>
-							<div class="panel-body">
-								<div class="table-responsive">
-									<table id="candidates" class="table table-bordered">
-										<thead>
-											<tr>
-												<%@report_fields.each do |header|%>
-													<th><%=header[:title]%></th>
-												<%end%>
-												<th class="col-xs-3 col-lg-3">Action</th>
-											</tr>
-										</thead>
-										<tbody>
-											<%@candidates.each do |record|%>
-												<tr record="<%=record.id%>">
-													<%@report_fields.each do |header|%>
-														<td><%=record.send(header[:field])%></td>
-													<%end%>
-													<td>
-														<div class="btn-group">
-															<a class="btn btn-info view_btn">
-																<span class="glyphicon glyphicon-search"></span>
-															</a>
-															<a class="btn btn-success action-btn">
-																<span class="glyphicon glyphicon-plus"></span>
-															</a>
-														</div>
-													</td>
-												</tr>
-											<%end%>
-										</tbody>
-									</table>
-								</div> 
-							</div>
-						</div>
-					</div>
+          <%=render '/forms/attachments_form', :f => f, :owner => @report%>
 
-					<%=render '/forms/attachments_form', :f => f, :owner => @report%>
-
-					<div class="mt10 mr10">
-						<div class="form-actions">
-							<%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
-								:class => "btn btn-success pull-right",
-								:disable_with => "Saving..."%>
-						</div>
-						<%=link_to "Cancel", 
-							@action == "new" ? root_url : report_path(@report), 
-							:id => "cancel-btn", 
-							:class => "mr5 btn btn-warning pull-right", 
-							:confirm => 'Are you sure?'%>
-						<%=link_to "Group Access",
-							"#", 
-							:class => "mr5 btn btn-info pull-right",
-							"data-toggle" => "modal",
-							"data-target" => "#group_access"%>
-					</div>
-				<%end%>
-			</div>        
-		</div>
-	</div> 
+          <div class="mt10 mr10">
+            <div class="form-actions">
+              <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+                :class => "btn btn-success pull-right",
+                :disable_with => "Saving..."%>
+            </div>
+            <%=link_to "Cancel",
+              @action == "new" ? root_url : report_path(@report),
+              :id => "cancel-btn",
+              :class => "mr5 btn btn-warning pull-right",
+              :confirm => 'Are you sure?'%>
+            <%=link_to "Group Access",
+              "#",
+              :class => "mr5 btn btn-info pull-right",
+              "data-toggle" => "modal",
+              "data-target" => "#group_access"%>
+          </div>
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <style>
-	.table th {
-		text-align: center;
-	}
-	.table td {
-		text-align: center;
-	}
+  .table th {
+    text-align: center;
+  }
+  .table td {
+    text-align: center;
+  }
 </style>
 
 
@@ -160,77 +164,80 @@
 
 
 <script type="text/javascript">
-	var airport_table;
-	$(document).ready(function(){
+  var airport_table;
+  $(document).ready(function(){
 
 
-		$(".view_btn").on('click',function(){
-			window.open("/records/" + $(this).closest("tr").children("td").eq(0).html());
-		});
+    $("#included").dataTable();
+    $("#candidates").dataTable();
+
+    $(".view_btn").on('click',function(){
+      window.open("/records/" + $(this).closest("tr").children("td").eq(0).html());
+    });
 
 
 
-		// Get listing of all the airport buttons
-		var field_id;
-		$(this).find(".airport_button").each(function(index, item){
-			// Get the button that's being clicked
-			$(item).on("click", function(){
-				// Get the selected airport's field id
-				field_id = $(this).prop("id");
-				resetModal(field_id);
-				$("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
-				$("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
-			});
-		}); 
-	});
+    // Get listing of all the airport buttons
+    var field_id;
+    $(this).find(".airport_button").each(function(index, item){
+      // Get the button that's being clicked
+      $(item).on("click", function(){
+        // Get the selected airport's field id
+        field_id = $(this).prop("id");
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
+      });
+    });
+  });
 
-	// Updata airport table
-	function handleSearch(event){
-		// Get the keywords user searched for
-		var icao = $("#icao").val();
-		var iata = $("#iata").val();
-		var arpt_name = $("#arpt_name").val();
-		// Do nothing if nothing is searched
-		if(icao == "" && iata == "" && arpt_name ==""){
-		// Update the table if icao code is not empty
-		}else{
-			// Get the data from server
-			$.get('<%=airport_data_submissions_path%>?&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
-				// Render airport table with data
-				$("#airports_table").html(data);
-				updateAirportTable();
-			});
-		}
-	}
-
-
-	function updateAirportTable(){
-		// Initialize table as a datatable
-		airport_table = $('#airports').DataTable({
-			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-			"iDisplayLength": 5
-		});
-		// User clicked on a row
-		$("body").on("click", "#airports" + " tbody tr", function(){
-			//$("tbody tr").on("click", function(){
-			// Get the row information
-			var icao = $(this).find("td").eq(0).text();
-			var iata = $(this).find("td").eq(1).text();
-			// Set the value on the form
-			$("#airport").val(icao);
-			$("#airport-select").val(icao);
-			resetModal();
-		});
-	}
+  // Updata airport table
+  function handleSearch(event){
+    // Get the keywords user searched for
+    var icao = $("#icao").val();
+    var iata = $("#iata").val();
+    var arpt_name = $("#arpt_name").val();
+    // Do nothing if nothing is searched
+    if(icao == "" && iata == "" && arpt_name ==""){
+    // Update the table if icao code is not empty
+    }else{
+      // Get the data from server
+      $.get('<%=airport_data_submissions_path%>?&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+        // Render airport table with data
+        $("#airports_table").html(data);
+        updateAirportTable();
+      });
+    }
+  }
 
 
-	function resetModal(){
-		// Reset the table, field, and close the modal
-		$("#airports_table").html("");
-		$("#icao").val("");
-		$("#iata").val("");
-		$("#arpt_name").val("");
-		$('#airport_div').hide();
-		$(".airport_modal").modal("hide");
-	}
+  function updateAirportTable(){
+    // Initialize table as a datatable
+    airport_table = $('#airports').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+    // User clicked on a row
+    $("body").on("click", "#airports" + " tbody tr", function(){
+      //$("tbody tr").on("click", function(){
+      // Get the row information
+      var icao = $(this).find("td").eq(0).text();
+      var iata = $(this).find("td").eq(1).text();
+      // Set the value on the form
+      $("#airport").val(icao);
+      $("#airport-select").val(icao);
+      resetModal();
+    });
+  }
+
+
+  function resetModal(){
+    // Reset the table, field, and close the modal
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }
 </script>

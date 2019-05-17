@@ -1,42 +1,42 @@
 <div class="panel panel-primary">
-	<div class="panel-heading">
-		<div class="panel-title">
-			Step 1. Select an Object
-		</div>
-	</div>
-	<div class="panel-body">
-		<div class="table-responsive">
-			<table id="templates" 
-				class="table table-bordered table-hover table-striped">
-				<thead>
-					<tr>
-						<th>Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					<%@types.stringify_keys.each do |k, v|%>
-						<tr>
-							<td data-id="<%=v%>"><%=k%></td>
-						</tr>
-					<%end%>
-				</tbody>
-			</table>
-		</div>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title">
+      Step 1. Select an Object
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="table-responsive">
+      <table id="templates"
+        class="table table-bordered table-hover table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%@types.stringify_keys.each do |k, v|%>
+            <tr>
+              <td data-id="<%=v%>"><%=k%></td>
+            </tr>
+          <%end%>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 
 
 
 <script>
-	$("tbody tr td").on("click", function(){
-		clickTemplate($(this));
-	});
+  $("tbody tr td").on("click", function(){
+    clickTemplate($(this));
+  });
 
-	function clickTemplate(cell){
-		$("td").css("background-color", "transparent");
-		$(cell).css("background-color", "lightblue");
-	}
+  function clickTemplate(cell){
+    $("td").css("background-color", "transparent");
+    $(cell).css("background-color", "lightblue");
+  }
 </script>
 
 

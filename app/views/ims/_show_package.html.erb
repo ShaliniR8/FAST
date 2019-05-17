@@ -1,32 +1,32 @@
 <div class="panel-info">
-	<div class="panel-heading">
-		<div class="panel-title">Packages
-		<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-	</div>
-	<div class="panel-body" style="max-height:500px;overflow-y:auto;">
-		<table class="table table-hover" id="package_table">
-			<thead>
-				<tr>
-					<%@headers.each do |h|%>
-						<th><%=h[:title]%></th>
-					<%end%>
-				</tr>
-			</thead>
-			<tbody>
-				<%@item.packages.each do |i|%>
-					<tr onclick="go_to_package(<%=i.id%>)">
-						<%@headers.each do |h|%>
-							<td><%=i.send(h[:field])%></td>
-						<%end%>
-					</tr>
-				<%end%>
-			</tbody>
-		</table>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title">Packages
+    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+  </div>
+  <div class="panel-body" style="max-height:500px;overflow-y:auto;">
+    <table class="table table-hover" id="package_table">
+      <thead>
+        <tr>
+          <%@headers.each do |h|%>
+            <th><%=h[:title]%></th>
+          <%end%>
+        </tr>
+      </thead>
+      <tbody>
+        <%@item.packages.each do |i|%>
+          <tr onclick="go_to_package(<%=i.id%>)">
+            <%@headers.each do |h|%>
+              <td><%=i.send(h[:field])%></td>
+            <%end%>
+          </tr>
+        <%end%>
+      </tbody>
+    </table>
+  </div>
 </div>
 <script>
-	function go_to_package(id)
-	{
-		window.location = ("<%=packages_path%>/"+id);
-	}
+  function go_to_package(id)
+  {
+    window.location = ("<%=packages_path%>/"+id);
+  }
 </script>

@@ -1,12 +1,12 @@
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-info">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		<b>Rules Assignments</b> 
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body"> 
+  <div class="grid per90 center-block">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b>Rules Assignments</b>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
@@ -15,17 +15,17 @@
                   <%@headers.each do |header|%>
                     <th><%=header[:title]%></th>
                   <%end%>
-                  <th>Level</th>    
+                  <th>Level</th>
                   <th>Change</th>
                 </tr></thead>
                 <tbody>
                   <%@assignments.each do |a|%>
-                    <tr>     
+                    <tr>
                       <%@headers.each do |header|%>
                         <td><%=a.access.send(header[:field])%></td>
                       <%end%>
                       <td><%=a.level%></td>
-                      <td>                        
+                      <td>
                         <%=link_to "Delete",delete_assignment_access_control_path(a),:confirm=>"This may affect all related users' access. Are you sure you want to continue?",:class=>"ml5 btn btn-danger delete_btn"%>
                       </td>
                     </tr>
@@ -38,10 +38,10 @@
             <%=link_to "Back",access_controls_path,:class=>"pull-right btn btn-danger"%>
           </div>
         </div>
-      </div> 
-    </div>       
-	</div> 
-</div>  
+      </div>
+    </div>
+  </div>
+</div>
 <style>
 .table th {
   text-align: center;

@@ -1,34 +1,34 @@
 <div class="col-xs-6">
-	<hr/>
-	<h4 style="color:#DC7633">
-		<b>PROBABILITY EXCERCISE</b>
-		<%=link_to "Edit", "#", :class => "btn btn-warning pull-right", :id => "edit_probability_table_btn"%>
-	</h4>
-	<table class="table table-bordered table-centered">
-		<tr>
-			<th bgcolor="#DC7633" style="color:white">CLASS</th>
-			<th bgcolor="#DC7633" colspan="<%=@record.probability_table.column_num.length%>" style="color:white">PROBABILITY</th>
-		</tr>
+  <hr/>
+  <h4 style="color:#DC7633">
+    <b>PROBABILITY EXCERCISE</b>
+    <%=link_to "Edit", "#", :class => "btn btn-warning pull-right", :id => "edit_probability_table_btn"%>
+  </h4>
+  <table class="table table-bordered table-centered">
+    <tr>
+      <th bgcolor="#DC7633" style="color:white">CLASS</th>
+      <th bgcolor="#DC7633" colspan="<%=@record.probability_table.column_num.length%>" style="color:white">PROBABILITY</th>
+    </tr>
 
-		<%@record.probability_table.row_num.each do |i|%>
-			<tr>
-				<%@record.probability_table.get_row(i).sort_by{|x| x.table_column}.each do |cell|%>
-					<%if (cell.table_row == 0 || cell.table_column == 0)%>
-						<th bgcolor="#FEF5E7"><%=cell.value%></th>
-					<%else%>
-						<td><%=cell.value%> (<%=cell.table_row%>, <%=cell.table_column%>)</td>
-					<%end%>
-				<%end%>
-			</tr>
-		<%end%>
-	</table>
+    <%@record.probability_table.row_num.each do |i|%>
+      <tr>
+        <%@record.probability_table.get_row(i).sort_by{|x| x.table_column}.each do |cell|%>
+          <%if (cell.table_row == 0 || cell.table_column == 0)%>
+            <th bgcolor="#FEF5E7"><%=cell.value%></th>
+          <%else%>
+            <td><%=cell.value%> (<%=cell.table_row%>, <%=cell.table_column%>)</td>
+          <%end%>
+        <%end%>
+      </tr>
+    <%end%>
+  </table>
 </div>
 
 
 <script>
-	$(function(){
-		$("#edit_probability_table_btn").on("click", function(){
-			$.get("<%=edit_risk_matrix_table_path(@record.probability_table)%>");
-		});
-	});
+  $(function(){
+    $("#edit_probability_table_btn").on("click", function(){
+      $.get("<%=edit_risk_matrix_table_path(@record.probability_table)%>");
+    });
+  });
 </script>

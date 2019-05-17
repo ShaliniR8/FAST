@@ -1,10 +1,10 @@
 <div class="search-group row" style="margin-bottom: 10px;">
-	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-		 <b>Date Range:</b>
-	</div>
-	<div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 input-group datetimerangepicker unhide'>
-		<%= text_field_tag :start_date, (Time.zone.now - 1.weeks).beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer search_field", readonly: true %>
-		<div class="input-group-addon">to</div>
-		<%= text_field_tag :end_date, Time.zone.now.end_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer search_field", readonly: true %>
-	</div>
+  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+     <b>Date Range:</b>
+  </div>
+  <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 input-group datetimerangepicker unhide'>
+    <%= text_field_tag :start_date, (Time.zone.now - 1.weeks).beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer search_field", readonly: true %>
+    <div class="input-group-addon">to</div>
+    <%= text_field_tag :end_date, Time.zone.now.end_of_day.strftime("%Y-%m-%d %H:%M"), class: "form-control field-datetime-autoposition cursor-pointer search_field", readonly: true %>
+  </div>
 </div>

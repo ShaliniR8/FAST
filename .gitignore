@@ -3,6 +3,7 @@ tmp
 public/uploads/**
 public/exports/**
 
+mysqldumps/**
 mitre/**
 nasa/**
 

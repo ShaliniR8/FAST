@@ -8,20 +8,20 @@
       <div class='col-xs-12'>
 
       <div class="form-row">
-        	<div class="form-group col-md-4">
-	  			<label for="inputEmail4">ICAO Code</label>
-	  			<input type="icao" class="form-control" id="icao" placeholder="ICAO Code">
-			</div>
-			<div class="form-group col-md-4">
-	  			<label for="inputPassword4">IATA Code</label>
-	  			<input type="iata" class="form-control" id="iata" placeholder="IATA">
-			</div>
-			<div class="form-group col-md-4">
-	  			<label for="inputPassword4">Airport Name</label>
-	  			<input type="arpt_name" class="form-control" id="arpt_name" placeholder="Airport Name">
-			</div>
-          	<div id="search_btn"></div></div>
-        	<div class="col-xs-12" id="airports_table"></div>
+          <div class="form-group col-md-4">
+          <label for="inputEmail4">ICAO Code</label>
+          <input type="icao" class="form-control" id="icao" placeholder="ICAO Code">
+      </div>
+      <div class="form-group col-md-4">
+          <label for="inputPassword4">IATA Code</label>
+          <input type="iata" class="form-control" id="iata" placeholder="IATA">
+      </div>
+      <div class="form-group col-md-4">
+          <label for="inputPassword4">Airport Name</label>
+          <input type="arpt_name" class="form-control" id="arpt_name" placeholder="Airport Name">
+      </div>
+            <div id="search_btn"></div></div>
+          <div class="col-xs-12" id="airports_table"></div>
       </div>
     </div>
   </div>
@@ -63,7 +63,7 @@
         console.log("ICAO code is: " + icao);
 
         if(icao == ""){
-    
+
         }else{
             $.get("<%=airport_data_submissions_path%>?icao=" + icao, function(data){
                 console.log($(".airport_button").prop('id'));

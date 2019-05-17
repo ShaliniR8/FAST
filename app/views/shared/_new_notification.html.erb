@@ -13,107 +13,107 @@
 
 <%@fields = Notification.get_meta_fields('form')%>
 <%=form_for @notification do |f|%>
-	<div class="panel-warning">
-		<div class="panel-heading">
-			<div class="panel-title">
-				New Notification
-				<button type="button" 
-					class="close pull-right" 
-					data-dismiss="modal" 
-					aria-label="Close">
-					<span class="glyphicon glyphicon-remove"></span>
-				</button>
-			</div>
-		</div>
-		<div class="panel-body" style="max-height:calc(100vh - 210px);overflow-y:auto">
-			<div class="row">
-				<%=f.hidden_field :users_id, :id => "users_id"%>
-				<%=hidden_field_tag :owner_type, @table%>
-				<%=f.hidden_field :owner_id, :value => @owner_id%> 
-				<%#=render "forms/form_fields", 
-					:f => f, 
-					:fields => @fields, 
-					:record => @notification%>
-				<div class="col-xs-6 mb5">
-					<%=f.label :notify_date, "Notify Date", :class => "required_label"%>
-					<%=f.text_field :notify_date, :class => "form-control field-date required_field"%>
-				</div>
-				<div class="col-xs-12">
-					<%=f.label :message, "Notify Message", :class => "required_label required_label"%>
-					<%=f.text_field :message, :class => "form-control required_field"%>
-				</div>
+  <div class="panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">
+        New Notification
+        <button type="button"
+          class="close pull-right"
+          data-dismiss="modal"
+          aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
+    <div class="panel-body" style="max-height:calc(100vh - 210px);overflow-y:auto">
+      <div class="row">
+        <%=f.hidden_field :users_id, :id => "users_id"%>
+        <%=hidden_field_tag :owner_type, @table%>
+        <%=f.hidden_field :owner_id, :value => @owner_id%>
+        <%#=render "forms/form_fields",
+          :f => f,
+          :fields => @fields,
+          :record => @notification%>
+        <div class="col-xs-6 mb5">
+          <%=f.label :notify_date, "Notify Date", :class => "required_label"%>
+          <%=f.text_field :notify_date, :class => "form-control field-date required_field"%>
+        </div>
+        <div class="col-xs-12">
+          <%=f.label :message, "Notify Message", :class => "required_label required_label"%>
+          <%=f.text_field :message, :class => "form-control required_field"%>
+        </div>
 
-				<div class="col-xs-12 mt20">
-					<%=render "/shared/notification_recipients"%>
-				</div>
-			</div>
-			<%=f.submit "Save",
-				:class => "btn btn-success pull-right mt5", 
-				:disable_with => "Saving..."%>
-		</div>
-	</div>
+        <div class="col-xs-12 mt20">
+          <%=render "/shared/notification_recipients"%>
+        </div>
+      </div>
+      <%=f.submit "Save",
+        :class => "btn btn-success pull-right mt5",
+        :disable_with => "Saving..."%>
+    </div>
+  </div>
 <%end%>
 
 
 <script type="text/javascript">
-	
 
 
-	$(".send_btn").on("click",function(){
-		if ($(this).hasClass('btn-transparent')){
-			$(this).removeClass('btn-transparent').addClass('btn-danger');
-			$(this).next(".cc_btn").removeClass('btn-danger').addClass('btn-transparent');
-		}else{
-			$(this).removeClass('btn-danger').addClass('btn-transparent');
-		}
-	});
 
-	var dt = $('#recipients').DataTable({
-		"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-		"iDisplayLength": 5
-	});
+  $(".send_btn").on("click",function(){
+    if ($(this).hasClass('btn-transparent')){
+      $(this).removeClass('btn-transparent').addClass('btn-danger');
+      $(this).next(".cc_btn").removeClass('btn-danger').addClass('btn-transparent');
+    }else{
+      $(this).removeClass('btn-danger').addClass('btn-transparent');
+    }
+  });
 
-
-	$('form').on('submit', function(){
-
-		var error = false;
-		var result = true;
-		$(".required_field").css('border-color', '');
-		$(this).find('.required_field').each(function(){
-			if ($(this).val() == ""){
-				error = true;
-				result = false;
-				$(this).css('border-color', 'red');  
-				event.preventDefault();
-			}
-		});
-		if (error){
-			swal({
-				title: "Please fill in all required fields.",
-				type: "error",
-			});
-			return result;
-		}
+  var dt = $('#recipients').DataTable({
+    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+    "iDisplayLength": 5
+  });
 
 
-		var count = 0;
-		var users_id = [];
-		dt.rows().nodes().to$().each(function() {
-			if ($(this).find(".send_btn").hasClass("btn-danger")){
-				count++;
-				users_id.push($(this).attr("user"));
-			}
-		});
-		if (count == 0){
-			event.preventDefault();
-			swal({
-				title: "Message has no recipient.",
-				type: "error",
-			});
-			return false;
-		}	
-		$("#users_id").val(users_id.toString());
-	});
+  $('form').on('submit', function(){
+
+    var error = false;
+    var result = true;
+    $(".required_field").css('border-color', '');
+    $(this).find('.required_field').each(function(){
+      if ($(this).val() == ""){
+        error = true;
+        result = false;
+        $(this).css('border-color', 'red');
+        event.preventDefault();
+      }
+    });
+    if (error){
+      swal({
+        title: "Please fill in all required fields.",
+        type: "error",
+      });
+      return result;
+    }
+
+
+    var count = 0;
+    var users_id = [];
+    dt.rows().nodes().to$().each(function() {
+      if ($(this).find(".send_btn").hasClass("btn-danger")){
+        count++;
+        users_id.push($(this).attr("user"));
+      }
+    });
+    if (count == 0){
+      event.preventDefault();
+      swal({
+        title: "Message has no recipient.",
+        type: "error",
+      });
+      return false;
+    }
+    $("#users_id").val(users_id.toString());
+  });
 
 
 </script>
@@ -121,16 +121,16 @@
 
 
 <style>
-	.datepicker {
-		z-index: 1200 !important;
-	}
-	.required_label:after{
-		content: " *";
-		color: red;
-		display: inline;
+  .datepicker {
+    z-index: 1200 !important;
+  }
+  .required_label:after{
+    content: " *";
+    color: red;
+    display: inline;
   }
   .checkbox {
-  	cursor: pointer;
+    cursor: pointer;
   }
 </style>
 

@@ -1,112 +1,112 @@
 <script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
 
 <%=form_tag edit_nested_fields_templates_path, method: :post, remote: true do%>
-	<%=hidden_field_tag :field_id, @field.id%>
-	<%=hidden_field_tag :category_id, @category.id%>
-	<%=fields_for :category, @category do |f1|%>
+  <%=hidden_field_tag :field_id, @field.id%>
+  <%=hidden_field_tag :category_id, @category.id%>
+  <%=fields_for :category, @category do |f1|%>
 
 
-		<%@field.options.split(";").each do |x|%>
-			<div class="panel panel-info">
-				<div class="panel-heading click-heading">
-					<div class="panel-title"><font style="color:black"><%=x%></font></div>
-				</div>
-				<div class="panel-body"> 
-					<table class="table table-bordered">
-						<thead>
-							<tr>
-								<th>Order</th>
-								<th width="10%">Field Name</th>
-								<th>Field Type</th>
-								<th>Data Type</th>
-								<th>Size</th>
-								<th>Show Lable</th>
-								<th>Required</th>
-								<th>Print in De-ID</th>
-								<th width="30%">Options</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody class="draggableFieldGroup" id="fields">
-							<%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, index|%>
-								<%=f1.fields_for :fields, field do |f|%>
-									<tr>
-										<td>
-											<center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
-											<%=f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
-										</td>
-										<td><%=f.text_field 	:label, 																							{:class => "form-control"}%>										</td>
-										<td><%=f.select 			:display_type, 	Field.getDisplay_type, {}, 						{:class => "form-control date-type-select"}%>		</td>
-										<td><%=f.select 			:data_type, 		Field.getData_type, {}, 							{:class => "form-control"}%>										</td>
-										<td><%=f.select 			:display_size, 	Field.getDisplay_size, {}, 						{:class => "form-control"}%>										</td>
-										<td><%=f.select 			:show_label, 		[["Yes", true], ["No", false]], {}, 	{:class => "form-control"}%>										</td>
-										<td><%=f.select 			:required, 			[["Yes", true], ["No", false]], {}, 	{:class => "form-control"}%>										</td>
-										<td><%=f.select 			:print, 				[["Yes", true], ["No", false]], {}, 	{:class => "form-control"}%>										</td>
-										<td><%=f.text_area 		:options, 																						{:class => "form-control", :size => "1"}%>			</td>
-										<td>
-											
-	
-										<%if field.deleted?%>
-											<a class="btn btn-default archive_btn">Unarchive</a>
-										<%else%>
-											<a class="btn btn-warning archive_btn">Archive</a>
-										<%end%>
-										<%=f.hidden_field :deleted, :id => "delete_field"%>	
+    <%@field.options.split(";").each do |x|%>
+      <div class="panel panel-info">
+        <div class="panel-heading click-heading">
+          <div class="panel-title"><font style="color:black"><%=x%></font></div>
+        </div>
+        <div class="panel-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th width="10%">Field Name</th>
+                <th>Field Type</th>
+                <th>Data Type</th>
+                <th>Size</th>
+                <th>Show Lable</th>
+                <th>Required</th>
+                <th>Print in De-ID</th>
+                <th width="30%">Options</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody class="draggableFieldGroup" id="fields">
+              <%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, index|%>
+                <%=f1.fields_for :fields, field do |f|%>
+                  <tr>
+                    <td>
+                      <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
+                      <%=f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
+                    </td>
+                    <td><%=f.text_field   :label,                                               {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {:class => "form-control date-type-select"}%>   </td>
+                    <td><%=f.select       :data_type,     Field.getData_type, {},               {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :display_size,  Field.getDisplay_size, {},            {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+                    <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
+                    <td>
 
 
-										</td>
-									</tr>
-								<%end%>
-							<%end%>
-						</tbody>
-
-						<%=link_to_add_fields "Add a Field", f1, :fields, {nested_field_value: x, nested_field_id: @field.id}%></br>
-
-
-					</table> 
-				</div>
-			</div>
-		<%end%>
-
-	<%end%>
+                    <%if field.deleted?%>
+                      <a class="btn btn-default archive_btn">Unarchive</a>
+                    <%else%>
+                      <a class="btn btn-warning archive_btn">Archive</a>
+                    <%end%>
+                    <%=f.hidden_field :deleted, :id => "delete_field"%>
 
 
-	<%=submit_tag "Submit", :class => "btn btn-success pull-right mr20", :disable_with => "Submitting..."%>
+                    </td>
+                  </tr>
+                <%end%>
+              <%end%>
+            </tbody>
+
+            <%=link_to_add_fields "Add a Field", f1, :fields, {nested_field_value: x, nested_field_id: @field.id}%></br>
+
+
+          </table>
+        </div>
+      </div>
+    <%end%>
+
+  <%end%>
+
+
+  <%=submit_tag "Submit", :class => "btn btn-success pull-right mr20", :disable_with => "Submitting..."%>
 <%end%>
 
 
 
 
 <style>
-	.custom-swal {
-		width: 70% !important;
-		max-height: 70% !important;
-		font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		font-size: 14px;
-	}
+  .custom-swal {
+    width: 70% !important;
+    max-height: 70% !important;
+    font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
 </style>
 
 
 
 <script>
-	var fieldList = $(".draggableFieldGroup");
-	fieldList.each(function(){
-		$(this).sortable({ 
-			handle: $(this, ".drag_and_drop"),
-			forcePlaceholderSize: true,
-			cursor: "move",
-			animation: 100,
-			start: function(event, ui){
-				ui.placeholder.height(ui.item.height());
-				ui.placeholder.width(ui.item.width());
-			},
-			update: function(event, ui){
-				$('.field_group', this).each(function(index, elem) {
-					$('.form-field-order', this).val(index);
-				});
-			}
-		});
-	});
+  var fieldList = $(".draggableFieldGroup");
+  fieldList.each(function(){
+    $(this).sortable({
+      handle: $(this, ".drag_and_drop"),
+      forcePlaceholderSize: true,
+      cursor: "move",
+      animation: 100,
+      start: function(event, ui){
+        ui.placeholder.height(ui.item.height());
+        ui.placeholder.width(ui.item.width());
+      },
+      update: function(event, ui){
+        $('.field_group', this).each(function(index, elem) {
+          $('.form-field-order', this).val(index);
+        });
+      }
+    });
+  });
 
 
 

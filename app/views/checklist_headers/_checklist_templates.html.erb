@@ -1,0 +1,11 @@
+<%
+  @title = "Checklist Templates"
+  @headers = Checklist.get_meta_fields('index')
+  @table_name = "checklists"
+  @records = owner.checklists
+%>
+<%=render "/shared/record_table",
+  :btn_name => "New",
+  :btn_path => new_checklist_path,
+  :panel => 'lightskyblue'%>
+

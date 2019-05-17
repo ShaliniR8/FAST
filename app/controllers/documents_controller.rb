@@ -1,30 +1,30 @@
 class DocumentsController < ApplicationController
-	def index
-		@documents = Document.find(:all)
+  def index
+    @documents = Document.find(:all)
 
-	end
+  end
 
-	def new
-		@document = Document.new
-		@category_options = Document.get_categories
+  def new
+    @document = Document.new
+    @category_options = Document.get_categories
     @file_options = ['File Upload', 'External Link']
     if BaseConfig.airline[:has_mobile_app]
       @file_options.push('File Upload (Tracked)')
     end
-		render :partial =>"new"
-	end
+    render :partial =>"new"
+  end
 
-	def destroy
-		@document = Document.find(params[:id])
-		@document.destroy
-		redirect_to documents_path
-	end
+  def destroy
+    @document = Document.find(params[:id])
+    @document.destroy
+    redirect_to documents_path
+  end
 
-	def create
-		@document = Document.new(params[:document])
-		@document.save
-		redirect_to documents_path
-	end
+  def create
+    @document = Document.new(params[:document])
+    @document.save
+    redirect_to documents_path
+  end
 
   def download
     @document = Document.find(params[:id])
@@ -38,7 +38,7 @@ class DocumentsController < ApplicationController
     redirect_to params[:url]
   end
 
-	def revision_history
-	end
+  def revision_history
+  end
 
 end

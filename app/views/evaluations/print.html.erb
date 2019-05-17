@@ -1,43 +1,43 @@
 <div class="title">
-	Evaluation #<%=@evaluation.get_id%>: 
-	<%=@evaluation.title%>
+  Evaluation #<%=@evaluation.get_id%>:
+  <%=@evaluation.title%>
 </div>
 
 
 <div class="content">
-	<%fields = Evaluation.get_meta_fields('show')%>
-	<%=render "forms/print_fields", 
-		:fields => fields, 
-		:owner => @evaluation,
-		:deidentified => @deidentified%>
+  <%fields = Evaluation.get_meta_fields('show')%>
+  <%=render "forms/print_fields",
+    :fields => fields,
+    :owner => @evaluation,
+    :deidentified => @deidentified%>
 
-	<%@evaluation.tasks.each do |task|%>
-		<div class="col-xs-12">
-			<hr>
-			<%=render "ims/print_task", :owner => task, 
-				:deidentified => @deidentified%>
-		</div>
-	<%end%>
+  <%@evaluation.tasks.each do |task|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "ims/print_task", :owner => task,
+        :deidentified => @deidentified%>
+    </div>
+  <%end%>
 
-	<%@evaluation.contacts.each do |contact|%>
-		<div class="col-xs-12">
-			<hr>
-			<%=render "ims/print_contact", :owner => contact, 
-				:deidentified => @deidentified%>
-		</div>
-	<%end%>
+  <%@evaluation.contacts.each do |contact|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "ims/print_contact", :owner => contact,
+        :deidentified => @deidentified%>
+    </div>
+  <%end%>
 
-	<%=render "audits/print_requirements", 
-		:owner => @evaluation, 
-		:deidentified => @deidentified,
-		:fields => @requirement_headers%>
+  <%=render "audits/print_requirements",
+    :owner => @evaluation,
+    :deidentified => @deidentified,
+    :fields => @requirement_headers%>
 
-	<%@evaluation.findings.each do |finding|%>
-		<div class="col-xs-12">
-			<hr>
-			<%=render "findings/print", 
-				:owner => finding, 
-				:deidentified => @deidentified%>
-		</div>
-	<%end%>
+  <%@evaluation.findings.each do |finding|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "findings/print",
+        :owner => finding,
+        :deidentified => @deidentified%>
+    </div>
+  <%end%>
 </div>

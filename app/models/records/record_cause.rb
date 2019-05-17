@@ -8,7 +8,7 @@ class RecordCause < Cause
       {:title=>"Value",:field=>"get_value"}
     ]
   end
-  
+
   def get_value
     if self.value=="true"
       "Yes"
@@ -17,14 +17,6 @@ class RecordCause < Cause
     end
   end
 
-  # def get_attr
-  #   Rails.logger.debug "self.category=#{self.category}"
-  #   self.class.categories[self.category].each do |c|
-  #     if c[:name]==self.send('attr')
-  #       return c[:title].present? ? c[:title] : c[:name].titleize
-  #     end
-  #   end
-  #end
 
   def self.categories
     {

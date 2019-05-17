@@ -44,10 +44,10 @@ table{
     <%if @im.apply_to.present?%><b>Plan Applied To: </b><%=@im.apply_to%></br><%end%>
     <%if @im.org_type.present?%><b>Organization Type: </b><%=@im.org_type%></br><%end%>
 
-    <!-- intentionally leave this out to save print space - requested by airlines   
+    <!-- intentionally leave this out to save print space - requested by airlines
     <%if @im.obj_scope.present?%><b>Objective and Scope: </br></b><%=@im.obj_scope.gsub(/\n/, '<br/>').html_safe%></br><%end%>
     <%if @im.ref_req.present?%><b>References and Requirements: </br></b><%=@im.ref_req.gsub(/\n/, '<br/>').html_safe%><%end%></br>
-    <%if @im.instruction.present?%><b>Instructions: </br></b><%=@im.instruction.gsub(/\n/, '<br/>').html_safe%><%end%></br> 
+    <%if @im.instruction.present?%><b>Instructions: </br></b><%=@im.instruction.gsub(/\n/, '<br/>').html_safe%><%end%></br>
     <%if @im.comment.present?%><b>Reviewer Comment: </br></b><%=@im.comment.gsub(/\n/, '<br/>').html_safe%></br><%end%>-->
 
         <%@checklist_headers=Object.const_get(@im.type+'Item').get_headers%>
@@ -61,7 +61,7 @@ table{
                 <%if i.packages.present?%>
                     <%@headers=Package.get_headers%>
                     <%i.packages.each do |p|%>
-                        <div class="category">  
+                        <div class="category">
                             <h5>Package: #<%=p.get_id%></h5>
                             <%@headers.each do |h|%>
                                 <b><%=h[:title]%>: </b><%=p.send(h[:field])%></br>
@@ -81,12 +81,12 @@ table{
                             <%end%>
                         </div>
                     <%end%>
-                    
+
                 <%end%>
             </div>
         <%end%>
 
-    
+
 
 </div>
 

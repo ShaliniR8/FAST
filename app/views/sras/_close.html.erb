@@ -1,18 +1,18 @@
 <%=form_for @sra do |f|%>
-	<div class="panel-warning panel">
-		<div class="panel-heading">
-			<div class="panel-title">Complete SRA
-			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-		</div>
-		<div class="panel-body">
-			<div class="row">
-				<div class="form-group col-xs-12">
-					<%=f.label :closing_comment,"Closing Comment"%><br>
-					<%=f.text_area :closing_comment,:value=>nil,:class=>"form-control",:rows=>"10"%>
-				</div>
-				<%=f.hidden_field :status,:value=>(@sra.reviewer.present? ?  "Pending Review" : (@sra.final_approver.present? ? "Pending Approval" : "Completed" )) %>
-			</div>
-			<%=f.submit "Save",:class=>"btn btn-success pull-right mt5", :disable_with => "Saving..."%>
-		</div>
-	</div>
+  <div class="panel-warning panel">
+    <div class="panel-heading">
+      <div class="panel-title">Complete SRA
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="form-group col-xs-12">
+          <%=f.label :closing_comment,"Closing Comment"%><br>
+          <%=f.text_area :closing_comment,:value=>nil,:class=>"form-control",:rows=>"10"%>
+        </div>
+        <%=f.hidden_field :status,:value=>(@sra.reviewer.present? ?  "Pending Review" : (@sra.final_approver.present? ? "Pending Approval" : "Completed" )) %>
+      </div>
+      <%=f.submit "Save",:class=>"btn btn-success pull-right mt5", :disable_with => "Saving..."%>
+    </div>
+  </div>
 <%end%>

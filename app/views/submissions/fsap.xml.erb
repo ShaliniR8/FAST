@@ -28,7 +28,7 @@
       <%end%>
       <%category.fields.each do |field|%>
         <%sub_field=@submission.submission_fields.find_by_fields_id(field.id)%>
-        <%if sub_field.present?%> 
+        <%if sub_field.present?%>
           <%if sub_field.export.present?%>
             <%=sub_field.export%>
           <%end%>

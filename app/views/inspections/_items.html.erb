@@ -3,9 +3,9 @@
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b>Checklist</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-      </div> 
+      </div>
     </div>
-    <div class="panel-body" style="display:none"> 
+    <div class="panel-body" style="display:none">
       <%=link_to "Download",download_checklist_inspection_path(@inspection,:format=>"csv"),:class=>"btn btn-success pull-right mb5",:target=>"_blank"%>
       <table class="table table-hover" id="item_table">
         <thead>
@@ -26,7 +26,7 @@
               <tr>
                 <td colspan="<%=@checklist_headers.length%>">
                   <b>Comment: </b><%=i.comment%>
-                </td> 
+                </td>
               </tr>
             <%end%>
           <%end%>

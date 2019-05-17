@@ -1,2 +1,2 @@
-class FindingContact < Contact 
+class FindingContact < Contact
 end
