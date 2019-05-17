@@ -371,7 +371,12 @@ class AuditsController < ApplicationController
 
 # For ProSafeT App
   def get_audit
-    audit = Audit.find(params[:id])
+    audit = Audit.where(id: params[:id]).includes({
+      checklists: {
+        checklist_header: :checklist_header_items,
+        checklist_rows: :checklist_cells
+      }
+    }).first
 
     # Get all fields that will be shown
     fields = Audit.get_meta_fields('show')
@@ -381,34 +386,32 @@ class AuditsController < ApplicationController
     json_fields = fields.map{ |field| field[:field].to_sym }
 
     # Filter out all empty and not whitelisted audit fields
-    audit_json = audit
-      .as_json(
-        only: json_fields,
-        include: {
-          checklists: {
-            only: :id,
-            include: {
-              checklist_header: {
-                only: :id,
-                include: {
-                  checklist_header_items: {
-                    only: [:id, :title, :data_type, :options, :editable, :display_order]
-                  }
+    audit_json = audit.as_json(
+      only: json_fields,
+      include: {
+        checklists: {
+          only: :id,
+          include: {
+            checklist_header: {
+              only: :id,
+              include: {
+                checklist_header_items: {
+                  only: [:id, :title, :data_type, :options, :editable, :display_order]
                 }
-              },
-              checklist_rows: {
-                only: [:id, :is_header],
-                include: {
-                  checklist_cells: {
-                    only: [:id, :value, :checklist_header_item_id],
-                  }
+              }
+            },
+            checklist_rows: {
+              only: [:id, :is_header],
+              include: {
+                checklist_cells: {
+                  only: [:id, :value, :checklist_header_item_id],
                 }
               }
             }
           }
         }
-      )['audit']
-      .delete_if{ |key, value| value.blank? }
+      }
+    )['audit'].delete_if{ |key, value| value.blank? }
 
     # Takes the id of each user field and replaces it with the
     # full name of the user corresponding to that id
@@ -427,6 +430,7 @@ class AuditsController < ApplicationController
         audit_json[key] = { :title => field[:title], :value => audit_json[key] }
       end
     end
+
     render :json => audit_json
   end
 
