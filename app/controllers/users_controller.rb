@@ -298,10 +298,8 @@ class UsersController < ApplicationController
   # --------- BELOW ARE EVERYTHING ADDED FOR PROSAFET APP
   # New methods for ProSafeT App 2019 by SM
   def get_user
-    user = current_token != nil ? current_token.user : current_user
-
     # Get only the data that we need from the user
-    mobile_user_info = user.as_json(only: [:id, :full_name, :email])['user']
+    mobile_user_info = current_user.as_json(only: [:id, :full_name, :email])['user']
 
     # Get which modules the user has access to
     mobile_user_info[:mobile_module_access] = [
@@ -309,9 +307,26 @@ class UsersController < ApplicationController
       'Safety Assurance',
       # 'SMS IM',
       # 'Safety Risk Management',
-    ].select{|module_name| user.has_access(module_name, 'module')}
+    ].select{|module_name| current_user.has_access(module_name, 'module')}
 
-    # mobile_user_info[:submissions] = user.submissions.as_json(only: [
+    # Get and parse the user's notices
+    mobile_user_info[:notices] = current_user.notices.as_json(only: [
+      :id,
+      :content,
+    ]).map do |notice|
+      notice = notice['notice']
+      content = notice['content']
+      extracted_uri = URI.extract(content, /http(s)?/)[0]
+      if extracted_uri.present?
+        parsed_content = extracted_uri.chop.split('/').reverse
+        notice['owner_id'] = parsed_content[0]
+        notice['type'] = parsed_content[1]
+      end
+      notice['content'] = content.gsub(/<a.*/, '').strip
+      notice
+    end
+
+    # mobile_user_info[:submissions] = current_user.submissions.as_json(only: [
     #   :id,
     #   :templates_id,
     #   :description,
@@ -323,11 +338,13 @@ class UsersController < ApplicationController
   end
 
   def get_audits
-    user = current_token != nil ? current_token.user : current_user
+    audits = Audit
 
-    audits = Audit.where('responsible_user_id = :id OR approver_id = :id', { id: user[:id] })
-      .as_json(only: [:id, :status, :title, :completion])
-      .map {|audit| audit['audit']}
+    if !current_user.admin? || current_user.has_access('audits', 'admin')
+      audits = audits.where('responsible_user_id = :id OR approver_id = :id', { id: current_user[:id] })
+        .as_json(only: [:id, :status, :title, :completion])
+        .map {|audit| audit['audit']}
+    end
 
     render :json => audits
   end
