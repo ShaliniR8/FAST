@@ -25,8 +25,15 @@ class SessionsController < ApplicationController
 		session[:user_id] = nil
 		session[:simulated_id] = nil
 		session[:last_active] = nil
-		flash[:notice] = "You have been logged out."
-		redirect_to new_session_path
+    respond_to do |format|
+      format.html do
+    		flash[:notice] = "You have been logged out."
+    		redirect_to new_session_path
+      end
+      format.json do
+        render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
+      end
+    end
 	end
 
 
