@@ -34,7 +34,7 @@ class SmsAction < ActiveRecord::Base
 
       {                                                                                                   type: 'newline',      visible: 'show'},
       {field: 'schedule_completion_date',       title: 'Scheduled Completion Date',         num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
-      {field: 'responsible_user_id',            title: 'Responsible User Name',             num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
+      {field: 'responsible_user_id',            title: 'Responsible User',                  num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',                    title: 'Final Approver',                    num_cols: 6,  type: 'user',         visible: 'index,form,show',       required: true},
       {field: 'responsible_department',         title: 'Responsible Department',            num_cols: 6,  type: 'select',       visible: 'form,show', required: false, options: get_custom_options('Departments')},
       {                                                                                                   type: 'newline',      visible: 'form'},

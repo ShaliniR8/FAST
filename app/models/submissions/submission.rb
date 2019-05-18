@@ -31,7 +31,7 @@ class Submission < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'get_id',         title: 'Submission ID',   num_cols: 6,  type: 'text', visible: 'index,show', required: false},
+      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
       {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
