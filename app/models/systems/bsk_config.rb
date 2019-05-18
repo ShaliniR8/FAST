@@ -36,6 +36,14 @@ class BSK_Config
   end
 
 
+  OBSERVATION_PHASES = [
+    "Observation Phase",
+    "Condition",
+    "Threat", "Sub Threat",
+    "Error", "Sub Error",
+    "Human Factor", "Comment"]
+
+
 
   FAA_INFO = { #CORRECT/REVISE
     "CHDO"=>"ACE-FSDO-09",

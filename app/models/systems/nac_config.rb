@@ -37,6 +37,9 @@ class NAC_Config
   end
 
 
+  OBSERVATION_PHASES = ["Observation Phase", "Condition", "Threat", "Error", "Human Factor", "Comment"]
+
+
 
   FAA_INFO = {
     "CHDO"=>"FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
