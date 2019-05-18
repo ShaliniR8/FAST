@@ -389,7 +389,7 @@ class AuditsController < ApplicationController
       only: json_fields, # Filter out audit fields that aren't whitelisted
       include: { # Include checklist data required for mobile
         checklists: {
-          only: :id,
+          only: [:id, :title],
           include: {
             checklist_header: {
               only: :id,
