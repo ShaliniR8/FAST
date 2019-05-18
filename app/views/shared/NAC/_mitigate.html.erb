@@ -1,4 +1,3 @@
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <div class="panel panel-warning">
   <div class="panel-heading">
     <div class="panel-title">
@@ -7,19 +6,19 @@
     </div>
   </div>
   <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto;">
-    <%=form_for @owner  do |f|%>
+    <%=form_for @owner do |f|%>
+
       <%=f.hidden_field :severity_after,    :value => "", :id => "sev"%>
       <%=f.hidden_field :likelihood_after,  :value => "", :id => "like"%>
-
+      <%=f.hidden_field :risk_factor_after, :value => "", :id => "risk_fact"%>
 
       <div class="form-group col-xs-12">
+        <%=render "shared/instructions", :instruction =>
+          "Select <b>Mitigated Probability</b> and <b>Mitigated Severity</b> from the table to assess risk."%>
+
         <%=f.label :statement, "Notes"%>
         <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
       </div>
-
-      <%=render "shared/instructions", :instruction =>
-        "Select <b>Mitigated Probability</b> and <b>Mitigated Severity</b> from the table to assess risk."
-      %>
 
       <div class="col-xs-12 col-sm-12 col-md-12">
         <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
@@ -31,7 +30,7 @@
       </div>
 
       <div class="col-xs-12">
-        <%=f.submit "Submit",:class=>"btn btn-success pull-right mr5", disable_with: "Submitting..."%>
+        <%=f.submit "Save Mitigated Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
       </div>
     <%end%>
   </div>
@@ -121,12 +120,13 @@
         probability_checked++;
       }
     });
-    if (probability_checked>0 && severity_checked>0){
-      mitigate(Math.min(...probabilities), Math.min(...severities));
+    if (probability_checked > 0 && severity_checked > 0){
+      mitigate(Math.min.apply(null, probabilities), Math.min.apply(null, severities));
     }else{
       clear_mitigate();
     }
   }
+
 
   function clear_mitigate(){
     $('.mitigate_risk_td').each(function(){
@@ -137,11 +137,14 @@
 
   function mitigate(row_index,column_index){
     clear_mitigate();
+    risk_table_def = <%=NAC_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=NAC_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.mitigate_risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-ok style='color:black'></span>");
-        $('#sev').val(row_index);
-        $('#like').val(column_index);
+        $('#sev').val(column_index);
+        $('#like').val(row_index);
+        $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
       }
     });
   }
