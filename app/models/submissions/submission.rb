@@ -30,7 +30,7 @@ class Submission < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'get_id',         title: 'Submission ID',   num_cols: 6,  type: 'text', visible: 'index,show', required: false},
+      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
       {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
@@ -385,7 +385,7 @@ class Submission < ActiveRecord::Base
       converted = self.class.create({
         :anonymous        => self.anonymous,
         :templates_id     => temp_id,
-        :description      => self.description + " --Copy of ##{self.id}",
+        :description      => self.description + " -- dual report of ##{self.id}",
         :event_date       => self.event_date,
         :user_id          => self.user_id,
         :event_time_zone  => self.event_time_zone,
@@ -396,15 +396,16 @@ class Submission < ActiveRecord::Base
       columns = [:value, :fields_id, :submissions_id]
       values = []
       new_temp.fields.each do |field|
-        values << [mapped_fields[field.id] || "", field.id, converted.id]
+        values << [mapped_fields[field.id], field.id, converted.id]
       end
-
-      values.each do |value|
-        SubmissionField.create({
-          :value => value[0],
-          :fields_id => value[1],
-          :submissions_id => value[2],
-        })
+      SubmissionField.transaction do
+        values.each do |value|
+          SubmissionField.create({
+            :value => value[0],
+            :fields_id => value[1],
+            :submissions_id => value[2]
+          })
+        end
       end
 
       #SubmissionField.import columns, values, validate: false

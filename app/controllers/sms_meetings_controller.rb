@@ -153,7 +153,11 @@ class SmsMeetingsController < ApplicationController
   end
 
   def index
-    @records=Object.const_get(params[:type]).find(:all)
+    @records=Object.const_get(params[:type]).includes(:invitations, :host)
+    unless current_user.admin?
+      @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+        current_user.id, ['Pending', 'Accepted'], current_user.id)
+    end
     @headers=SmsMeeting.get_headers
     @type = ''
     if params[:type] == "VpMeeting"

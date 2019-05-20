@@ -12,8 +12,8 @@
           </div>
           <div class="top_buttons pull-right">
             <%if current_user.admin? ||
-                  current_user.has_access('sras', 'admin') ||
-                  current_user.has_access("sras", "destroy")%>
+                  current_user.has_access('risk_controls', 'admin') ||
+                  current_user.has_access("risk_controls", "destroy")%>
               <%=link_to "Delete",
                 risk_control_path(@risk_control),
                 :method => "delete",
@@ -22,7 +22,7 @@
             <%end%>
 
             <%if current_user.admin? ||
-                  current_user.has_access('sras','admin')%>
+                  current_user.has_access('risk_controls','admin')%>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',
@@ -32,8 +32,8 @@
 
             <%if @risk_control.status != 'Completed' && (
                     current_user.admin? ||
-                    current_user.has_access('sras','admin') ||
-                    current_user.has_access("sras", "edit"))%>
+                    current_user.has_access('risk_controls','admin') ||
+                    current_user.has_access("risk_controls", "edit"))%>
               <%=link_to "Edit",
                 edit_risk_control_path(@risk_control),
                 :class => "btn btn-warning pull-right mr5 mb5",
@@ -79,7 +79,7 @@
             <%when 'New', 'Open'%>
               <%if @risk_control.approver == current_user ||
                     current_user.admin? ||
-                    current_user.has_access('sras','admin') %>
+                    current_user.has_access('risk_controls','admin') %>
                 <%=link_to  "Assign", '#',
                   :id => 'assign_btn',
                   :class=>"btn btn-warning pull-right mr5 mb5",
@@ -143,7 +143,7 @@
           :owner => @risk_control,
           :cause_type => 'description',
           :can_change => (@risk_control.status == "Open" || @risk_control.status == "New") &&
-              current_user.has_access("sras", "edit")%>
+              current_user.has_access("risk_controls", "edit")%>
 
         <%=render "/sms_actions/cost", :owner => @risk_control%>
         <%=render "/forms/show_comment", :owner => @risk_control%>

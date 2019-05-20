@@ -25,18 +25,18 @@
             :color_matrix => color_matrix,
             :frequency => frequency,
             :allow_mitigate => false,
-            :show_btns => show_btns%>
+            :show_btns => false%>
         <%else%>
           <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
             :owner => hazard,
             :allow_mitigate => false,
             :allow_baseline => false,
-            :show_btns => show_btns%>
+            :show_btns => false%>
         <%end%>
 
         <%if BaseConfig.airline[:has_root_causes] && hazard.root_causes.present?%>
-          <div class="col-xs-12"%>
-            <div class="panel clickable panel-info">
+          <div class="col-xs-12">
+            <div class="panel clickable panel-lightskyblue">
               <div class="panel-heading click-heading collapsed">
                 <div class="panel-title">
                   <b>Root Causes</b>
@@ -46,12 +46,10 @@
                 </div>
               </div>
               <div class="panel-body" style="display:none">
-                <div class="row">
                   <%=render '/root_causes/root_causes_table',
                     :owner => hazard,
                     :show_btns => false,
                     :headers => HazardRootCause.get_headers%>
-                </div>
               </div>
             </div>
           </div>

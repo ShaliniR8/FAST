@@ -70,6 +70,7 @@ module ControllerAuthentication
 
 
   def login_required
+    puts "Login required"
     unless logged_in?
       store_target_location
       redirect_to login_url, :alert => "You need to log in first to access this page."

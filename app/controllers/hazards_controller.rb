@@ -328,7 +328,7 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     mitigate_special_matrix("hazard", "mitigated_severity", "mitigated_probability")
-    if BaseConfig.airline[:base_risk_matrix]
+    if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/mitigate"
     else
       render :partial=>"shared/#{BaseConfig.airline[:code]}/mitigate"
@@ -341,7 +341,7 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     form_special_matrix(@owner, "hazard", "severity_extra", "probability_extra")
-    if BaseConfig.airline[:base_risk_matrix]
+    if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/baseline"
     else
       render :partial=>"shared/#{BaseConfig.airline[:code]}/baseline"

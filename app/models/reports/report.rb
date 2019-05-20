@@ -25,7 +25,6 @@ class Report < ActiveRecord::Base
 
   before_create :set_priveleges
   after_create :set_name
-  after_save   :check_records
   before_create :set_extra
 
   extend AnalyticsFilters
@@ -151,14 +150,6 @@ class Report < ActiveRecord::Base
     end
   end
 
-  def check_records
-    if self.status=="Closed"
-      self.records.each do |r|
-        r.status="Closed"
-        r.save
-      end
-    end
-  end
 
   def set_name
     if self.name.blank?

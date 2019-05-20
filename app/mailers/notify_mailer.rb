@@ -25,7 +25,7 @@ class NotifyMailer < ActionMailer::Base
     @record = record
     @record_url = g_link(record)
     subject = "ProSafeT: #{subject}"
-    if BaseConfig.airline_config[:enable_mailer]
+    if BaseConfig.airline[:enable_mailer]
       if Rails.env.production?
         mail(:to => user.email, :subject => subject).deliver
       else

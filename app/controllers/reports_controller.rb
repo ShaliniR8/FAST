@@ -242,6 +242,7 @@ class ReportsController < ApplicationController
         content:  "#{params[:commit]} - ##{@owner.id}",
         stamp:    Time.now)
     when 'Close Event'
+      close_records(@owner)
       redirect_path = params[:redirect_path]
     end
 
@@ -278,12 +279,6 @@ class ReportsController < ApplicationController
   def close
     @fields = Report.get_meta_fields('close')
     @report = Report.find(params[:id])
-    @dispositions = Report.dispositions
-    @company_dis = Report.company_dis
-    @frequency = (0..4).to_a.reverse
-    @like = Record.get_likelihood
-    risk_matrix_initializer
-    form_special_matrix(@report, "report", "severity_extra", "probability_extra")
     render :partial => 'reports/close'
   end
 
@@ -471,5 +466,32 @@ class ReportsController < ApplicationController
     render :partial => "airports"
     #render :partial => "records/record_table"
   end
+
+
+  private
+
+  def close_records(owner)
+    owner.records.each do |record|
+      if record.status != 'Closed'
+        record.status = 'Closed'
+        record.save
+        submission = record.submission
+        notify(record.submission.created_by,
+          "Your submission ##{submission.id} has been closed by analyst." + g_link(submission),
+          true, "Submission ##{submission.id} Closed")
+        SubmissionTransaction.create(
+          users_id: current_user.id,
+          action:   'Close',
+          owner_id: submission.id,
+          stamp:    Time.now)
+        RecordTransaction.create(
+          users_id: current_user.id,
+          action:   'Close',
+          owner_id: record.id,
+          stamp:    Time.now)
+      end
+    end
+  end
+
 
 end

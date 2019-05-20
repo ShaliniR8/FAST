@@ -1,5 +1,5 @@
 <div class="title">
-  Report <%="##{owner.get_id}: #{owner.template.name} "%>
+  Report <%="##{owner.get_id}: #{owner.template.name} - #{owner.get_description}"%>
 </div>
 
 <div class="content">
@@ -21,18 +21,13 @@
 
       <%if cat.id == 338%>
         <div class="category">
-          <h5><span style="color:black"><%=cat.title%></span></h5>
+          <div class="sub_sub_title"><%=cat.title%></div>
           <table id="observation_phases_table" class="table table-bordered" width="100%">
             <thead>
               <tr>
-                <th>Observation Phase</th>
-                <th>Condition</th>
-                <th>Threat</th>
-                <th>Sub Threat</th>
-                <th>Error</th>
-                <th>Sub Error</th>
-                <th>Human Factor</th>
-                <th>Comment</th>
+                <%BaseConfig.observation_phases.each do |x|%>
+                  <th><%=x%></th>
+                <%end%>
               </tr>
             </thead>
             <tbody>

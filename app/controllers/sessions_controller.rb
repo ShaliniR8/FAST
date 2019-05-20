@@ -6,13 +6,13 @@ class SessionsController < ApplicationController
     @categories = Category.all
   end
 
-  def create
-            puts "== crea#{session[:return_to]}"
 
+  def create
+    puts "== crea#{session[:return_to]}"
     user = User.authenticate(params[:login], params[:password])
     if user
       session[:user_id] = user.id
-      session[:mode]=""
+      session[:mode] = ""
       session[:last_active] = Time.now
       redirect_to_target_or_default(root_url)
     else
@@ -20,6 +20,7 @@ class SessionsController < ApplicationController
       render :new
     end
   end
+
 
   def destroy
     session[:user_id] = nil

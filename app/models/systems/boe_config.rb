@@ -2,7 +2,7 @@ class BOE_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.2",
+      :version                                        => "1.0.3",
 
       :code                                           => "BOE",
       :time_zone                                      => "Central Time (US & Canada)",
@@ -24,11 +24,12 @@ class BOE_Config
       :enable_orm                                     => false,
       :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '3',
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
-      :has_root_causes                                => true,
+      :has_root_causes                                => false,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
