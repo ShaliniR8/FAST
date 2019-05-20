@@ -1,115 +1,115 @@
 $("#chart_area").append("<%= escape_javascript(render('/records/draw_chart'))%>");
 
 
-	function drawBarChart(){
-		console.log("draw bar chart");
-		$("chart_div").html("");
-		var data = new google.visualization.DataTable();
-		data.addColumn("string", "Value");
-		data.addColumn("number", "Count");
-		data.addColumn({type: "string", role: "tooltip"});
-		data.addColumn({type: "string", role: "annotationText"});
-		data.addColumn({type: "string", role: "style"});
-		data.addRows([
-			<%@data.each_with_index do |(k, v), index|%>
-				<%="['#{index+1}', #{v}, '#{k}', '#{k}',"%> colorArray[<%=index%>]],
-			<%end%>);
-		var view = new google.visualization.DataView(data);
-		view.setColumns([0, 1,
-			{	calc: "stringify",
-				sourceColumn: 1,
-				type: "string",
-				role: "annotation"
-			}, 2, 3, 4]);
-		var options = {
-			height: 500,
-			title: "Analytics of <%=raw(@label)%>",
-			titleTextStyle: {color: "black", fontSize: 18, bold: true},
-			legend: { position: 'none'},
-			bar: {groupWidth: "90%"},
-		};
-		var barChart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-		google.visualization.events.addListener(barChart, 'onmouseover', uselessHandler2);
-		google.visualization.events.addListener(barChart, 'onmouseout', uselessHandler3);
-		google.visualization.events.addListener(barChart, "select", function(){
-			// URI Encode
-			var selections = barChart.getSelection();
-			if(selections.length > 0){
-				var item = selections[0];
-				var value = encodeURIComponent(data.getValue(item.row, 3));
-				// If "All" is selected, search based on label 
-				if ($("#template_select").val() == "All"){ 
-					var field_label = "<%=URI.encode(@label, /\W/)%>";
-				// If template is specified, search based on field ID
-				}else{
-				}
-			}
-		});		
-		google.visualization.events.addListener(barChart, 'ready', function () {
-			document.getElementById('chart_download').innerHTML = '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
-		});
-		barChart.draw(view, options);
-	}
+  function drawBarChart(){
+    console.log("draw bar chart");
+    $("chart_div").html("");
+    var data = new google.visualization.DataTable();
+    data.addColumn("string", "Value");
+    data.addColumn("number", "Count");
+    data.addColumn({type: "string", role: "tooltip"});
+    data.addColumn({type: "string", role: "annotationText"});
+    data.addColumn({type: "string", role: "style"});
+    data.addRows([
+      <%@data.each_with_index do |(k, v), index|%>
+        <%="['#{index+1}', #{v}, '#{k}', '#{k}',"%> colorArray[<%=index%>]],
+      <%end%>);
+    var view = new google.visualization.DataView(data);
+    view.setColumns([0, 1,
+      { calc: "stringify",
+        sourceColumn: 1,
+        type: "string",
+        role: "annotation"
+      }, 2, 3, 4]);
+    var options = {
+      height: 500,
+      title: "Analytics of <%=raw(@label)%>",
+      titleTextStyle: {color: "black", fontSize: 18, bold: true},
+      legend: { position: 'none'},
+      bar: {groupWidth: "90%"},
+    };
+    var barChart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    google.visualization.events.addListener(barChart, 'onmouseover', uselessHandler2);
+    google.visualization.events.addListener(barChart, 'onmouseout', uselessHandler3);
+    google.visualization.events.addListener(barChart, "select", function(){
+      // URI Encode
+      var selections = barChart.getSelection();
+      if(selections.length > 0){
+        var item = selections[0];
+        var value = encodeURIComponent(data.getValue(item.row, 3));
+        // If "All" is selected, search based on label
+        if ($("#template_select").val() == "All"){
+          var field_label = "<%=URI.encode(@label, /\W/)%>";
+        // If template is specified, search based on field ID
+        }else{
+        }
+      }
+    });
+    google.visualization.events.addListener(barChart, 'ready', function () {
+      document.getElementById('chart_download').innerHTML = '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
+    });
+    barChart.draw(view, options);
+  }
 
 
-	function drawPieChart(){
-		console.log("draw pie chart");
-		$("chart_div").html("");
-		var data = new google.visualization.DataTable();
-		data.addColumn("string", "Value");
-		data.addColumn("number", "Count");
-		data.addColumn({type: "string", role: "tooltip"});
-		data.addColumn({type: "string", role: "annotationText"});
-		data.addColumn({type: "string", role: "style"});
-		data.addRows([
-			<%@data.each_with_index do |(k, v), index|%>
-				<%="['#{k}', #{v}, '#{k}', '#{k}',"%> colorArray[<%=index%>]],
-			<%end%>);
+  function drawPieChart(){
+    console.log("draw pie chart");
+    $("chart_div").html("");
+    var data = new google.visualization.DataTable();
+    data.addColumn("string", "Value");
+    data.addColumn("number", "Count");
+    data.addColumn({type: "string", role: "tooltip"});
+    data.addColumn({type: "string", role: "annotationText"});
+    data.addColumn({type: "string", role: "style"});
+    data.addRows([
+      <%@data.each_with_index do |(k, v), index|%>
+        <%="['#{k}', #{v}, '#{k}', '#{k}',"%> colorArray[<%=index%>]],
+      <%end%>);
 
-		var view = new google.visualization.DataView(data);
-		view.setColumns([0, 1,
-			{	calc: "stringify",
-				sourceColumn: 1,
-				type: "string",
-				role: "annotation"
-			}, 2, 3, 4]);
-		var options = {
-			height: 500,
-			title: "Analytics of <%=@field.label%>",
-			titleTextStyle: {color: "black", fontSize: 18, bold: true},
-			legend: {position: 'labeled'},
-			colors: colorArray,
-			pieSliceTextStyle: { color: 'black'},
-			pieSliceText: 'annotationText',
-			chartArea: {  height: "40%", width: "95%" },
-			tooltip: {textStyle: {color: 'black'}, showColorCode: true},
-		};
-		var pieChart = new google.visualization.PieChart(document.getElementById('chart_div'));
-		google.visualization.events.addListener(pieChart, 'onmouseover', uselessHandler2);
-		google.visualization.events.addListener(pieChart, 'onmouseout', uselessHandler3);
-		google.visualization.events.addListener(pieChart, "select", function(){
-			// URI Encode
-			var selections = pieChart.getSelection();
-			if(selections.length > 0){
-				var row = selections[0].row;
-				var value = encodeURIComponent(data.getValue(row, 0));
-				// If "All" is selected, search based on label 
-				if ($("#template_select").val() == "All"){ 
-					var field_label = "<%=URI.encode(@label, /\W/)%>";
-				// If template is specified, search based on field ID
-				}else{
-				}
-			}
-		});		
-		google.visualization.events.addListener(pieChart, 'ready', function () {
-			document.getElementById('chart_download').innerHTML = '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
-		});
-		pieChart.draw(view, options);
-	}
+    var view = new google.visualization.DataView(data);
+    view.setColumns([0, 1,
+      { calc: "stringify",
+        sourceColumn: 1,
+        type: "string",
+        role: "annotation"
+      }, 2, 3, 4]);
+    var options = {
+      height: 500,
+      title: "Analytics of <%=@field.label%>",
+      titleTextStyle: {color: "black", fontSize: 18, bold: true},
+      legend: {position: 'labeled'},
+      colors: colorArray,
+      pieSliceTextStyle: { color: 'black'},
+      pieSliceText: 'annotationText',
+      chartArea: {  height: "40%", width: "95%" },
+      tooltip: {textStyle: {color: 'black'}, showColorCode: true},
+    };
+    var pieChart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    google.visualization.events.addListener(pieChart, 'onmouseover', uselessHandler2);
+    google.visualization.events.addListener(pieChart, 'onmouseout', uselessHandler3);
+    google.visualization.events.addListener(pieChart, "select", function(){
+      // URI Encode
+      var selections = pieChart.getSelection();
+      if(selections.length > 0){
+        var row = selections[0].row;
+        var value = encodeURIComponent(data.getValue(row, 0));
+        // If "All" is selected, search based on label
+        if ($("#template_select").val() == "All"){
+          var field_label = "<%=URI.encode(@label, /\W/)%>";
+        // If template is specified, search based on field ID
+        }else{
+        }
+      }
+    });
+    google.visualization.events.addListener(pieChart, 'ready', function () {
+      document.getElementById('chart_download').innerHTML = '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
+    });
+    pieChart.draw(view, options);
+  }
 
-	function uselessHandler2() {
-		$('#chart_div').css('cursor','pointer');
-	}  
-	function uselessHandler3() {
-		$('#chart_div').css('cursor','default');
-	} 
+  function uselessHandler2() {
+    $('#chart_div').css('cursor','pointer');
+  }
+  function uselessHandler3() {
+    $('#chart_div').css('cursor','default');
+  }

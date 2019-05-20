@@ -1,5 +1,5 @@
 class ReportAttachment < Attachment
-	belongs_to :report, foreign_key:"owner_id", class_name: "Report"
+  belongs_to :report, foreign_key:"owner_id", class_name: "Report"
 
   after_create :create_transaction
   before_destroy :delete_transaction

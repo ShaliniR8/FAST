@@ -7,292 +7,292 @@
 <%=render "access_controls/new_modal"%>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%=render "shared/alerts"%>
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<div class="top_text">
-						Corrective Action #<%=corrective_action.get_id%>: <%=corrective_action.title%>
-					</div>
-					<div class="top_buttons pull-right">
-						<%if current_user.admin? ||
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            Corrective Action #<%=corrective_action.get_id%>: <%=corrective_action.title%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%if current_user.admin? ||
                   current_user.has_access(@type, 'admin') ||
                   current_user.has_access(@type,'destroy') %>
-							<%=link_to "Delete",
-								sms_action_path(corrective_action),
-								:method => "delete",
-								:confirm => 'Are you sure?',
-								:class => "btn btn-danger pull-right mr5 mb5"%>
-						<%end%>
+              <%=link_to "Delete",
+                sms_action_path(corrective_action),
+                :method => "delete",
+                :confirm => 'Are you sure?',
+                :class => "btn btn-danger pull-right mr5 mb5"%>
+            <%end%>
 
-						<%if current_user.admin? ||
+            <%if current_user.admin? ||
                   current_user.has_access(@type,'admin')%>
-							<%=link_to 'Override Status', '#',
-								:class => 'btn btn-danger pull-right mr5 mb5',
-								:id => 'override_status_btn',
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
+              <%=link_to 'Override Status', '#',
+                :class => 'btn btn-danger pull-right mr5 mb5',
+                :id => 'override_status_btn',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
 
-						<%if @corrective_action.status != 'Completed' && (
+            <%if @corrective_action.status != 'Completed' && (
                   current_user.admin? ||
                   current_user.has_access(@type,'admin') ||
                   current_user.has_access(@type, "edit"))%>
-							<%=link_to "Edit",
-								edit_sms_action_path(corrective_action),
-								:class => "btn btn-warning pull-right mr5 mb5",
-								:disable_with => "Editing..."%>
-						<%end%>
+              <%=link_to "Edit",
+                edit_sms_action_path(corrective_action),
+                :class => "btn btn-warning pull-right mr5 mb5",
+                :disable_with => "Editing..."%>
+            <%end%>
 
-						<%=link_to "De-ID PDF",
-							print_sms_action_path(
-								@sms_action,
-								:deidentified => true,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "De-ID PDF",
+              print_sms_action_path(
+                @sms_action,
+                :deidentified => true,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-						<%=link_to "PDF",
-							print_sms_action_path(
-								@corrective_action,
-								:deidentified => false,
-								:format => :pdf),
-							:class => "btn btn-darkturquoise pull-right mr5 mb5"%>
+            <%=link_to "PDF",
+              print_sms_action_path(
+                @corrective_action,
+                :deidentified => false,
+                :format => :pdf),
+              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
 
-						<%if corrective_action.type == "FindingAction"%>
-							<%=link_to "View Finding",
-								finding_path(corrective_action.finding),
-								:class => "btn btn-info pull-right mr5 mb5",
-								:disable_with => "Redirecting..."%>
+            <%if corrective_action.type == "FindingAction"%>
+              <%=link_to "View Finding",
+                finding_path(corrective_action.finding),
+                :class => "btn btn-info pull-right mr5 mb5",
+                :disable_with => "Redirecting..."%>
 
-						<%elsif corrective_action.type == "InvestigationAction"%>
-							<%=link_to "View Investigation",
-								investigation_path(corrective_action.investigation),
-								:class => "btn btn-info pull-right mr5 mb5",
-								:disable_with => "Redirecting..."%>
-						<%end%>
+            <%elsif corrective_action.type == "InvestigationAction"%>
+              <%=link_to "View Investigation",
+                investigation_path(corrective_action.investigation),
+                :class => "btn btn-info pull-right mr5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
 
-						<%if BaseConfig.airline[:allow_set_alert]%>
-							<%=link_to "Set Alert",
-								"#",
-								:class => "btn btn-success pull-right mr5 mb5",
-								:id => "alert_btn",
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
+            <%if BaseConfig.airline[:allow_set_alert]%>
+              <%=link_to "Set Alert",
+                "#",
+                :class => "btn btn-success pull-right mr5 mb5",
+                :id => "alert_btn",
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
 
-						<%=link_to "Send Message",
-							new_message_path(:link => sms_action_path(corrective_action),
-							:link_type => "SmsAction",
-							:link_id => corrective_action.id),
-							:class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Send Message",
+              new_message_path(:link => sms_action_path(corrective_action),
+              :link_type => "SmsAction",
+              :link_id => corrective_action.id),
+              :class => "btn btn-warning pull-right mr5 mb5"%>
 
-						<%=link_to "Expand All", "#",
-							:class => "btn btn-default mr5 expandall pull-right mb5"%>
-					</div>
-				</div>
-			</div>
+            <%=link_to "Expand All", "#",
+              :class => "btn btn-default mr5 expandall pull-right mb5"%>
+          </div>
+        </div>
+      </div>
 
-			<div class="panel-body">
-				<div class="col-xs-12 mb15">
-					<%if corrective_action.status == "New"%>
-						<%if corrective_action.can_assign?%>
+      <div class="panel-body">
+        <div class="col-xs-12 mb15">
+          <%if corrective_action.status == "New"%>
+            <%if corrective_action.can_assign?%>
               <%if @corrective_action.approver == current_user ||
                     current_user.admin? ||
                     current_user.has_access(@type,'admin')%>
-  							<%= link_to 'Assign', '#',
-  								:id => 'assign_btn',
-  								:class => 'btn btn-warning pull-right mr5',
-  								'data-toggle' => 'modal',
-  								'data-target' => '.bs-example-modal-lg' %>
+                <%= link_to 'Assign', '#',
+                  :id => 'assign_btn',
+                  :class => 'btn btn-warning pull-right mr5',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg' %>
               <%end%>
-						<%else%>
-								<b style='color:red;'>
-									*Please complete the Source of Input before assigning the Corrective Action.
-								</b>
-						<%end%>
+            <%else%>
+                <b style='color:red;'>
+                  *Please complete the Source of Input before assigning the Corrective Action.
+                </b>
+            <%end%>
 
-					<%elsif corrective_action.status == 'Assigned'%>
-						<%if corrective_action.can_complete? current_user%>
-							<%=link_to "Complete", '#',
-								:class => "btn btn-success pull-right complete_btn mr5 mb5",
-								:id => 'complete',
-								'data-toggle' => 'modal',
-								'data-target' => '.bs-example-modal-lg'%>
+          <%elsif corrective_action.status == 'Assigned'%>
+            <%if corrective_action.can_complete? current_user%>
+              <%=link_to "Complete", '#',
+                :class => "btn btn-warning pull-right complete_btn mr5 mb5",
+                :id => 'complete',
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg'%>
 
-							<%=link_to "Add Cost", "#",
-								:class => "btn btn-success pull-right mr5 mb5",
-								:id => "cost_btn",
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
+              <%=link_to "Add Cost", "#",
+                :class => "btn btn-success pull-right mr5 mb5",
+                :id => "cost_btn",
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
 
-							<%if BaseConfig.airline[:has_extension]%>
-								<%=link_to "Request Extension", "#",
-									:class => "btn btn-warning pull-right mr5",
-									:id => "extension_btn",
-									"data-toggle" => "modal",
-									"data-target" => ".bs-example-modal-lg"%>
-							<%end%>
-						<%end%>
+              <%if BaseConfig.airline[:has_extension]%>
+                <%=link_to "Request Extension", "#",
+                  :class => "btn btn-warning pull-right mr5",
+                  :id => "extension_btn",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
+            <%end%>
 
-					<%elsif corrective_action.status == "Pending Approval" %>
-						<%if corrective_action.can_approve? current_user%>
-							<%=link_to "Approve", "#",
-								:class => "btn btn-success pull-right mr5 approve_btn mb5",
-								:id => 'approve',
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-							<%=link_to "Reject", "#",
-								:class => "btn btn-danger pull-right mr5 approve_btn mb5",
-								:id => 'reject',
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
+          <%elsif corrective_action.status == "Pending Approval" %>
+            <%if corrective_action.can_approve? current_user%>
+              <%=link_to "Approve", "#",
+                :class => "btn btn-success pull-right mr5 approve_btn mb5",
+                :id => 'approve',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+              <%=link_to "Reject", "#",
+                :class => "btn btn-danger pull-right mr5 approve_btn mb5",
+                :id => 'reject',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
 
-					<%elsif corrective_action.status == "Completed"%>
+          <%elsif corrective_action.status == "Completed"%>
 
-						<%if BaseConfig.airline[:has_verification]%>
-							<%=link_to "Schedule Verification", "#",
-								:class => "btn btn-warning pull-right mr5",
-								:id => "verification_btn",
-								"data-toggle" => "modal",
-								"data-target" => ".bs-example-modal-lg"%>
-						<%end%>
-						<%if corrective_action.can_reopen? current_user%>
-							<%=link_to "Reopen",
-								reopen_sms_action_path(corrective_action),
-								:class => "btn btn-success pull-right mr5",
-								:disable_with => "Reopening...",
-								:confirm => "Are you sure?"%>
-						<%end%>
-					<%end%>
-				</div>
+            <%if BaseConfig.airline[:has_verification]%>
+              <%=link_to "Schedule Verification", "#",
+                :class => "btn btn-warning pull-right mr5",
+                :id => "verification_btn",
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
+            <%if corrective_action.can_reopen? current_user%>
+              <%=link_to "Reopen",
+                reopen_sms_action_path(corrective_action),
+                :class => "btn btn-success pull-right mr5",
+                :disable_with => "Reopening...",
+                :confirm => "Are you sure?"%>
+            <%end%>
+          <%end%>
+        </div>
 
-				<%=render "/sms_actions/show", :owner => @corrective_action, :show_btn => true%>
-				<%=render "/forms/attachments_show", :owner => @corrective_action%>
-				<%=render "/records/transactions", :owner => @corrective_action%>
+        <%=render "/sms_actions/show", :owner => @corrective_action, :show_btn => true%>
+        <%=render "/forms/attachments_show", :owner => @corrective_action%>
+        <%=render "/records/transactions", :owner => @corrective_action%>
 
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <style>
-	.datepicker{
-		z-index: 1200!important;
-	}
+  .datepicker{
+    z-index: 1200!important;
+  }
 </style>
 
 
 <script>
-	$(document).ready(function(){
+  $(document).ready(function(){
 
-		$("#extension_btn").on("click", function(){
-			$.get("<%=new_extension_request_path(
-					:owner_type => corrective_action.class.base_class.name,
-					:owner_id => corrective_action,
-					:user_id => corrective_action.approver.id)%>",
-					function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-
-
-		$("#verification_btn").on("click", function(){
-			$.get("<%=new_verification_path(
-					:owner_type => corrective_action.class.base_class.name,
-					:owner_id => corrective_action,
-					:user_id => corrective_action.approver.id)%>",
-					function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $("#extension_btn").on("click", function(){
+      $.get("<%=new_extension_request_path(
+          :owner_type => corrective_action.class.base_class.name,
+          :owner_id => corrective_action,
+          :user_id => (corrective_action.approver.id rescue nil))%>",
+          function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
 
-		$("#alert_btn").on('click', function(){
-			$.get("<%=new_notification_path(
-					:owner_type => corrective_action.class.name,
-					:owner_id => corrective_action)%>",
-					function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $("#verification_btn").on("click", function(){
+      $.get("<%=new_verification_path(
+          :owner_type => corrective_action.class.base_class.name,
+          :owner_id => corrective_action,
+          :user_id => (corrective_action.approver.id rescue nil))%>",
+          function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#assign_btn').on('click',function(){
-			$.get("<%=assign_sms_action_path(@corrective_action)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
 
-		$("#reassign_btn").on('click',function(){
-			$.get("<%=reassign_sms_action_path(corrective_action)%>",
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $("#alert_btn").on('click', function(){
+      $.get("<%=new_notification_path(
+          :owner_type => corrective_action.class.name,
+          :owner_id => corrective_action)%>",
+          function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$("#cost_btn").on('click',function(){
-			$.get("<%=new_cost_sms_action_path(corrective_action)%>",
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#assign_btn').on('click',function(){
+      $.get("<%=assign_sms_action_path(@corrective_action)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$(".complete_btn").on('click', function(){
-			var commit=$(this).attr('id');
-			$.get("<%=complete_sms_action_path(corrective_action)%>?commit=" + commit,
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $("#reassign_btn").on('click',function(){
+      $.get("<%=reassign_sms_action_path(corrective_action)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('.approve_btn').on('click',function(){
-			var commit=$(this).attr('id');
-			$.get("<%=approve_sms_action_path(corrective_action)%>?commit=" + commit,
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $("#cost_btn").on('click',function(){
+      $.get("<%=new_cost_sms_action_path(corrective_action)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#att_btn').on('click',function(){
-			$.get("<%=new_attachment_sms_action_path(corrective_action)%>",
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $(".complete_btn").on('click', function(){
+      var commit=$(this).attr('id');
+      $.get("<%=complete_sms_action_path(corrective_action)%>?commit=" + commit,
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#mitigate_btn').on('click', function(){
-			$.get("<%=mitigate_sms_action_path(corrective_action)%>",
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('.approve_btn').on('click',function(){
+      var commit=$(this).attr('id');
+      $.get("<%=approve_sms_action_path(corrective_action)%>?commit=" + commit,
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#baseline_btn').on('click', function(){
-			$.get("<%=baseline_sms_action_path(corrective_action)%>",
-				function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_sms_action_path(corrective_action)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-		$('#override_status_btn').on('click',function(){
-			$.get("<%=override_status_sms_action_path(@sms_action)%>", function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
+    $('#mitigate_btn').on('click', function(){
+      $.get("<%=mitigate_sms_action_path(corrective_action)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
 
-	});
+    $('#baseline_btn').on('click', function(){
+      $.get("<%=baseline_sms_action_path(corrective_action)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_sms_action_path(@sms_action)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+  });
 </script>

@@ -1,503 +1,504 @@
 <!DOCTYPE html PUBLIC "-//W3c//DTD XHTML 1.0 Transitional//EN"
-			 "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+       "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-	<head>
-		<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
 
-		<%if session[:mode] == "ASAP"%>
-			<title>ProSafeT Safety Reporting</title>
-		<%elsif session[:mode] == "SMS"%>
-			<title>ProSafeT Safety Assurance</title>
-		<%elsif session[:mode] == "SMS IM"%>
-			<title>ProSafeT SMS IM</title>
-		<%elsif session[:mode] == "SRM"%>
-			<title>ProSafeT SRA (SRM)</title>
-		<%else%>
-			<title>ProSafeT General Information</title>
-		<%end%>
-
-
-		<%= csrf_meta_tag %>
-		<!-- Mobile specific metas -->
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 user-scalable=no">
-		<!-- Force IE9 to render in normal mode -->
-		<!--[if IE]><meta http-equiv="x-ua-compatible" content="IE=9" /><![endif]-->
-		<meta name="author" content="" />
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<meta name="application-name" content="" />
-		<!-- Import google fonts - Heading first/ text second -->
-		<link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700' rel='stylesheet' type='text/css'>
-		<!-- Css files -->
-		<!-- Icons -->
-		<link href="/css/icons.css" rel="stylesheet" />
-		<!-- Bootstrap stylesheets (included template modifications) -->
-		<link href="/css/bootstrap.css" rel="stylesheet" />
-		<!-- Plugins stylesheets (all plugin custom css) -->
-		<link href="/css/plugins.css" rel="stylesheet" />
-
-		<link href="/css/extrabutton.css" rel="stylesheet" />
-		<link href="/css/extrapanel.css" rel="stylesheet" />
-		<!-- Main stylesheets (template main css file) -->
-		<link href="/css/main.css" rel="stylesheet" />
-		<!-- Custom stylesheets ( Put your own changes here ) -->
-		<link href="/audit_module_public/custom.css" rel="stylesheet" />
-		<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-		<!-- Fav and touch icons -->
-		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/ico/apple-touch-icon-144-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/ico/apple-touch-icon-114-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/ico/apple-touch-icon-72-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" href="/img/ico/apple-touch-icon-57-precomposed.png">
-		<link rel="icon" href="/img/ico/favicon.ico" type="image/png">
-		<!-- Windows8 touch icon ( http://www.buildmypinnedsite.com/ )-->
-		<meta name="msapplication-TileColor" content="#3399cc" />
-		<%=javascript_include_tag "application"%>
+    <%if session[:mode] == "ASAP"%>
+      <title>ProSafeT Safety Reporting</title>
+    <%elsif session[:mode] == "SMS"%>
+      <title>ProSafeT Safety Assurance</title>
+    <%elsif session[:mode] == "SMS IM"%>
+      <title>ProSafeT SMS IM</title>
+    <%elsif session[:mode] == "SRM"%>
+      <title>ProSafeT SRA (SRM)</title>
+    <%else%>
+      <title>ProSafeT General Information</title>
+    <%end%>
 
 
-		<!-- Defined Styles -->
-		<style type="text/css">
-			.module_label {
-				margin-top: 10px;
-				margin-right:10px;
-				height: 10px;
-				padding: 5px;
-				color: #808C99;
-				font-size: 18px;
-			}
-			.non-link:hover{
-				background-color:#f0ffff
-			}
-			.table-hover{
-				cursor: pointer;
-			}
-			.mt50{
-				margin-top: :35px!important;
-			}
-			.dropdown-menu-header{
-				background-color: #e7e7e7 !important;
-			}
-			.navbar-brand{
-				padding: 7px 7px;
-			}
-			li{
-				font-weight:bold;
-			}
-			.dropdown-menu > li > a {
-				font-weight: bold;
-			}
-			.vertical-alignment-helper {
-				display:table;
-				height: 100%;
-				width: 100%;
-				pointer-events:none; /* This makes sure that we can still click outside of the modal to close it */
-			}
-			.vertical-align-center {
-				/* To center vertically */
-				display: table-cell;
-				vertical-align: middle;
-				pointer-events:none;
-			}
-			.modal-content {
-				/* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
-				width:inherit;
-				height:inherit;
-				/* To center horizontally */
-				margin: 0 auto;
-				pointer-events: all;
-			}
-			.navbar {
-				background-color: white !important;
-			}
-			.navbar-collapse.in{
-				overflow-y: visible;
-			}
-			.navbar-nav .open .dropdown-menu{
-				margin-left: 0px!important;
-			}
+    <%= csrf_meta_tag %>
+    <!-- Mobile specific metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 user-scalable=no">
+    <!-- Force IE9 to render in normal mode -->
+    <!--[if IE]><meta http-equiv="x-ua-compatible" content="IE=9" /><![endif]-->
+    <meta name="author" content="" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="application-name" content="" />
+    <!-- Import google fonts - Heading first/ text second -->
+    <link href='https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700' rel='stylesheet' type='text/css'>
+    <!-- Css files -->
+    <!-- Icons -->
+    <link href="/css/icons.css" rel="stylesheet" />
+    <!-- Bootstrap stylesheets (included template modifications) -->
+    <link href="/css/bootstrap.css" rel="stylesheet" />
+    <!-- Plugins stylesheets (all plugin custom css) -->
+    <link href="/css/plugins.css" rel="stylesheet" />
 
-			.required_label:after{
-				content: " *";
-				color: red;
-				display: inline;
-			}
+    <link href="/css/extrabutton.css" rel="stylesheet" />
+    <link href="/css/extrapanel.css" rel="stylesheet" />
+    <!-- Main stylesheets (template main css file) -->
+    <link href="/css/main.css" rel="stylesheet" />
+    <!-- Custom stylesheets ( Put your own changes here ) -->
+    <link href="/audit_module_public/custom.css" rel="stylesheet" />
+    <link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-			.btn {
-				font-weight: bold!important;
-			}
-			.btn-chocolate {
-				color: white;
-				background-color: chocolate;
-				border-color: chocolate;
-			}
-			.btn-lightblue {
-				color: black;
-				background-color: lightblue;
-				border-color: lightblue;
-			}
-			.btn-darkturquoise {
-				color: white;
-				background-color: darkturquoise;
-				border-color: darkturquoise;
-			}
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="icon" href="/img/ico/favicon.ico" type="image/png">
+    <!-- Windows8 touch icon ( http://www.buildmypinnedsite.com/ )-->
+    <meta name="msapplication-TileColor" content="#3399cc" />
+    <%=javascript_include_tag "application"%>
 
 
+    <!-- Defined Styles -->
+    <style type="text/css">
+      .module_label {
+        margin-top: 10px;
+        margin-right:10px;
+        height: 10px;
+        padding: 5px;
+        color: #808C99;
+        font-size: 18px;
+      }
+      .non-link:hover{
+        background-color:#f0ffff
+      }
+      .table-hover{
+        cursor: pointer;
+      }
+      tfoot {
+        display: table-header-group;
+      }
+      .mt50{
+        margin-top: :35px!important;
+      }
+      .dropdown-menu-header{
+        background-color: #e7e7e7 !important;
+      }
+      .navbar-brand{
+        padding: 7px 7px;
+      }
+      li{
+        font-weight:bold;
+      }
+      .dropdown-menu > li > a {
+        font-weight: bold;
+      }
+      .vertical-alignment-helper {
+        display:table;
+        height: 100%;
+        width: 100%;
+        pointer-events:none; /* This makes sure that we can still click outside of the modal to close it */
+      }
+      .vertical-align-center {
+        /* To center vertically */
+        display: table-cell;
+        vertical-align: middle;
+        pointer-events:none;
+      }
+      .modal-content {
+        /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+        width:inherit;
+        height:inherit;
+        /* To center horizontally */
+        margin: 0 auto;
+        pointer-events: all;
+      }
+      .navbar {
+        background-color: white !important;
+      }
+      .navbar-collapse.in{
+        overflow-y: visible;
+      }
+      .navbar-nav .open .dropdown-menu{
+        margin-left: 0px!important;
+      }
 
-			.panel-title{
-				font-weight: bold!important;
-			}
-			.panel-purple > .panel-heading {
-				background-color: #BB8FCE;
-				color: white;
-			}
-			.panel-green > .panel-heading {
-				background-color: #52BE80;
-				color: white;
-			}
-			.panel-orange > .panel-heading {
-				background-color: #DC7633;
-				color: white;
-			}
-			.panel-steelblue > .panel-heading {
-				background-color: steelblue;
-				color: white;
-			}
-			.panel-lightskyblue > .panel-heading {
-				background-color: lightblue;
-				color: darkslategrey;
-			}
-			.panel-tan > .panel-heading {
-				background-color: tan;
-				color: white;
-			}
-			.panel-rosybrown > .panel-heading {
-				background-color: rosybrown;
-				color: white;
-			}
-			.tooltip-inner {
-				max-width: 80% !important;
-				font-weight: bold;
-				font-size: 13px !important;
-			}
-			.click-heading:hover{
-				cursor: pointer;
-			}
-			.table-centered td,th{
-				text-align: center
-			}
-			.table tbody tr > td.red {
-				background-color: #ff3333;
-			}
-			.table tbody tr > rd.orangered{
-				background-color: orangered;
-			}
-			.table tbody tr > td.yellow {
-				background-color: yellow;
-			}
-			.table tbody tr > td.green {
-				background-color: mediumseagreen;
-			}
-			.table tbody tr > td.limegreen{
-				background-color: limegreen;
-			}
-			.table tbody tr > td.orange {
-				background-color: orange;
-			}
-			.table tbody tr > td.lime {
-				background-color: #60FF60;
-			}
-			.table tbody tr > td.mediumseagreen {
-				background-color: mediumseagreen;
-			}
+      .required_label:after{
+        content: " *";
+        color: red;
+        display: inline;
+      }
+
+      .btn {
+        font-weight: bold!important;
+      }
+      .btn-chocolate {
+        color: white;
+        background-color: chocolate;
+        border-color: chocolate;
+      }
+      .btn-lightblue {
+        color: black;
+        background-color: lightblue;
+        border-color: lightblue;
+      }
+      .btn-darkturquoise {
+        color: white;
+        background-color: darkturquoise;
+        border-color: darkturquoise;
+      }
+      .radio{
+        display: auto;
+        cursor: pointer;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        margin-right: 2px;
+      }
+      .panel-title{
+        font-weight: bold!important;
+      }
+      .panel-purple > .panel-heading {
+        background-color: #BB8FCE;
+        color: white;
+      }
+      .panel-green > .panel-heading {
+        background-color: #52BE80;
+        color: white;
+      }
+      .panel-orange > .panel-heading {
+        background-color: #DC7633;
+        color: white;
+      }
+      .panel-steelblue > .panel-heading {
+        background-color: steelblue;
+        color: white;
+      }
+      .panel-lightskyblue > .panel-heading {
+        background-color: lightblue;
+        color: darkslategrey;
+      }
+      .panel-tan > .panel-heading {
+        background-color: tan;
+        color: white;
+      }
+      .panel-rosybrown > .panel-heading {
+        background-color: rosybrown;
+        color: white;
+      }
+      .tooltip-inner {
+        max-width: 80% !important;
+        font-weight: bold;
+        font-size: 13px !important;
+      }
+      .click-heading:hover{
+        cursor: pointer;
+      }
+      .table-centered td,th{
+        text-align: center
+      }
+      .table tbody tr > td.red {
+        background-color: #ff3333;
+      }
+      .table tbody tr > rd.orangered{
+        background-color: orangered;
+      }
+      .table tbody tr > td.yellow {
+        background-color: yellow;
+      }
+      .table tbody tr > td.green {
+        background-color: mediumseagreen;
+      }
+      .table tbody tr > td.limegreen{
+        background-color: limegreen;
+      }
+      .table tbody tr > td.orange {
+        background-color: orange;
+      }
+      .table tbody tr > td.lime {
+        background-color: #60FF60;
+      }
+      .table tbody tr > td.mediumseagreen {
+        background-color: mediumseagreen;
+      }
       .table tbody tr > td.steelblue {
         background-color: steelblue;
       }
-			.table tbody tr > td.crimson {
-				background-color: crimson;
-			}
-			.table tbody tr > td.coral {
-				background-color: coral;
-			}
-			.table tbody tr > td.gold {
-				background-color: gold;
-			}
-			.table tbody tr > td.skyblue {
-				background-color: skyblue;
-			}
-			.dropdown-divider{
-				height: 1px;
-				margin: 9px 0;
-				overflow: hidden;
-				background-color: #e5e5e5;
-			}
-			body {
-				background: #f7f7f7;
-			}
-			.badge-red {
-				background-color: red;
-			}
-			.menu-link a:hover {
-				color: midnightblue!important;
-			}
-		</style>
+      .table tbody tr > td.crimson {
+        background-color: crimson;
+      }
+      .table tbody tr > td.coral {
+        background-color: coral;
+      }
+      .table tbody tr > td.gold {
+        background-color: gold;
+      }
+      .table tbody tr > td.skyblue {
+        background-color: skyblue;
+      }
+      .dropdown-divider{
+        height: 1px;
+        margin: 9px 0;
+        overflow: hidden;
+        background-color: #e5e5e5;
+      }
+      body {
+        background: #f7f7f7;
+      }
+      .badge-red {
+        background-color: red;
+      }
+      .menu-link a:hover {
+        color: midnightblue!important;
+      }
+    </style>
 
-	</head>
-
-
-
-
-
-	<body>
-
-		<!-- .page-navbar -->
-		<nav class="navbar navbar-default">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-
-					<a class="navbar-brand" href="<%=choose_module_home_index_path%>">
-						<img src="/ProSafeT_logo_final.png" style="width:145px;height:35px" alt="Company Logo"/>
-					</a>
-				</div>
-
-				<div class="collapse navbar-collapse" id="myNavbar">
-
-					<!-- Module based menu -->
-					<ul class="nav navbar-nav">
-						<%if session[:mode].present?%>
-							<li><a href ="/">Dashboard</a></li>
-						<%end%>
-
-						<%if session[:mode] == "ASAP"%>
-							<%=render :partial => '/layouts/asap'%>
-						<%elsif session[:mode] == "SMS IM"%>
-							<%=render :partial => '/layouts/smsim'%>
-						<%elsif session[:mode] == 'SMS'%>
-							<%=render :partial => '/layouts/sms'%>
-						<%elsif session[:mode] == 'SRM'%>
-							<%=render :partial => '/layouts/srm'%>
-						<%end%>
-					</ul>
-
-					<!-- General Menu -->
-					<ul class="nav navbar-nav navbar-right">
-
-						<!-- System Configurations -->
-						<%if current_user.level == "Admin"%>
-							<li class="dropdown">
-								<%=link_to "System Configuration<b class='caret'></b>".html_safe,
-									"#",
-									:class => "dropdown-toggle",
-									"data-toggle" => "dropdown"%>
-								<ul class="dropdown-menu dropdown-notification">
-									<li>
-										<%=link_to "Safety Reports Templates", templates_path%>
-									</li>
-									<li style="display:<%=BaseConfig.airline[:enable_orm] ? 'block' : 'none'%>">
-										<%=link_to "ORM Templates", orm_templates_path%>
-									</li>
-									<li style="display:<%=BaseConfig.airline[:enable_configurable_risk_matrices] ? 'block' : 'none'%>">
-										<%=link_to "Risk Matrices", risk_matrix_groups_path%>
-									</li>
-									<li style="display:<%=BaseConfig.airline[:has_root_causes] ? 'block' : 'none'%>">
-										<%=link_to "Root Causes Templates", cause_options_path%>
-									</li>
-									<li style="display:<%=BaseConfig.airline[:enable_custom_options] ? 'block' : 'none'%>">
-										<%=link_to "Custom Options", custom_options_path%>
-									</li>
-									<li style="display:<%=BaseConfig.airline[:enable_message_templates] ? 'block' : 'none'%>">
-										<%=link_to "Message Templates", canned_messages_path%>
-									</li>
-									<li style="display:<%=BaseConfig.airline[:enable_checklist_templates] ? 'block' : 'none'%>">
-										<%=link_to "Checklist Templates", checklist_templates_path%>
-									</li>
-
-									<div class="dropdown-divider"></div>
-									<li><%=link_to "Automated Notifications", automated_notifications_path%></li>
-
-								</ul>
-							</li>
-						<%end%>
-
-						<!-- Messages -->
-						<li class="dropdown">
-							<%unread_message = current_user.num_unread%>
-							<a href="#" data-toggle="dropdown">
-								Messages
-								<span class="badge badge-red">
-									<%=unread_message%>
-								</span>
-								<b class="caret"></b>
-							</a>
-							<ul class="dropdown-menu dropdown-notification" role="menu">
-								<li>
-									<a href=<%=messages_path%>>Inbox
-										<span class="badge badge-red">
-											<%=unread_message%>
-										</span>
-									</a>
-								</li>
-								<li>
-									<a href=<%=sent_messages_path%>>Sent</a>
-								</li>
-								<li>
-									<a href=<%=new_message_path%>>New</a>
-								</li>
-							</ul>
-						</li>
-
-						<!-- Main Menu -->
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-								<%= current_user.full_name %>
-								<b class="caret"></b>
-							</a>
-							<ul class="dropdown-menu dropdown-notification messages">
-								<li class="menu-link"><%=link_to "My Profile", user_path(current_user)%></li>
-								<li class="menu-link"><%=link_to "Change Password", change_password_user_path(current_user)%></li>
-
-								<%if current_user.level == "Admin" %>
-									<li><%=link_to "Admin", "#", :class => "dropdown-menu-header"%></li>
-									<li class="menu-link"><%=link_to "All Accounts", users_path%></li>
-									<li class="menu-link"><%=link_to "New Account", new_user_path%></li>
-
-									<li><%=link_to "Access Control", "#", :class => "dropdown-menu-header"%></li>
-									<li class="menu-link"><%=link_to "Privileges", privileges_path%></li>
-									<li class="menu-link"><%=link_to "Rules", access_controls_path%></li>
-								<%end%>
-
-								<li><a href="#" class="dropdown-menu-header">Modules</a></li>
-
-								<%if current_user.has_access('ASAP','module') %>
-									<li class="menu-link"><%= link_to 'Safety Reporting', switch_errors_path(mode: 'ASAP') %></li>
-								<%end%>
-								<% if current_user.has_access('SMS IM','module') %>
-									<li class="menu-link"><%= link_to 'SMS IM', switch_errors_path(:mode=>"SMS IM") %></li>
-								<%end%>
-								<% if current_user.has_access('Safety Assurance','module') %>
-									<li class="menu-link"><%= link_to 'Safety Assurance', switch_errors_path(:mode=>"SMS") %></li>
-								<%end%>
-								<% if current_user.has_access('Safety Risk Management','module') %>
-									<li class="menu-link"><%= link_to 'SRA (SRM)', switch_errors_path(:mode=>"SRM") %></li>
-								<%end%>
-
-								<li><a href="#" class="dropdown-menu-header">Reference</a></li>
-								<li class="menu-link"><%=link_to "Version History", revision_history_documents_path%></li>
-								<%if current_user.has_access("documents","index")%>
-									<li class="menu-link"><%=link_to "Documents", documents_path%></li>
-								<%end%>
-								<li><a href ="https://support.prosafet.com" target="_blank">Support</a></li>
-							</ul>
-						</li>
-
-						<li><a href ="<%=logout_path%>">Logout</a></li>
-
-					</ul>
-				</div>
-			</div>
-		</nav>
-
-		<div class="module_label">
-			<span class="pull-right">
-				<%= case session[:mode]
-					when "SMS"
-						"Safety Assurance Module"
-					when "SMS IM"
-						"SMS IM Module"
-					when "ASAP"
-						"Safety Reporting Module"
-					when "SRM"
-						"SRA (SRM) Module"
-					end
-				%>
-			</span>
-		</div>
-
-		<div id="page-header"></div>
-
-		<%if session[:simulated_id].present? %>
-			<%=render 'shared/simulation_footer' %>
-		<%end%>
-
-
-		<!-- Javascripts -->
-		<!-- Load pace first -->
-		<script src="/plugins/core/pace/pace.min.js"></script>
-		<!-- Important javascript libs(put in all pages) -->
-		<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-		<script>
-		window.jQuery || document.write('<script src="/js/libs/jquery-3.1.1.min.js">\x3C/script>')
-		</script>
-		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-		<script>
-		window.jQuery || document.write('<script src="/js/libs/jquery-ui-1.10.4.min.js">\x3C/script>')
-		</script>
-		<!--[if lt IE 9]>
-		<script type="text/javascript" src="js/libs/excanvas.min.js"></script>
-		<script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<script type="text/javascript" src="js/libs/respond.min.js"></script>
-		<![endif]-->
-		<!-- Bootstrap plugins -->
-		<script src="/js/bootstrap/bootstrap.min.js"></script>
-		<!-- Core plugins ( not remove ) -->
-		<script src="/js/libs/modernizr.custom.js"></script>
-		<!-- Handle responsive view functions -->
-		<script src="/js/jRespond.min.js"></script>
-		<!-- Custom scroll for sidebars,tables and etc. -->
-		<script src="/plugins/core/slimscroll/jquery.slimscroll.min.js"></script>
-		<script src="/plugins/core/slimscroll/jquery.slimscroll.horizontal.min.js"></script>
-		<!-- Remove click delay in touch -->
-		<script src="/plugins/core/fastclick/fastclick.js"></script>
-		<!-- Increase jquery animation speed -->
-		<script src="/plugins/core/velocity/jquery.velocity.min.js"></script>
-		<!-- Quick search plugin (fast search for many widgets) -->
-		<script src="/plugins/core/quicksearch/jquery.quicksearch.js"></script>
-		<!-- Bootbox fast bootstrap modals -->
-		<script src="/plugins/ui/bootbox/bootbox.js"></script>
-
-		<!-- Necessary plugins -->
-		<script src="/plugins/forms/checkall/jquery.checkAll.js"></script>
-		<script src="/plugins/charts/sparklines/jquery.sparkline.min.js"></script>
-		<script src="/plugins/ui/waypoint/waypoints.min.js"></script>
-		<script src="/js/jquery.Dynamic.js"></script>
-		<script src="/audit_module_public/main_alt.js"></script>
-		<script type="text/javascript" src="/javascripts/jQuery-ujs.js"></script>
-		<script src="/javascripts/utility/bootstrap.file-input.js"></script>
+  </head>
 
 
 
 
-		<%= yield %>
 
-		<!-- Additional plugins(necessary on most pages) -->
-		<script src="/plugins/misc/touchpunch/jquery.ui.touch-punch.js"></script>
-		<script src="/plugins/forms/bootstrap-datepicker/bootstrap-datepicker.js"></script>
-		<script src="/js/libs/moment.js"></script>
-		<script src="/plugins/forms/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
-		<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
-		<!--<script src="/plugins/ui/bootstrap-sweetalert/sweet-alert.js"></script>-->
-		<%= stylesheet_link_tag "sweetalert2.min.css" %>
-		<%= javascript_include_tag "sweetalert2.min.js" %>
+  <body>
+
+    <!-- .page-navbar -->
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+
+          <a class="navbar-brand" href="<%=choose_module_home_index_path%>">
+            <img src="/ProSafeT_logo_final.png" style="width:145px;height:35px" alt="Company Logo"/>
+          </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="myNavbar">
+
+          <!-- Module based menu -->
+          <ul class="nav navbar-nav">
+            <%if session[:mode].present?%>
+              <li><a href ="/">Dashboard</a></li>
+            <%end%>
+
+            <%if session[:mode] == "ASAP"%>
+              <%=render :partial => '/layouts/asap'%>
+            <%elsif session[:mode] == "SMS IM"%>
+              <%=render :partial => '/layouts/smsim'%>
+            <%elsif session[:mode] == 'SMS'%>
+              <%=render :partial => '/layouts/sms'%>
+            <%elsif session[:mode] == 'SRM'%>
+              <%=render :partial => '/layouts/srm'%>
+            <%end%>
+          </ul>
+
+          <!-- General Menu -->
+          <ul class="nav navbar-nav navbar-right">
+
+            <!-- System Configurations -->
+            <%if current_user.level == "Admin"%>
+              <li class="dropdown">
+                <%=link_to "System Configuration<b class='caret'></b>".html_safe,
+                  "#",
+                  :class => "dropdown-toggle",
+                  "data-toggle" => "dropdown"%>
+                <ul class="dropdown-menu dropdown-notification">
+                  <li>
+                    <%=link_to "Safety Reports Templates", templates_path%>
+                  </li>
+                  <li style="display:<%=BaseConfig.airline[:enable_orm] ? 'block' : 'none'%>">
+                    <%=link_to "ORM Templates", orm_templates_path%>
+                  </li>
+                  <li style="display:<%=BaseConfig.airline[:enable_configurable_risk_matrices] ? 'block' : 'none'%>">
+                    <%=link_to "Risk Matrices", risk_matrix_groups_path%>
+                  </li>
+                  <li style="display:<%=BaseConfig.airline[:has_root_causes] ? 'block' : 'none'%>">
+                    <%=link_to "Root Causes Templates", cause_options_path%>
+                  </li>
+                  <li><%=link_to "Custom Options", custom_options_path%></li>
+                  <li><%=link_to "Message Templates", canned_messages_path%></li>
+                  <li style="display:<%=BaseConfig.airline[:checklist_version] == '2' ? 'block' : 'none'%>">
+                    <%=link_to "Checklists", checklist_templates_path%>
+                  </li>
+                  <li style="display:<%=BaseConfig.airline[:checklist_version] == '3' ? 'block' : 'none'%>">
+                    <%=link_to "Checklist Templates", checklists_path%>
+                  </li>
+
+                  <div class="dropdown-divider"></div>
+                  <li><%=link_to "Automated Notifications", automated_notifications_path%></li>
+
+                </ul>
+              </li>
+            <%end%>
+
+            <!-- Messages -->
+            <li class="dropdown">
+              <%unread_message = current_user.num_unread%>
+              <a href="#" data-toggle="dropdown">
+                Messages
+                <span class="badge badge-red">
+                  <%=unread_message%>
+                </span>
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu dropdown-notification" role="menu">
+                <li>
+                  <a href=<%=messages_path%>>Inbox
+                    <span class="badge badge-red">
+                      <%=unread_message%>
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a href=<%=sent_messages_path%>>Sent</a>
+                </li>
+                <li><%=link_to "New", new_message_path%></li>
+              </ul>
+            </li>
+
+            <!-- Main Menu -->
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <%= current_user.full_name %>
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu dropdown-notification messages">
+                <li class="menu-link"><%=link_to "My Profile", user_path(current_user)%></li>
+                <li class="menu-link"><%=link_to "Change Password", change_password_user_path(current_user)%></li>
+
+                <%if current_user.level == "Admin" %>
+                  <li><%=link_to "Admin", "#", :class => "dropdown-menu-header"%></li>
+                  <li class="menu-link"><%=link_to "All Accounts", users_path%></li>
+                  <li class="menu-link"><%=link_to "New Account", new_user_path%></li>
+
+                  <li><%=link_to "Access Control", "#", :class => "dropdown-menu-header"%></li>
+                  <li class="menu-link"><%=link_to "Privileges", privileges_path%></li>
+                  <li class="menu-link"><%=link_to "Rules", access_controls_path%></li>
+                <%end%>
+
+                <li><a href="#" class="dropdown-menu-header">Modules</a></li>
+
+                <%if current_user.has_access('ASAP','module') %>
+                  <li class="menu-link"><%= link_to 'Safety Reporting', switch_errors_path(mode: 'ASAP') %></li>
+                <%end%>
+                <% if current_user.has_access('SMS IM','module') %>
+                  <li class="menu-link"><%= link_to 'SMS IM', switch_errors_path(:mode=>"SMS IM") %></li>
+                <%end%>
+                <% if current_user.has_access('Safety Assurance','module') %>
+                  <li class="menu-link"><%= link_to 'Safety Assurance', switch_errors_path(:mode=>"SMS") %></li>
+                <%end%>
+                <% if current_user.has_access('Safety Risk Management','module') %>
+                  <li class="menu-link"><%= link_to 'SRA (SRM)', switch_errors_path(:mode=>"SRM") %></li>
+                <%end%>
+
+                <li><a href="#" class="dropdown-menu-header">Reference</a></li>
+                <li class="menu-link"><%=link_to "Version History", revision_history_documents_path%></li>
+                <%if current_user.has_access("documents","index")%>
+                  <li class="menu-link"><%=link_to "Documents", documents_path%></li>
+                <%end%>
+                <li><a href ="https://support.prosafet.com" target="_blank">Support</a></li>
+              </ul>
+            </li>
+
+            <li><a href ="<%=logout_path%>">Logout</a></li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="module_label">
+      <span class="pull-right">
+        <%= case session[:mode]
+          when "SMS"
+            "Safety Assurance Module"
+          when "SMS IM"
+            "SMS IM Module"
+          when "ASAP"
+            "Safety Reporting Module"
+          when "SRM"
+            "SRA (SRM) Module"
+          end
+        %>
+      </span>
+    </div>
+
+    <div id="page-header"></div>
+
+    <%if session[:simulated_id].present? %>
+      <%=render 'shared/simulation_footer' %>
+    <%end%>
 
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.4.1/es5-shim.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.1/es6-shim.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Javascripts -->
+    <!-- Load pace first -->
+    <script src="/plugins/core/pace/pace.min.js"></script>
+    <!-- Important javascript libs(put in all pages) -->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script>
+    window.jQuery || document.write('<script src="/js/libs/jquery-3.1.1.min.js">\x3C/script>')
+    </script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script>
+    window.jQuery || document.write('<script src="/js/libs/jquery-ui-1.10.4.min.js">\x3C/script>')
+    </script>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="js/libs/excanvas.min.js"></script>
+    <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <script type="text/javascript" src="js/libs/respond.min.js"></script>
+    <![endif]-->
+    <!-- Bootstrap plugins -->
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <!-- Core plugins ( not remove ) -->
+    <script src="/js/libs/modernizr.custom.js"></script>
+    <!-- Handle responsive view functions -->
+    <script src="/js/jRespond.min.js"></script>
+    <!-- Custom scroll for sidebars,tables and etc. -->
+    <script src="/plugins/core/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/plugins/core/slimscroll/jquery.slimscroll.horizontal.min.js"></script>
+    <!-- Remove click delay in touch -->
+    <script src="/plugins/core/fastclick/fastclick.js"></script>
+    <!-- Increase jquery animation speed -->
+    <script src="/plugins/core/velocity/jquery.velocity.min.js"></script>
+    <!-- Quick search plugin (fast search for many widgets) -->
+    <script src="/plugins/core/quicksearch/jquery.quicksearch.js"></script>
+    <!-- Bootbox fast bootstrap modals -->
+    <script src="/plugins/ui/bootbox/bootbox.js"></script>
+
+    <!-- Necessary plugins -->
+    <script src="/plugins/forms/checkall/jquery.checkAll.js"></script>
+    <script src="/plugins/charts/sparklines/jquery.sparkline.min.js"></script>
+    <script src="/plugins/ui/waypoint/waypoints.min.js"></script>
+    <script src="/js/jquery.Dynamic.js"></script>
+    <script src="/audit_module_public/main_alt.js"></script>
+    <script type="text/javascript" src="/javascripts/jQuery-ujs.js"></script>
+    <script src="/javascripts/utility/bootstrap.file-input.js"></script>
+
+    <%= yield %>
+
+    <!-- Additional plugins(necessary on most pages) -->
+    <script src="/plugins/misc/touchpunch/jquery.ui.touch-punch.js"></script>
+    <script src="/plugins/forms/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+    <script src="/js/libs/moment.js"></script>
+    <script src="/plugins/forms/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+    <!--<script src="/plugins/ui/bootstrap-sweetalert/sweet-alert.js"></script>-->
+    <%= stylesheet_link_tag "sweetalert2.min.css" %>
+    <%= javascript_include_tag "sweetalert2.min.js" %>
 
 
-		<script>
-			$(".basic-datepicker").datepicker({format: "YYYY-MM-DD"}).on('focus', function() {$(this).trigger('blur');});
-			$(".basic-datetimepicker")
-				.datetimepicker({
-					format: "YYYY-MM-DD HH:mm"
-				});
-		</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.4.1/es5-shim.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.1/es6-shim.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-	</body>
+
+    <script>
+      $(".basic-datepicker").datepicker({format: "YYYY-MM-DD"}).on('focus', function() {$(this).trigger('blur');});
+      $(".basic-datetimepicker")
+        .datetimepicker({
+          format: "YYYY-MM-DD HH:mm"
+        });
+    </script>
+
+  </body>
 </html>

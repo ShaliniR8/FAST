@@ -4,58 +4,58 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <div class="panel-info">
-	<div class="panel-heading">
-		<div class="panel-title">
-			<b>Privileges</b>
-			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-	</div>
-	<div class="panel-body">
-		<div class="row">
-			<table class="table table-striped table-bordered" id="view_privileges">
-				<thead>
-					<tr>
-						<%@headers.keys.each do |k|%>
-								<th><%=k%></th>
-						<%end%>  
-					</tr>
-				</thead>
-				<tbody>
-					<%@privileges.each do |u|%>
-						<tr uid="<%=u.id%>">
-							<%@headers.values.each do |v|%>
-								<td><%=u.send(v)%></td>
-							<%end%>
-						</tr>
-					<%end%>
-				</tbody>
-			</table>
-		</div>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b>Privileges</b>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <table class="table table-striped table-bordered" id="view_privileges">
+        <thead>
+          <tr>
+            <%@headers.keys.each do |k|%>
+                <th><%=k%></th>
+            <%end%>
+          </tr>
+        </thead>
+        <tbody>
+          <%@privileges.each do |u|%>
+            <tr uid="<%=u.id%>">
+              <%@headers.values.each do |v|%>
+                <td><%=u.send(v)%></td>
+              <%end%>
+            </tr>
+          <%end%>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 
 <script>
-	$('#view_privileges').DataTable({
-		"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-		"iDisplayLength": 10,
-		"aaSorting": [[0, "asc"]],
-		initComplete: function(){
-			this.api().columns().every(function(){
-					var column = this;
-					rand_num = new Date().getTime();
-					var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
-							.appendTo($(column.footer()).empty())
-							.on('keyup change input', function(){
-								if ( column.search() !== this.value ){
-									column.search( this.value ).draw();
-								} 
-							});
-					column.data().unique().sort().each(function(d, j){
-						if(d!="" && d!=undefined){
-							$('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
-						}
-					});
-			});
-		}
-	});
+  $('#view_privileges').DataTable({
+    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+    "iDisplayLength": 10,
+    "aaSorting": [[0, "asc"]],
+    initComplete: function(){
+      this.api().columns().every(function(){
+          var column = this;
+          rand_num = new Date().getTime();
+          var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
+              .appendTo($(column.footer()).empty())
+              .on('keyup change input', function(){
+                if ( column.search() !== this.value ){
+                  column.search( this.value ).draw();
+                }
+              });
+          column.data().unique().sort().each(function(d, j){
+            if(d!="" && d!=undefined){
+              $('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
+            }
+          });
+      });
+    }
+  });
 </script>

@@ -1,36 +1,36 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <div class="panel panel-warning">
-	<div class="panel-heading">
-		<div class="panel-title">
-			<b>Mitigated Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button> 
-		</div>
-	</div>
-	<div class="panel-body">  	  
-		<%=form_for @owner do |f|%>
-			<div class="row col-xs-12" style="max-height:500px;overflow-y:auto;">
-				<%=render "shared/instructions", 
-								:instruction => "Select the <b>Mitigated Severity</b> and the <b>Mitigated Likelihood</b> from dropdown to see Risk Factor."%>
-				<%=render "shared/bsk_risk_matrix_form_mitigated", :f => f%>
-				<%=render "shared/bsk_risk_matrix_table_form"%>
-			</div>
-			<div class="col-xs-12 mt10 mr20">
-				<%=f.submit "Submit",:class=>"btn btn-success pull-right mr5", disable_with: "Submitting..."%>
-			</div>
-		<%end%>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b>Mitigated Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+    </div>
+  </div>
+  <div class="panel-body">
+    <%=form_for @owner do |f|%>
+      <div class="row col-xs-12" style="max-height:500px;overflow-y:auto;">
+        <%=render "shared/instructions",
+                :instruction => "Select the <b>Mitigated Severity</b> and the <b>Mitigated Likelihood</b> from dropdown to see Risk Factor."%>
+        <%=render "shared/bsk_risk_matrix_form_mitigated", :f => f%>
+        <%=render "shared/bsk_risk_matrix_table_form"%>
+      </div>
+      <div class="col-xs-12 mt10 mr20">
+        <%=f.submit "Save Mitigated Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
+      </div>
+    <%end%>
+  </div>
 </div>
 
 
 
 
 <script>
-	$(document).ready(function(){
-		$("#<%=@owner.severity_after%>-<%=Investigation.get_likelihood.index(@owner.likelihood_after)%>").html("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
-		$('#sev').on('change',function(){
-			reset_risk_mitigate();
-		});
-		$('#like').on('change',function(){
-			reset_risk_mitigate();
-		});
-	});
+  $(document).ready(function(){
+    $("#<%=@owner.severity_after%>-<%=Investigation.get_likelihood.index(@owner.likelihood_after)%>").html("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
+    $('#sev').on('change',function(){
+      reset_risk_mitigate();
+    });
+    $('#like').on('change',function(){
+      reset_risk_mitigate();
+    });
+  });
 </script>

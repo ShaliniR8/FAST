@@ -1,9 +1,9 @@
 <%=render '/forms/show_fields',
-	:fields => Recommendation.get_meta_fields('show'),
-	:record => owner %>
+  :fields => Recommendation.get_meta_fields('show'),
+  :record => owner %>
 
 <%can_change = owner.status != "Completed" && show_btn%>
 <%=render '/causes/all',
-	:owner => owner,
-	:cause_type => 'description',
-	:can_change => can_change%>
+  :owner => owner,
+  :cause_type => 'description',
+  :can_change => can_change%>

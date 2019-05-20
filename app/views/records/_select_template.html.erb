@@ -1,22 +1,22 @@
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-primary">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		<b>Template Selection</b>
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body">  
-     		<%= form_tag destination,{:method=>"get",:class=>"form-inline"} do%>
+  <div class="grid per90 center-block">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b>Template Selection</b>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <%= form_tag destination,{:method=>"get",:class=>"form-inline"} do%>
           <center>
-         		<div class="form-group"> 
+            <div class="form-group">
               <%=label_tag "Template:"%>
-              <%=select_tag :template,options_from_collection_for_select(@templates,'id','name'),{:class=>"ml5 form-control"}%>         		
+              <%=select_tag :template,options_from_collection_for_select(@templates,'id','name'),{:class=>"ml5 form-control"}%>
             </div>
               <%= submit_tag "Create", class:"ml5 btn btn-xl btn-success"%>
           </center>
         <%end%>
-      </div>        
+      </div>
     </div>
-	</div> 
-</div>  
+  </div>
+</div>

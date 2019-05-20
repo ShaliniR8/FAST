@@ -1,60 +1,60 @@
 <%if defined?(field) && field.deleted?%>
-	<%deleted = "deleted_fields" %>
+  <%deleted = "deleted_fields" %>
 <%end%>
 
 
 <%if source == 'Existing'%>
-	<tr class="field_group to_delete <%=deleted%>" style="background-color:#EBF5FB" field="<%=field.id%>">
+  <tr class="field_group to_delete <%=deleted%>" style="background-color:#EBF5FB" field="<%=field.id%>">
 <%else%>
-	<tr class="field_group to_delete" style="background-color:#FEF5E7">
+  <tr class="field_group to_delete" style="background-color:#FEF5E7">
 <%end%>
-		
 
-	<!--TR 9/8/18 If the field is deleted then add the deleted_fields class-->
-	
-	<%if defined?(locals)%>
-		<%=f.hidden_field :nested_field_id, :value => (raw locals[:nested_field_id])%>
-		<%=f.hidden_field :nested_field_value, :value => (raw locals[:nested_field_value])%>
-	<%end%>
-		
-	<td>
-		<center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
-		<%if source == 'Existing'%>
-			<%= f.hidden_field :field_order, :value => fld_index, :class => "form-field-order" %>
-		<%else%>
-			<%= f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
-		<%end%>
-	</td>
 
-	<td><%=f.text_field 	:label, 																							{:class => "form-control"}%>										</td>
-	<td><%=f.select 			:display_type, 	Field.getDisplay_type, {}, 						{:class => "form-control date-type-select"}%>		</td>
-	<td><%=f.select 			:data_type, 		Field.getData_type, {}, 							{:class => "form-control"}%>										</td>
-	<td><%=f.select 			:display_size, 	Field.getDisplay_size, {}, 						{:class => "form-control"}%>										</td>
-	<td><%=f.select 			:show_label, 		[["Yes", true], ["No", false]], {}, 	{:class => "form-control"}%>										</td>
-	<td><%=f.select 			:required, 			[["Yes", true], ["No", false]], {}, 	{:class => "form-control"}%>										</td>
-	<td><%=f.select 			:print, 				[["Yes", true], ["No", false]], {}, 	{:class => "form-control"}%>										</td>
-	<td><%=f.text_area 		:options, 																						{:class => "form-control", :size => "1"}%>			</td>
-	<td>
-		<%if source == 'Existing'%>
-			<%if field.deleted?%>
-				<a class="btn btn-default archive_btn">Unarchive</a>
-			<%else%>
-				<a class="btn btn-warning archive_btn">Archive</a>
-			<%end%>
-			<%if BaseConfig.airline[:allow_template_nested_fields]%>
-				<a class="btn btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
-			<%end%>
+  <!--TR 9/8/18 If the field is deleted then add the deleted_fields class-->
 
-			<%=f.hidden_field :deleted, :id => "delete_field"%>	
-		<%else%>
-			<button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
-		<%end%>																																												
-	</td>
-						
-			
-	<td class="extra_info"><%=f.text_field :element_id, 				{:class => "form-control"}%></td>
-	<td class="extra_info"><%=f.text_field :element_class, 			{:class => "form-control"}%></td>
-	<td class="extra_info"><%=f.text_field :map_id, 						{:class => "form-control"}%></td>
+  <%if defined?(locals)%>
+    <%=f.hidden_field :nested_field_id, :value => (raw locals[:nested_field_id])%>
+    <%=f.hidden_field :nested_field_value, :value => (raw locals[:nested_field_value])%>
+  <%end%>
+
+  <td>
+    <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
+    <%if source == 'Existing'%>
+      <%= f.hidden_field :field_order, :value => fld_index, :class => "form-field-order" %>
+    <%else%>
+      <%= f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
+    <%end%>
+  </td>
+
+  <td><%=f.text_field   :label,                                               {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {:class => "form-control date-type-select"}%>   </td>
+  <td><%=f.select       :data_type,     Field.getData_type, {},               {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :display_size,  Field.getDisplay_size, {},            {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+  <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
+  <td>
+    <%if source == 'Existing'%>
+      <%if field.deleted?%>
+        <a class="btn btn-default archive_btn">Unarchive</a>
+      <%else%>
+        <a class="btn btn-warning archive_btn">Archive</a>
+      <%end%>
+      <%if BaseConfig.airline[:allow_template_nested_fields]%>
+        <a class="btn btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
+      <%end%>
+
+      <%=f.hidden_field :deleted, :id => "delete_field"%>
+    <%else%>
+      <button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
+    <%end%>
+  </td>
+
+
+  <td class="extra_info"><%=f.text_field :element_id,         {:class => "form-control"}%></td>
+  <td class="extra_info"><%=f.text_field :element_class,      {:class => "form-control"}%></td>
+  <td class="extra_info"><%=f.text_field :map_id,             {:class => "form-control"}%></td>
 
 
 
@@ -66,26 +66,26 @@
 
 
 
-	$(function(){
+  $(function(){
 
-		$(".extra_info").hide();
-		$(".deleted_fields").hide();   
-
-
-		<%if source == 'Existing'%>
-			$("#show_nested_btn_<%=field.id%>").on("click", function(){
-				$.get("<%=show_nested_templates_path%>", {"field_id" : <%=field.id%>});
-			});
-		<%end%>
+    $(".extra_info").hide();
+    $(".deleted_fields").hide();
 
 
-
-	});
+    <%if source == 'Existing'%>
+      $("#show_nested_btn_<%=field.id%>").on("click", function(){
+        $.get("<%=show_nested_templates_path%>", {"field_id" : <%=field.id%>});
+      });
+    <%end%>
 
 
 
-	function removeField(deletable){
-		$(deletable).closest('.to_delete').remove();
-	}
+  });
+
+
+
+  function removeField(deletable){
+    $(deletable).closest('.to_delete').remove();
+  }
 
 </script>

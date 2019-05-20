@@ -4,60 +4,55 @@
 
 
 <div class="col-xs-12">
-	<div class="panel <%=@cat.panel%>">
-		<div class="panel-heading click-heading">
-			<div class="panel-title">
-				<%=@cat.title%>
-				<span class="pull-right clickable">
-					<i class="mt5 glyphicon glyphicon-chevron-up"></i>
-				</span>
-			</div> 
-		</div>
-		<div class="panel-body"> 
-			<div class="row">
-				<div class="col-xs-12">
-					<div>
-						<table id="observation_phases_table" class="table table-striped table-bordered" width="100%">
-							<thead>
-								<tr>
-									<th>Observation Phase</th>
-									<th>Condition</th>
-									<th>Threat</th>
-									<th>Sub Threat</th>
-									<th>Error</th>
-									<th>Sub Error</th>
-									<th>Human Factor</th>
-									<th>Comment</th>
-								</tr>
-							</thead>
-							<tbody>
-								<%@cat.fields.group_by(&:element_id).each do |element_id, arr|%>
-									<%if @record.record_fields.where(:fields_id => arr.first.id).present? && 
-										@record.record_fields.where(:fields_id => arr.first.id).first.value.present?%>
-										<tr>
-											<th><%=arr.first.label%></th>
-											<%arr.each do |x|%>
-												<%record_fields = @record.record_fields.where(:fields_id => x.id).first%>
-												<td><%=record_fields.value%></td>
-											<%end%>
-										</tr>
-									<%end%>
-								<%end%>
-							</tbody>
-						</table>
-					</div>   
-				</div> 
-			</div>
-		</div>
-	</div>
+  <div class="panel <%=@cat.panel%>">
+    <div class="panel-heading click-heading">
+      <div class="panel-title">
+        <%=@cat.title%>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-up"></i>
+        </span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-xs-12">
+          <div>
+            <table id="observation_phases_table" class="table table-striped table-bordered" width="100%">
+              <thead>
+                <tr>
+                  <%BaseConfig.observation_phases.each do |x|%>
+                    <th><%=x%></th>
+                  <%end%>
+                </tr>
+              </thead>
+              <tbody>
+                <%@cat.fields.group_by(&:element_id).each do |element_id, arr|%>
+                  <%if @record.record_fields.where(:fields_id => arr.first.id).present? &&
+                    @record.record_fields.where(:fields_id => arr.first.id).first.value.present?%>
+                    <tr>
+                      <th><%=arr.first.label%></th>
+                      <%arr.each do |x|%>
+                        <%record_fields = @record.record_fields.where(:fields_id => x.id).first%>
+                        <td><%=record_fields.value%></td>
+                      <%end%>
+                    </tr>
+                  <%end%>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <style>
-	.smallselect {
-		position: relative;
-		top: 50%;
-		transform: translateY(-50%);
-	}
+  .smallselect {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 </style>

@@ -1,89 +1,84 @@
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "2.0.0"
-	module ActiveRecord
-		module Associations
-			class AssociationProxy
-				def send(method, *args)
-					if proxy_respond_to?(method, true)
-						super
-					else
-						load_target
-						@target.send(method, *args)
-					end
-				end
-			end
-		end
-	end
+  module ActiveRecord
+    module Associations
+      class AssociationProxy
+        def send(method, *args)
+          if proxy_respond_to?(method, true)
+            super
+          else
+            load_target
+            @target.send(method, *args)
+          end
+        end
+      end
+    end
+  end
 end
 
 
 class SrasController < ApplicationController
 
-	before_filter :login_required
-	before_filter :load_options
+  before_filter :login_required
+  before_filter :load_options
 
 
-	def index
-		@table = Object.const_get("Sra")
-		@headers = @table.get_meta_fields('index')
-		@terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-		handle_search
+  def index
+    @table = Object.const_get("Sra")
+    @headers = @table.get_meta_fields('index')
+    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    handle_search
 
-    if !current_user.admin?
-      sras = Sra.where('status in (?) and user_id = ?',
+    if !current_user.admin? && !current_user.has_access('sras','admin')
+      cars = Sra.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
         current_user.id)
       cars += Sra.where('approver_id = ? OR reviewer_id = ?',
         current_user.id, current_user.id)
+      cars += Sra.where(viewer_access: true) if current_user.has_access('sras','viewer')
       @records = @records & cars
     end
-	end
+  end
 
 
-	def new
-		load_options
-		@fields = Sra.get_meta_fields('form')
-		@risk_groups = RiskMatrixGroup.find(:all)
-		@sra = Sra.new
-		@owner = @sra
-		#form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
-		if params[:record].present?
-			@record = Record.find(params[:record])
-		end
-		@cancel_path = root_url
-		if @record.present?
-			@cancel_path = record_path(@record)
-		end
-	end
+  def new
+    load_options
+    @fields = Sra.get_meta_fields('form')
+    @risk_groups = RiskMatrixGroup.find(:all)
+    @sra = Sra.new
+    @owner = @sra
+    #form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
+    if params[:record].present?
+      @record = Record.find(params[:record])
+    end
+    @cancel_path = root_url
+    if @record.present?
+      @cancel_path = record_path(@record)
+    end
+  end
 
 
-	def create
-		sra = Sra.create(params[:sra])
+  def create
+    sra = Sra.create(params[:sra])
     sra.status = 'New'
-		if sra.record_id.present?
-			@record = Record.find(sra.record_id)
-			@record.sra_id = sra.id
-			@record.save
-		end
-		if params[:matrix_id].present?
-			connection = SraMatrixConnection.create(
-				:matrix_id => params[:matrix_id],
-				:owner_id => sra.id)
-			connection.save
-		end
-		if sra.save
-			notify(
-				sra.responsible_user,
-				"SRA ##{sra.get_id} has been scheduled for you." +
-					g_link(sra),
-				true,
-				"SRA ##{sra.get_id} Assigned")
-			redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
-		end
-	end
+    if sra.record_id.present?
+      @record = Record.find(sra.record_id)
+      @record.sra_id = sra.id
+      @record.save
+    end
+    if params[:matrix_id].present?
+      connection = SraMatrixConnection.create(
+        :matrix_id => params[:matrix_id],
+        :owner_id => sra.id)
+      connection.save
+    end
+    if sra.save
+      redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
+    end
+  end
 
 
 
-	def update
+  def update
     @owner = Sra.find(params[:id]).becomes(Sra)
     case params[:commit]
     when 'Assign'
@@ -123,21 +118,24 @@ class SrasController < ApplicationController
       if !@owner.approver #Approved by reviewer with absent approver case
         update_status = 'Completed'
         notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Approved by the Reviewer." + g_link(@owner),
+          "SRA ##{@owner.id} was Approved by the Quality Reviewer." + g_link(@owner),
           true, 'SRA Approved')
+        transaction_content = 'Approved by the Quality Reviewer'
       elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
         update_status = 'Pending Approval'
         notify(@owner.approver,
           "SRA ##{@owner.id} needs your Approval." + g_link(@owner),
           true, 'SRA Pending Approval')
+        transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.date_complete = Time.now
         notify(@owner.responsible_user,
           "SRA ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
           true, 'SRA Approved')
+        transaction_content = 'Approved by the Final Approver'
       end
-		when 'Override Status'
-			transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
+    when 'Override Status'
+      transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
@@ -154,84 +152,84 @@ class SrasController < ApplicationController
 
 
 
-	def show
-		@root_cause_headers = HazardRootCause.get_headers
-		@description_headers = Cause.get_meta_fields('show')
-		@agenda_headers = SrmAgenda.get_headers
-		@sra = Sra.find(params[:id])
-		@risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
-		@owner = @sra
-		load_options
-		load_special_matrix(@sra)
-		@fields = Sra.get_meta_fields('show')
-	end
+  def show
+    @root_cause_headers = HazardRootCause.get_headers
+    @description_headers = Cause.get_meta_fields('show')
+    @agenda_headers = SrmAgenda.get_headers
+    @sra = Sra.find(params[:id])
+    @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
+    @owner = @sra
+    load_options
+    load_special_matrix(@sra)
+    @fields = Sra.get_meta_fields('show')
+  end
 
 
 
-	def edit
-		load_options
-		@fields = Sra.get_meta_fields('form')
-		@sra = Sra.find(params[:id])
-		@risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
-		@owner = @sra
-		form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
-	end
+  def edit
+    load_options
+    @fields = Sra.get_meta_fields('form')
+    @sra = Sra.find(params[:id])
+    @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
+    @owner = @sra
+    form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
+  end
 
 
 
-	def new_hazard
-		@sra = Sra.find(params[:id])
-		@hazard = Hazard.new
-		form_special_matrix(@hazard, "sra[hazards_attributes][0]", "severity_extra", "probability_extra")
-		load_options
-		@fields = Hazard.get_meta_fields('form')
-		respond_to do |format|
-			format.js {render "/sras/new_hazard", layout: false}
-		end
-	end
+  def new_hazard
+    @sra = Sra.find(params[:id])
+    @hazard = Hazard.new
+    form_special_matrix(@hazard, "sra[hazards_attributes][0]", "severity_extra", "probability_extra")
+    load_options
+    @fields = Hazard.get_meta_fields('form')
+    respond_to do |format|
+      format.js {render "/sras/new_hazard", layout: false}
+    end
+  end
 
 
 
-	def close
-		@sra = Sra.find(params[:id])
-		render :partial => "close"
-	end
+  def close
+    @sra = Sra.find(params[:id])
+    render :partial => "close"
+  end
 
 
 
-	def load_options
-		@frequency = (0..4).to_a.reverse
-		@like = Finding.get_likelihood
-		risk_matrix_initializer
-	end
-	helper_method :load_options
+  def load_options
+    @frequency = (0..4).to_a.reverse
+    @like = Finding.get_likelihood
+    risk_matrix_initializer
+  end
+  helper_method :load_options
 
 
 
-	def destroy
-		sra = Sra.find(params[:id])
-		sra.destroy
-		redirect_to sras_path, flash: {danger: "SRA ##{params[:id]} deleted."}
-	end
+  def destroy
+    sra = Sra.find(params[:id])
+    sra.destroy
+    redirect_to sras_path, flash: {danger: "SRA ##{params[:id]} deleted."}
+  end
 
 
 
 
-	def new_attachment
-		@owner=Sra.find(params[:id])
-		@attachment=SraAttachment.new
-		render :partial=>"shared/attachment_modal"
-	end
+  def new_attachment
+    @owner=Sra.find(params[:id])
+    @attachment=SraAttachment.new
+    render :partial=>"shared/attachment_modal"
+  end
 
   def assign
     @owner = Sra.find(params[:id]).becomes(Sra)
     render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
   end
 
-	def complete
+  def complete
     @owner = Sra.find(params[:id]).becomes(Sra)
     render partial: '/forms/workflow_forms/process', locals:{field: :closing_comment}
-	end
+  end
 
   def approve
     @owner = Sra.find(params[:id]).becomes(Sra)
@@ -241,154 +239,164 @@ class SrasController < ApplicationController
     render :partial => '/forms/workflow_forms/process', locals: {status: status, field: field }
   end
 
-	def override_status
-		@owner = Sra.find(params[:id]).becomes(Sra)
-		render :partial => '/forms/workflow_forms/override_status'
-	end
+  def override_status
+    @owner = Sra.find(params[:id]).becomes(Sra)
+    render :partial => '/forms/workflow_forms/override_status'
+  end
 
-	def print
-		@deidentified = params[:deidentified]
-		@sra = Sra.find(params[:id])
-		html = render_to_string(:template => "/sras/print.html.erb")
-		pdf = PDFKit.new(html)
-		pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-		pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-		filename = "SRA_##{@sra.get_id}" + (@deidentified ? '(de-identified)' : '')
-		send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-	end
-
-
-
-
-	def get_agenda
-		@sra=Sra.find(params[:id])
-		@meeting=SrmMeeting.find(params[:meeting])
-		@headers=SrmAgenda.get_headers
-		@status=SrmAgenda.get_status
-		@tof={"Yes"=>true,"No"=>false}
-		@accept_deline={"Accepted"=>true,"Declined"=>false}
-		render :partial=>"agenda"
-	end
+  def print
+    @deidentified = params[:deidentified]
+    @sra = Sra.find(params[:id])
+    html = render_to_string(:template => "/sras/print.html.erb")
+    pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    filename = "SRA_##{@sra.get_id}" + (@deidentified ? '(de-identified)' : '')
+    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+  end
 
 
 
-	def carryover
-		sra = Sra.find(params[:id])
-		MeetingTransaction.create(:users_id=>current_user.id, :action=>"Carry Over SRA", :content=> "SRA ##{sra.get_id} Carried Over", :owner_id=>sra.meeting.id, :stamp=>Time.now)
-		SraTransaction.create(:users_id=>current_user.id, :action=>"Carried Over", :content=>"SRA Carried Over from Meeting ##{sra.meeting.get_id}", :owner_id=>sra.id, :stamp=>Time.now)
-		sra.meeting_id = nil
-		sra.status = "New"
-		sra.save
-		render status: 200
-	end
+
+  def get_agenda
+    @sra=Sra.find(params[:id])
+    @meeting=SrmMeeting.find(params[:meeting])
+    @headers=SrmAgenda.get_headers
+    @status=SrmAgenda.get_status
+    @tof={"Yes"=>true,"No"=>false}
+    @accept_deline={"Accepted"=>true,"Declined"=>false}
+    render :partial=>"agenda"
+  end
 
 
 
-	def mitigate
-		@owner = Sra.find(params[:id])
-		@risk_group = @owner.matrix_connection.matrix_group
-		load_options
-		mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
-		if BaseConfig.airline[:base_risk_matrix]
-			render :partial=>"shared/mitigate"
-		else
-			render :partial => "/risk_matrix_groups/form_mitigated"
-		end
-	end
+  def carryover
+    sra = Sra.find(params[:id])
+    MeetingTransaction.create(
+      :users_id => current_user.id,
+      :action => "Carry Over SRA",
+      :content=> "SRA ##{sra.get_id} Carried Over",
+      :owner_id => sra.meeting.id,
+      :stamp => Time.now)
+    SraTransaction.create(
+      :users_id => current_user.id,
+      :action => "Carried Over",
+      :content => "SRA Carried Over from Meeting ##{sra.meeting.get_id}",
+      :owner_id => sra.id,
+      :stamp => Time.now)
+    sra.meeting_id = nil
+    sra.status = "New"
+    sra.save
+    render status: 200
+  end
 
 
 
-	def baseline
-		@owner = Sra.find(params[:id])
-		@risk_group = @owner.matrix_connection.matrix_group
-		form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
-		load_options
-		if BaseConfig.airline[:base_risk_matrix]
-			render :partial=>"shared/baseline"
-		else
-			render :partial => "/risk_matrix_groups/form_baseline"
-		end
-	end
+  def mitigate
+    @owner = Sra.find(params[:id])
+    @risk_group = @owner.matrix_connection.matrix_group
+    load_options
+    mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
+    if BaseConfig.airline[:base_risk_matrix]
+      render :partial=>"shared/mitigate"
+    else
+      render :partial => "/risk_matrix_groups/form_mitigated"
+    end
+  end
 
 
 
-	def enable
-		@sra=Sra.find(params[:id])
-		@sra.viewer_access=!@sra.viewer_access
-		SraTransaction.create(:users_id=>current_user.id,:action=>"#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",:owner_id=>params[:id],:stamp=>Time.now)
-		@sra.save
-		redirect_to sra_path(@sra)
-	end
+  def baseline
+    @owner = Sra.find(params[:id])
+    @risk_group = @owner.matrix_connection.matrix_group
+    form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
+    load_options
+    if BaseConfig.airline[:base_risk_matrix]
+      render :partial=>"shared/baseline"
+    else
+      render :partial => "/risk_matrix_groups/form_baseline"
+    end
+  end
 
 
 
-	def new_minutes
-		@owner=Sra.find(params[:id])
-		@meeting = Meeting.find(params[:meeting])
-		render :partial=>"shared/add_minutes"
-	end
+  def enable
+    @sra=Sra.find(params[:id])
+    @sra.viewer_access=!@sra.viewer_access
+    SraTransaction.create(:users_id=>current_user.id,:action=>"#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",:owner_id=>params[:id],:stamp=>Time.now)
+    @sra.save
+    redirect_to sra_path(@sra)
+  end
 
 
 
-	def reopen
-		@sra = Sra.find(params[:id])
-		notify(
-			@sra.responsible_user,
-			"SRA ##{@sra.get_id} has been reopened and assigned." +
-				g_link(@sra),
-			true,
-			"SRA ##{@sra.get_id} Reopened and Assigned")
-		reopen_report(@sra)
-	end
+  def new_minutes
+    @owner=Sra.find(params[:id])
+    @meeting = Meeting.find(params[:meeting])
+    render :partial=>"shared/add_minutes"
+  end
 
 
 
-	def new_section
-		@owner = Sra.find(params[:owner_id])
-		@templates = Template.find(:all)  # TODO
-		respond_to do |format|
-			format.js {render "/sections/new_section", layout: false}
-		end
-	end
+  def reopen
+    @sra = Sra.find(params[:id])
+    notify(
+      @sra.responsible_user,
+      "SRA ##{@sra.get_id} has been reopened and assigned." +
+        g_link(@sra),
+      true,
+      "SRA ##{@sra.get_id} Reopened and Assigned")
+    reopen_report(@sra)
+  end
 
 
-	def add_section
-		@owner = Sra.find(params[:owner_id])
-		section = SraSection.create(params[:sections])
-		section.owner = @owner
-		new_section
-	end
+
+  def new_section
+    @owner = Sra.find(params[:owner_id])
+    @templates = Template.find(:all)  # TODO
+    respond_to do |format|
+      format.js {render "/sections/new_section", layout: false}
+    end
+  end
 
 
-	def edit_section(owner_id=nil, section=nil)
-		owner_id ||= params[:owner_id]
-		section ||= params[:section]
-		@owner = Sra.find(owner_id)
-		@section = Section.find(section)
-		respond_to do |format|
-			format.js {render "/sections/edit_section", layout: false}
-		end
-	end
+  def add_section
+    @owner = Sra.find(params[:owner_id])
+    section = SraSection.create(params[:sections])
+    section.owner = @owner
+    new_section
+  end
 
-	def update_section
-		@section = Section.find(params[:section_id])
-		if params[:sections][:section_fields_attributes].present?
-			params[:sections][:section_fields_attributes].each_value do |field|
-				if field[:value].is_a?(Array)
-					field[:value].delete("")
-					field[:value] = field[:value].join(";")
-				end
-			end
-		end
-		@section.update_attributes(params[:sections])
-		if params[:commit] == "Save"
-			@section.status = "In Progress"
-		elsif params[:commit] == "Submit"
-			@section.status = "Completed"
-		end
-			@section.save
-			edit_section(@section.owner.id, @section.id)
-	end
+
+  def edit_section(owner_id=nil, section=nil)
+    owner_id ||= params[:owner_id]
+    section ||= params[:section]
+    @owner = Sra.find(owner_id)
+    @section = Section.find(section)
+    respond_to do |format|
+      format.js {render "/sections/edit_section", layout: false}
+    end
+  end
+
+  def update_section
+    @section = Section.find(params[:section_id])
+    if params[:sections][:section_fields_attributes].present?
+      params[:sections][:section_fields_attributes].each_value do |field|
+        if field[:value].is_a?(Array)
+          field[:value].delete("")
+          field[:value] = field[:value].join(";")
+        end
+      end
+    end
+    @section.update_attributes(params[:sections])
+    if params[:commit] == "Save"
+      @section.status = "In Progress"
+    elsif params[:commit] == "Submit"
+      @section.status = "Completed"
+    end
+      @section.save
+      edit_section(@section.owner.id, @section.id)
+  end
 
 
 end

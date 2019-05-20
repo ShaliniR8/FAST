@@ -2,55 +2,53 @@ class BSK_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.2",
+      :version                                        => "1.0.3",
 
       :code                                           => "BSK",
       :base_risk_matrix                               => true,
-      :has_analytics_filter                           => true,
-      :enable_message_mailer                          => true,
-      :enable_message_templates                       => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
-      :enable_custom_options                          => true,
-      :enable_configurable_risk_matrices              => true,
-      :enable_checklist_templates                     => true,
-      :allow_set_alert                                => true,
-      :has_verification                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
+      :enable_configurable_risk_matrices              => false,
+      :allow_set_alert                                => false,
+      :has_verification                               => false,
       :has_mobile_app                                 => false,
+      :enable_mailer                                  => true,
 
 
 
       # Safety Reporting Module
-      :allow_anonymous_submission                     => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
-      :submission_mailer                              => true,  # Notifier will be notified on receiving new submissions
-      :allow_multi_submissions                        => true,
-      :view_narrative_from_meeting                    => true, # Show report narratives from the meeting page
-      :enable_orm                                     => true,
+      :enable_orm                                     => false,
       :observation_phases_trend                       => true,
-      :submission_title_required                      => true,
-      :allow_template_nested_fields                   => true,
-      :checklist_version                              => '2',
+      :allow_template_nested_fields                   => false,
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
-      :sa_mailer                                      => true,
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
-      :has_framework                                  => false,
-      :sra_mailers                                    => true,
+      :has_framework                                  => true,
     }
   end
 
 
+  OBSERVATION_PHASES = [
+    "Observation Phase",
+    "Condition",
+    "Threat", "Sub Threat",
+    "Error", "Sub Error",
+    "Human Factor", "Comment"]
+
+
 
   FAA_INFO = { #CORRECT/REVISE
-    "CHDO"=>"FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
-    "Region"=>"Anchorage",
-    "ASAP MOU Holder Name"=>"N/A",
+    "CHDO"=>"ACE-FSDO-09",
+    "Region"=>"Eatern",
+    "ASAP MOU Holder Name"=>"Miami Air International",
     "ASAP MOU Holder FAA Designator"=>"N/A"
   }
 

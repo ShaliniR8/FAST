@@ -1,57 +1,57 @@
 <div class="panel panel-info">
-	<div class="panel-heading">
-		<div class="panel-title">Agendas
-		<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-	</div>
-	<div class="panel-body">		
-		<div class="row">
-			<%=form_for @meeting do |f|%>
-				<div class="col-xs-12" style="max-height:400px;overflow-y:auto">
-					<table class="table table-striped table-bordered">
-						<thead>
-							<tr>
-								<%@headers.each do |h|%>
-							    <th><%=h[:title]%></th>
-								<%end%>
-								<th>Comment</th>
-							</tr>
-						</thead>
-						<tbody id="agendas">
-							<%@report.agendas.each do |a|%>
-								<%if a.user_id==current_user.id%>
-									<%=f.fields_for :agendas,a do |x|%>
-										<tr>
-											<td><%=x.text_field :title,:class=>"form-control"%></td>
-											<td><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
-											<td><%=a.get_user%></td>
-											<td><%=a.get_created%></td>
-											<td><%=a.get_updated%></td>
-											<td><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
-											<td><%=x.select :accepted,options_for_select(@accept_deline,a.accepted),{:include_blank=>""},:class=>"form-control"%></td>
-											<td><%=x.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
-										</tr>
-									<%end%>
-								<%else%>
-									<tr>
-										<td><%=a.title%></td>
-										<td><%=a.status%></td>
-										<td><%=a.get_user%></td>
-										<td><%=a.get_created%></td>
-										<td><%=a.get_updated%></td>
-										<td><%=a.discussion ? "Yes" : "No"%></td>
-										<td><%=a.accepted ? "Accepted" : "Declined"%></td>
-										<td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
-									</tr>
-								<%end%>
-							<%end%>
-						</tbody>
-					</table>
-				</div>
-				<div class="col-xs-12">
-					<%=f.submit "Submit",:class=>"btn btn-success pull-right", :disable_with => "Submitting..."%>
-					<%=link_to_fields "Add",f,:agendas,"AsapAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5"%>
-				</div>
-			<%end%>
-		</div>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title">Agendas
+    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <%=form_for @meeting do |f|%>
+        <div class="col-xs-12" style="max-height:400px;overflow-y:auto">
+          <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <%@headers.each do |h|%>
+                  <th><%=h[:title]%></th>
+                <%end%>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody id="agendas">
+              <%@report.agendas.each do |a|%>
+                <%if a.user_id==current_user.id%>
+                  <%=f.fields_for :agendas,a do |x|%>
+                    <tr>
+                      <td><%=x.text_field :title,:class=>"form-control"%></td>
+                      <td><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
+                      <td><%=a.get_user%></td>
+                      <td><%=a.get_created%></td>
+                      <td><%=a.get_updated%></td>
+                      <td><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
+                      <td><%=x.select :accepted,options_for_select(@accept_deline,a.accepted),{:include_blank=>""},:class=>"form-control"%></td>
+                      <td><%=x.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
+                    </tr>
+                  <%end%>
+                <%else%>
+                  <tr>
+                    <td><%=a.title%></td>
+                    <td><%=a.status%></td>
+                    <td><%=a.get_user%></td>
+                    <td><%=a.get_created%></td>
+                    <td><%=a.get_updated%></td>
+                    <td><%=a.discussion ? "Yes" : "No"%></td>
+                    <td><%=a.accepted ? "Accepted" : "Declined"%></td>
+                    <td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
+                  </tr>
+                <%end%>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-xs-12">
+          <%=f.submit "Save Agenda",:class=>"btn btn-success pull-right", :disable_with => "Saving..."%>
+          <%=link_to_fields "Add",f,:agendas,"AsapAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5"%>
+        </div>
+      <%end%>
+    </div>
+  </div>
 </div>

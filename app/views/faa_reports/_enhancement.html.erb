@@ -1,71 +1,61 @@
-<div class="col-sm-12 col-md-12 col-lg-12"%>
-	<div class="panel panel-lightskyblue">
-		<div class="panel-heading click-heading collapsed">
-			<div class="panel-title">
-				<b>Safety Enhancements</b>
-				<span class="pull-right clickable">
-					<i class="mt5 glyphicon glyphicon-chevron-down"></i>
-				</span>
-			</div> 
-		</div>
-		<div class="panel-body" style="display:none"> 
-			<div class="row">
-				<%@report.issues.each do |r|%>
-					
-
-
-					<%if false%>
-					<div class="col-sm-12 col-md-12 col-lg-12"%>
-						<div class="panel panel-info">
-							<div class="panel-heading click-heading collapsed">
-								<div class="panel-title">
-									<b><%=r.title%></b>
-									<span class="pull-right clickable">
-										<i class="mt5 glyphicon glyphicon-chevron-down"></i>
-									</span>
-								</div>
-							</div>
-							<div class="panel-body" style="display:none">
-								<div class="row">
-									<%=render "/forms/show_fields", :fields => Issue.get_meta_fields('show'), :record => r%>
-									<%if current_user.has_access("faa_reports", "edit")%>
-										<%=form_for @report do |ff|%>
-											<%=ff.fields_for :issues, r do |f|%>
-												<%=f.hidden_field :_destroy, :value => true%>
-												<%=f.submit "Delete", :class=>"btn btn-danger pull-right mr5"%>
-												<%=link_to "Edit", 
-													"#", 
-													:class => "btn btn-warning pull-right mr5 edit_se_btn", 
-													"data-toggle" => "modal", 
-													"data-target" => ".bs-example-modal-lg", 
-													:route => edit_enhancement_faa_report_path(@report, :enhancement => r)%>   
-											<%end%>
-										<%end%>
-									<%end%>
-								</div>
-							</div>
-						</div>
-					</div>
-					<%end%>
-
-
-
-
-				<%end%>
-			</div>
-		</div>
-	</div>
+<div class="col-sm-12 col-md-12 col-lg-12">
+  <div class="panel panel-lightskyblue">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b>Safety Enhancements</b>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
+      </div>
+    </div>
+    <div class="panel-body" style='display:none'>
+      <div class="row">
+        <div class="col-xs-12">
+          <table id="enhancement_table" class="table table-hover table-striped table-bordered">
+            <thead>
+              <tr>
+                <%Issue.get_meta_fields('show').each do |header|%>
+                  <th><%=header[:title]%></th>
+                <%end%>
+              </tr>
+            </thead>
+            <tbody>
+              <%@report.issues.each do |i|%>
+                <tr data-toggle='modal'
+                  data-target='.bs-example-modal-lg'
+                  route='<%=edit_enhancement_faa_report_path(@report, :enhancement => i.id)%>'>
+                  <%Issue.get_meta_fields('show').each do |header|%>
+                    <td><%=render 'forms/show_field', :field_hash => header, :record => i%></td>
+                  <%end%>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-	$(document).ready(function(){
-		$(".edit_se_btn").on("click", function(){
-			$.get($(this).attr("route"), function(data){
-				$(".modal-content").html(data);
-				$(window).trigger("resize");
-			});
-		});
-	});
+  $(document).ready(function(){
+
+    $("#enhancement_table").dataTable();
+
+    $("#enhancement_table tbody").on('click', 'tr', function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $(".edit_se_btn").on("click", function(){
+      $.get($(this).attr("route"), function(data){
+        $(".modal-content").html(data);
+        $(window).trigger("resize");
+      });
+    });
+  });
 </script>

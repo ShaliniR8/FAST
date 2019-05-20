@@ -3,19 +3,19 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-steelblue">
-     	<div class="panel-heading">
-     		<div class="panel-title">
+  <div class="grid per90 center-block">
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
           <div class="top_text">
-       		  <b>FAA Quarterly Reports</b> 
+            <b>FAA Quarterly Reports</b>
           </div>
           <div class="top_buttons pull-right">
           <%=link_to "New",new_faa_report_path,:class=>"btn btn-success pull-right new_faa_report"%>
         </div>
-     		</div>
-     	</div>
-     	<div class="panel-body" id="form_body"> 
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
@@ -23,11 +23,11 @@
                 <thead><tr>
                   <%@headers.each do |header|%>
                     <th><%=header[:title]%></th>
-                  <%end%>    
+                  <%end%>
                 </tr></thead>
                 <tbody>
                   <%@reports.each do |a|%>
-                    <tr id="<%=a.id%>">     
+                    <tr id="<%=a.id%>">
                       <%@headers.each do |header|%>
                         <td><%=a.send(header[:field])%></td>
                       <%end%>
@@ -38,10 +38,10 @@
             </div>
           </div>
         </div>
-      </div> 
-    </div>       
-	</div> 
-</div>  
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>

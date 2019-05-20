@@ -1,104 +1,99 @@
 <div class="title">
-	Report <%="##{owner.get_id}: #{owner.template.name} "%>		
+  Report <%="##{owner.get_id}: #{owner.template.name} - #{owner.get_description}"%>
 </div>
 
 <div class="content">
-	
-	<%=render "forms/print_fields", 
-		:fields => Record.get_meta_fields('show'), 
-		:owner => owner, 
-		:deidentified => deidentified%>
 
-	<%if BaseConfig.airline[:base_risk_matrix]%>
-		<%= render "/shared/print_risk_matrix", :owner => owner %>
-	<%else%>
-		<%= render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", :owner => owner %>
-	<%end%>
+  <%=render "forms/print_fields",
+    :fields => Record.get_meta_fields('show'),
+    :owner => owner,
+    :deidentified => deidentified%>
 
-	<div class="col-xs-12">
-		<hr>
-		<%owner.template.categories.order(:category_order).each do |cat|%>
-			
-			<%if cat.id == 338%>
-				<div class="category">
-					<h5><span style="color:black"><%=cat.title%></span></h5>
-					<table id="observation_phases_table" class="table table-bordered" width="100%">
-						<thead>
-							<tr>
-								<th>Observation Phase</th>
-								<th>Condition</th>
-								<th>Threat</th>
-								<th>Sub Threat</th>
-								<th>Error</th>
-								<th>Sub Error</th>
-								<th>Human Factor</th>
-								<th>Comment</th>
-							</tr>
-						</thead>
-						<tbody>
-							<%cat.fields.group_by(&:element_id).each do |element_id, arr|%>
-								<%if owner.record_fields.where(:fields_id => arr.first.id).present? && 
-									owner.record_fields.where(:fields_id => arr.first.id).first.value.present?%>
-									<tr>
-										<th><%=arr.first.label%></th>
-										<%arr.each do |x|%>
-											<%record_fields = owner.record_fields.where(:fields_id => x.id).first%>
-											<td><%=record_fields.value%></td>
-										<%end%>
-									</tr>
-								<%end%>
-							<%end%>
-						</tbody>
-					</table>
-				</div>
-			
-			
-			<%elsif cat.not_empty_for(owner) && (cat.print || !deidentified)%>
-				<div class="content">
-					<div class="sub_sub_title">
-						<%=cat.title%>		
-					</div>
-					<%cat.fields.order(:field_order).each do |field|%>
-						<%if field.print || !deidentified%>
-							<%value = owner.record_fields.where("fields_id = ?", field.id).first%>
-							<%if value.present?%>
-								<%value = value.print_value%>
-								<%if value.present?%>
-									<%if cat.title == "Narratives" %>
-										<b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
-									<%else%>
-										<b><%=field.label%>: </b>
-										<%if field.display_type == "employee"%>
-											<%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-												<%=User.find(value).full_name%>
-											<%else%>
-												<%=value%>
-											<%end%>
-										<%else%>
-											<%=value%>
-										<%end%>
-										</br>
-									<%end%>
-								<%end%>	
-							<%end%>
-						<%end%>
-					<%end%>
-				</div>    
-			<%end%>
-		<%end%>
-	</div>
+  <%if BaseConfig.airline[:base_risk_matrix]%>
+    <%= render "/shared/print_risk_matrix", :owner => owner %>
+  <%else%>
+    <%= render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", :owner => owner %>
+  <%end%>
 
-	<%=render "forms/print_descriptions", :title => 'Descriptions', :descriptions => owner.descriptions%>
-	<%=render "forms/print_descriptions", :title => 'Causes', :descriptions => owner.causes%>
-	<%=render "forms/print_descriptions", :title => 'Detections', :descriptions => owner.detections%>
-	<%=render "forms/print_descriptions", :title => 'Reactions', :descriptions => owner.reactions%>
-	<%=render "forms/print_descriptions", :title => 'Suggestions', :descriptions => owner.suggestions%>
-	
-	<%owner.corrective_actions.each do |car|%>
-		<div class="col-xs-12">
-			<hr>
-			<%=render 'corrective_actions/print', :owner => car, :deidentified => deidentified%>
-		</div>
-	<%end%>
+  <div class="col-xs-12">
+    <hr>
+    <%owner.template.categories.order(:category_order).each do |cat|%>
+
+      <%if cat.id == 338%>
+        <div class="category">
+          <div class="sub_sub_title"><%=cat.title%></div>
+          <table id="observation_phases_table" class="table table-bordered" width="100%">
+            <thead>
+              <tr>
+                <%BaseConfig.observation_phases.each do |x|%>
+                  <th><%=x%></th>
+                <%end%>
+              </tr>
+            </thead>
+            <tbody>
+              <%cat.fields.group_by(&:element_id).each do |element_id, arr|%>
+                <%if owner.record_fields.where(:fields_id => arr.first.id).present? &&
+                  owner.record_fields.where(:fields_id => arr.first.id).first.value.present?%>
+                  <tr>
+                    <th><%=arr.first.label%></th>
+                    <%arr.each do |x|%>
+                      <%record_fields = owner.record_fields.where(:fields_id => x.id).first%>
+                      <td><%=record_fields.value%></td>
+                    <%end%>
+                  </tr>
+                <%end%>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+
+
+      <%elsif cat.not_empty_for(owner) && (cat.print || !deidentified)%>
+        <div class="content">
+          <div class="sub_sub_title">
+            <%=cat.title%>
+          </div>
+          <%cat.fields.order(:field_order).each do |field|%>
+            <%if field.print || !deidentified%>
+              <%value = owner.record_fields.where("fields_id = ?", field.id).first%>
+              <%if value.present?%>
+                <%value = value.print_value%>
+                <%if value.present?%>
+                  <%if cat.title == "Narratives" %>
+                    <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                  <%else%>
+                    <b><%=field.label%>: </b>
+                    <%if field.display_type == "employee"%>
+                      <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                        <%=User.find(value).full_name%>
+                      <%else%>
+                        <%=value%>
+                      <%end%>
+                    <%else%>
+                      <%=value%>
+                    <%end%>
+                    </br>
+                  <%end%>
+                <%end%>
+              <%end%>
+            <%end%>
+          <%end%>
+        </div>
+      <%end%>
+    <%end%>
+  </div>
+
+  <%=render "forms/print_descriptions", :title => 'Descriptions', :descriptions => owner.descriptions%>
+  <%=render "forms/print_descriptions", :title => 'Causes', :descriptions => owner.causes%>
+  <%=render "forms/print_descriptions", :title => 'Detections', :descriptions => owner.detections%>
+  <%=render "forms/print_descriptions", :title => 'Reactions', :descriptions => owner.reactions%>
+  <%=render "forms/print_descriptions", :title => 'Suggestions', :descriptions => owner.suggestions%>
+
+  <%owner.corrective_actions.each do |car|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render 'corrective_actions/print', :owner => car, :deidentified => deidentified%>
+    </div>
+  <%end%>
 
 </div>

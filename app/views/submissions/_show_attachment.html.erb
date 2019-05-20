@@ -1,23 +1,23 @@
 <div class="col-sm-12 col-xs-12 col-md-6 col-lg-6 to_hide">
-	<div class="panel panel-default">
+  <div class="panel panel-default">
         <div class="panel-heading click-heading">
-			<div class="panel-title"><b><%=attachment.document_filename%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-up"></i></span></div> 
+      <div class="panel-title"><b><%=attachment.document_filename%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-up"></i></span></div>
         </div>
-	    <div class="panel-body">
-			<b>Caption: </b><%=attachment.caption%></br>
-			<%if Attachment.image_extensions.include? attachment.name.file.extension%>		
-				<a href="<%=attachment.name.url%>" target="_blank"><%=image_tag attachment.name.url,class: "img-responsive",style:"max-width:400px;max-height:400px;"%></br></a>
-			<%elsif Attachment.audio_extensions.include? attachment.name.file.extension%>
-				<audio controls>
+      <div class="panel-body">
+      <b>Caption: </b><%=attachment.caption%></br>
+      <%if Attachment.image_extensions.include? attachment.name.file.extension%>
+        <a href="<%=attachment.name.url%>" target="_blank"><%=image_tag attachment.name.url,class: "img-responsive",style:"max-width:400px;max-height:400px;"%></br></a>
+      <%elsif Attachment.audio_extensions.include? attachment.name.file.extension%>
+        <audio controls>
                     <source src="<%=attachment.name.url%>" type="audio/mpeg">
                 </audio>
-			<%elsif Attachment.video_extensions.include? attachment.name.file.extension%>
-				<video width="640" height="360" controls autostart="false">
-                	<source src="<%=attachment.name.url%>" type="video/mp4">
+      <%elsif Attachment.video_extensions.include? attachment.name.file.extension%>
+        <video width="640" height="360" controls autostart="false">
+                  <source src="<%=attachment.name.url%>" type="video/mp4">
                 </video>
-			<%else%>
-				<b><%=link_to "Click to Open/Download", attachment.name.url, :class=>"btn btn-info"%></b></br>
-			<%end%>
-		</div>
-	</div>
+      <%else%>
+        <b><%=link_to "Click to Open/Download", attachment.name.url, :class=>"btn btn-info"%></b></br>
+      <%end%>
+    </div>
+  </div>
 </div>

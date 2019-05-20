@@ -3,157 +3,157 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <div class="item active mt50" id="test2?" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="col-lg-12">
+  <div class="grid per90 center-block">
+    <div class="col-lg-12">
 
 
 
-			<%if flash[:error] %>
-				<div class="panel panel-danger" id="error_panel">
-					<div class="panel-heading">
-						<div class="panel-title">
-							<b>Error</b>
-						</div>
-					</div >
-					<div class="panel-body" id="errors">
-						<div style="color:red"> 
-							<%if flash[:error].kind_of?(Array)%>
-								<%flash[:error].each do |x| %>
-									<b>*<%=x%></b></br>
-								<%end%>
-							<%else%>
-								<b>*<%=flash[:error]%></b></br>
-							<%end%>
-						</div>
-					</div>
-				</div>
-			<%end%>
+      <%if flash[:error] %>
+        <div class="panel panel-danger" id="error_panel">
+          <div class="panel-heading">
+            <div class="panel-title">
+              <b>Error</b>
+            </div>
+          </div >
+          <div class="panel-body" id="errors">
+            <div style="color:red">
+              <%if flash[:error].kind_of?(Array)%>
+                <%flash[:error].each do |x| %>
+                  <b>*<%=x%></b></br>
+                <%end%>
+              <%else%>
+                <b>*<%=flash[:error]%></b></br>
+              <%end%>
+            </div>
+          </div>
+        </div>
+      <%end%>
 
-			<div class="panel panel-info">
+      <div class="panel panel-info">
 
-				<div class="panel-heading">
-					<div class="panel-title">
-						<b><%=((@action == "new")? "New Account" : "Edit Account Information")%></b>
-					</div>
-				</div>
+        <div class="panel-heading">
+          <div class="panel-title">
+            <b><%=((@action == "new")? "New Account" : "Edit Account Information")%></b>
+          </div>
+        </div>
 
-				<div class="panel-body mt5">
+        <div class="panel-body mt5">
 
-					<%=render "shared/instructions", :instruction => 
-										"
-										Items with  (<b style='color:red'>*</b>) are required. <br>
-										Password needs to be at least 6 characters long.
-										"
-										%>
-
-
-					<%=form_for @user, :html => {:multipart => true} do |f| %>
-						
-
-						<%if @authorized%>
-
-							<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-								<hr> 
-								<h4><b>ACCOUNT INFORMATION</b></h4>
-
-								<div class="col-xs-10 mt10">
-
-									<div class="form-group row">
-										<%=f.label :username, :class => "col-sm-4 col-form-label required_label"%>
-										<div class="col-sm-8">
-											<%=f.text_field :username, {:class=>"form-control required_field"}%>
-										</div>
-									</div>
-
-									<%if @action == "self_edit"%>
-										<div class="form-group row">
-											<%=f.label :validate, "Enter Password for Validation", :class => "col-sm-4 col-form-label required_label"%>
-											<div class="col-sm-8">
-												<input class="form-control required_field" type="password" size="30" id="pw" name="pw"/>
-											</div>
-										</div>
-	
-									<%else%>
-										<div class="form-group row">
-											<%=f.label :account_type, "Account Type", :class => "col-sm-4 col-form-label required_label"%>
-											<div class = "col-sm-8">
-												<%=f.select :level, options_for_select(@levels,@user.level), {:include_blank => ""} ,{:class => "form-control required_field"}	%>
-											</div>
-										</div>
-
-										<%if @action == "new"%>
-
-											<div class="form-group row">
-												<%=f.label :password, "Password", :class => "col-sm-4 col-form-label required_label"%>
-												<div class = "col-sm-8">
-													<%=f.password_field :password, {:class=>"form-control required_field password pass"}%>
-												</div>
-											</div>
-											<div class="form-group row">
-												<%=f.label :password, "Confirm Password", :class => "col-sm-4 col-form-label required_label"%>
-												<div class = "col-sm-8">
-													<%=f.password_field :password_confirmation, {:class=>"form-control required_field password pass_confirm"}%>
-												</div>
-											</div>
+          <%=render "shared/instructions", :instruction =>
+                    "
+                    Items with  (<b style='color:red'>*</b>) are required. <br>
+                    Password needs to be at least 6 characters long.
+                    "
+                    %>
 
 
-										<%else%>
-											<div class="form-group row">
-												<%=f.label :password, "New Password", :class => "col-sm-4 col-form-label"%>
-												<div class="col-sm-8">
-													<%=f.password_field :password, {:class=>"form-control password pass"}%>
-												</div>
-											</div>
-											<div class="form-group row">
-												<%=f.label :password, "Confirm New Password", :class => "col-sm-4 col-form-label"%>
-												<div class="col-sm-8">
-													<%=f.password_field :password_confirmation, {:class=>"form-control password pass_confirm"}%>
-												</div>
-											</div>
-										<%end%> 
-
-									<%end%>
-
-								</div>
-
-							</div>
+          <%=form_for @user, :html => {:multipart => true} do |f| %>
 
 
-							<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-								<hr> 
-								<h4><b>EMPLOYEE INFORMATION</b></h4>
-								<div class="col-xs-10 mt10">
-									<%User.get_account_details.each do |x|%>
-										<div class="form-group row">
-											<%=f.label x[:field], x[:title], :class => "col-sm-4 col-form-label #{x[:required] ? 'required_label' : ''}"%>
-											<div class = "col-sm-8">
-												<%=f.text_field x[:field], {:class=>"form-control #{x[:required] ? 'required_field' : ''}", :placeholder => x[:title]}%>
-											</div>
-										</div>
-									<%end%>
-								</div>
-							</div>
+            <%if @authorized%>
 
-							<input type="hidden" name="page" value="<%=@action%>"/>
-							<div class="form-actions pull-right mt20 mr20">
-								<%=link_to "Cancel",(@action == "new")? users_path : user_path(@user) , :id => "cancel-btn", :class=>"mr5 btn btn-warning", :confirm => "Are you sure?"%>
-								<%=f.submit "Save", :class => "btn btn-success", :disable_with => "Saving..."%>
-								
-							</div>
-						<%end%>
-					<%end%>
-				</div>
-			</div>
-		</div>
-	</div>
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                <hr>
+                <h4><b>ACCOUNT INFORMATION</b></h4>
+
+                <div class="col-xs-10 mt10">
+
+                  <div class="form-group row">
+                    <%=f.label :username, :class => "col-sm-4 col-form-label required_label"%>
+                    <div class="col-sm-8">
+                      <%=f.text_field :username, {:class=>"form-control required_field"}%>
+                    </div>
+                  </div>
+
+                  <%if @action == "self_edit"%>
+                    <div class="form-group row">
+                      <%=f.label :validate, "Enter Password for Validation", :class => "col-sm-4 col-form-label required_label"%>
+                      <div class="col-sm-8">
+                        <input class="form-control required_field" type="password" size="30" id="pw" name="pw"/>
+                      </div>
+                    </div>
+
+                  <%else%>
+                    <div class="form-group row">
+                      <%=f.label :account_type, "Account Type", :class => "col-sm-4 col-form-label required_label"%>
+                      <div class = "col-sm-8">
+                        <%=f.select :level, options_for_select(@levels,@user.level), {:include_blank => ""} ,{:class => "form-control required_field"}  %>
+                      </div>
+                    </div>
+
+                    <%if @action == "new"%>
+
+                      <div class="form-group row">
+                        <%=f.label :password, "Password", :class => "col-sm-4 col-form-label required_label"%>
+                        <div class = "col-sm-8">
+                          <%=f.password_field :password, {:class=>"form-control required_field password pass"}%>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <%=f.label :password, "Confirm Password", :class => "col-sm-4 col-form-label required_label"%>
+                        <div class = "col-sm-8">
+                          <%=f.password_field :password_confirmation, {:class=>"form-control required_field password pass_confirm"}%>
+                        </div>
+                      </div>
+
+
+                    <%else%>
+                      <div class="form-group row">
+                        <%=f.label :password, "New Password", :class => "col-sm-4 col-form-label"%>
+                        <div class="col-sm-8">
+                          <%=f.password_field :password, {:class=>"form-control password pass"}%>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <%=f.label :password, "Confirm New Password", :class => "col-sm-4 col-form-label"%>
+                        <div class="col-sm-8">
+                          <%=f.password_field :password_confirmation, {:class=>"form-control password pass_confirm"}%>
+                        </div>
+                      </div>
+                    <%end%>
+
+                  <%end%>
+
+                </div>
+
+              </div>
+
+
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                <hr>
+                <h4><b>EMPLOYEE INFORMATION</b></h4>
+                <div class="col-xs-10 mt10">
+                  <%User.get_account_details.each do |x|%>
+                    <div class="form-group row">
+                      <%=f.label x[:field], x[:title], :class => "col-sm-4 col-form-label #{x[:required] ? 'required_label' : ''}"%>
+                      <div class = "col-sm-8">
+                        <%=f.text_field x[:field], {:class=>"form-control #{x[:required] ? 'required_field' : ''}", :placeholder => x[:title]}%>
+                      </div>
+                    </div>
+                  <%end%>
+                </div>
+              </div>
+
+              <input type="hidden" name="page" value="<%=@action%>"/>
+              <div class="form-actions pull-right mt20 mr20">
+                <%=link_to "Cancel",(@action == "new")? users_path : user_path(@user) , :id => "cancel-btn", :class=>"mr5 btn btn-warning", :confirm => "Are you sure?"%>
+                <%=f.submit "Save", :class => "btn btn-success", :disable_with => "Saving..."%>
+
+              </div>
+            <%end%>
+          <%end%>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <style>
-	.required_label:after {
-		content:"*";
-		color:red;
-	}
+  .required_label:after {
+    content:"*";
+    color:red;
+  }
 </style>
 
 

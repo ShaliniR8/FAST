@@ -1,32 +1,32 @@
 <div class="col-xs-12">
-	<div class="panel panel-lightskyblue">
-		<div class="panel-heading click-heading collapsed">
-			<div class="panel-title">
-				<b>Meeting Agenda</b>
-				<span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-			</div> 
-		</div>
-		<div class="panel-body" style="display:none">
-			<table class="table table-hover table-bordered table-striped">
-				<thead>
-					<tr>
-						<%@agenda_headers.each do |h|%>
-							<th><%=h[:title]%></th>
-						<%end%>
-						<th>Comment</th>
-					</tr>
-				</thead>
-				<tbody>
-					<%@report.agendas.each do |a|%> 
-						<tr>
-							<%@agenda_headers.each do |h|%>
-								<td><%=a.send(h[:field])%></td>
-							<%end%>
-							<td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
-						</tr>
-					<%end%>
-				</tbody>
-			</table>
-		</div>
-	</div>
+  <div class="panel panel-lightskyblue">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b>Meeting Agenda</b>
+        <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div>
+    </div>
+    <div class="panel-body" style="display:none">
+      <table class="table table-hover table-bordered table-striped">
+        <thead>
+          <tr>
+            <%@agenda_headers.each do |h|%>
+              <th><%=h[:title]%></th>
+            <%end%>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%@report.agendas.each do |a|%>
+            <tr>
+              <%@agenda_headers.each do |h|%>
+                <td><%=a.send(h[:field])%></td>
+              <%end%>
+              <td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
+            </tr>
+          <%end%>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

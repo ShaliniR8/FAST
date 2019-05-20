@@ -10,97 +10,97 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="panel panel-warning">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<%="#{action_name.titleize} Hazard"%>
-				</div>
-			</div>
-			<div class="panel-body" id="form_body"> 
-				<%form_for @hazard, :html => {:multipart => true} do |f|%>
-				
-					<%if params[:owner_id].present?%>
-						<%=f.hidden_field :sra_id, :value => params[:owner_id]%>
-					<%end%>
+  <div class="grid per90 center-block">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <%="#{action_name.titleize} Hazard"%>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <%form_for @hazard, :html => {:multipart => true} do |f|%>
 
-					<%=render "/forms/form_fields", :f => f, :fields => @fields, :record => @hazard%>
+          <%if params[:owner_id].present?%>
+            <%=f.hidden_field :sra_id, :value => params[:owner_id]%>
+          <%end%>
 
-					<%if BaseConfig.airline[:base_risk_matrix]%>
-						<%=render "shared/matrix", :f => f, :owner => @hazard%> 
-					<%else%>
-						<%=render "shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
-					<%end%>
+          <%=render "/forms/form_fields", :f => f, :fields => @fields, :record => @hazard%>
 
-					<%=render '/forms/attachments_form', :f => f, :owner => @hazard%>
+          <%if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'%>
+            <%=render "shared/matrix", :f => f, :owner => @hazard%>
+          <%else%>
+            <%=render "shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
+          <%end%>
 
-					<div class="mt10 mr10">
-						<%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
-							:class => "btn btn-success pull-right", 
-							:disable_with => "Saving..."%>
-						<%=link_to "Cancel", 
-							action_name == 'new' ? @owner : @hazard, 
-							:id=>"cancel-btn", 
-							:class=>"mr5 btn btn-warning pull-right", 
-							:confirm=>'Are you sure?'%>
-					</div>
-				<%end%>
+          <%=render '/forms/attachments_form', :f => f, :owner => @hazard%>
 
-			</div> 
-		</div>       
-	</div> 
+          <div class="mt10 mr10">
+            <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+              :class => "btn btn-success pull-right",
+              :disable_with => "Saving..."%>
+            <%=link_to "Cancel",
+              action_name == 'new' ? @owner : @hazard,
+              :id=>"cancel-btn",
+              :class=>"mr5 btn btn-warning pull-right",
+              :confirm=>'Are you sure?'%>
+          </div>
+        <%end%>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <script>
-	function reset_risk(){
-		$(".colorcell").html('');
-		var sev_val=$("#sev").val();
-		var like_val=$("#like").val();
-		var likehood="";
-		switch (like_val){
-			case "A - Improbable":
-				likehood="0";
-				break;
-			case "B - Unlikely":
-				likehood="1";
-				break;
-			case "C - Remote":
-				likehood="2";
-				break;
-			case "D - Probable":
-				likehood="3";
-				break;
-			case "E - Frequent":
-				likehood="4";
-				break;
-			default:
-				likehood="";
-		}
-		switch($("#"+sev_val+"-"+likehood).attr('background')){
-			case "#60FF60":
-				like_val="Green - Acceptable";
-				break;
-			case "yellow":
-				like_val="Yellow - Acceptable with mitigation";
-				break;
-			case "orange":
-				like_val="Orange - Unacceptable";
-				break;
-			default:
-				like_val="";
-		}
-		$("#risk").val(like_val);
-		$("#"+sev_val+"-"+likehood).html("<center><span class='glyphicon glyphicon-remove' style='color:red'></span></center>");
-	}
-	$(document).ready(function(){
-		reset_risk();
-		$('#sev').on('change',function(){
-			reset_risk();
-		});
-		$('#like').on('change',function(){
-			reset_risk();
-		});
-	});
+  function reset_risk(){
+    $(".colorcell").html('');
+    var sev_val=$("#sev").val();
+    var like_val=$("#like").val();
+    var likehood="";
+    switch (like_val){
+      case "A - Improbable":
+        likehood="0";
+        break;
+      case "B - Unlikely":
+        likehood="1";
+        break;
+      case "C - Remote":
+        likehood="2";
+        break;
+      case "D - Probable":
+        likehood="3";
+        break;
+      case "E - Frequent":
+        likehood="4";
+        break;
+      default:
+        likehood="";
+    }
+    switch($("#"+sev_val+"-"+likehood).attr('background')){
+      case "#60FF60":
+        like_val="Green - Acceptable";
+        break;
+      case "yellow":
+        like_val="Yellow - Acceptable with mitigation";
+        break;
+      case "orange":
+        like_val="Orange - Unacceptable";
+        break;
+      default:
+        like_val="";
+    }
+    $("#risk").val(like_val);
+    $("#"+sev_val+"-"+likehood).html("<center><span class='glyphicon glyphicon-remove' style='color:red'></span></center>");
+  }
+  $(document).ready(function(){
+    reset_risk();
+    $('#sev').on('change',function(){
+      reset_risk();
+    });
+    $('#like').on('change',function(){
+      reset_risk();
+    });
+  });
 </script>

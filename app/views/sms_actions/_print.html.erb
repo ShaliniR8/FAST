@@ -1,34 +1,34 @@
 <div class="title">
-	Corrective Action #
-	<%=owner.get_id%>: <%=owner.title%>
+  Corrective Action #
+  <%=owner.get_id%>: <%=owner.title%>
 </div>
 <%=render "/forms/print_fields",
-	:fields => SmsAction.get_meta_fields('show'),
-	:owner => owner,
-	:deidentified => deidentified
+  :fields => SmsAction.get_meta_fields('show'),
+  :owner => owner,
+  :deidentified => deidentified
 %>
 <%=render '/forms/print_descriptions',
-	:descriptions => owner.descriptions,
-	:title => "Descriptions"
+  :descriptions => owner.descriptions,
+  :title => "Descriptions"
 %>
 
 <!-- Print Risk Matrix -->
 <%if BaseConfig.airline[:base_risk_matrix]%>
-	<%=render "/shared/print_risk_matrix", 
-		:owner => owner
-	%>
+  <%=render "/shared/print_risk_matrix",
+    :owner => owner
+  %>
 <%else%>
-	<%=render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", 
-		:owner => owner 
-	%>
+  <%=render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix",
+    :owner => owner
+  %>
 <%end%>
 
 <%if owner.costs.present?%>
-	<%owner.costs.each do |c|%>
-		<div class="category">
-			<%=render '/sras/print_cost',
-			:cost => c, 
-			:deidentified => deidentified%>
-		</div>
-	<%end%>
+  <%owner.costs.each do |c|%>
+    <div class="category">
+      <%=render '/sras/print_cost',
+      :cost => c,
+      :deidentified => deidentified%>
+    </div>
+  <%end%>
 <%end%>

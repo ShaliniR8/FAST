@@ -1,28 +1,28 @@
 <style>
 body {
-	font: normal 12px Verdana, Arial, sans-serif;
+  font: normal 12px Verdana, Arial, sans-serif;
 }
 table{
-	font: normal 11px Verdana, Arial, sans-serif;
+  font: normal 11px Verdana, Arial, sans-serif;
 }
 .category{
-	border: 1px solid black;
-	margin-bottom:3px;
-	padding:3px;
+  border: 1px solid black;
+  margin-bottom:3px;
+  padding:3px;
 }
 .grid_block{
-	display: inline-block;
-	width: 300px;
-	margin-bottom: 3px;
-	margin-top: 2px;
+  display: inline-block;
+  width: 300px;
+  margin-bottom: 3px;
+  margin-top: 2px;
 }
 .line_block{
-	display: inline-block;
-	width: 580px;
-	margin-right: 5px;
-	margin-left:  5px;
-	margin-bottom: 5px;
-	margin-top:5px;
+  display: inline-block;
+  width: 580px;
+  margin-right: 5px;
+  margin-left:  5px;
+  margin-bottom: 5px;
+  margin-top:5px;
 }
 </style>
 <h5><b>Hazard #<%=hazard.get_id%>: <%=hazard.title%></b></h5>
@@ -31,65 +31,65 @@ table{
 <b>Status: </b><%=hazard.status%></br>
 <%if hazard.description.present?%><b>Description of Hazard: </b></br><%=hazard.description.gsub(/\n/, '<br/>').html_safe%></br><%end%>
 
-	<%if BaseConfig.airline[:base_risk_matrix]%>
-		<%= render "/shared/print_risk_matrix", :owner => hazard %>
-	<%else%>
-		<%= render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", :owner => hazard%>
-	<%end%>
+  <%if BaseConfig.airline[:base_risk_matrix]%>
+    <%= render "/shared/print_risk_matrix", :owner => hazard %>
+  <%else%>
+    <%= render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", :owner => hazard%>
+  <%end%>
 
-	<% root_cause_headers = RootCause.get_headers %>
-	<% if hazard.root_causes.present? %>
-		<div class="category">
-			<h5><b>Root Causes</b></h5>
-			<table class="table table-hover" style="table-layout: fixed;">
-				<thead>
-					<tr>
-						<% root_cause_headers.each do |h| %>
-							<th><%= h[:title] %></th>
-						<% end %>
-					</tr>
-				</thead>
-				<tbody>
-					<% hazard.root_causes.each do |c| %>
-						<tr>
-							<% root_cause_headers.each do |h| %>
-								<td><%= c.send(h[:field]) %></td>
-							<% end %>
-						</tr>
-					<% end %>
-				</tbody>
-			</table>
-		</div>
-	<% end %>
+  <% root_cause_headers = RootCause.get_headers %>
+  <% if hazard.root_causes.present? %>
+    <div class="category">
+      <h5><b>Root Causes</b></h5>
+      <table class="table table-hover" style="table-layout: fixed;">
+        <thead>
+          <tr>
+            <% root_cause_headers.each do |h| %>
+              <th><%= h[:title] %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% hazard.root_causes.each do |c| %>
+            <tr>
+              <% root_cause_headers.each do |h| %>
+                <td><%= c.send(h[:field]) %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
 <%description_headers = HazardDescription.get_headers%>
 <%if hazard.descriptions.present?%>
-	<div class="category">
-		<h5><b>Descriptions</b></h5>
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<%description_headers.each do |h|%>
-						<th><%=h[:title]%></th>
-					<%end%>
-				</tr>
-			</thead>
-			<tbody>
-				<%hazard.descriptions.each do |c|%>
-					<tr>
-						<%description_headers.each do |h|%>
-							<td><%=c.send(h[:field])%></td>
-						<%end%>
-					</tr>
-				<%end%>
-			</tbody>
-		</table>
-	</div>
+  <div class="category">
+    <h5><b>Descriptions</b></h5>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <%description_headers.each do |h|%>
+            <th><%=h[:title]%></th>
+          <%end%>
+        </tr>
+      </thead>
+      <tbody>
+        <%hazard.descriptions.each do |c|%>
+          <tr>
+            <%description_headers.each do |h|%>
+              <td><%=c.send(h[:field])%></td>
+            <%end%>
+          </tr>
+        <%end%>
+      </tbody>
+    </table>
+  </div>
 <%end%>
 
 <%if hazard.risk_controls.present?%>
-	<%hazard.risk_controls.each do |c|%>
-		<div class="category">            
-			<%=render "/sras/print_risk_control",:risk_control=>c, :deidentified=>deidentified%>
-		</div>
-	<%end%>
+  <%hazard.risk_controls.each do |c|%>
+    <div class="category">
+      <%=render "/sras/print_risk_control",:risk_control=>c, :deidentified=>deidentified%>
+    </div>
+  <%end%>
 <%end%>

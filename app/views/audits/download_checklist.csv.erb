@@ -1,4 +1,13 @@
-<% headers = ['Sort ID', 'Title','Revision Level','Revision Date','Department','Requirement','Reference Number', 'Reference','Instructions','Created By'] %>
-<%= CSV.generate_line headers %><%@audit.items.each do |i|%>
-	<%= CSV.generate_line([i.sort_id,i.title,i.revision_level,i.get_revision_date,i.department,i.requirement,i.reference_number,i.reference,i.instructions,i.get_created_by]).html_safe%>
+<% headers = ['Title','Department','Reference Number', 'Reference','Requirement','Status','Level of Compliance','Comment'] %>
+<%= CSV.generate_line headers %>
+<%@audit.items.each do |i|%>
+  <%= CSV.generate_line([
+    i.title,
+    i.department,
+    i.reference_number,
+    i.reference,
+    i.requirement,
+    i.status,
+    i.level_of_compliance,
+    i.comment]).html_safe%>
 <%end%>

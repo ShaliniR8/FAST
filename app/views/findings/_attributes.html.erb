@@ -1,31 +1,31 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <%@attributes.each do |a|%>
     <%=fields_for :causes do |f|%>
-		<%if a[:type]=="text_field"%>
-			<div class="col-xs-12 form-inline form-group">
-				<%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%>
-				<%=f.text_field a[:name],:class=>"ml5 form-control"%>
-			</div>
-		<%elsif a[:type]== "check_box"%>
-			<div class="col-xs-6 form-inline form-group">
-				<%=f.check_box a[:name],{:class=>"ml5"},true,nil%>
-				<%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%>	
-			</div>
-		<%elsif a[:type]== "select"%>
-			<div class="col-xs-12 form-inline form-group">
-				<%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%>
-				<%=f.select a[:name],options_for_select(a[:options]),{:include_blank=>true},{:class=>"ml5 form-control"}%>
-			</div>
-		<%elsif a[:type]== "text_area"%>
-			<div class="col-xs-12 form-group">
-				<%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%></br>
-				<%=f.text_area a[:name],:class=>"ml5 form-control",:rows=>"10"%>
-			</div>
-		<%elsif a[:type] == "datatimepicker"%>
-			<div class="col-xs-12 form-inline">
-				<%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name].titleize)%></br>
-				<%=f.text_field a[:name], :class=>'field-datetime form-control'%>
-			</div>
-	 	<%end%>
-	 <%end%>
+    <%if a[:type]=="text_field"%>
+      <div class="col-xs-12 form-inline form-group">
+        <%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%>
+        <%=f.text_field a[:name],:class=>"ml5 form-control"%>
+      </div>
+    <%elsif a[:type]== "check_box"%>
+      <div class="col-xs-6 form-inline form-group">
+        <%=f.check_box a[:name],{:class=>"ml5"},true,nil%>
+        <%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%>
+      </div>
+    <%elsif a[:type]== "select"%>
+      <div class="col-xs-12 form-inline form-group">
+        <%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%>
+        <%=f.select a[:name],options_for_select(a[:options]),{:include_blank=>true},{:class=>"ml5 form-control"}%>
+      </div>
+    <%elsif a[:type]== "text_area"%>
+      <div class="col-xs-12 form-group">
+        <%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name])%></br>
+        <%=f.text_area a[:name],:class=>"ml5 form-control",:rows=>"10"%>
+      </div>
+    <%elsif a[:type] == "datatimepicker"%>
+      <div class="col-xs-12 form-inline">
+        <%=f.label a[:name],(a[:title].present? ?  a[:title] : a[:name].titleize)%></br>
+        <%=f.text_field a[:name], :class=>'field-datetime form-control'%>
+      </div>
+    <%end%>
+   <%end%>
 <%end%>

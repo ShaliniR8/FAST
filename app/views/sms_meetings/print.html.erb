@@ -36,7 +36,7 @@ body {
     <%if @meeting.notes.present?%>
         <b>Notes: </b><%=@meeting.notes.gsub(/\n/, '<br/>').html_safe%>
     <%end%>
-    <%@meeting.packages.each do |p|%> 
+    <%@meeting.packages.each do |p|%>
         <%=render "print_agenda", :package=>p%>
     <%end%>
 </div>

@@ -1,62 +1,62 @@
 <div class="col-xs-12 col-sm-4">
-	<div class="panel panel-warning">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>Reports Statistics</b> 
-			</div>
-		</div>
-		<div class="panel-body" style="height:300px">
-			<div class="row">
-				<div class="col-xs-12">
-					<h5>Average Days to Complete: <%=Record.get_avg_complete(current_user)%></h5>
-				</div>
-			</div>
-			<div id="records" style="width: 100%"></div>   
-			<div id="records_download" style="width: 100%" align="right"></div> 
-		</div>
-	</div>
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Reports Statistics</b>
+      </div>
+    </div>
+    <div class="panel-body" style="height:300px">
+      <div class="row">
+        <div class="col-xs-12">
+          <h5>Average Days to Complete: <%=Record.get_avg_complete(current_user)%></h5>
+        </div>
+      </div>
+      <div id="records" style="width: 100%"></div>
+      <div id="records_download" style="width: 100%" align="right"></div>
+    </div>
+  </div>
 </div>
-<script type="text/javascript"> 
-	<%= render partial: "analytics_data.js.erb", locals: {type: :record} %>
-	google.charts.load('current', {packages: ['corechart', 'bar']});
-	google.charts.setOnLoadCallback(function() {drawChartrecs(recordData); });
-	function drawChartrecs(data, params) {
-		var recs_options = {
-			chart: {
-				title: 'ASAP Statistics'
-			},
-			legend:'none',          
-			height:230,
-			colors:['blue'],
-			bars: 'horizontal' ,
-			chartArea: {left:100}// Required for Material Bar Charts.
-		};
+<script type="text/javascript">
+  <%= render partial: "analytics_data.js.erb", locals: {type: :record} %>
+  google.charts.load('current', {packages: ['corechart', 'bar']});
+  google.charts.setOnLoadCallback(function() {drawChartrecs(recordData); });
+  function drawChartrecs(data, params) {
+    var recs_options = {
+      chart: {
+        title: 'ASAP Statistics'
+      },
+      legend:'none',
+      height:230,
+      colors:['blue'],
+      bars: 'horizontal' ,
+      chartArea: {left:100}// Required for Material Bar Charts.
+    };
 
-		var records_chart = new google.visualization.BarChart(document.getElementById('records'));
-		google.visualization.events.addListener(records_chart, 'onmouseover', cursor_pointer);
-		google.visualization.events.addListener(records_chart, 'onmouseout', cursor_default);
+    var records_chart = new google.visualization.BarChart(document.getElementById('records'));
+    google.visualization.events.addListener(records_chart, 'onmouseover', cursor_pointer);
+    google.visualization.events.addListener(records_chart, 'onmouseout', cursor_default);
 
-		google.visualization.events.addListener(records_chart, 'ready', function () {
-			document.getElementById('records_download').innerHTML = '<a href="' + records_chart.getImageURI() + '"download><u>Download Chart</u></a>';
-		}); 
-		var dataTable = google.visualization.arrayToDataTable(data);
-		records_chart.draw(dataTable, recs_options);  
-		google.visualization.events.addListener(records_chart, 'select', function(){
-			var all_status=<%=raw @records.keys%>
-			var root_url="<%=records_path%>?status="
-			var dateParams = params && params.startDate && params.endDate? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
-			var empGroupParams = params && params.employeeGroups ? "&emp_groups=" + params.employeeGroups.join(",") : "";
-			var feederOperators = params && params.feederOperators ? "&feeder_operators=" + params.feederOperators.join(",") : "";
-			var selection = records_chart.getSelection();
-			var message = "";
-			var row = selection[0].row + 1;
-			var status = data[row][0];
-			message = root_url + status + dateParams + empGroupParams;
-			window.location=message; 
-		});
-	}
-	
-	$(window).bind('resizeEnd', function() {
-		drawChartrecs(recordData);
-	});
+    google.visualization.events.addListener(records_chart, 'ready', function () {
+      document.getElementById('records_download').innerHTML = '<a href="' + records_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+    });
+    var dataTable = google.visualization.arrayToDataTable(data);
+    records_chart.draw(dataTable, recs_options);
+    google.visualization.events.addListener(records_chart, 'select', function(){
+      var all_status=<%=raw @records.keys%>
+      var root_url="<%=records_path%>?status="
+      var dateParams = params && params.startDate && params.endDate? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
+      var empGroupParams = params && params.employeeGroups ? "&emp_groups=" + params.employeeGroups.join(",") : "";
+      var feederOperators = params && params.feederOperators ? "&feeder_operators=" + params.feederOperators.join(",") : "";
+      var selection = records_chart.getSelection();
+      var message = "";
+      var row = selection[0].row + 1;
+      var status = data[row][0];
+      message = root_url + status + dateParams + empGroupParams;
+      window.location=message;
+    });
+  }
+
+  $(window).bind('resizeEnd', function() {
+    drawChartrecs(recordData);
+  });
 </script>

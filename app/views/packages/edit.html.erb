@@ -5,14 +5,14 @@
 <script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
 <script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-   	<div class="panel panel-warning">
-     	<div class="panel-heading">
-     		<div class="panel-title">
-       		 <b>Edit: <%=@package.class.display_name%></b>
-     		</div>
-     	</div>
-     	<div class="panel-body">
+  <div class="grid per90 center-block">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+           <b>Edit: <%=@package.class.display_name%></b>
+        </div>
+      </div>
+      <div class="panel-body">
         <%=form_for @package.becomes(Package),:html => {:multipart => true}  do |f|%>
           <div class="row">
             <%=render 'form',:f=>f,:fields=>@fields%>
@@ -21,9 +21,9 @@
                     <div class="panel-heading click-heading collapsed">
                       <div class="panel-title">
                         <b>Attachments</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-                      </div> 
+                      </div>
                     </div>
-                    <div class="panel-body" style="display:none"> 
+                    <div class="panel-body" style="display:none">
                       <div class="row" id="attachments">
                         <%@package.attachments.each do |att|%>
                           <%=render "/records/existing_attachments_field",:f=>f,:attachment=>att%>
@@ -38,9 +38,9 @@
 
           </div>
         <%end%>
-      </div> 
-    </div>       
-	</div> 
+      </div>
+    </div>
+  </div>
 </div>
 <style>
  .datepicker{

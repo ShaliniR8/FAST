@@ -47,7 +47,7 @@ class QueryStatementsController < ApplicationController
 
 
 
-  def index 
+  def index
     start = Time.now
     @headers=QueryStatement.get_headers
     @records=QueryStatement.find(:all)
@@ -314,7 +314,7 @@ class QueryStatementsController < ApplicationController
       end
     end
     report_ids = []
-    report_fields.each do |x| 
+    report_fields.each do |x|
       if target == "Submission"
         report_ids << x[:submissions_id]
       else
@@ -333,7 +333,7 @@ class QueryStatementsController < ApplicationController
   # params[:value] : field value
   # params[:field_id] : field id
   def visualization_table
-    value = params[:value]    
+    value = params[:value]
     @query = QueryStatement.find(params[:id])
     target_class = Object.const_get(@query.target_class)
     @headers = target_class.get_headers
@@ -386,7 +386,7 @@ class QueryStatementsController < ApplicationController
     end
     #submission_fields = SubmissionField.where(:fields_id => @field.id, :value => value)
     report_ids = []
-    report_fields.each do |x| 
+    report_fields.each do |x|
       if target == "Submission"
         report_ids << x[:submissions_id]
       else
@@ -435,7 +435,7 @@ class QueryStatementsController < ApplicationController
             @fields.push(category)
           end
         end
-      end   
+      end
     end
   end
 
@@ -452,5 +452,5 @@ class QueryStatementsController < ApplicationController
   def analyze_field
   end
 
-  
+
 end

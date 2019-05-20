@@ -1,23 +1,23 @@
 <div class="panel panel-warning">
-	<div class="panel-heading">
-		<div class="panel-title">
-			<b>Baseline Risk Assessment</b>
-			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
-				<span class="glyphicon glyphicon-remove"></span>
-			</button> 
-		</div>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b>Baseline Risk Assessment</b>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
+  </div>
 
-	<div class="panel-body" style="max-height:600px; overflow-y:auto;">
+  <div class="panel-body" style="max-height:600px; overflow-y:auto;">
 
-		<%=form_for @owner do |f|%>
-			<%=render "/risk_matrix_groups/form_baseline_matrix", :f => f%>
-			<div class="col-xs-12">
-				<%=f.submit "Submit",:class=>"btn btn-success pull-right mr5", disable_with: "Submitting..."%>
-			</div>
-		<%end%>
+    <%=form_for @owner do |f|%>
+      <%=render "/risk_matrix_groups/form_baseline_matrix", :f => f%>
+      <div class="col-xs-12">
+        <%=f.submit "Submit",:class=>"btn btn-success pull-right mr5", disable_with: "Submitting..."%>
+      </div>
+    <%end%>
 
-	</div>
+  </div>
 
 </div>
 

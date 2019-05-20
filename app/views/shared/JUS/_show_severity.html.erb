@@ -1,28 +1,28 @@
 <div class="col-xs-12 mb20">
-	<hr/>
-	<h4 style="color:#48C9B0"><b>SEVERITY EXCERCISE</b></h4>
-	<table class="table table-bordered table-centered">
+  <hr/>
+  <h4 style="color:#48C9B0"><b>SEVERITY EXCERCISE</b></h4>
+  <table class="table table-bordered table-centered">
 
-		<tr>
-			<th bgcolor="#48C9B0" style="color:white">CLASS</th>
-			<th bgcolor="#48C9B0" colspan="5" style="color:white">SEVERITY</th>
-		</tr>
-		<tr>
-			<th bgcolor="#EAFAF1" width="5%"></th>
-			<%@severity_table[:column_header].each do |header|%>
-				<th bgcolor="#EAFAF1" width="15%"><%=header%></th>
-			<%end%>
-		</tr>
-		<tr>
-			<%@severity_table[:row_header].each_with_index do |row_header,row_index|%>
-				<tr>
-					<th bgcolor="#EAFAF1" width="5%"><%=row_header%></th>
-					<%@severity_table[:column_header].each_with_index do |column_header,column_index|%>
-						<td class="severity_td<%=owner.class.name%>_<%=owner.id%>" data-row="<%=row_index%>" data-status="" data-mitigated="" data-column="<%=column_index%>"><%=@severity_table[:rows][row_index][column_index]%></td>
-					<%end%>
-				</tr>
-			<%end%>
-		</tr>
+    <tr>
+      <th bgcolor="#48C9B0" style="color:white">CLASS</th>
+      <th bgcolor="#48C9B0" colspan="5" style="color:white">SEVERITY</th>
+    </tr>
+    <tr>
+      <th bgcolor="#EAFAF1" width="5%"></th>
+      <%@severity_table[:column_header].each do |header|%>
+        <th bgcolor="#EAFAF1" width="15%"><%=header%></th>
+      <%end%>
+    </tr>
+    <tr>
+      <%@severity_table[:row_header].each_with_index do |row_header,row_index|%>
+        <tr>
+          <th bgcolor="#EAFAF1" width="5%"><%=row_header%></th>
+          <%@severity_table[:column_header].each_with_index do |column_header,column_index|%>
+            <td class="severity_td<%=owner.class.name%>_<%=owner.id%>" data-row="<%=row_index%>" data-status="" data-mitigated="" data-column="<%=column_index%>"><%=@severity_table[:rows][row_index][column_index]%></td>
+          <%end%>
+        </tr>
+      <%end%>
+    </tr>
 
-	</table>
+  </table>
 </div>

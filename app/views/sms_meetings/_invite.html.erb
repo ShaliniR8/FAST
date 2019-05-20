@@ -15,7 +15,7 @@
         <tr user="<%=user.id%>">
           <%@headers.each do |header|%>
             <td><%=user.send(header[:field])%></td>
-          <%end%>         
+          <%end%>
           <%if @action=="new"%>
             <td><a class="btn btn-info invite_btn">Invite</a></td>
           <%elsif @action=="show"%>
@@ -54,10 +54,10 @@
         }
         else
         {
-  
+
           $(this).text("Invite");
           $(this).removeClass("btn-success").addClass("btn-info");
-  
+
         }
       });
       var dt=$('#users').DataTable({

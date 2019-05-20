@@ -5,73 +5,73 @@
 
 
 <div class="col-xs-12 mt20">
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>Available Events</b>
-			</div>
-		</div>
-		<div class="panel-body">
-			<div class="table-responsive">
-				<div class="col-xs-12">
-					<table id="records_table" class="table table-bordered">
-						<thead>
-							<tr>
-								<%@headers.each do |header|%>
-									<th class="<%=header[:size]%>">
-										<%=header[:title]%>
-									</th>
-								<%end%>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody>
-							<%@records.each do |record|%>
-								<tr>
-									<%@headers.each do |header|%>
-										<td><%=record.send(header[:field])%></td>
-									<%end%>                  
-									<td>
-										<div class="btn-group">
-											<a class="btn btn-info view_btn">
-												<span class="glyphicon glyphicon-search"></span>
-											</a>
-											<a class="btn btn-success bind_btn">
-												<span class="glyphicon glyphicon-plus"></span>
-											</a>
-										</div>
-									</td>
-								</tr>
-							<%end%>
-						</tbody>
-					</table>
-				</div>
-			</div>          
-		</div>
-	</div>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Available Events</b>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="table-responsive">
+        <div class="col-xs-12">
+          <table id="records_table" class="table table-bordered">
+            <thead>
+              <tr>
+                <%@headers.each do |header|%>
+                  <th class="<%=header[:size]%>">
+                    <%=header[:title]%>
+                  </th>
+                <%end%>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%@records.each do |record|%>
+                <tr>
+                  <%@headers.each do |header|%>
+                    <td><%=record.send(header[:field])%></td>
+                  <%end%>
+                  <td>
+                    <div class="btn-group">
+                      <a class="btn btn-info view_btn">
+                        <span class="glyphicon glyphicon-search"></span>
+                      </a>
+                      <a class="btn btn-success bind_btn">
+                        <span class="glyphicon glyphicon-plus"></span>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <style>
 .table th, td {
-	text-align: center;
+  text-align: center;
 }
 </style>
 
 
 
 <script>
-	$(document).ready(function(){
-		$(".view_btn").on('click',function(){
-			window.open("/reports/"+$(this).closest("tr").children("td").eq(0).html());
-		});
-		$(".bind_btn").on('click',function(){
-			window.location="/reports/bind?report="+$(this).closest("tr").children("td").eq(0).html()+"&record=<%=params[:record]%>";
-		});
-		$('#records_table').DataTable({
-			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-			"iDisplayLength": 5
-		});
-	});
+  $(document).ready(function(){
+    $(".view_btn").on('click',function(){
+      window.open("/reports/"+$(this).closest("tr").children("td").eq(0).html());
+    });
+    $(".bind_btn").on('click',function(){
+      window.location="/reports/bind?report="+$(this).closest("tr").children("td").eq(0).html()+"&record=<%=params[:record]%>";
+    });
+    $('#records_table').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  });
 </script>

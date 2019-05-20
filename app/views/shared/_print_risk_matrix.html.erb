@@ -1,27 +1,27 @@
 <%if owner.risk_factor.present? || owner.risk_factor_after.present? %>
-	<div class="col-xs-12">
-		<div class="sub_sub_title">Risk Assessment</div>
-		<div class="content">
-			<%if owner.risk_factor.present?%>
-				<div class="col-xs-6">
-					<b>Baseline Severity: </b><%=owner.severity%></br>
-					<b>Baseline Likelihood: </b><%=owner.likelihood%></br>
-					<b>Baseline Risk: </b><%=owner.risk_factor%></br>
-				</div>
-			<%end%>
-			<%if owner.risk_factor_after.present?%>
-				<div class="col-xs-6">
-					<b>Mitigated Severity: </b><%=owner.severity_after%></br>
-					<b>Mitigated Likelihood: </b><%=owner.likelihood_after%></br>
-					<b>Mitigated Risk: </b><%=owner.risk_factor_after%></br>
-				</div>
-			<%end%>
-			<%if owner.statement.present?%>
-				<div class="col-xs-12">
-					<b>Risk Assessment Notes: </b></br>
-					<%=simple_format(owner.statement)%>
-				</div>
-			<%end%>
-		</div>
-	</div>
+  <div class="col-xs-12">
+    <div class="sub_sub_title">Risk Assessment</div>
+    <div class="content">
+      <%if owner.risk_factor.present?%>
+        <div class="col-xs-6">
+          <b>Baseline Severity: </b><%=owner.severity%></br>
+          <b>Baseline Likelihood: </b><%=owner.likelihood%></br>
+          <b>Baseline Risk: </b><%=owner.risk_factor%></br>
+        </div>
+      <%end%>
+      <%if owner.risk_factor_after.present?%>
+        <div class="col-xs-6">
+          <b>Mitigated Severity: </b><%=owner.severity_after%></br>
+          <b>Mitigated Likelihood: </b><%=owner.likelihood_after%></br>
+          <b>Mitigated Risk: </b><%=owner.risk_factor_after%></br>
+        </div>
+      <%end%>
+      <%if owner.statement.present?%>
+        <div class="col-xs-12">
+          <b>Risk Assessment Notes: </b></br>
+          <%=simple_format(owner.statement)%>
+        </div>
+      <%end%>
+    </div>
+  </div>
 <%end%>

@@ -1,61 +1,61 @@
 <div class="col-xs-12 col-sm-4">
-	<div class="panel panel-danger">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<b>Framework IM Package Statistics</b> 
-			</div>
-		</div>
-		<div class="panel-body" style="height:300px">
-			<div class="row">
-				<div class="col-xs-12">
-					<h5>Average Days to Complete: <%=FrameworkImPackage.get_avg_complete%></h5>
-				</div>
-			</div>
-			<div id="fp" style="width: 100%"></div>   
-			<div id="fp_download" style="width: 100%" align="right"></div> 
-		</div>
-	</div>
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Framework IM Package Statistics</b>
+      </div>
+    </div>
+    <div class="panel-body" style="height:300px">
+      <div class="row">
+        <div class="col-xs-12">
+          <h5>Average Days to Complete: <%=FrameworkImPackage.get_avg_complete%></h5>
+        </div>
+      </div>
+      <div id="fp" style="width: 100%"></div>
+      <div id="fp_download" style="width: 100%" align="right"></div>
+    </div>
+  </div>
 </div>
 <script type="text/javascript">
-	<%= render partial: "analytics_data.js.erb", locals: {type: :fp} %>
-	google.charts.load('current', {packages: ['corechart', 'bar']});
-	google.charts.setOnLoadCallback(function() {drawChartfp(fpData);});
-	function drawChartfp(data) {
-		var fp_options = {
-			chart: {
-				title: 'SMS IM Statistics'
-			},
-			legend:'none',          
-			hAxis: {
-				minValue: 0
-			},
-			height:230,
-			colors:['blue'],
-			bars: 'horizontal',
-			chartArea: {left:100} // Required for Material Bar Charts.
-		};
+  <%= render partial: "analytics_data.js.erb", locals: {type: :fp} %>
+  google.charts.load('current', {packages: ['corechart', 'bar']});
+  google.charts.setOnLoadCallback(function() {drawChartfp(fpData);});
+  function drawChartfp(data) {
+    var fp_options = {
+      chart: {
+        title: 'SMS IM Statistics'
+      },
+      legend:'none',
+      hAxis: {
+        minValue: 0
+      },
+      height:230,
+      colors:['blue'],
+      bars: 'horizontal',
+      chartArea: {left:100} // Required for Material Bar Charts.
+    };
 
-		var fp_chart = new google.visualization.BarChart(document.getElementById('fp'));
-		google.visualization.events.addListener(fp_chart, 'onmouseover', cursor_pointer);
-		google.visualization.events.addListener(fp_chart, 'onmouseout', cursor_default);
-		google.visualization.events.addListener(fp_chart, 'ready', function () {
-			document.getElementById('fp_download').innerHTML = '<a href="' + fp_chart.getImageURI() + '"download><u>Download Chart</u></a>';
-		});
-		fp_chart.draw(google.visualization.arrayToDataTable(data), fp_options);  
-		google.visualization.events.addListener(fp_chart, 'select', function(){
-			var all_status=<%=raw @fp.keys%>
-			var root_url="<%=packages_path%>?type=FrameworkImPackage&status="
-			var selection = fp_chart.getSelection();
-			var message = "";
-			for (var i = 0; i < selection.length; i++) {
-				var item = selection[i];
-				message= root_url+all_status[item.row];
-			}
-			window.location=message;
-		});
-	}
-	
-	$(window).bind('resizeEnd', function() {
-		drawChartfp(fpData);
-	});
+    var fp_chart = new google.visualization.BarChart(document.getElementById('fp'));
+    google.visualization.events.addListener(fp_chart, 'onmouseover', cursor_pointer);
+    google.visualization.events.addListener(fp_chart, 'onmouseout', cursor_default);
+    google.visualization.events.addListener(fp_chart, 'ready', function () {
+      document.getElementById('fp_download').innerHTML = '<a href="' + fp_chart.getImageURI() + '"download><u>Download Chart</u></a>';
+    });
+    fp_chart.draw(google.visualization.arrayToDataTable(data), fp_options);
+    google.visualization.events.addListener(fp_chart, 'select', function(){
+      var all_status=<%=raw @fp.keys%>
+      var root_url="<%=packages_path%>?type=FrameworkImPackage&status="
+      var selection = fp_chart.getSelection();
+      var message = "";
+      for (var i = 0; i < selection.length; i++) {
+        var item = selection[i];
+        message= root_url+all_status[item.row];
+      }
+      window.location=message;
+    });
+  }
+
+  $(window).bind('resizeEnd', function() {
+    drawChartfp(fpData);
+  });
 </script>

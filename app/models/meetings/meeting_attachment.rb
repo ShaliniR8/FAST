@@ -1,5 +1,5 @@
 class MeetingAttachment < Attachment
-	belongs_to :meeting, foreign_key:"owner_id", class_name: "Meeting"
+  belongs_to :meeting, foreign_key:"owner_id", class_name: "Meeting"
 
   after_create :create_transaction
   before_destroy :delete_transaction

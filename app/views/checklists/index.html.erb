@@ -1,0 +1,26 @@
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "/checklists/instructions"%>
+    <%=render "/forms/index_fields", :btns => [
+      {btn_name: 'New', btn_class: 'btn-success', modal: true, class_id: 'new_template_btn'},
+      {btn_name: 'Checklist Headers', btn_path: checklist_headers_path, btn_class: 'btn-info'},
+      ]%>
+  </div>
+</div>
+
+
+<script>
+  $(function(){
+    $('#new_template_btn').on('click',function(){
+      $.get("<%=new_checklist_path(
+        :owner_class => 'Checklist',
+        :owner_id => '',
+        :allow_template => false)%>",
+        function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
+
+</script>

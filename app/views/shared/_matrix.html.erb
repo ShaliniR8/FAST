@@ -1,32 +1,32 @@
 <%load_options%>
 
 <div class="col-xs-12"%>
-	<div class="panel panel-info">
-		<div class="panel-heading click-heading collapsed">
-			<div class="panel-title">
-				<b>Baseline Risk Assessmenet</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-			</div>
-		</div>
-		<div class="panel-body" style="display:none">
-			<div class="row col-xs-12">
-				<%=render "shared/instructions", 
-								:instruction => "Select the <b>Baseline Severity</b> and the <b>Baseline Likelihood</b> from dropdown to see Risk Factor."%>
-				<%=render "shared/bsk_risk_matrix_form_baseline", :f => f%>
-				<%=render "shared/bsk_risk_matrix_table_form"%>
-			</div>
-		</div>
-	</div>
+  <div class="panel panel-lightskyblue">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b>Baseline Risk Assessmenet</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+      </div>
+    </div>
+    <div class="panel-body" style="display:none">
+      <div class="row col-xs-12">
+        <%=render "shared/instructions",
+                :instruction => "Select the <b>Baseline Severity</b> and the <b>Baseline Likelihood</b> from dropdown to see Risk Factor."%>
+        <%=render "shared/bsk_risk_matrix_form_baseline", :f => f%>
+        <%=render "shared/bsk_risk_matrix_table_form"%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <script>
-	$(document).ready(function(){
-		$("#<%=owner.severity%>-<%=Investigation.get_likelihood.index(owner.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
-		$('#sev').on('change',function(){
-			reset_risk();
-		});
-		$('#like').on('change',function(){
-			reset_risk();
-		});
-	});
+  $(document).ready(function(){
+    $("#<%=owner.severity%>-<%=Investigation.get_likelihood.index(owner.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
+    $('#sev').on('change',function(){
+      reset_risk();
+    });
+    $('#like').on('change',function(){
+      reset_risk();
+    });
+  });
 </script>

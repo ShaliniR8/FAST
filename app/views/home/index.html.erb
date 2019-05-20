@@ -2,163 +2,163 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<div class="row">
-			<%=render "shared/alerts" %>
-			<%if session[:mode] == "ASAP" && !@templates.empty?%>
-				<%=render "new_submission"%>
-				<%if BaseConfig.airline[:enable_orm]%>
-					<%=render "new_orms"%>
-				<%end%>
-			<%end%>
-			<%=render "news"%>
-			<div id="calendar-parent">
-				<%=render "calendar"%>
-			</div>
+  <div class="grid per90 center-block">
+    <div class="row">
+      <%=render "shared/alerts" %>
+      <%if session[:mode] == "ASAP" && !@templates.empty?%>
+        <%=render "new_submission"%>
+        <%if BaseConfig.airline[:enable_orm]%>
+          <%=render "new_orms"%>
+        <%end%>
+      <%end%>
+      <%=render "news"%>
+      <div id="calendar-parent">
+        <%=render "calendar"%>
+      </div>
 
-			<%= render "analytics_filter" if BaseConfig.airline[:has_analytics_filter] %>
-			<%= render "draw_chart" %>
+      <%= render "analytics_filter"%>
+      <%= render "draw_chart" %>
 
-			<!-- Safety Reporting -->
-			<%if session[:mode] == "ASAP"%>	
-				<%if current_user.has_access("submissions", "index")%><%=render "submissions"%><%end%>
-				<%if current_user.has_access("records", "index")%><%=render "records"%><%end%>
-				<%if current_user.has_access("reports", "index")%><%=render "reports"%><%end%>
-				<%if current_user.has_access("corrective_actions", "index")%><%=render "corrective_actions"%><%end%>
-				<%if current_user.has_access("records", "show") && current_user.has_access("reports", "show")%>
-					<div id="risk-matrix-parent">
-						<%if BaseConfig.airline[:base_risk_matrix]%>
-							<%=render "risk_matrix"%><%=render "after_matrix"%>
-						<%else%>
-							<%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
-							<%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
-						<%end%>
-					</div>
-				<%end%>
-
-
-			<!-- Safety Assurance -->
-			<%elsif session[:mode] == "SMS"%>
-				<div class="col-xs-12 col-sm-12">
-					<%if current_user.has_access("audits","index")%><%=render "audits"%><%end%>
-					<%if current_user.has_access("inspections","index")%><%=render "inspections"%><%end%>
-					<%if current_user.has_access("evaluations","index")%><%=render "evaluations"%><%end%>
-					<%if current_user.has_access("investigations","index")%><%=render "investigations"%><%end%>
-				</div>
-				<div class="col-xs-12 col-sm-12">
-					<%if current_user.has_access("findings","index")%><%=render "findings"%><%end%>
-					<%if current_user.has_access("sms_actions","index")%><%=render "sms_actions"%><%end%>
-					<%if current_user.has_access("recommendations","index")%><%=render "recommendations"%><%end%>
-				</div>
-
-				<div id="risk-matrix-parent" class="col-xs-12 col-sm-12">
-					<%if BaseConfig.airline[:base_risk_matrix]%>
-						<%=render "risk_matrix"%><%=render "after_matrix"%>
-					<%else%>
-						<%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
-						<%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
-					<%end%>
-				</div>
+      <!-- Safety Reporting -->
+      <%if session[:mode] == "ASAP"%>
+        <%if current_user.has_access("submissions", "index")%><%=render "submissions"%><%end%>
+        <%if current_user.has_access("records", "index")%><%=render "records"%><%end%>
+        <%if current_user.has_access("reports", "index")%><%=render "reports"%><%end%>
+        <%if current_user.has_access("corrective_actions", "index")%><%=render "corrective_actions"%><%end%>
+        <%if current_user.has_access("records", "show") && current_user.has_access("reports", "show")%>
+          <div id="risk-matrix-parent">
+            <%if BaseConfig.airline[:base_risk_matrix]%>
+              <%=render "risk_matrix"%><%=render "after_matrix"%>
+            <%else%>
+              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
+              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
+            <%end%>
+          </div>
+        <%end%>
 
 
+      <!-- Safety Assurance -->
+      <%elsif session[:mode] == "SMS"%>
+        <div class="col-xs-12 col-sm-12">
+          <%if current_user.has_access("audits","index")%><%=render "audits"%><%end%>
+          <%if current_user.has_access("inspections","index")%><%=render "inspections"%><%end%>
+          <%if current_user.has_access("evaluations","index")%><%=render "evaluations"%><%end%>
+          <%if current_user.has_access("investigations","index")%><%=render "investigations"%><%end%>
+        </div>
+        <div class="col-xs-12 col-sm-12">
+          <%if current_user.has_access("findings","index")%><%=render "findings"%><%end%>
+          <%if current_user.has_access("sms_actions","index")%><%=render "sms_actions"%><%end%>
+          <%if current_user.has_access("recommendations","index")%><%=render "recommendations"%><%end%>
+        </div>
 
-			<!-- Safety Risk Management -->
-			<%elsif session[:mode]=="SRM"%>
-				<%if current_user.has_access("sras","index")%><%=render "sras"%><%end%>
-				<%if current_user.has_access("hazards","index")%><%=render "hazards"%><%end%>
-				<%if current_user.has_access("risk_controls","index")%><%=render "risk_controls"%><%end%>
-				<%if current_user.has_access("safety_plans","index")%><%=render "safety_plans"%><%end%>
-				<%if current_user.has_access("hazards","index")%>
-					<div id="risk-matrix-parent">
-						<%if BaseConfig.airline[:base_risk_matrix]%>
-							<%=render "risk_matrix"%><%=render "after_matrix"%>
-						<%else%>
-							<%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
-							<%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
-						<%end%>
-					</div>
-				<%end%>
+        <div id="risk-matrix-parent" class="col-xs-12 col-sm-12">
+          <%if BaseConfig.airline[:base_risk_matrix]%>
+            <%=render "risk_matrix"%><%=render "after_matrix"%>
+          <%else%>
+            <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
+            <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
+          <%end%>
+        </div>
 
 
 
-			<!-- SMS IM -->
-			<%elsif session[:mode]=="SMS IM"%>
-				<%if BaseConfig.airline[:has_framework]%><%=render "frameworks"%><%end%> <!-- hide just for demo purpose, will release to Miami Air -->
-				<%=render "vps"%>
-				<%=render "jobaids"%>
-				<%if BaseConfig.airline[:has_framework]%><%=render "fp"%><%end%><!-- hide just for demo purpose, will release to Miami Air -->
-				<%=render "vpp"%>
-				<%=render "jap"%>
-			<%end%>
+      <!-- Safety Risk Management -->
+      <%elsif session[:mode]=="SRM"%>
+        <%if current_user.has_access("sras","index")%><%=render "sras"%><%end%>
+        <%if current_user.has_access("hazards","index")%><%=render "hazards"%><%end%>
+        <%if current_user.has_access("risk_controls","index")%><%=render "risk_controls"%><%end%>
+        <%if current_user.has_access("safety_plans","index")%><%=render "safety_plans"%><%end%>
+        <%if current_user.has_access("hazards","index")%>
+          <div id="risk-matrix-parent">
+            <%if BaseConfig.airline[:base_risk_matrix]%>
+              <%=render "risk_matrix"%><%=render "after_matrix"%>
+            <%else%>
+              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
+              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
+            <%end%>
+          </div>
+        <%end%>
 
 
 
-		</div>
-	</div>
+      <!-- SMS IM -->
+      <%elsif session[:mode]=="SMS IM"%>
+        <%if BaseConfig.airline[:has_framework]%><%=render "frameworks"%><%end%> <!-- hide just for demo purpose, will release to Miami Air -->
+        <%=render "vps"%>
+        <%=render "jobaids"%>
+        <%if BaseConfig.airline[:has_framework]%><%=render "fp"%><%end%><!-- hide just for demo purpose, will release to Miami Air -->
+        <%=render "vpp"%>
+        <%=render "jap"%>
+      <%end%>
+
+
+
+    </div>
+  </div>
 </div>
 
 
 <script>
-	function cursor_pointer(){
-		$('#subs').css('cursor','pointer');
-		$('#records').css('cursor','pointer');
-		$('#reports').css('cursor','pointer');
-		$('#cas').css('cursor','pointer');
+  function cursor_pointer(){
+    $('#subs').css('cursor','pointer');
+    $('#records').css('cursor','pointer');
+    $('#reports').css('cursor','pointer');
+    $('#cas').css('cursor','pointer');
 
-		$('#sras').css('cursor','pointer');
-		$('#hazards').css('cursor','pointer');
-		$('#risk_controls').css('cursor','pointer');
-		$('#safety_plans').css('cursor','pointer');
+    $('#sras').css('cursor','pointer');
+    $('#hazards').css('cursor','pointer');
+    $('#risk_controls').css('cursor','pointer');
+    $('#safety_plans').css('cursor','pointer');
 
-		$('#audits').css('cursor','pointer');
-		$('#inspections').css('cursor','pointer');
-		$('#evaluations').css('cursor','pointer');
-		$('#investigations').css('cursor','pointer');
-		$('#findings').css('cursor','pointer');
-		$('#actions').css('cursor','pointer');
-		$('#recommendations').css('cursor','pointer');
+    $('#audits').css('cursor','pointer');
+    $('#inspections').css('cursor','pointer');
+    $('#evaluations').css('cursor','pointer');
+    $('#investigations').css('cursor','pointer');
+    $('#findings').css('cursor','pointer');
+    $('#actions').css('cursor','pointer');
+    $('#recommendations').css('cursor','pointer');
 
-		$('#fp').css('cursor','pointer');
-		$('#frameworks').css('cursor','pointer');
-		$('#jap').css('cursor','pointer');
-		$('#jobaids').css('cursor','pointer');
-		$('#vpp').css('cursor','pointer');
-		$('#vps').css('cursor','pointer');
-	}  
-	function cursor_default(){
-		$('#subs').css('cursor','default');
-		$('#records').css('cursor','default');
-		$('#reports').css('cursor','default');
-		$('#cas').css('cursor','default');
+    $('#fp').css('cursor','pointer');
+    $('#frameworks').css('cursor','pointer');
+    $('#jap').css('cursor','pointer');
+    $('#jobaids').css('cursor','pointer');
+    $('#vpp').css('cursor','pointer');
+    $('#vps').css('cursor','pointer');
+  }
+  function cursor_default(){
+    $('#subs').css('cursor','default');
+    $('#records').css('cursor','default');
+    $('#reports').css('cursor','default');
+    $('#cas').css('cursor','default');
 
-		$('#sras').css('cursor','default');
-		$('#hazards').css('cursor','default');
-		$('#risk_controls').css('cursor','default');
-		$('#safety_plans').css('cursor','default');
+    $('#sras').css('cursor','default');
+    $('#hazards').css('cursor','default');
+    $('#risk_controls').css('cursor','default');
+    $('#safety_plans').css('cursor','default');
 
-		$('#audits').css('cursor','default');
-		$('#inspections').css('cursor','default');
-		$('#evaluations').css('cursor','default');
-		$('#investigations').css('cursor','default');
-		$('#findings').css('cursor','default');
-		$('#actions').css('cursor','default');
-		$('#recommendations').css('cursor','default');
+    $('#audits').css('cursor','default');
+    $('#inspections').css('cursor','default');
+    $('#evaluations').css('cursor','default');
+    $('#investigations').css('cursor','default');
+    $('#findings').css('cursor','default');
+    $('#actions').css('cursor','default');
+    $('#recommendations').css('cursor','default');
 
-		$('#fp').css('cursor','default');
-		$('#frameworks').css('cursor','default');
-		$('#jap').css('cursor','default');
-		$('#jobaids').css('cursor','default');
-		$('#vpp').css('cursor','default');
-		$('#vps').css('cursor','default');
-	} 
+    $('#fp').css('cursor','default');
+    $('#frameworks').css('cursor','default');
+    $('#jap').css('cursor','default');
+    $('#jobaids').css('cursor','default');
+    $('#vpp').css('cursor','default');
+    $('#vps').css('cursor','default');
+  }
 
 
-	$(window).resize(function() {
-		if(this.resizeTO) clearTimeout(this.resizeTO);
-		this.resizeTO = setTimeout(function(){
-			$(this).trigger('resizeEnd');
-		}, 100);
-	});
+  $(window).resize(function() {
+    if(this.resizeTO) clearTimeout(this.resizeTO);
+    this.resizeTO = setTimeout(function(){
+      $(this).trigger('resizeEnd');
+    }, 100);
+  });
 </script>
 
 

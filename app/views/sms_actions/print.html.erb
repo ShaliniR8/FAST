@@ -1,28 +1,28 @@
 <div class="title">
-	Corrective Action #
-	<%=@corrective_action.get_id%>: <%=@corrective_action.title%>
+  Corrective Action #
+  <%=@corrective_action.get_id%>: <%=@corrective_action.title%>
 </div>
 
 <%=render "/forms/print_fields",
-	:fields => SmsAction.get_meta_fields('show'),
-	:owner => @corrective_action,
-	:deidentified => @deidentified
+  :fields => SmsAction.get_meta_fields('show'),
+  :owner => @corrective_action,
+  :deidentified => @deidentified
 %>
 
 <!-- Print Risk Matrix -->
 <% if BaseConfig.airline[:base_risk_matrix]%>
-	<%=render "/shared/print_risk_matrix", 
-		:owner => @corrective_action
-	%>
+  <%=render "/shared/print_risk_matrix",
+    :owner => @corrective_action
+  %>
 <%else%>
-	<%=render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", 
-		:owner => @corrective_action 
-	%>
+  <%=render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix",
+    :owner => @corrective_action
+  %>
 <%end%>
 
 <%=render '/forms/print_descriptions',
-	:descriptions => @corrective_action.descriptions,
-	:title => "Descriptions"
+  :descriptions => @corrective_action.descriptions,
+  :title => "Descriptions"
 %>
 
 <%=render '/sras/print_cost', :owner => @corrective_action, :deidentified => @deidentified

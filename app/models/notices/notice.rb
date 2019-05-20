@@ -1,3 +1,3 @@
 class Notice < ActiveRecord::Base
-	belongs_to :user, foreign_key: "users_id",class_name:"User"
+  belongs_to :user, foreign_key: "users_id",class_name:"User"
 end

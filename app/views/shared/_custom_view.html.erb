@@ -2,72 +2,72 @@
 
 
 <div class="panel panel-warning">
-	<div class="panel-heading">
-		<div class="panel-title">
-			<b>Custom View</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
-		</div>
-	</div>
-	<div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">  	  
-		<%= form_tag({ controller: controller_name, action: 'index' }, method: :get) do%>
-			<%=hidden_field_tag :custom_view,true%>
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b>Custom View</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+    </div>
+  </div>
+  <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+    <%= form_tag({ controller: controller_name, action: 'index' }, method: :get) do%>
+      <%=hidden_field_tag :custom_view,true%>
 
-			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-					<b>Record Attributes</b>
-				</div>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-					<div class="panel-body">
-						<ul class="list-group">
-							<% @record_attributes.each do |attribute| %>
-								<label class="list-group-item ml5" style="font-weight: inherit;"><%= check_box_tag "selected_attributes[]", attribute[:title] %>&nbsp;&nbsp;<%= attribute[:title] %></label>
-							<% end %>
-						</ul>
-					</div>
-				</div>
-			</div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <b>Record Attributes</b>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+          <div class="panel-body">
+            <ul class="list-group">
+              <% @record_attributes.each do |attribute| %>
+                <label class="list-group-item ml5" style="font-weight: inherit;"><%= check_box_tag "selected_attributes[]", attribute[:title] %>&nbsp;&nbsp;<%= attribute[:title] %></label>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
 
-			<div class="row">
-				<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-					<b>Template</b>
-				</div>
-				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-					<%=select_tag :template_tag, options_from_collection_for_select(@templates,:id, :name), {:include_blank=>"", :class=>'form-control mb5',:id=>"temp_select"}%>
-				</div>
-			</div>
+      <div class="row">
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+          <b>Template</b>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+          <%=select_tag :template_tag, options_from_collection_for_select(@templates,:id, :name), {:include_blank=>"", :class=>'form-control mb5',:id=>"temp_select"}%>
+        </div>
+      </div>
 
-			<div class="row">
-				<div id="dynamic-categories"></div>
-			</div>
+      <div class="row">
+        <div id="dynamic-categories"></div>
+      </div>
 
-			<%= submit_tag "Select", class:"ml5 btn btn-xl btn-success pull-right mt10"%>
-		<%end%>
-	</div>
+      <%= submit_tag "Select", class:"ml5 btn btn-xl btn-success pull-right mt10"%>
+    <%end%>
+  </div>
 </div>
 
 <script>
-	$(document).ready(function(){
+  $(document).ready(function(){
 
-		$("#temp_select").on('change',function(){
-			var temp_id = $(this).val();
-			var path = "/<%= controller_name %>/dynamic_categories.js"; // All templates
-			if (temp_id != "") path = "/<%= controller_name %>/dynamic_categories.js?temp_id="+temp_id; // Specific template
-    	$.ajax(path);
-		});
+    $("#temp_select").on('change',function(){
+      var temp_id = $(this).val();
+      var path = "/<%= controller_name %>/dynamic_categories.js"; // All templates
+      if (temp_id != "") path = "/<%= controller_name %>/dynamic_categories.js?temp_id="+temp_id; // Specific template
+      $.ajax(path);
+    });
 
-	});
+  });
 </script>
 
 
 
 <style type="text/css">
 
-	.datetimerangepicker{
-		padding-left: 15px!important;
-		padding-right: 15px!important;
-	}
+  .datetimerangepicker{
+    padding-left: 15px!important;
+    padding-right: 15px!important;
+  }
 
-	.field-datetime-autoposition{
-		background-color: #ffffff!important;
-	}
+  .field-datetime-autoposition{
+    background-color: #ffffff!important;
+  }
 
 </style>

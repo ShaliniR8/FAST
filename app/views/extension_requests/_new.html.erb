@@ -10,62 +10,62 @@
 
 <%@fields = ExtensionRequest.get_meta_fields('form')%>
 <%=form_for @extension_request do |f|%>
-	<div class="panel-steelblue">
-		<div class="panel-heading">
-			<div class="panel-title">
-				Request Extension
-				<button type="button" 
-					class="close pull-right" 
-					data-dismiss="modal" 
-					aria-label="Close">
-					<span class="glyphicon glyphicon-remove"></span>
-				</button>
-			</div>
-		</div>
-		<div class="panel-body" style="max-height:calc(100vh - 210px);overflow-y:auto">
+  <div class="panel-steelblue">
+    <div class="panel-heading">
+      <div class="panel-title">
+        Request Extension
+        <button type="button"
+          class="close pull-right"
+          data-dismiss="modal"
+          aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
+    <div class="panel-body" style="max-height:calc(100vh - 210px);overflow-y:auto">
 
-			<div class="row">
-				<div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12">
 
-					<div class="col-xs-12">
-						<div class="well" style="font-weight:bold">
-							Please address the length and reason for the extension in the Request Detail box.
-						</div>
-					</div>
+          <div class="col-xs-12">
+            <div class="well" style="font-weight:bold">
+              Please address the length and reason for the extension in the Request Detail box.
+            </div>
+          </div>
 
-					<%=f.hidden_field :requester_id, :value => current_user.id%>
-					<%=f.hidden_field :approver_id, :value => @user_id%>
-					<%=f.hidden_field :owner_id, :value => @owner_id%>
-					<%=f.hidden_field :request_date, :value => Time.now%>
-					<%=hidden_field_tag :owner_type, @table%>
+          <%=f.hidden_field :requester_id, :value => current_user.id%>
+          <%=f.hidden_field :approver_id, :value => @user_id%>
+          <%=f.hidden_field :owner_id, :value => @owner_id%>
+          <%=f.hidden_field :request_date, :value => Time.now%>
+          <%=hidden_field_tag :owner_type, @table%>
 
-					<%=render "forms/form_fields", 
-						:fields => @fields, 
-						:record => @extension_request, 
-						:f => f%>
-				
-					<%=f.submit "Save",
-						:class => "btn btn-success pull-right mt10 mb20 mr20", 
-						:disable_with => "Saving..."%>
-				</div>
-			</div>
-		</div>
-	</div>
+          <%=render "forms/form_fields",
+            :fields => @fields,
+            :record => @extension_request,
+            :f => f%>
+
+          <%=f.submit "Save",
+            :class => "btn btn-success pull-right mt10 mb20 mr20",
+            :disable_with => "Saving..."%>
+        </div>
+      </div>
+    </div>
+  </div>
 <%end%>
 
 
 
 <style>
-	.datepicker {
-		z-index: 1200 !important;
-	}
-	.required_label:after{
-		content: " *";
-		color: red;
-		display: inline;
+  .datepicker {
+    z-index: 1200 !important;
+  }
+  .required_label:after{
+    content: " *";
+    color: red;
+    display: inline;
   }
   .checkbox {
-  	cursor: pointer;
+    cursor: pointer;
   }
 </style>
 

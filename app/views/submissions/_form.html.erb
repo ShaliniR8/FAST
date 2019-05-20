@@ -15,315 +15,315 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <!-- This calculate  "#total_duty_time" based on "#duty_on_time" and "#duty_off_time". Fields need to have exact HTML ID -->
-<script type="text/javascript" src="/javascripts/templates/total_duty_time_calculation.js"></script> 
+<script type="text/javascript" src="/javascripts/templates/total_duty_time_calculation.js"></script>
 
 
 <%if @template.js_link.present?%>
-	<script type="text/javascript" src="/javascripts/templates/<%=@template.js_link%>"></script>
+  <script type="text/javascript" src="/javascripts/templates/<%=@template.js_link%>"></script>
 <%end%>
 
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%= render "shared/alerts" %>
-		<div class="panel panel-warning">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<div class="top_text">
-						<%=@action.titleize + " " + @record.template.name%> Submission 
-					</div>
-					<div class="top_buttons pull-right">
-						<a class="btn btn-default expandall mb5" 
-							data-toggle="tooltip" 
-							data-placement="top" 
-							title="Expand all panels">Expand All</a>
-					</div>
-				</div>
-			</div>
+  <div class="grid per90 center-block">
+    <%= render "shared/alerts" %>
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            <%=@action.titleize + " " + @record.template.name%> Submission
+          </div>
+          <div class="top_buttons pull-right">
+            <a class="btn btn-default expandall mb5"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Expand all panels">Expand All</a>
+          </div>
+        </div>
+      </div>
 
-			<div class="modal fade bs-example-modal-lg emp_modal" 
-				tabindex="-1" 
-				role="dialog" 
-				aria-labelledby="myLargeModalLabel">
-				<div class="modal-dialog modal-lg" role="document">
-					<div class="modal-content">
-						<%=render 'emp'%>
-					</div>
-				</div>
-			</div>
+      <div class="modal fade bs-example-modal-lg emp_modal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <%=render 'emp'%>
+          </div>
+        </div>
+      </div>
 
-			<div class="modal fade bs-example-modal-lg airport_modal" 
-				tabindex="-1" 
-				role="dialog" 
-				aria-labelledby="myLargeModalLabel">
-				<div class="modal-dialog modal-lg" role="document">
-					<div class="modal-content">
-						<%=render 'airports_select'%>
-					</div>
-				</div>
-			</div>
+      <div class="modal fade bs-example-modal-lg airport_modal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <%=render 'airports_select'%>
+          </div>
+        </div>
+      </div>
 
 
-			<div class="panel-body" id="form_body">
-				<%=form_for @record , :html => {:multipart => true} do |f|%>
-					
-					<div class="col-xs-12">
-						<%=render "shared/instructions", 
-							:instruction => 
-							"<p>
-								Click on the <b>grey panels</b> to expand accordian and see content.</br>
-								Items in <b>red</b> are required. </br>
-								Scroll to the button of the page to <b>Submit/Save</b> the submission.</br>
-							</p>"%>
-					</div>
-  
-					<%if @template.allow_anonymous%>
-						<div class="col-xs-12">
-							<div class="col-xs-1">
-								<%=select_tag :anonymous, 
-									options_for_select({"Yes" => 1, "No" => 0}, 0), 
-									{:class => "form-control"}%>
-							</div>
-							<div class="col-xs-10 mt5">
-								<%=label_tag :anonymous, 
-									"Do you want to submit anonymously?"%>
-							</div>
-						</div>
-					<%end%>
+      <div class="panel-body" id="form_body">
+        <%=form_for @record , :html => {:multipart => true} do |f|%>
 
-					<%if @template.map_template.present? && BaseConfig.airline[:allow_multi_submissions]%>
-						<div class="col-xs-12" style="margin-top:10px; margin-bottom:10px">
-							<div class="col-xs-1">
-								<%=select_tag :create_copy, 
-									options_for_select({"Yes" => 1, "No" => 0}), 
-									{:class => "form-control required_field", :include_blank => true}%>
-							</div>
-							<div class="col-xs-10 mt5">
-								<b style="color:red">
-									Do you want to submit a <%=@template.map_template.name%> report at the same time?
-								</b>
-							</div>
-						</div>
-					<%end%>
+          <div class="col-xs-12">
+            <%=render "shared/instructions",
+              :instruction =>
+              "<p>
+                Click on the <b>grey panels</b> to expand accordian and see content.</br>
+                Items in <b>red</b> are required. </br>
+                Scroll to the button of the page to <b>Submit/Save</b> the submission.</br>
+              </p>"%>
+          </div>
 
-					<%=f.hidden_field :templates_id, :value => @template.id%>
-					<%=f.hidden_field :completed %>
-					<%if @action == "new"%> 
-						<%=f.hidden_field :user_id, :value => current_user.id%>
-					<%end%>
+          <%if @template.allow_anonymous%>
+            <div class="col-xs-12">
+              <div class="col-xs-1">
+                <%=select_tag :anonymous,
+                  options_for_select({"Yes" => 1, "No" => 0}, 0),
+                  {:class => "form-control"}%>
+              </div>
+              <div class="col-xs-10 mt5">
+                <%=label_tag :anonymous,
+                  "Do you want to submit anonymously?"%>
+              </div>
+            </div>
+          <%end%>
 
-	
-					<div class="col-xs-12 mt10">					
+          <%if @template.map_template.present?%>
+            <div class="col-xs-12" style="margin-top:10px; margin-bottom:10px">
+              <div class="col-xs-1">
+                <%=select_tag :create_copy,
+                  options_for_select({"Yes" => 1, "No" => 0}),
+                  {:class => "form-control required_field", :include_blank => true}%>
+              </div>
+              <div class="col-xs-10 mt5">
+                <b style="color:red">
+                  Do you want to submit a <%=@template.map_template.name%> report at the same time?
+                </b>
+              </div>
+            </div>
+          <%end%>
 
-						<div class="col-xs-12 col-sm-2 mb5">
-							<%=label_tag :submitted_by, "Submitted By"%>
-							<input type="text" 
-								readonly 
-								class="form-control" 
-								value='<%=@action == "new" ? current_user.full_name : @record.created_by.full_name%>'>
-						</div>
+          <%=f.hidden_field :templates_id, :value => @template.id%>
+          <%=f.hidden_field :completed %>
+          <%if @action == "new"%>
+            <%=f.hidden_field :user_id, :value => current_user.id%>
+          <%end%>
 
-						<%if BaseConfig.airline[:submission_description]%>
-							<div class="col-xs-12 col-sm-4 mb5">
-								<%=label_tag :description, 
-									"Event Title", 
-									:style => "#{BaseConfig.airline[:submission_title_required] ? 'color:red' : ''}" %>
-									<%=f.text_field :description, 
-										{:class => "form-control #{BaseConfig.airline[:submission_title_required] ? 'required_field' : ''} ", 
-										:maxlength => "30", 
-										:placeholder => "please limit to 30 characters"}%>
-							</div>
-						<%end%>
 
-						<div class="col-xs-12 col-sm-4 mb5">
-							<%=label_tag :event_date, "Date and Time of Event", :style => "color:red"%>
-							<%=f.text_field :event_date, {:class => 'field-datetime form-control required_field', :id => "event_date"}%>
-						</div>
+          <div class="col-xs-12 mt10">
 
-						<%if BaseConfig.airline[:submission_time_zone]%>
-							<div class="col-xs-12 col-sm-2 mb5">
-								<%=label_tag :event_time_zone, "Time Zone"%>
-								<div class="input-group">
-									<%=f.select :event_time_zone, 
-										@record.getTimeZone,
-										{:include_blank => ""},
-										{:class => 'form-control tz atz toplevel_timezone'}%>
-									<span class="input-group-addon tc">All</span>
-								</div>
-							</div>
-						<%end%>
-					</div>
-					
-					<div class="col-xs-12 mt20">
-						<%@record.categories.where(deleted: false).order(:category_order).each do |c| %>
-							<% @cat = c %>
-							<%if @cat.id == 338%>
-								<%=render "observation_phases_fields", :f => f%>
-							<%else%>
-								<%=render "category_fields",:f => f%>
-							<%end%>
-						<%end%>
-						<%@cat = nil%>
-						<%=render '/forms/attachments_form', :f => f, :owner => @record%>
-					</div>
+            <div class="col-xs-12 col-sm-2 mb5">
+              <%=label_tag :submitted_by, "Submitted By"%>
+              <input type="text"
+                readonly
+                class="form-control"
+                value='<%=@action == "new" ? current_user.full_name : @record.created_by.full_name%>'>
+            </div>
 
-					<div class="mt10 mr10">
-						<%= f.submit "Submit", 
-							:class => "btn btn-success pull-right mr10 submit_btn", 
-							:disable_with => "Submitting...", 
-							:confirm => "Are you sure?", 
-							"data-toggle" => "tooltip", 
-							"data-placement" => "top", 
-							"title" => "This will file the Submission and notify the Analysts"%>
-						<%= f.submit "Save for Later", 
-							:class => "btn btn-info pull-right mr5 submit_btn", 
-							:disable_with => "Saving...", 
-							"data-toggle" => "tooltip", 
-							"data-placement" => "top", 
-							"title" => "This will save the Submission to In Progress"%>
+            <%if BaseConfig.airline[:submission_description]%>
+              <div class="col-xs-12 col-sm-4 mb5">
+                <%=label_tag :description,
+                  "Event Title",
+                  :style => "color:red" %>
+                  <%=f.text_field :description,
+                    {:class => "form-control required_field",
+                    :maxlength => "30",
+                    :placeholder => "please limit to 30 characters"}%>
+              </div>
+            <%end%>
 
-						<%if @action == "new"%>
-							<%if !params[:home]%>
-								<%=link_to "Cancel", 
-									new_submission_path, 
-									:id=>"cancel-btn", 
-									:class=>"mr5 btn btn-warning pull-right", 
-									:confirm=>'Are you sure?', 
-									"data-toggle" => "tooltip", 
-									"data-placement" => "top", 
-									"title" => "This cancels the Submission, you will lose all the unsaved changes"%>
-							<%else%>
-								<%=link_to "Cancel", root_url, 
-									:id=>"cancel-btn", 
-									:class=>"mr5 btn btn-warning pull-right", 
-									:confirm=>'Are you sure?', 
-									"data-toggle" => "tooltip", 
-									"data-placement" => "top", 
-									"title" => "This cancels the Submission, you will lose all the unsaved changes"%>
-							<%end%>
-						<%elsif @action == "Continue"%>
-							<%=link_to "Cancel", incomplete_submissions_path,
-								:id=>"cancel-btn", 
-								:class=>"mr5 btn btn-warning pull-right", 
-								:confirm=>'Are you sure?', 
-								"data-toggle" => "tooltip", 
-								"data-placement" => "top", 
-								"title" => "This cancels the Submission, you will lose all the unsaved changes"%>
-						<%else%>
-							<%=link_to "Cancel", submission_path(@record), 
-								:id=>"cancel-btn", 
-								:class=>"mr5 btn btn-warning pull-right", 
-								:confirm=>'Are you sure?', 
-								"data-toggle" => "tooltip", 
-								"data-placement" => "top", 
-								"title" => "This cancels the Submission, you will lose all the unsaved changes"%>
-						<%end%>
-					</div>
+            <div class="col-xs-12 col-sm-4 mb5">
+              <%=label_tag :event_date, "Date and Time of Event", :style => "color:red"%>
+              <%=f.text_field :event_date, {:class => 'field-datetime form-control required_field', :id => "event_date"}%>
+            </div>
 
-				<%end%>
-			</div>        
-		</div>
-	</div> 
+            <%if BaseConfig.airline[:submission_time_zone]%>
+              <div class="col-xs-12 col-sm-2 mb5">
+                <%=label_tag :event_time_zone, "Time Zone"%>
+                <div class="input-group">
+                  <%=f.select :event_time_zone,
+                    @record.getTimeZone,
+                    {:include_blank => ""},
+                    {:class => 'form-control tz atz toplevel_timezone'}%>
+                  <span class="input-group-addon tc">All</span>
+                </div>
+              </div>
+            <%end%>
+          </div>
+
+          <div class="col-xs-12 mt20">
+            <%@record.categories.where(deleted: false).order(:category_order).each do |c| %>
+              <% @cat = c %>
+              <%if @cat.id == 338%>
+                <%=render "observation_phases_fields", :f => f%>
+              <%else%>
+                <%=render "category_fields",:f => f%>
+              <%end%>
+            <%end%>
+            <%@cat = nil%>
+            <%=render '/forms/attachments_form', :f => f, :owner => @record%>
+          </div>
+
+          <div class="mt10 mr10">
+            <%= f.submit "Submit",
+              :class => "btn btn-success pull-right mr10 submit_btn",
+              :disable_with => "Submitting...",
+              :confirm => "Are you sure?",
+              "data-toggle" => "tooltip",
+              "data-placement" => "top",
+              "title" => "This will file the Submission and notify the Analysts"%>
+            <%= f.submit "Save for Later",
+              :class => "btn btn-info pull-right mr5 submit_btn",
+              :disable_with => "Saving...",
+              "data-toggle" => "tooltip",
+              "data-placement" => "top",
+              "title" => "This will save the Submission to In Progress"%>
+
+            <%if @action == "new"%>
+              <%if !params[:home]%>
+                <%=link_to "Cancel",
+                  new_submission_path,
+                  :id=>"cancel-btn",
+                  :class=>"mr5 btn btn-warning pull-right",
+                  :confirm=>'Are you sure?',
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
+              <%else%>
+                <%=link_to "Cancel", root_url,
+                  :id=>"cancel-btn",
+                  :class=>"mr5 btn btn-warning pull-right",
+                  :confirm=>'Are you sure?',
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
+              <%end%>
+            <%elsif @action == "Continue"%>
+              <%=link_to "Cancel", incomplete_submissions_path,
+                :id=>"cancel-btn",
+                :class=>"mr5 btn btn-warning pull-right",
+                :confirm=>'Are you sure?',
+                "data-toggle" => "tooltip",
+                "data-placement" => "top",
+                "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
+            <%else%>
+              <%=link_to "Cancel", submission_path(@record),
+                :id=>"cancel-btn",
+                :class=>"mr5 btn btn-warning pull-right",
+                :confirm=>'Are you sure?',
+                "data-toggle" => "tooltip",
+                "data-placement" => "top",
+                "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
+            <%end%>
+          </div>
+
+        <%end%>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <script type="text/javascript">
-	
-	function update_timezones(){
-		 $('.toplevel_timezone').on('change',function(){
-			var timezone = $('.toplevel_timezone').val();
-			$(".timezone_field").val(timezone);
-		});
-	}
+
+  function update_timezones(){
+     $('.toplevel_timezone').on('change',function(){
+      var timezone = $('.toplevel_timezone').val();
+      $(".timezone_field").val(timezone);
+    });
+  }
 
 
-	var airport_table;
+  var airport_table;
 
-	$(document).ready(function(){
+  $(document).ready(function(){
 
-		update_timezones();	
-		
-		// Get listing of all the airport buttons
-		var field_id;
-		$(this).find(".airport_button").each(function(index, item){
-			// Get the button that's being clicked
-			$(item).on("click", function(){	
-				// Get the selected airport's field id
-				field_id = $(this).prop("id");
-				resetModal(field_id);
-				$("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
-				$("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
-			});
-		});	
-	});
+    update_timezones();
 
-	// Updata airport table
-	function handleSearch(event){
-		// Get field id
-		var field_id = event.data.field_id
-		// Get the keywords user searched for
-		var icao = $("#icao").val();
-		var iata = $("#iata").val();
-		var arpt_name = $("#arpt_name").val();
-		// Do nothing if nothing is searched
-		if(icao == "" && iata == "" && arpt_name ==""){
-		// Update the table if icao code is not empty
-		}else{
-			// Get the data from server
-			$.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
-				// Render airport table with data
-				$("#airports_table").html(data);
-				updateAirportTable(field_id);
-			});
-		}
-	}
+    // Get listing of all the airport buttons
+    var field_id;
+    $(this).find(".airport_button").each(function(index, item){
+      // Get the button that's being clicked
+      $(item).on("click", function(){
+        // Get the selected airport's field id
+        field_id = $(this).prop("id");
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
+      });
+    });
+  });
 
-	function updateAirportTable(field_id){
-		// Initialize table as a datatable
-			airport_table = $('#airports' + field_id).DataTable({
-				"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-				"iDisplayLength": 5
-			});
-			// User clicked on a row
-			$("body").on("click", "#airports" + field_id + " tbody tr", function(){
-				// Get the row information
-				var icao = $(this).find("td").eq(0).text();
-				var iata = $(this).find("td").eq(1).text();
-				// Set the value on the form
-				$("#airport" + field_id).val(icao + ";" + iata);
-				$("#airport-select" + field_id).val(icao + ";" + iata);
-				resetModal(field_id);
-			});
-	}
+  // Updata airport table
+  function handleSearch(event){
+    // Get field id
+    var field_id = event.data.field_id
+    // Get the keywords user searched for
+    var icao = $("#icao").val();
+    var iata = $("#iata").val();
+    var arpt_name = $("#arpt_name").val();
+    // Do nothing if nothing is searched
+    if(icao == "" && iata == "" && arpt_name ==""){
+    // Update the table if icao code is not empty
+    }else{
+      // Get the data from server
+      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+        // Render airport table with data
+        $("#airports_table").html(data);
+        updateAirportTable(field_id);
+      });
+    }
+  }
 
-	function resetModal(field_id){
-		// Reset the table, field, and close the modal
-		$("#airports_table").html("");
-		$("#icao").val("");
-		$("#iata").val("");
-		$("#arpt_name").val("");
-		$('#airport_div').hide();
-		$(".airport_modal").modal("hide");
-	}
+  function updateAirportTable(field_id){
+    // Initialize table as a datatable
+      airport_table = $('#airports' + field_id).DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
+      // User clicked on a row
+      $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+        // Get the row information
+        var icao = $(this).find("td").eq(0).text();
+        var iata = $(this).find("td").eq(1).text();
+        // Set the value on the form
+        $("#airport" + field_id).val(icao + ";" + iata);
+        $("#airport-select" + field_id).val(icao + ";" + iata);
+        resetModal(field_id);
+      });
+  }
+
+  function resetModal(field_id){
+    // Reset the table, field, and close the modal
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }
 </script>
 
 
 
 <style type="text/css">
-	.tc {
-		cursor: pointer;
-	}
-	.checkbox,
-	.radio{
-		cursor: pointer;
-		margin-top: 2px;
-		margin-bottom: 2px;
-	}	
-	.checkbox:hover {
-		font-weight:bold;
-	}	
-	.radio:hover {
-		font-weight:bold;
-	}		
+  .tc {
+    cursor: pointer;
+  }
+  .checkbox,
+  .radio{
+    cursor: pointer;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+  .checkbox:hover {
+    font-weight:bold;
+  }
+  .radio:hover {
+    font-weight:bold;
+  }
 </style>
 
 

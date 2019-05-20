@@ -1,25 +1,25 @@
 <% if flash.present? %>
-	<% flash.each do |type, message| %>
-		<% alert_type, fa_type = 
-			case type.to_sym
-			when :no_access
-				['danger', 'ban']
-			when :success
-				['success', 'check-circle-o']
-			when :warning
-				['warning', 'warning']
-			when :notice
-				['info', 'info-circle']
-			else
-				['danger', 'exclamation-circle']
-			end
-		%>
-		<div class="alert alert-<%=alert_type%> fade in" role="alert" style="width: 50%; margin: 0 auto; margin-bottom: 10px">
-			<div class="fa alert-icon fa-<%=fa_type%>"></div>
-			<b><%=message%></b>
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-	<%end%>
+  <% flash.each do |type, message| %>
+    <% alert_type, fa_type =
+      case type.to_sym
+      when :no_access
+        ['danger', 'ban']
+      when :success
+        ['success', 'check-circle-o']
+      when :warning
+        ['warning', 'warning']
+      when :notice
+        ['info', 'info-circle']
+      else
+        ['danger', 'exclamation-circle']
+      end
+    %>
+    <div class="alert alert-<%=alert_type%> fade in" role="alert" style="width: 50%; margin: 0 auto; margin-bottom: 10px">
+      <div class="fa alert-icon fa-<%=fa_type%>"></div>
+      <b><%=message%></b>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  <%end%>
 <%end%>

@@ -1,88 +1,88 @@
 <div class="panel panel-info">
-	<div class="panel-heading">
-		<div class="panel-title"><b>Airport Search Detail</b>
-		<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
-	</div>
-	<div class="panel-body">
-		<div class="row">
-			<div class='col-xs-12'>
-				<div class="form-row">
-					<div class="form-group col-md-4">
-						<label for="inputEmail4">ICAO Code</label>
-						<input type="icao" class="form-control" id="icao" placeholder="ICAO Code">
-					</div>
-					<div class="form-group col-md-4">
-						<label for="inputPassword4">IATA Code</label>
-						<input type="iata" class="form-control" id="iata" placeholder="IATA">
-					</div>
-					<div class="form-group col-md-4">
-						<label for="inputPassword4">Airport Name</label>
-						<input type="arpt_name" class="form-control" id="arpt_name" placeholder="Airport Name">
-					</div>
-					<div id="search_btn"></div>
-				</div>
-				<div class="col-xs-12" id="airports_table"></div>
-			</div>
-		</div>
-	</div>
+  <div class="panel-heading">
+    <div class="panel-title"><b>Airport Search Detail</b>
+    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class='col-xs-12'>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="inputEmail4">ICAO Code</label>
+            <input type="icao" class="form-control" id="icao" placeholder="ICAO Code">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputPassword4">IATA Code</label>
+            <input type="iata" class="form-control" id="iata" placeholder="IATA">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputPassword4">Airport Name</label>
+            <input type="arpt_name" class="form-control" id="arpt_name" placeholder="Airport Name">
+          </div>
+          <div id="search_btn"></div>
+        </div>
+        <div class="col-xs-12" id="airports_table"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style type="text/css">
-	#search_btn{
-		text-align:center;
-	}
+  #search_btn{
+    text-align:center;
+  }
 </style>
 
 <script type="text/javascript">
-	$(document).ready(function(){
-	});
+  $(document).ready(function(){
+  });
 
-	var airport_table;
-	function build_airport_table(){
-		airport_table=$('#airports').DataTable({
-			destroy: true,
-			"aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-			"iDisplayLength": 5
-		});
-	}
+  var airport_table;
+  function build_airport_table(){
+    airport_table=$('#airports').DataTable({
+      destroy: true,
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  }
 
-	function clear_airport_table(){
-		airport_table.destroy();
-	}
+  function clear_airport_table(){
+    airport_table.destroy();
+  }
 
-	function update_airport_table2(){
-		var icao = $("#icao_code").val();
-		if(icao == ""){
-		}else{
-			$.get("<%=airport_data_records_path%>?icao=" + icao, function(data){
-				$("#airports_table").html(data);
-			});
-		}
-	}
+  function update_airport_table2(){
+    var icao = $("#icao_code").val();
+    if(icao == ""){
+    }else{
+      $.get("<%=airport_data_records_path%>?icao=" + icao, function(data){
+        $("#airports_table").html(data);
+      });
+    }
+  }
 
-	function update_airports(item, field_id){
-		if($("#icao_code_select").val() != ""){
-			$.get("<%=airport_data_records_path%>?icao_code="+$("#icao_code_select").val(), function(data){
-				$("#airports_table").html(data);
-				clear_airport_table();
-				$("tbody tr").unbind();
-				$(".close").unbind();
-				$("tbody tr").on("click", function(){
-					$(item).parent().parent().find("#airport"+field_id).val($(this).find("td").eq(0).text());
-					$(item).parent().parent().find("#airport-select"+field_id).val($(this).find("td").eq(0).text());
-					$('#airport_div').hide();
-					$('.airport_modal').modal('toggle');
-				});
-				$('.close').on('click',function(){
-					$(item).parent().parent().find("#airport"+field_id).val("");
-					$(item).parent().parent().find("#airport-select"+field_id).val("");
-					$('#airport_div').hide();
-				});
-				build_airport_table();
-			});
-		}else{
-		}
-	}
+  function update_airports(item, field_id){
+    if($("#icao_code_select").val() != ""){
+      $.get("<%=airport_data_records_path%>?icao_code="+$("#icao_code_select").val(), function(data){
+        $("#airports_table").html(data);
+        clear_airport_table();
+        $("tbody tr").unbind();
+        $(".close").unbind();
+        $("tbody tr").on("click", function(){
+          $(item).parent().parent().find("#airport"+field_id).val($(this).find("td").eq(0).text());
+          $(item).parent().parent().find("#airport-select"+field_id).val($(this).find("td").eq(0).text());
+          $('#airport_div').hide();
+          $('.airport_modal').modal('toggle');
+        });
+        $('.close').on('click',function(){
+          $(item).parent().parent().find("#airport"+field_id).val("");
+          $(item).parent().parent().find("#airport-select"+field_id).val("");
+          $('#airport_div').hide();
+        });
+        build_airport_table();
+      });
+    }else{
+    }
+  }
 
 </script>
 

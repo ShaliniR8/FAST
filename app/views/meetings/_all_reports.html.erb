@@ -4,124 +4,92 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <div class="panel panel-lightskyblue">
-	<div class="panel-heading click-heading">
-		<div class="panel-title">
-			<b>Included Events</b>
-			<span class="pull-right clickable">
-				<i class="mt5 glyphicon glyphicon-chevron-up"></i>
-			</span>
-		</div>
-	</div>
-	<div class="panel-body">		
-		<div class="row col-xs-12">
-			<table class="table table-bordered table-striped" id="reports_table">
-				<thead>
-					<tr>
-						<%@report_headers.each do |h|%>
-							<th><%=h[:title]%></th>
-						<%end%> 
-						<th>Actions</th> 
-					</tr>
-				</thead>
-				<tbody>
-					<%@reports.each do |u|%>
-						<tr uid="<%=u.id%>">
-							<%@report_headers.each do |h|%>
-								<td class="<%=h[:html_class].present? ? u.send(h[:html_class]) : ''%>">
-									<%case h[:type]%>
-									<%when 'date'%>
-										<%=u.send(h[:field]).strftime("%Y-%m-%d") rescue ''%>	
-									<%when 'datetime'%>
-										<%=u.send(h[:field]).strftime("%Y-%m-%d %H:%M") rescue ''%>	
-									<%when 'textarea'%>
-										<%=u.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue ''%>	
-									<%else%>
-										<%=u.send(h[:field])%>	
-									<%end%>	
-								</td>
-							<%end%>
-							<td>
-								<%if BaseConfig.airline[:view_narrative_from_meeting]%>
-									<%=link_to "View Narrative", 
-										"#", 
-										:class => "btn btn-info mb5 view_narrative_btn", 
-										"data-toggle" => "modal", 
-										"data-target" => ".bs-example-modal-lg",
-										:route => show_narrative_report_path(u, :meeting => @meeting.id)%>
-								<%end%>
-								<%=link_to "Go To Event", 
-									report_path(u),
-									:class => "btn btn-info mb5", 
-									:disable_with => "Redirecting..."%>
-								<%if @meeting.has_user(current_user) || 
-									@meeting.host.users_id == current_user.id%>
-									<%if current_user.has_access("meetings","edit") && 
-										@meeting.has_user(current_user) && 
-										@meeting.in_review %>
-										<%if u.status != "Closed" && @meeting.status != "Closed"%>
-											<%=link_to "Carryover", "#",
-												:class=>"btn btn-danger mb5",
-												:onclick=>"delete_report(#{u.id},this)", 
-												:disable_with => "Removing...", 
-												:confirm => "Are you sure?",
-												"data-toggle" => "tooltip",
-												"data-placement" => "top", 
-												:title => "This will remove Event ##{u.id} from the current meeting."%>
-											<%=link_to "Agenda","#",
-												:class => "btn btn-warning agenda_btn mb5",
-												"data-toggle" => "modal",
-												"data-target" => ".bs-example-modal-lg",
-												:route => get_agenda_report_path(u,:meeting=>@meeting.id)%>
-										<%end%>
-										<%=link_to "Add Minutes",
-											"#",
-											:class => "btn btn-success minutes_btn mb5",
-											"data-toggle" => "modal",
-											"data-target" => ".bs-example-modal-lg", 
-											:route => new_minutes_report_path(u, :meeting => @meeting) %>
-									<%end%>
-								<%end%>
-							</td>
-						</tr>
-					<%end%>
-				</tbody>
-			</table>
-		</div>
-	</div>
+  <div class="panel-heading click-heading">
+    <div class="panel-title">
+      <b>Included Events</b>
+      <span class="pull-right clickable">
+        <i class="mt5 glyphicon glyphicon-chevron-up"></i>
+      </span>
+    </div>
+  </div>
+  <div class="panel-body">
+    <table>
+      <tr>
+        <td>
+          <i class='glyphicon glyphicon-file btn btn-sm btn-info mb5 mr5 ml5'></i>
+          <b>View Narrative </b>- View the Narrative summary for an Event.
+        </td>
+        <td>
+          <i class='glyphicon glyphicon-search btn btn-sm btn-info mb5 mr5 ml5'></i>
+          <b>View Event </b>- View an Event.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <i class='glyphicon glyphicon-ok-circle btn-danger btn btn-sm mb5 mr5 ml5'></i>
+          <b>Close Event </b>- Close an Event.
+        </td>
+        <td>
+          <i class='glyphicon glyphicon-minus btn btn-sm btn-danger mb5 ml5 mr5'></i>
+          <b>Carryover Event </b>- Remove an Event from the meeting.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <i class='glyphicon glyphicon-list btn btn-sm btn-warning mb5 mr5 ml5'></i>
+          <b>Agendas </b>- View or add Meeting Agendas
+        </td>
+        <td>
+          <i class='glyphicon glyphicon-pencil btn btn-sm btn-success mb5 mr5 ml5'></i>
+          <b>Add Meeting Minutes </b>- Add Meeting Minutes to the meeting
+        </td>
+      </tr>
+    </table>
+    <table class="table table-bordered table-striped" id="reports_table">
+      <thead>
+        <tr>
+          <%@report_headers.each do |h|%>
+            <th><%=h[:title]%></th>
+          <%end%>
+          <th>Meeting Minutes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%@reports.each do |u|%>
+          <%=render '/meetings/included_event', :event => u, :meeting => @meeting%>
+        <%end%>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 
-<style>
-	.table tbody tr > td.red {
-		background-color: red !important;
-	}
-	.table tbody tr > td.yellow {
-		background-color: yellow !important;
-	}
-	.table tbody tr > td.green {
-		background-color: mediumseagreen !important;
-	}
-</style>
-
 <script>
-	$(document).ready(function(){
-		$(".view_narrative_btn").on('click',function(){
-			$.get($(this).attr('route'),function(data){
-				$(".modal-content").html(data);
-				$(window).trigger('resize');
-			});
-		});
-		$(".agenda_btn").on('click',function(){
-			$.get($(this).attr('route'),function(data){
-				$(".modal-content").html(data);	
-				$(window).trigger('resize');			
-			});
-		});
-		$(".minutes_btn").on('click',function(){
-			$.get($(this).attr('route'),function(data){
-				$(".modal-content").html(data);		
-				$(window).trigger('resize');		
-			});
-		});
-	});
+  $(document).ready(function(){
+    $("#reports_table").on('click', ".view_narrative_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#reports_table").on('click', ".agenda_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#reports_table").on('click', ".close_event_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#reports_table").on('click', ".minutes_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+  });
 </script>

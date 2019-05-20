@@ -1,34 +1,34 @@
 <?xml version="1.0"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-	xmlns:o="urn:schemas-microsoft-com:office:office"
-	xmlns:x="urn:schemas-microsoft-com:office:excel"
-	xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-	xmlns:html="http://www.w3.org/TR/REC-html40">
-	
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
 
-	<Worksheet ss:Name="Options Data">
-		<Table>
-			<%@record.children.each do |x|%>
-				<Row></Row>
-				<Row>
-					<Cell><Data ss:Type="String"><%=x.name%></Data></Cell>
-				</Row>
-				<%x.children.each do |y|%>
-					<Row>
-						<Cell></Cell>
-						<Cell><Data ss:Type="String"><%=y.name%></Data></Cell>
-					</Row>
-					<Row>
-						<Cell></Cell>
-						<Cell></Cell>
-						<%y.children.each do |z|%>
-							<Cell><Data ss:Type="String"><%=z.name%></Data></Cell>
-						<%end%>
-					</Row>
-				<%end%>
-				<Row></Row>
-			<%end%>
-		</Table>
-	</Worksheet>
 
-</Workbook>	
+  <Worksheet ss:Name="Options Data">
+    <Table>
+      <%@record.children.each do |x|%>
+        <Row></Row>
+        <Row>
+          <Cell><Data ss:Type="String"><%=x.name%></Data></Cell>
+        </Row>
+        <%x.children.each do |y|%>
+          <Row>
+            <Cell></Cell>
+            <Cell><Data ss:Type="String"><%=y.name%></Data></Cell>
+          </Row>
+          <Row>
+            <Cell></Cell>
+            <Cell></Cell>
+            <%y.children.each do |z|%>
+              <Cell><Data ss:Type="String"><%=z.name%></Data></Cell>
+            <%end%>
+          </Row>
+        <%end%>
+        <Row></Row>
+      <%end%>
+    </Table>
+  </Worksheet>
+
+</Workbook>

@@ -1,20 +1,20 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <%fields.each do |field|%>
-	<%case field[:type]%>
-	<%when "text_field"%>
-		<div class="form-group form-inline col-xs-<%=field[:size]%>">
-			<%=f.label field[:field],field[:title]%>
-			<%=f.text_field field[:field],:class=>field[:class]%>
-		</div>
-	<%when "text"%>
-		<div class="form-group col-xs-12">
-			<%=f.label field[:field],field[:title]%>
-			<%=f.text_area field[:field],:rows=>5,:class=>field[:class]%>
-		</div>
-	<%when "select"%>
-		<div class="form-group form-inline col-xs-<%=field[:size]%>">
-			<%=f.label field[:field],field[:title]%>
-			<%=f.select field[:field],options_for_select(field[:options],f.object.send(field[:field])),{:include_blank=>""},{:class=>field[:class]}%>
-		</div>
-	<%end%>
+  <%case field[:type]%>
+  <%when "text_field"%>
+    <div class="form-group form-inline col-xs-<%=field[:size]%>">
+      <%=f.label field[:field],field[:title]%>
+      <%=f.text_field field[:field],:class=>field[:class]%>
+    </div>
+  <%when "text"%>
+    <div class="form-group col-xs-12">
+      <%=f.label field[:field],field[:title]%>
+      <%=f.text_area field[:field],:rows=>5,:class=>field[:class]%>
+    </div>
+  <%when "select"%>
+    <div class="form-group form-inline col-xs-<%=field[:size]%>">
+      <%=f.label field[:field],field[:title]%>
+      <%=f.select field[:field],options_for_select(field[:options],f.object.send(field[:field])),{:include_blank=>""},{:class=>field[:class]}%>
+    </div>
+  <%end%>
 <%end%>

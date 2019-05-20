@@ -1,105 +1,105 @@
 <div class="item active mt50" style="height:auto;">
-	<div class="grid per90 center-block">
-		<%= render "shared/alerts" %>
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<b><%=@template.name%> #<%=@record.id%></b> 
-				</div>
-			</div>
+  <div class="grid per90 center-block">
+    <%= render "shared/alerts" %>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <b><%=@template.name%> #<%=@record.id%></b>
+        </div>
+      </div>
 
-			<div class="panel-body">
-				<div class="col-xs-12">
-					<b>Submitted By: </b><%=@record.submitted_by%>
-				</div>
-				<div class="col-xs-12">
-					<b>Submitted At: </b><%=@record.submitted_at%>
-				</div>
-				<div class="col-xs-12">
-					<b>Tail Number: </b><%=@record.tail_number%>
-				</div>
-				<div class="col-xs-12 pull-right">
-					<h4 style="font-weight:bold">Total Score: <b style="color:red"><%=@record.total_score%></b></h4>
-				</div>
-				
+      <div class="panel-body">
+        <div class="col-xs-12">
+          <b>Submitted By: </b><%=@record.submitted_by%>
+        </div>
+        <div class="col-xs-12">
+          <b>Submitted At: </b><%=@record.submitted_at%>
+        </div>
+        <div class="col-xs-12">
+          <b>Tail Number: </b><%=@record.tail_number%>
+        </div>
+        <div class="col-xs-12 pull-right">
+          <h4 style="font-weight:bold">Total Score: <b style="color:red"><%=@record.total_score%></b></h4>
+        </div>
 
-				<table class="table table-bordered mt20" width="100%" id="fixedheight">
-					<thead>
-						<tr style="font-size:18px;">
-							<th width="20%" bgcolor="#F0F0F0">Item</th>
-							<th width="20%" bgcolor="green">Low</th>
-							<th width="20%" bgcolor="yellow">Moderate</th>
-							<th width="20%" bgcolor="red">High</th>
-						</tr>
-					</thead>
-					<tbody>
-						<%@template.orm_fields.each do |x|%>
-							<tr aid="<%=x.id%>">
-								<th bgcolor="#F0F0F0" style="font-size:15px;"><%=x.name%></th>
-								<td data-row="<%=x.id%>" data-column="low" data-value="<%=x.low_pt%>" data-status="">
-									<p style="text-align:left;"><%=x.low%></p><span class="badge badge-success" style="float:right;"><%=x.low_pt%></span>
-								</td>
-								<td data-row="<%=x.id%>" data-column="moderate" data-value="<%=x.moderate_pt%>" data-status="">
-									<p style="text-align:left;"><%=x.moderate%></p><span class="badge badge-warning" style="float:right;"><%=x.moderate_pt%></span>
-								</td>
-								<td data-row="<%=x.id%>" data-column="high" data-value="<%=x.high_pt%>" data-status="">
-									<p style="text-align:left;"><%=x.high%></p><span class="badge badge-danger" style="float:right;"><%=x.high_pt%></span>
-								</td>
-							</tr>
-						<%end%>
-						<tr>
-							<th bgcolor="#F0F0F0" style="font-size:15px;">Intangible Consideration</th>
-							<td id="extra_low" data-status=""><p style="text-align:left;">Crew feels mission is LOW risk</p><span class="badge badge-success" style="float:right;"><%=@record.extra_low%></span></td>
-							<td id="extra_moderate" data-status=""><p style="text-align:left;">Crew feels mission is MODERATE risk</p><span class="badge badge-warning" style="float:right;"><%=@record.extra_moderate%></span></td>
-							<td id="extra_high" data-status=""><p style="text-align:left;">Crew feels mission is HIGH risk</p><span class="badge badge-danger" style="float:right;"><%=@record.extra_high%></span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>        
-		</div>
-	</div> 
+
+        <table class="table table-bordered mt20" width="100%" id="fixedheight">
+          <thead>
+            <tr style="font-size:18px;">
+              <th width="20%" bgcolor="#F0F0F0">Item</th>
+              <th width="20%" bgcolor="green">Low</th>
+              <th width="20%" bgcolor="yellow">Moderate</th>
+              <th width="20%" bgcolor="red">High</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%@template.orm_fields.each do |x|%>
+              <tr aid="<%=x.id%>">
+                <th bgcolor="#F0F0F0" style="font-size:15px;"><%=x.name%></th>
+                <td data-row="<%=x.id%>" data-column="low" data-value="<%=x.low_pt%>" data-status="">
+                  <p style="text-align:left;"><%=x.low%></p><span class="badge badge-success" style="float:right;"><%=x.low_pt%></span>
+                </td>
+                <td data-row="<%=x.id%>" data-column="moderate" data-value="<%=x.moderate_pt%>" data-status="">
+                  <p style="text-align:left;"><%=x.moderate%></p><span class="badge badge-warning" style="float:right;"><%=x.moderate_pt%></span>
+                </td>
+                <td data-row="<%=x.id%>" data-column="high" data-value="<%=x.high_pt%>" data-status="">
+                  <p style="text-align:left;"><%=x.high%></p><span class="badge badge-danger" style="float:right;"><%=x.high_pt%></span>
+                </td>
+              </tr>
+            <%end%>
+            <tr>
+              <th bgcolor="#F0F0F0" style="font-size:15px;">Intangible Consideration</th>
+              <td id="extra_low" data-status=""><p style="text-align:left;">Crew feels mission is LOW risk</p><span class="badge badge-success" style="float:right;"><%=@record.extra_low%></span></td>
+              <td id="extra_moderate" data-status=""><p style="text-align:left;">Crew feels mission is MODERATE risk</p><span class="badge badge-warning" style="float:right;"><%=@record.extra_moderate%></span></td>
+              <td id="extra_high" data-status=""><p style="text-align:left;">Crew feels mission is HIGH risk</p><span class="badge badge-danger" style="float:right;"><%=@record.extra_high%></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 <style>
 
-	#fixedheight {
+  #fixedheight {
     table-layout: fixed;
-	}
-	table td {
-	  height: 60px;
-	  overflow: hidden;
-	}
+  }
+  table td {
+    height: 60px;
+    overflow: hidden;
+  }
 </style>
 
 
 <script>
 
-	$(function(){
-		<%@fields.each do |x|%>
-			$("td").each(function(){
-				if($(this).data("row") == <%=x.orm_field_id%> && $(this).data("column") == "<%=x.selected%>"){
-					$(this).data("status","checked");
-					$(this).css('background','#B0E2FF');
-				}
-			});
-		<%end%>
+  $(function(){
+    <%@fields.each do |x|%>
+      $("td").each(function(){
+        if($(this).data("row") == <%=x.orm_field_id%> && $(this).data("column") == "<%=x.selected%>"){
+          $(this).data("status","checked");
+          $(this).css('background','#B0E2FF');
+        }
+      });
+    <%end%>
 
-		<%if @record.extra_low > 0%>
-			$("#extra_low").data("status","checked");
-			$("#extra_low").css('background','#B0E2FF');
-		<%end%>
-		<%if @record.extra_moderate > 0%>
-			$("#extra_moderate").data("status","checked");
-			$("#extra_moderate").css('background','#B0E2FF');
-		<%end%>
-		<%if @record.extra_high > 0%>
-			$("#extra_high").data("status","checked");
-			$("#extra_high").css('background','#B0E2FF');
-		<%end%>
+    <%if @record.extra_low > 0%>
+      $("#extra_low").data("status","checked");
+      $("#extra_low").css('background','#B0E2FF');
+    <%end%>
+    <%if @record.extra_moderate > 0%>
+      $("#extra_moderate").data("status","checked");
+      $("#extra_moderate").css('background','#B0E2FF');
+    <%end%>
+    <%if @record.extra_high > 0%>
+      $("#extra_high").data("status","checked");
+      $("#extra_high").css('background','#B0E2FF');
+    <%end%>
 
 
-	});
+  });
 
 </script>
 

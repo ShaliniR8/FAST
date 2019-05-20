@@ -1,13 +1,13 @@
 swal({
 
-	title: "Section #<%=@section.id%>: <%=@section.title%>",
-	html: "<%= escape_javascript render('/sections/form')%>",
-	customClass: "custom-swal",
-	showCancelButton: false,
-	showConfirmButton: false,
-	allowOutsideClick: true,
-	onOpen: function(){
+  title: "Section #<%=@section.id%>: <%=@section.title%>",
+  html: "<%= escape_javascript render('/sections/form')%>",
+  customClass: "custom-swal",
+  showCancelButton: false,
+  showConfirmButton: false,
+  allowOutsideClick: true,
+  onOpen: function(){
 
-	}
+  }
 }).catch(swal.noop);
 

@@ -1,62 +1,62 @@
 <%@field_name = @label.parameterize.underscore%>
 
 <div class="row">
-	<ul class="nav nav-tabs">
-		<li class="active">
-			<a class="nav-item nav-link active" 
-				id="nav-grid-tab-<%=@field_name%>" 
-				data-toggle="tab" 
-				href="#nav-grid-<%=@field_name%>" 
-				role="tab" 
-				aria-controls="nav-grid-<%=@field_name%>" 
-				aria-selected="true">
-				Grid View
-			</a>
-		</li>		
-		<li>
-			<a class="nav-item nav-link" 
-				id="nav-chart-tab-<%=@field_name%>" 
-				data-toggle="tab" 
-				href="#nav-piechart-<%=@field_name%>" 
-				role="tab" 
-				aria-controls="nav-chart-<%=@field_name%>" 
-				aria-selected="false"> 
-				Pie Chart
-			</a>
-		</li>
-		<li>
-			<a class="nav-item nav-link active" 
-				id="nav-chart-tab-<%=@field_name%>" 
-				data-toggle="tab" 
-				href="#nav-barchart-<%=@field_name%>" 
-				role="tab" 
-				aria-controls="nav-chart-<%=@field_name%>" 
-				aria-selected="false">
-				Bar Chart
-			</a>
-		</li>
-	</ul>
+  <ul class="nav nav-tabs">
+    <li class="active">
+      <a class="nav-item nav-link active"
+        id="nav-grid-tab-<%=@field_name%>"
+        data-toggle="tab"
+        href="#nav-grid-<%=@field_name%>"
+        role="tab"
+        aria-controls="nav-grid-<%=@field_name%>"
+        aria-selected="true">
+        Grid View
+      </a>
+    </li>
+    <li>
+      <a class="nav-item nav-link"
+        id="nav-chart-tab-<%=@field_name%>"
+        data-toggle="tab"
+        href="#nav-piechart-<%=@field_name%>"
+        role="tab"
+        aria-controls="nav-chart-<%=@field_name%>"
+        aria-selected="false">
+        Pie Chart
+      </a>
+    </li>
+    <li>
+      <a class="nav-item nav-link active"
+        id="nav-chart-tab-<%=@field_name%>"
+        data-toggle="tab"
+        href="#nav-barchart-<%=@field_name%>"
+        role="tab"
+        aria-controls="nav-chart-<%=@field_name%>"
+        aria-selected="false">
+        Bar Chart
+      </a>
+    </li>
+  </ul>
 
-	<div class="tab-content">
-		<div class="tab-pane fade in show active" 
-			id="nav-grid-<%=@field_name%>" 
-			role="tabpanel" 
-			aria-labelledby="nav-grid-tab-<%=@field_name%>">
-			<%= render "/records/query_result/grid_view"%>
-		</div>	
-		<div class="tab-pane fade" 
-			id="nav-piechart-<%=@field_name%>" 
-			role="tabpanel" 
-			aria-labelledby="nav-piechart-tab-<%=@field_name%>">
-			<%= render "/records/query_result/piechart_view"%>
-		</div>	
-		<div class="tab-pane fade" 
-			id="nav-barchart-<%=@field_name%>" 
-			role="tabpanel" 
-			aria-labelledby="nav-barchart-tab-<%=@field_name%>">
-			<%= render "/records/query_result/barchart_view"%>
-		</div>	
-	</div>
+  <div class="tab-content">
+    <div class="tab-pane fade in show active"
+      id="nav-grid-<%=@field_name%>"
+      role="tabpanel"
+      aria-labelledby="nav-grid-tab-<%=@field_name%>">
+      <%= render "/records/query_result/grid_view"%>
+    </div>
+    <div class="tab-pane fade"
+      id="nav-piechart-<%=@field_name%>"
+      role="tabpanel"
+      aria-labelledby="nav-piechart-tab-<%=@field_name%>">
+      <%= render "/records/query_result/piechart_view"%>
+    </div>
+    <div class="tab-pane fade"
+      id="nav-barchart-<%=@field_name%>"
+      role="tabpanel"
+      aria-labelledby="nav-barchart-tab-<%=@field_name%>">
+      <%= render "/records/query_result/barchart_view"%>
+    </div>
+  </div>
 </div>
 
 

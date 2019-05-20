@@ -3,14 +3,14 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
 
-<%=form_for @query do |f|%> 
+<%=form_for @query do |f|%>
   <div class="item active mt50" style="height:auto;">
     <div class="grid per90 center-block">
       <div class="panel panel-primary">
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
-              <b><%=@title%></b> 
+              <b><%=@title%></b>
             </div>
             <div class="top_buttons pull-right">
               <%=f.submit "Save Query", :class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
@@ -22,16 +22,16 @@
             </div>
           </div>
         </div>
-        <div class="panel-body" id="form_body"> 
+        <div class="panel-body" id="form_body">
           <%=render "shared/privilege_form", {:target => "query_statement[privileges][]", :owner => @query, :f => f}%>
           <div class="row">
             <div class="form-group form-inline col-xs-5">
               <%=f.label :title%>
-              <%=f.text_field :title, :class => "form-control ml5 required_field"%> 
+              <%=f.text_field :title, :class => "form-control ml5 required_field"%>
             </div>
             <div class="form-group form-inline col-xs-5">
               <%=f.label :target_class,"Target"%>
-              <%=f.select :target_class, @classes, {:include_blank => ""}, {:class => "form-control ml5 required_field", :id => "class_select"}%> 
+              <%=f.select :target_class, @classes, {:include_blank => ""}, {:class => "form-control ml5 required_field", :id => "class_select"}%>
             </div>
           </div>
 
@@ -50,7 +50,7 @@
             - Leave selections blank to show all values. (i.e. Select Flight Crew ASAP as template and leave Category and Field blank to pull <b>ALL</b> Flight Crew ASAP reports.)
           </div>
 
-          <div id="conditions" class="row col-xs-12"> 
+          <div id="conditions" class="row col-xs-12">
             <div class="row mb10"><b>
               <div class="col-xs-2" style="text-align:center">Template</div>
               <div class="col-xs-2" style="text-align:center">Category</div>
@@ -69,11 +69,11 @@
               </div>
             </div>
           </div>
-          
+
         <%end%>
-      </div> 
-    </div>   
-  </div> 
+      </div>
+    </div>
+  </div>
 </div>
 
 

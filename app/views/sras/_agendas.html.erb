@@ -1,26 +1,26 @@
 <div class="col-xs-12" style="max-height:400px;overflow-y:auto">
-	<table class="table table-striped table-bordered">
-		<thead>
-			<tr>
-				<%@agenda_headers.each do |h|%>
-					<th><%=h[:title]%></th>
-				<%end%>
-				<th>Comment</th>
-			</tr>
-		</thead>
-		<tbody id="agendas">
-			<%sra.srm_agendas.each do |a|%>
-				<tr>
-					<td><%=a.title%></td>
-					<td><%=a.status%></td>
-					<td><%=a.get_user%></td>
-					<td><%=a.get_created%></td>
-					<td><%=a.get_updated%></td>
-					<td><%=a.discussion ? "Yes" : "No"%></td>
-					<td><%=a.accepted ? "Accepted" : "Declined"%></td>
-					<td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
-				</tr>
-			<%end%>
-		</tbody>
-	</table>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <%@agenda_headers.each do |h|%>
+          <th><%=h[:title]%></th>
+        <%end%>
+        <th>Comment</th>
+      </tr>
+    </thead>
+    <tbody id="agendas">
+      <%sra.srm_agendas.each do |a|%>
+        <tr>
+          <td><%=a.title%></td>
+          <td><%=a.status%></td>
+          <td><%=a.get_user%></td>
+          <td><%=a.get_created%></td>
+          <td><%=a.get_updated%></td>
+          <td><%=a.discussion ? "Yes" : "No"%></td>
+          <td><%=a.accepted ? "Accepted" : "Declined"%></td>
+          <td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
+        </tr>
+      <%end%>
+    </tbody>
+  </table>
 </div>

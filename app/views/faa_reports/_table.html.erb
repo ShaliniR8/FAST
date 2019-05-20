@@ -1,47 +1,47 @@
 <div class="panel-warning">
-	<div class="panel-heading">
-		<div class="panel-title"><%=@title%>
-			<button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
-				<span class="glyphicon glyphicon-remove"></span>
-			</button>
-		</div>
-	</div>
-	<div class="panel-body">
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="table-responsive">
-					<table id="reports"class="table table-hover table-striped table-bordered">
-						<thead><tr>
-							<%@headers.each do |header|%>
-								<th><%=header[:title]%></th>
-							<%end%>    
-						</tr></thead>
-						<tbody>
-							<%@result.each do |a|%>
-								<tr id="<%=a.id%>">     
-									<%@headers.each do |header|%>
-										<td class="<%=header[:html_class].present? ? a.send(header[:html_class]) : ''%>"><%=a.send(header[:field])%></td>
-									<%end%>
-								</tr>
-							<%end%>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>  
+  <div class="panel-heading">
+    <div class="panel-title"><%=@title%>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
+  </div>
+  <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto" id="form_body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="table-responsive">
+          <table id="reports"class="table table-hover table-striped table-bordered">
+            <thead><tr>
+              <%@headers.each do |header|%>
+                <th><%=header[:title]%></th>
+              <%end%>
+            </tr></thead>
+            <tbody>
+              <%@result.each do |a|%>
+                <tr id="<%=a.id%>">
+                  <%@headers.each do |header|%>
+                    <td class="<%=header[:html_class].present? ? a.send(header[:html_class]) : ''%>"><%=a.send(header[:field])%></td>
+                  <%end%>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
 <script>
-	$(document).ready(function(){
-		$('tbody tr').on('click',function(){
-			window.open("<%=records_path()%>"+"/"+$(this).attr("id"));
-		});
-		$('#reports').dataTable({
-			"aLengthMenu": [[5, 10, -1], [5, 10,"All"]],
-			"iDisplayLength": 5
-		});
-	});
+  $(document).ready(function(){
+    $('tbody tr').on('click',function(){
+      window.open("<%=records_path()%>"+"/"+$(this).attr("id"));
+    });
+    $('#reports').dataTable({
+      "aLengthMenu": [[5, 10, -1], [5, 10,"All"]],
+      "iDisplayLength": 5
+    });
+  });
 </script>

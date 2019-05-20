@@ -1,0 +1,25 @@
+<td>
+  <%if !header_item.editable && action_name == 'start' || (action_name == 'start' && checklist_cell.checklist_row.is_header rescue true)%>
+    <%=checklist_cell.value%>
+  <%else%>
+    <%case header_item.data_type%>
+    <%when 'radio'%>
+      <div class="col-xs-12">
+        <%header_item.options.split(";").each do |option|%>
+          <label class="radio radio-inline">
+            <%=f.radio_button :value, option%>
+            <%=option%>
+          </label>
+        <%end%>
+      </div>
+    <%when 'dropdown'%>
+      <%=f.select :value,
+        header_item.options.split(";"),
+        {:include_blank => ""},
+        {:class=>'form-control field_select'}%>
+    <%when 'text'%>
+      <%=f.text_field :value, :class => "form-control"%>
+    <%end%>
+    <%=f.hidden_field :checklist_header_item_id, :value => header_item.id%>
+  <%end%>
+</td>

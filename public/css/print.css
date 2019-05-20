@@ -27,4 +27,9 @@ hr {
 table{
 	font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 	font-size: 12px !important;
+  page-break-inside: avoid !important;
+  margin: 4px 0 4px 0;
+}
+table, tr, td, th, tbody, thead, tfoot {
+  page-break-inside: avoid !important;
 }
