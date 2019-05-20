@@ -468,6 +468,7 @@ class ReportsController < ApplicationController
   def close_records(owner)
     owner.records.each do |record|
       if record.status != 'Closed'
+        record.close_date = Time.now
         record.status = 'Closed'
         record.save
         submission = record.submission
