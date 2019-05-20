@@ -14,10 +14,10 @@
           <%@sra_headers.each do |header|%>
             <td><%=sra.send(header[:field])%></td>
           <%end%>
-          <%if (sra.status) == "Open"%>
-            <td><a class="btn btn-info add_btn">Add</a></td>
-          <%else%>
+          <%if sra.meeting.present?%>
             <td><b style="color:green">Added</b></td>
+          <%else%>
+            <td><a class="btn btn-info add_btn">Add</a></td>
           <%end%>
         </tr>
       <%end%>
