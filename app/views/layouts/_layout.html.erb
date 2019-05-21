@@ -392,6 +392,7 @@
                 <%end%>
 
                 <li><a href="#" class="dropdown-menu-header">Reference</a></li>
+                <li class="menu-link"><%=link_to "User Guides", user_guides_documents_path%></li>
                 <li class="menu-link"><%=link_to "Version History", revision_history_documents_path%></li>
                 <%if current_user.has_access("documents","index")%>
                   <li class="menu-link"><%=link_to "Documents", documents_path%></li>

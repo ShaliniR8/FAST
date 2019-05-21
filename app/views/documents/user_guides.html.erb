@@ -1,0 +1,124 @@
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          User Guides
+        </div>
+      </div>
+
+      <div class="panel-body">
+
+        <div class="col-xs-3">
+          <div class="sidenav">
+            <a href="summary">Summary</a>
+
+            <a data-target="#account_management">Account Management</b></a>
+            <div class="col-md-offset-1" id="account_management">
+              <a href="accounts">Accounts</a>
+              <a href="rules">Rules</a>
+              <a href="privileges">Privileges</a>
+            </div>
+
+            <a href="safety_reporting">Safety Reporting Module</a>
+            <a href="safety_assurance">Safety Assurance Module</a>
+            <a href="srm">SRA (SRM) Module</a>
+
+            <a data-target="#admin" data-toggle="collapse">Admin</b></a>
+            <div class="col-md-offset-1" id="admin">
+              <a href="safety_report_templates">Safety Report Templates</a>
+              <a href="message_templates">Message Templates</a>
+              <a href="custom_options">Custom Options</a>
+            </div>
+
+
+            <a href="1">1</a>
+            <a href="2">2</a>
+            <a href="3">3</a>
+            <a href="4">4</a>
+            <a href="5">5</a>
+            <a href="6">6</a>
+            <a href="7">7</a>
+            <a href="8">8</a>
+            <a href="9">9</a>
+
+
+          </div>
+        </div>
+
+        <div class="col-xs-9">
+          <div class="main">
+            <div id="user_guide_content">
+              <%=render "documents/user_guides/summary"%>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+  .sidenav > a{
+    cursor: pointer;
+    color: steelblue !important;
+  }
+
+  a:hover {
+    font-weight: bold;
+    text-decoration: underline !important;
+  }
+
+  .sidenav {
+    width: 100%;
+    z-index: 1;
+    top: 20px;
+    left: 10px;
+    background: #eee;
+    overflow-x: hidden;
+    padding: 8px 0;
+  }
+  .sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    color: #2196F3;
+    display: block;
+  }
+  .sidenav a:hover {
+    color: #064579;
+  }
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  }
+</style>
+
+
+<script>
+  $(function(){
+
+    $(document).on("click", ".sidenav a", function(e){
+      e.preventDefault();
+      var href = $(this).attr("href");
+      if (href != undefined){
+        $.get("<%=load_content_documents_path%>?href=" + href, function(data){
+          $("#user_guide_content").html(data);
+        });
+      }else{
+        $("#user_guide_content").html("");
+      }
+    });
+
+  });
+</script>
+
+
+
+
+
+

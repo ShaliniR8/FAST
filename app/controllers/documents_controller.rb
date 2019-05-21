@@ -1,7 +1,9 @@
 class DocumentsController < ApplicationController
+
+  before_filter :login_required
+
   def index
     @documents = Document.find(:all)
-
   end
 
   def new
@@ -39,6 +41,13 @@ class DocumentsController < ApplicationController
   end
 
   def revision_history
+  end
+
+  def user_guides
+  end
+
+  def load_content
+    render :partial => "documents/user_guides/#{params[:href]}"
   end
 
 end
