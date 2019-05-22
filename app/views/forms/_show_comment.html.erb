@@ -21,7 +21,7 @@
               <tbody>
                 <%owner.comments.preload(:viewer).each do |c|%>
                   <tr>
-                    <td><%=c.viewer.full_name%></td>
+                    <td><%=c.viewer.full_name rescue "<b>External</b> #{c.alt_user}".html_safe%></td>
                     <td><%=c.get_subnmission_time%></td>
                     <td><%=c.get_content%></td>
                   </tr>

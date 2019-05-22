@@ -4,6 +4,8 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 
 
 <div class="item active mt50" style="height:auto;">
@@ -26,7 +28,8 @@
                 'pdf',
                 'viewer_access',
                 'send_message',
-                'expand_all'
+                'expand_all',
+                'private_link'
               ],
               owner: @owner %>
 
@@ -71,12 +74,6 @@
     </div>
   </div>
 </div>
-
-<style>
-  .datepicker{
-    z-index: 1200!important;
-  }
-</style>
 
 
 <script>
