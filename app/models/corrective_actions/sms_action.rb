@@ -362,7 +362,7 @@ class SmsAction < ActiveRecord::Base
 
 
   def self.get_avg_complete
-    candidates = self.where("status = ? and complete_date is not ?",
+    candidates = self.where("status = ? and complete_date is not ? and created_at is not null",
       "Completed", nil)
     if candidates.present?
       sum = 0
