@@ -115,7 +115,7 @@
               <%end%>
 
             <%elsif @finding.status == "Assigned" %>
-              <%if current_user.admin? || @finding.responsible_user == current_user%>
+              <%if current_user.admin? || @finding.responsible_user == current_user || current_user.has_access(@type,'admin')%>
                 <%=link_to "Complete", "#",
                   :class => "btn btn-warning pull-right complete_btn mr5 mb5",
                   :id => 'complete',
