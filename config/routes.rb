@@ -39,6 +39,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :notifications
   resources :notices
+  resources :private_links
   resources :verifications do
     member do
       get 'address'
