@@ -1,8 +1,12 @@
-- if !['Completed', 'Pending Approval'].include? owner.status
+- if owner.status == 'Assigned' &&\
+  (current_user.admin? ||\
+    owner.responsible_user == current_user ||\
+    current_user.has_access(permission,'admin')
+  )
   = link_to 'Add Recommendation',
     new_recommendation_path(\
-        owner_id: owner.id,
-        owner_type: owner.class.name\
-      ),
-      class: 'btn btn-success pull-right mr5 mb5',
-      disable_with: 'Adding...'
+      owner_id: owner.id,
+      owner_type: owner.class.name\
+    ),
+    class: 'btn btn-success pull-right mr5 mb5',
+    disable_with: 'Adding...'
