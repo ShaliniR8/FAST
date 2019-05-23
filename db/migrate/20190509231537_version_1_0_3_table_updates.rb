@@ -18,7 +18,16 @@ class Version103TableUpdates < ActiveRecord::Migration
       execute "UPDATE #{type} SET status = 'Assigned' WHERE status = 'Open';"
       execute "UPDATE #{type} SET status = 'Completed' WHERE status = 'Closed';"
     end
-
+    [
+      'audits',
+      'inspections',
+      'evaluations',
+      'investigations',
+      'findings',
+      'sms_actions'
+    ].each do |type|
+      execute "UPDATE #{type} SET privileges = NULL"
+    end
   end
 
   def self.down
