@@ -29,7 +29,11 @@ PrdgSession::Application.routes.draw do |map|
      get 'get_user_json'
   end
 
-
+  resources :signatures do
+    member do
+      get 'display_signature'
+    end
+  end
 
   # System Feature
   resources :automated_notifications do
@@ -382,6 +386,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_contact'
       get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_checklist'
       post 'upload_checklist'
       get 'update_checklist'

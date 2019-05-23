@@ -29,6 +29,7 @@ class AuditsController < SafetyAssuranceController
     :new_attachment,
     :new_contact,
     :new_cost,
+    :new_signature,
     :new_task,
     :override_status,
     :reopen,

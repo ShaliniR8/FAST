@@ -59,6 +59,11 @@ class SafetyAssuranceController < ApplicationController
     render :partial => 'forms/new_cost'
   end
 
+  def new_signature
+    @signature = Signature.new
+    render partial: 'forms/signatures/sign'
+  end
+
   def new_task
     load_options
     @task = @owner.tasks.new

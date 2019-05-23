@@ -45,10 +45,3 @@ class Attachment < ActiveRecord::Base
   end
 
 end
-
-module HasAttachments
-  extend ActiveSupport::Concern
-  included do
-    has_many :attachments, as: :owner,    dependent: :destroy
-  end
-end

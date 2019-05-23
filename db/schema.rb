@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190517173316) do
+ActiveRecord::Schema.define(:version => 20190521225450) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -870,6 +870,17 @@ ActiveRecord::Schema.define(:version => 20190517173316) do
     t.integer "poc_id"
   end
 
+  create_table "private_links", :force => true do |t|
+    t.string   "email"
+    t.string   "name"
+    t.string   "digest"
+    t.date     "expire_date"
+    t.string   "access_level"
+    t.string   "link"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "privileges", :force => true do |t|
     t.string   "name"
     t.text     "description"
@@ -1158,6 +1169,16 @@ ActiveRecord::Schema.define(:version => 20190517173316) do
     t.text     "notes"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "signatures", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "signee_name"
+    t.integer  "user_id"
+    t.string   "owner_id"
+    t.string   "owner_type"
+    t.string   "path"
   end
 
   create_table "sms_actions", :force => true do |t|

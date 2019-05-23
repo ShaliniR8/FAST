@@ -1,0 +1,9 @@
+.col-xs-12.col-lg-12
+  .panel.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b = "#{owner.signee_name}: #{owner.created_at.strftime("%b %e, %Y")}"
+        <span class='pull-right clickable'><i class='mt5 glyphicon glyphicon-chevron-down'></i></span>
+    .panel-body style='display:none'
+      = render display_signature_signature_path id: owner.id
+      = render '/forms/show_fields', record: owner, fields: fields

@@ -117,6 +117,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def display_signature(owner)
+    if owner.class.name == 'Signature'
+      send_file owner.path.current_path, type: 'image/png', disposition: 'inline'
+    end
+  end
 
 
   # def display_in_table(report)
