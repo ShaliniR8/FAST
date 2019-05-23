@@ -1,17 +1,16 @@
 class SignaturesController < ApplicationController
-  before_filter:
-  def display_signature
-    full_path = signature.path.current_path
-    Rails.logger.debug "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ HIT"
-    current_signature = Signature.find(params[:id])
-    send_file current_signature.path.current_path, type: 'image/png', disposition: 'inline'
+
+  before_filter :define_owner, only: [:show]
+
+  def define_owner
+    @class = Object.const_get('Signature')
+    @owner = Signature.find(params[:id])
+  end
+
+  def show
+    signature = Signature.find(params[:id])
+    full_path = @owner.path.current_path
+    image_data = File.read(signature.path.current_path)
+    send_data Base64.encode64(image_data), type: 'image/png', disposition: 'inline'
   end
 end
-
-
-
-  # def display_image
-  #   Rails.logger.debug "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-  #   # Rails.logger.debug "#{full_path} #{full_path.class.name}"
-  #   # "#{Rails.root.to_s}/app/assets/signature/path/#{owner.id}/#{owner.path}", type: 'image/png', disposition: 'inline'
-  # end

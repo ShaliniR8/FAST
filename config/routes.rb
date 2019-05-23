@@ -29,11 +29,7 @@ PrdgSession::Application.routes.draw do |map|
      get 'get_user_json'
   end
 
-  resources :signatures do
-    member do
-      get 'display_signature'
-    end
-  end
+  resources :signatures, only:[:show]
 
   # System Feature
   resources :automated_notifications do
