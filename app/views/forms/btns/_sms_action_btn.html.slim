@@ -1,4 +1,8 @@
-- if !['Completed', 'Pending Approval'].include? owner.status
+- if owner.status == 'Assigned' &&\
+  (current_user.admin? ||\
+    owner.responsible_user == current_user ||\
+    current_user.has_access(permission,'admin')
+  )
   = link_to 'Add Corrective Action',
     new_sms_action_path( \
       owner_id: owner.id,
