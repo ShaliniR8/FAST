@@ -35,6 +35,7 @@
         <div class="panel-body">
 
           <div class="col-xs-12 mb20">
+
             <%= render 'forms/btns/render_btns',
               btns: [
                 'assign',
@@ -49,6 +50,7 @@
 
             <%if @owner.status == "New" && !@owner.can_assign?%>
               <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
+
             <%end%>
           </div>
 

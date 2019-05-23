@@ -100,7 +100,7 @@ class SrmMeetingsController < ApplicationController
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
     @sra_headers = Sra.get_meta_fields('index')
-    @sras = Sra.where('meeting_id is ? and status = ?', nil, 'Open')
+    @sras = Sra.where('meeting_id is ?', nil)
   end
 
 
@@ -216,7 +216,7 @@ class SrmMeetingsController < ApplicationController
     @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
     @timezones = Meeting.get_timezones
     @sra_headers = Sra.get_meta_fields('index')
-    @sras = @meeting.sras + Sra.where("status = 'Open'")
+    @sras = @meeting.sras + Sra.where('meeting_id is ?', nil)
   end
 
 
