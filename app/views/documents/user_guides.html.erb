@@ -10,44 +10,41 @@
 
       <div class="panel-body">
 
-        <div class="col-xs-3">
+        <div class="col-xs-4">
+          <h4><b>Table of Contents</b></h4>
           <div class="sidenav">
-            <a href="summary">Summary</a>
-
-            <a data-target="#account_management">Account Management</b></a>
-            <div class="col-md-offset-1" id="account_management">
-              <a href="accounts">Accounts</a>
-              <a href="rules">Rules</a>
-              <a href="privileges">Privileges</a>
-            </div>
-
-            <a href="safety_reporting">Safety Reporting Module</a>
-            <a href="safety_assurance">Safety Assurance Module</a>
-            <a href="srm">SRA (SRM) Module</a>
-
-            <a data-target="#admin" data-toggle="collapse">Admin</b></a>
-            <div class="col-md-offset-1" id="admin">
-              <a href="safety_report_templates">Safety Report Templates</a>
-              <a href="message_templates">Message Templates</a>
-              <a href="custom_options">Custom Options</a>
-            </div>
-
-
-            <a href="1">1</a>
-            <a href="2">2</a>
-            <a href="3">3</a>
-            <a href="4">4</a>
-            <a href="5">5</a>
-            <a href="6">6</a>
-            <a href="7">7</a>
-            <a href="8">8</a>
-            <a href="9">9</a>
-
-
+            <ol>
+              <li><a class="doc" href="administrative">Administrative</a></li>
+              <ol type="a">
+                <li><a class="tv" href="privileges">User Privileges</a></li>
+                <li><a class="tv" href="custom_orms">Creating/Editing a Custom ORM</a></li>
+                <li><a class="tv" href="risk_matrix">Risk Matrix Customization</a></li>
+              </ol>
+              <li><a class="doc" href="safety_reporting">Safety Reporting</a></li>
+              <ol type="a">
+                <li><a class="tv" href="sr_dashboard">Dashboard Walkthrough</a></li>
+                <li><a class="tv" href="report">Filing a Safety Report</a></li>
+                <li><a class="tv" href="progress_report">Continuing an In-Progress Report</a></li>
+                <li><a class="tv" href="orm">Filing an ORM</a>
+                </li>
+              </ol>
+              <li><a class="doc" href="safety_assurance">Safety Assurance</a></li>
+              <ol type="a" >
+                <li><a class="tv" href="audit">Create a New Audit</a></li> 
+              </ol>
+              <li><a class="doc" href="sra">Safety Risk Assessment</a></li>
+              <ol type="a">
+                <li><a class="tv" href="srm">Create an SRA/M</a></li>
+              </ol>
+              <li><a class="doc" href="sms_im">SMS-IM</a></li>
+              <ol type="a">
+                <li><a class="tv" href="sms_dashboard">Dashboard Walkthrough</a></li>
+              </ol>
+            </ol>
           </div>
         </div>
 
-        <div class="col-xs-9">
+        <div class="col-xs-8">
           <div class="main">
             <div id="user_guide_content">
               <%=render "documents/user_guides/summary"%>
@@ -61,17 +58,17 @@
   </div>
 </div>
 
-
-
 <style>
-  .sidenav > a{
-    cursor: pointer;
-    color: steelblue !important;
+  .sidenav li {
+    font-weight: normal !important;
+  }
+  .sidenav a{
+    /*cursor: pointer;*/
+    color: darkslategray;
   }
 
-  a:hover {
+  .sidenav a:hover {
     font-weight: bold;
-    text-decoration: underline !important;
   }
 
   .sidenav {
@@ -84,24 +81,29 @@
     padding: 8px 0;
   }
   .sidenav a {
-    padding: 6px 8px 6px 16px;
+    padding: 3px 3px 3px 3px;
     text-decoration: none;
-    color: #2196F3;
     display: block;
   }
-  .sidenav a:hover {
-    color: #064579;
-  }
+
   @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}
+  }
+  .embolden {
+    color: steelblue !important;
+    font-weight: bold;
+  }
+  .position-right{
+    float: right;
   }
 </style>
 
 
 <script>
   $(function(){
-
+    $(".tv").append("<i class='glyphicon glyphicon-expand position-right'></i>");
+    $(".doc").append("<i class='glyphicon glyphicon-file position-right'></i>"); 
     $(document).on("click", ".sidenav a", function(e){
       e.preventDefault();
       var href = $(this).attr("href");
@@ -114,7 +116,13 @@
       }
     });
 
+    var addclass = 'embolden';
+    var $category = $('.sidenav a').click(function(e) {
+      $category.removeClass(addclass);
+      $(this).addClass(addclass);
+    });
   });
+
 </script>
 
 
