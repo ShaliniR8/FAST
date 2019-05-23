@@ -71,7 +71,7 @@ class AuditsController < ApplicationController
       cars += Audit.where('approver_id = ?',  current_user.id)
       if current_user.has_access('audits','viewer')
         Audit.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.empty?
+          if viewable.privileges.blank?
             cars += [viewable]
           else
             viewable.privileges.each do |privilege|

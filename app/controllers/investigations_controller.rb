@@ -168,7 +168,7 @@ class InvestigationsController < ApplicationController
       cars += Investigation.where('approver_id = ?',  current_user.id)
       if current_user.has_access('investigations','viewer')
         Investigation.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.empty?
+          if viewable.privileges.blank?
             cars += [viewable]
           else
             viewable.privileges.each do |privilege|
