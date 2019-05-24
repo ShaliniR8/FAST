@@ -416,6 +416,35 @@ class AuditsController < ApplicationController
     # Default checklists to an empty array
     audit_json[:checklists] = [] if audit_json[:checklists].blank?
 
+    checklist_headers = {}
+    audit_json[:checklists] = audit_json[:checklists].reduce({}) do |checklists, checklist|
+      # Gathers all checklist headers that belong to this audit's checklists
+      id = checklist[:checklist_header]['id']
+      if checklist_headers[id].blank?
+        checklist_headers[id] = checklist[:checklist_header]
+      end
+      checklist.delete(:checklist_header)
+
+      # Creates id maps for checklist rows and checklist cells
+      checklist[:checklist_rows] = checklist[:checklist_rows].reduce({}) do |checklist_rows, row|
+        row[:checklist_cells] = row[:checklist_cells].reduce({}) do |checklist_cells, cell|
+          checklist_cells.merge({ cell['id'] => cell })
+        end
+        checklist_rows.merge({ row['id'] => row })
+      end
+
+       # Creates an id map for all checklists used in this audit
+      checklists.merge({ checklist['id'] => checklist })
+    end
+
+    # Creates an id map for all checklist header items used in this audit
+    audit_json[:checklist_header_items] = checklist_headers.values
+      .map{ |checklist_header| checklist_header[:checklist_header_items] }
+      .flatten
+      .reduce({}) do |checklist_header_items, item|
+        checklist_header_items.merge({ item['id'] => item })
+      end
+
     # Takes the id of each user field and replaces it with the
     # full name of the user corresponding to that id
     user_fields = fields.select{ |field| field[:type] == 'user' }

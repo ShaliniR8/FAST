@@ -340,13 +340,29 @@ class UsersController < ApplicationController
   end
 
   def get_audits
-    audits = Audit
+    audits = Audit.all
 
-    if !current_user.admin? || current_user.has_access('audits', 'admin')
-      audits = audits.where('responsible_user_id = :id OR approver_id = :id', { id: current_user[:id] })
-        .as_json(only: [:id, :status, :title, :completion])
-        .map {|audit| audit['audit']}
+    if !current_user.admin? && !current_user.has_access('audits', 'admin')
+      audits = Audit.where('responsible_user_id = :id OR approver_id = :id', { id: current_user[:id] })
+      if current_user.has_access('audits', 'viewer')
+        Audit.where({ viewer_access: true }).each do |viewable|
+          if viewable.privileges.empty?
+            audits += [viewable]
+          else
+            viewable.privileges.each do |privilege|
+              current_user.privileges.include? privilege
+              audits += [viewable]
+            end
+          end
+        end
+      end
     end
+
+    # Convert to id map for fast audit lookup
+    audits = audits
+      .as_json(only: [:id, :status, :title, :completion])
+      .map {|audit| audit['audit']}
+      .reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
 
     render :json => audits
   end
