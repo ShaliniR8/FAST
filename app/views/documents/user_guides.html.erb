@@ -10,8 +10,27 @@
 
       <div class="panel-body">
 
-        <div class="col-xs-4">
-          <h4><b>Table of Contents</b></h4>
+
+        <div class="col-xs-4" style="overflow-y:auto;height:100vh;">
+          <h3><b>Table of Contents</b></h3>
+          <div class="sidenav">
+            <ol>
+              <%Document.get_user_guides.each do |x|%>
+                <li><a class="<%=x[:class]%>" href="<%=x[:href]%>"><%=x[:name]%></a></li>
+                <ol type="a">
+                  <%x[:topics].each do |y|%>
+                    <li><a class="<%=y[:class]%>" href="<%=y[:href]%>"><%=y[:name]%></a></li>
+                  <%end%>
+                </ol>
+              <%end%>
+            </ol>
+          </div>
+        </div>
+
+
+        <%if false%>
+        <div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height:100vh;">
+          <h3><b>Table of Contents</b></h3>
           <div class="sidenav">
             <ol>
               <li><a class="doc" href="administrative">Administrative</a></li>
@@ -23,18 +42,18 @@
               <li><a class="doc" href="safety_reporting">Safety Reporting</a></li>
               <ol type="a">
                 <li><a class="tv" href="sr_dashboard">Dashboard Walkthrough</a></li>
-                <li><a class="tv" href="report">Filing a Safety Report</a></li>
-                <li><a class="tv" href="progress_report">Continuing an In-Progress Report</a></li>
-                <li><a class="tv" href="orm">Filing an ORM</a>
+                <li><a class="tv" href="file_report">Filing a Safety Report</a></li>
+                <li><a class="tv" href="file_orm">Filing an ORM</a>
                 </li>
               </ol>
               <li><a class="doc" href="safety_assurance">Safety Assurance</a></li>
               <ol type="a" >
-                <li><a class="tv" href="audit">Create a New Audit</a></li> 
+                <li><a class="tv" href="audit">Create a New Audit</a></li>
               </ol>
               <li><a class="doc" href="sra">Safety Risk Assessment</a></li>
               <ol type="a">
                 <li><a class="tv" href="srm">Create an SRA/M</a></li>
+                <li><a class="tv" href="srm_dashboard">Dashboard Walkthrough</a></li>
               </ol>
               <li><a class="doc" href="sms_im">SMS-IM</a></li>
               <ol type="a">
@@ -43,11 +62,12 @@
             </ol>
           </div>
         </div>
+        <%end%>
 
         <div class="col-xs-8">
           <div class="main">
             <div id="user_guide_content">
-              <%=render "documents/user_guides/summary"%>
+              <%=render "documents/user_guides/template", :topic_name => 'Welcome!', :href => 'summary'%>
             </div>
           </div>
         </div>
@@ -69,7 +89,7 @@
 
   .sidenav a:hover {
     font-weight: bold;
-    color: steelblue !important
+    color: darkslategray !important
   }
 
   .sidenav {
@@ -94,7 +114,7 @@
     .sidenav a {font-size: 18px;}
   }
   .embolden {
-    color: steelblue !important;
+    color: darkslategray !important;
     font-weight: bold;
   }
   .position-right{
@@ -106,12 +126,22 @@
 <script>
   $(function(){
     $(".tv").append("<i class='glyphicon glyphicon-expand position-right'></i>");
-    $(".doc").append("<i class='glyphicon glyphicon-file position-right'></i>"); 
+    $(".doc").append("<i class='glyphicon glyphicon-file position-right'></i>");
+
+    var addclass = 'embolden';
+    var $category = $('.sidenav a').click(function(e) {
+      $category.removeClass(addclass);
+      $(this).addClass(addclass);
+    });
+
     $(document).on("click", ".sidenav a", function(e){
       e.preventDefault();
       var href = $(this).attr("href");
+      var name = $(this).text();
+      console.log(href);
+      console.log(name);
       if (href != undefined){
-        $.get("<%=load_content_documents_path%>?href=" + href, function(data){
+        $.get("<%=load_content_documents_path%>?topic_name=" + name + "&href=" + href, function(data){
           $("#user_guide_content").html(data);
         });
       }else{
@@ -119,11 +149,6 @@
       }
     });
 
-    var addclass = 'embolden';
-    var $category = $('.sidenav a').click(function(e) {
-      $category.removeClass(addclass);
-      $(this).addClass(addclass);
-    });
   });
 
 </script>
