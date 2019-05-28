@@ -61,6 +61,8 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "revision_history"
+      get "user_guides"
+      get "load_content"
     end
   end
   resources :messages do
