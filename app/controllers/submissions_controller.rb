@@ -172,7 +172,7 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:completed] = params[:commit] == 'Submit' ? true : false
+    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
     params[:submission][:anonymous] = params[:anonymous] == '1' ? true : false
 
 
@@ -310,11 +310,19 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
-    params[:submission][:completed] = params[:commit] == "Submit" ? true : false
+    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
-      if params[:commit] == "Submit"
+      if params[:commit] == "Save for Later"
+        respond_to do |format|
+          format.html {
+            redirect_to incomplete_submissions_path,
+              flash: {success: "Submission ##{@record.id} updated."}
+          }
+          format.json
+        end
+      else
         if params[:create_copy]
           converted = @record.convert
           notify_notifiers(converted, params[:commit])
@@ -323,14 +331,6 @@ class SubmissionsController < ApplicationController
           format.html {
             redirect_to submission_path(@record),
               flash: {success: params[:submission][:comments_attributes].present? ? "Notes added" : "Submission submitted."}
-          }
-          format.json
-        end
-      else
-        respond_to do |format|
-          format.html {
-            redirect_to incomplete_submissions_path,
-              flash: {success: "Submission ##{@record.id} updated."}
           }
           format.json
         end
