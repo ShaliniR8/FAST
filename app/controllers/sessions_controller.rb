@@ -3,7 +3,14 @@ class SessionsController < ApplicationController
 
 
   def new
-    @categories = Category.all
+    respond_to do |format|
+      format.html do
+        @categories = Category.all
+      end
+      format.json do
+        render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
+      end
+    end
   end
 
   def create
