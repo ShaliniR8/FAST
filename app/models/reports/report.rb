@@ -36,10 +36,10 @@ class Report < ActiveRecord::Base
     [
       {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
       {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
-      {                                                                                   type: 'newline',  visible: 'form,show'                        },
+      {                                                                                   type: 'newline',  visible: 'show'                        },
       {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show', required: true  },
       {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show', required: true  },
-      {                                                                                   type: 'newline',  visible: 'form,show'                        },
+      {                                                                                   type: 'newline',  visible: 'show'                        },
       {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',           required: false },
 
       {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_label_options },
