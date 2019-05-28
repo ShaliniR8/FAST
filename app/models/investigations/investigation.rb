@@ -7,6 +7,7 @@ class Investigation < ActiveRecord::Base
   include Costable
   include Findingable
   include Recommendationable
+  include Signatureable
   include SmsActionable
   include SmsTaskable
   include Transactionable

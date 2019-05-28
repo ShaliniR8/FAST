@@ -21,6 +21,7 @@
                 'delete',
                 'override_status',
                 'edit',
+                'sign',
                 'deid_pdf',
                 'pdf',
                 'viewer_access',
@@ -70,6 +71,7 @@
           :show_btn => false%>
 
         <%=render "/forms/cost", :owner => @owner%>
+        <%=render 'forms/signatures/show_signatures', owner: @owner %>
         <%=render "/forms/show_comment", :owner => @owner%>
 
         <%=render "/forms/attachments_show", :owner => @owner%>

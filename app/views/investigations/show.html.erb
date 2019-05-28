@@ -23,6 +23,7 @@
                   'delete',
                   'override_status',
                   'edit',
+                  'sign',
                   'deid_pdf',
                   'pdf',
                   'view_report',
@@ -100,6 +101,7 @@
             :fields=> SmsTask.get_meta_fields('show')%>
 
           <%=render "/forms/cost", :owner => @owner%>
+        <%=render 'forms/signatures/show_signatures', owner: @owner %>
 
 
           <%#=render "/records/show_template_fields", :record => @owner.record%>

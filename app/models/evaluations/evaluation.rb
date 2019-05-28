@@ -6,6 +6,7 @@ class Evaluation < ActiveRecord::Base
   include Contactable
   include Costable
   include Findingable
+  include Signatureable
   include SmsTaskable
   include Transactionable
 
