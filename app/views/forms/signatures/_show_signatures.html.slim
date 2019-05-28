@@ -1,4 +1,4 @@
--if @owner.signatures.present?
+-if owner.signatures.present?
   - fields = Signature.get_meta_fields('show')
   .col-xs-12.col-lg-12
     .panel.panel-info
@@ -6,5 +6,5 @@
         .panel-title
           b Signatures <span class='pull-right clickable'><i class='mt5 glyphicon glyphicon-chevron-down'></i></span>
       .panel-body style='display:none'
-        - @owner.signatures.each do |x|
+        - owner.signatures.each do |x|
           = render 'forms/signatures/show_signature', owner: x, fields: fields

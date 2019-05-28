@@ -4,7 +4,6 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -63,7 +62,7 @@
         <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
         <%=render '/forms/cost', :owner => @owner%>
 
-        <%=render 'forms/signatures/show_signatures' %>
+        <%=render 'forms/signatures/show_signatures', owner: @owner %>
 
 
         <%=render "/forms/show_comment", :owner => @owner%>
