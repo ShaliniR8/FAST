@@ -18,16 +18,16 @@
 module ControllerAuthentication
 
   def self.included(controller)
-    controller.send :helper_method, :current_user, :logged_in?, :redirect_to_target_or_default
+    controller.send :helper_method, :current_user, :logged_in?, :redirect_to_target_or_default, :redirect_back_or_default
   end
 
+
   def current_user
-    # Rails.logger.info("CURRENT USER_ID BEGIN")
-  #   Rails.logger.info(session[:user_id])
-  #   Rails.logger.info("CURRENT USER_ID END")
     begin
       if defined?(current_token) && current_token != nil
         @current_user = current_token.user
+      elsif session[:digest]
+        @current_user = User.new(:username => session[:digest].name, :email => session[:digest].email)
       elsif session[:simulated_id]
         @current_user ||= User.find(session[:simulated_id]) if session[:user_id]
       else
@@ -37,6 +37,8 @@ module ControllerAuthentication
       @current_user = nil
     end
   end
+
+
 
   #Kaushik Mahorker OAuth
   #Checks to see if request was made using OAuth
@@ -70,7 +72,6 @@ module ControllerAuthentication
 
 
   def login_required
-    puts "Login required"
     unless logged_in?
       store_target_location
       redirect_to login_url, :alert => "You need to log in first to access this page."
@@ -94,6 +95,10 @@ module ControllerAuthentication
     end
   end
 
+  def redirect_back_or_default(default)
+    redirect_to(session[:return_to] || default)
+  end
+
 
 
   private
@@ -102,4 +107,9 @@ module ControllerAuthentication
   def store_target_location
     session[:return_to] = request.url
   end
+
+  def store_location
+    session[:return_to] = request.fullpath if request.get? and controller_name != "user_sessions" and controller_name != "sessions"
+  end
+
 end

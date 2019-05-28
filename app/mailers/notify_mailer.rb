@@ -19,6 +19,23 @@ class NotifyMailer < ActionMailer::Base
   end
 
 
+  def share_private_link(shared_by, private_link)
+    @private_link = private_link
+    @email = private_link.email
+    @subject = "New shared link on ProSafeT"
+    link = "<a style='font-weight:bold;text-decoration:underline' href='#{private_links_url(:digest => private_link.digest)}'>View</a>"
+    @message = "#{shared_by.full_name} has shared a link with you on ProSafeT. #{link}"
+
+    if BaseConfig.airline[:enable_mailer]
+      if Rails.env.production?
+        mail(:to => @email, :subject => @subject).deliver
+      else
+        mail(:to => 'noc@prodigiq.com', :subject => @subject).deliver
+      end
+    end
+  end
+
+
   def automated_reminder(user, subject, message, record)
     @user = user
     @message = message.gsub("\n", "<br>") rescue ''

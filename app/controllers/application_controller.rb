@@ -28,6 +28,12 @@ class ApplicationController < ActionController::Base
       session[:last_active] = Time.now
     end
 
+    if session[:digest].present? &&
+      request.url == session[:digest].link &&
+      session[:digest].expire_date > Time.now.to_date
+      return
+    end
+
     if current_user.blank?
     else
       if !current_user.has_access(controller_name,action_name)
@@ -38,7 +44,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
   def check_group(form)
+    if session[:digest].present?
+      return true
+    end
+
     report = Object.const_get(form.titleize.gsub(/\s+/, '')).find(params[:id])
     if current_user.level == "Admin" || current_user.has_access("#{form}s",'admin')
       true
@@ -243,8 +254,6 @@ class ApplicationController < ActionController::Base
 
   def adjust_session
     load_controller_list
-
-
     if @sms_list.include? controller_name
       session[:mode]='SMS'
     elsif @sms_im_list.include? controller_name
@@ -256,6 +265,8 @@ class ApplicationController < ActionController::Base
     end
     true
   end
+
+
   def get_classes_by_module
     case session[:mode]
     when 'SMS'

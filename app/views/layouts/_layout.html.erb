@@ -273,6 +273,7 @@
           </a>
         </div>
 
+        <%if current_user.id.present?%>
         <div class="collapse navbar-collapse" id="myNavbar">
 
           <!-- Module based menu -->
@@ -405,12 +406,13 @@
 
           </ul>
         </div>
+        <%end%>
       </div>
     </nav>
 
     <div class="module_label">
       <span class="pull-right">
-        <%= case session[:mode]
+        <%=case session[:mode]
           when "SMS"
             "Safety Assurance Module"
           when "SMS IM"

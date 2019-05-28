@@ -182,7 +182,9 @@ class AuditsController < SafetyAssuranceController
       @owner,
       params[:commit],
       current_user.id,
-      transaction_content
+      transaction_content,
+      nil,
+      current_user
     )
     @owner.save
     redirect_to audit_path(@owner)
