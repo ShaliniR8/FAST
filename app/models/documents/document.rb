@@ -30,15 +30,16 @@ class Document < ActiveRecord::Base
       {name: 'Administrative', href: 'administrative', class: 'doc',
         topics: [
           {name: 'User Privileges',               href: 'privileges',   class: 'tv'},
-          {name: 'Creating/Editing a Custom ORM', href: 'custom_orms',  class: ''},
+          {name: 'Creating/Editing a Custom ORM', href: 'custom_orms',  class: 'tv'},
           {name: 'Risk Matrix Customization',     href: 'risk_matrix',  class: ''},
         ]
       },
       {name: 'Safety Reporting', href: 'safety_reporting', class: 'doc',
         topics: [
-          {name: 'Dashboard Walkthrough',  href: 'sr_dashboard', class: ''},
-          {name: 'Filing a Safety Report', href: 'file_report',  class: 'tv'},
-          {name: 'Filing an ORM',          href: 'file_orm',     class: ''},
+          {name: 'Dashboard Walkthrough',             href: 'sr_dashboard',     class: ''},
+          {name: 'Filing a Safety Report',            href: 'file_report',      class: 'tv'},
+          {name: 'Continuing an In-Progress Report',  href: 'continue_report',  class: 'tv'},
+          {name: 'Filing an ORM',                     href: 'file_orm',         class: 'tv'},
         ]
       },
       {name: 'Safety Assurance', href: 'safety_assurance', class: 'doc',
@@ -51,7 +52,7 @@ class Document < ActiveRecord::Base
       {name: 'Safety Risk Assessment (SRA/SRM)', href: 'sra', class: 'doc',
         topics: [
           {name: 'Dashboard Walkthrough', href: 'srm_dashboard',  class: 'tv'},
-          {name: 'Create an SRA/M',       href: 'srm',            class: ''},
+          {name: 'Create an SRA/M',       href: 'srm',            class: 'tv'},
         ]
       },
 
