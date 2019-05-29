@@ -235,12 +235,12 @@ class ReportsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:report][:status]}"
     when 'Add Meeting Minutes'
       redirect_path = meeting_path(@owner.meetings.first)
-      MeetingTransaction.create(
-        users_id: current_user.id,
-        action:   params[:commit],
-        owner_id: @owner.meetings.first.id,
-        content:  "#{params[:commit]} - ##{@owner.id}",
-        stamp:    Time.now)
+      Transaction.build_for(
+        @owner.meetings.first.id,
+        params[:commit],
+        current_user.id,
+        "#{params[:commit]} - ##{@owner.id}"
+      )
     when 'Close Event'
       close_records(@owner)
       redirect_path = params[:redirect_path]
@@ -473,22 +473,23 @@ class ReportsController < ApplicationController
   def close_records(owner)
     owner.records.each do |record|
       if record.status != 'Closed'
+        record.close_date = Time.now
         record.status = 'Closed'
         record.save
         submission = record.submission
         notify(record.submission.created_by,
           "Your submission ##{submission.id} has been closed by analyst." + g_link(submission),
           true, "Submission ##{submission.id} Closed")
-        SubmissionTransaction.create(
-          users_id: current_user.id,
-          action:   'Close',
-          owner_id: submission.id,
-          stamp:    Time.now)
-        RecordTransaction.create(
-          users_id: current_user.id,
-          action:   'Close',
-          owner_id: record.id,
-          stamp:    Time.now)
+        Transaction.build_for(
+          submission.id,
+          'Close',
+          current_user.id
+        )
+        Transaction.build_for(
+          record.id,
+          'Close',
+          current_user.id,
+        )
       end
     end
   end

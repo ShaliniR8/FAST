@@ -59,7 +59,7 @@ class AuditsController < SafetyAssuranceController
       cars += Audit.where('approver_id = ?',  current_user.id)
       if current_user.has_access('audits','viewer')
         Audit.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.empty?
+          if viewable.privileges.blank?
             cars += [viewable]
           else
             viewable.privileges.each do |privilege|
@@ -183,7 +183,9 @@ class AuditsController < SafetyAssuranceController
       @owner,
       params[:commit],
       current_user.id,
-      transaction_content
+      transaction_content,
+      nil,
+      current_user
     )
     @owner.save
     redirect_to audit_path(@owner)

@@ -1,6 +1,8 @@
 class ErrorsController < ApplicationController
+
   def switch
-    session[:mode]=params[:mode]
-    redirect_to root_url
+    session[:mode] = params[:mode]
+    redirect_back_or_default(root_url)
   end
+
 end

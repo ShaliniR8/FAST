@@ -39,6 +39,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :notifications
   resources :notices
+  resources :private_links
   resources :verifications do
     member do
       get 'address'
@@ -61,6 +62,8 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "revision_history"
+      get "user_guides"
+      get "load_content"
     end
   end
   resources :messages do

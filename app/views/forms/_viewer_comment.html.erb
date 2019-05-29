@@ -15,6 +15,7 @@
           <%=f.label :content,"Comment"%>
           <%=f.text_area :content, :class => "form-control", :rows => 5%>
           <%=f.hidden_field :user_id, :value => current_user.id%>
+          <%=f.hidden_field :alt_user, :value => "#{current_user.username} - #{current_user.email}"%>
         </div>
 
         <%=x.submit "Add Comment",
