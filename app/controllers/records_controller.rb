@@ -106,11 +106,14 @@ class RecordsController < ApplicationController
       current_user.id,
       'Report Opened.'
     )
-    notify(
-      @record.submission.created_by,
-      "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
-      true,
-      "Submission ##{@record.submission.id} Opened by Analyst")
+    begin #TODO - Review case for if submission is deleted then report is opened
+      notify(
+        @record.submission.created_by,
+        "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
+        true,
+        "Submission ##{@record.submission.id} Opened by Analyst")
+    rescue
+    end
     @record.save
     redirect_to @record,
       :flash => {:success => "Report Opened."}
@@ -434,11 +437,11 @@ class RecordsController < ApplicationController
         notify(@owner.submission.created_by,
           "Your submission ##{@owner.submission.id} has been closed by analyst." + g_link(@owner.submission),
           true, "Submission ##{@owner.submission.id} Closed")
-        SubmissionTransaction.create(
-          users_id: current_user.id,
-          action:   params[:commit],
-          owner_id: @owner.submission.id,
-          stamp:    Time.now)
+        Transaction.build_for(
+          @owner.submission,
+          params[:commit],
+          current_user.id
+        )
         end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"

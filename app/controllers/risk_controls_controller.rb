@@ -156,9 +156,9 @@ class RiskControlsController < ApplicationController
 
 
   def new_cost
-    @corrective_action = RiskControl.find(params[:id])
-    @cost = ControlCost.new
-    render :partial => "sms_actions/new_cost"
+    @owner = RiskControl.find(params[:id])
+    @cost = Cost.new
+    render :partial => "forms/new_cost"
   end
 
 
