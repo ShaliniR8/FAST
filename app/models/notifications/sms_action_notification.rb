@@ -6,7 +6,7 @@ class SmsActionNotification < Notification
   def create_transaction
     @table = "Transaction"
     Transaction.build_for(
-      self.owner.id,
+      self.owner,
       "Set Alert",
       session[:user_id],
       "Recipients: #{users_id.split(',').map{|id| User.find(id).full_name}.join(', ')}.
