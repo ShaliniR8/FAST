@@ -10,6 +10,7 @@ class Demo_Config
       :event_tabulation                               => true,
       :enable_configurable_risk_matrices              => true,
       :allow_set_alert                                => true,
+      :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
@@ -21,7 +22,7 @@ class Demo_Config
       :enable_orm                                     => true,
       :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => true,
-      :checklist_version                              => '1',
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
