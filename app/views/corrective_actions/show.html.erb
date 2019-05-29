@@ -148,7 +148,7 @@
     });
 
     $('#comment_btn').on('click',function(){
-      $.get("<%=comment_inspection_path(@inspection)%>",function(data){
+      $.get("<%=comment_corrective_action_path(@corrective_action)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
