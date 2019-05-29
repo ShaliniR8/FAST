@@ -42,15 +42,16 @@
               ],
               owner: @owner %>
 
-              <%if @owner.status == 'New' && !@owner.can_assign? %>
-                <b style='color:red;'>*Please complete the Source of Input before assigning the Recommendation.</b>
-              <%end%>
+            <%if @owner.status == 'New' && !@owner.can_assign? %>
+              <b style='color:red;'>*Please complete the Source of Input before assigning the Recommendation.</b>
+            <%end%>
+          </div>
 
           <%=render '/recommendations/show', :owner => @owner, :show_btn => true%>
           <%=render "/forms/show_comment", :owner => @owner%>
           <%=render "/forms/attachments_show", :owner => @owner%>
           <%=render "/records/transactions", :owner => @owner%>
-        </div>
+
       </div>
     </div>
   </div>
