@@ -4,13 +4,12 @@ class SmsActionNotification < Notification
 
 
   def create_transaction
-    @table = "SmsActionTransaction"
-    Object.const_get(@table).create(
-      :users_id => session[:user_id],
-      :action => "Set Alert",
-      :owner_id => self.owner.id,
-      :stamp => Time.now,
-      :content => "Recipients: #{users_id.split(',').map{|id| User.find(id).full_name}.join(', ')}.
+    @table = "Transaction"
+    Transaction.build_for(
+      self.owner.id,
+      "Set Alert",
+      session[:user_id],
+      "Recipients: #{users_id.split(',').map{|id| User.find(id).full_name}.join(', ')}.
         Date: #{notify_date}."
       )
   end
