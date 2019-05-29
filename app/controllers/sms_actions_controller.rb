@@ -44,7 +44,7 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def new
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}" : 'SmsAction'
+    @table = 'SmsAction'
     @parent = Object.const_get(params[:owner_type])
       .find(params[:owner_id])
       .becomes(Object.const_get(params[:owner_type])) rescue nil
@@ -63,8 +63,7 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def create
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Action" : "SmsAction"
-    owner = Object.const_get(@table).create(params[:sms_action])
+    owner = SmsAction.create(params[:sms_action])
     redirect_to owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
   end
 
