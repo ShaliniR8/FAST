@@ -145,7 +145,7 @@
           :can_change => (@risk_control.status == "Open" || @risk_control.status == "New") &&
               current_user.has_access("risk_controls", "edit")%>
 
-        <%=render "/sms_actions/cost", :owner => @risk_control%>
+        <%=render "/forms/cost", :owner => @risk_control%>
         <%=render "/forms/show_comment", :owner => @risk_control%>
         <%=render "/forms/attachments_show", :owner => @risk_control%>
         <%=render "/records/transactions", :owner => @risk_control%>
