@@ -138,7 +138,7 @@ class SmsAction < ActiveRecord::Base
       self.owner,
       'Add Corrective Action',
       (session[:simulated_id] || session[:user_id]),
-      :content => "##{self.get_id} - #{self.title}"
+      "##{self.get_id} - #{self.title}"
     )
   end
 
