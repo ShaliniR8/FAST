@@ -398,7 +398,11 @@ class ApplicationController < ActionController::Base
     @terms = @table.get_meta_fields()
     @records = @table.within_timerange(params[:start_date], params[:end_date])
     if params[:type].present?
-      @records = @records.select{|x| x.owner_type == params[:type]}
+      begin #TODO: Resolve issues with IM not having owner_type defined (non-polymorphic elements in IM); keep begin block and remove rescue at that point
+        @records = @records.select{|x| x.owner_type == params[:type]}
+      rescue
+        @records = @records.select{|x| x.type == params[:type]}
+      end
     end
     if params[:status].present?
       if params[:status] == "Overdue"
