@@ -16,7 +16,7 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 
 
-class FindingsController < ApplicationController
+class FindingsController < SafetyAssuranceController
 
   before_filter(only: [:show]) { check_group('finding') }
   before_filter :define_owner, only: [
@@ -31,6 +31,7 @@ class FindingsController < ApplicationController
     :override_status,
     :reopen,
     :show,
+    :update,
     :update_checklist
   ]
 
