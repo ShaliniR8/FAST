@@ -206,7 +206,7 @@ class SubmissionsController < ApplicationController
     if @record.save
       notify_notifiers(@record, params[:commit])
       if params[:commit] == "Submit"
-        if params[:create_copy]
+        if params[:create_copy] == '1'
           converted = @record.convert
           notify_notifiers(converted, params[:commit])
         end
@@ -323,7 +323,7 @@ class SubmissionsController < ApplicationController
           format.json
         end
       else
-        if params[:create_copy]
+        if params[:create_copy] == '1'
           converted = @record.convert
           notify_notifiers(converted, params[:commit])
         end
