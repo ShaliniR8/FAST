@@ -6,14 +6,14 @@ class Demo_Config
 
       :code                                           => "BOE",
       :base_risk_matrix                               => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => true,
       :allow_set_alert                                => true,
       :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
-      :enable_mailer                                  => true,
+      :enable_mailer                                  => false,
 
 
       # Safety Reporting Module
