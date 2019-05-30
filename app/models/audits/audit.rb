@@ -29,6 +29,7 @@ class Audit < ActiveRecord::Base
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true
+  accepts_nested_attributes_for :checklists
 
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }
