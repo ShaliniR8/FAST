@@ -20,7 +20,9 @@ end
 class AuditsController < ApplicationController
   require 'csv'
 
-  before_filter :login_required
+
+  # before_filter :login_required
+  before_filter :oauth_load
   before_filter :auditor_check, :only => [:edit,:new]
   before_filter(only: [:show]) { check_group('audit') }
 
@@ -245,7 +247,10 @@ class AuditsController < ApplicationController
       stamp:      Time.now
     )
     @owner.save
-    redirect_to audit_path(@owner)
+    respond_to do |format|
+      format.html { redirect_to audit_path(@owner) }
+      format.json { render :json => { :success => 'Audit Updated.' }, :status => 200 }
+    end
   end
 
 
