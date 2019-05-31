@@ -403,9 +403,9 @@ private
       .map {|audit| audit['audit']}
       .reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
 
-    # Get ids of the 8 most recent audits
+    # Get ids of the 3 most recent audits
     recent_audits = @records
-      .last(8)
+      .last(3)
       .as_json(only: :id)
       .map {|audit| audit['audit']['id'] }
 
