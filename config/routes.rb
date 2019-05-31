@@ -170,11 +170,7 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "users_index"
-      get 'get_json'   #Added by BP July 14 2017
-      get 'submission_json'
-      get "notices_json"    #added by BL OCT 10 2018
       get 'get_user'
-      get 'get_audits'
     end
   end
   resources :password_resets
@@ -390,7 +386,6 @@ PrdgSession::Application.routes.draw do |map|
       get 'reopen'
       get 'update_checklist_records'
       get 'override_status'
-      get 'get_audit'
     end
     collection do
       get "advanced_search"
