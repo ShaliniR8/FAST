@@ -62,33 +62,17 @@ class AuditsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("Audit")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @records = @records.where('template = 0 OR template IS NULL')
-    if !current_user.admin? && !current_user.has_access('audits','admin')
-      cars = Audit.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Audit.where('approver_id = ?',  current_user.id)
-      if current_user.has_access('audits','viewer')
-        Audit.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.empty?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
+    respond_to do |format|
+      format.html do
+        @table = Object.const_get("Audit")
+        @headers = @table.get_meta_fields('index')
+        @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+        handle_search
+        filter_audits
       end
-      @records = @records & cars
+      format.json { index_as_json }
     end
   end
-
-
-
 
   def new
     @audit = Audit.new
@@ -286,12 +270,17 @@ class AuditsController < ApplicationController
 
 
   def show
-    load_options
-    @audit = Audit.find(params[:id])
-    @fields = Audit.get_meta_fields('show')
-    @recommendation_fields = FindingRecommendation.get_meta_fields('show')
-    @type = 'audits'
-    @checklist_headers = AuditItem.get_headers
+    respond_to do |format|
+      format.html do
+        load_options
+        @audit = Audit.find(params[:id])
+        @fields = Audit.get_meta_fields('show')
+        @recommendation_fields = FindingRecommendation.get_meta_fields('show')
+        @type = 'audits'
+        @checklist_headers = AuditItem.get_headers
+      end
+      format.json { show_as_json }
+    end
   end
 
 
@@ -374,55 +363,114 @@ class AuditsController < ApplicationController
     reopen_report(@audit)
   end
 
-# For ProSafeT App 2019
-  def get_audit
-    audit = Audit.where(id: params[:id]).includes({
+private
+
+  def filter_audits
+    @records = @records.where('template = ? OR template is ?', 0, nil)
+    if !current_user.admin? && !current_user.has_access('audits', 'admin')
+      audits = Audit.where('(status in (:status) AND responsible_user_id = :id) OR approver_id = :id', {
+        status: ['Assigned', 'Pending Approval', 'Completed'], id: current_user[:id]
+      })
+      if current_user.has_access('audits', 'viewer')
+        Audit.where({ viewer_access: true }).each do |viewable|
+          if viewable.privileges.empty?
+            audits += [viewable]
+          else
+            viewable.privileges.each do |privilege|
+              current_user.privileges.include? privilege
+              audits += [viewable]
+            end
+          end
+        end
+      end
+      @records = @records.merge(audits)
+    end
+  end
+
+#---------# For ProSafeT App 2019 #---------#
+#-------------------------------------------#
+
+  # Override index
+  def index_as_json
+    @records = Audit
+    filter_audits
+
+    json = {}
+
+    # Convert to id map for fast audit lookup
+    json[:audits] = @records
+      .as_json(only: [:id, :status, :title, :completion])
+      .map {|audit| audit['audit']}
+      .reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
+
+    # Get ids of the 8 most recent audits
+    recent_audits = @records
+      .last(8)
+      .as_json(only: :id)
+      .map {|audit| audit['audit']['id'] }
+
+    json[:recent_audits] = load_audits(*recent_audits)
+
+    render :json => json
+  end
+
+  # Override show
+  def show_as_json
+    audit = load_audits(params[:id])
+    render :json => audit
+  end
+
+  def load_audits(*ids)
+    audits = Audit.where(id: ids).includes({
       checklists: { # Preload checklists to prevent N+1 queries
         checklist_header: :checklist_header_items,
         checklist_rows: :checklist_cells
       }
-    }).first
+    })
 
-    # Get all fields that will be shown
-    fields = Audit.get_meta_fields('show')
-      .select{ |field| field[:field].present? }
-
-    # Array of fields to whitelist for the JSON
-    json_fields = fields.map{ |field| field[:field].to_sym }
-
-    audit_json = audit.as_json(
-      only: json_fields, # Filter out audit fields that aren't whitelisted
-      include: { # Include checklist data required for mobile
-        checklists: {
-          only: [:id, :title],
-          include: {
-            checklist_header: {
-              only: :id,
-              include: {
-                checklist_header_items: {
-                  only: [:id, :title, :data_type, :options, :editable, :display_order]
+    json = audits
+      .as_json(
+        include: { # Include checklist data required for mobile
+          checklists: {
+            only: [:id, :title],
+            include: {
+              checklist_header: {
+                only: :id,
+                include: {
+                  checklist_header_items: {
+                    only: [:id, :title, :data_type, :options, :editable, :display_order]
+                  }
                 }
-              }
-            },
-            checklist_rows: {
-              only: [:id, :is_header],
-              include: {
-                checklist_cells: {
-                  only: [:id, :value, :checklist_header_item_id],
+              },
+              checklist_rows: {
+                only: [:id, :is_header],
+                include: {
+                  checklist_cells: {
+                    only: [:id, :value, :checklist_header_item_id],
+                  }
                 }
               }
             }
           }
         }
-      }
-    )['audit']
-    .delete_if{ |key, value| value.blank? } # Remove empty audit fields
+      )
+      .map { |audit| format_audit_json(audit['audit']) }
 
+    if (ids.length == 1)
+      json = json[0]
+    else
+      json = json.reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
+    end
+
+    json
+  end
+
+  def format_audit_json(json)
     # Default checklists to an empty array
-    audit_json[:checklists] = [] if audit_json[:checklists].blank?
+    json[:checklists] = [] if json[:checklists].blank?
 
     checklist_headers = {}
-    audit_json[:checklists] = audit_json[:checklists].reduce({}) do |checklists, checklist|
+    json[:checklists] = json[:checklists].reduce({}) do |checklists, checklist|
       # Gathers all checklist headers that belong to this audit's checklists
       id = checklist[:checklist_header]['id']
       if checklist_headers[id].blank?
@@ -443,32 +491,38 @@ class AuditsController < ApplicationController
     end
 
     # Creates an id map for all checklist header items used in this audit
-    audit_json[:checklist_header_items] = checklist_headers.values
+    json[:checklist_header_items] = checklist_headers.values
       .map{ |checklist_header| checklist_header[:checklist_header_items] }
       .flatten
       .reduce({}) do |checklist_header_items, item|
         checklist_header_items.merge({ item['id'] => item })
       end
 
+    # Get all fields that will be shown
+    fields = Audit.get_meta_fields('show')
+      .select{ |field| field[:field].present? }
+
     # Takes the id of each user field and replaces it with the
     # full name of the user corresponding to that id
     user_fields = fields.select{ |field| field[:type] == 'user' }
     user_fields.map do |field|
       key = field[:field]
-      user_id = audit_json[key]
+      user_id = json[key]
       if user_id
-        audit_json[key] = User.find(user_id).full_name rescue ''
+        json[key] = User.find(user_id).full_name rescue ''
       end
     end
 
+    # Creates a key map for all the meta field titles that will be shown
+    json[:meta_field_titles] = {}
     fields.each do |field|
       key = field[:field]
-      if audit_json[key]
-        audit_json[key] = { :title => field[:title], :value => audit_json[key] }
+      if json[key].present?
+        json[:meta_field_titles][key] = field[:title]
       end
     end
 
-    render :json => audit_json
+    json
   end
 
 end
