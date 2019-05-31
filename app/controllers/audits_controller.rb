@@ -428,8 +428,19 @@ private
       }
     })
 
+    # Get all fields that will be shown
+    @fields = Audit.get_meta_fields('show')
+      .select{ |field| field[:field].present? }
+
+    # Array of fields to whitelist for the JSON
+    json_fields = @fields.map{ |field| field[:field].to_sym }
+
+    # Include other fields that should always be whitelisted
+    whitelisted_fields = [:id, *json_fields]
+
     json = audits
       .as_json(
+        only: whitelisted_fields,
         include: { # Include checklist data required for mobile
           checklists: {
             only: [:id, :title],
@@ -454,7 +465,7 @@ private
           }
         }
       )
-      .map { |audit| format_audit_json(audit['audit']) }
+      .map { |audit| format_audit_json(audit) }
 
     if (ids.length == 1)
       json = json[0]
@@ -465,7 +476,8 @@ private
     json
   end
 
-  def format_audit_json(json)
+  def format_audit_json(audit)
+    json = audit['audit'].delete_if{ |key, value| value.blank? }
     # Default checklists to an empty array
     json[:checklists] = [] if json[:checklists].blank?
 
@@ -498,24 +510,20 @@ private
         checklist_header_items.merge({ item['id'] => item })
       end
 
-    # Get all fields that will be shown
-    fields = Audit.get_meta_fields('show')
-      .select{ |field| field[:field].present? }
-
     # Takes the id of each user field and replaces it with the
     # full name of the user corresponding to that id
-    user_fields = fields.select{ |field| field[:type] == 'user' }
+    user_fields = @fields.select{ |field| field[:type] == 'user' }
     user_fields.map do |field|
       key = field[:field]
       user_id = json[key]
       if user_id
-        json[key] = User.find(user_id).full_name rescue ''
+        json[key] = User.find(user_id).full_name rescue nil
       end
     end
 
     # Creates a key map for all the meta field titles that will be shown
     json[:meta_field_titles] = {}
-    fields.each do |field|
+    @fields.each do |field|
       key = field[:field]
       if json[key].present?
         json[:meta_field_titles][key] = field[:title]
