@@ -13,7 +13,7 @@ class BaseConfig
 
 
   def self.airline_code
-    'NAC'
+    Object.const_get('AIRLINE_CODE')
   end
 
   def self.airline
