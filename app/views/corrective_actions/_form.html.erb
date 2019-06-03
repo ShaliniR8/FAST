@@ -20,7 +20,9 @@
 
       <div class="panel-body" id="form_body">
         <%= form_for @corrective_action,:html => {:multipart => true} do |f|%>
-
+          <%if action_name == "new"%>
+            <%=f.hidden_field :created_by_id, :value => current_user.id%>
+          <%end%>
           <%=render "shared/privilege_form", :target => "corrective_action[privileges][]", :owner => @corrective_action, :f => f%>
 
           <%if params[:report].present?%>

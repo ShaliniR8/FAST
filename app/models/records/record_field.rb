@@ -20,7 +20,7 @@ class RecordField < ActiveRecord::Base
   end
 
   def category
-    self.field.category
+    self.field.category rescue nil
   end
 
   def create_transaction

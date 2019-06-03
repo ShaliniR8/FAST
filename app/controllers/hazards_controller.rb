@@ -29,6 +29,7 @@ class HazardsController < ApplicationController
       cars += hazards.where('sras.approver_id = ? OR sras.reviewer_id = ?',
         current_user.id, current_user.id)
       cars += hazards.where('sras.viewer_access = 1') if current_user.has_access('sras','viewer')
+      cars += Hazard.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

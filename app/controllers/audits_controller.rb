@@ -261,7 +261,7 @@ private
           end
         end
       end
-      @records = @records.merge(audits)
+      @records = @records & cars
     end
   end
 

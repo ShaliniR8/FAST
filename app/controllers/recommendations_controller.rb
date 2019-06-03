@@ -47,6 +47,7 @@ class RecommendationsController < SafetyAssuranceController
       cars = Recommendation.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += Recommendation.where('approver_id = ?', current_user.id)
+      cars += Recommendation.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end
