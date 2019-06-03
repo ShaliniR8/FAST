@@ -1,4 +1,4 @@
-<div class="panel panel-info">
+<div class="panel panel-warning">
   <div class="panel-heading">
     <div class="panel-title">
       <b>Baseline Risk Assessment</b>
@@ -7,18 +7,17 @@
   </div>
   <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto;">
     <%=form_for @owner  do |f|%>
-      <%=f.hidden_field :severity,          :value => "",     :id => "sev"%>
-      <%=f.hidden_field :likelihood,        :value => "",     :id => "like"%>
+      <%=f.hidden_field :severity,    :value => "", :id => "sev"%>
+      <%=f.hidden_field :likelihood,  :value => "", :id => "like"%>
+      <%=f.hidden_field :risk_factor, :value => "", :id => "risk_fact"%>
 
       <div class="form-group col-xs-12">
+        <%=render "shared/instructions", :instruction =>
+          "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."%>
+
         <%=f.label :statement, "Notes"%>
         <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
       </div>
-
-
-      <%=render "shared/instructions", :instruction =>
-        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."
-      %>
 
       <div class="col-xs-12 col-sm-12 col-md-12">
         <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
@@ -30,7 +29,9 @@
         <%=render "shared/#{BaseConfig.airline[:code]}/form_risk_table"%>
       </div>
 
-      <%=f.submit "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
+      <div class="col-xs-12">
+        <%=f.submit "Save Baseline Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
+      </div>
     <%end%>
   </div>
 </div>
@@ -124,20 +125,23 @@
       }
     });
     if (probability_checked > 0 && severity_checked > 0){
-      set_risk(Math.min(...probabilities), Math.min(...severities));
+      set_risk(Math.min.apply(null, probabilities), Math.min.apply(null, severities));
     }else{
       clear_risk();
     }
   }
 
 
-  function set_risk(row_index,column_index){
+  function set_risk(row_index, column_index){
     clear_risk();
+    risk_table_def = <%=NAC_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=NAC_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
-        $('#sev').val(row_index);
-        $('#like').val(column_index);
+        $('#sev').val(column_index);
+        $('#like').val(row_index);
+        $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
       }
     });
   }
@@ -161,17 +165,14 @@
           severity_result[$(this).data("row")] = $(this).data("column");
         }
       });
-
       $('.probability_td').each(function(){
         if ($(this).data('status') === "checked"){
           probability_result[$(this).data("column")] = $(this).data("row");
         }
       });
-
       for(i = 0; i < severity_result.length; i++){
         $('form').append("<input name='<%=@target_name%>[<%=@severity_field%>][]' value=" + severity_result[i]+" hidden></input>");
       }
-
       for (i = 0; i < probability_result.length; i++){
         $('form').append("<input name='<%=@target_name%>[<%=@probability_field%>][]' value=" + probability_result[i]+" hidden></input>");
       }

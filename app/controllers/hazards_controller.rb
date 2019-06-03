@@ -81,13 +81,12 @@ class HazardsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
     end
     @owner.update_attributes(params[:hazard])
-    HazardTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        stamp:      Time.now,
-        content:    transaction_content
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     redirect_to hazard_path(@owner)
   end
 
@@ -97,7 +96,11 @@ class HazardsController < ApplicationController
     hazard = Hazard.find(params[:id])
     hazard.status = params[:status]
     hazard.close_date = Time.now
-    HazardTransaction.create(:users_id => current_user.id, :action => params[:status], :owner_id => params[:id], :stamp => Time.now)
+    Transaction.build_for(
+      hazard,
+      params[:status],
+      current_user.id,
+    )
     hazard.save
     redirect_to hazard_path(hazard)
   end
@@ -141,7 +144,7 @@ class HazardsController < ApplicationController
 
   def new_attachment
     @owner=Hazard.find(params[:id])
-    @attachment=HazardAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 
@@ -314,14 +317,18 @@ class HazardsController < ApplicationController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
+  def comment
+    @owner = Hazard.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def mitigate
     @owner=Hazard.find(params[:id])
     load_options
     mitigate_special_matrix("hazard", "mitigated_severity", "mitigated_probability")
-    if BaseConfig.airline[:base_risk_matrix]
+    if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/mitigate"
     else
       render :partial=>"shared/#{BaseConfig.airline[:code]}/mitigate"
@@ -334,7 +341,7 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     form_special_matrix(@owner, "hazard", "severity_extra", "probability_extra")
-    if BaseConfig.airline[:base_risk_matrix]
+    if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/baseline"
     else
       render :partial=>"shared/#{BaseConfig.airline[:code]}/baseline"

@@ -18,16 +18,16 @@
         </div>
       </div>
       <div class="panel-body" id="form_body">
-        <%=form_for @evaluation ,:html => {:multipart => true} do |f|%>
-          <%=render "/shared/privilege_form", :target => "evaluation[privileges][]", :owner => @evaluation, :f => f%>
-          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @evaluation %>
-          <%=render '/forms/attachments_form', :f => f, :owner => @evaluation%>
+        <%=form_for @owner ,:html => {:multipart => true} do |f|%>
+          <%=render "/shared/privilege_form", :target => "evaluation[privileges][]", :owner => @owner, :f => f%>
+          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
+          <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
           <div class="mt10 mr10">
             <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
               :class => "btn btn-success pull-right",
               :disable_with => "Saving..."%>
             <%=link_to "Cancel",
-              action_name == "edit" ? evaluation_path(@evaluation) : root_url,
+              action_name == "edit" ? evaluation_path(@owner) : root_url,
               :id => "cancel-btn",
               :class => "mr5 btn btn-warning pull-right",
               :confirm => 'Are you sure?'%>

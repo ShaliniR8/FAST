@@ -1,18 +1,21 @@
 class Hazard < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Associations List
   belongs_to :sra,                :foreign_key => "sra_id",                 :class_name => "Sra"
   belongs_to :responsible_user,   :foreign_key => "responsible_user_id",    :class_name => "User"
   belongs_to :created_by,         :foreign_key => "created_by_id",          :class_name => "User"
 
-  has_many :attachments,          :foreign_key => "owner_id",               :class_name => "HazardAttachment",    :dependent => :destroy
   has_many :risk_controls,        :foreign_key => "hazard_id",              :class_name => "RiskControl",         :dependent => :destroy
-  has_many :transactions,         :foreign_key => "owner_id",               :class_name => "HazardTransaction",   :dependent => :destroy
   has_many :descriptions,         :foreign_key => "owner_id",               :class_name => "HazardDescription",   :dependent => :destroy
   has_many :root_causes,          :foreign_key => "owner_id",               :class_name => "HazardRootCause",     :dependent => :destroy
 
   accepts_nested_attributes_for :risk_controls
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
-
 
 
   after_create -> { create_transaction('Create') }
@@ -140,8 +143,17 @@ class Hazard < ActiveRecord::Base
   end
 
   def create_transaction(action)
-    HazardTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
-    SraTransaction.create(:users_id=>session[:user_id], :action=>"Add Hazard", :content=>"##{self.get_id} #{self.title}", :owner_id=>self.sra.id, :stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
+    Transaction.build_for(
+      self.sra,
+      'Add Hazard',
+      (session[:simulated_id] || session[:user_id]),
+      "##{self.get_id} #{self.title}"
+    )
   end
 
 

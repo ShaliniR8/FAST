@@ -21,8 +21,9 @@ end
 
 class SubmissionsController < ApplicationController
 
-  # before_filter :set_table_name,:login_required
   before_filter :set_table_name, :oauth_load # Kaushik Mahorker KM
+
+
 
   def set_table_name
     @table_name = "submissions"
@@ -32,7 +33,6 @@ class SubmissionsController < ApplicationController
 
   def mitre_export_all
   end
-
 
 
 
@@ -136,7 +136,7 @@ class SubmissionsController < ApplicationController
 
   def comment
     @owner = Submission.find(params[:id])
-    @comment = SubmissionNote.new
+    @comment = @owner.comments.new
     render :partial => "notes"
   end
 
@@ -172,7 +172,7 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:completed] = params[:commit] == 'Submit' ? true : false
+    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
     params[:submission][:anonymous] = params[:anonymous] == '1' ? true : false
 
 
@@ -193,8 +193,7 @@ class SubmissionsController < ApplicationController
           uploaded_file = ActionDispatch::Http::UploadedFile.new(
             :tempfile => temp_file,
             :filename => file_name,
-            :type     => mime_type
-          )
+            :type     => mime_type)
 
           # Replace attachment parameter with the created file
           params[:submission][:attachments_attributes][key][:name] = uploaded_file
@@ -205,22 +204,21 @@ class SubmissionsController < ApplicationController
     @record = Submission.new(params[:submission])
 
     if @record.save
-      notify_notifiers(@record)
+      notify_notifiers(@record, params[:commit])
       if params[:commit] == "Submit"
-        if params[:create_copy] == "1"
+        if params[:create_copy] == '1'
           converted = @record.convert
-          notify_notifiers(converted)
+          notify_notifiers(converted, params[:commit])
         end
-        respond_to do |format|
-          format.html { redirect_to submission_path(@record), flash: {success: "Submission submitted."} }
-          format.json
-        end
+      end
 
-      else
-        respond_to do |format|
+      respond_to do |format|
+        if params[:commit] == "Submit"
+          format.html { redirect_to submission_path(@record), flash: {success: "Submission submitted."} }
+        else
           format.html { redirect_to incomplete_submissions_path, flash: {success: "Submission created in progress."} }
-          format.json
         end
+        format.json
       end
 
     else
@@ -295,88 +293,44 @@ class SubmissionsController < ApplicationController
         # File is a base64 string
         if attachment[:name].present? && attachment[:name].is_a?(Hash)
           file_params = attachment[:name]
-
           temp_file = Tempfile.new('file_upload')
           temp_file.binmode
           temp_file.write(Base64.decode64(file_params[:base64]))
           temp_file.rewind()
-
           file_name = file_params[:fileName]
           mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
-
           uploaded_file = ActionDispatch::Http::UploadedFile.new(
             :tempfile => temp_file,
             :filename => file_name,
-            :type     => mime_type
-          )
-
-          # Replace attachment parameter with the created file
+            :type     => mime_type)
           params[:submission][:attachments_attributes][key][:name] = uploaded_file
         end
       end
     end
 
-
     @record = Submission.find(params[:id])
-    if params[:commit] == "Submit"
 
+    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
 
-      mailer_privileges = AccessControl.where(
-        :action => 'notifier',
-        :entry => @record.template.name)
-        .map{|x| x.privileges.map(&:id)}.flatten
-
-      notify_users = User.preload(:privileges)
-        .where("disable is null or disable = 0")
-        .keep_if{|x|
-          x.privileges.map(&:id) & mailer_privileges != []}
-
-      notify_users.each do |u|
-        if @record.completed?
-          notify( u,
-            "A note has been added to submission ##{@record.id}. " + g_link(@record),
-            true,
-            "New ##{@record.id} Submission Note")
-        else
-          notify( u,
-            "A new #{@record.template.name} submission ##{@record.id} is submitted. " + g_link(@record),
-            true,
-            "New #{@record.template.name} Submission")
-        end
-      end
-      params[:submission][:completed] = true
-    else
-      params[:submission][:completed] = false
-    end
     if @record.update_attributes(params[:submission])
-      if params[:commit] == "Submit"
-        # if crew wants to submit asap/incident as the same time
+      notify_notifiers(@record, params[:commit])
+      if params[:commit] == "Save for Later"
+        respond_to do |format|
+          format.html {
+            redirect_to incomplete_submissions_path,
+              flash: {success: "Submission ##{@record.id} updated."}
+          }
+          format.json
+        end
+      else
         if params[:create_copy] == '1'
           converted = @record.convert
-          convert_privileges = AccessControl.where(
-            :action => 'notifier',
-            :entry => converted.template.name)
-            .map{|x| x.privileges.map(&:id)}.flatten
-          convert_notify_users = User.preload(:privileges)
-            .where("disable is null or disable = 0")
-            .keep_if{|x| x.privileges.map(&:id) & convert_privileges != []}
-          notify_users.each do |u|
-            notify(u, "A new #{converted.template.name} submission ##{converted.id} is submitted. " + g_link(converted),
-              true, "New #{converted.template.name} Submission")
-          end
+          notify_notifiers(converted, params[:commit])
         end
         respond_to do |format|
           format.html {
             redirect_to submission_path(@record),
               flash: {success: params[:submission][:comments_attributes].present? ? "Notes added" : "Submission submitted."}
-          }
-          format.json
-        end
-      else
-        respond_to do |format|
-          format.html {
-            redirect_to incomplete_submissions_path,
-              flash: {success: "Submission ##{@record.id} updated."}
           }
           format.json
         end
@@ -454,7 +408,6 @@ class SubmissionsController < ApplicationController
     @categories=Category.find(:all)
     @fields=Field.find(:all)
     @templates=Template.find(:all)
-    #@templates = Template.where("id = 5 or id = 7 or id = 29 or id = 31 or id = 23 or id = 25 or id = 28 or id = 21 or id = 32 or id = 30 or id = 27")
     @templates.sort_by! {|x| x.name }
     render :partial=>"detailed_search"
   end
@@ -596,34 +549,36 @@ class SubmissionsController < ApplicationController
 
   private
 
-  def notify_notifiers(owner)
-    if owner.completed
-      mailer_privileges = AccessControl.where(
-        :action => 'notifier',
-        :entry => owner.template.name)
-        .map{|x| x.privileges.map(&:id)}.flatten
-      notifiers = User.preload(:privileges)
-        .where("disable is null or disable = 0")
-        .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
+  def notify_notifiers(owner, commit)
+
+    mailer_privileges = AccessControl.where(
+      :action => 'notifier',
+      :entry => owner.template.name)
+      .map{|x| x.privileges.map(&:id)}.flatten
+    notifiers = User.preload(:privileges)
+      .where("disable is null or disable = 0")
+      .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
+
+    case commit
+    when "Submit"
       notifiers.each do |user|
-        notify(
-          user,
-          "A new #{owner.template.name} submission ##{owner.id} is submitted. " + g_link(owner),
-          true,
-          "New #{owner.template.name} Submission")
+        notify(user, "A new #{owner.template.name} submission ##{owner.id} is submitted. " + g_link(owner),
+          true, "New #{owner.template.name} Submission")
       end
-    else
+    when "Save for Later"
       notify(
         owner.created_by,
         "You have a #{owner.template.name} Submission in progress." + g_link(owner),
         false,
         "#{owner.template.name} Submission In Progress")
+    when "Add Notes"
+      notifiers.each do |user|
+        notify(user, "Additional notes have been added to submission ##{owner.id}. " + g_link(owner),
+          true, "Additional Notes Added to Submission")
+      end
+    else
     end
   end
-
-
-
-
 
 
 end

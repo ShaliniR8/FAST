@@ -3,6 +3,6 @@
 </div>
 
 <div class="content">
-  <%fields = ImTask.get_meta_fields('show')%>
+  <%fields = SmsTask.get_meta_fields('show')%>
   <%=render '/forms/print_fields', :fields => fields, :owner => owner, :deidentified => deidentified%>
 </div>

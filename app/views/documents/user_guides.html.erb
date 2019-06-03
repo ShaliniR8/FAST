@@ -1,0 +1,160 @@
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          User Guides
+        </div>
+      </div>
+
+      <div class="panel-body">
+
+
+        <div class="col-xs-4" style="overflow-y:auto;height:100vh;">
+          <h3><b>Table of Contents</b></h3>
+          <div class="sidenav">
+            <ol>
+              <%Document.get_user_guides.each do |x|%>
+                <li><a class="<%=x[:class]%>" href="<%=x[:href]%>"><%=x[:name]%></a></li>
+                <ol type="a">
+                  <%x[:topics].each do |y|%>
+                    <li><a class="<%=y[:class]%>" href="<%=y[:href]%>"><%=y[:name]%></a></li>
+                  <%end%>
+                </ol>
+              <%end%>
+            </ol>
+          </div>
+        </div>
+
+
+        <%if false%>
+        <div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height:100vh;">
+          <h3><b>Table of Contents</b></h3>
+          <div class="sidenav">
+            <ol>
+              <li><a class="doc" href="administrative">Administrative</a></li>
+              <ol type="a">
+                <li><a class="tv" href="privileges">User Privileges</a></li>
+                <li><a class="tv" href="custom_orms">Creating/Editing a Custom ORM</a></li>
+                <li><a class="tv" href="risk_matrix">Risk Matrix Customization</a></li>
+              </ol>
+              <li><a class="doc" href="safety_reporting">Safety Reporting</a></li>
+              <ol type="a">
+                <li><a class="tv" href="sr_dashboard">Dashboard Walkthrough</a></li>
+                <li><a class="tv" href="file_report">Filing a Safety Report</a></li>
+                <li><a class="tv" href="file_orm">Filing an ORM</a>
+                </li>
+              </ol>
+              <li><a class="doc" href="safety_assurance">Safety Assurance</a></li>
+              <ol type="a" >
+                <li><a class="tv" href="audit">Create a New Audit</a></li>
+              </ol>
+              <li><a class="doc" href="sra">Safety Risk Assessment</a></li>
+              <ol type="a">
+                <li><a class="tv" href="srm">Create an SRA/M</a></li>
+                <li><a class="tv" href="srm_dashboard">Dashboard Walkthrough</a></li>
+              </ol>
+              <li><a class="doc" href="sms_im">SMS-IM</a></li>
+              <ol type="a">
+                <li><a class="tv" href="sms_dashboard">Dashboard Walkthrough</a></li>
+              </ol>
+            </ol>
+          </div>
+        </div>
+        <%end%>
+
+        <div class="col-xs-8">
+          <div class="main">
+            <div id="user_guide_content">
+              <%=render "documents/user_guides/template", :topic_name => 'Welcome!', :href => 'summary'%>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sidenav li {
+    font-weight: normal !important;
+  }
+  .sidenav a{
+    /*cursor: pointer;*/
+    color: darkslategray;
+  }
+
+  .sidenav a:hover {
+    font-weight: bold;
+    color: darkslategray !important
+  }
+
+  .sidenav {
+    width: 100%;
+    z-index: 1;
+    top: 20px;
+    left: 10px;
+    background: #eee;
+    overflow-x: hidden;
+    padding: 8px 0;
+  }
+  .sidenav a {
+    padding: 3px 3px 3px 3px;
+    text-decoration: none;
+    display: block;
+  }
+  .sidenav .doc{
+    font-size: 16px;
+  }
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  }
+  .embolden {
+    color: darkslategray !important;
+    font-weight: bold;
+  }
+  .position-right{
+    float: right;
+  }
+</style>
+
+
+<script>
+  $(function(){
+    $(".tv").append("<i class='glyphicon glyphicon-expand position-right'></i>");
+    $(".doc").append("<i class='glyphicon glyphicon-file position-right'></i>");
+
+    var addclass = 'embolden';
+    var $category = $('.sidenav a').click(function(e) {
+      $category.removeClass(addclass);
+      $(this).addClass(addclass);
+    });
+
+    $(document).on("click", ".sidenav a", function(e){
+      e.preventDefault();
+      var href = $(this).attr("href");
+      var name = $(this).text();
+      console.log(href);
+      console.log(name);
+      if (href != undefined){
+        $.get("<%=load_content_documents_path%>?topic_name=" + name + "&href=" + href, function(data){
+          $("#user_guide_content").html(data);
+        });
+      }else{
+        $("#user_guide_content").html("");
+      }
+    });
+
+  });
+
+</script>
+
+
+
+
+
+

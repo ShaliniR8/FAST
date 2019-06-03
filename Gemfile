@@ -19,9 +19,11 @@ gem 'pdfkit', '0.5.0'
 gem 'docx', '~> 0.2.07', :require => ["docx"]
 #gem 'hello_fax'
 
-#Engines 
+#Engines
 
 gem 'ruby_dig'
+
+gem 'slim'
 
 # Use unicorn as the web server
 # gem 'unicorn'

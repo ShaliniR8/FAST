@@ -120,19 +120,22 @@ class RiskControlsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
     end
     @owner.update_attributes(params[:risk_control])
-    RiskControlTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to risk_control_path(@owner)
   end
 
 
-
+  def comment
+    @owner = RiskControl.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def destroy
@@ -153,9 +156,9 @@ class RiskControlsController < ApplicationController
 
 
   def new_cost
-    @corrective_action = RiskControl.find(params[:id])
-    @cost = ControlCost.new
-    render :partial => "sms_actions/new_cost"
+    @owner = RiskControl.find(params[:id])
+    @cost = Cost.new
+    render :partial => "forms/new_cost"
   end
 
 
@@ -163,7 +166,7 @@ class RiskControlsController < ApplicationController
 
   def new_attachment
     @owner=RiskControl.find(params[:id])
-    @attachment=RiskControlAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

@@ -6,8 +6,8 @@ class BSK_Config
 
       :code                                           => "BSK",
       :base_risk_matrix                               => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
@@ -20,26 +20,35 @@ class BSK_Config
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => false,
-      :observation_phases_trend                       => false,
+      :observation_phases_trend                       => true,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '2',
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
-      :has_framework                                  => false,
+      :has_framework                                  => true,
     }
   end
 
 
+  OBSERVATION_PHASES = [
+    "Observation Phase",
+    "Condition",
+    "Threat", "Sub Threat",
+    "Error", "Sub Error",
+    "Human Factor", "Comment"]
+
+
 
   FAA_INFO = { #CORRECT/REVISE
-    "CHDO"=>"FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
-    "Region"=>"Anchorage",
-    "ASAP MOU Holder Name"=>"N/A",
+    "CHDO"=>"ACE-FSDO-09",
+    "Region"=>"Eatern",
+    "ASAP MOU Holder Name"=>"Miami Air International",
     "ASAP MOU Holder FAA Designator"=>"N/A"
   }
 

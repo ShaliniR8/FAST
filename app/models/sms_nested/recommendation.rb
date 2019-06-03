@@ -1,15 +1,18 @@
 class Recommendation < ActiveRecord::Base
 
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Associations List
   belongs_to :responsible_user,    foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to :approver,            foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :created_by,          foreign_key: 'created_by_id',       class_name: 'User'
+  belongs_to :owner,               polymorphic: true
 
-  has_many :transactions, foreign_key: 'owner_id', class_name: 'RecommendationTransaction', dependent: :destroy
-  has_many :attachments,  foreign_key: 'owner_id', class_name: 'RecommendationAttachment',  dependent: :destroy
   has_many :descriptions, foreign_key: 'owner_id', class_name: 'RecommendationDescription', dependent: :destroy
   has_many :notices,      foreign_key: 'owner_id', class_name: 'RecommendationNotice',      dependent: :destroy
-
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
 
   after_create :create_recommendation_transaction
   before_create :set_priveleges
@@ -82,39 +85,26 @@ class Recommendation < ActiveRecord::Base
 
 
   def create_transaction(action)
-    RecommendationTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
     )
   end
 
 
   def create_recommendation_transaction
-    RecommendationTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      'Create',
+      (session[:simulated_id] || session[:user_id])
     )
-    if self.type == "FindingRecommendation"
-      FindingTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Recommendation",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.finding.id,
-        :stamp => Time.now
-      )
-    else
-      InvestigationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Recommendation",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.investigation.id,
-        :stamp => Time.now
-      )
-    end
+    Transaction.build_for(
+      self.owner,
+      'Add Recommendation',
+      (session[:simulated_id] || session[:user_id]),
+      "##{self.get_id} #{self.title}"
+    )
   end
 
 
@@ -197,4 +187,20 @@ class Recommendation < ActiveRecord::Base
       "N/A"
     end
   end
+
+  def get_source
+    case owner.class.name
+    when 'Investigation'
+      "<a style='font-weight:bold' href='/investigations/#{owner.id}'>
+        Investigation ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    when 'Finding'
+      "<a style='font-weight:bold' href='/findings/#{owner.id}'>
+        Finding ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+  end
+
 end

@@ -112,6 +112,11 @@
                   :route => close_report_path(@report, :redirect_path => report_path(@report))%>
               <%end%>
             <%end%>
+            <%=link_to "Add Comment", "#",
+              :class => "btn btn-success pull-right mr5 mb5",
+              :id => 'comment_btn',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
           </div>
 
           <%=render "closing_note"%>
@@ -166,7 +171,7 @@
           <%end%>
 
 
-
+          <%=render "/forms/show_comment", :owner => @report%>
           <%=render "/forms/attachments_show", :owner => @report%>
           <%=render "/records/transactions", :owner => @report%>
 
@@ -184,6 +189,12 @@
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity_after%>-<%=Finding.get_likelihood.index(@report.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_report_path(@report)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_report_path(@report)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

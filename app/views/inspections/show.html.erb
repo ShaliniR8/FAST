@@ -12,153 +12,69 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            Inspection #<%=@inspection.get_id%>:
-            <%="#{@inspection.title}"%>
+            <%="Inspection ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
 
-            <%if current_user.admin? ||
-                  current_user.has_access('inspections','admin') ||
-                  current_user.has_access("inspections","destroy")%>
-              <%=link_to "Delete",
-                inspection_path(@inspection),
-                :method => "delete",
-                :confirm => 'Are you sure?',
-                :class => "btn btn-danger pull-right mr5 mb5"%>
-            <%end%>
+            <%= render '/forms/btns/render_btns',
+              btns: [
+                'delete',
+                'override_status',
+                'edit',
+                'sign',
+                'deid_pdf',
+                'pdf',
+                'viewer_access',
+                'send_message',
+                'expand_all'
+              ],
+              owner: @owner %>
 
-            <%if current_user.admin? ||
-                  current_user.has_access('inspections','admin')%>
-              <%=link_to 'Override Status', '#',
-                :class => 'btn btn-danger pull-right mr5 mb5',
-                :id => 'override_status_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-            <%if @inspection.status != 'Completed' && (
-                  current_user.admin? ||
-                  current_user.has_access('inspections','admin') ||
-                  current_user.has_access('inspections','edit'))%>
-                <%=link_to 'Edit',
-                  edit_inspection_path(@inspection),
-                  :class => 'btn btn-warning pull-right mr5 mb5',
-                  :disable_with => 'Editing...'%>
-            <%end%>
-
-            <%=link_to "De-ID PDF",
-              print_inspection_path(
-                @inspection,
-                :format => :pdf,
-                :deidentified => true),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%=link_to "PDF",
-              print_inspection_path(
-                @inspection,
-                :format => :pdf,
-                :deidentified => false),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%if current_user.admin? ||
-                  current_user.has_access('inspections','admin') ||
-                  current_user.has_access("inspections","edit")%>
-              <%=link_to @inspection.viewer_access ? "Disable Viewer Access" : "Enable Viewer Access",
-                viewer_access_inspection_path(@inspection),
-                :class => "btn btn-warning pull-right mr5 mb5"%>
-            <%end%>
-
-            <%=link_to "Send Message",
-              new_message_path(:link => inspection_path(@inspection),
-              :link_type => "Inspection",
-              :link_id => @inspection.id),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
-
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 expandall pull-right mb5"%>
           </div>
         </div>
       </div>
       <div class="panel-body">
         <div class="col-xs-12 mb20">
 
-          <%if @inspection.status == "New"%>
-            <%if @inspection.approver == current_user ||
-                  current_user.admin? ||
-                  current_user.has_access('investigations','admin')%>
-              <%=link_to "Assign", "#",
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :id =>'assign_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-          <%elsif @inspection.status == "Assigned"%>
-            <%if @inspection.can_complete? current_user %>
-              <%=link_to "Complete", '#',
-                :class => "btn btn-warning pull-right complete_btn mr5",
-                :id => 'complete',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
+          <%= render '/forms/btns/render_btns',
+            btns: [
+              'assign',
+              'complete',
+              'approve_reject',
+              'reopen',
+              'task',
+              'cost',
+              'contact',
+              'finding',
+              'comment'
+            ],
+            owner: @owner %>
 
 
-          <%elsif @inspection.status == "Pending Approval"%>
-            <%if @inspection.can_approve? current_user %>
-              <%=link_to "Approve",
-                "#",
-                :class => "btn btn-success pull-right mr5 approve_btn mb5",
-                :id => 'approve',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-              <%=link_to "Reject",
-                "#",
-                :class => "btn btn-danger pull-right mr5 approve_btn mb5",
-                :id => 'reject',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-          <% elsif @inspection.status == "Completed"%>
-            <%if @inspection.can_reopen? current_user %>
-              <%=link_to "Reopen",
-                reopen_inspection_path(@inspection),
-                :class => "btn btn-success pull-right mr5"%>
-            <%end%>
-          <%end%>
-
-          <%if !['Completed', 'Pending Approval'].include? @inspection.status%>
-            <%=link_to "Add Task", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'task_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
-            <%=link_to "Add Contact", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'contact_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-            <%=link_to "Add Finding",
-              new_finding_path(
-                :owner_id => @inspection.id,
-                :owner_type => @inspection.class.name),
-              :class => "btn btn-success pull-right mr5 mb5",
-              :disable_with => "Adding..."%>
-          <%end%>
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @inspection %>
-        <%=render '/checklists/checklist_types', :owner => @inspection, :type => 'inspection'%>
-        <%=render "/ims/show_task", :owner => @inspection, :fields => InspectionTask.get_meta_fields('show')%>
-        <%=render "/ims/show_contact", :owner=>@inspection, :fields => InspectionContact.get_meta_fields('show')%>
-        <%=render '/findings/show_all', :owner => @inspection, :show_btn => false%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @owner %>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'inspection'%>
 
-        <div class="col-xs-12"><%=render "/audits/show_comment", :owner => @inspection%></div>
+        <%=render "/ims/show_task",
+          :owner => @owner,
+          :fields => SmsTask.get_meta_fields('show')%>
+        <%=render "/ims/show_contact",
+          :owner=>@owner,
+          :fields => Contact.get_meta_fields('show')%>
+        <%=render "/audits/show_requirements",
+          :owner => @owner,
+          :type => 'inspection'%>
+        <%=render '/findings/show_all',
+          :owner => @owner,
+          :show_btn => false%>
 
-        <%=render "/forms/attachments_show", :owner => @inspection%>
-        <%=render "/records/transactions", :owner => @inspection%>
+        <%=render "/forms/cost", :owner => @owner%>
+        <%=render 'forms/signatures/show_signatures', owner: @owner %>
+        <%=render "/forms/show_comment", :owner => @owner%>
+
+        <%=render "/forms/attachments_show", :owner => @owner%>
+        <%=render "/records/transactions", :owner => @owner%>
       </div>
     </div>
   </div>
@@ -175,74 +91,13 @@
 
 <script>
   $(document).ready(function(){
-    $('#task_btn').on('click',function(){
-      $.get("<%=new_task_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#contact_btn').on('click',function(){
-      $.get("<%=new_contact_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#requirement_btn').on('click',function(){
-      $.get("<%=new_requirement_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_inspection_path(@inspection)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.complete_btn').on('click',function(){
-      var commit=$(this).attr('id');
-      $.get("<%=complete_inspection_path(@inspection)%>?commit="+commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      var commit=$(this).attr('id');
-      $.get("<%=approve_inspection_path(@inspection)%>?commit="+commit,function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#checklist_btn').on('click',function(){
-      $.get("<%=new_checklist_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_inspection_path(@inspection)%>",function(data){
+      $.get("<%=new_attachment_inspection_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
-    $('#update_checklist_btn').on('click',function(){
-      $.get("<%=update_checklist_inspection_path(@inspection)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_inspection_path(@inspection)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
+
     $('#item_table').dataTable();
   });
 </script>

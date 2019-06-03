@@ -1,13 +1,12 @@
 class SafetyPlan < ActiveRecord::Base
 
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Associations List
   belongs_to :created_by, foreign_key: "created_by_id", class_name: "User"
-
-  has_many :transactions, foreign_key: 'owner_id', class_name: 'SafetyPlanTransaction', dependent: :destroy
-  has_many :attachments,  foreign_key: 'owner_id', class_name: 'SafetyPlanAttachment',  dependent: :destroy
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
 
   after_create -> { create_transaction('Create') }
@@ -50,11 +49,11 @@ class SafetyPlan < ActiveRecord::Base
 
 
   def create_transaction(action)
-    SafetyPlanTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
   end
 
   def self.get_custom_options(title)

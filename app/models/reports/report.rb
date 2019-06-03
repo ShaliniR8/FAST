@@ -1,9 +1,13 @@
 class Report < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :report_meetings,    foreign_key: 'report_id',   class_name: 'ReportMeeting',      dependent: :destroy
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
-  has_many :transactions,       foreign_key: 'owner_id',    class_name: 'ReportTransaction',  dependent: :destroy
-  has_many :attachments,        foreign_key: 'owner_id',    class_name: 'ReportAttachment',   dependent: :destroy
   has_many :agendas,            foreign_key: 'event_id',    class_name: 'AsapAgenda',         dependent: :destroy
   has_many :suggestions,        foreign_key: 'owner_id',    class_name: 'ReportSuggestion',   dependent: :destroy
   has_many :descriptions,       foreign_key: 'owner_id',    class_name: 'ReportDescription',  dependent: :destroy
@@ -13,10 +17,6 @@ class Report < ActiveRecord::Base
 
   belongs_to :meeting, foreign_key:"meeting_id", class_name:"Meeting"
 
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
-
   serialize :privileges
   serialize :severity_extra
   serialize :probability_extra
@@ -25,7 +25,6 @@ class Report < ActiveRecord::Base
 
   before_create :set_priveleges
   after_create :set_name
-  after_save   :check_records
   before_create :set_extra
 
   extend AnalyticsFilters
@@ -37,10 +36,10 @@ class Report < ActiveRecord::Base
     [
       {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
       {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
-      {                                                                                   type: 'newline',  visible: 'form,show'                        },
+      {                                                                                   type: 'newline',  visible: 'show'                        },
       {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show', required: true  },
       {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show', required: true  },
-      {                                                                                   type: 'newline',  visible: 'form,show'                        },
+      {                                                                                   type: 'newline',  visible: 'show'                        },
       {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',           required: false },
 
       {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_label_options },
@@ -100,11 +99,11 @@ class Report < ActiveRecord::Base
   def reopen(new_status)
     self.status = new_status
     self.records.each{|x| x.reopen("Linked");}
-    ReportTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Reopen",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Reopen',
+      (session[:simulated_id] || session[:user_id])
+    )
     self.save
   end
 
@@ -151,14 +150,6 @@ class Report < ActiveRecord::Base
     end
   end
 
-  def check_records
-    if self.status=="Closed"
-      self.records.each do |r|
-        r.status="Closed"
-        r.save
-      end
-    end
-  end
 
   def set_name
     if self.name.blank?
@@ -548,7 +539,7 @@ class Report < ActiveRecord::Base
       self.privileges.present? ?  self.privileges : []
     end
   def self.get_avg_complete
-    candidates=self.where("status=? and close_date is not ?","Closed",nil)
+    candidates = self.where("status=? and close_date is not ?","Closed",nil)
     if candidates.present?
       sum=0
       candidates.map{|x| sum+=(x.close_date-x.created_at.to_date).to_i}

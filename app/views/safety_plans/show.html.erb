@@ -77,9 +77,16 @@
                 :confirm => "Are you sure?"%>
             <%end%>
           <%end%>
+
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @safety_plan%>
+        <%=render "/forms/show_comment", :owner => @safety_plan%>
         <%=render "/forms/attachments_show", :owner => @safety_plan%>
         <%=render "/records/transactions", :owner => @safety_plan%>
 
@@ -94,6 +101,12 @@
   $(document).ready(function(){
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_safety_plan_path(@safety_plan, :evaluate => false)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_safety_plan_path(@safety_plan)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

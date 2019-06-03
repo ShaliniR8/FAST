@@ -41,13 +41,17 @@ class PackagesController < ApplicationController
 
   def new_attachment
     @owner=Package.find(params[:id]).becomes(Package)
-    @attachment=PackageAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 
   def close
     package=Package.find(params[:id])
-    PackageTransaction.create(:users_id=>current_user.id,:action=>"Complete",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      package,
+      'Complete',
+      current_user.id
+    )
     package.status="Completed"
     package.date_complete=Time.now.to_date
     if package.save

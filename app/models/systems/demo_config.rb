@@ -4,28 +4,30 @@ class Demo_Config
     {
       :version                                        => "1.0.3",
 
-      :code                                           => "BSK",
+      :code                                           => "BOE",
       :base_risk_matrix                               => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => true,
       :allow_set_alert                                => true,
+      :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
-      :enable_mailer                                  => true,
+      :enable_mailer                                  => false,
 
 
       # Safety Reporting Module
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => true,
-      :observation_phases_trend                       => true,
+      :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => true,
       :checklist_version                              => '3',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
@@ -36,203 +38,126 @@ class Demo_Config
 
 
   FAA_INFO = { #CORRECT/REVISE
-    "CHDO"=>"FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
-    "Region"=>"Anchorage",
-    "ASAP MOU Holder Name"=>"N/A",
-    "ASAP MOU Holder FAA Designator"=>"N/A"
+    "CHDO"=>"ProSafeT",
+    "Region"=>"Pacific",
+    "ASAP MOU Holder Name"=>"ProSafeT",
+    "ASAP MOU Holder FAA Designator"=>"ProSafeT"
   }
 
 
   MATRIX_INFO = {
     severity_table: {
       starting_space: true,
-      column_header: ['1','2','3','4','5'],
-      row_header: [
-        'Accident or Incident',
-        'Employee/Customer Injury',
-        'Assets',
-        'Operational Events',
-        'Airworthiness',
-        'Brand',
-        'Customer',
-        'Environment',
-        'Security',
-        'Regulatory',
-        'System or Process',
-        'Audit Finding',
-        'OSHA'
-      ],
+      row_header: ['5','4','3','2','1'],
+      column_header: [
+        'Safety (Impact)',
+        'People (Injury)',
+        'Security (Threat)',
+        'Environment (Effect)',
+        'Assets (Damage)'],
       rows: [
-        [ #Accident or Incident
-          'Accident with serious injuries or fatalities; or significant damage to aircraft or property',
-          'Serious incident with injuries and/or substantial damage to aircraft or property',
-          'Incident with minor injury and/or minor aircraft or property damage',
-          'incident with less than minor injury and/or less than minor damage',
-          'No relevant safety risk'
+        [
+          'Massive',
+          'Fatality/Disability',
+          'Extreme',
+          'Catastrophic',
+          'Massive'
         ],
-        [ #Employee/Customer Injury
-          'Fatality or serious injury with total disability/loss of capacity',
-          'Immediate admission to hospital as an inpatient and/or partial disability/loss of capacity',
-          'Injury requiring ongoing treatment, with no permanent disability/loss of capacity',
-          'Minor injury not resulting in an absence',
-          'No injury risk'
+        [
+          'Major',
+          'Major',
+          'High',
+          'Major',
+          'Major'
         ],
-        [ #Assets
-          'Multiple Aircraft OTS > 24 hours',
-          'One aircraft OTS > 24 hours',
-          'Aircraft OTS 2 to 24 hours',
-          'Aircraft OTS < 2 hours',
-          'No Aircraft OTS'
+        [
+          'Minor',
+          'Minor',
+          'Medium',
+          'Moderate',
+          'Minor'
         ],
-        [ #Operational Events
-          'Loss of aircraft; beyond crew capability, operating with no meaningful safety margins',
-          'Physical distress/high workload impairing the accuracy and completion of tasks',
-          'Large reduction in safety margins; reduction in ability of crew to cope with adverse operating conditions',
-          'Operation beyond operating limitations; Use of abnormal procedures',
-          'No effect on operational safety'
+        [
+          'Slight',
+          'Slight',
+          'Low',
+          'Minor',
+          'Slight'
         ],
-        [ #Airworthiness
-          'Returning an aircraft to service and operating it in a non-standard, unairworthy, or unsafe condition',
-          'Returning an aircraft to service and operating it in a non-standard but not unsafe condition',
-          'Returning an aircraft to service in a non-standard condition, but not operating it',
-          'Affecting aircraft or systems reliability above established control limits but no affect on airworthiness or the safe operation of the aircraft',
-          'No effect on airworthiness'
-        ],
-        [ #Brand
-          'Extended negative national media coverage resulting in a substantial change in public opinion of Sun Country',
-          'Short term negative media/internet activity resulting in minor change in public opinion of Sun Country',
-          'Short term negative media/internet activity resulting in no change in public opinion of Sun Country',
-          'Isolated negative media/internet activity resulting in no change in public opinion of Sun Country',
-          'No negative media/internet activity',
-        ],
-        [ #Customer
-          "<b><center>Extreme Customer Dissatisfaction</b></center>More than 500 customers affected for 48 hours or more",
-          "<b><center>Customer Dissatisfaction</b></center>More than 500 customers affected for 3 to 48 hours",
-          "<b><center>Customer Annoyance</b></center>Less than 500 customers affected for 3 to 48 hours",
-          "<b><center>Isolated Customer Annoyance</b></center>Less than 500 customers affected for up to 3 hours",
-          'No customer disruptions'
-        ],
-        [ #Environment
-          "Severe Danger to Environment:<br />Large, significant waste of resources and emissions into water, air, or soil",
-          'Medium significance in waste of resources and emissions into water, air, or soil',
-          'Small significance in waste of resources and emissions into water, air, or soil',
-          'Small waste or emission, no relevant risk of pollution',
-          'No relevant risk of pollution, no spill but an undesirable situation'
-        ],
-        [ #Security
-          'Loss of aircraft or death of Sun Country employee due to successful attack, terrorist activity, or civil unrest',
-          'Security threat is genuine. Situation can only be resolved by handing control to outside agencies',
-          'Security threat is genuine. Situation is only mitigated/resolved with assistance of outside agencies',
-          'Security threat is genuine but can be mitigated or resolved by Sun Country',
-          'Security threat is a hoax'
-        ],
-        [ #Regulatory
-          "<center><b>Major Regulatory Deviation</b></center>Loss of company approvals, permits or certificates, resulting in the suspension of all operations",
-          "<center><b>Moderate Regulatory Deviation</b></center>Loss of company approvals, permits or certificates, resulting in suspension in part of Sun Country operations",
-          "<center><b>Minor Regulatory Deviation</b></center>Major breach of company policy or SOPs with no direct impact on approvals, permits or certificates, with a significant negative effect of ability to manage operations. Attitude of regulatory authority towards Sun Country has been negatively impacted",
-          "<center><b>Policy/Procedure Deviation</b></center>Breach of company policy or SOPs, with no direct impact on approvals, certificates, permits, with a minor effect of ability to manage operations. Falls below industry \"best practices\"",
-          "No breach of company requirements; No impact on approvals or permits"
-        ],
-        [ #System or Process
-          'Loss or breakdown of entire system, subsystem or process',
-          'Partial breakdown of a system, subsystem, or process',
-          'System deficiencies leading to poor reliability or disruption',
-          'Little to no effect on system, subsystem, or process',
-          'No impact on system, subsystem, or process'
-        ],
-        [ #Audit Finding
-          'Safety of Operations in Doubt',
-          'Non-Compliance with company policy or CFR',
-          'Non-conformance with company policy or CFR',
-          'Audit Observation',
-          'No findings or observations'
-        ],
-        [ #OSHA
-          'Willful',
-          'Repeat',
-          'Serious',
-          'General/Other',
-          'No breach of OSHA requirements'
+        [
+          'Negligible',
+          'Negligible',
+          'Negligible',
+          'Negligible',
+          'Negligible'
         ]
-      ] #End of rows
+      ]
     },
 
     severity_table_dict: {
-      0 => '1',
-      1 => '2',
-      2 => '3',
-      3 => '4',
-      4 => '5'
+      0 => "5",
+      1 => "4",
+      2 => "3",
+      3 => "2",
+      4 => "1"
     },
 
     probability_table: {
       starting_space: true,
-      row_header: ['A', 'B', 'C', 'D'],
-      column_header: ['Reactive Assessment (Control Effectiveness)', 'Proactive Assessment (Likelihood)'],
-
+      row_header: [''],
+      column_header: ['A','B','C','D','E'],
       rows: [
-        [ #A
-          "<center><b>Not Effective</b></center>Remaining controls were ineffective or no controls remained. The only thing preventing an accident were luck or exceptional skill, which is not trained or required",
-          "<center><b>Likely to Occur</b></center>(Will occur in most circumstances, not surprised if it happens) or occurs > 1 in 100"
-        ],
-        [ #B
-          "<center><b>Minimal</b></center>Some controls were left but their total effectiveness was minimal",
-          "<center><b>Possible to Occur</b></center>(Might occur in some circumstances) or occurs > 1 in 1,000"
-        ],
-        [ #C
-          "<center><b>Limited</b></center>An abnormal situation, more demanding to manage, but with still a considerable remaining safety margin",
-          "<center><b>Unlikely to Occur</b></center>(Could occur in some circumstances, surprised if it happens) or occurs in > 1 in 10,000"
-        ],
-        [ #D
-          "<center><b>Effective</b></center>Consisting of several good controls",
-          "<center><b>Rare to Occur</b></center>(May occur but only in exceptional circumstances, may happen but it would only be highly unexpected) or occurs > 1 in 1,000,000"
+        [
+          'Improbable (10 Years)',
+          'Remote (5 Years)',
+          'Occasional (1 Year)',
+          'Probable (6 Months)',
+          'Frequent (30 Days)'
         ]
-      ] #End of rows
+      ]
     },
 
     probability_table_dict: {
-      0 => 'A',
-      1 => 'B',
-      2 => 'C',
-      3 => 'D'
+      0 => 'Improbable (10 Years)',
+      1 => 'Remote (5 Years)',
+      2 => 'Occasional (1 Year)',
+      3 => 'Probable (6 Months)',
+      4 => 'Frequent (30 Days)'
     },
 
     risk_table: {
       starting_space: true,
-      column_header: ['1','2','3','4','5'],
-      row_header: ['A', 'B', 'C', 'D'],
+      row_header: ['5','4','3','2','1'],
+      column_header: ['A','B','C','D','E'],
       rows: [
-        ["crimson",     "crimson",      "coral",          "yellow",         "mediumseagreen"      ],
-        ["crimson",     "coral",        "yellow",         "steelblue",      "mediumseagreen"      ],
-        ["coral",       "yellow",       "steelblue",      "mediumseagreen", "mediumseagreen"      ],
-        ["yellow",      "steelblue",    "mediumseagreen", "mediumseagreen", "mediumseagreen"      ],
+        ['yellow','red','red','red','red'],
+        ['yellow','yellow','red','red','red'],
+        ['limegreen','yellow','yellow','yellow','red'],
+        ['limegreen','limegreen','yellow','yellow','yellow'],
+        ['limegreen','limegreen','limegreen','yellow','yellow']
+
       ]
     },
 
-    risk_table_dict: {
-      crimson:        'Red (A/1, A/2, B/1) - High',
-      coral:          'Orange (A/3, B/2, C/1) - Serious',
-      yellow:         'Yellow (A/4 B/3, D/1) - Moderate',
-      steelblue:      'Blue (B/4, C/3, D/2) - Minor',
-      mediumseagreen: 'Green (A/5, B/5, C/4, C/5, D/3, D/4, D/5) - Low',
+    risk_definitions: {
+      red:       {rating: "HIGH",     cells: "A4, A3, B4",     description: "Unacceptable"                 },
+      yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
+      limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
     },
 
     risk_table_index: {
-      crimson:        "High",
-      coral:          "Serious",
-      yellow:         "Moderate",
-      steelblue:      "Minor",
-      mediumseagreen: "Low"
+      red:        "High",
+      yellow:     "Moderate",
+      limegreen:  "Low"
     },
 
-    risk_definitions: {
-      crimson:          { rating: 'High',      cells: 'A/1, A/2, and B/1',                      description: '' },
-      coral:            { rating: 'Serious',   cells: 'A/3, B/2, and C/1',                      description: '' },
-      yellow:           { rating: 'Moderate',  cells: 'A/4, B/3, and D/1',                      description: '' },
-      steelblue:        { rating: 'Minor',     cells: 'B/4, C/3, and D/2',                      description: '' },
-      mediumseagreen:   { rating: 'Low',       cells: 'A/5, B/5, C/4, C/5, D/3, D/4, and D/5',  description: '' }
+    risk_table_dict: {
+      red:        "High",
+      yellow:     "Moderate",
+      limegreen:  "Low"
     }
   }
+
 
   #ALL FOLLOWING MAY NEED CORRECTION/REVISION
 

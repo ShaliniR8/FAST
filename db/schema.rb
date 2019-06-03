@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190419231322) do
+ActiveRecord::Schema.define(:version => 20190522203544) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
   end
 
   create_table "attachments", :force => true do |t|
-    t.string  "type"
+    t.string  "owner_type"
     t.string  "name"
     t.string  "caption"
     t.integer "owner_id"
@@ -321,7 +321,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.text     "notes"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "obj_id"
   end
 
@@ -361,7 +361,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
 
   create_table "costs", :force => true do |t|
     t.integer  "owner_id"
-    t.string   "type"
+    t.string   "owner_type"
     t.text     "description"
     t.date     "cost_date"
     t.boolean  "direct_cost"
@@ -504,7 +504,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
   end
 
   create_table "findings", :force => true do |t|
-    t.integer  "audit_id"
+    t.integer  "owner_id"
     t.string   "title"
     t.integer  "responsible_user_id"
     t.date     "completion_date"
@@ -538,7 +538,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.date     "open_date"
     t.date     "complete_date"
     t.text     "narrative"
-    t.string   "type"
+    t.string   "owner_type"
     t.text     "analysis_result"
     t.integer  "custom_id"
     t.string   "likelihood_after"
@@ -724,6 +724,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.integer  "custom_id"
     t.integer  "obj_id"
     t.text     "privileges"
+    t.text     "final_comment"
   end
 
   create_table "message_accesses", :force => true do |t|
@@ -869,6 +870,17 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.integer "poc_id"
   end
 
+  create_table "private_links", :force => true do |t|
+    t.string   "email"
+    t.string   "name"
+    t.string   "digest"
+    t.date     "expire_date"
+    t.string   "access_level"
+    t.string   "link"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "privileges", :force => true do |t|
     t.string   "name"
     t.text     "description"
@@ -907,7 +919,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
   create_table "recommendations", :force => true do |t|
     t.integer  "owner_id"
     t.string   "status",                  :default => "New"
-    t.string   "type"
+    t.string   "owner_type"
     t.string   "title"
     t.string   "department"
     t.integer  "responsible_user_id"
@@ -977,6 +989,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+    t.text     "final_comment"
   end
 
   create_table "recurrences", :force => true do |t|
@@ -1158,6 +1171,16 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.datetime "updated_at"
   end
 
+  create_table "signatures", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "signee_name"
+    t.integer  "user_id"
+    t.string   "owner_id"
+    t.string   "owner_type"
+    t.string   "path"
+  end
+
   create_table "sms_actions", :force => true do |t|
     t.string   "title"
     t.string   "responsible_department"
@@ -1176,7 +1199,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.integer  "responsible_user_id"
     t.boolean  "emp"
     t.boolean  "dep"
-    t.string   "type"
+    t.string   "owner_type"
     t.text     "comment"
     t.date     "open_date"
     t.date     "complete_date"
@@ -1215,7 +1238,7 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "owner_obj_id"
   end
 
@@ -1341,11 +1364,12 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
     t.datetime "stamp"
     t.text     "content"
     t.string   "action"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "user_poc_id"
     t.integer  "owner_obj_id"
     t.string   "poc_first_name"
     t.string   "poc_last_name"
+    t.string   "alt_user"
   end
 
   create_table "users", :force => true do |t|
@@ -1392,12 +1416,13 @@ ActiveRecord::Schema.define(:version => 20190419231322) do
   end
 
   create_table "viewer_comments", :force => true do |t|
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "owner_id"
     t.text     "content"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "alt_user"
   end
 
 end

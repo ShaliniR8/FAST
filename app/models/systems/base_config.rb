@@ -13,7 +13,7 @@ class BaseConfig
 
 
   def self.airline_code
-    'BOE'
+    'NAC'
   end
 
   def self.airline
@@ -23,6 +23,10 @@ class BaseConfig
 
   def self.faa_info
     Object.const_get(BaseConfig.airline[:code] + "_Config")::FAA_INFO
+  end
+
+  def self.observation_phases
+    Object.const_get(BaseConfig.airline[:code] + "_Config")::OBSERVATION_PHASES || []
   end
 
 

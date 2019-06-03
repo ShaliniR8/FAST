@@ -200,15 +200,14 @@
                     :class=>"btn btn-success pull-right mr5 mb5 "%>
                 <%end%>
               <%end%>
-
-            <%elsif template_viewer_access%>
-              <%=link_to "Add Comment",
-                "#",
-                :class=>"btn btn-success pull-right mr5 mb5 ",
-                :id=>'comment_btn',
-                "data-toggle"=>"modal",
-                "data-target"=>".bs-example-modal-lg"%>
             <%end%>
+
+            <%=link_to "Add Comment",
+              "#",
+              :class=>"btn btn-success pull-right mr5 mb5 ",
+              :id=>'comment_btn',
+              "data-toggle"=>"modal",
+              "data-target"=>".bs-example-modal-lg"%>
           </div>
 
           <div class="col-xs-12 mb20">
@@ -245,7 +244,7 @@
           </div>
 
 
-          <%=render "/shared/processing_instructions", :owner => @record%>
+          <%#=render "/shared/processing_instructions", :owner => @record%>
 
           <%=render "forms/show_fields", :fields => Record.get_meta_fields('show'), :record => @record%>
 
@@ -291,7 +290,6 @@
               :show_btns => true%>
           <%end%>
 
-          <%=render "/audits/show_comment",:owner => @record%>
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
           <%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => can_change%>
@@ -322,6 +320,7 @@
             </div>
           <%end%>
 
+          <%=render "/forms/show_comment",:owner => @record%>
           <%=render "/forms/attachments_show", :owner => @record%>
           <%=render "/records/transactions", :owner => @record%>
 

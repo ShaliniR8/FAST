@@ -28,6 +28,12 @@ class ApplicationController < ActionController::Base
       session[:last_active] = Time.now
     end
 
+    if session[:digest].present? &&
+      request.url == session[:digest].link &&
+      session[:digest].expire_date > Time.now.to_date
+      return
+    end
+
     if current_user.blank?
     else
       if !current_user.has_access(controller_name,action_name)
@@ -38,14 +44,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
   def check_group(form)
+    if session[:digest].present?
+      return true
+    end
+
     report = Object.const_get(form.titleize.gsub(/\s+/, '')).find(params[:id])
     if current_user.level == "Admin" || current_user.has_access("#{form}s",'admin')
       true
     else
       group_validation = false #to reduce calculation of whether user is part of the group if present
       report_privileges = report.privileges.present? ? report.get_privileges : []
-      if !report.privileges.empty?
+      if !report_privileges.empty?
         current_user.privileges.each do |p|
           if report.get_privileges.include? p.id.to_s
             group_validation = true
@@ -117,6 +128,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def display_signature(owner)
+    if owner.class.name == 'Signature'
+      send_file owner.path.current_path, type: 'image/png', disposition: 'inline'
+    end
+  end
 
 
   # def display_in_table(report)
@@ -170,31 +186,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def get_finding_owner(finding)
-    if finding.type == "AuditFinding"
-      return 'audits'
-    elsif finding.type == "InspectionFinding"
-      return 'inspections'
-    elsif finding.type == "EvaluationFinding"
-      return 'evaluations'
-    elsif finding.type == "InvestigationFinding"
-      return 'investigations'
-    end
-  end
-
   def get_car_owner(car)
-    if car.type == "FindingAction"
-      return get_finding_owner(car.finding)
-    elsif car.type == "InvestigationAction"
-      return 'investigations'
-    end
-  end
-
-  def get_recommendation_owner(rec)
-    if rec.type == "FindingRecommendation"
-      return get_finding_owner(rec.finding)
-    elsif rec.type == "InvestigationRecommendation"
-      return 'investigations'
+    case car.owner_type
+      when 'Finding'
+        return car.owner.get_owner
+      when 'Investigation'
+        return 'investigations'
     end
   end
 
@@ -232,6 +229,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def get_recommendation_owner(rec)
+    case rec.owner_type
+    when 'Finding'
+      return rec.owner.get_owner
+    else
+      return "#{rec.owner_type.downcase}s"
+    end
+  end
+
 
   def submission_display(report)
     true
@@ -253,8 +259,6 @@ class ApplicationController < ActionController::Base
 
   def adjust_session
     load_controller_list
-
-
     if @sms_list.include? controller_name
       session[:mode]='SMS'
     elsif @sms_im_list.include? controller_name
@@ -266,6 +270,8 @@ class ApplicationController < ActionController::Base
     end
     true
   end
+
+
   def get_classes_by_module
     case session[:mode]
     when 'SMS'
@@ -392,7 +398,11 @@ class ApplicationController < ActionController::Base
     @terms = @table.get_meta_fields()
     @records = @table.within_timerange(params[:start_date], params[:end_date])
     if params[:type].present?
-      @records = @records.select{|x| x.type == params[:type]}
+      begin #TODO: Resolve issues with IM not having owner_type defined (non-polymorphic elements in IM); keep begin block and remove rescue at that point
+        @records = @records.select{|x| x.owner_type == params[:type]}
+      rescue
+        @records = @records.select{|x| x.type == params[:type]}
+      end
     end
     if params[:status].present?
       if params[:status] == "Overdue"
@@ -508,43 +518,12 @@ class ApplicationController < ActionController::Base
     owner_class = owner.class.name
     owner.status = "New"
     owner.save
-    case owner_class
-    when "Audit"
-      AuditTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to audit_path(owner)
-    when "Inspection"
-      InspectionTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to inspection_path(owner)
-    when "Evaluation"
-      EvaluationTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to evaluation_path(owner)
-    when "Investigation"
-      InvestigationTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to investigation_path(owner)
-    when "Finding"
-      FindingTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to finding_path(owner)
-    when "SmsAction"
-      SmsActionTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to sms_action_path(owner)
-    when "Recommendation"
-      RecommendationTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to recommendation_path(owner)
-    when "Sra"
-      SraTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to sra_path(owner)
-    when "Hazard"
-      HazardTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to hazard_path(owner)
-    when "RiskControl"
-      RiskControlTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to risk_control_path(owner)
-    when "SafetyPlan"
-      SafetyPlanTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id=>owner.id, :stamp=>Time.now)
-      redirect_to safety_plan_path(owner)
-    else
-      return
-    end
+    Transaction.build_for(
+      owner,
+      'Reopen',
+      current_user.id
+    )
+    redirect_to eval("#{owner_class.underscore}_path(owner)") rescue return
   end
 
 

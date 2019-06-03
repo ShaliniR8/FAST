@@ -1,0 +1,5 @@
+- if owner.record.present?
+  = link_to 'View Report',
+    record_path(owner.record),
+    class: 'btn btn-info pull-right mr5 mb5',
+    disable_with: 'Redirecting...'

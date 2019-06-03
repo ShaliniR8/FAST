@@ -267,9 +267,9 @@ class UsersController < ApplicationController
 
   def disable
     @user = User.find(params[:id])
-    @user.disable = @user.disable ? false : true
+    @user.disable = @user.disable ? 0 : 1
     @user.save
-    status = @user.disable ? "disabled" : "enabled"
+    status = @user.disable ? "Disabled" : "Enabled"
     redirect_to user_path(@user), flash: { warning: "User has been #{status}."}
   end
 

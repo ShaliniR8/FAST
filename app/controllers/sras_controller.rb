@@ -72,12 +72,6 @@ class SrasController < ApplicationController
       connection.save
     end
     if sra.save
-      notify(
-        sra.responsible_user,
-        "SRA ##{sra.get_id} has been scheduled for you." +
-          g_link(sra),
-        true,
-        "SRA ##{sra.get_id} Assigned")
       redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
     end
   end
@@ -124,31 +118,33 @@ class SrasController < ApplicationController
       if !@owner.approver #Approved by reviewer with absent approver case
         update_status = 'Completed'
         notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Approved by the Reviewer." + g_link(@owner),
+          "SRA ##{@owner.id} was Approved by the Quality Reviewer." + g_link(@owner),
           true, 'SRA Approved')
+        transaction_content = 'Approved by the Quality Reviewer'
       elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
         update_status = 'Pending Approval'
         notify(@owner.approver,
           "SRA ##{@owner.id} needs your Approval." + g_link(@owner),
           true, 'SRA Pending Approval')
+        transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.date_complete = Time.now
         notify(@owner.responsible_user,
           "SRA ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
           true, 'SRA Approved')
+        transaction_content = 'Approved by the Final Approver'
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
-    SraTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        stamp:      Time.now,
-        content:    transaction_content || ''
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to sra_path(@owner)
   end
@@ -220,7 +216,7 @@ class SrasController < ApplicationController
 
   def new_attachment
     @owner=Sra.find(params[:id])
-    @attachment=SraAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 
@@ -258,7 +254,11 @@ class SrasController < ApplicationController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
+  def comment
+    @owner = Sra.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def get_agenda
@@ -275,18 +275,18 @@ class SrasController < ApplicationController
 
   def carryover
     sra = Sra.find(params[:id])
-    MeetingTransaction.create(
-      :users_id => current_user.id,
-      :action => "Carry Over SRA",
-      :content=> "SRA ##{sra.get_id} Carried Over",
-      :owner_id => sra.meeting.id,
-      :stamp => Time.now)
-    SraTransaction.create(
-      :users_id => current_user.id,
-      :action => "Carried Over",
-      :content => "SRA Carried Over from Meeting ##{sra.meeting.get_id}",
-      :owner_id => sra.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      sra.meeting,
+      'Carry Over SRA',
+      current_user.id,
+      "SRA ##{sra.get_id} Carried Over"
+    )
+    Transaction.build_for(
+      sra,
+      'Carried Over',
+      current_user.id,
+      "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
+    )
     sra.meeting_id = nil
     sra.status = "New"
     sra.save
@@ -326,7 +326,11 @@ class SrasController < ApplicationController
   def enable
     @sra=Sra.find(params[:id])
     @sra.viewer_access=!@sra.viewer_access
-    SraTransaction.create(:users_id=>current_user.id,:action=>"#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      @sra,
+      "#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
+      current_user.id
+    )
     @sra.save
     redirect_to sra_path(@sra)
   end

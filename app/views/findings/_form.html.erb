@@ -22,30 +22,30 @@
         </div>
         <div class="panel-body">
 
-          <%=form_for @finding.becomes(Finding), :html => {:multipart => true} do |f|%>
+          <%=form_for @owner, :html => {:multipart => true} do |f|%>
 
             <%if action_name == 'new'%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
-              <%=f.hidden_field :audit_id, :value => params[:owner_id]%>
+              <%=hidden_field_tag :owner_id,  params[:owner_id]%>
             <%end%>
 
-            <%=render "/shared/privilege_form", :target => "finding[privileges][]", :owner => @finding, :f => f%>
-            <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @finding %>
+            <%=render "/shared/privilege_form", :target => "finding[privileges][]", :owner => @owner, :f => f%>
+            <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
 
             <%if BaseConfig.airline[:base_risk_matrix]%>
-              <%=render "/shared/matrix", :f => f, :owner => @finding%>
+              <%=render "/shared/matrix", :f => f, :owner => @owner%>
             <%else%>
               <%=render "/shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
             <%end%>
 
-            <%=render '/forms/attachments_form', :f => f, :owner => @finding%>
+            <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
 
             <div class="mt10 mr10">
               <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
                 :class => "btn btn-success pull-right mt5",
                 :disable_with => "Saving..."%>
               <%=link_to "Cancel",
-                action_name == 'new' ? @owner : @finding.becomes(Finding),
+                action_name == 'new' ? @parent : @owner.becomes(Finding),
                 :class => "btn btn-warning pull-right mt5 mr5",
                 :confirm => 'Are you sure?'%>
               <%=link_to "Group Access",

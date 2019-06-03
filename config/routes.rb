@@ -29,7 +29,7 @@ PrdgSession::Application.routes.draw do |map|
      get 'get_user_json'
   end
 
-
+  resources :signatures, only:[:show]
 
   # System Feature
   resources :automated_notifications do
@@ -39,6 +39,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :notifications
   resources :notices
+  resources :private_links
   resources :verifications do
     member do
       get 'address'
@@ -62,6 +63,8 @@ PrdgSession::Application.routes.draw do |map|
 
     collection do
       get "revision_history"
+      get "user_guides"
+      get "load_content"
     end
   end
   resources :messages do
@@ -289,6 +292,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'show_narrative'
       get "reopen"
       get 'override_status'
+      get 'comment'
     end
   end
   resources :meetings do
@@ -320,6 +324,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'assign'
       get 'complete'
       get 'approve'
+      get 'comment'
     end
   end
   resources :query_statements do
@@ -371,7 +376,9 @@ PrdgSession::Application.routes.draw do |map|
       get 'download_checklist'
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_checklist'
       post 'upload_checklist'
       get 'update_checklist'
@@ -395,7 +402,9 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_finding'
       get 'new_checklist'
       post 'upload_checklist'
@@ -421,7 +430,9 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_finding'
       get 'new_checklist'
       post 'upload_checklist'
@@ -448,6 +459,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'mitigate'
       get 'baseline'
       get 'new_recommendation'
+      get 'new_signature'
       get 'new_contact'
       get 'new_finding'
       get 'new_action'
@@ -467,6 +479,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'download_checklist'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'retract_cause_attributes'
@@ -516,6 +529,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'baseline'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :finding_action, :controller => 'sms_actions'
@@ -530,6 +544,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -559,6 +574,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'get_agenda'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -581,6 +597,7 @@ PrdgSession::Application.routes.draw do |map|
       get "new_root_cause"
       get "reload_root_causes"
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -606,6 +623,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :safety_plans do
@@ -618,6 +636,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :srm_meetings do

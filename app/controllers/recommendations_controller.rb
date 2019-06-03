@@ -15,14 +15,32 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-class RecommendationsController < ApplicationController
+class RecommendationsController < SafetyAssuranceController
 
   before_filter(only: [:show]) { check_group('recommendation') }
+  before_filter :define_owner, only:[
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :edit,
+    :destroy,
+    :new_attachment,
+    :override_status,
+    :reopen,
+    :show,
+    :update
+  ]
+
+  def define_owner
+    @class = Object.const_get('Recommendation')
+    @owner = @class.find(params[:id])
+  end
 
   def index
-    @table = Object.const_get("Recommendation")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    @table = Object.const_get('Recommendation')
+    @headers = Recommendation.get_meta_fields('index')
+    @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
 
     if !current_user.admin? && !current_user.has_access('recommendations','admin')
@@ -34,81 +52,41 @@ class RecommendationsController < ApplicationController
   end
 
 
-
-
   def new
     @privileges = Privilege.find(:all)
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Recommendation" : "Recommendation"
-    @owner = Object.const_get(params[:owner_type])
+    @parent = Object.const_get(params[:owner_type])
       .find(params[:owner_id])
       .becomes(Object.const_get(params[:owner_type])) rescue nil
-    @recommendation = Object.const_get(@table).new
+    @owner = @parent.recommendations.new
     @fields = Recommendation.get_meta_fields('form')
   end
 
 
   def create
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Recommendation" : "Recommendation"
-    recommendation = Object.const_get(@table).create(params[:recommendation])
-    redirect_to recommendation.becomes(Recommendation), flash: {success: "Recommendation created."}
+    @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    @owner = @parent.recommendations.create(params[:recommendation])
+    redirect_to @owner, flash: {success: "Recommendation created."}
   end
-
-
-
-  def destroy
-    recommendation=Recommendation.find(params[:id])
-    recommendation.destroy
-    redirect_to recommendations_path, flash: {danger: "Recommendation ##{params[:id]} deleted."}
-  end
-
 
 
   def show
-    @recommendation = Recommendation.find(params[:id])
-    @type = get_recommendation_owner(@recommendation)
+    @type = @owner.owner_type
     @fields = Recommendation.get_meta_fields('show')
   end
 
 
-
   def edit
     @privileges = Privilege.find(:all)
-    @recommendation = Recommendation.find(params[:id])
     @users = User.find(:all)
     @users.keep_if{|u| !u.disable}
-    @type = get_recommendation_owner(@recommendation)
+    @type = get_recommendation_owner(@owner)
     @users.keep_if{|u| u.has_access(@type, 'edit')}
     @headers = User.get_headers
     @fields = Recommendation.get_meta_fields('form')
   end
 
 
-
-  def assign
-    @owner = Recommendation.find(params[:id]).becomes(Recommendation)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def complete
-    @owner = Recommendation.find(params[:id]).becomes(Recommendation)
-    status = @owner.approver.present? ? "Pending Approval" : "Completed"
-    render :partial => "/forms/workflow_forms/process", locals: {status: status}
-  end
-
-  def approve
-    @owner = Recommendation.find(params[:id]).becomes(Recommendation)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def override_status
-    @owner = Recommendation.find(params[:id]).becomes(Recommendation)
-    render :partial => '/forms/workflow_forms/override_status'
-  end
-
-
   def update
-    @owner = Recommendation.find(params[:id]).becomes(Recommendation)
 
     case params[:commit]
     when 'Assign'
@@ -118,11 +96,13 @@ class RecommendationsController < ApplicationController
         true, 'Recommendation Assigned')
     when 'Complete'
       if @owner.approver
+        update_status = 'Pending Approval'
         notify(@owner.approver,
           "Recommendation ##{@owner.id} needs your Approval." + g_link(@owner),
           true, 'Recommendation Pending Approval')
       else
         @owner.complete_date = Time.now
+        update_status = 'Completed'
       end
     when 'Reject'
       notify(@owner.responsible_user,
@@ -137,25 +117,16 @@ class RecommendationsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
     end
     @owner.update_attributes(params[:recommendation])
-    RecommendationTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    @owner.status = update_status || @owner.status
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to recommendation_path(@owner)
   end
-
-
-
-
-  def new_attachment
-    @owner = Recommendation.find(params[:id]).becomes(Recommendation)
-    @attachment = RecommendationAttachment.new
-    render :partial => "shared/attachment_modal"
-  end
-
 
 
   def print
@@ -167,13 +138,6 @@ class RecommendationsController < ApplicationController
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Recommendation_##{@recommendation.get_id}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
-
-  def reopen
-    @recommendation = Recommendation.find(params[:id]).becomes(Recommendation)
-    reopen_report(@recommendation)
   end
 
 

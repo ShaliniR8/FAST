@@ -2,22 +2,21 @@ require 'open-uri'
 require 'fileutils'
 
 class Submission < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Association List
   belongs_to :template,   foreign_key: "templates_id",  class_name: "Template"
   belongs_to :created_by, foreign_key: "user_id",       class_name: "User"
   belongs_to :record,     foreign_key: "records_id",    class_name: "Record"
 
   has_many :submission_fields,    foreign_key: "submissions_id",  class_name: "SubmissionField",        :dependent => :destroy
-  has_many :attachments,          foreign_key: "owner_id",        class_name: "SubmissionAttachment",   :dependent => :destroy
-  has_many :transactions,         foreign_key: "owner_id",        class_name: "SubmissionTransaction",  :dependent => :destroy
-  has_many :comments,             foreign_key: "owner_id",        class_name: "SubmissionNote",         :dependent => :destroy
   has_many :notices,              foreign_key: "owner_id",        class_name: "SubmissionNotice",       :dependent => :destroy
 
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :submission_fields
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
-
 
   after_create :make_report
   after_create :create_transaction
@@ -31,7 +30,7 @@ class Submission < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'get_id',         title: 'Submission ID',   num_cols: 6,  type: 'text', visible: 'index,show', required: false},
+      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
       {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
@@ -133,12 +132,12 @@ class Submission < ActiveRecord::Base
 
 
   def create_transaction
-    SubmissionTransaction.create(
-      :users_id => self.anonymous? ? '' : session[:user_id],
-      :content => "User Submitted Report.",
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Create',
+      self.anonymous? ? '' : (session[:simulated_id] || session[:user_id]),
+      'User Submitted Report.'
+    )
   end
 
 
@@ -263,7 +262,7 @@ class Submission < ActiveRecord::Base
         :event_time_zone    => self.event_time_zone
       )
     self.attachments.each do |x|
-      temp = RecordAttachment.new(
+      temp = Attachment.new(
         :name => x.name,
         :caption => x.caption)
       record.attachments.push(temp)
@@ -386,7 +385,7 @@ class Submission < ActiveRecord::Base
       converted = self.class.create({
         :anonymous        => self.anonymous,
         :templates_id     => temp_id,
-        :description      => self.description + " --Copy of ##{self.id}",
+        :description      => self.description + " -- dual report of ##{self.id}",
         :event_date       => self.event_date,
         :user_id          => self.user_id,
         :event_time_zone  => self.event_time_zone,
@@ -397,21 +396,22 @@ class Submission < ActiveRecord::Base
       columns = [:value, :fields_id, :submissions_id]
       values = []
       new_temp.fields.each do |field|
-        values << [mapped_fields[field.id] || "", field.id, converted.id]
+        values << [mapped_fields[field.id], field.id, converted.id]
       end
-
-      values.each do |value|
-        SubmissionField.create({
-          :value => value[0],
-          :fields_id => value[1],
-          :submissions_id => value[2],
-        })
+      SubmissionField.transaction do
+        values.each do |value|
+          SubmissionField.create({
+            :value => value[0],
+            :fields_id => value[1],
+            :submissions_id => value[2]
+          })
+        end
       end
 
       #SubmissionField.import columns, values, validate: false
 
       self.attachments.each do |x|
-        temp = SubmissionAttachment.new(
+        temp = Attachment.new(
           :name => x.name,
           :caption => x.caption)
         converted.attachments.push(temp)

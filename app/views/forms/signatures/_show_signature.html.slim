@@ -1,0 +1,20 @@
+css:
+  .signature-img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+.col-xs-12.col-lg-12
+  .panel.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b = "#{owner.signee_name}: #{owner.created_at.strftime("%b %e, %Y")}"
+        <span class='pull-right clickable'><i class='mt5 glyphicon glyphicon-chevron-down'></i></span>
+    .panel-body style='display:none'
+      .col-xs-12
+        img.signature-img src="" id="signature#{owner.id}"
+      = render '/forms/show_fields', record: owner, fields: fields
+
+javascript:
+  $.get('#{eval("signature_path(#{owner.id})")}',function(data){
+    $("#signature#{owner.id}").attr("src", 'data:image/png;base64,'+ data);
+  });

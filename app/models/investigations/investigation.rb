@@ -1,32 +1,28 @@
 class Investigation < ActiveRecord::Base
 
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Contactable
+  include Costable
+  include Findingable
+  include Recommendationable
+  include Signatureable
+  include SmsActionable
+  include SmsTaskable
+  include Transactionable
+
+#Associations List
   belongs_to :responsible_user,         :foreign_key => "responsible_user_id",  :class_name => "User"
   belongs_to :approver,                 :foreign_key => "approver_id",          :class_name => "User"
   belongs_to :record,                   :foreign_key => "record_id",            :class_name => "Record"
-  belongs_to :created_by,              foreign_key: 'created_by_id',           class_name: 'User'
-  has_many :attachments,                :foreign_key => 'owner_id',             :class_name => "InvestigationAttachment",       :dependent => :destroy
+  belongs_to :created_by,               foreign_key: 'created_by_id',           class_name: 'User'
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
-  has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
-  has_many :comments,                   :foreign_key => "owner_id",             :class_name => "InvestigationComment",          :dependent => :destroy
-  has_many :recommendations,            :foreign_key => "owner_id",             :class_name => "InvestigationRecommendation",   :dependent => :destroy
-  has_many :contacts,                   :foreign_key => "owner_id",             :class_name => "InvestigationContact",          :dependent => :destroy
-  has_many :findings,                   :foreign_key => "audit_id",             :class_name => "InvestigationFinding",          :dependent => :destroy
-  has_many :tasks,                      :foreign_key => "owner_id",             :class_name => "InvestigationTask",             :dependent => :destroy
-  has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
-  has_many :transactions,               :foreign_key => "owner_id",             :class_name => "InvestigationTransaction",      :dependent => :destroy
 
-  accepts_nested_attributes_for :corrective_actions
-  accepts_nested_attributes_for :contacts
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :tasks
-  accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :recommendations
-  accepts_nested_attributes_for :findings
-  accepts_nested_attributes_for :comments
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
   after_create -> { create_transaction('Create') }
   before_create :set_priveleges
@@ -145,11 +141,12 @@ class Investigation < ActiveRecord::Base
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      InvestigationTransaction.create(users_id: (session[:user_id] rescue nil),
-          action: action,
-          owner_id: self.id,
-          content: defined?(session) ? '' : 'Recurring Investigation',
-          stamp: Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil),
+        defined?(session) ? '' : 'Recurring Investigation'
+      )
     end
   end
   def investigation_type
@@ -365,10 +362,10 @@ class Investigation < ActiveRecord::Base
 
 
   def self.get_avg_complete
-    candidates=self.where("status=? and complete_date is not ? and open_date is not ? ","Completed",nil,nil)
+    candidates=self.where("status=? and complete_date is not ?","Completed",nil)
     if candidates.present?
       sum=0
-      candidates.map{|x| sum+=(x.complete_date-x.open_date).to_i}
+      candidates.map{|x| sum+=(x.complete_date-x.created_at.to_date).to_i}
       result= (sum.to_f/candidates.length.to_f).round(1)
       result
     else

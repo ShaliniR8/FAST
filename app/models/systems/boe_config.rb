@@ -2,7 +2,7 @@ class BOE_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.2",
+      :version                                        => "1.0.3",
 
       :code                                           => "BOE",
       :time_zone                                      => "Central Time (US & Canada)",
@@ -24,11 +24,12 @@ class BOE_Config
       :enable_orm                                     => false,
       :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '3',
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
-      :has_root_causes                                => true,
+      :has_root_causes                                => false,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
@@ -185,7 +186,7 @@ class BOE_Config
   def self.print_risk(probability_score, severity_score)
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_dict][lookup_table[severity_score][probability_score].to_sym]
+      return MATRIX_INFO[:risk_table_dict][lookup_table[severity_score][probability_score].to_sym] rescue nil
     end
   end
 

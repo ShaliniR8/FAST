@@ -1,8 +1,12 @@
 class Sra < ActiveRecord::Base
 
-  has_many :attachments,              :foreign_key => "owner_id",   :class_name => "SraAttachment",       :dependent => :destroy
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Association List
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
-  has_many :transactions,             :foreign_key => "owner_id",   :class_name => "SraTransaction",      :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy
   has_many :notices,                  :foreign_key => "owner_id",   :class_name => "SraNotice",           :dependent => :destroy
   has_many :responsible_users,        :foreign_key => "owner_id",   :class_name => "SraResponsibleUser",  :dependent => :destroy
@@ -27,7 +31,6 @@ class Sra < ActiveRecord::Base
   serialize :mitigated_severity
   serialize :mitigated_probability
 
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
   accepts_nested_attributes_for :hazards
 
 
@@ -39,6 +42,7 @@ class Sra < ActiveRecord::Base
 
   def self.progress
     {
+      "New"                     => { :score => 0,   :color => "default"},
       "Assigned"                => { :score => 25,  :color => "default"},
       "Pending Review"          => { :score => 50,  :color => "warning"},
       "Pending Approval"        => { :score => 75,  :color => "warning"},
@@ -72,7 +76,7 @@ class Sra < ActiveRecord::Base
       { field: "title",                     title: "SRA Title",                                num_cols: 6,   type: "text",        visible: 'index,form,show',   required: false},
       { field: "type_of_change",            title: "Type of Change",                           num_cols: 6,   type: "datalist",    visible: 'index,form,show',   required: false, options: get_custom_options('SRA Type of Change')},
       { field: "system_task",               title: "System/Task",                              num_cols: 6,   type: "datalist",    visible: 'index,form,show',   required: false, options: get_custom_options('Systems/Tasks')},
-      { field: "responsible_user_id",       title: "Responsible User",                          num_cols: 6,   type: "user",        visible: 'index,form,show',   required: false},
+      { field: "responsible_user_id",       title: "Responsible User",                         num_cols: 6,   type: "user",        visible: 'index,form,show',  required: false},
       { field: "reviewer_id",               title: "Quality Reviewer",                         num_cols: 6,   type: "user",        visible: 'form,show',         required: false},
       { field: "approver_id",               title: "Final Approver",                           num_cols: 6,   type: "user",        visible: 'form,show',         required: false},
       { field: "scheduled_completion_date", title: "Scheduled Completion Date",                num_cols: 6,   type: "date",        visible: 'index,form,show',   required: false},
@@ -81,7 +85,7 @@ class Sra < ActiveRecord::Base
       {                                     title: "Affected Department",                      num_cols: 12,  type: "panel_start", visible: 'form,show'},
       { field: "departments",               title: "Affected Departments",                     num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: get_custom_options('Departments')},
       { field: "other_department",          title: "Other Affected Departments",               num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
-      { field: "departments_comment",       title: "Affected Departments Comments",             num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
+      { field: "departments_comment",       title: "Affected Departments Comments",            num_cols: 12,  type: "textarea",    visible: 'form,show',        required: false},
       {                                                                                        num_cols: 12,  type: "panel_end",   visible: 'form,show'},
 
       {                                     title: "Affected Programs",                        num_cols: 12,  type: "panel_start", visible: 'form,show'},
@@ -96,18 +100,26 @@ class Sra < ActiveRecord::Base
       { field: "manuals_comment",           title: "Affected Manuals Comments",                num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
       {                                                                                        num_cols: 12,  type: "panel_end",   visible: 'form,show'},
 
-      {                                     title: "Affected Regulatory Compliances",          num_cols: 12,  type: "panel_start", visible: 'form,show',},
-      { field: "compliances",               title: "Affected Regulatory Compliance",           num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: get_custom_options('Regulatory Compliance Elements'), },
-      { field: "other_compliance",          title: "Other Affected Regulatory Compliance",     num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
-      { field: "compliances_comment",       title: "Affected Regulatory Compliances Comments", num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
-      {                                                                                        num_cols: 12,  type: "panel_end",   visible: 'form,show'},
+      {                                     title: "Affected #{Sra.sra_section_4}",           num_cols: 12,  type: "panel_start", visible: 'form,show',},
+      { field: "compliances",               title: "Affected #{Sra.sra_section_4}",           num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: get_custom_options("#{Sra.sra_section_4}")},
+      { field: "other_compliance",          title: "Other Affected #{Sra.sra_section_4}",     num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
+      { field: "compliances_comment",       title: "Affected #{Sra.sra_section_4} Comments",  num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
+      {                                                                                       num_cols: 12,  type: "panel_end",   visible: 'form,show'},
 
-      { field: "closing_comment",           title: "Responsible User's Closing Comments",   num_cols: 12,  type: "text",        visible: 'show'},
+      { field: "closing_comment",           title: "Responsible User's Closing Comments",      num_cols: 12,  type: "text",        visible: 'show'},
       { field: "reviewer_comment",          title: "Quality Reviewer's Closing Comments",      num_cols: 12,  type: "text",        visible: 'show'},
       { field: "approver_comment",          title: "Final Approver's Closing Comments",        num_cols: 12,  type: "text",        visible: 'show'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+
+  def self.sra_section_4
+    if BaseConfig.airline_code == 'BSK'
+      'System Task Analysis SHEL(L) Models'
+    else
+      'Regulatory Compliances'
+    end
+  end
 
 
   def self.get_custom_options(title)
@@ -148,7 +160,11 @@ class Sra < ActiveRecord::Base
     self.mitigated_severity.present? ?  self.mitigated_severity : []
   end
   def create_transaction(action)
-    SraTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
   end
 
   def approver_name

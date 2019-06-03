@@ -1,0 +1,7 @@
+- if !['Pending Approval', 'Completed'].include? owner.status
+  = link_to 'Add Finding',
+    new_finding_path(\
+      owner_id: owner.id,
+      owner_type: owner.class.name),
+    class: 'btn btn-success pull-right mr5 mb5',
+    disable_with: 'Adding...'

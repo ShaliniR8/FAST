@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version
+    :android_version, :disable
 
 
 
@@ -37,12 +37,9 @@ class User < ActiveRecord::Base
   validates_presence_of :username,    :message => " cannot be empty."
   validates_presence_of :first_name,  :message => " cannot be empty."
   validates_presence_of :last_name,   :message => " cannot be empty."
-  validates_presence_of :email,       :message => " cannot be empty."
   # validates_presence_of :password, :message => " cannot be empty."
   validates_uniqueness_of :username, :case_sensitive => false, :message => " has already been taken."
   validates_format_of :username, :with => /^[-\w\._@]+$/i, :allow_blank => true, :message => "should only contain letters, numbers, or .-_@"
-  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
-  #validates_uniqueness_of :email, :case_sensitive => false, :message => " has already been taken."
   # validates_presence_of :password, :on => :create
   validates_confirmation_of :password, :message => " must match."
   validates_length_of :password, :minimum => 4, :allow_blank => true, :message => " needs to be at least 4 characters long."

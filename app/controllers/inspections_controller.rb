@@ -15,50 +15,45 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-class InspectionsController < ApplicationController
+class InspectionsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('inspection') }
+  before_filter :define_owner, only: [
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :destroy,
+    :edit,
+    :new_attachment,
+    :new_contact,
+    :new_cost,
+    :new_signature,
+    :new_task,
+    :override_status,
+    :reopen,
+    :show,
+    :update,
+    :upload_checklist,
+    :viewer_access
+  ]
+
+  def define_owner
+    @class = Object.const_get('Inspection')
+    @owner = Inspection.find(params[:id])
+  end
 
 
   def new
-    @inspection = Inspection.new
+    @owner = Inspection.new
     load_options
     @fields = Inspection.get_meta_fields('form')
   end
-
 
 
   def edit
-    @inspection = Inspection.find(params[:id])
     load_options
     @fields = Inspection.get_meta_fields('form')
-  end
-
-
-
-  def destroy
-    Inspection.find(params[:id]).destroy
-    redirect_to inspections_path, flash: {danger: "Inspection ##{params[:id]} deleted."}
-  end
-
-
-
-  def viewer_access
-    inspection = Inspection.find(params[:id])
-    inspection.viewer_access = !inspection.viewer_access
-    if inspection.viewer_access
-      content = "Viewer Access Enabled"
-    else
-      content = "Viewer Access Disabled"
-    end
-    InspectionTransaction.create(
-      :users_id => current_user.id,
-      :action => "Viewer Access",
-      :owner_id => inspection.id,
-      :content => content,
-      :stamp => Time.now)
-    inspection.save
-    redirect_to inspection_path(inspection)
   end
 
 
@@ -76,8 +71,6 @@ class InspectionsController < ApplicationController
 
 
   def update
-    @owner = Inspection.find(params[:id]).becomes(Inspection)
-
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -104,38 +97,19 @@ class InspectionsController < ApplicationController
         "Inspection ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Inspection Approved')
     when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:inspection][:status]}"
+      transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
     end
     @owner.update_attributes(params[:inspection])
     @owner.status = update_status || @owner.status
-    InspectionTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to inspection_path(@owner)
   end
-
-
-
-  def new_task
-    @audit = Inspection.find(params[:id])
-    load_options
-    @task = InspectionTask.new
-    render :partial => 'audits/task'
-  end
-
-
-
-  def new_contact
-    @audit = Inspection.find(params[:id])
-    @contact = InspectionContact.new
-    render :partial => 'audits/contact'
-  end
-
 
 
   def new_requirement
@@ -155,20 +129,19 @@ class InspectionsController < ApplicationController
   end
 
 
-
   def index
     @table = Object.const_get("Inspection")
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
-    @records = @records.where('template = 0 OR template IS NULL')
+    @records = @records.keep_if{|x| x[:template].nil? || x[:template] == 0}
     if !current_user.admin? && !current_user.has_access('inspections','admin')
       cars = Inspection.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += Inspection.where('approver_id = ?',  current_user.id)
       if current_user.has_access('inspections','viewer')
         Inspection.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.empty?
+          if viewable.privileges.blank?
             cars += [viewable]
           else
             viewable.privileges.each do |privilege|
@@ -183,14 +156,11 @@ class InspectionsController < ApplicationController
   end
 
 
-
   def show
-    @inspection = Inspection.find(params[:id])
     load_options
     @fields = Inspection.get_meta_fields('show')
     @checklist_headers = InspectionRequirement.get_meta_fields('show')
   end
-
 
 
   def load_options
@@ -213,11 +183,9 @@ class InspectionsController < ApplicationController
   helper_method :load_options
 
 
-
   def upload_checklist
-    inspection = Inspection.find(params[:id])
     if !params[:append].present?
-      inspection.clear_checklist
+      @owner.clear_checklist
     end
     if params[:checklist].present?
       upload = File.open(params[:checklist].tempfile)
@@ -225,17 +193,16 @@ class InspectionsController < ApplicationController
         :headers => :true,
         :header_converters => lambda { |h| h.downcase.gsub(' ', '_') }
         }) do |row|
-        InspectionItem.create(row.to_hash.merge({:owner_id=>inspection.id}))
+        InspectionItem.create(row.to_hash.merge({:owner_id=>@owner.id}))
       end
     end
-    InspectionTransaction.create(
-      :users_id => current_user.id,
-      :action => "Upload Checklist",
-      :owner_id => params[:id],
-      :stamp => Time.now)
-    redirect_to inspection_path(inspection)
+    Transaction.build_for(
+      @owner,
+      'Upload Checklist',
+      current_user.id
+    )
+    redirect_to inspection_path(@owner)
   end
-
 
 
   def new_checklist
@@ -245,53 +212,15 @@ class InspectionsController < ApplicationController
   end
 
 
-
   def update_checklist
     @audit = Inspection.find(params[:id])
     @checklist_headers = InspectionItem.get_headers
     render :partial => "audits/update_checklist"
   end
 
-  def assign
-    @owner = Inspection.find(params[:id]).becomes(Inspection)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def complete
-    @owner = Inspection.find(params[:id]).becomes(Inspection)
-    render :partial => '/forms/workflow_forms/process'
-  end
-
-  def approve
-    @owner = Inspection.find(params[:id]).becomes(Inspection)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def override_status
-    @owner = Inspection.find(params[:id]).becomes(Inspection)
-    render :partial => '/forms/workflow_forms/override_status'
-  end
-
-
-  def new_attachment
-      @owner = Inspection.find(params[:id])
-      @attachment = InspectionAttachment.new
-      render :partial => "shared/attachment_modal"
-  end
-
-
 
   def download_checklist
     @inspection = Inspection.find(params[:id])
   end
-
-
-
-  def reopen
-    @inspection = Inspection.find(params[:id])
-    reopen_report(@inspection)
-  end
-
 
 end

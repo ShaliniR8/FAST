@@ -7,8 +7,8 @@ class NAC_Config
 
       :code                                           => "NAC",
       :base_risk_matrix                               => false,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
@@ -23,17 +23,21 @@ class NAC_Config
       :enable_orm                                     => false,
       :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => false,
-      :checklist_version                              => '2',
+      :checklist_version                              => '1',
 
       # Safety Assurance Module
-      :allow_reopen_report                            => true,
+      :allow_reopen_report                            => false,
       :has_root_causes                                => false,
+      :enable_recurrence                              => true,
 
 
       # SMS IM Module
       :has_framework                                  => false,
     }
   end
+
+
+  OBSERVATION_PHASES = ["Observation Phase", "Condition", "Threat", "Error", "Human Factor", "Comment"]
 
 
 
@@ -213,7 +217,7 @@ class NAC_Config
   def self.print_risk(probability_score, severity_score)
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_index][lookup_table[severity_score][probability_score].to_sym]
+      return MATRIX_INFO[:risk_table_index][lookup_table[severity_score][probability_score].to_sym] rescue nil
     end
   end
 

@@ -1,13 +1,19 @@
 class SmsTask < ActiveRecord::Base
-  belongs_to :res_user,foreign_key:'res',class_name:"User"
-  belongs_to :final_approver,foreign_key:'app_id',class_name:"User"
 
+#Association List
+  belongs_to :res_user,        foreign_key:'res',       class_name:"User"
+  belongs_to :final_approver,  foreign_key:'app_id',    class_name:"User"
+  belongs_to :owner,           polymorphic: true
 
   after_create :transaction_log
 
   def transaction_log
-    SmsActionTransaction.create(:users_id=>session[:user_id], :action=>"Add Task", :content=>"##{self.id} #{self.title}", :owner_id=>self.owner_id, :stamp=>Time.now)
-    #InspectionTransaction.create(:users_id=>current_user.id,:action=>"Open",:owner_id=>inspection.id,:stamp=>Time.now)
+    Transaction.build_for(
+      self.owner,
+      'Add Task',
+      (session[:simulated_id] || session[:user_id] rescue nil),
+      "##{self.id} #{self.title}"
+    )
   end
 
   def get_completion

@@ -1,5 +1,12 @@
 class RecurrencesController < ApplicationController
 
+  before_filter :recurrence_enabled
+
+  def recurrence_enabled
+    unless BaseConfig.airline[:enable_recurrence]
+      redirect_to errors_path
+    end
+  end
 
   def create
     params.each do |key, data|

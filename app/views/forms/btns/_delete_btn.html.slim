@@ -1,0 +1,8 @@
+- if current_user.admin? || \
+    current_user.has_access(permission,'admin') || \
+    current_user.has_access(permission,'destroy')
+  = link_to 'Delete',
+    eval("#{owner_class}_path(owner)"),
+    method: 'delete',
+    confirm: 'Are you sure?',
+    class: 'btn btn-danger pull-right mr5 mb5'

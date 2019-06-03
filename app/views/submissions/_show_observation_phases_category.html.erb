@@ -16,14 +16,9 @@
             <table id="observation_phases_table" class="table table-hover table-striped table-bordered" width="100%">
               <thead>
                 <tr>
-                  <th>Observation Phase</th>
-                  <th>Condition</th>
-                  <th>Threat</th>
-                  <th>Sub Threat</th>
-                  <th>Error</th>
-                  <th>Sub Error</th>
-                  <th>Human Factor</th>
-                  <th>Comment</th>
+                  <%BaseConfig.observation_phases.each do |x|%>
+                    <th><%=x%></th>
+                  <%end%>
                 </tr>
               </thead>
               <tbody>
