@@ -31,6 +31,7 @@ class SmsAction < ActiveRecord::Base
       {field: 'title',                          title: 'Title',                             num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       {field: 'get_status',                     title: 'Status',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {field: 'get_source',                     title: 'Source of Input',                   num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
+      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
 
       {                                                                                                   type: 'newline',      visible: 'show'},
       {field: 'schedule_completion_date',       title: 'Scheduled Completion Date',         num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},

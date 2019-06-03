@@ -62,10 +62,11 @@ class ApplicationController < ActionController::Base
           report.viewer_access &&
           current_user.has_access("#{form}s",'viewer')
         redirect_to errors_path if !group_validation
+      elsif current_user.id == report.created_by_id
+        redirect_to errors_path if !group_validation
       else
         false
         redirect_to errors_path
-
       end
     end
   end

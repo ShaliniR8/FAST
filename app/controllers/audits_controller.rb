@@ -81,6 +81,7 @@ class AuditsController < ApplicationController
           end
         end
       end
+      cars += Audit.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

@@ -23,6 +23,7 @@ class RiskControl < ActiveRecord::Base
     return [
       {field: 'id',                           title: 'ID',                              num_cols: 6,  type: 'text',     visible: 'index,show',      required: false,      editable: false},
       {field: 'status',                       title: 'Status',                          num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
       {field: 'title',                        title: 'Title',                           num_cols: 6,  type: 'text',     visible: 'index,form,show', required: true},
       {field: 'scheduled_completion_date',    title: 'Scheduled Completion Date',       num_cols: 6,  type: 'date',     visible: 'index,form,show', required: false},
       {field: 'responsible_user_id',          title: 'Responsible User',                num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},

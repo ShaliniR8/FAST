@@ -28,6 +28,8 @@ class CorrectiveAction < ActiveRecord::Base
     return [
       { field: 'id',                      title: 'ID',                             num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       { field: 'status',                  title: 'Status',                         num_cols: 6,  type: 'select',   visible: 'index,show',      required: false, options: getStatusOptions},
+      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+
       { field: 'recommendation',          title: 'Is this only a recommendation',  num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
       { field: 'due_date',                title: 'Scheduled Completion Date',      num_cols: 6,  type: 'date',     visible: 'index,form,show', required: false},
       { field: 'opened_date',             title: 'Date Opened',                    num_cols: 6,  type: 'date',     visible: 'show',            required: false},

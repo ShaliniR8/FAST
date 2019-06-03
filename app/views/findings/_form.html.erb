@@ -23,7 +23,9 @@
         <div class="panel-body">
 
           <%=form_for @finding.becomes(Finding), :html => {:multipart => true} do |f|%>
-
+            <%if action_name == "new"%>
+              <%=f.hidden_field :created_by_id, :value => current_user.id%>
+            <%end%>
             <%if action_name == 'new'%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
               <%=f.hidden_field :audit_id, :value => params[:owner_id]%>

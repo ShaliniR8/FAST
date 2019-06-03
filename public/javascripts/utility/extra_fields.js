@@ -17,7 +17,7 @@ $(document).ready(function(){
 				if ($(this).val() == ""){
 					error = true;
 					result = false;
-					$(this).css('border-color', 'red');  
+					$(this).css('border-color', 'red');
 					event.preventDefault();
 				}
 			});
@@ -37,7 +37,7 @@ $(document).ready(function(){
 		uid=$(this).attr('id')
 		$(".non_dup").each(function(){
 			if ($(this).val() == new_val&&$(this).attr('id')!=uid){
-				 $(this).val('');   
+				 $(this).val('');
 			}
 		});
 	});

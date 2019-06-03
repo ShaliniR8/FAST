@@ -1,5 +1,4 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
 <script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
@@ -13,7 +12,7 @@
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
-    <%= render "shared/alerts" %>
+    <%=render "shared/alerts" %>
 
     <div class="panel panel-warning">
       <div class="panel-heading">
@@ -24,6 +23,10 @@
 
       <div class="panel-body" id="form_body">
         <%=form_for @audit, :html => {:multipart => true} do |f|%>
+          <%if action_name == "new"%>
+            <%=f.hidden_field :created_by_id, :value => current_user.id%>
+          <%end%>
+
           <%=render "shared/privilege_form",
           :target => "audit[privileges][]",:owner => @audit,:f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @audit %>
