@@ -84,7 +84,9 @@
         <div class="col-xs-12 mb15">
 
             <%if @corrective_action.status == "New"%>
-              <%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
+              <%if current_user.admin? ||
+                  @corrective_action.approver_id == current_user.id ||
+                  @corrective_action.created_by == current_user%>
                 <%=link_to 'Assign', '#',
                   :id => 'assign_btn',
                   :class => 'btn btn-warning pull-right mr5',

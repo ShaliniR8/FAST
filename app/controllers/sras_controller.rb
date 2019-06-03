@@ -35,6 +35,7 @@ class SrasController < ApplicationController
       cars += Sra.where('approver_id = ? OR reviewer_id = ?',
         current_user.id, current_user.id)
       cars += Sra.where(viewer_access: true) if current_user.has_access('sras','viewer')
+      cars += Sra.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

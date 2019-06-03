@@ -21,7 +21,9 @@
         </div>
         <div class="panel-body">
           <%=form_for @owner.becomes(Recommendation), :html => {:multipart => true} do |f|%>
-
+            <%if action_name == "new"%>
+              <%=f.hidden_field :created_by_id, :value => current_user.id%>
+            <%end%>
             <%if params[:owner_type].present?%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
               <%=hidden_field_tag :owner_id, params[:owner_id]%>

@@ -35,6 +35,8 @@ class Hazard < ActiveRecord::Base
     return [
       {field: "get_id",             title: "Hazard ID",             num_cols: 6,  type: "text",     visible: 'index,show',      required: false},
       {field: "status",             title: "Status",                num_cols: 4,  type: "text",     visible: 'index,show',      required: false},
+      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+
       {field: "title",              title: "Hazard Title",          num_cols: 6,  type: "text",     visible: 'form,index,show', required: true},
       {field: 'get_source',         title: 'Source of Input',       num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: "description",        title: "Description",           num_cols: 12, type: "textarea", visible: 'form,show'},

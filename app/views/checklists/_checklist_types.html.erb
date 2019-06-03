@@ -1,7 +1,7 @@
 <%=
   case BaseConfig.airline[:checklist_version]
   when "1"
-    render "/audits/items", :owner => owner, :type => 'audit'
+    render "/audits/items", :owner => owner, :type => owner.class.name.downcase
   when "2"
     render "/checklist_templates/show_checklist_records", :owner => owner
   when "3"

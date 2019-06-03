@@ -386,7 +386,7 @@ class Sra < ActiveRecord::Base
   def can_complete? current_user
     current_user_id = session[:simulated_id] || session[:user_id]
     self.status == 'Assigned' && (
-      (current_user_id == self.manager_id rescue false) ||
+      (current_user_id == self.responsible_user_id rescue false) ||
       current_user.admin? ||
       current_user.has_access('sras','admin'))
   end

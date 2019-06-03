@@ -150,6 +150,7 @@ class EvaluationsController < SafetyAssuranceController
           end
         end
       end
+      cars += Evaluation.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

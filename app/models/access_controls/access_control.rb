@@ -462,7 +462,6 @@ class AccessControl < ActiveRecord::Base
         'Admin'=>'admin'
       },
       'safety_plans'=>{
-
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",

@@ -31,12 +31,12 @@ class RiskControlsController < ApplicationController
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
 
-    if !current_user.admin? && !current_user.has_access('sras','admin')
+    if !current_user.admin? && !current_user.has_access('risk_controls','admin')
       rcs = RiskControl.includes(hazard: :sra)
       cars = rcs.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += rcs.where('approver_id = ?',  current_user.id)
-      cars += rcs.where('sras.viewer_access = 1') if current_user.has_access('sras','viewer')
+      cars += RiskControl.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end
