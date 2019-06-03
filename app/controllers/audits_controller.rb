@@ -270,7 +270,7 @@ private
 
   # Override index
   def index_as_json
-    @records = Audit
+    @records = Audit.all
     filter_audits
 
     json = {}
