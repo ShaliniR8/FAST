@@ -3,6 +3,7 @@ tmp
 public/uploads/**
 public/exports/**
 app/assets/**
+**/airline_code.yml
 
 mysqldumps/**
 mitre/**
