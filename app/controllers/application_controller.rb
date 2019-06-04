@@ -28,19 +28,32 @@ class ApplicationController < ActionController::Base
       session[:last_active] = Time.now
     end
 
-    if session[:digest].present? &&
-      request.url == session[:digest].link &&
-      session[:digest].expire_date > Time.now.to_date
-      return
+    puts "-----------------------------"
+    puts session
+    if session[:digest].present?
+      puts "1"
+      if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
+        puts "2"
+        return
+      else
+        puts "3"
+        redirect_to logout_path
+        return
+      end
     end
 
     if current_user.blank?
+      puts "4"
     else
-      if !current_user.has_access(controller_name,action_name)
-        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
-      elsif current_user.disable
+      puts "5"
+      if current_user.disable
+        puts "6"
         redirect_to logout_path
+      elsif !current_user.has_access(controller_name,action_name)
+        puts "7"
+        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
       end
+      puts "8"
     end
   end
 
