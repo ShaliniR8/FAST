@@ -21,12 +21,11 @@
 
 <%=render "/forms/cost", :owner => owner%>
 
-<%=render "/verifications/show_verifications",
-  :fields => Verification.get_meta_fields('index'),
-  :records => owner.verifications,
-  :title => "Verifications"%>
-
 <%=render "/extension_requests/show_requests",
   :fields => ExtensionRequest.get_meta_fields('index'),
   :records => owner.extension_requests,
   :title => "Extension Requests"%>
+<%=render "/verifications/show_verifications",
+  :fields => Verification.get_meta_fields('index'),
+  :records => owner.verifications,
+  :title => "Verifications"%>
