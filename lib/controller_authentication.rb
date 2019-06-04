@@ -23,6 +23,9 @@ module ControllerAuthentication
 
 
   def current_user
+    # Rails.logger.info("CURRENT USER_ID BEGIN")
+    # Rails.logger.info(session.inspect)
+    # Rails.logger.info("CURRENT USER_ID END")
     begin
       if defined?(current_token) && current_token != nil
         @current_user = current_token.user
@@ -45,9 +48,9 @@ module ControllerAuthentication
   #if so it sets current_user to the matching user based on the access_token parameter
   #else use standard login method
   def oauth_load
-    Rails.logger.info("CURRENT TOKEN BEGIN")
-    Rails.logger.info(current_token.inspect)
-    Rails.logger.info("CURRENT TOKEN END")
+    # Rails.logger.info("CURRENT TOKEN BEGIN")
+    # Rails.logger.info(current_token.inspect)
+    # Rails.logger.info("CURRENT TOKEN END")
     if current_token != nil
       @current_user = current_token.user
     else

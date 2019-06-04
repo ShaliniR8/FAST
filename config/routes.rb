@@ -60,6 +60,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'download'
     end
+
     collection do
       get "revision_history"
       get "user_guides"
@@ -156,10 +157,6 @@ PrdgSession::Application.routes.draw do |map|
   resources :responsible_users
 
 
-
-
-
-
   # User and Access Control
   resources :users do
     member do
@@ -176,6 +173,7 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "users_index"
+      get 'get_user'
       get 'get_json'   #Added by BP July 14 2017
       get 'submission_json'
       get "notices_json"    #added by BL OCT 10 2018
@@ -371,8 +369,6 @@ PrdgSession::Application.routes.draw do |map|
       get "current"
     end
   end
-
-
 
 
 
