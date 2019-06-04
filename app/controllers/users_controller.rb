@@ -339,6 +339,50 @@ class UsersController < ApplicationController
     render :json => mobile_user_info
   end
 
+########################################################
+#--- Temporary methods for legacy app compatibility ---#
+########################################################
+     # following method added. BP Jul 14 2017
+  # Added if statement for OAuth compatibiltiy KM Jul 17 2017
+  def get_json
+    @date = params[:date]
+    if current_token != nil
+      @user = current_token.user
+    else
+      @user = current_user
+    end
+    @submissions = current_user.submissions.where("created_at > ?",@date)
+    stream = render_to_string(:template=>"users/get_json.js.erb" )
+    send_data(stream, :type=>"json", :disposition => "inline")
+  end
+
+  #added by BP Aug 8 2017. Used to get all submissions with detailed fields from current user
+  def submission_json
+    if current_token != nil
+      @user = current_token.user
+    else
+      @user = current_user
+    end
+    @submissions = Submission.find(:all, :conditions => [ "event_date > ?",'2017-8-11 12:00:00'])
+    stream = render_to_string(:template=>"users/submission_json.js.erb" )
+    send_data(stream, :type=>"json", :disposition => "inline")
+  end
+
+
+  def notices_json
+    if current_token != nil
+      @user = current_token.user
+    else
+      @user = current_user
+    end
+    @notices = @user.get_notices
+    stream = render_to_string(:template=>"users/notices_json.js.erb" )
+    send_data(stream, :type=>"json", :disposition => "inline")
+  end
+###############################
+#--- End Temporary Methods ---#
+###############################
+
   private
 
   def build_module_access
