@@ -161,6 +161,10 @@ class SmsAction < ActiveRecord::Base
     self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
   end
 
+  def get_completion_date
+    self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
+  end
+
 
 
   def overdue
