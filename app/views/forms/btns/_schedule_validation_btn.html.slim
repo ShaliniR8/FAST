@@ -8,6 +8,7 @@
 
 javascript:
   $("#verification_btn").on("click", function(){
+    $(".modal-content").html("");
     $.get('#{new_verification_path(owner_type: owner.class.name, owner_id: owner, user_id: (owner.approver.id rescue nil))}',
         function(data){
       $(".modal-content").html(data);

@@ -139,6 +139,7 @@ class AuditsController < SafetyAssuranceController
 
 
   def update
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -166,17 +167,23 @@ class AuditsController < SafetyAssuranceController
         true, 'Audit Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
+    when 'Add Cost'
+      transaction = false
+    when 'Add Contact'
+      transaction = false
     end
     @owner.update_attributes(params[:audit])
     @owner.status = update_status || @owner.status
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content,
-      nil,
-      current_user
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content,
+        nil,
+        current_user
+      )
+    end
     @owner.save
     respond_to do |format|
       format.html { redirect_to audit_path(@owner) }

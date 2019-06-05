@@ -32,6 +32,7 @@ class SessionsController < ApplicationController
   def destroy
     session[:user_id] = nil
     session[:simulated_id] = nil
+    session[:digest] = nil
     session[:last_active] = nil
     respond_to do |format|
       format.html do

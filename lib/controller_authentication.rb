@@ -29,12 +29,12 @@ module ControllerAuthentication
     begin
       if defined?(current_token) && current_token != nil
         @current_user = current_token.user
-      elsif session[:digest]
-        @current_user = User.new(:username => session[:digest].name, :email => session[:digest].email)
       elsif session[:simulated_id]
         @current_user ||= User.find(session[:simulated_id]) if session[:user_id]
-      else
+      elsif session[:user_id]
         @current_user ||= User.find(session[:user_id]) if session[:user_id]
+      elsif session[:digest]
+        @current_user = User.new(:username => session[:digest].name, :email => session[:digest].email)
       end
     rescue ActiveRecord::RecordNotFound => e
       @current_user = nil

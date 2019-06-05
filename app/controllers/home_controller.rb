@@ -319,6 +319,7 @@ class HomeController < ApplicationController
         records = Object.const_get(x).where('status in (?) and (responsible_user_id = ? || approver_id = ?)',
           ['Assigned', 'Pending Approval'], current_user_id, current_user_id)
         records.each do |record|
+          x = x == 'SmsAction' ? 'CorrectiveAction' : x
           if (record.get_completion_date.present? rescue false)
             @calendar_entries.push({
               :url => "#{records.table_name}/#{record.id}",
@@ -329,6 +330,18 @@ class HomeController < ApplicationController
             })
           end
         end
+      end
+
+
+      Verification.where(:status => 'New').each do |x|
+        owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
+        @calendar_entries.push({
+          :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+          :start => x.verify_date,
+          :color => 'skyblue',
+          :textColor => "darkslategrey",
+          :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
+        })
       end
 
 
