@@ -20,7 +20,6 @@ class AuditsController < SafetyAssuranceController
 
   # before_filter :login_required
   before_filter :oauth_load
-  before_filter :auditor_check, :only => [:edit,:new]
   before_filter(only: [:show]) { check_group('audit') }
   before_filter :define_owner, only: [
     :approve,
