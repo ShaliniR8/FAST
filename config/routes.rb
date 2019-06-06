@@ -159,6 +159,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'reload'
     end
   end
+  resources :occurrence_templates
   resources :checklist_templates do
     member do
 

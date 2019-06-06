@@ -1,0 +1,83 @@
+css:
+  .btn{
+    display: inline!important;
+  }
+  .list-group{
+    margin-bottom: 0;
+  }
+  .list-group-item{
+    border-radius: 0;
+    border-width: 1px 0 0 0;
+  }
+  th {
+    min-height: 25px;
+  }
+
+- if owner.format != 'section'
+  .col-xs-12 style="margin-top: 15px"
+    .col-xs-4
+      p <b>Title:</b> #{owner.title}
+    .col-xs-2
+      p <b>Format:</b> #{@formats[owner.format.to_sym]}
+    - if ['checkbox','selection'].include? owner.format
+      .col-xs-5
+        p <b>Options:</b> #{owner.options}
+    .col-xs-1.pull-right aid="#{owner.id}" id="#{owner.id}"
+      = link_to 'Edit',
+        '#',
+        class: 'ml5 btn edit_btn btn-warning',
+        'data-toggle' => 'modal',
+        'data-target' => '.bs-example-modal-lg'
+- else
+  .col-xs-12 style="margin: 10px"
+    .list-group.well style="padding: 0; overflow: hidden;"
+      .list-group-item
+        - if owner.children.present?
+          a href="#list_#{owner.id}" class="cat_#{owner.id} glyphicon glyphicon-chevron-right" data-toggle="collapse"
+        b = owner.title
+        .pull-right aid="#{owner.id}" id="#{owner.id}"
+          /btns here
+          = link_to 'Add',
+            '#',
+            class: 'ml5 btn add_btn btn-success',
+            'data-toggle' => 'modal',
+            'data-target' => '.bs-example-modal-lg'
+          = link_to 'Edit',
+            '#',
+            class: 'ml5 btn edit_btn btn-warning',
+            'data-toggle' => 'modal',
+            'data-target' => '.bs-example-modal-lg'
+          = link_to '[Archive]',
+            '#',
+            class: 'ml5 btn btn-danger',
+            confirm: 'Are you sure?'
+        .list-group.collapse id="list_#{owner.id}"
+          - owner.children.each do |x|
+            = render 'show', owner: x
+
+
+javascript:
+  $(function(){
+    $('.cat_#{owner.id}').on('click', function(){
+      $(this)
+        .toggleClass('glyphicon-chevron-right')
+        .toggleClass('glyphicon-chevron-down');
+    });
+
+    $('##{owner.id} .add_btn').on('click', function(){
+      $.get('/occurrence_templates/new?parent_id=' + $(this).closest('div').attr('aid'),
+        function(data){
+          $('.modal-content').html(data);
+          $(window).trigger('resize');
+        });
+    });
+
+    $('##{owner.id} .edit_btn').on('click', function(){
+      $.get('/occurrence_templates/' + $(this).closest('div').attr('aid') + '/edit/',
+        function(data){
+          $('.modal-content').html(data);
+          $(window).trigger('resize');
+        });
+    });
+
+  });
