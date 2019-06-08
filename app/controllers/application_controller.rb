@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   before_filter :access_validation
   before_filter :send_session
   before_filter :adjust_session
+  before_filter :set_last_seen_at, if: proc { logged_in? && (session[:last_seen_at] == nil || session[:last_seen_at] < 15.minutes.ago) }
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
 
@@ -138,19 +139,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-
-  # def display_in_table(report)
-  #   if report.privileges.present?
-  #     current_user.privileges.each do |p|
-  #       if report.get_privileges.include? p.id.to_s
-  #         return true
-  #       end
-  #     end
-  #     return false
-  #   else
-  #     return true
-  #   end
-  # end
 
   def keep_privileges(privilege, type)
     rule = AccessControl.where("action=? and entry=?", 'index', type)
@@ -545,12 +533,6 @@ class ApplicationController < ActionController::Base
   end
 
 
-
-
-
-
-
-
   def denotify(user,owner,action)
     if user.present?
       owner.notices.where('users_id = ? and action = ?', user.id, action).each(&:destroy)
@@ -563,5 +545,9 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def set_last_seen_at
+    current_user.update_attribute(:last_seen_at, Time.current)
+    session[:last_seen_at] = Time.current
+  end
 
 end
