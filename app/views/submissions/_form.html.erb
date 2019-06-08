@@ -306,6 +306,7 @@
 
 
     $("form").on('submit',function(){
+
       $("div.category-panel").find('.panel-body').slideUp();
       $("div.category-panel").closest('div.category-panel').addClass('collapsed');
       $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');

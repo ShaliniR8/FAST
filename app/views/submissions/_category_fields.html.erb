@@ -16,18 +16,20 @@
           <font style="color:blue;font-weight:bold"><%=@cat.description%></font>
         </div>
 
-        <%@cat.fields.where(deleted: false, :nested_field_id => nil).order(:field_order).each do |field|%>
+        <%@cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order).each do |field|%>
 
           <%=render "/submissions/field", :field => field, :f => f%>
 
-          <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-            <div class="form-group nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
-              style="display:none;">
-              <%=f.fields_for :submission_fields do |nf|%>
-                <%=render "/submissions/field", :field => nested_field, :f => nf%>
-              <%end%>
-            </div>
-          <%end%>
+          <div class="col-xs-12">
+            <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+              <div class="nested_field
+                nested_field_<%=field.id%>
+                nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                style="display:none;">
+                <%=render "/submissions/field", :field => nested_field, :f => f%>
+              </div>
+            <%end%>
+          </div>
 
         <%end%>
       </div>
