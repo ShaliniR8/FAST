@@ -1,5 +1,10 @@
 class TMC_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[training]
+
   def self.airline_config
     {
       :version                                        => "1.0.3",
