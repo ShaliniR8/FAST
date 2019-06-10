@@ -13,6 +13,7 @@ PrdgSession::Application.routes.draw do |map|
   match '/saml/consume',        :to => 'saml#consume',        :as => :consume
   match '/saml/metadata',       :to => 'saml#metadata',       :as => :metadata
   match '/saml/init',           :to => 'saml#init',           :as => :init
+  match '/saml/logout',         :to => 'saml#logout',         :as => :logout
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'

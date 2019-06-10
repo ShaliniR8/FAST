@@ -39,6 +39,9 @@ class SessionsController < ApplicationController
     session[:last_active] = nil
     respond_to do |format|
       format.html do
+        if BaseConfig.airline[:enable_sso]
+          redirect_to '/saml/logout'
+        end
         flash[:notice] = "You have been logged out."
         redirect_to new_session_path
       end
@@ -47,7 +50,6 @@ class SessionsController < ApplicationController
       end
     end
   end
-
 
 
 # -------------- BELOW ARE EVERYTHING FOR PROSAFET APP
@@ -61,8 +63,6 @@ class SessionsController < ApplicationController
       send_data(stream, :type=>"json", :disposition => "inline")
     end
   end
-
-
 
 
 
