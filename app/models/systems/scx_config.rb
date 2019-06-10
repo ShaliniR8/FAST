@@ -245,7 +245,7 @@ class SCX_Config
   SAML_DATA = {
     # Always ask if they have a URL for their metadata
     # If they do, you can skip all tags under IdP Info and use the following- otherwise leave this string empty: ''
-      metadata_link: 'https://syextec0002.suncountry.com/FederationMetadata/2007-06/FederationMetadata.xml',
+      metadata_link: 'https://syextec0001.suncountry.com/FederationMetadata/2007-06/FederationMetadata.xml',
 
     ### IdP Info ###
 
@@ -257,9 +257,7 @@ class SCX_Config
        # <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="|__this__|" />
       idp_sso_target_url: 'https://syextec0001.suncountry.com/adfs/ls/',
 
-      # Route to IdP's sign-out; should be in metadata.xml under:
-       # <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="|__this__|" />
-      idp_slo_target_url: "https://syextec0001.suncountry.com/adfs/ls/",
+
       # Specifies the route to the hash algorithm; standard format is sha1, s"http://www.w3.org/2000/09/xmldsig#sha1"
 
       ### Fingerprint Config ###
@@ -288,24 +286,32 @@ class SCX_Config
       response_consume_url: '/saml/consume',
       issuer_metadata_url:  '/saml/metadata',
       issuer_logout_url:    '/saml/logout',
-      name_id_format:       "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+
+    ### Data Request information
+      #This determines the format of the identifying information
+      name_id_format:    'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress', # "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
 
     # Security
 
-    # Additional useful SAML information accessible through this element:
-    access_point: 'https://syextec0002.suncountry.com/adfs/ls/idpinitiatedsignon'
+    ### Critical IdP links:
+
+      # Location to send SAML request from ProSafeT, should be in the following format:
+      # "|__IdP_domain__|/adfs/ls/idpinitiatedsignon"
+      access_point: 'https://syextec0001.suncountry.com/adfs/ls/idpinitiatedsignon',
+
+      # Route to IdP's sign-out; should be in the following format:
+      # '|__IdP_domain__|/adfs/ls/?wa=wsignout1.0'
+      idp_slo_target_url: 'https://syextec0001.suncountry.com/adfs/ls/?wa=wsignout1.0',
   }
   #The following must also be defined for SSO: This interprets the IdP's response info and matches it to an account
   def self.digest_response(response)
     #Unique digest statement to find user-identifying email from IdP:
-    email = response.attributes[:'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
-    user = User.where(email: email).first
+    Rails.logger.debug "######## SSO IMPLEMENTATION DATA ########\n nameid: #{response.nameid}\n attributes: #{response.attributes.to_h}"
+    user = User.where(email: response.nameid).first
     if user.nil?
-      Rails.logger.info "SSO ERROR: Could not find user with Email address #{email}"
-      redirect_to SAML_DATA[:access_point]
-    else
-      user
+      Rails.logger.info "SSO ERROR: Could not find user with Email address #{response.nameid}"
     end
+    user
   end
 
 #ALL FOLLOWING MAY NEED CORRECTION/REVISION
