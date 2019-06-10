@@ -41,8 +41,13 @@ class ChecklistsController < ApplicationController
     @owner = Object.const_get("#{params[:checklist][:owner_type]}").find(params[:checklist][:owner_id])
     @record = @table.create(params[:checklist])
     if params[:checklist_upload].present?
-      upload = File.open(params[:checklist_upload].tempfile)
-      create_records_from_upload(upload, @record)
+      @upload = File.open(params[:checklist_upload].tempfile)
+      case params[:checklist_upload].tempfile.content_type
+      when "application/xml"
+        upload_xml(@upload, @record)
+      else
+        upload_csv(@upload, @record)
+      end
     end
     redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @owner
   end
@@ -104,12 +109,11 @@ class ChecklistsController < ApplicationController
 
   private
 
-  def create_records_from_upload(upload, owner)
+  def upload_csv(upload, owner)
     checklist_header_items = owner.checklist_header.checklist_header_items
     begin
       CSV.foreach(upload, :headers => true) do |row|
         checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
-
         checklist_header_items.each_with_index do |header_item, index|
           cell = row[index]
           ChecklistCell.create({
@@ -122,5 +126,49 @@ class ChecklistsController < ApplicationController
     end
   end
 
+  def upload_xml(upload, owner)
+    begin
+      xml = Nokogiri::XML(upload)
+      questions = xml.xpath("//sasdct:DCTQuestions/sasdct:Question")
+    rescue Exception => e
+      puts e
+    end
 
+    questions_array = []
+    questions.each_with_index do |question, index|
+      question_hash = []
+      question.children.each do |children|
+        question_hash << [children.name, children.text] if children.elem?
+      end
+      question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
+      question_hash << ["DisplayOrder", question["DisplayOrder"]]
+      questions_array << question_hash.to_h
+    end
+
+    checklist_header_items = owner.checklist_header.checklist_header_items
+    questions_array.each_with_index do |question, index|
+      question_number = question["DisplayOrder"]
+      text = question["Text"]
+      responses = question["QuestionResponses"].gsub("\t", "").split("\n").join(";") rescue ''
+      references = question["QuestionReferences"]
+      question_bullets = question["QuestionBullets"]
+        .gsub("\t", "")
+        .split("\n")
+        .each_with_index.map{|x, i| "##{i}. #{x}" if x.present?}
+        .compact.join("<br>") rescue ''
+      text += "<br>#{question_bullets}"
+
+      values = [question_number, text, responses, references]
+      checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+      checklist_header_items.each_with_index do |h_item, i|
+        value = values[i]
+        ChecklistCell.create({
+          :checklist_row_id => checklist_row.id,
+          :value => h_item.editable ? "" : value,
+          :options => h_item.editable ? value : "",
+          :checklist_header_item_id => h_item.id})
+      end
+
+    end
+  end
 end

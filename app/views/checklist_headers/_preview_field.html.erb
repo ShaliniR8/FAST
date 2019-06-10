@@ -1,3 +1,5 @@
+<%options = (cell.options || item.options) rescue item.options%>
+
 <%case owner_type%>
 <%when 'Sample'%>
   <%case item.data_type%>
@@ -6,17 +8,17 @@
   <%when 'dropdown'%>
     <select class="form-control field_select" id="preview_select" name="preview_select">
       <option></option>
-      <%item.options.split(';').each do |option|%>
+      <%options.split(';').each do |option|%>
         <option data-id="<%=item.id%>"><%=option%></option>
       <%end%>
     </select>
   <%when 'radio'%>
     <div class="col-xs-12 ml5">
-      <%item.options.split(";").each do |option|%>
+      <%options.split(";").each do |option|%>
         <label class="radio radio-inline">
           <%=radio_button_tag :value, option%>
           <%=option%>
-        </label>
+        </label><br>
       <%end%>
     </div>
   <%end%>
@@ -24,27 +26,27 @@
 <%when 'ChecklistHeader'%>
   <%case item.data_type%>
   <%when 'text'%>
-    <%=cell.value%>
+    <%=cell.value.html_safe%>
   <%when 'dropdown'%>
     <select class="form-control field_select" id="preview_select" name="preview_select">
       <option></option>
-      <%item.options.split(';').each do |option|%>
+      <%options.split(';').each do |option|%>
         <option data-id="<%=item.id%>"><%=option%></option>
       <%end%>
     </select>
   <%when 'radio'%>
     <div class="col-xs-12 ml5">
-      <%item.options.split(";").each do |option|%>
+      <%options.split(";").each do |option|%>
         <label class="radio radio-inline">
           <%=radio_button_tag "value_#{cell.id}", option, option == cell.value%>
           <%=option%>
-        </label>
+        </label><br>
       <%end%>
     </div>
   <%end%>
 
 <%else%>
-  <%=cell.value%>
+  <%=cell.value.html_safe%>
 <%end%>
 
 

@@ -4,19 +4,28 @@
   <%else%>
     <%case header_item.data_type%>
     <%when 'radio'%>
-      <div class="col-xs-12">
-        <%header_item.options.split(";").each do |option|%>
-          <label class="radio radio-inline">
-            <%=f.radio_button :value, option%>
-            <%=option%>
-          </label>
-        <%end%>
-      </div>
+      <%if action_name == "start"%>
+        <div class="col-xs-12">
+          <%checklist_cell.options.split(";").each do |option|%>
+            <label class="radio radio-inline">
+              <%=f.radio_button :value, option%>
+              <%=option%>
+            </label><br>
+          <%end%>
+        </div>
+      <%else%>
+        <%=f.text_field :options, :value => (f.object.options || header_item.options), :class => "form-control"%>
+      <%end%>
+
     <%when 'dropdown'%>
-      <%=f.select :value,
-        header_item.options.split(";"),
-        {:include_blank => ""},
-        {:class=>'form-control field_select'}%>
+      <%if action_name == "start"%>
+        <%=f.select :value,
+          header_item.options.split(";"),
+          {:include_blank => ""},
+          {:class=>'form-control field_select'}%>
+      <%else%>
+        <%=f.text_field :options, :value => (f.object.options || header_item.options), :class => "form-control"%>
+      <%end%>
     <%when 'text'%>
       <%=f.text_field :value, :class => "form-control"%>
     <%end%>
