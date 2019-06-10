@@ -28,6 +28,9 @@ class Recommendation < ActiveRecord::Base
       { field: 'status',                        title: 'Status',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       { field: 'title',                         title: 'Title',                             num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       { field: 'get_source',                    title: 'Source of Input',                   num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
+      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+
+
       { type: 'newline',      visible: 'show'},
       { field: 'response_date',                 title: 'Scheduled Response Date',           num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
       { type: 'newline',      visible: 'show'},

@@ -151,6 +151,7 @@ class InspectionsController < SafetyAssuranceController
           end
         end
       end
+      cars += Inspection.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

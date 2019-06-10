@@ -70,30 +70,13 @@ class ExtensionRequestsController < ApplicationController
   def send_notification(status, ext_req)
     case status
     when 'New'
-      message = "A new Extension Request has been submitted for " +
-        "#{ext_req.owner.class.name} ##{ext_req.owner.get_id}." +
-        generate_link_to("Click to view", ext_req.owner)
-      notify(
-        ext_req.approver,
-        # Time.now + 3.days,
-        message,
-        # ext_req.owner.class.name,
-        false,
-        # ext_req.owner.id,
-        "new_extension")
+      notify(ext_req.requester,
+        "A new Extension Request has been submitted." + g_link(ext_req.owner),
+        true, 'Extension Request submitted')
     else
-      message = "Your Extension Request for " +
-        "#{ext_req.owner.class.name} ##{ext_req.owner.get_id} " +
-        "has been addressed." +
-        generate_link_to("Click to view", ext_req.owner)
-      notify(
-        ext_req.requester,
-        # Time.now + 3.days,
-        message,
-        # ext_req.owner.class.name,
-        false,
-        # ext_req.owner.id,
-        "address_extension")
+      notify(ext_req.approver,
+        "Your Extension Request has been addressed." + g_link(ext_req.owner),
+        true, 'Extension Request addressed')
     end
   end
 

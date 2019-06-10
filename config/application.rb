@@ -44,7 +44,7 @@ module PrdgSession
   config.filter_parameters += [:password, :pw, :base64]
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.default_url_options = { :host => 'scx-training.prosafet.com' }
+  config.action_mailer.default_url_options = { :host => 'tmc.prosafet.com' }
   config.action_mailer.smtp_settings = {
     address: 'smtp.1and1.com',
     port: 587,

@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   before_filter :access_validation
   before_filter :send_session
   before_filter :adjust_session
+  before_filter :set_last_seen_at, if: proc { logged_in? && (session[:last_seen_at] == nil || session[:last_seen_at] < 15.minutes.ago) }
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
 
@@ -28,18 +29,21 @@ class ApplicationController < ActionController::Base
       session[:last_active] = Time.now
     end
 
-    if session[:digest].present? &&
-      request.url == session[:digest].link &&
-      session[:digest].expire_date > Time.now.to_date
-      return
+    if session[:digest].present?
+      if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
+        return
+      else
+        redirect_to logout_path
+        return
+      end
     end
 
     if current_user.blank?
     else
-      if !current_user.has_access(controller_name,action_name)
-        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
-      elsif current_user.disable
+      if current_user.disable
         redirect_to logout_path
+      elsif !current_user.has_access(controller_name,action_name)
+        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
       end
     end
   end
@@ -73,10 +77,11 @@ class ApplicationController < ActionController::Base
           report.viewer_access &&
           current_user.has_access("#{form}s",'viewer')
         redirect_to errors_path if !group_validation
+      elsif current_user.id == report.created_by_id
+        redirect_to errors_path if !group_validation
       else
         false
         redirect_to errors_path
-
       end
     end
   end
@@ -134,19 +139,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-
-  # def display_in_table(report)
-  #   if report.privileges.present?
-  #     current_user.privileges.each do |p|
-  #       if report.get_privileges.include? p.id.to_s
-  #         return true
-  #       end
-  #     end
-  #     return false
-  #   else
-  #     return true
-  #   end
-  # end
 
   def keep_privileges(privilege, type)
     rule = AccessControl.where("action=? and entry=?", 'index', type)
@@ -541,12 +533,6 @@ class ApplicationController < ActionController::Base
   end
 
 
-
-
-
-
-
-
   def denotify(user,owner,action)
     if user.present?
       owner.notices.where('users_id = ? and action = ?', user.id, action).each(&:destroy)
@@ -559,5 +545,9 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def set_last_seen_at
+    current_user.update_attribute(:last_seen_at, Time.current)
+    session[:last_seen_at] = Time.current
+  end
 
 end

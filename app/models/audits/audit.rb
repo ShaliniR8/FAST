@@ -27,6 +27,7 @@ class Audit < ActiveRecord::Base
   accepts_nested_attributes_for :items
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true
+  accepts_nested_attributes_for :checklists
 
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }
@@ -40,6 +41,7 @@ class Audit < ActiveRecord::Base
       {field: 'title',                title: 'Title',                       num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       {                                                                                   type: 'newline',      visible: 'show'},
       {field: 'status',               title: 'Status',                      num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
+      {field: 'created_by_id',        title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
       {                                                                                   type: 'newline',      visible: 'show'},
       {field: 'completion',           title: 'Scheduled Completion Date',   num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
       {field: 'responsible_user_id',  title: 'Responsible User',            num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},

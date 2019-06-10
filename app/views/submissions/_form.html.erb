@@ -235,27 +235,6 @@
     });
   }
 
-
-  var airport_table;
-
-  $(document).ready(function(){
-
-    update_timezones();
-
-    // Get listing of all the airport buttons
-    var field_id;
-    $(this).find(".airport_button").each(function(index, item){
-      // Get the button that's being clicked
-      $(item).on("click", function(){
-        // Get the selected airport's field id
-        field_id = $(this).prop("id");
-        resetModal(field_id);
-        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
-        $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
-      });
-    });
-  });
-
   // Updata airport table
   function handleSearch(event){
     // Get field id
@@ -279,20 +258,20 @@
 
   function updateAirportTable(field_id){
     // Initialize table as a datatable
-      airport_table = $('#airports' + field_id).DataTable({
-        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-        "iDisplayLength": 5
-      });
-      // User clicked on a row
-      $("body").on("click", "#airports" + field_id + " tbody tr", function(){
-        // Get the row information
-        var icao = $(this).find("td").eq(0).text();
-        var iata = $(this).find("td").eq(1).text();
-        // Set the value on the form
-        $("#airport" + field_id).val(icao + ";" + iata);
-        $("#airport-select" + field_id).val(icao + ";" + iata);
-        resetModal(field_id);
-      });
+    airport_table = $('#airports' + field_id).DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+    // User clicked on a row
+    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+      // Get the row information
+      var icao = $(this).find("td").eq(0).text();
+      var iata = $(this).find("td").eq(1).text();
+      // Set the value on the form
+      $("#airport" + field_id).val(icao + ";" + iata);
+      $("#airport-select" + field_id).val(icao + ";" + iata);
+      resetModal(field_id);
+    });
   }
 
   function resetModal(field_id){
@@ -304,6 +283,53 @@
     $('#airport_div').hide();
     $(".airport_modal").modal("hide");
   }
+
+  var airport_table;
+
+  $(document).ready(function(){
+
+    update_timezones();
+
+    // Get listing of all the airport buttons
+    var field_id;
+    $(this).find(".airport_button").each(function(index, item){
+      // Get the button that's being clicked
+      $(item).on("click", function(){
+        // Get the selected airport's field id
+        field_id = $(this).prop("id");
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
+      });
+    });
+
+
+
+    $("form").on('submit',function(){
+
+      $("div.category-panel").find('.panel-body').slideUp();
+      $("div.category-panel").closest('div.category-panel').addClass('collapsed');
+      $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+
+      $(this).find('.required_field').each(function(){
+        if ($(this).val() == ""){
+          $(this).css('border-color', 'red');
+          $(this).closest('div.category-panel').removeClass('collapsed');
+          $(this).closest('div.category-panel').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+          $(this).closest('div.category-panel').find('.panel-body').slideDown();
+        }
+      });
+    });
+
+
+
+  });
+
+
+
+
+
+
 </script>
 
 

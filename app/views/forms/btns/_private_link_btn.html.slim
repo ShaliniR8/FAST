@@ -1,7 +1,6 @@
-- if owner.status != 'Completed' && ( \
-  current_user.admin? || \
+- if current_user.admin? || \
   current_user.has_access(permission,'admin') || \
-  current_user.has_access(permission,'edit'))
+  current_user.has_access(permission,'edit')
   = link_to 'Share',
     '#',
     class: 'btn btn-lightblue pull-right mr5 mb5',

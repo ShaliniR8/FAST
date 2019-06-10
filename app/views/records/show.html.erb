@@ -119,7 +119,7 @@
                   <%end%>
                 <%end%>
 
-                <%if current_user.admin?%>
+                <%if current_user.admin? || record_edit_access%>
                   <%=link_to 'Override Status', '#',
                     :class => 'btn btn-danger mb5',
                     :id => 'override_status_btn',
@@ -161,15 +161,6 @@
                   :id => 'close',
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
-
-                <%#=link_to "Close Report",
-                  close_record_path(@record),
-                  :class=>"btn btn-danger pull-right mr5 mb5",
-                  :confirm => "Are you sure?",
-                  :disable_with => "Closing...",
-                  "data-toggle" => "tooltip",
-                  "data-placement" => "top",
-                  :title => "This will close the Report. No changes can be made after the Report is closed"%>
               <%end%>
 
 

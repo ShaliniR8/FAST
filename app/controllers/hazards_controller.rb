@@ -29,6 +29,7 @@ class HazardsController < ApplicationController
       cars += hazards.where('sras.approver_id = ? OR sras.reviewer_id = ?',
         current_user.id, current_user.id)
       cars += hazards.where('sras.viewer_access = 1') if current_user.has_access('sras','viewer')
+      cars += Hazard.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end
@@ -259,14 +260,14 @@ class HazardsController < ApplicationController
         .where(owner_id: @records.map(&:id))
         .keep_if{|x| x.cause_option.ancestors.map(&:id).include?(@root.id)}
         .group_by{|x| (x.cause_option.ancestors.map(&:id) & @root.children.map(&:id)).first}
-        .map {|x, xs| [CauseOption.find(x), xs.length] }
+        .map {|x, xs| [CauseOption.find(x), xs.map{|c| c.hazard}.uniq.length] }
         .to_h.sort_by{|k, v| v}.reverse!
     else
       @root_causes = HazardRootCause
         .includes(:cause_option)
         .where(owner_id: @records.map(&:id))
         .group_by(&:cause_option_id)
-        .map {|x, xs| [CauseOption.find(x), xs.length] }
+        .map {|x, xs| [CauseOption.find(x), xs.map{|c| c.hazard}.uniq.length] }
         .to_h.sort_by{|k, v| v}.reverse!
     end
   end

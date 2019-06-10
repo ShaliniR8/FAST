@@ -78,6 +78,7 @@ class SmsActionsController < SafetyAssuranceController
       cars = SmsAction.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += SmsAction.where('approver_id = ?',  current_user.id)
+      cars += SmsAction.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

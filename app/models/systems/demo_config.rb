@@ -30,7 +30,7 @@ class Demo_Config
       :checklist_version                              => '3',
 
       # Safety Assurance Module
-      :allow_reopen_report                            => true,
+      :allow_reopen_report                            => false,
       :has_root_causes                                => true,
       :enable_recurrence                              => true,
 

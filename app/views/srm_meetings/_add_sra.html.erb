@@ -12,7 +12,9 @@
       <%@sras.each do |sra|%>
         <tr sra="<%=sra.id%>">
           <%@sra_headers.each do |header|%>
-            <td><%=sra.send(header[:field])%></td>
+            <td>
+              <%=render "forms/show_field", :field_hash => header, :record => sra%>
+            </td>
           <%end%>
           <%if sra.meeting.present?%>
             <td><b style="color:green">Added</b></td>

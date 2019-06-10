@@ -12,7 +12,7 @@
         <%@owner.records.each do |record|%>
           <h4><b>Report: #<%=record.id%></b></h4>
           <% record.record_fields.each do |x| %>
-            <% if x.category.title == "Narratives" && !x.value.nil? && !x.value.empty?%>
+            <% if x.category.present? && x.category.title == "Narratives" && !x.value.nil? && !x.value.empty?%>
               <b><%= x.field.label %></b></br>
               <%= x.value %> </br></br>
             <%end%>
