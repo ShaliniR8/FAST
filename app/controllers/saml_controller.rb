@@ -50,7 +50,7 @@ class SamlController < ApplicationController
       Rails.logger.debug "New SP SLO for userid ##{session[:user_id]} transactionid: ##{session[:transaction_id]}"
 
       if settings.name_identifier_value.nil?
-        settings.name_identifier_value = User.find(session[:user_id]).email
+        settings.name_identifier_value = User.find(session[:user_id]).sso_id
       end
 
       relay_state = url_for controller: 'sessions', action: 'new'
