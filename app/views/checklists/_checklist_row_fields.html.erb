@@ -1,6 +1,6 @@
 <tr class="field_group to_delete">
   <%if source == 'Existing'%>
-  111
+    111
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
         <%header_item = checklist_cell.checklist_header_item%>
@@ -14,7 +14,7 @@
 
 
   <%elsif source == 'Template'%>
-  222
+    222
     <%checklist_cells.each do |checklist_cell|%>
       <%new_checklist_cell = new_checklist_row.checklist_cells.build(checklist_cell.attributes)%>
       <%=f.fields_for :checklist_cells, new_checklist_cell do |cell_form|%>
@@ -29,7 +29,7 @@
 
 
   <%else%>
-333
+    333
     <%locals[:checklist_header].checklist_header_items.each do |header_item|%>
       <%checklist_cell = ChecklistCell.new%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
@@ -48,7 +48,6 @@
       <%is_header = (defined? checklist_row) && checklist_row.is_header || false%>
       <%=link_to "<i class='glyphicon glyphicon-header'></i>".html_safe, '#',
         :class => "btn #{is_header ? 'btn-success' : 'btn-default'} header_toggle_btn"%>
-
       <%=f.hidden_field :_destroy, :id => "delete_row"%>
       <%=link_to "<i class='glyphicon glyphicon-trash'></i>".html_safe, '#', :class => "btn btn-danger remove_btn"%>
     </td>

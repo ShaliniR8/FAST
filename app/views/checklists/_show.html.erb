@@ -24,7 +24,7 @@
 
       <div class="col-xs-12">
 
-        <%owner.checklists.each do |checklist|%>
+        <%owner.checklists.preload(:checklist_rows => :checklist_cells).each do |checklist|%>
 
           <%if owner.status != 'Completed' && (
               current_user.admin? ||

@@ -95,7 +95,7 @@ class ChecklistsController < ApplicationController
 
 
   def destroy
-    checklist = @table.find(params[:id])
+    checklist = @table.preload(:checklist_rows => :checklist_cells).find(params[:id])
     owner = checklist.owner
     checklist.destroy
     redirect_to owner.class.name == 'ChecklistHeader' ? checklists_path : owner
@@ -142,26 +142,27 @@ class ChecklistsController < ApplicationController
       end
       question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
       question_hash << ["DisplayOrder", question["DisplayOrder"]]
+      header_section = question.children.select{|x| x.name if x.name == "SectionHeaderMLF"}.first.attributes
+
+      question_hash << ["MLFLabel", header_section["MLFLabel"].value]
+      question_hash << ["MLFName", header_section["MLFName"].value]
+
       questions_array << question_hash.to_h
     end
 
     checklist_header_items = owner.checklist_header.checklist_header_items
-    questions_array.each_with_index do |question, index|
-      question_number = question["DisplayOrder"]
-      text = question["Text"]
-      responses = question["QuestionResponses"].gsub("\t", "").split("\n").join(";") rescue ''
-      references = question["QuestionReferences"]
-      question_bullets = question["QuestionBullets"]
-        .gsub("\t", "")
-        .split("\n")
-        .each_with_index.map{|x, i| "##{i}. #{x}" if x.present?}
-        .compact.join("<br>") rescue ''
-      text += "<br>#{question_bullets}"
 
-      values = [question_number, text, responses, references]
-      checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+    questions_array.group_by{|x| [x["MLFLabel"], x["MLFName"]]}.each do |(mlflabel, mlfname), question_list|
+
+      checklist_row = ChecklistRow.create({
+        :checklist_id => owner.id,
+        :created_by_id => current_user.id,
+        :is_header => true})
+
+      header_values = [mlflabel, mlfname]
+
       checklist_header_items.each_with_index do |h_item, i|
-        value = values[i]
+        value = header_values[i] rescue ''
         ChecklistCell.create({
           :checklist_row_id => checklist_row.id,
           :value => h_item.editable ? "" : value,
@@ -169,6 +170,37 @@ class ChecklistsController < ApplicationController
           :checklist_header_item_id => h_item.id})
       end
 
+
+      Checklist.transaction do
+        question_list.each do |question|
+          question_number = question["DisplayOrder"]
+          text = question["Text"]
+          responses = question["QuestionResponses"].gsub("\t", "").split("\n").reject(&:empty?).join(";") rescue ''
+          references = question["QuestionReferences"]
+          question_bullets = question["QuestionBullets"]
+            .split("\n\t\t\t\t")
+            .reject(&:empty?)
+            .each_with_index.map{|x, i| "##{i+1}. #{x}"}
+            .join("\n\t\t\t\t") rescue ''
+
+          if question["QuestionBullets"].present?
+            #byebug
+          end
+          text += "\n#{question_bullets}"
+
+          values = [question_number, text, responses, references]
+          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+
+          checklist_header_items.each_with_index do |h_item, i|
+            value = values[i]
+            ChecklistCell.create({
+              :checklist_row_id => checklist_row.id,
+              :value => h_item.editable ? "" : value,
+              :options => h_item.editable ? value : "",
+              :checklist_header_item_id => h_item.id})
+          end
+        end
+      end
     end
   end
 end

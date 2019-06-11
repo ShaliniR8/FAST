@@ -26,7 +26,7 @@
 <%when 'ChecklistHeader'%>
   <%case item.data_type%>
   <%when 'text'%>
-    <%=cell.value.html_safe%>
+    <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%when 'dropdown'%>
     <select class="form-control field_select" id="preview_select" name="preview_select">
       <option></option>
@@ -46,7 +46,7 @@
   <%end%>
 
 <%else%>
-  <%=cell.value.html_safe%>
+  <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
 <%end%>
 
 
