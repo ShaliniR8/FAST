@@ -1,6 +1,6 @@
 <td>
   <%if !header_item.editable && action_name == 'start' || (action_name == 'start' && checklist_cell.checklist_row.is_header rescue true)%>
-    <%=checklist_cell.value.html_safe rescue ''%>
+    <%=checklist_cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%else%>
     <%case header_item.data_type%>
     <%when 'radio'%>

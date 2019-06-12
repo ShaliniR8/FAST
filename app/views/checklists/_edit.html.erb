@@ -53,7 +53,7 @@
             <thead>
               <tr>
                 <%@record.checklist_header.checklist_header_items.order(:display_order).each do |item|%>
-                  <th><%=item.title%></th>
+                  <th width="<%=item.size%>%"><%=item.title%></th>
                 <%end%>
                 <%if action_name == 'edit'%><th>Actions</th><%end%>
               </tr>

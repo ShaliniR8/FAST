@@ -112,14 +112,16 @@ class ChecklistsController < ApplicationController
   def upload_csv(upload, owner)
     checklist_header_items = owner.checklist_header.checklist_header_items
     begin
-      CSV.foreach(upload, :headers => true) do |row|
-        checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
-        checklist_header_items.each_with_index do |header_item, index|
-          cell = row[index]
-          ChecklistCell.create({
-            :checklist_row_id => checklist_row.id,
-            :value => cell,
-            :checklist_header_item_id => checklist_header_items[index].id})
+      Checklist.transaction do
+        CSV.foreach(upload, :headers => true) do |row|
+          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+          checklist_header_items.each_with_index do |header_item, index|
+            cell = row[index]
+            ChecklistCell.create({
+              :checklist_row_id => checklist_row.id,
+              :value => cell,
+              :checklist_header_item_id => checklist_header_items[index].id})
+          end
         end
       end
     rescue Exception => e
@@ -142,6 +144,7 @@ class ChecklistsController < ApplicationController
       end
       question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
       question_hash << ["DisplayOrder", question["DisplayOrder"]]
+      question_hash << ["QuestionID", question["QuestionID"]]
       header_section = question.children.select{|x| x.name if x.name == "SectionHeaderMLF"}.first.attributes
 
       question_hash << ["MLFLabel", header_section["MLFLabel"].value]
@@ -150,7 +153,7 @@ class ChecklistsController < ApplicationController
       questions_array << question_hash.to_h
     end
 
-    checklist_header_items = owner.checklist_header.checklist_header_items
+    checklist_header_items = owner.checklist_header.checklist_header_items.order("display_order")
 
     questions_array.group_by{|x| [x["MLFLabel"], x["MLFName"]]}.each do |(mlflabel, mlfname), question_list|
 
@@ -174,21 +177,21 @@ class ChecklistsController < ApplicationController
       Checklist.transaction do
         question_list.each do |question|
           question_number = question["DisplayOrder"]
-          text = question["Text"]
+          question_qid = question["QuestionID"]
+          question_text = question["Text"]
           responses = question["QuestionResponses"].gsub("\t", "").split("\n").reject(&:empty?).join(";") rescue ''
-          references = question["QuestionReferences"]
+          references = question["QuestionReferences"] +
+            "\n\nQID: #{question['QuestionID']}" +
+            "\nSafety Attribute: #{question['SafetyAttribute']}"
           question_bullets = question["QuestionBullets"]
             .split("\n\t\t\t\t")
             .reject(&:empty?)
             .each_with_index.map{|x, i| "##{i+1}. #{x}"}
             .join("\n\t\t\t\t") rescue ''
 
-          if question["QuestionBullets"].present?
-            #byebug
-          end
-          text += "\n#{question_bullets}"
+          question_text += "\n\t\t\t\t#{question_bullets}"
 
-          values = [question_number, text, responses, references]
+          values = [question_number, question_text, responses, "placeholder for comment", references]
           checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
 
           checklist_header_items.each_with_index do |h_item, i|

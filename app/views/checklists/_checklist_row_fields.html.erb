@@ -1,6 +1,5 @@
 <tr class="field_group to_delete">
   <%if source == 'Existing'%>
-    111
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
         <%header_item = checklist_cell.checklist_header_item%>
@@ -14,7 +13,6 @@
 
 
   <%elsif source == 'Template'%>
-    222
     <%checklist_cells.each do |checklist_cell|%>
       <%new_checklist_cell = new_checklist_row.checklist_cells.build(checklist_cell.attributes)%>
       <%=f.fields_for :checklist_cells, new_checklist_cell do |cell_form|%>
@@ -29,8 +27,7 @@
 
 
   <%else%>
-    333
-    <%locals[:checklist_header].checklist_header_items.each do |header_item|%>
+    <%locals[:checklist_header].checklist_header_items.order("display_order").each do |header_item|%>
       <%checklist_cell = ChecklistCell.new%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
         <%=render 'checklist_row_fields_td',

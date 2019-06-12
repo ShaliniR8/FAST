@@ -6,4 +6,8 @@ class ChecklistRow < ActiveRecord::Base
 
   accepts_nested_attributes_for :checklist_cells
 
+  def get_cells
+    checklist_cells.includes(:checklist_header_item).order("checklist_header_items.display_order")
+  end
+
 end
