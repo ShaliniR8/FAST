@@ -1,5 +1,10 @@
 class SamlController < ApplicationController
   helper_method :saml_settings
+  helper_method :saml_config
+
+  def saml_config
+    Object.const_get("#{BaseConfig.airline_code}_Config")
+  end
 
   def init
     request = OneLogin::RubySaml::Authrequest.new
@@ -9,9 +14,9 @@ class SamlController < ApplicationController
   def consume
     response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], settings: saml_settings)
     if response.is_valid?(collect_errors = true)
-      user = Object.const_get("#{BaseConfig.airline_code}_Config").digest_response response
+      user = saml_config.digest_response response
       if user.nil?
-        redirect_to SCX_Config::SAML_DATA[:access_point]
+        redirect_to saml_config::SAML_DATA[:access_point]
       else
         session[:user_id] = user.id
         session[:mode]=""
@@ -20,7 +25,7 @@ class SamlController < ApplicationController
       end
     else
       Rails.logger.debug "RESPONSE INVALID: #{response.errors}"
-      redirect_to Object.const_get("#{BaseConfig.airline_code}_Config")::SAML_DATA[:access_point]
+      redirect_to saml_config::SAML_DATA[:access_point]
     end
   end
 
@@ -105,7 +110,7 @@ class SamlController < ApplicationController
   end
 
   def saml_settings
-    saml_data = Object.const_get("#{BaseConfig.airline_code}_Config")::SAML_DATA
+    saml_data = saml_config::SAML_DATA
 
     if saml_data[:metadata_link].present?
       idp_metadata_parser = OneLogin::RubySaml::IdpMetadataParser.new
