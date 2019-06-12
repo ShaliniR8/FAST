@@ -9,6 +9,7 @@ class SCX_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'Sun Country Airlines',
       :code                                           => "SCX",
       :base_risk_matrix                               => false,
       :event_summary                                  => false,

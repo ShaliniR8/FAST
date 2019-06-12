@@ -9,6 +9,7 @@ class NAC_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'Northern Air Cargo',
       :code                                           => "NAC",
       :base_risk_matrix                               => false,
       :event_summary                                  => false,

@@ -9,6 +9,7 @@ class WAA_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'World Atlantic Airlines',
       :code                                           => "WAA",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,

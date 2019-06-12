@@ -9,6 +9,7 @@ class Demo_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'ProSafeT Demo',
       :code                                           => "BOE",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,
@@ -39,8 +40,6 @@ class Demo_Config
       :has_framework                                  => false,
     }
   end
-
-
 
   FAA_INFO = { #CORRECT/REVISE
     "CHDO"=>"ProSafeT",

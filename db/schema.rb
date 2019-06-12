@@ -10,10 +10,10 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190522203544) do
+ActiveRecord::Schema.define(:version => 20190608002403) do
 
   create_table "access_controls", :force => true do |t|
-    t.boolean "list_type",     :default => true
+    t.boolean "list_type"
     t.string  "action"
     t.string  "entry"
     t.boolean "viewer_access"
@@ -124,10 +124,10 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.integer  "auditor_poc_id"
     t.integer  "approver_poc_id"
     t.text     "privileges"
+    t.integer  "recurrence_id"
     t.text     "final_comment"
     t.integer  "created_by_id"
     t.boolean  "template"
-    t.integer  "recurrence_id"
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -161,14 +161,14 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.datetime "updated_at"
     t.string   "panel"
     t.boolean  "print"
-    t.boolean  "deleted",        :default => false
     t.integer  "category_order"
+    t.boolean  "deleted",        :default => false
   end
 
   create_table "cause_options", :force => true do |t|
     t.string  "name",                      :null => false
-    t.boolean "hidden", :default => false
     t.integer "level"
+    t.boolean "hidden", :default => false
   end
 
   create_table "cause_options_connections", :id => false, :force => true do |t|
@@ -291,6 +291,20 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "client_applications", :force => true do |t|
+    t.string   "name"
+    t.string   "url"
+    t.string   "support_url"
+    t.string   "callback_url"
+    t.string   "key",          :limit => 40
+    t.string   "secret",       :limit => 40
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "client_applications", ["key"], :name => "index_client_applications_on_key", :unique => true
 
   create_table "contacts", :force => true do |t|
     t.integer  "owner_id"
@@ -466,8 +480,7 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.string   "employee_group"
   end
 
-  create_table "fields", :id => false, :force => true do |t|
-    t.integer  "id",                 :default => 0,     :null => false
+  create_table "fields", :force => true do |t|
     t.string   "data_type"
     t.string   "display_type"
     t.text     "label"
@@ -759,6 +772,33 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.string   "message"
     t.date     "notify_date"
   end
+
+  create_table "oauth_nonces", :force => true do |t|
+    t.string   "nonce"
+    t.integer  "timestamp"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "oauth_nonces", ["nonce", "timestamp"], :name => "index_oauth_nonces_on_nonce_and_timestamp", :unique => true
+
+  create_table "oauth_tokens", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "type",                  :limit => 20
+    t.integer  "client_application_id"
+    t.string   "token",                 :limit => 40
+    t.string   "secret",                :limit => 40
+    t.string   "callback_url"
+    t.string   "verifier",              :limit => 20
+    t.string   "scope"
+    t.datetime "authorized_at"
+    t.datetime "invalidated_at"
+    t.datetime "expires_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "oauth_tokens", ["token"], :name => "index_oauth_tokens_on_token", :unique => true
 
   create_table "orm_fields", :force => true do |t|
     t.string   "name"
@@ -1294,6 +1334,7 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.string   "js_link"
     t.boolean  "archive",         :default => false
     t.boolean  "allow_anonymous", :default => false
+    t.string   "description"
   end
 
   create_table "trackings", :force => true do |t|
@@ -1351,6 +1392,7 @@ ActiveRecord::Schema.define(:version => 20190522203544) do
     t.string   "reset_digest"
     t.datetime "reset_sent_at"
     t.integer  "android_version"
+    t.datetime "last_seen_at"
   end
 
   create_table "verifications", :force => true do |t|

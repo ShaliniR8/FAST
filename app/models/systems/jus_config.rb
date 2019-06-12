@@ -9,6 +9,7 @@ class JUS_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'USA Jet',
       :code                                           => "JUS",
       :base_risk_matrix                               => true,
       :event_summary                                  => true,

@@ -13,6 +13,7 @@ class MAC_Config
   }
 
 
+# :name => 'Mountain Air Cargo', #This should be in an self.airline_config function that returns a hash
 
   MATRIX_INFO = {
     severity_table: {

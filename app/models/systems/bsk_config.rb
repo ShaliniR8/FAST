@@ -9,6 +9,7 @@ class BSK_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'Miami Air International',
       :code                                           => "BSK",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,

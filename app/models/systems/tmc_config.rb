@@ -9,6 +9,7 @@ class TMC_Config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'TMC Jet',
       :code                                           => "TMC",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,
