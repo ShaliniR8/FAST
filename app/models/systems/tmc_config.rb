@@ -9,7 +9,7 @@ class TMC_Config
     {
       :version                                        => "1.0.3",
 
-      :name                                           => 'TMC Jet',
+      :name                                           => 'Travel Management Company',
       :code                                           => "TMC",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,

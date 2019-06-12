@@ -9,7 +9,7 @@ class BOE_Config
     {
       :version                                        => "1.0.3",
 
-      :name                                           => 'Boeing',
+      :name                                           => 'Boeing Executive Flight Operations',
       :code                                           => "BOE",
       :time_zone                                      => "Central Time (US & Canada)",
 
