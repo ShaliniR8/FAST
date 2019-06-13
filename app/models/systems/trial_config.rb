@@ -9,7 +9,7 @@ class Trial_Config
     {
       :version                                        => "1.0.4",
 
-      :name                                           => 'ProSafeT Sandbox',
+      :name                                           => 'ProSafeT Trial',
       :code                                           => "BOE",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,
@@ -20,7 +20,7 @@ class Trial_Config
       :has_verification                               => true,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Pacific Time (US & Canada)',
 
       # Safety Reporting Module
       :submission_description                         => true,

@@ -39,7 +39,6 @@ class CreateConfigurationChecklistRelatedTables < ActiveRecord::Migration
       t.integer       :checklist_row_id
       t.integer       :checklist_header_item_id
       t.text          :value
-      t.text          :options
       t.timestamps
     end
 

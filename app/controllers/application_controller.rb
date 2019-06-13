@@ -20,12 +20,11 @@ class ApplicationController < ActionController::Base
   def track_activity
     #setup logger
     #if user is present and not prosafet_admin then write to log
-    prosafet_id = 1
     date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
     file_date = date_time.strftime("%Y%m%d")
     action_time = date_time.strftime("%H:%M")
     file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
-    if current_user.present? && current_user.id != prosafet_id    
+    if current_user.present? && current_user.username != "prosafet_admin"    
       tracking_log = Logger.new(file_name)
       if controller_name == "sessions" && action_name == "create"
         tracking_log.info("***********LOGIN: #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
