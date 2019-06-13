@@ -14,7 +14,7 @@ class SCX_Config
       :has_extension                                  => false,
       :has_mobile_app                                 => false,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Central Time (US & Canada)',
 
 
       # Safety Reporting Module

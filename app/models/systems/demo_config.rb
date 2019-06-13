@@ -14,7 +14,7 @@ class Demo_Config
       :has_verification                               => true,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => false,
-
+      :time_zone                                      => 'Pacific Time (US & Canada)',
 
       # Safety Reporting Module
       :submission_description                         => true,
