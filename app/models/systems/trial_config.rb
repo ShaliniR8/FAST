@@ -1,4 +1,4 @@
-class Demo_Config
+class Trial_Config
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[audit]
@@ -7,9 +7,9 @@ class Demo_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => "1.0.4",
 
-      :name                                           => 'ProSafeT Demo',
+      :name                                           => 'ProSafeT Sandbox',
       :code                                           => "BOE",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,
@@ -19,8 +19,8 @@ class Demo_Config
       :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
-      :enable_mailer                                  => false,
-      :time_zone                                      => 'Pacific Time (US & Canada)',
+      :enable_mailer                                  => true,
+
 
       # Safety Reporting Module
       :submission_description                         => true,
