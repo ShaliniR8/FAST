@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   skip_before_filter :access_validation,:only=>[:destroy]
-
+  after_filter :track_activity, :only => [:create]
 
   def new
     respond_to do |format|
