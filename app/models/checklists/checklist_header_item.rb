@@ -7,7 +7,7 @@ class ChecklistHeaderItem < ActiveRecord::Base
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     return [
       { field: "title",     title: "Column Name",     num_cols: 12, type: "text",     visible: 'form,show', required: false },
-      { field: "size",      title: "Column Size (%)", num_cols: 12, type: "number",   visible: 'form,show', required: false },
+      { field: "size",      title: "Column Size % (Should Total 100)", num_cols: 12, type: "number",   visible: 'form,show', required: false },
       { field: "data_type", title: "Input Type",      num_cols: 12, type: "select",   visible: 'form,show', required: false, options: get_data_types},
       { field: "options",   title: "Options",         num_cols: 12, type: "text",     visible: 'form,show', required: false },
       { field: "editable",  title: "Allow Input",     num_cols: 12, type: "boolean",  visible: 'form,show', required: false },
