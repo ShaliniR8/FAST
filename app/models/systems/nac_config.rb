@@ -19,7 +19,7 @@ class NAC_Config
       :has_verification                               => false,
       :has_mobile_app                                 => false,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Alaska',
 
 
       # Safety Reporting Module

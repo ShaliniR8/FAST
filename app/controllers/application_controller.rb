@@ -9,12 +9,33 @@ class ApplicationController < ActionController::Base
   before_filter :access_validation
   before_filter :send_session
   before_filter :adjust_session
+  before_filter :track_activity
   before_filter :set_last_seen_at, if: proc { logged_in? && (session[:last_seen_at] == nil || session[:last_seen_at] < 15.minutes.ago) }
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
 
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
+
+  def track_activity
+    #setup logger
+    #if user is present and not prosafet_admin then write to log
+    prosafet_id = 1
+    date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
+    file_date = date_time.strftime("%Y%m%d")
+    action_time = date_time.strftime("%H:%M")
+    file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
+    if current_user.present? && current_user.id != prosafet_id    
+      tracking_log = Logger.new(file_name)
+      if controller_name == "sessions" && action_name == "create"
+        tracking_log.info("***********LOGIN: #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
+      elsif controller_name == "sessions" && action_name == "destroy"
+        tracking_log.info("***********LOGOUT #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
+      else
+        tracking_log.info("#{action_time} #{current_user.full_name} #{controller_name}##{action_name}")
+      end
+    end
+  end
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password

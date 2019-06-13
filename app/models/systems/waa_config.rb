@@ -19,7 +19,7 @@ class WAA_Config
       :has_verification                               => false,
       :has_mobile_app                                 => false,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Central Time (US & Canada)',
 
 
       # Safety Reporting Module

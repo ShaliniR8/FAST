@@ -19,7 +19,7 @@ class BSK_Config
       :has_verification                               => false,
       :has_mobile_app                                 => false,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Eastern Time (US & Canada)',
 
 
       # Safety Reporting Module
