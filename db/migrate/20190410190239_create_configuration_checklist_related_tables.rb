@@ -38,7 +38,8 @@ class CreateConfigurationChecklistRelatedTables < ActiveRecord::Migration
     create_table "checklist_cells", :force => true do |t|
       t.integer       :checklist_row_id
       t.integer       :checklist_header_item_id
-      t.string        :value
+      t.text          :value
+      t.text          :options
       t.timestamps
     end
 

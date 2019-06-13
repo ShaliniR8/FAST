@@ -6,8 +6,8 @@
     <table class="table table-bordered table-striped mt10">
       <thead>
         <tr>
-          <%@template.checklist_header.checklist_header_items.order(:display_order).each do |item|%>
-            <th><%=item.title%></th>
+          <%@template.checklist_header.checklist_header_items.order("display_order").each do |item|%>
+            <th width="<%=item.size%>%"><%=item.title%></th>
           <%end%>
           <th>Actions</th>
         </tr>

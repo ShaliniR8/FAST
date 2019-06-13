@@ -13,6 +13,7 @@
     <%end%>
   </td>
   <td><%=f.text_field :title, :class => "form-control"%></td>
+  <td><%=f.number_field :size, :class => "form-control", :step => 10%></td>
   <td><%=f.select :data_type, ChecklistHeaderItem.get_data_types, {}, :class => "form-control"%></td>
   <td><%=f.text_field :options, :class => "form-control"%></td>
   <td>
