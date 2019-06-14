@@ -69,12 +69,14 @@
                       :class => "btn btn-success ml5 mt5",
                       :disable_with => "Redirecting..."%>
                   <%end%>
+
                   <%if current_user.has_access("records", "show")%>
                     <%=link_to "<i class='glyphicon glyphicon-eye-open'></i>".html_safe,
                       record_path(record),
                       :class => "btn btn-info mt5",
                       :disable_with => "Redirecting..."%>
                   <%end%>
+
                   <%=link_to "<i class='glyphicon glyphicon-eye-close'></i>".html_safe,
                     "#",
                     "data-toggle" => "modal",

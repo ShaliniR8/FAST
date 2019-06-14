@@ -10,6 +10,13 @@ $(document).ready(function(){
 		if(submit_btn == "Save for Later"){
 			buttons.removeAttr('data-disable-with');
 		}else{
+
+      $(".required_field").each(function(){
+        if($(this).closest("div.nested_field").css("display") == "none"){
+          $(this).removeClass("required_field");
+        }
+      });
+
 			var error = false;
 			var result = true;
 			$(".required_field").css('border-color', '');
@@ -22,10 +29,12 @@ $(document).ready(function(){
 				}
 			});
 			if (error){
-				swal({
-					title: "Please fill in all required fields.",
-					type: "error",
-				});
+        swal({
+          title: "Error",
+          text: "Please fill in all required fields.",
+          type: "error",
+          customClass: 'custom-swal',
+        }).catch(swal.noop);
 				return result;
 			}
 		}

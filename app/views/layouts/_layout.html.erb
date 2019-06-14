@@ -412,15 +412,17 @@
 
     <div class="module_label">
       <span class="pull-right">
+        <% prefix = "#{BaseConfig.airline[:name]}
+          #{" <span style='color:red'>#{Rails.env.titleize}</span>" if !Rails.env.production?} | "%>
         <%=case session[:mode]
-          when "SMS"
-            "Safety Assurance Module"
-          when "SMS IM"
-            "SMS IM Module"
-          when "ASAP"
-            "Safety Reporting Module"
-          when "SRM"
-            "SRA (SRM) Module"
+          when 'SMS'
+            "#{prefix}Safety Assurance Module".html_safe
+          when 'SMS IM'
+            "#{prefix}SMS IM Module".html_safe
+          when 'ASAP'
+            "#{prefix}Safety Reporting Module".html_safe
+          when 'SRM'
+            "#{prefix}SRA (SRM) Module".html_safe
           end
         %>
       </span>

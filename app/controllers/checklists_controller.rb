@@ -41,8 +41,13 @@ class ChecklistsController < ApplicationController
     @owner = Object.const_get("#{params[:checklist][:owner_type]}").find(params[:checklist][:owner_id])
     @record = @table.create(params[:checklist])
     if params[:checklist_upload].present?
-      upload = File.open(params[:checklist_upload].tempfile)
-      create_records_from_upload(upload, @record)
+      @upload = File.open(params[:checklist_upload].tempfile)
+      case params[:checklist_upload].tempfile.content_type
+      when "application/xml"
+        upload_xml(@upload, @record)
+      else
+        upload_csv(@upload, @record)
+      end
     end
     redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @owner
   end
@@ -90,7 +95,7 @@ class ChecklistsController < ApplicationController
 
 
   def destroy
-    checklist = @table.find(params[:id])
+    checklist = @table.preload(:checklist_rows => :checklist_cells).find(params[:id])
     owner = checklist.owner
     checklist.destroy
     redirect_to owner.class.name == 'ChecklistHeader' ? checklists_path : owner
@@ -104,23 +109,101 @@ class ChecklistsController < ApplicationController
 
   private
 
-  def create_records_from_upload(upload, owner)
+  def upload_csv(upload, owner)
     checklist_header_items = owner.checklist_header.checklist_header_items
     begin
-      CSV.foreach(upload, :headers => true) do |row|
-        checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
-
-        checklist_header_items.each_with_index do |header_item, index|
-          cell = row[index]
-          ChecklistCell.create({
-            :checklist_row_id => checklist_row.id,
-            :value => cell,
-            :checklist_header_item_id => checklist_header_items[index].id})
+      Checklist.transaction do
+        CSV.foreach(upload, :headers => true) do |row|
+          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+          checklist_header_items.each_with_index do |header_item, index|
+            cell = row[index]
+            ChecklistCell.create({
+              :checklist_row_id => checklist_row.id,
+              :value => cell,
+              :checklist_header_item_id => checklist_header_items[index].id})
+          end
         end
       end
     rescue Exception => e
     end
   end
 
+  def upload_xml(upload, owner)
+    begin
+      xml = Nokogiri::XML(upload)
+      questions = xml.xpath("//sasdct:DCTQuestions/sasdct:Question")
+    rescue Exception => e
+      puts e
+    end
 
+    questions_array = []
+    questions.each_with_index do |question, index|
+      question_hash = []
+      question.children.each do |children|
+        question_hash << [children.name, children.text] if children.elem?
+      end
+      question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
+      question_hash << ["DisplayOrder", question["DisplayOrder"]]
+      question_hash << ["QuestionID", question["QuestionID"]]
+      header_section = question.children.select{|x| x.name if x.name == "SectionHeaderMLF"}.first.attributes
+
+      question_hash << ["MLFLabel", header_section["MLFLabel"].value]
+      question_hash << ["MLFName", header_section["MLFName"].value]
+
+      questions_array << question_hash.to_h
+    end
+
+    checklist_header_items = owner.checklist_header.checklist_header_items.order("display_order")
+
+    questions_array.group_by{|x| [x["MLFLabel"], x["MLFName"]]}.each do |(mlflabel, mlfname), question_list|
+
+      checklist_row = ChecklistRow.create({
+        :checklist_id => owner.id,
+        :created_by_id => current_user.id,
+        :is_header => true})
+
+      header_values = [mlflabel, mlfname]
+
+      checklist_header_items.each_with_index do |h_item, i|
+        value = header_values[i] rescue ''
+        ChecklistCell.create({
+          :checklist_row_id => checklist_row.id,
+          :value => h_item.editable ? "" : value,
+          :options => h_item.editable ? value : "",
+          :checklist_header_item_id => h_item.id})
+      end
+
+
+      Checklist.transaction do
+        question_list.each do |question|
+          question_number = question["DisplayOrder"]
+          question_qid = question["QuestionID"]
+          question_text = question["Text"]
+          responses = question["QuestionResponses"].gsub("\t", "").split("\n").reject(&:empty?).join(";") rescue ''
+          references = question["QuestionReferences"] +
+            "\n\nQID: #{question['QuestionID']}" +
+            "\nSafety Attribute: #{question['SafetyAttribute']}"
+          question_bullets = question["QuestionBullets"]
+            .split("\n\t\t\t\t")
+            .reject(&:empty?)
+            .each_with_index.map{|x, i| "##{i+1}. #{x}"}
+            .join("\n\t\t\t\t") rescue ''
+
+          question_text += "\n\t\t\t\t#{question_bullets}"
+
+          values = [question_number, question_text, responses, "placeholder for comment", references]
+          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+
+          checklist_header_items.each_with_index do |h_item, i|
+            value = values[i]
+            ChecklistCell.create({
+              :checklist_row_id => checklist_row.id,
+              :value => h_item.editable ? "" : value,
+              :options => h_item.editable ? value : "",
+              :checklist_header_item_id => h_item.id})
+          end
+        end
+      end
+    end
+  end
 end

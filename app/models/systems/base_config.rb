@@ -13,7 +13,7 @@ class BaseConfig
 
 
   def self.airline_code
-    'Demo'
+    Object.const_get('AIRLINE_CODE')
   end
 
   def self.airline

@@ -25,7 +25,15 @@
             <tbody>
               <%owner.transactions.preload(:user).reverse!.each do |t|%>
                 <tr>
-                  <td><%=datetime_to_string(t.stamp.in_time_zone(BaseConfig.airline[:time_zone]))%></td>
+                  <td>
+                    <%#=datetime_to_string(t.stamp.in_time_zone(BaseConfig.airline[:time_zone]))%>
+                    <%base_config = BaseConfig.airline[:time_zone]%>
+                    <%if base_config.present?%>
+                      <%=datetime_to_string(t.stamp.in_time_zone(BaseConfig.airline[:time_zone] ))%>
+                    <%else%>
+                      <%=datetime_to_string(t.stamp.in_time_zone)%>
+                    <%end%>
+                  </td>
                   <td><%=t.user.present? ? t.user.full_name : (t.alt_user.present? ? "<b>External</b> #{t.alt_user}".html_safe : "Anonymous")%></td>
                   <td><%=t.action%></td>
                   <td><%=t.content.html_safe rescue ''%></td>

@@ -9,11 +9,32 @@ class ApplicationController < ActionController::Base
   before_filter :access_validation
   before_filter :send_session
   before_filter :adjust_session
+  before_filter :track_activity
+  before_filter :set_last_seen_at, if: proc { logged_in? && (session[:last_seen_at] == nil || session[:last_seen_at] < 15.minutes.ago) }
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
 
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
+
+  def track_activity
+    #setup logger
+    #if user is present and not prosafet_admin then write to log
+    date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
+    file_date = date_time.strftime("%Y%m%d")
+    action_time = date_time.strftime("%H:%M")
+    file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
+    if current_user.present? && current_user.username != "prosafet_admin"    
+      tracking_log = Logger.new(file_name)
+      if controller_name == "sessions" && action_name == "create"
+        tracking_log.info("***********LOGIN: #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
+      elsif controller_name == "sessions" && action_name == "destroy"
+        tracking_log.info("***********LOGOUT #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
+      else
+        tracking_log.info("#{action_time} #{current_user.full_name} #{controller_name}##{action_name}")
+      end
+    end
+  end
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
@@ -138,19 +159,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-
-  # def display_in_table(report)
-  #   if report.privileges.present?
-  #     current_user.privileges.each do |p|
-  #       if report.get_privileges.include? p.id.to_s
-  #         return true
-  #       end
-  #     end
-  #     return false
-  #   else
-  #     return true
-  #   end
-  # end
 
   def keep_privileges(privilege, type)
     rule = AccessControl.where("action=? and entry=?", 'index', type)
@@ -545,12 +553,6 @@ class ApplicationController < ActionController::Base
   end
 
 
-
-
-
-
-
-
   def denotify(user,owner,action)
     if user.present?
       owner.notices.where('users_id = ? and action = ?', user.id, action).each(&:destroy)
@@ -563,5 +565,9 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def set_last_seen_at
+    current_user.update_attribute(:last_seen_at, Time.current)
+    session[:last_seen_at] = Time.current
+  end
 
 end

@@ -1,8 +1,8 @@
 <table id="checklist_records_<%checklist.id%>" class="table table-bordered table-striped mt10">
   <thead>
     <tr>
-      <%checklist.checklist_header.checklist_header_items.order(:display_order).map(&:title).each do |header|%>
-        <th><%=header%></th>
+      <%checklist.checklist_header.checklist_header_items.order("display_order").each do |header|%>
+        <th width="<%=header.size%>%"><%=header.title%></th>
       <%end%>
     </tr>
   </thead>
