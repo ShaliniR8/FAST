@@ -23,9 +23,7 @@ class Cost < ActiveRecord::Base
       self.owner,
       'Add Cost',
       (session[:simulated_id] || session[:user_id]),
-      "##{self.id} #{self.description}",
-      nil,
-      User.new(:username => session[:digest].name, :email => session[:digest].email)
+      "##{self.id} #{self.description}"
     )
   end
 
