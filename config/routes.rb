@@ -160,6 +160,7 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :occurrence_templates
+  resources :occurrences
   resources :checklist_templates do
     member do
 

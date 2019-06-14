@@ -1,0 +1,26 @@
+- owner = @template.find(owner_id) if !defined?(owner)
+- if owner[:format] == 'section'
+  .col-xs-12
+    - if owner.children.first[:format] == 'section'
+      /If children are subsections, have a section selection
+      = select_tag "#{owner.id}_selection",
+        options_for_select(owner.children.map{ |child|\
+          [child.title, child.id]}),
+        include_blank: true
+      .content id="#{owner.id}_content"
+    - else
+      /Else render their separate fields as separate nested submissions
+      = form_for @owner do |x|
+        - owner.children.each do |child|
+          = render 'form'
+- else
+  b field
+  /Render form field
+
+javascript:
+  $('.select').click(function() {
+    console.log "CHANGED";
+    // $('##{owner.id}_content').innerHTML=("/occurrences/form?owner_id=" + $(this).val);
+  })
+  // On select of selection tag owner.id_selection, replace id owner.id_content with render of form with the id of the selected
+  // CURRENTLY: need to set it so that @template.find(this) this is replaced with whatever the ID is of the value selected in ##{owner.id}_selection

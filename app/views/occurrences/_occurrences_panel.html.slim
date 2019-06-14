@@ -1,0 +1,28 @@
+.col-xs-12
+  .panel.panel-lightskyblue
+    .panel-heading.click-heading
+      .panel-title
+        b Occurrences
+        span class="pull-right clickable"
+          i class="mt5 glyphicon glyphicon-chevron-down"
+    .panel-body style="display:none;"
+      .row
+        .col-xs-12
+          - if %w[New Assigned].include?(owner.status) && ( current_user.admin? ||\
+              current_user.has_access(owner.class.name.underscore, 'Admin') ||\
+              current_user.has_access(owner.class.name.underscore, 'Edit'))
+            = link_to 'Add Occurrence',
+              '#',
+              class: 'btn btn-success pull-right mr5',
+              id: 'add_occurrence_btn'
+
+javascript:
+  $(function(){
+    $('#add_occurrence_btn').on('click', function(){
+      $.get('#{new_occurrence_path}?owner_id=#{owner.id}&owner_type=#{owner.class.name}',
+        function(data){
+          $(".modal-content").html(data);
+          $(window).trigger('resize');
+        });
+    });
+  })

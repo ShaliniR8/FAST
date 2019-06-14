@@ -129,6 +129,7 @@
             :owner => @hazard,
             :show_btns => true,
             :headers => RootCause.get_headers%>
+          <%=render '/occurrences/occurrences_panel', owner: @hazard %>
         <%end%>
 
         <%=render '/causes/all',

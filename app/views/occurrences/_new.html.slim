@@ -1,0 +1,22 @@
+javascript:
+  swal({
+    title: 'Add Occurrence',
+    html: '#{escape_javascript render("/occurrences/form", owner: owner)}',
+    customClass: 'custom-swal',
+    showCancelButton: false,
+    showConfirmButton: false,
+    allowOutsideClick: true,
+    // onOpen: function(){
+
+    //   $('.cat_select').on('change',function(){
+    //     update_options($(this), []);
+    //   });
+    // }
+  }).catch(swal.noop)
+
+ruby:
+/ = javascript_include_tag '/javascripts/utility/extra_fields.js'
+
+/ /Generates first panel for occurrences
+/ - options.each do |opt|
+/   = render 'form', owner: opt
