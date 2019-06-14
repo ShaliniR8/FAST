@@ -32,8 +32,8 @@ class ApplicationController < ActionController::Base
       if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
         return
       else
-        redirect_to logout_path
-        return
+        # redirect_to logout_path
+        # return
       end
     end
 

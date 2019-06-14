@@ -21,6 +21,8 @@ class Investigation < ActiveRecord::Base
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
 
+  has_many    :checklists, as: :owner, dependent: :destroy
+
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
 
@@ -41,9 +43,10 @@ class Investigation < ActiveRecord::Base
     [
       {field: 'id',                         title: 'ID',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {field: 'title',                      title: 'Title',                         num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
+      {field: 'get_source',                 title: 'Source of Input',               num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',              title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',              title: 'Created By',                    num_cols: 6,  type: 'user',         visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'viewer_access',              title: 'Viewer Access',                 num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
@@ -91,7 +94,6 @@ class Investigation < ActiveRecord::Base
   end
 
 
-
   def self.progress
     {
       "New"               => { :score => 25,  :color => "default"},
@@ -101,6 +103,15 @@ class Investigation < ActiveRecord::Base
     }
   end
 
+  def get_source
+    if self.record.present?
+      "<a style='font-weight:bold' href='/records/#{self.record.id}'>
+        Report ##{self.record.id}
+      </a>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+  end
 
   def get_privileges
     self.privileges.present? ?  self.privileges : []

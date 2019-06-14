@@ -30,8 +30,8 @@ class Contact < ActiveRecord::Base
       'Add Contact',
       session[:user_id],
       "##{self.id} #{self.contact_name}",
-      nil,
-      User.new(:username => session[:digest].name, :email => session[:digest].email)
+      nil
+      #User.new(:username => session[:digest].name, :email => session[:digest].email)
     )
   end
 

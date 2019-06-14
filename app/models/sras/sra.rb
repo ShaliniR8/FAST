@@ -72,6 +72,7 @@ class Sra < ActiveRecord::Base
     return [
       { field: "get_id",                    title: "ID",                                       num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
       { field: "status",                    title: "Status",                                   num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
+      { field: 'get_source',                title: 'Source of Input',                           num_cols: 6,   type: 'text',         visible: 'index,show',      required: false},
       {                                                                                                       type: "newline",     visible: 'form,show'},
       { field: "title",                     title: "SRA Title",                                num_cols: 6,   type: "text",        visible: 'index,form,show',   required: false},
       { field: "type_of_change",            title: "Type of Change",                           num_cols: 6,   type: "datalist",    visible: 'index,form,show',   required: false, options: get_custom_options('SRA Type of Change')},
@@ -110,6 +111,16 @@ class Sra < ActiveRecord::Base
       { field: "reviewer_comment",          title: "Quality Reviewer's Closing Comments",      num_cols: 12,  type: "text",        visible: 'show'},
       { field: "approver_comment",          title: "Final Approver's Closing Comments",        num_cols: 12,  type: "text",        visible: 'show'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+  def get_source
+    if self.record.present?
+      "<a style='font-weight:bold' href='/records/#{self.record.id}'>
+        Report ##{self.record.id}
+      </a>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
   end
 
 

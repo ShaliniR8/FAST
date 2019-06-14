@@ -58,6 +58,7 @@
           </div>
 
           <%=render '/forms/show_fields', :fields => @fields, :record => @owner %>
+          <%=render '/checklists/checklist_types', :owner => @owner, :type => 'investigation'%>
 
           <%if BaseConfig.airline[:base_risk_matrix]%>
             <%=render "shared/bsk_risk_matrix_show",
