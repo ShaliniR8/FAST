@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   before_filter :send_session
   before_filter :adjust_session
   before_filter :track_activity
-  before_filter :set_last_seen_at, if: proc { logged_in? && (session[:last_seen_at] == nil || session[:last_seen_at] < 15.minutes.ago) }
+  before_filter :set_last_seen_at
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
 
@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
     file_date = date_time.strftime("%Y%m%d")
     action_time = date_time.strftime("%H:%M")
     file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
-    if current_user.present? && current_user.username != "prosafet_admin"    
+    if current_user.present? && current_user.username != "prosafet_admin"
       tracking_log = Logger.new(file_name)
       if controller_name == "sessions" && action_name == "create"
         tracking_log.info("***********LOGIN: #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
@@ -53,8 +53,8 @@ class ApplicationController < ActionController::Base
       if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
         return
       else
-        redirect_to logout_path
-        return
+        # redirect_to logout_path
+        # return
       end
     end
 

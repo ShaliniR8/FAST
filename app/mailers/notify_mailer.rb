@@ -15,6 +15,8 @@ class NotifyMailer < ActionMailer::Base
       else
         mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
       end
+    else
+      mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
     end
   end
 
@@ -32,6 +34,8 @@ class NotifyMailer < ActionMailer::Base
       else
         mail(:to => 'noc@prodigiq.com', :subject => @subject).deliver
       end
+    else
+      mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
     end
   end
 
@@ -48,6 +52,8 @@ class NotifyMailer < ActionMailer::Base
       else
         mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
       end
+    else
+      mail(:to => 'noc@prodigiq.com', :subject => subject).deliver
     end
   end
 
