@@ -7,7 +7,7 @@ class Trial_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.4",
+      :version                                        => "1.0.3",
 
       :name                                           => 'ProSafeT Trial',
       :code                                           => "BOE",
@@ -19,7 +19,7 @@ class Trial_Config
       :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
-      :enable_mailer                                  => true,
+      :enable_mailer                                  => false,
       :time_zone                                      => 'Pacific Time (US & Canada)',
 
       # Safety Reporting Module
