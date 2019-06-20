@@ -7,6 +7,7 @@ class Audit < ActiveRecord::Base
   include Contactable
   include Costable
   include Findingable
+  include Noticeable
   include Signatureable
   include SmsTaskable
   include Transactionable
@@ -17,7 +18,6 @@ class Audit < ActiveRecord::Base
   belongs_to  :created_by,          foreign_key: 'created_by_id',         class_name: 'User'
   has_many    :requirements,        foreign_key: 'owner_id',      class_name: 'AuditRequirement',       dependent: :destroy
   has_many    :items,               foreign_key: 'owner_id',      class_name: 'AuditItem',              dependent: :destroy
-  has_many    :notices,             foreign_key: 'owner_id',      class_name: 'AuditNotice',            dependent: :destroy
   has_many    :checklist_records,   foreign_key: 'owner_id',      class_name: 'AuditChecklistRecord',   dependent: :destroy
 
   has_many    :checklists, as: :owner, dependent: :destroy

@@ -6,6 +6,7 @@ class Inspection < ActiveRecord::Base
   include Contactable
   include Costable
   include Findingable
+  include Noticeable
   include Signatureable
   include SmsTaskable
   include Transactionable
@@ -16,7 +17,6 @@ class Inspection < ActiveRecord::Base
   belongs_to :created_by,           foreign_key: 'created_by_id',       class_name: 'User'
   has_many :requirements,           foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
   has_many :items,                  foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
-  has_many :notices,                foreign_key: 'owner_id',            class_name: 'InspectionNotice',         dependent: :destroy
 
   has_many :checklists, as: :owner, dependent: :destroy
 

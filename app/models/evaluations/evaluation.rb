@@ -6,6 +6,7 @@ class Evaluation < ActiveRecord::Base
   include Contactable
   include Costable
   include Findingable
+  include Noticeable
   include Signatureable
   include SmsTaskable
   include Transactionable
@@ -17,7 +18,6 @@ class Evaluation < ActiveRecord::Base
 
   has_many    :requirements,      foreign_key: 'owner_id',                class_name: 'EvaluationRequirement',    dependent: :destroy
   has_many    :items,             foreign_key: 'owner_id',                class_name: 'EvaluationItem',           dependent: :destroy
-  has_many    :notices,           foreign_key: 'owner_id',                class_name: 'EvaluationNotice',         dependent: :destroy
 
   has_many    :checklists, as: :owner, dependent: :destroy
 

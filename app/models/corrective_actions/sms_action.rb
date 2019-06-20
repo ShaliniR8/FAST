@@ -4,6 +4,7 @@ class SmsAction < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Costable
+  include Noticeable
   include Transactionable
 
 #Associations List
@@ -12,7 +13,6 @@ class SmsAction < ActiveRecord::Base
   belongs_to  :created_by,              foreign_key: 'created_by_id',             class_name: 'User'
   belongs_to  :owner,                   polymorphic: true
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
-  has_many    :notices,                 foreign_key: "owner_id",                  class_name: "SmsActionNotice",          :dependent => :destroy
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
   has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
 

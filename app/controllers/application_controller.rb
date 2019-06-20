@@ -548,9 +548,18 @@ class ApplicationController < ActionController::Base
 
   def notify(user, message, mailer=false, subject=nil)
     if user.present?
-      notice = Notice.create({
-        :user => user,
-        :content => message})
+      begin
+        notice = @owner.notices.create({
+          :user => user,
+          :content => message
+        })
+      rescue
+        Rails.logger.warn 'WARNING: notify failed, @owner not defined- defaulting to unidentified Notice'
+        notice = Notice.create({
+          :user => user,
+          :content => message
+        })
+      end
       if mailer
         NotifyMailer.notify(user, message, subject)
       end
