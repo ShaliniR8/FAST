@@ -3,6 +3,7 @@ class Config < Thor
 
   desc 'init |__AIRLINE_CODE__|', 'Not yet implemented'
   def init(airline_code)
+    #cmd = "mysql -e \"CREATE DATABASE #{database['database']};\""
     # TODO
   end
 
@@ -18,6 +19,92 @@ class Config < Thor
     set_enabled_systems_and_environments
     set_database_yml
   end
+
+  desc 'wipe_tables', 'Clears all user-input fields; users, privileges, and rules are maintained'
+  def wipe_tables
+    require File.expand_path('config/environment.rb')
+    puts '############################'
+    puts '|| WIPING DATABASE TABLES ||'
+    puts '############################'
+    target_db = Rails.configuration.database_configuration[Rails.env]['database']
+    puts "This Database is the target: #{target_db}"
+    puts 'To confirm the clearing of this database, please type out the full database name and hit ENTER'
+    input = STDIN.gets
+    if input[0...-1] != target_db
+      puts 'Confirmation failed - aborting task'
+      return
+    end
+    %w[
+      access_levels
+      agendas
+      attachments
+      audits
+      automated_notifications
+      causes
+      checklist_cells
+      checklist_headers
+      checklist_items
+      checklist_questions
+      checklist_records
+      checklist_rows
+      checklist_templates
+      checklists
+      contacts
+      corrective_actions
+      costs
+      documents
+      evaluations
+      expectations
+      extension_requests
+      faa_reports
+      findings
+      hazards
+      ims
+      inspections
+      investigations
+      issues
+      meetings
+      message_accesses
+      messages
+      notices
+      notifications
+      orm_submission_fields
+      orm_submissions
+      packages
+      participations
+      private_links
+      query_conditions
+      query_statements
+      recommendations
+      record_fields
+      records
+      recurrences
+      report_meetings
+      reports
+      responsible_users
+      risk_controls
+      root_causes
+      safety_plans
+      section_fields
+      sections
+      signatures
+      sms_actions
+      sms_tasks
+      sras
+      submission_fields
+      submissions
+      trackings
+      transactions
+      verifications
+      viewer_comments
+    ].each do |table|
+      print "Truncating #{Rails.configuration.database_configuration[Rails.env]['database']}:#{table}..."
+      ActiveRecord::Base.connection.execute("TRUNCATE #{table}")
+      puts ' Truncated!'
+    end
+  end
+
+  private
 
   def set_airline_code
     puts "Setting airline_code.yml with value '#{@airline_code}'..."
