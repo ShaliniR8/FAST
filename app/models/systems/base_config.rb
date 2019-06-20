@@ -12,8 +12,8 @@ class BaseConfig
   }
 
   def self.get_sra_meta_fields
-    airline_class = Object.const_get("#{BaseConfig.airline_code}_Config") || nil
-    if airline.present? && (airline_class.respond_to? :get_sra_meta_fields)
+    airline_class = Object.const_get("#{BaseConfig.airline_code}_Config")
+    if airline_class.respond_to? :get_sra_meta_fields
       airline_class.get_sra_meta_fields
     else
       [
