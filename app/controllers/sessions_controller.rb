@@ -24,6 +24,15 @@ class SessionsController < ApplicationController
       session[:user_id] = user.id
       session[:mode] = ""
       session[:last_active] = Time.now
+      accesses = Hash.new{ |h, k| h[k] = [] }
+      user.privileges.includes(:access_controls).map{ |priv|
+        priv.access_controls.each do |acs|
+          accesses[acs.entry] << acs.action
+        end
+      }
+      accesses.update(accesses) { |key, val| val.uniq }
+      session[:permissions] = accesses.to_json
+      Rails.logger.debug session
       redirect_to_target_or_default(root_url)
     else
       flash.now[:danger] = "Invalid username or password."

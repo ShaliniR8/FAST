@@ -7,6 +7,8 @@ class AccessControl < ActiveRecord::Base
 
 
   after_create :set_viewer_access
+  after_create :update_rules_config
+  after_destroy :update_rules_config
   validates :action, presence: true, allow_blank: false
   validates :entry, presence: true, allow_blank: false
 
@@ -652,7 +654,15 @@ class AccessControl < ActiveRecord::Base
     end
   end
 
-
+  def update_rules_config
+    restricting_rules = Hash.new{ |h, k| h[k] = [] }
+    AccessControl.all.each do |acs|
+      restricting_rules[acs.entry] << acs.action
+    end
+    restricting_rules.update(restricting_rules) { |key, val| val.uniq }
+    Rails.application.config.restricting_rules = restricting_rules
+    Rails.logger.info "[INFO] Access Rules have been updated- restricting_rules application config updated"
+  end
 
   def self.get_headers
     [
