@@ -7,7 +7,7 @@
       <%current_user.notices.where("DATE_ADD(created_at, INTERVAL 5 DAY) >= ?", Time.now.to_date ).reverse.each do |notice|%>
         <p>
           <b><%=datetime_to_string(notice.created_at.in_time_zone)%></b>
-          <%=notice.content.html_safe%>
+          <%=sanitize notice.content.html_safe%>
           <%=link_to '<i style="color:tomato;text-decoration:underline" class="glyphicon glyphicon-remove warning"></i>'.html_safe,
             '#',
             :class => 'remove_btn',

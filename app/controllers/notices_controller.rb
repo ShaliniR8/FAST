@@ -3,7 +3,7 @@ class NoticesController < ApplicationController
   def new
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     @notice = owner.notices.new
-    @users = User.where(:disable => 0)
+    @users = User.where('disable = 0 OR disable IS NULL')
     @headers = User.invite_headers
     @owner_id = params[:owner_id]
     render :partial => '/shared/new_notice', locals: {
@@ -16,6 +16,7 @@ class NoticesController < ApplicationController
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     @table = params[:owner_type]
     @notice = owner.notices.new(params[:notice])
+    @notice.content = "From #{current_user.full_name}: #{@notice.content} #{g_link(owner)}"
     @notice.save
     redirect_to "/#{Object.const_get(@table).table_name}/#{params[:notice][:owner_id]}"
   end

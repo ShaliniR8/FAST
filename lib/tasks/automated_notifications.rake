@@ -34,10 +34,10 @@ namespace :notifications do
       (start_date < ? OR start_date IS NULL)',
       DateTime.now,
       DateTime.now
-    ).each do |notice|
+    ).include(:user).each do |notice|
       NotifyMailer.notify(notice.user, notice.content, 'ProSafeT User Notice')
       notice.create_email = false
-      puts "Email sent for Notice ##{notice.id}"if notice.save!
+      puts "Email sent to #{notice.user.full_name} for Notice ##{notice.id}" if notice.save!
     end
   end
 
