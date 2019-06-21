@@ -11,7 +11,7 @@
 # It's strongly recommended to check this file into your version control system.
 
 
-ActiveRecord::Schema.define(:version => 20190610211431) do
+ActiveRecord::Schema.define(:version => 20190620212706) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -125,10 +125,10 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.integer  "auditor_poc_id"
     t.integer  "approver_poc_id"
     t.text     "privileges"
-    t.integer  "recurrence_id"
     t.text     "final_comment"
     t.integer  "created_by_id"
     t.boolean  "template"
+    t.integer  "recurrence_id"
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -191,7 +191,8 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
   create_table "checklist_cells", :force => true do |t|
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
-    t.string   "value"
+    t.text     "value"
+    t.text     "options"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -293,7 +294,8 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.datetime "updated_at"
   end
 
-  create_table "client_applications", :force => true do |t|
+  create_table "client_applications", :id => false, :force => true do |t|
+    t.integer  "id",                         :default => 0, :null => false
     t.string   "name"
     t.string   "url"
     t.string   "support_url"
@@ -304,8 +306,6 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "client_applications", ["key"], :name => "index_client_applications_on_key", :unique => true
 
   create_table "contacts", :force => true do |t|
     t.integer  "owner_id"
@@ -757,11 +757,13 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.string   "content"
     t.string   "status"
     t.datetime "expire_date"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "owner_id"
     t.string   "action"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "start_date"
+    t.boolean  "create_email", :default => false
   end
 
   create_table "notifications", :force => true do |t|
@@ -774,16 +776,16 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.date     "notify_date"
   end
 
-  create_table "oauth_nonces", :force => true do |t|
+  create_table "oauth_nonces", :id => false, :force => true do |t|
+    t.integer  "id",         :default => 0, :null => false
     t.string   "nonce"
     t.integer  "timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "oauth_nonces", ["nonce", "timestamp"], :name => "index_oauth_nonces_on_nonce_and_timestamp", :unique => true
-
-  create_table "oauth_tokens", :force => true do |t|
+  create_table "oauth_tokens", :id => false, :force => true do |t|
+    t.integer  "id",                                  :default => 0, :null => false
     t.integer  "user_id"
     t.string   "type",                  :limit => 20
     t.integer  "client_application_id"
@@ -799,7 +801,23 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.datetime "updated_at"
   end
 
-  add_index "oauth_tokens", ["token"], :name => "index_oauth_tokens_on_token", :unique => true
+  create_table "occurrence_templates", :force => true do |t|
+    t.integer  "parent_id"
+    t.string   "title"
+    t.string   "format"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "options"
+  end
+
+  create_table "occurrences", :force => true do |t|
+    t.integer  "template_id"
+    t.string   "owner_type"
+    t.integer  "owner_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "value"
+  end
 
   create_table "orm_fields", :force => true do |t|
     t.string   "name"
@@ -978,11 +996,11 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.integer  "investigation_id"
     t.boolean  "anonymous"
     t.integer  "sra_id"
+    t.string   "event_time_zone"
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
-    t.string   "event_time_zone"
     t.text     "final_comment"
   end
 
@@ -1035,15 +1053,15 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.text     "minutes"
     t.date     "close_date"
     t.text     "privileges"
-    t.string   "severity_extra"
-    t.string   "probability_extra"
-    t.string   "mitigated_severity"
-    t.string   "mitigated_probability"
     t.string   "venue"
     t.string   "crew"
     t.string   "icao"
     t.string   "event_label"
     t.datetime "event_date"
+    t.string   "severity_extra"
+    t.string   "probability_extra"
+    t.string   "mitigated_severity"
+    t.string   "mitigated_probability"
   end
 
   create_table "responsible_users", :force => true do |t|
@@ -1111,6 +1129,7 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.integer  "privileges_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "poc_id"
   end
 
   create_table "root_causes", :force => true do |t|
@@ -1280,6 +1299,7 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+    t.datetime "followup_date"
     t.integer  "created_by_id"
   end
 
