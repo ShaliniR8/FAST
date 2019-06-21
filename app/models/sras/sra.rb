@@ -3,12 +3,12 @@ class Sra < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Noticeable
   include Transactionable
 
 #Association List
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy
-  has_many :notices,                  :foreign_key => "owner_id",   :class_name => "SraNotice",           :dependent => :destroy
   has_many :responsible_users,        :foreign_key => "owner_id",   :class_name => "SraResponsibleUser",  :dependent => :destroy
   has_many :sections,                 :foreign_key => "owner_id",   :class_name => "SraSection",          :dependent => :destroy
 
