@@ -1,6 +1,6 @@
 <%audit_new = current_user.has_access("audits", "new")%>
 <%audit_index = current_user.has_access("audits","index")%>
-<%audit_admin = current_user.has_access('audits', 'admin')%>
+<%audit_admin = current_user.has_access('audits', 'admin', admin: true) %>
 <%if audit_admin || audit_new || audit_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Audits<b class="caret"></b></a>
@@ -18,7 +18,7 @@
 
 <%inspection_new = current_user.has_access("inspections", "new")%>
 <%inspection_index = current_user.has_access("inspections", 'index')%>
-<%inspection_admin = current_user.has_access('inspections', 'admin')%>
+<%inspection_admin = current_user.has_access('inspections', 'admin', admin: true) %>
 <%if inspection_admin || inspection_new || inspection_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Inspections<b class="caret"></b></a>
@@ -36,7 +36,7 @@
 
 <%evaluation_new = current_user.has_access("evaluations", "new")%>
 <%evaluation_index = current_user.has_access("evaluations", 'index')%>
-<%evaluation_admin = current_user.has_access('evaluations', 'admin')%>
+<%evaluation_admin = current_user.has_access('evaluations', 'admin', admin: true) %>
 <%if evaluation_admin || evaluation_new || evaluation_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Evaluations<b class="caret"></b></a>
@@ -54,7 +54,7 @@
 
 <%investigation_new = current_user.has_access('investigations', 'new')%>
 <%investigation_index = current_user.has_access('investigations','index')%>
-<%investigation_admin = current_user.has_access('investigations','admin')%>
+<%investigation_admin = current_user.has_access('investigations','admin', admin: true) %>
 <%if investigation_admin || investigation_new || investigation_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Investigations<b class="caret"></b></a>

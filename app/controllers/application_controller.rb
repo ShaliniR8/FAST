@@ -43,7 +43,7 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
-  def access_validation
+  def access_validation(strict=false)
     Rails.logger.debug("Action #{action_name}, Controller #{controller_name}")
 
     if !session[:last_active].present?
@@ -68,9 +68,13 @@ class ApplicationController < ActionController::Base
       if current_user.disable
         redirect_to logout_path
       elsif !current_user.has_access(controller_name,action_name)
-        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
+        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict))
       end
     end
+  end
+
+  def strict_access_validation
+    access_validation(true) || current_user.admin?
   end
 
 

@@ -8,6 +8,11 @@ class RecurrencesController < ApplicationController
     end
   end
 
+  def child_access_validation(con_name, act_name)
+    redirect_to errors_path unless current_user.has_access(con_name, act_name, admin: true)
+  end
+  helper_method :child_access_validation
+
   def create
     params.each do |key, data|
       case key
@@ -30,6 +35,7 @@ class RecurrencesController < ApplicationController
     @recurrence.created_by_id = current_user.id
     @recurrence.form_type = @table.name
     @recurrence.save!
+    child_access_validation(@table.name,'admin')
     redirect_to recurrence_path(@recurrence), flash: {success: "Recurrent #{@table} created."}
   end
 
@@ -41,18 +47,18 @@ class RecurrencesController < ApplicationController
     @table = Object.const_get(@type)
     @template = @table.find(@recurrence.template_id)
     @template_fields = @table.get_meta_fields('form')
+    child_access_validation(@type,'admin')
   end
 
   def index
     if params.key? :form_type
       @table = Recurrence.where(form_type: Object.const_get(params[:form_type]))
-    elsif current_user.admin?
-      @table = Recurrence
     else
-      @table = Recurrence.none
+      @table = Recurrence
     end
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    child_access_validation(@table.name,'admin')
     handle_search
   end
 
@@ -78,6 +84,7 @@ class RecurrencesController < ApplicationController
     @table = Object.const_get(@type)
     @template = @table.new
     @template_fields = @table.get_meta_fields('form')
+    child_access_validation(@type,'admin')
   end
 
 
@@ -88,6 +95,7 @@ class RecurrencesController < ApplicationController
     @template = @type.find(@recurrence.template_id)
     @template_fields = @type.get_meta_fields('show')
     @children = @recurrence.children
+    child_access_validation(@type.name,'admin')
   end
 
   def update
@@ -97,12 +105,14 @@ class RecurrencesController < ApplicationController
     @template = @type.find(@recurrence.template_id)
     template = params[:audit] || params[:investigation] || params[:evaluation] || params[:inspection]
     @template.update_attributes(template)
+    child_access_validation(@type.name,'admin')
     redirect_to recurrence_path(@recurrence)
   end
 
   def destroy
     recurrence = Recurrence.find(params[:id])
     type = Object.const_get(recurrence.form_type)
+    child_access_validation(@type.name,'admin')
     template = type.find(recurrence.template_id)
     template.destroy
     recurrence.destroy

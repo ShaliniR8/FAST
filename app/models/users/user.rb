@@ -85,15 +85,19 @@ class User < ActiveRecord::Base
   end
 
 
-  def has_access(con_name, act_name)
+  def has_access(con_name, act_name, strict:false, admin:false)
+    con_name = con_name.downcase.pluralize
+
+    return true if admin && self.admin?
     rules = Rails.application.config.restricting_rules
     if rules.key?(con_name) && rules[con_name].include?(act_name)
       permissions = JSON.parse(session[:permissions])
+      return true if permissions.key?(con_name) && permissions[con_name].include?(admin) && admin
       unless permissions.key?(con_name) && permissions[con_name].include?(act_name)
         return false
       end
     end
-    true
+    strict ? (AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present) : true
     # rule = AccessControl.where('action = ? AND entry = ?', act_name, con_name).first
     # if rule.present?
     #   (rule.privileges & privileges).size > 0
