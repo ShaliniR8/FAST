@@ -298,8 +298,7 @@ private
 
   # Override show
   def show_as_json
-    audit = load_audits(params[:id])
-    render :json => audit
+    render :json => load_audits(params[:id])
   end
 
   def load_audits(*ids)
@@ -320,42 +319,38 @@ private
     # Include other fields that should always be whitelisted
     whitelisted_fields = [:id, *json_fields]
 
-    json = audits
-      .as_json(
-        only: whitelisted_fields,
-        include: { # Include checklist data required for mobile
-          checklists: {
-            only: [:id, :title],
-            include: {
-              checklist_header: {
-                only: :id,
-                include: {
-                  checklist_header_items: {
-                    only: [:id, :title, :data_type, :options, :editable, :display_order]
-                  }
+    json = audits.as_json(
+      only: whitelisted_fields,
+      include: { # Include checklist data required for mobile
+        checklists: {
+          only: [:id, :title],
+          include: {
+            checklist_header: {
+              only: :id,
+              include: {
+                checklist_header_items: {
+                  only: [:id, :title, :data_type, :options, :editable, :display_order]
                 }
-              },
-              checklist_rows: {
-                only: [:id, :is_header],
-                include: {
-                  checklist_cells: {
-                    only: [:id, :value, :checklist_header_item_id],
-                  }
+              }
+            },
+            checklist_rows: {
+              only: [:id, :is_header],
+              include: {
+                checklist_cells: {
+                  only: [:id, :value, :checklist_header_item_id],
                 }
               }
             }
           }
         }
-      )
-      .map { |audit| format_audit_json(audit) }
+      }
+    ).map { |audit| format_audit_json(audit) }
 
     if (ids.length == 1)
-      json = json[0]
+      json[0]
     else
-      json = json.reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
+      json.reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
     end
-
-    json
   end
 
   def format_audit_json(audit)
