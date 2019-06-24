@@ -1352,9 +1352,8 @@ ActiveRecord::Schema.define(:version => 20190610211431) do
   end
 
   create_table "transactions", :force => true do |t|
-    t.integer  "owner_id"
-    t.string   "type"
     t.integer  "users_id"
+    t.integer  "owner_id"
     t.datetime "stamp"
     t.text     "content"
     t.string   "action"
