@@ -43,16 +43,16 @@ namespace :ultipro do
       begin
         data_dump = File.read(@filepath).sub(/^\<\?.*\?\>$/, '')
       rescue
-        Rails.logger.debug "[ERROR] #{DateTime.now}: #{@filepath} could not be opened"
+        Rails.logger.info "[ERROR] #{DateTime.now}: #{@filepath} could not be opened"
         next #Abort
       end
 
       if File.exist?(@filepath_prior) && compare_file(@filepath_prior, @filepath)
-        Rails.logger.debug "[INFO] Historical Data was identical- no update necessary"
+        Rails.logger.info "[INFO] Historical Data was identical- no update necessary"
         next #abort- nothing to update
       end
-      # begin
-        Rails.logger.debug "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
+      begin
+        Rails.logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
         @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
         @log_data = []
         Hash.from_xml(data_dump)['wbat_poc']['poc']
@@ -78,14 +78,14 @@ namespace :ultipro do
         Rails.logger.info '###################################'
         Rails.logger.info '### ULTIPRO MIGRATION COMPLETED ###'
         Rails.logger.info '###################################'
-      # rescue
-      #   Rails.logger.info '################################'
-      #   Rails.logger.info '### ULTIPRO MIGRATION FAILED ###'
-      #   Rails.logger.info '################################'
-      #   Rails.logger.info "Failed on: #{@err_username}"
-      #   Rails.logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
-      #   Rails.logger.info "Final log entry: #{@log_entry}"
-      # end
+      rescue
+        Rails.logger.info '################################'
+        Rails.logger.info '### ULTIPRO MIGRATION FAILED ###'
+        Rails.logger.info '################################'
+        Rails.logger.info "Failed on: #{@err_username}"
+        Rails.logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
+        Rails.logger.info "Final log entry: #{@log_entry}"
+      end
       Rails.logger.info "SERVER DATE+TIME OF CONCLUSION: #{DateTime.now.strftime("%F %R")}"
       Rails.logger.info 'SUMMARY OF EVENTS:'
       if @log_data.empty?
@@ -219,7 +219,6 @@ namespace :ultipro do
       end
       user_privileges.each do |priv| #Next check if user has any privs that they shouldn't
         if @tracked_privileges.include?(priv) && !privileges.include?(priv)
-          Rails.logger.debug "CHECKING TO REMOVE #{priv}"
           user.roles.where({privileges_id: @privilege_list[priv]}).destroy_all if !@dry_run
           @log_entry << "\n    Removed- #{priv}"
         end
