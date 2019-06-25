@@ -178,8 +178,8 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:completed] = 'Save for Later'.casecmp(params[:commit]) != 0
-    params[:submission][:anonymous] = params[:anonymous] == '1' ? true : false
+    params[:submission][:completed] = params[:commit] != 'Save for Later'
+    params[:submission][:anonymous] = params[:anonymous] == '1'
 
 
     if params[:submission][:attachments_attributes].present?
@@ -323,8 +323,8 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
-    params[:submission][:completed] = 'Save for Later'.casecmp(params[:commit]) != 0
-    params[:submission][:anonymous] = params[:anonymous] == '1' ? true : false
+    params[:submission][:completed] = params[:commit] != 'Save for Later'
+    params[:submission][:anonymous] = params[:anonymous] == '1'
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
