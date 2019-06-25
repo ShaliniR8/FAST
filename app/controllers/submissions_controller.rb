@@ -37,34 +37,39 @@ class SubmissionsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("Submission")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
+    respond_to do |format|
+      format.html do
+        @table = Object.const_get("Submission")
+        @headers = @table.get_meta_fields('index')
+        @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+        handle_search
 
-    @categories = Category.all
-    @fields = Field.all
-    @templates = Template.all
+        @categories = Category.all
+        @fields = Field.all
+        @templates = Template.all
 
-    records = @records
-      .where(:completed => 1)
-      .preload(:template, :created_by)
-      .can_be_accessed(current_user)
+        records = @records
+          .where(:completed => 1)
+          .preload(:template, :created_by)
+          .can_be_accessed(current_user)
 
-    @records = @records.to_a & records.to_a
-    records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
-    @records = @records.to_a & records.to_a
+        @records = @records.to_a & records.to_a
+        records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
+        @records = @records.to_a & records.to_a
 
-    if params[:template]
-      records = @records.select{|x| x.template.name == params[:template]}
-    end
-    @records = @records.to_a & records.to_a
+        if params[:template]
+          records = @records.select{|x| x.template.name == params[:template]}
+        end
+        @records = @records.to_a & records.to_a
 
-    # handle custom view
-    if params[:custom_view].present?
-      selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
-      @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
-      @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+        # handle custom view
+        if params[:custom_view].present?
+          selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
+          @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
+          @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+        end
+      end
+      format.json { index_as_json }
     end
   end
 
@@ -233,22 +238,27 @@ class SubmissionsController < ApplicationController
 
 
   def show
-    @record = Submission.preload(:submission_fields).find(params[:id])
-    if !@record.completed
-      if @record.user_id == current_user.id
-        redirect_to continue_submission_path(@record)
-      else
-        redirect_to errors_path
+    respond_to do |format|
+      format.html do
+        @record = Submission.preload(:submission_fields).find(params[:id])
+        if !@record.completed
+          if @record.user_id == current_user.id
+            redirect_to continue_submission_path(@record)
+          else
+            redirect_to errors_path
+          end
+        end
+        @template = @record.template
+        access_level=current_user.has_template_access(@template.name)
+        unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+          if access_level == "" && @record.user_id != current_user.id
+              redirect_to errors_path
+          elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
+              redirect_to errors_path
+          end
+        end
       end
-    end
-    @template = @record.template
-    access_level=current_user.has_template_access(@template.name)
-    unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
-      if access_level == "" && @record.user_id != current_user.id
-          redirect_to errors_path
-      elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
-          redirect_to errors_path
-      end
+      format.json { show_as_json }
     end
   end
 
@@ -584,5 +594,227 @@ class SubmissionsController < ApplicationController
     end
   end
 
+#---------# For ProSafeT App 2019 #---------#
+#-------------------------------------------#
+
+  # Override index
+  def index_as_json
+    @records = Submission.where(user_id: current_user.id).includes(:template)
+
+    json = {}
+
+    # Convert to id map for fast lookup
+    json[:submissions] = @records
+      .as_json(
+        only: [:id, :completed, :description, :event_date],
+        include: { template: { only: :name }}
+      )
+      .map { |submission|
+        submission = submission['submission']
+        submission[:template_name] = submission[:template]['name']
+        submission.delete(:template)
+        submission
+      }
+      .reduce({}) { |submissions, submission| submissions.merge({ submission['id'] => submission }) }
+
+    json[:templates] = format_template_json
+
+    # Get ids of the 3 most recent submissions by event_date
+    recent_submissions = @records
+      .order(:event_date)
+      .last(3)
+      .as_json(only: :id)
+      .map{ |submission| submission['submission']['id'] }
+
+    # Get ids of the 3 most recent
+    json[:recent_submissions] = load_submissions(*recent_submissions)
+
+    render :json => json
+  end
+
+  def show_as_json
+    render :json => load_submissions(params[:id])
+  end
+
+  def load_submissions(*ids)
+    submissions = Submission.where(id: ids).includes(:submission_fields)
+
+    json = submissions.as_json(
+      only: [
+        :id,
+        :anonymous,
+        :completed,
+        :description,
+        :event_date,
+        :event_time_zone
+      ],
+      include: {
+        submission_fields: {
+          only: [:id, :fields_id, :value]
+        },
+        attachments: {
+          only: [:id, :caption],
+          methods: :document_filename
+        }
+      }
+    ).map { |submission| format_submission_json(submission) }
+
+    if (ids.length == 1)
+      json[0]
+    else
+      json.reduce({}){ |submissions, submission| submissions.merge({ submission['id'] => submission }) }
+    end
+  end
+
+  def format_submission_json(submission)
+    json = submission['submission']
+
+    json[:submission_fields] = json[:submission_fields].reduce({}) do |submission_fields, submission_field|
+      # Creates an id map based on template field id
+      submission_fields.merge({ submission_field['fields_id'] => submission_field })
+    end
+
+    json
+  end
+
+  def format_template_json
+    # Get templates the user has access to
+    templates = Template
+      .includes({ categories: :fields }) # preload
+      .all
+      .keep_if do |template|
+        current_user.has_template_access(template.name).match /full|submitter/
+      end
+
+    # Get json data for templates
+    templates_json = templates
+      .as_json(
+        only: [:id, :name, :map_template_id],
+        include: {
+          categories: {
+            only: [:id, :title, :category_order, :description, :deleted],
+            include: {
+              fields: {
+                only: [
+                  :id,
+                  :label,
+                  :data_type,
+                  :options,
+                  :field_order,
+                  :show_label,
+                  :required,
+                  :display_type,
+                  :nested_field_id,
+                  :nested_field_value,
+                  :element_class,
+                  :element_id,
+                  :deleted,
+                ]
+              }
+            }
+          }
+        }
+      )
+      .map { |template| template['template'] }
+
+    # sort categories and fields
+    templates_json.each do |template|
+      template[:categories].sort_by!{ |category| category['category_order'] }
+      template[:categories].each do |category|
+        # LOSAV fields
+        new_fields = []
+        follow_fields = nil
+        losav_options = nil
+        # check for legacy LOSAV fields, convert to nested fields
+        category[:fields].each do |child_field|
+          if (child_field['element_class'].include? 'sub')
+            # load LOSAV JSON and filter out the follow fields
+            losav_options ||= JSON.parse(File.read(Rails.root.join('public', 'javascripts', 'templates', 'losav_options.json')))
+            follow_fields ||= category[:fields].select{ |field| field['element_class'].include? 'follow' }
+
+            parent_class = child_field['element_class'].gsub(/follow|sub/, '').strip
+            follow_fields.each do |parent_field|
+              # find the parent field
+              if (parent_field['element_id'] == child_field['element_id'] && parent_field['element_class'].include?(parent_class))
+                # create new nested fields based on parent id and LOSAV JSON
+                parent_field['options']
+                  .split(';')
+                  .map!{ |option| option.strip }
+                  .delete_if{ |option| option.blank? }
+                  .each do |option|
+                    new_field = child_field.clone
+                    new_field['nested_field_id'] = parent_field['id']
+                    new_field['nested_field_value'] = option
+                    new_field['options'] = losav_options[option].join(';')
+                    new_fields.push(new_field)
+                  end
+
+                # set child_field to be deleted, replaced by new fields
+                child_field['deleted'] = true
+                break
+              end
+            end
+          end
+        end
+        # add created fields if any were made
+        category[:fields].concat(new_fields)
+
+        # convert field_orders to arrays, where nested_fields have parent order and sibling order
+        nested_fields = []
+        category[:fields].each do |field|
+          field['field_order'] = [field['field_order']]
+          if (field['nested_field_id'] != nil)
+            parent_field = Field.find(field['nested_field_id'])
+            field['field_order'].unshift(parent_field['field_order'])
+          end
+        end
+
+        category[:fields].sort!{ |a, b| a['field_order'] <=> b['field_order'] }
+      end
+    end
+
+    # format and filter template data
+    templates_json.each do |template|
+      # remove deleted categories
+      template[:categories].delete_if{ |category| category['deleted'] }
+      template[:categories].each do |category|
+        # these keys are no longer necessary
+        category.delete_if{ |key| key.match /category_order|deleted/ }
+
+        # remove deleted fields
+        category[:fields].delete_if{ |field| field['deleted'] }
+        category[:fields].each do |field|
+          # reduce redundancy by setting fields with element_class of "required_field" as required
+          if (field['element_class'] == 'required_field')
+            field['required'] = true
+          end
+
+          # remove label if show_label is false
+          if (!field['show_label'])
+            field['label'] = nil
+          end
+
+          # replace options string with an array, and remove empty values
+          field['options'] = field['options']
+            .split(';')
+            .map!{ |option| option.strip }
+            .delete_if{ |option| option.blank? }
+
+          field.delete_if do |key, value|
+            case key
+            # these keys are no longer necessary
+            when /field_order|deleted|show_label|element_class|element_id/
+              true
+            # these keys are only relevant if they have a value
+            when /element_id|element_class|options|label|nested_field_value|nested_field_id/
+              value.blank?
+            else
+              false
+            end
+          end
+        end
+      end
+    end
+  end
 
 end
