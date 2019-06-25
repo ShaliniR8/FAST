@@ -539,7 +539,9 @@ class SubmissionsController < ApplicationController
 
 
 
-
+########################################################
+#--- Temporary methods for legacy app compatibility ---#
+########################################################
 # ------------- BELOW ARE EVERYTHING ADDED FOR PROSAFET APP
   #Added by BP Aug 8. render json for templates accessible to the current user
   def template_json
@@ -558,8 +560,9 @@ class SubmissionsController < ApplicationController
     response.headers['Content-Length'] = stream.bytesize.to_s
     send_data(stream, :type => "json", :disposition => "inline")
   end
-
-
+###############################
+#--- End Temporary Methods ---#
+###############################
 
   private
 
