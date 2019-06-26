@@ -20,6 +20,7 @@ class Trial_Config
       :has_verification                               => true,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => false,
+      :track_log                                      => true,
       :time_zone                                      => 'Pacific Time (US & Canada)',
 
       # Safety Reporting Module
