@@ -198,6 +198,7 @@ class BOE_Config
   def self.print_risk(probability_score, severity_score)
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
+      puts "==#{MATRIX_INFO[:risk_table_dict][:yellow]}"
       return MATRIX_INFO[:risk_table_dict][lookup_table[severity_score][probability_score].to_sym] rescue nil
     end
   end

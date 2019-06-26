@@ -46,7 +46,7 @@ class FindingsController < SafetyAssuranceController
     @fields = Finding.get_meta_fields('form')
     @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
     @owner = @parent.findings.new
-    form_special_matrix(@owner, 'finding', 'severity_extra', 'probability_extra')
+    choose_load_special_matrix_form(@owner, 'finding')
   end
 
 
@@ -60,7 +60,7 @@ class FindingsController < SafetyAssuranceController
   def edit
     load_options
     @fields = Finding.get_meta_fields('form')
-    form_special_matrix(@owner, 'finding', 'severity_extra', 'probability_extra')
+    choose_load_special_matrix_form(@owner, 'finding')
     @type = @owner.get_owner
     @users.keep_if{|u| u.has_access(@type, 'edit')}
   end
@@ -194,7 +194,7 @@ class FindingsController < SafetyAssuranceController
   def mitigate
     @owner = Finding.find(params[:id]).becomes(Finding)
     load_options
-    mitigate_special_matrix("finding", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form("finding", 'mitigate', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
@@ -206,7 +206,7 @@ class FindingsController < SafetyAssuranceController
   def baseline
     @owner = Finding.find(params[:id]).becomes(Finding)
     load_options
-    form_special_matrix(@owner, "finding", "severity_extra", "probability_extra")
+    load_special_matrix_form("finding", 'baseline', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/baseline"
     else

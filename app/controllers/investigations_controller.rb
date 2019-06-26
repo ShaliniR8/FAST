@@ -65,14 +65,14 @@ class InvestigationsController < SafetyAssuranceController
     end
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
+    load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
 
   def edit
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
+    load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
 
@@ -196,7 +196,7 @@ class InvestigationsController < SafetyAssuranceController
 
   def mitigate
     @owner = Investigation.find(params[:id])
-    mitigate_special_matrix("investigation", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form("investigation", "mitigate", @owner)
     load_options
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/mitigate"
@@ -208,7 +208,7 @@ class InvestigationsController < SafetyAssuranceController
   def baseline
     @owner = Investigation.find(params[:id])
     load_options
-    form_special_matrix(@owner, "investigation", "severity_extra", "probability_extra")
+    load_special_matrix_form("investigation", "baseline", @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/baseline"
     else

@@ -1,0 +1,35 @@
+<%if BaseConfig.airline[:base_risk_matrix]%>  
+  <%if BaseConfig.airline_code == 'Demo' && type == 'hazards'%>
+    <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+      :owner => owner,
+      :show_btns => show_btn,
+      :allow_baseline => defined?(allow_baseline) ? allow_baseline : true,
+      :allow_mitigate => defined?(allow_mitigate) ? allow_mitigate : true,
+      :can_change => can_change%>
+  <%else%>
+    <%=render "shared/bsk_risk_matrix_show",
+      :owner => owner,
+      :type => type,
+      :allow_baseline => defined?(allow_baseline) ? allow_baseline : true,
+      :allow_mitigate => defined?(allow_mitigate) ? allow_mitigate : true,   
+      :show_btns => show_btn,
+      # :like => defined?(like) ? like : nil,
+      # :color_matrix => defined?(color_matrix) ? color_matrix : nil,
+      # :frequency => defined?(frequency) ? frequency : nil,
+      :can_change => can_change%>
+  <%end%>
+<%else%>
+  <%airline_config = Object.const_get("#{BaseConfig.airline_code}_Config")%>
+  <%allow_baseline = true%>
+  <%allow_mitigate = true%>
+  <%if defined?(airline_config::RISK_ARRAY) && airline_config::RISK_ARRAY[type.to_sym].present?%>
+    <%allow_baseline = airline_config::RISK_ARRAY[type.to_sym][:baseline]%>
+    <%allow_mitigate = airline_config::RISK_ARRAY[type.to_sym][:mitigate]%>
+  <%end%>
+  <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+    :owner => owner,
+    :show_btns => show_btn,
+    :allow_baseline => allow_baseline,
+    :allow_mitigate => allow_mitigate, 
+    :can_change => can_change%>
+<%end%>

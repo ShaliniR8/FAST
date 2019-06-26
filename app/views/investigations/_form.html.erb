@@ -28,11 +28,9 @@
           <%end%>
           <%=render "/shared/privilege_form", :target => "investigation[privileges][]", :owner => @owner, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
-          <%if BaseConfig.airline[:base_risk_matrix]%>
-            <%=render "shared/matrix", :f => f, :owner => @owner%>
-          <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
-          <%end%>
+
+          <%=render "shared/choose_form_matrix", :f => f, :type => 'investigations', :owner => @owner%>
+
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
           <div class="mt10 mr10">
             <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",

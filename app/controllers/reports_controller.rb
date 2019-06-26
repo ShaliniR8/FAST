@@ -147,7 +147,7 @@ class ReportsController < ApplicationController
       .find(:all)
       .select{|x| x.status == "Open" && x.report.blank?} - @report.records
     @candidates.sort_by!{|x| x.event_date}.reverse!
-    form_special_matrix(@report, "report", "severity_extra", "probability_extra")
+    load_special_matrix_form('report', 'baseline', @report)
   end
 
 
@@ -192,7 +192,7 @@ class ReportsController < ApplicationController
       .sort_by!{|a| a.name}
     @action = "edit"
     @report = Report.find(params[:id])
-    form_special_matrix(@report, "report", "severity_extra", "probability_extra")
+    load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
     end
@@ -423,7 +423,7 @@ class ReportsController < ApplicationController
   def mitigate
     @owner=Report.find(params[:id])
     load_options
-    mitigate_special_matrix("report", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form('report', 'mitigate', @owner)
     if BaseConfig.airline[:base_risk_matrix]
         render :partial=>"shared/mitigate"
       else
@@ -435,7 +435,7 @@ class ReportsController < ApplicationController
   def baseline
     @owner=Report.find(params[:id])
     load_options
-    form_special_matrix(@owner, "report", "severity_extra", "probability_extra")
+    load_special_matrix_form('report', 'baseline', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial=>"shared/baseline"
     else
