@@ -45,6 +45,7 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password
   def access_validation(strict=false)
     Rails.logger.debug("Action #{action_name}, Controller #{controller_name}")
+    define_session_permissions if session[:last_active].present? && current_user.present? && (current_user.privileges_last_updated > session[:last_active])
 
     if !session[:last_active].present?
       session[:last_active] = Time.now

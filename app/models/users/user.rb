@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable
+    :android_version, :disable, :updated_at
 
 
 
@@ -86,7 +86,7 @@ class User < ActiveRecord::Base
 
 
   def has_access(con_name, act_name, strict:false, admin:false)
-    con_name = con_name.downcase.pluralize
+    con_name = con_name.downcase.pluralize if con_name.present?
 
     return true if admin && self.admin?
     rules = Rails.application.config.restricting_rules
