@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
       file_date = date_time.strftime("%Y%m%d")
       action_time = date_time.strftime("%H:%M")
       file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
-      if current_user.present? && current_user.username != "prosafet_admin"
+      if current_user.present? && current_user.username != "prosafet_admin" && current_user.username != 'bli'
         tracking_log = Logger.new(file_name)
         if controller_name == "sessions" && action_name == "create"
           ActivityTracker.create(:user_id => current_user.id, :last_active => DateTime.now)
