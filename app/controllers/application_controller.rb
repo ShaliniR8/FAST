@@ -18,20 +18,25 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   def track_activity
-    #setup logger
-    #if user is present and not prosafet_admin then write to log
-    date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
-    file_date = date_time.strftime("%Y%m%d")
-    action_time = date_time.strftime("%H:%M")
-    file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
-    if current_user.present? && current_user.username != "prosafet_admin"
-      tracking_log = Logger.new(file_name)
-      if controller_name == "sessions" && action_name == "create"
-        tracking_log.info("***********LOGIN: #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
-      elsif controller_name == "sessions" && action_name == "destroy"
-        tracking_log.info("***********LOGOUT #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
-      else
-        tracking_log.info("#{action_time} #{current_user.full_name} #{controller_name}##{action_name}")
+    #if Trial or Demo and user is not prosafet_admin then track log
+    track_airline_log = BaseConfig.airline[:track_log]
+    if track_airline_log
+      date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
+      file_date = date_time.strftime("%Y%m%d")
+      action_time = date_time.strftime("%H:%M")
+      file_name = "#{Rails.root}/log/tracker_" << file_date << ".log"
+      if current_user.present? && current_user.username != "prosafet_admin" && current_user.username != 'bli'
+        tracking_log = Logger.new(file_name)
+        if controller_name == "sessions" && action_name == "create"
+          ActivityTracker.create(:user_id => current_user.id, :last_active => DateTime.now)
+          tracking_log.info("***********LOGIN: #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
+        elsif controller_name == "sessions" && action_name == "destroy"
+          tracking_log.info("***********LOGOUT #{action_time} #{current_user.full_name} #{controller_name}##{action_name}***********")
+        else
+          last_tracker = ActivityTracker.where('created_at BETWEEN ? AND ? AND user_id = ?', DateTime.now.beginning_of_day, DateTime.now.end_of_day, current_user.id).last
+          last_tracker.update_attributes(:last_active => DateTime.now) if last_tracker.present?
+          tracking_log.info("#{action_time} #{current_user.full_name} #{controller_name}##{action_name}")
+        end
       end
     end
   end
