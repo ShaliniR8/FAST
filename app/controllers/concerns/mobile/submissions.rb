@@ -97,7 +97,7 @@ module Concerns
         # Get json data for templates
         templates_json = templates
           .as_json(
-            only: [:id, :name, :map_template_id],
+            only: [:id, :name, :map_template_id, :allow_anonymous],
             include: {
               categories: {
                 only: [:id, :title, :category_order, :description, :deleted],
