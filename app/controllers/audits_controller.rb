@@ -329,7 +329,7 @@ private
               only: :id,
               include: {
                 checklist_header_items: {
-                  only: [:id, :title, :data_type, :options, :editable, :display_order]
+                  only: [:id, :title, :data_type, :editable, :display_order, :size]
                 }
               }
             },
@@ -337,7 +337,7 @@ private
               only: [:id, :is_header],
               include: {
                 checklist_cells: {
-                  only: [:id, :value, :checklist_header_item_id],
+                  only: [:id, :value, :checklist_header_item_id, :options, :checklist_row_id]
                 }
               }
             }
