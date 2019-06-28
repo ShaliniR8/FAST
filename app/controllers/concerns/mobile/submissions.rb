@@ -1,0 +1,256 @@
+#----------# For ProSafeT App v2 #----------#
+#-------------------------------------------#
+
+module Concerns
+  module Mobile
+    module Submissions extend ActiveSupport::Concern
+
+      def index_as_json
+        @records = Submission.where(user_id: current_user.id).includes(:template)
+
+        json = {}
+
+        # Convert to id map for fast lookup
+        json[:submissions] = @records
+          .as_json(
+            only: [:id, :completed, :description, :event_date],
+            include: { template: { only: :name }}
+          )
+          .map { |submission|
+            submission = submission['submission']
+            submission[:template_name] = submission[:template]['name']
+            submission.delete(:template)
+            submission
+          }
+          .reduce({}) { |submissions, submission| submissions.merge({ submission['id'] => submission }) }
+
+        json[:templates] = submission_templates_as_json
+
+        # Get ids of the 3 most recent submissions by event_date
+        recent_submissions = @records
+          .order(:event_date)
+          .last(3)
+          .as_json(only: :id)
+          .map{ |submission| submission['submission']['id'] }
+
+        # Get ids of the 3 most recent
+        json[:recent_submissions] = submissions_as_json(*recent_submissions)
+
+        render :json => json
+      end
+
+      def show_as_json
+        render :json => submissions_as_json(params[:id])
+      end
+
+      def submissions_as_json(*ids)
+        submissions = Submission.where(id: ids).includes(:submission_fields)
+
+        json = submissions.as_json(
+          only: [
+            :id,
+            :anonymous,
+            :completed,
+            :description,
+            :event_date,
+            :event_time_zone,
+            :templates_id
+          ],
+          include: {
+            submission_fields: {
+              only: [:id, :fields_id, :value]
+            },
+            attachments: {
+              only: [:id, :caption],
+              methods: :document_filename
+            }
+          }
+        ).map { |submission| format_submission_json(submission) }
+
+        if (ids.length == 1)
+          json[0]
+        else
+          json.reduce({}){ |submissions, submission| submissions.merge({ submission['id'] => submission }) }
+        end
+      end
+
+      def format_submission_json(submission)
+        json = submission['submission']
+
+        json[:submission_fields] = json[:submission_fields].reduce({}) do |submission_fields, submission_field|
+          # Creates an id map based on template field id
+          submission_fields.merge({ submission_field['fields_id'] => submission_field })
+        end
+
+        json
+      end
+
+      def submission_templates_as_json
+        # Get templates the user has access to
+        templates = Template
+          .includes({ categories: :fields }) # preload
+          .all
+          .keep_if do |template|
+            current_user.has_template_access(template.name).match /full|submitter/
+          end
+
+        # Get json data for templates
+        templates_json = templates
+          .as_json(
+            only: [:id, :name, :map_template_id],
+            include: {
+              categories: {
+                only: [:id, :title, :category_order, :description, :deleted],
+                include: {
+                  fields: {
+                    only: [
+                      :id,
+                      :label,
+                      :data_type,
+                      :options,
+                      :field_order,
+                      :show_label,
+                      :required,
+                      :display_type,
+                      :nested_field_id,
+                      :nested_field_value,
+                      :element_class,
+                      :element_id,
+                      :deleted,
+                    ]
+                  }
+                }
+              }
+            }
+          )
+          .map { |template| template['template'] }
+
+        # sort categories and fields
+        templates_json.each do |template|
+          template[:categories].sort_by!{ |category| category['category_order'] }
+          template[:categories].each do |category|
+            # LOSAV fields
+            new_fields = []
+            follow_fields = nil
+            losav_options = nil
+            # check for legacy LOSAV fields, convert to nested fields
+            category[:fields].each do |child_field|
+              if (child_field['element_class'].include? 'sub')
+                # load LOSAV JSON and filter out the follow fields
+                losav_options ||= JSON.parse(File.read(Rails.root.join('public', 'javascripts', 'templates', 'losav_options.json')))
+                follow_fields ||= category[:fields].select{ |field| field['element_class'].include? 'follow' }
+
+                parent_class = child_field['element_class'].gsub(/follow|sub/, '').strip
+                follow_fields.each do |parent_field|
+                  # find the parent field
+                  if (parent_field['element_id'] == child_field['element_id'] && parent_field['element_class'].include?(parent_class))
+                    # create new nested fields based on parent id and LOSAV JSON
+                    parent_field['options']
+                      .split(';')
+                      .map!{ |option| option.strip }
+                      .delete_if{ |option| option.blank? }
+                      .each do |option|
+                        new_field = child_field.clone
+                        new_field['nested_field_id'] = parent_field['id']
+                        new_field['nested_field_value'] = option
+                        new_field['options'] = losav_options[option].join(';')
+                        new_fields.push(new_field)
+                      end
+
+                    # set child_field to be deleted, replaced by new fields
+                    child_field['deleted'] = true
+                    break
+                  end
+                end
+              end
+            end
+            # add created fields if any were made
+            category[:fields].concat(new_fields)
+
+            # convert field_orders to arrays, where nested_fields have parent order and sibling order
+            nested_fields = []
+            category[:fields].each do |field|
+              field['field_order'] = [field['field_order']]
+              if (field['nested_field_id'] != nil)
+                parent_field = Field.find(field['nested_field_id'])
+                field['field_order'].unshift(parent_field['field_order'])
+              end
+            end
+
+            category[:fields].sort!{ |a, b| a['field_order'] <=> b['field_order'] }
+          end
+        end
+
+        # format and filter template data
+        templates_json.each do |template|
+          # remove deleted categories
+          template[:categories].delete_if{ |category| category['deleted'] }
+          template[:categories].each do |category|
+            # these keys are no longer necessary
+            category.delete_if{ |key| key.match /category_order|deleted/ }
+
+            # remove deleted fields
+            category[:fields].delete_if{ |field| field['deleted'] }
+            category[:fields].each do |field|
+              # reduce redundancy by setting fields with element_class of "required_field" as required
+              field['required'] = true if field['element_class'] == 'required_field'
+
+              # mark categories as required if they have any required fields
+              category['required'] = true if field['required']
+
+              # remove label if show_label is false
+              if (!field['show_label'])
+                field['label'] = nil
+              end
+
+              # replace options string with an array, and remove empty values
+              field['options'] = field['options']
+                .split(';')
+                .map!{ |option| option.strip }
+                .delete_if{ |option| option.blank? }
+
+              field.delete_if do |key, value|
+                case key
+                # these keys are no longer necessary
+                when /field_order|deleted|show_label|element_class|element_id/
+                  true
+                # these keys are only relevant if they have a value
+                when /element_id|element_class|options|label|nested_field_value|nested_field_id|required/
+                  value.blank?
+                else
+                  false
+                end
+              end
+            end
+          end
+        end
+      end
+
+      ########################################################
+      #--- Temporary methods for legacy app compatibility ---#
+      ########################################################
+      # ------------- BELOW ARE EVERYTHING ADDED FOR PROSAFET APP
+        #Added by BP Aug 8. render json for templates accessible to the current user
+        def template_json
+          @templates = Template.find(:all)
+          @templates.keep_if{|x| (current_user.has_template_access(x.name).include? "full")||(current_user.has_template_access(x.name).include? "submitter")}
+          stream = render_to_string(:template=>"submissions/template_json.js.erb" )
+          send_data(stream, :type => "json", :disposition => "inline")
+        end
+
+
+        def user_submission_json
+          @date = params[:date]
+          @submissions = Submission.find(:all, :conditions => [ "created_at > ? and user_id = ?",@date,current_user.id])
+          # @templates=Template.find(:all)
+          stream = render_to_string(:template => "submissions/user_submission_json.js.erb" )
+          response.headers['Content-Length'] = stream.bytesize.to_s
+          send_data(stream, :type => "json", :disposition => "inline")
+        end
+      ###############################
+      #--- End Temporary Methods ---#
+      ###############################
+
+    end
+  end
+end
