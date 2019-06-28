@@ -333,14 +333,6 @@ class UsersController < ApplicationController
       notice
     end
 
-    # mobile_user_info[:submissions] = current_user.submissions.as_json(only: [
-    #   :id,
-    #   :templates_id,
-    #   :description,
-    #   :event_date,
-    #   :completed
-    # ]).map {|submission| submission['submission']}
-
     render :json => mobile_user_info
   end
 
@@ -395,7 +387,5 @@ class UsersController < ApplicationController
       params[:"module_#{name}"].to_i == 1
     end.join(',')
   end
-
-
 
 end

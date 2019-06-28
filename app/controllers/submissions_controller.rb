@@ -649,7 +649,8 @@ class SubmissionsController < ApplicationController
         :completed,
         :description,
         :event_date,
-        :event_time_zone
+        :event_time_zone,
+        :templates_id
       ],
       include: {
         submission_fields: {
