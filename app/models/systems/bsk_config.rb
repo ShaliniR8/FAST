@@ -11,7 +11,7 @@ class BSK_Config
       :enable_configurable_risk_matrices              => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
-      :has_mobile_app                                 => false,
+      :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
 
 
