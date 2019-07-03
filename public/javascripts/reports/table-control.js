@@ -20,15 +20,19 @@ $(document).ready(
 			}
 		});
 		$('form').on('submit',function(){
-			var count=0;
-			var form=$(this);
+			var count = 0;
+			var form = $(this);
 			$("#included tbody tr").each(function(){
-				form.append('<input type="hidden" name=records['+count+ '] value='+$(this).attr("record")+'>');
-				count++;
+        if(typeof($(this).attr("record")) !== "undefined"){
+          form.append('<input type="hidden" name=records['+count+ '] value='+$(this).attr("record")+'>');
+          count++;
+        }
 			});
 			$("#candidates tbody tr").each(function(){
-				form.append('<input type="hidden" name=dettach['+count+ '] value='+$(this).attr("record")+'>');
-				count++;
+        if(typeof($(this).attr("record")) !== "undefined"){
+				  form.append('<input type="hidden" name=dettach['+count+ '] value='+$(this).attr("record")+'>');
+				  count++;
+        }
 			});
 			return true;
 		});

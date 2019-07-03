@@ -92,7 +92,7 @@
                       <%=field_value%>
                     <%when "user"%>
                       <%if field_value != nil && field_value != ""%>
-                        <%=User.find(field_value).full_name rescue ''%>
+                        <%=User.find(field_value).full_name rescue field_value.to_s%>
                       <%end%>
                     <%when "textarea"%>
                       <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>

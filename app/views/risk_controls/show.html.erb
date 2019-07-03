@@ -78,6 +78,7 @@
           <%case @risk_control.status%>
             <%when 'New', 'Open'%>
               <%if @risk_control.approver == current_user ||
+                    @risk_control.created_by == current_user ||
                     current_user.admin? ||
                     current_user.has_access('risk_controls','admin') %>
                 <%=link_to  "Assign", '#',

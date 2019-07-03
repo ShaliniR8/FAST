@@ -19,7 +19,9 @@
       </div>
       <div class="panel-body" id="form_body">
         <%form_for @hazard, :html => {:multipart => true} do |f|%>
-
+          <%if action_name == "new"%>
+            <%=f.hidden_field :created_by_id, :value => current_user.id%>
+          <%end%>
           <%if params[:owner_id].present?%>
             <%=f.hidden_field :sra_id, :value => params[:owner_id]%>
           <%end%>

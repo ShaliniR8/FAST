@@ -44,11 +44,13 @@
   <%elsif field_type == 'checkbox'%>
     <div class="form-group col-xs-<%=field_col%> <%=field_name%>">
       <b><%=field_description%>: </b></br>
-      <%field_value.reject(&:empty?).each do |x|%>
-        <div class="col-xs-6">
-          <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-          <%=x%>
-        </div>
+      <%if field_value.present?%>
+        <%field_value.reject(&:empty?).each do |x|%>
+          <div class="col-xs-6">
+            <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+            <%=x%>
+          </div>
+        <%end%>
       <%end%>
     </div>
 
