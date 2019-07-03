@@ -23,6 +23,7 @@ class SrasController < ApplicationController
 
 
   def index
+    @title = "SRAs"
     @table = Object.const_get("Sra")
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
