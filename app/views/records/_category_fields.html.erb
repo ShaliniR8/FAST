@@ -205,7 +205,7 @@
                   <%end%>
 
                 <%elsif field.display_type == "checkbox"%>
-                  <%current_options = @record_field.value.split(";")%>
+                  <%current_options = @record_field.value.split(";") rescue ''%>
                   <div class="col-xs-12">
                     <%field.getOptions.each do |option|%>
                       <div class="col-xs-6">

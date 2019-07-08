@@ -29,7 +29,7 @@
         <%end%>
         <%=rf.text_field :value,
           {
-            :class => required+" "+field_class+" "+field.element_class,
+            :class => required + " " + field_class + " " + field.element_class,
             :placeholder => field.label,
             :id=>field.element_id
           }%>
@@ -169,7 +169,7 @@
       <%elsif field.display_type == "checkbox"%>
         </br>
         <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
-          <%current_options = @record_field.value.split(";")%>
+          <%current_options = @record_field.value.split(";") rescue ''%>
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">

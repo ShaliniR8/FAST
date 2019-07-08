@@ -119,7 +119,7 @@
                   <%end%>
                 <%end%>
 
-                <%if current_user.admin?%>
+                <%if current_user.admin? || record_edit_access%>
                   <%=link_to 'Override Status', '#',
                     :class => 'btn btn-danger mb5',
                     :id => 'override_status_btn',

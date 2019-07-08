@@ -168,7 +168,7 @@ class InspectionsController < ApplicationController
       cars += Inspection.where('approver_id = ?',  current_user.id)
       if current_user.has_access('inspections','viewer')
         Inspection.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.empty?
+          if viewable.privileges.blank?
             cars += [viewable]
           else
             viewable.privileges.each do |privilege|
@@ -178,6 +178,7 @@ class InspectionsController < ApplicationController
           end
         end
       end
+      cars += Inspection.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
   end

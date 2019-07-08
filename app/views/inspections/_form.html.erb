@@ -19,6 +19,9 @@
       </div>
       <div class="panel-body" id="form_body">
         <%=form_for @inspection, :html => {:multipart => true} do |f|%>
+          <%if action_name == "new"%>
+            <%=f.hidden_field :created_by_id, :value => current_user.id%>
+          <%end%>
           <%=render "/shared/privilege_form", :target => "inspection[privileges][]", :owner => @inspection, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @inspection %>
           <%=render '/forms/attachments_form', :f => f, :owner => @inspection%>

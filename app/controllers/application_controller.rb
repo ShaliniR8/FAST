@@ -45,7 +45,7 @@ class ApplicationController < ActionController::Base
     else
       group_validation = false #to reduce calculation of whether user is part of the group if present
       report_privileges = report.privileges.present? ? report.get_privileges : []
-      if !report.privileges.empty?
+      if !report_privileges.empty?
         current_user.privileges.each do |p|
           if report.get_privileges.include? p.id.to_s
             group_validation = true
@@ -62,10 +62,11 @@ class ApplicationController < ActionController::Base
           report.viewer_access &&
           current_user.has_access("#{form}s",'viewer')
         redirect_to errors_path if !group_validation
+      elsif current_user.id == report.created_by_id
+        redirect_to errors_path if !group_validation
       else
         false
         redirect_to errors_path
-
       end
     end
   end

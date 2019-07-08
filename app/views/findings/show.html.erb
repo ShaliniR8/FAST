@@ -102,8 +102,9 @@
             <%if @finding.status == "New"%>
               <%if @finding.can_assign?%>
                 <%if @finding.approver == current_user ||
-                      current_user.admin? ||
-                      current_user.has_access(@type,'admin')%>
+                    @finding.created_by == current_user ||
+                    current_user.admin? ||
+                    current_user.has_access(@type,'admin')%>
                   <%=link_to 'Assign', '#',
                     :id => 'assign_btn',
                     :class => 'btn btn-warning pull-right mr5',
@@ -115,7 +116,7 @@
               <%end%>
 
             <%elsif @finding.status == "Assigned" %>
-              <%if current_user.admin? || @finding.responsible_user == current_user%>
+              <%if current_user.admin? || @finding.responsible_user == current_user || current_user.has_access(@type,'admin')%>
                 <%=link_to "Complete", "#",
                   :class => "btn btn-warning pull-right complete_btn mr5 mb5",
                   :id => 'complete',

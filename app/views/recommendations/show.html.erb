@@ -86,8 +86,9 @@
             <%if @recommendation.status == 'New'%>
               <%if @recommendation.can_assign? %>
                 <%if @recommendation.approver == current_user ||
-                        current_user.admin? ||
-                        current_user.has_access(@type,'admin')%>
+                    @recommendation.created_by == current_user ||
+                    current_user.admin? ||
+                    current_user.has_access(@type,'admin')%>
                   <%=link_to 'Assign', '#',
                     :id => 'assign_btn',
                     :class => 'btn btn-success pull-right mr5',

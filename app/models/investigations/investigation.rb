@@ -47,6 +47,7 @@ class Investigation < ActiveRecord::Base
       {field: 'title',                      title: 'Title',                         num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
+      {field: 'created_by_id',              title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'viewer_access',              title: 'Viewer Access',                 num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
@@ -365,10 +366,10 @@ class Investigation < ActiveRecord::Base
 
 
   def self.get_avg_complete
-    candidates=self.where("status=? and complete_date is not ? and open_date is not ? ","Completed",nil,nil)
+    candidates=self.where("status=? and complete_date is not ?","Completed",nil)
     if candidates.present?
       sum=0
-      candidates.map{|x| sum+=(x.complete_date-x.open_date).to_i}
+      candidates.map{|x| sum+=(x.complete_date-x.created_at.to_date).to_i}
       result= (sum.to_f/candidates.length.to_f).round(1)
       result
     else

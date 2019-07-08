@@ -74,9 +74,11 @@
           <div class="col-xs-12 mt20">
             <div class="col-xs-12 col-sm-2 mb5">
               <%=label_tag :submitted_by, "Submitted By"%>
+              <%#integrate @record.get_user_id in the future?%>
+              <%submitter_display = @record.submission.present? && @record.submission.anonymous? ? 'Anonymous' : @record.created_by.full_name%>
               <input type="text"
                 readonly class="form-control"
-                value='<%=@action == "new" ? current_user.full_name : @record.created_by.full_name%>'>
+                value='<%=@action == "new" ? current_user.full_name : submitter_display%>'>
             </div>
 
             <%if BaseConfig.airline[:submission_description]%>
