@@ -1,4 +1,6 @@
 class Investigation < ActiveRecord::Base
+  extend AnalyticsFilters
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -36,7 +38,6 @@ class Investigation < ActiveRecord::Base
   serialize :mitigated_probability
   before_create :set_extra
 
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
@@ -50,7 +51,7 @@ class Investigation < ActiveRecord::Base
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'viewer_access',              title: 'Viewer Access',                 num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'completion', title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
+      {field: 'completion',                 title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
       {field: 'responsible_user_id',        title: 'Investigator',                  num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'form,show',       required: false},
       {field: 'event_occured',              title: 'Date/Time When Event Occurred', num_cols: 6,  type: 'datetime',     visible: 'form,show',       required: false},
@@ -121,34 +122,6 @@ class Investigation < ActiveRecord::Base
     if self.privileges.blank?
       self.privileges=[]
     end
-  end
-
-  def set_extra
-    if self.severity_extra.blank?
-      self.severity_extra=[]
-    end
-    if self.severity_extra.blank?
-      self.probability_extra=[]
-    end
-    if self.mitigated_severity.blank?
-      self.mitigated_severity=[]
-    end
-    if self.mitigated_probability.blank?
-      self.mitigated_probability=[]
-    end
-  end
-
-  def get_extra_severity
-    self.severity_extra.present? ?  self.severity_extra : []
-  end
-  def get_extra_probability
-    self.probability_extra.present? ?  self.probability_extra : []
-  end
-  def get_mitigated_probability
-    self.mitigated_probability.present? ?  self.mitigated_probability : []
-  end
-  def get_mitigated_severity
-    self.mitigated_severity.present? ?  self.mitigated_severity : []
   end
 
   def create_transaction(action)
@@ -299,26 +272,6 @@ class Investigation < ActiveRecord::Base
     ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
   end
 
-  def can_complete? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.responsible_user_id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('investigations','admin')
-  end
-
-  def can_approve? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.final_approver_id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('investigations','admin')
-  end
-
-  def can_reopen? current_user
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('investigations','admin'))
-  end
-
   def likelihood_index
     if BaseConfig.airline[:base_risk_matrix]
       self.class.get_likelihood.index(self.likelihood).to_i
@@ -328,6 +281,7 @@ class Investigation < ActiveRecord::Base
     #self.class.get_likelihood.index(self.likelihood).to_i
     # self.likelihood.to_i
   end
+
   def likelihood_after_index
     if BaseConfig.airline[:base_risk_matrix]
       self.class.get_likelihood.index(self.likelihood_after).to_i

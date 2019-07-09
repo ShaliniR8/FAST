@@ -1,4 +1,6 @@
 class SmsAction < ActiveRecord::Base
+  extend AnalyticsFilters
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -25,7 +27,6 @@ class SmsAction < ActiveRecord::Base
   serialize :mitigated_severity
   serialize :mitigated_probability
 
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
@@ -396,28 +397,10 @@ class SmsAction < ActiveRecord::Base
     ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
   end
 
-  def can_assign?
-    self.immediate_action || (self.owner.status == 'Completed' rescue true)
-  end
 
-  def can_complete?(current_user)
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.responsible_user.id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('sms_actions','admin')
-  end
-
-  def can_approve?(current_user)
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == approver_id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('sms_actions','admin')
-  end
-
-  def can_reopen?(current_user)
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('sms_actions','admin'))
+  def can_assign?(user, form_conds: false, user_conds: false)
+    super(user, form_conds: form_conds, user_conds: user_conds) &&
+      (self.immediate_action || (self.owner.status == 'Completed' rescue true))
   end
 
 

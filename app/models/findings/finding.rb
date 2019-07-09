@@ -1,4 +1,6 @@
 class Finding < ActiveRecord::Base
+  extend AnalyticsFilters
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -28,7 +30,6 @@ class Finding < ActiveRecord::Base
   serialize       :mitigated_probability
   before_create   :set_extra
 
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
@@ -316,28 +317,9 @@ class Finding < ActiveRecord::Base
 
 
 
-  def can_assign?
-    self.immediate_action || self.owner.status == 'Completed'
-  end
-
-  def can_complete? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.responsible_user.id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('findings','admin')
-  end
-
-  def can_approve? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.approver.id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('findings','admin')
-  end
-
-  def can_reopen? current_user
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('findings','admin'))
+  def can_assign?(user, form_conds: false, user_conds: false)
+    super(user, form_conds: form_conds, user_conds: user_conds) &&
+      (self.immediate_action || self.owner.status == 'Completed')
   end
 
 

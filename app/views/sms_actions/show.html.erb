@@ -46,7 +46,7 @@
               'comment'
             ],
             owner: @owner %>
-          <%if @owner.status == "New" && !@owner.can_assign?%>
+          <%if @owner.status == "New" && !@owner.can_assign?(current_user)%>
             <b style='color:red;'>*Please complete the Source of Input before assigning the Corrective Action.</b>
           <%end%>
         </div>

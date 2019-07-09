@@ -1,4 +1,6 @@
 class Inspection < ActiveRecord::Base
+  extend AnalyticsFilters
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -28,7 +30,6 @@ class Inspection < ActiveRecord::Base
     before_create :set_priveleges
   serialize :privileges
 
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -201,26 +202,9 @@ class Inspection < ActiveRecord::Base
     return planned ? "Yes" : "No"
   end
 
-  def can_complete?(current_user)
-    current_user_id = session[:simulated_id] || session[:user_id]
-    result = (current_user_id == self.responsible_user_id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('inspections','admin')
-    self.items.each{|x| result=result&&x.status=='Completed'}
-    result
-  end
-
-  def can_approve?(current_user)
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.approver.id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('inspections','admin')
-  end
-
-  def can_reopen?(current_user)
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('inspections','admin'))
+  def can_complete?(user, form_conds: false, user_conds: false)
+    super(user, form_conds: form_conds, user_conds: user_conds) &&
+      self.items.all?{ |x| x.status == 'Completed' }
   end
 
 
