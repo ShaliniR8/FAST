@@ -20,16 +20,18 @@
 
           <%=render "/submissions/field", :field => field, :f => f%>
 
-          <div class="col-xs-12">
-            <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-              <div class="nested_field
-                nested_field_<%=field.id%>
-                nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
-                style="display:none;">
-                <%=render "/submissions/field", :field => nested_field, :f => f%>
-              </div>
-            <%end%>
-          </div>
+          <%if field.nested_fields.where(:deleted => false).present?%>
+            <div class="col-xs-12">
+              <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+                <div class="nested_field
+                  nested_field_<%=field.id%>
+                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                  style="display:none;">
+                  <%=render "/submissions/field", :field => nested_field, :f => f%>
+                </div>
+              <%end%>
+            </div>
+          <%end%>
 
         <%end%>
       </div>
