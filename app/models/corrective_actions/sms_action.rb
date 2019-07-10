@@ -1,6 +1,7 @@
 class SmsAction < ActiveRecord::Base
   extend AnalyticsFilters
   include StandardWorkflow
+  include RiskHandling
 
 #Concerns List
   include Attachmentable
@@ -18,14 +19,11 @@ class SmsAction < ActiveRecord::Base
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
   has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
 
+  serialize :privileges
+
   after_create -> { create_transaction('Create') }
   after_create    :owner_transaction
   before_create   :set_priveleges
-  serialize :privileges
-  serialize :severity_extra
-  serialize :probability_extra
-  serialize :mitigated_severity
-  serialize :mitigated_probability
 
 
   def self.get_meta_fields(*args)
@@ -105,6 +103,7 @@ class SmsAction < ActiveRecord::Base
     self.privileges.present? ?  self.privileges : []
   end
 
+
   def set_priveleges
     if self.privileges.blank?
       self.privileges = []
@@ -134,7 +133,6 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
   def owner_transaction #TODO Ensure polymorphism cooperates with sms_action
     Transaction.build_for(
       self.owner,
@@ -145,11 +143,9 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
   def approver_name
     self.approver.full_name rescue ''
   end
-
 
 
   def responsible_user_name
@@ -157,15 +153,14 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
   def schedule_date
     self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
   end
 
+
   def get_completion_date
     self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
   end
-
 
 
   def overdue
@@ -176,11 +171,9 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
   def emp_action
     return emp ? "Yes" : "No"
   end
-
 
 
   def dep_action
@@ -188,11 +181,9 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
   def im_action
     return immediate_action ? "Yes" : "No"
   end
-
 
 
   def com_action
@@ -214,121 +205,6 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
-  def get_before_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_before_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index]
-        .index(display_before_risk_factor)
-    end
-  end
-
-
-
-  def get_after_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_after_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index]
-        .index(display_after_risk_factor)
-    end
-  end
-
-
-
-  def display_before_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity
-    else
-      get_risk_values[:severity_1] rescue "N/A"
-    end
-  end
-
-
-
-  def display_before_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood
-    else
-      get_risk_values[:probability_1] rescue "N/A"
-    end
-  end
-
-
-
-  def display_before_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor rescue "N/A"
-    else
-      get_risk_values[:risk_1] rescue "N/A"
-    end
-  end
-
-
-
-  def display_after_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity_after
-    else
-      get_risk_values[:severity_2] rescue "N/A"
-    end
-  end
-
-
-
-  def display_after_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood_after
-    else
-      get_risk_values[:probability_2] rescue "N/A"
-    end
-  end
-
-
-
-  def display_after_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor_after rescue "N/A"
-    else
-      get_risk_values[:risk_2] rescue "N/A"
-    end
-  end
-
-
-
-  def get_risk_values
-    airport_config = Object.const_get("#{BaseConfig.airline[:code]}_Config")
-    matrix_config = airport_config::MATRIX_INFO
-    @severity_table = matrix_config[:severity_table]
-    @probability_table = matrix_config[:probability_table]
-    @risk_table = matrix_config[:risk_table]
-
-    @severity_score = airport_config.calculate_severity(severity_extra)
-    @sub_severity_score = airport_config.calculate_severity(mitigated_severity)
-    @probability_score = airport_config.calculate_severity(probability_extra)
-    @sub_probability_score = airport_config.calculate_severity(mitigated_probability)
-
-    @print_severity = airport_config.print_severity(self, @severity_score)
-    @print_probability = airport_config.print_probability(self, @probability_score)
-    @print_risk = airport_config.print_risk(@probability_score, @severity_score)
-
-    @print_sub_severity = airport_config.print_severity(self, @sub_severity_score)
-    @print_sub_probability = airport_config.print_probability(self, @sub_probability_score)
-    @print_sub_risk = airport_config.print_risk(@sub_probability_score, @sub_severity_score)
-
-    {
-      :severity_1       => @print_severity,
-      :severity_2       => @print_sub_severity,
-      :probability_1    => @print_probability,
-      :probability_2    => @print_sub_probability,
-      :risk_1           => @print_risk,
-      :risk_2           => @print_sub_risk,
-    }
-  end
-
-
-
   def get_id
     if self.custom_id.present?
       self.custom_id
@@ -336,6 +212,7 @@ class SmsAction < ActiveRecord::Base
       self.id
     end
   end
+
 
   def self.get_avg_complete
     candidates = self.where("status = ? and complete_date is not ? and created_at is not null",
@@ -351,78 +228,10 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
-  def set_extra
-    if self.severity_extra.blank?
-      self.severity_extra = []
-    end
-    if self.probability_extra.blank?
-      self.probability_extra = []
-    end
-    if self.mitigated_severity.blank?
-      self.mitigated_severity = []
-    end
-    if self.mitigated_probability.blank?
-      self.mitigated_probability = []
-    end
-  end
-
-
-
-  def get_extra_severity
-    self.severity_extra rescue []
-  end
-
-
-
-  def get_extra_probability
-    self.probability_extra rescue []
-  end
-
-
-
-  def get_mitigated_probability
-    self.mitigated_probability rescue []
-  end
-
-
-
-  def get_mitigated_severity
-    self.mitigated_severity rescue []
-  end
-
-
-
-  def self.get_likelihood
-    ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
-  end
-
-
   def can_assign?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       (self.immediate_action || (self.owner.status == 'Completed' rescue true))
   end
 
 
-  def likelihood_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood).to_i
-    else
-      self.likelihood.to_i
-    end
-    #self.class.get_likelihood.index(self.likelihood).to_i
-    #self.likelihood.to_i
-  end
-
-
-
-  def likelihood_after_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood_after).to_i
-    else
-      self.likelihood_after.to_i
-    end
-    #self.class.get_likelihood.index(self.likelihood_after).to_i
-    #self.likelihood_after.to_i
-  end
 end

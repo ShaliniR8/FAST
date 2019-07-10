@@ -1,6 +1,7 @@
 class Investigation < ActiveRecord::Base
   extend AnalyticsFilters
   include StandardWorkflow
+  include RiskHandling
 
 #Concerns List
   include Attachmentable
@@ -32,11 +33,6 @@ class Investigation < ActiveRecord::Base
   before_create :set_priveleges
 
   serialize :privileges
-  serialize :severity_extra
-  serialize :probability_extra
-  serialize :mitigated_severity
-  serialize :mitigated_probability
-  before_create :set_extra
 
 
   def self.get_meta_fields(*args)
@@ -104,6 +100,7 @@ class Investigation < ActiveRecord::Base
     }
   end
 
+
   def get_source
     if self.record.present?
       "<a style='font-weight:bold' href='/records/#{self.record.id}'>
@@ -114,15 +111,18 @@ class Investigation < ActiveRecord::Base
     end
   end
 
+
   def get_privileges
     self.privileges.present? ?  self.privileges : []
   end
+
 
   def set_priveleges
     if self.privileges.blank?
       self.privileges=[]
     end
   end
+
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
@@ -134,131 +134,48 @@ class Investigation < ActiveRecord::Base
       )
     end
   end
+
+
   def investigation_type
     self.inv_type
   end
+
 
   def get_investigator_name
     self.responsible_user.present? ? self.responsible_user.full_name : ""
   end
 
+
   def get_approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
+
 
   def get_scheduled_date
     self.completion.present? ?  (self.completion.strftime("%Y-%m-%d")) : ""
   end
 
+
   def overdue
     self.completion.present? ? self.completion < Time.now.to_date&&self.status!="Completed" : false
   end
+
 
   def type
     return "Investigation"
   end
 
+
   def get_event_occured_date
     self.event_occured.present? ? (self.event_occured.strftime("%Y-%m-%d %H:%M")) : ""
   end
+
 
   def get_local_date
     self.local_event_occured.present? ? (self.local_event_occured.strftime("%Y-%m-%d %H:%M")) : ""
   end
 
-  def get_before_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_before_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].index(display_before_risk_factor)
-    end
-  end
 
-  def get_after_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_after_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].index(display_after_risk_factor)
-    end
-  end
-
-  def display_before_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity
-    else
-      get_risk_values[:severity_1].present? ? get_risk_values[:severity_1] : "N/A"
-    end
-  end
-
-  def display_before_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood
-    else
-      get_risk_values[:probability_1].present? ? get_risk_values[:probability_1] : "N/A"
-    end
-  end
-
-  def display_before_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor.present? ? risk_factor : "N/A"
-    else
-      get_risk_values[:risk_1].present? ? get_risk_values[:risk_1] : "N/A"
-    end
-  end
-
-  def display_after_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity_after
-    else
-      get_risk_values[:severity_2].present? ? get_risk_values[:severity_2] : "N/A"
-    end
-  end
-
-  def display_after_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood_after
-    else
-      get_risk_values[:probability_2].present? ? get_risk_values[:probability_2] : "N/A"
-    end
-  end
-
-  def display_after_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor_after.present? ? risk_factor_after : "N/A"
-    else
-      get_risk_values[:risk_2].present? ? get_risk_values[:risk_2] : "N/A"
-    end
-  end
-
-  def get_risk_values
-    airport_config = Object.const_get("#{BaseConfig.airline[:code]}_Config")
-    matrix_config = airport_config::MATRIX_INFO
-    @severity_table = matrix_config[:severity_table]
-    @probability_table = matrix_config[:probability_table]
-    @risk_table = matrix_config[:risk_table]
-
-    @severity_score = airport_config.calculate_severity(severity_extra)
-    @sub_severity_score = airport_config.calculate_severity(mitigated_severity)
-    @probability_score = airport_config.calculate_severity(probability_extra)
-    @sub_probability_score = airport_config.calculate_severity(mitigated_probability)
-
-    @print_severity = airport_config.print_severity(self, @severity_score)
-    @print_probability = airport_config.print_probability(self, @probability_score)
-    @print_risk = airport_config.print_risk(@probability_score, @severity_score)
-
-    @print_sub_severity = airport_config.print_severity(self, @sub_severity_score)
-    @print_sub_probability = airport_config.print_probability(self, @sub_probability_score)
-    @print_sub_risk = airport_config.print_risk(@sub_probability_score, @sub_severity_score)
-
-    {
-      :severity_1       => @print_severity,
-      :severity_2       => @print_sub_severity,
-      :probability_1    => @print_probability,
-      :probability_2    => @print_sub_probability,
-      :risk_1           => @print_risk,
-      :risk_2           => @print_sub_risk,
-    }
-  end
   def get_id
     if self.custom_id.present?
       self.custom_id
@@ -268,37 +185,15 @@ class Investigation < ActiveRecord::Base
   end
 
 
-  def self.get_likelihood
-    ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
-  end
-
-  def likelihood_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood).to_i
-    else
-      self.likelihood.to_i
-    end
-    #self.class.get_likelihood.index(self.likelihood).to_i
-    # self.likelihood.to_i
-  end
-
-  def likelihood_after_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood_after).to_i
-    else
-      self.likelihood_after.to_i
-    end
-    #self.class.get_likelihood.index(self.likelihood_after).to_i
-    # self.likelihood_after.to_i
-  end
-
   def get_ntsb
     return ntsb ? "Yes" : "No"
   end
 
+
   def get_safety_hazard
     return safety_hazard ? "Yes" : "No"
   end
+
 
   def self.get_terms
     {
@@ -324,7 +219,6 @@ class Investigation < ActiveRecord::Base
       "Risk Factor (Mitigated)"                       => "risk_factor_after"
     }.sort.to_h
   end
-
 
 
   def self.get_avg_complete
