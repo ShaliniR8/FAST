@@ -44,13 +44,13 @@ class JUS_Config
   RISK_ARRAY = {
     :sms_actions => {
       :form => "mitigate",
-      :baseline => false,
-      :mitigate => true,
-    },
-    :findings => {
-      :form => nil,
       :baseline => true,
       :mitigate => false,
+    },
+    :findings => {
+      :form => "baseline",
+      :baseline => true,
+      :mitigate => true,
     },
     :hazards => {
       :form => "baseline",

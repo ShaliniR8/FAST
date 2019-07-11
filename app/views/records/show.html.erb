@@ -24,7 +24,7 @@
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
-              Report #<%=@record.get_id%>: <%="#{@record.template.name}"%>
+              Report #<%=@record.get_id%>: <%=@record.template.name}%>
             </div>
             <div class="top_buttons pull-right">
 
@@ -136,9 +136,6 @@
                     :class=>"btn btn-danger mb5 "%>
                 <%end%>
 
-
-
-
               <%end%>
             </div>
           </div>
@@ -174,7 +171,7 @@
                 <%=link_to "Add to Event",
                   add_reports_path(:template=>@record.template,:record=>@record),
                   :id => "report-btn",
-                  :class => "btn btn-success mr5 mb5  pull-right",
+                  :class => "btn btn-success mr5 mb5 pull-right",
                   :disable_with => "Adding..."%>
               <%end%>
 
@@ -235,11 +232,7 @@
             <%end%>
           </div>
 
-
-          <%#=render "/shared/processing_instructions", :owner => @record%>
-
           <%=render "forms/show_fields", :fields => Record.get_meta_fields('show'), :record => @record%>
-
 
           <%if @record.submission.present?%>
             <%if @record.submission.comments.present?%>

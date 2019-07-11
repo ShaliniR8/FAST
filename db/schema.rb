@@ -197,10 +197,6 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
     t.text     "value"
-<<<<<<< HEAD
-    t.text     "options"
-=======
->>>>>>> 561259f... Adds configurable risk matrices and JUS configurations
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "options"

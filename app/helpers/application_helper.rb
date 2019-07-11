@@ -119,6 +119,8 @@ module ApplicationHelper
   def print_special_matrix(target)
     load_special_matrix(target)
 
+    @notes = target.statement
+    
     @severity_score = calculate_severity(target.severity_extra)
     @sub_severity_score = calculate_severity(target.mitigated_severity)
 

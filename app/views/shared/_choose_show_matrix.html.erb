@@ -1,5 +1,6 @@
 <%if BaseConfig.airline[:base_risk_matrix]%>  
   <%if BaseConfig.airline_code == 'Demo' && type == 'hazards'%>
+    <!--if Demo and Hazards use BOE's matrix-->
     <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
       :owner => owner,
       :show_btns => show_btn,

@@ -9,10 +9,7 @@
     </div>
     <div class="panel-body" style="display:none">
       <div class="row col-xs-12">
-        <%=render "shared/instructions",
-                :instruction => "Select the <b>Baseline Severity</b> and the <b>Baseline Likelihood</b> from dropdown to see Risk Factor."%>
-        <%=render "shared/bsk_risk_matrix_form_baseline", :f => f%>
-        <%=render "shared/bsk_risk_matrix_table_form"%>
+        <%=render '/shared/baseline_content', :f => f%>
       </div>
     </div>
   </div>

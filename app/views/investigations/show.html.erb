@@ -58,7 +58,7 @@
           </div>
 
           <%=render '/forms/show_fields', :fields => @fields, :record => @owner %>
-          <%=render '/checklists/checklist_types', :owner => @owner, :type => 'investigation'%>
+          <!-- <%#=render '/checklists/checklist_types', :owner => @owner, :type => 'investigation'%> -->
 
           <%can_change = @owner.status != "Completed" &&
             @owner.status != "Pending Approval" &&
@@ -97,10 +97,10 @@
             :fields=> SmsTask.get_meta_fields('show')%>
 
           <%=render "/forms/cost", :owner => @owner%>
-        <%=render 'forms/signatures/show_signatures', owner: @owner %>
+          <%=render 'forms/signatures/show_signatures', owner: @owner %>
 
 
-          <%#=render "/records/show_template_fields", :record => @owner.record%>
+          <!-- <%#=render "/records/show_template_fields", :record => @owner.record%> -->
 
           <%=render "/forms/show_comment", :owner => @owner%>
           <%=render "/forms/attachments_show", :owner => @owner%>

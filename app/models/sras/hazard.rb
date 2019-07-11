@@ -102,7 +102,7 @@ class Hazard < ActiveRecord::Base
       ]
     end
   end
-
+  
 
   def get_root_causes
     root_cause_arr = root_causes.map{|x| "<li>#{x.cause_option.name}</li>"}.join("").html_safe
