@@ -26,10 +26,9 @@ class Evaluation < ActiveRecord::Base
 
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :items
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
 
   before_create :set_priveleges
+  after_create :create_transaction
   serialize :privileges
 
 

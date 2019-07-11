@@ -29,10 +29,10 @@ class Investigation < ActiveRecord::Base
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
 
-  after_create -> { create_transaction('Create') }
-  before_create :set_priveleges
-
   serialize :privileges
+
+  before_create :set_priveleges
+  after_create :create_transaction
 
 
   def self.get_meta_fields(*args)
@@ -73,6 +73,7 @@ class Investigation < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+
   def self.get_custom_options(title)
     CustomOption
       .where(:title => title)
@@ -80,6 +81,7 @@ class Investigation < ActiveRecord::Base
       .options
       .split(';') rescue ['Please go to Custom Options to add options.']
   end
+
 
   def self.user_levels
     {
@@ -120,18 +122,6 @@ class Investigation < ActiveRecord::Base
   def set_priveleges
     if self.privileges.blank?
       self.privileges=[]
-    end
-  end
-
-
-  def create_transaction(action)
-    if !self.changes()['viewer_access'].present?
-      Transaction.build_for(
-        self,
-        action,
-        ((session[:simulated_id] || session[:user_id]) rescue nil),
-        defined?(session) ? '' : 'Recurring Investigation'
-      )
     end
   end
 
@@ -232,4 +222,6 @@ class Investigation < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

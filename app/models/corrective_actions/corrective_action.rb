@@ -1,4 +1,5 @@
 class CorrectiveAction < ActiveRecord::Base
+  extend AnalyticsFilters
 
 #Concerns List
   include Attachmentable
@@ -13,15 +14,11 @@ class CorrectiveAction < ActiveRecord::Base
   belongs_to  :approver,              foreign_key: 'approver_id',         class_name: 'User'
   belongs_to  :created_by,            foreign_key: 'created_by_id',       class_name: 'User'
 
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
-
-  after_create :create_report_record_transaction
   serialize :privileges
   before_create :set_priveleges
+  after_create :create_report_record_transaction
+  after_create :create_transaction
 
-
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -65,10 +62,10 @@ class CorrectiveAction < ActiveRecord::Base
     }
   end
 
+
   def self.getStatusOptions
     ["New", "Open", "Assigned", "Rejected", "Completed"]
   end
-
 
 
   def self.getYesNoOptions
@@ -79,28 +76,14 @@ class CorrectiveAction < ActiveRecord::Base
   end
 
 
-
-
   def get_privileges
     self.privileges.present? ?  self.privileges : []
   end
 
 
-
   def set_priveleges
     self.privileges=[]
   end
-
-
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      session[:user_id]
-    )
-  end
-
 
 
   def create_report_record_transaction()
@@ -123,7 +106,6 @@ class CorrectiveAction < ActiveRecord::Base
   end
 
 
-
   def self.departments
     [
       "Crew Scheduling","Environmental","Flight Ops-Line",
@@ -142,7 +124,6 @@ class CorrectiveAction < ActiveRecord::Base
   end
 
 
-
   def self.status_options
     [
       "New",
@@ -152,7 +133,6 @@ class CorrectiveAction < ActiveRecord::Base
       "Completed"
     ]
   end
-
 
 
   def self.action_options
@@ -180,6 +160,7 @@ class CorrectiveAction < ActiveRecord::Base
     ]
   end
 
+
   def get_description
     if self.description.blank?
       ""
@@ -189,6 +170,7 @@ class CorrectiveAction < ActiveRecord::Base
       self.description
     end
   end
+
 
   def get_response
     if self.response.blank?
@@ -200,6 +182,7 @@ class CorrectiveAction < ActiveRecord::Base
     end
   end
 
+
   def get_opened
     if self.opened_date.present?
       self.opened_date.strftime("%Y-%m-%d")
@@ -208,6 +191,7 @@ class CorrectiveAction < ActiveRecord::Base
     end
   end
 
+
   def get_association
     if self.employee
       "Employee"
@@ -215,6 +199,7 @@ class CorrectiveAction < ActiveRecord::Base
       "Company"
     end
   end
+
 
   def self.get_headers
     [
@@ -229,13 +214,16 @@ class CorrectiveAction < ActiveRecord::Base
     ]
   end
 
+
   def get_final_approver
     approver.full_name
   end
 
+
   def get_responsible_user
     employee_responsible.full_name
   end
+
 
   def get_id
     if self.custom_id.present?
@@ -244,6 +232,7 @@ class CorrectiveAction < ActiveRecord::Base
       self.id
     end
   end
+
 
   def self.get_search_terms
     {
@@ -256,6 +245,7 @@ class CorrectiveAction < ActiveRecord::Base
     }
   end
 
+
   def self.terms
     {
       :status=>{ :type =>"select",:options=>self.status_options},
@@ -266,6 +256,7 @@ class CorrectiveAction < ActiveRecord::Base
       :action=>{:type=>"datalist",:options=>self.action_options}
     }
   end
+
 
   def self.get_avg_complete
     candidates = self.where("status = ? and created_at is not ? and close_date is not ?",
@@ -279,4 +270,6 @@ class CorrectiveAction < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

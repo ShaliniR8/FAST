@@ -16,10 +16,12 @@ class Recommendation < ActiveRecord::Base
 
   has_many :descriptions, foreign_key: 'owner_id', class_name: 'RecommendationDescription', dependent: :destroy
 
-  after_create :create_recommendation_transaction
-  before_create :set_priveleges
-
   serialize :privileges
+
+  before_create :set_priveleges
+  after_create :create_transaction
+  after_create :create_owner_transaction
+
 
 
   def self.get_meta_fields(*args)
@@ -86,31 +88,6 @@ class Recommendation < ActiveRecord::Base
       self.privileges = []
     end
   end
-
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      (session[:simulated_id] || session[:user_id])
-    )
-  end
-
-
-  def create_recommendation_transaction
-    Transaction.build_for(
-      self,
-      'Create',
-      (session[:simulated_id] || session[:user_id])
-    )
-    Transaction.build_for(
-      self.owner,
-      'Add Recommendation',
-      (session[:simulated_id] || session[:user_id]),
-      "##{self.get_id} #{self.title}"
-    )
-  end
-
 
 
   def get_id

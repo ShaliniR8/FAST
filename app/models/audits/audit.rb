@@ -30,10 +30,8 @@ class Audit < ActiveRecord::Base
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true
   accepts_nested_attributes_for :checklists
 
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
   before_create :set_priveleges
-
+  after_create :create_transaction
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)

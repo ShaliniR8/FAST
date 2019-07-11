@@ -24,11 +24,10 @@ class Inspection < ActiveRecord::Base
 
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :items
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
 
-    before_create :set_priveleges
   serialize :privileges
+  before_create :set_priveleges
+  after_create :create_transaction
 
 
   def self.get_meta_fields(*args)
@@ -38,7 +37,7 @@ class Inspection < ActiveRecord::Base
       {field: 'title',                    title: 'Title',                       num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       {                                                                                       type: 'newline',      visible: 'show'},
       {field: 'status',                   title: 'Status',                      num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',           title: 'Created By',                   num_cols: 6,  type: 'user',         visible: 'show',            required: false},
 
       {                                                                                       type: 'newline',      visible: 'show'},
       {field: 'viewer_access',            title: 'Viewer Access',               num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
@@ -64,6 +63,7 @@ class Inspection < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+
   def self.get_custom_options(title)
     CustomOption
       .where(:title => title)
@@ -71,6 +71,7 @@ class Inspection < ActiveRecord::Base
       .options
       .split(';') rescue ['Please go to Custom Options to add options.']
   end
+
 
   def self.user_levels
     {
@@ -92,11 +93,9 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
   def get_privileges
     self.privileges.present? ?  self.privileges : []
   end
-
 
 
   def set_priveleges
@@ -106,24 +105,9 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
-  def create_transaction(action)
-    if !self.changes()['viewer_access'].present?
-      Transaction.build_for(
-        self,
-        action,
-        ((session[:simulated_id] || session[:user_id]) rescue nil),
-        defined?(session) ? '' : 'Recurring Inspection'
-      )
-    end
-  end
-
-
-
   def clear_checklist
     self.items.each {|x| x.destroy}
   end
-
 
 
   def open_checklist
@@ -139,17 +123,14 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
   def inspector_name
     self.responsible_user.present? ?  self.responsible_user.full_name : ""
   end
 
 
-
   def approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
-
 
 
   def self.get_avg_complete
@@ -165,11 +146,9 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
   def get_completion_date
     self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
   end
-
 
 
   def get_id
@@ -181,26 +160,15 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
-  def release_findings
-    self.findings.each do |f|
-      if f.status=="Pending Release"
-        f.status="Open"
-        f.open_date=Time.now.to_date
-        f.save
-      end
-    end
-  end
-
   def overdue
     self.completion.present? ? self.completion<Time.now.to_date&&self.status!="Completed" : false
   end
 
 
-
   def get_planned
     return planned ? "Yes" : "No"
   end
+
 
   def can_complete?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
@@ -231,7 +199,6 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
   def self.get_avg_complete
     candidates=self.where("status=? and complete_date is not ? and open_date is not ? ","Completed",nil,nil)
     if candidates.present?
@@ -243,4 +210,6 @@ class Inspection < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

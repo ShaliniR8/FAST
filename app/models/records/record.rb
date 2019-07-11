@@ -1,4 +1,5 @@
 class Record < ActiveRecord::Base
+  extend AnalyticsFilters
 
 #Concerns List
 include Attachmentable
@@ -36,12 +37,9 @@ include Transactionable
   accepts_nested_attributes_for :descriptions
 
 
-  after_create -> { creation_transaction }
-
-
   before_create :set_extra
+  after_create -> { create_transaction(context: 'Generated report from user submission.') }
 
-  extend AnalyticsFilters
 
 
 
@@ -83,7 +81,6 @@ include Transactionable
   end
 
 
-
   def reopen(new_status)
     self.status = new_status
     Transaction.build_for(
@@ -93,7 +90,6 @@ include Transactionable
     )
     self.save
   end
-
 
 
   # whether the current user can access this record
@@ -111,7 +107,6 @@ include Transactionable
   end
 
 
-
   def getTimeZone()
     ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
      "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
@@ -122,7 +117,6 @@ include Transactionable
      "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
      "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
-
 
 
   def set_extra
@@ -141,11 +135,9 @@ include Transactionable
   end
 
 
-
   def get_extra_severity
     self.severity_extra.present? ?  self.severity_extra : []
   end
-
 
 
   def get_extra_probability
@@ -153,28 +145,14 @@ include Transactionable
   end
 
 
-
   def get_mitigated_probability
     self.mitigated_probability.present? ?  self.mitigated_probability : []
   end
 
 
-
   def get_mitigated_severity
     self.mitigated_severity.present? ?  self.mitigated_severity : []
   end
-
-
-
-  def creation_transaction
-    Transaction.build_for(
-      self,
-      'Create',
-      (self.anonymous? ? '' : session[:user_id]),
-      'Generated report from user submission'
-    )
-  end
-
 
 
   def self.get_headers
@@ -205,7 +183,6 @@ include Transactionable
   end
 
 
-
   def get_before_risk_color
     if BaseConfig.airline[:base_risk_matrix]
       BaseConfig::RISK_MATRIX[:risk_factor][display_before_risk_factor]
@@ -213,7 +190,6 @@ include Transactionable
       Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].key(display_before_risk_factor)
     end
   end
-
 
 
   def get_after_risk_color
@@ -225,7 +201,6 @@ include Transactionable
   end
 
 
-
   def display_before_severity
     if BaseConfig.airline[:base_risk_matrix]
       severity
@@ -233,7 +208,6 @@ include Transactionable
       get_risk_values[:severity_1].present? ? get_risk_values[:severity_1] : "N/A"
     end
   end
-
 
 
   def display_before_likelihood
@@ -245,7 +219,6 @@ include Transactionable
   end
 
 
-
   def display_before_risk_factor
     if BaseConfig.airline[:base_risk_matrix]
       risk_factor.present? ? risk_factor : "N/A"
@@ -253,7 +226,6 @@ include Transactionable
       get_risk_values[:risk_1].present? ? get_risk_values[:risk_1] : "N/A"
     end
   end
-
 
 
   def display_after_severity
@@ -265,7 +237,6 @@ include Transactionable
   end
 
 
-
   def display_after_likelihood
     if BaseConfig.airline[:base_risk_matrix]
       likelihood_after
@@ -275,7 +246,6 @@ include Transactionable
   end
 
 
-
   def display_after_risk_factor
     if BaseConfig.airline[:base_risk_matrix]
       risk_factor_after.present? ? risk_factor_after : "N/A"
@@ -283,7 +253,6 @@ include Transactionable
       get_risk_values[:risk_2].present? ? get_risk_values[:risk_2] : "N/A"
     end
   end
-
 
 
   def get_risk_values
@@ -317,7 +286,6 @@ include Transactionable
   end
 
 
-
   def get_viewer_access
     if self.viewer_access
       "Yes"
@@ -325,7 +293,6 @@ include Transactionable
       "No"
     end
   end
-
 
 
   def get_id
@@ -337,25 +304,9 @@ include Transactionable
   end
 
 
-
   def get_event_date
     self.event_date.strftime("%Y-%m-%d %H:%M:%S")
   end
-
-
-
-
-  def create_transaction(action, content)
-    if !self.changes()['viewer_access'].present?
-      Transaction.build_for(
-        self,
-        action,
-        (session[:simulated_id] || session[:user_id]),
-        content
-      )
-    end
-  end
-
 
 
   def self.get_terms
@@ -376,12 +327,10 @@ include Transactionable
   end
 
 
-
   def get_field(id)
     f = self.record_fields.find_by_fields_id(id)
     f.present? ? f.value : ""
   end
-
 
 
   def get_field_by_label(label)
@@ -392,7 +341,6 @@ include Transactionable
   end
 
 
-
   def submit_name
     if self.anonymous?
       'Anonymous'
@@ -400,7 +348,6 @@ include Transactionable
       self.created_by.full_name
     end
   end
-
 
 
   def get_description
@@ -416,11 +363,9 @@ include Transactionable
   end
 
 
-
   def get_template
     self.template.name
   end
-
 
 
   def submitted_date
@@ -428,17 +373,14 @@ include Transactionable
   end
 
 
-
   def updated_date
     self.updated_at.strftime("%Y-%m-%d") rescue ''
   end
 
 
-
   def self.getStatus
     ["New", "In Progress", "Closed"]
   end
-
 
 
   def self.build(template)
@@ -448,17 +390,14 @@ include Transactionable
   end
 
 
-
   def categories
     self.template.categories
   end
 
 
-
   def all_causes
     self.suggestions + self.descriptions + self.causes + self.detections + self.reactions
   end
-
 
 
   def time_diff(base)
@@ -470,17 +409,14 @@ include Transactionable
   end
 
 
-
   def get_date
     self.event_date.strftime("%Y-%m-%d") rescue ''
   end
 
 
-
   def self.get_likelihood
     ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
   end
-
 
 
   def likelihood_index
@@ -492,7 +428,6 @@ include Transactionable
   end
 
 
-
   def likelihood_after_index
     if BaseConfig.airline[:base_risk_matrix]
       self.class.get_likelihood.index(self.likelihood_after).to_i
@@ -500,7 +435,6 @@ include Transactionable
       self.likelihood_after.to_i
     end
   end
-
 
 
   def convert(copy=true)
@@ -575,7 +509,6 @@ include Transactionable
   end
 
 
-
   def self.get_avg_complete(current_user)
     candidates = self.where("status = ? and close_date is not ?", "Closed", nil)
     candidates.keep_if{|r| current_user.has_access(r.template.name, "full" ) }
@@ -588,7 +521,6 @@ include Transactionable
       "N/A"
     end
   end
-
 
 
   def satisfy(conditions)
@@ -652,9 +584,6 @@ include Transactionable
   end
 
 
-
-
-
   def has_emp
     self.corrective_actions.each do |c|
       if c.employee
@@ -670,7 +599,6 @@ include Transactionable
     end
     false
   end
-
 
 
   def has_com
@@ -690,7 +618,6 @@ include Transactionable
   end
 
 
-
   def get_instructions
     case status
     when 'New'
@@ -708,7 +635,6 @@ include Transactionable
 
     end
   end
-
 
 
 end

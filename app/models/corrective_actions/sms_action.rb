@@ -21,9 +21,9 @@ class SmsAction < ActiveRecord::Base
 
   serialize :privileges
 
-  after_create -> { create_transaction('Create') }
-  after_create    :owner_transaction
   before_create   :set_priveleges
+  after_create :create_transaction
+  after_create -> { create_owner_transaction(action:'Add Corrective Action') }
 
 
   def self.get_meta_fields(*args)
@@ -121,25 +121,6 @@ class SmsAction < ActiveRecord::Base
     else
       status
     end
-  end
-
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      (session[:simulated_id] || session[:user_id])
-    )
-  end
-
-
-  def owner_transaction #TODO Ensure polymorphism cooperates with sms_action
-    Transaction.build_for(
-      self.owner,
-      'Add Corrective Action',
-      (session[:simulated_id] || session[:user_id]),
-      "##{self.get_id} - #{self.title}"
-    )
   end
 
 

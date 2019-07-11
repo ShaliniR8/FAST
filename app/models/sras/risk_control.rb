@@ -1,4 +1,5 @@
 class RiskControl < ActiveRecord::Base
+  extend AnalyticsFilters
 
 #Concerns List
   include Attachmentable
@@ -15,9 +16,9 @@ class RiskControl < ActiveRecord::Base
 
   accepts_nested_attributes_for :descriptions
 
-  after_create -> { create_transaction('Create') }
+  after_create :create_transaction
+  after_create :create_owner_transaction
 
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -48,36 +49,15 @@ class RiskControl < ActiveRecord::Base
   end
 
 
-
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      session[:user_id]
-    )
-    Transaction.build_for(
-      self.hazard,
-      'Add Risk Control',
-      session[:user_id],
-      "##{self.get_id} #{self.title}"
-    )
-  end
-
-  def release
-    if self.status=="New"
-      self.status="Open"
-      self.save
-    end
-  end
-
   def get_approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
 
+
   def get_responsible_user_name
     self.responsible_user.present? ? self.responsible_user.full_name : ""
   end
+
 
   def get_completion_date
     self.scheduled_completion_date.present? ? self.scheduled_completion_date.strftime("%Y-%m-%d") : ""
@@ -92,6 +72,7 @@ class RiskControl < ActiveRecord::Base
       .split(';') rescue ['Please go to Custom Options to add options.']
   end
 
+
   def get_id
     if self.custom_id.present?
       self.custom_id
@@ -100,11 +81,13 @@ class RiskControl < ActiveRecord::Base
     end
   end
 
+
   def can_complete? current_user
     (current_user.id == @risk_control.responsible_user_id rescue true) ||
       current_user.admin? ||
       current_user.has_access('sras','admin')
   end
+
 
   def can_approve? current_user
     current_user_id = session[:simulated_id] || session[:user_id]
@@ -113,19 +96,23 @@ class RiskControl < ActiveRecord::Base
       current_user.has_access('sras','admin'))
   end
 
+
   def can_reopen? current_user
     BaseConfig.airline[:allow_reopen_report] && (
       current_user.admin? ||
       current_user.has_access('sras','admin'))
   end
 
+
   def type
     "RiskControl"
   end
 
+
   def overdue
     self.scheduled_completion_date.present? ? self.scheduled_completion_date<Time.now.to_date&&self.status!="Completed" : false
   end
+
 
   def self.get_avg_complete
     candidates=self.where("status=? and date_complete is not ? and date_open is not ?","Completed",nil,nil)
@@ -138,4 +125,6 @@ class RiskControl < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

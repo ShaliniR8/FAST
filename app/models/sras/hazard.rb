@@ -20,7 +20,8 @@ class Hazard < ActiveRecord::Base
   accepts_nested_attributes_for :descriptions
 
 
-  after_create -> { create_transaction('Create') }
+  after_create :create_transaction
+  after_create :create_owner_transaction
 
 
   def self.get_meta_fields(*args)
@@ -104,20 +105,6 @@ class Hazard < ActiveRecord::Base
     end
   end
 
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      (session[:simulated_id] || session[:user_id])
-    )
-    Transaction.build_for(
-      self.sra,
-      'Add Hazard',
-      (session[:simulated_id] || session[:user_id]),
-      "##{self.get_id} #{self.title}"
-    )
-  end
-
 
   def get_root_causes
     root_cause_arr = root_causes.map{|x| "<li>#{x.cause_option.name}</li>"}.join("").html_safe
@@ -149,9 +136,6 @@ class Hazard < ActiveRecord::Base
         current_user.has_access('sras','admin'))
     end
 
-    def release_controls
-      self.risk_controls.each(&:release)
-    end
 
     def self.get_avg_complete
       candidates=self.where("status=? and close_date is not ? and created_at is not ?","Completed",nil,nil)

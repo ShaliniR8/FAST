@@ -31,9 +31,7 @@ class Sra < ActiveRecord::Base
 
   accepts_nested_attributes_for :hazards
 
-  after_create -> { create_transaction('Create') }
-
-
+  after_create :create_transaction
 
   def self.progress
     {
@@ -86,14 +84,6 @@ class Sra < ActiveRecord::Base
       .split(';') rescue ['Please go to Custom Options to add options.']
   end
 
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      (session[:simulated_id] || session[:user_id])
-    )
-  end
 
   def approver_name
     self.approver.present? ? self.approver.full_name : ""
@@ -184,11 +174,6 @@ class Sra < ActiveRecord::Base
     else
       "N/A"
     end
-  end
-
-
-  def release_controls
-    self.hazards.each(&:release_controls)
   end
 
 

@@ -22,9 +22,10 @@ class Finding < ActiveRecord::Base
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
 
-  after_create    :create_finding_transaction
-  before_create   :set_priveleges
   serialize       :privileges
+  before_create   :set_priveleges
+  after_create    :create_transaction
+  after_create    :create_owner_transaction
 
 
   def self.get_meta_fields(*args)
@@ -36,7 +37,7 @@ class Finding < ActiveRecord::Base
       {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {field: 'get_source',                 title: 'Source of Input',               num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',              title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
 
       {field: 'responsible_user_id',        title: 'Responsible User',              num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'index,form,show',       required: false},
@@ -84,9 +85,11 @@ class Finding < ActiveRecord::Base
       .split(';') rescue ['Please go to Custom Options to add options.']
   end
 
+
   def get_source
     "<b style='color:grey'>N/A</b>".html_safe
   end
+
 
   def self.progress
     {
@@ -96,6 +99,7 @@ class Finding < ActiveRecord::Base
       "Completed"         => { :score => 100, :color => "success"},
     }
   end
+
 
   def get_owner
     "#{self.owner_type.underscore}s"
@@ -119,40 +123,20 @@ class Finding < ActiveRecord::Base
   end
 
 
-  def create_finding_transaction
-    Transaction.build_for(
-      self,
-      'Create',
-      session[:user_id]
-    )
-    Transaction.build_for( #TODO: Ensure Polymorphism for Findings works here
-      self.owner,
-      'Add Finding',
-      (session[:simulated_id] || session[:user_id]),
-      "##{self.get_id} #{self.title}"
-    )
-  end
-
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      (session[:simulated_id] || session[:user_id])
-    )
-  end
-
   def get_approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
+
 
   def get_completion_date
     self.completion_date.present? ? self.completion_date.strftime("%Y-%m-%d") : ""
   end
 
+
   def overdue
     self.completion_date.present? ? self.completion_date < Time.now.to_date && self.status != "Completed" : false
   end
+
 
   def get_responsible_user_name
     self.responsible_user.present? ? self.responsible_user.full_name : ""
@@ -162,6 +146,7 @@ class Finding < ActiveRecord::Base
   def self.get_yesno
     ['Yes', 'No']
   end
+
 
   def self.get_headers
     [
@@ -210,6 +195,7 @@ class Finding < ActiveRecord::Base
     }.sort.to_h
   end
 
+
   def self.get_avg_complete
     candidates = self.where("status=? and complete_date is not ? and open_date is not ? ","Completed", nil, nil)
     if candidates.present?
@@ -221,6 +207,7 @@ class Finding < ActiveRecord::Base
       "N/A"
     end
   end
+
 
   def get_source
     case owner.class.name
@@ -243,9 +230,7 @@ class Finding < ActiveRecord::Base
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end
-
   end
-
 
 
 end
