@@ -91,7 +91,11 @@ class User < ActiveRecord::Base
     return true if admin && self.admin?
     rules = Rails.application.config.restricting_rules
     if rules.key?(con_name) && rules[con_name].include?(act_name)
-      permissions = JSON.parse(session[:permissions])
+      begin
+        permissions = JSON.parse(session[:permissions])
+      rescue
+        return false #rescue for if session has expired
+      end
       return true if permissions.key?(con_name) && permissions[con_name].include?(admin) && admin
       unless permissions.key?(con_name) && permissions[con_name].include?(act_name)
         return false
