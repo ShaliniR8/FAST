@@ -64,6 +64,7 @@ class Evaluation < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+
   def self.get_custom_options(title)
     CustomOption
       .where(:title => title)
@@ -83,7 +84,6 @@ class Evaluation < ActiveRecord::Base
   end
 
 
-
   def self.progress
     {
       "New"               => { :score => 25,  :color => "default"},
@@ -93,9 +93,11 @@ class Evaluation < ActiveRecord::Base
     }
   end
 
+
   def get_privileges
     self.privileges.present? ?  self.privileges : []
   end
+
 
   def set_priveleges
     if self.privileges.blank?
@@ -107,6 +109,7 @@ class Evaluation < ActiveRecord::Base
   def clear_checklist
     self.items.each {|x| x.destroy}
   end
+
 
   def open_checklist
     self.items.each do |i|
@@ -120,21 +123,26 @@ class Evaluation < ActiveRecord::Base
       self.status=="New"||self.status=="Scheduled"
   end
 
+
   def evaluator_name
     self.responsible_user.present? ?  self.responsible_user.full_name : ""
   end
+
 
   def approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
 
+
   def get_completion_date
     self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
   end
 
+
   def type
     "Inspection"
   end
+
 
   def get_id
     if self.custom_id.present?
@@ -144,9 +152,11 @@ class Evaluation < ActiveRecord::Base
     end
   end
 
+
   def overdue
     self.completion.present? ? self.completion<Time.now.to_date&&self.status!="Completed" : false
   end
+
 
   def get_planned
     return planned ? "Yes" : "No"
@@ -156,30 +166,6 @@ class Evaluation < ActiveRecord::Base
   def can_complete?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       self.items.all?{ |x| x.status == "Completed" }
-  end
-
-
-  def self.get_terms
-    {
-      "Title"                         =>  :title,
-      "Status"                        =>  "status",
-      "Lead Evaluator"                =>  "Evaluator_name",
-      "Final Approver"                =>  "approver_name",
-      "Evaluation Department"         =>  :department,
-      "Department Being Evaluated"    =>  :evaluation_department,
-      "Scheduled Completion Date"     =>  "get_completion_date",
-      "Vendor"                        =>  "vendor",
-      "Type"                          =>  "evaluation_type",
-      "Supplier"                      =>  "supplier",
-      "Location"                      =>  "location",
-      "Station Code"                  =>  "station_code",
-      "Process"                       =>  "process",
-      "Planned"                       =>  "get_planned",
-      "Internal/External/Supplier"    =>  "supplier",
-      "Objective and Scope"           =>  "objective",
-      "References and Requirements"   =>  "reference",
-      "Evaluation Instructions"       =>  "instruction"
-    }.sort.to_h
   end
 
 
@@ -194,4 +180,6 @@ class Evaluation < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

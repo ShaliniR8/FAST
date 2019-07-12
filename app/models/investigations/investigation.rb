@@ -141,11 +141,6 @@ class Investigation < ActiveRecord::Base
   end
 
 
-  def get_scheduled_date
-    self.completion.present? ?  (self.completion.strftime("%Y-%m-%d")) : ""
-  end
-
-
   def overdue
     self.completion.present? ? self.completion < Time.now.to_date&&self.status!="Completed" : false
   end
@@ -156,58 +151,12 @@ class Investigation < ActiveRecord::Base
   end
 
 
-  def get_event_occured_date
-    self.event_occured.present? ? (self.event_occured.strftime("%Y-%m-%d %H:%M")) : ""
-  end
-
-
-  def get_local_date
-    self.local_event_occured.present? ? (self.local_event_occured.strftime("%Y-%m-%d %H:%M")) : ""
-  end
-
-
   def get_id
     if self.custom_id.present?
       self.custom_id
     else
       self.id
     end
-  end
-
-
-  def get_ntsb
-    return ntsb ? "Yes" : "No"
-  end
-
-
-  def get_safety_hazard
-    return safety_hazard ? "Yes" : "No"
-  end
-
-
-  def self.get_terms
-    {
-      "Title"                                         => "title",
-      "Status"                                        => "status",
-      "Investigator"                                  => "get_investigator_name",
-      "Final Approver"                                => "get_approver_name",
-      "Scheduled Completion Date"                     => "get_scheduled_date",
-      "NTSB Reportable"                               => "get_ntsb",
-      "Safety Hazard"                                 => "get_safety_hazard",
-      "Date/Time When Event Occurred"                 => "get_event_occured_date",
-      "Local Time When Event Occurred"                => "get_local_date",
-      "Source"                                        => "source",
-      "Type"                                          => "inv_type",
-      "Containment"                                   => "containment",
-      "Notes"                                         => "notes",
-      "Description of Event"                          => "description",
-      "Severity"                                      => "severity",
-      "Likelihood"                                    => "likelihood",
-      "Risk Factor"                                   => "risk_factor",
-      "Likelihood (Mitigated)"                        => "likelihood_after",
-      "Severity (Mitigated)"                          => "severity_after",
-      "Risk Factor (Mitigated)"                       => "risk_factor_after"
-    }.sort.to_h
   end
 
 

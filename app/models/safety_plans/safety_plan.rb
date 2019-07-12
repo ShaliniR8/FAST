@@ -54,11 +54,6 @@ class SafetyPlan < ActiveRecord::Base
   end
 
 
-  # def self.risk_factors
-  #   ['Green - ACCEPTABLE','Yellow - ACCEPTABLE WITH MITIGATION','Orange - UNACCEPTABLE']
-  # end
-
-
   def self.results
     ['Satisfactory','Unsatisfactory']
   end
@@ -70,11 +65,6 @@ class SafetyPlan < ActiveRecord::Base
     else
       self.id
     end
-  end
-
-
-  def both_factor
-    self.risk_factor_after + self.risk_factor_after
   end
 
 

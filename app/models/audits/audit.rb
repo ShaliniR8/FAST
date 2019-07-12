@@ -33,6 +33,7 @@ class Audit < ActiveRecord::Base
   before_create :set_priveleges
   after_create :create_transaction
 
+
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
@@ -63,7 +64,6 @@ class Audit < ActiveRecord::Base
   end
 
 
-
   def self.user_levels
     {
       0  => 'N/A',
@@ -72,7 +72,6 @@ class Audit < ActiveRecord::Base
       30 => 'Admin',
     }
   end
-
 
 
   def self.progress
@@ -84,9 +83,11 @@ class Audit < ActiveRecord::Base
     }
   end
 
+
   def get_status_score
     self.class.progress[self.status][:score]
   end
+
 
   def get_status_color
     self.class.progress[self.status][:color]
@@ -96,7 +97,6 @@ class Audit < ActiveRecord::Base
   def get_privileges
     self.privileges.present? ? self.privileges : []
   end
-
 
 
   def set_priveleges
@@ -109,7 +109,6 @@ class Audit < ActiveRecord::Base
   def clear_checklist
     self.items.each {|x| x.destroy}
   end
-
 
 
   def open_checklist
@@ -128,10 +127,10 @@ class Audit < ActiveRecord::Base
       .split(';') rescue ['Please go to Custom Options to add options.']
   end
 
+
   def deletable
       self.status == "New" || self.status == "Scheduled" || self.status == "Open"
   end
-
 
 
   def auditor_name
@@ -139,11 +138,9 @@ class Audit < ActiveRecord::Base
   end
 
 
-
   def approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
-
 
 
   def get_completion_date
@@ -151,11 +148,9 @@ class Audit < ActiveRecord::Base
   end
 
 
-
   def type
     "Audit"
   end
-
 
 
   def self.get_headers
@@ -169,7 +164,6 @@ class Audit < ActiveRecord::Base
       { field: "status",                size: "",     title: "Status"                     },
     ]
   end
-
 
 
   def get_id
@@ -191,32 +185,6 @@ class Audit < ActiveRecord::Base
   end
 
 
-
-  def self.get_terms
-    {
-      "Title"                         =>  "title",
-      "Status"                        =>  "status",
-      "Lead Auditor"                  =>  "auditor_name",
-      "Final Approver"                =>  "approver_name",
-      "Scheduled Completion Date"     =>  "get_completion_date",
-      "Vendor"                        =>  "vendor",
-      "Type"                          =>  "audit_type",
-      "Supplier"                      =>  "supplier",
-      "Location"                      =>  "location",
-      "Objective and Scope"           =>  "objective",
-      "References and Requirements"   =>  "reference",
-      "Audit Instructions"            =>  "instruction",
-      "Auditing Department"           =>  :department,
-      "Department Being Audited"      =>  :audit_department,
-      "Station Code"                  =>  :station_code,
-      "Process"                       =>  :process,
-      "Planned"                       =>  :planned,
-      "Internal/External/Supplier"    =>  :supplier
-    }.sort.to_h
-  end
-
-
-
   def self.get_avg_complete
     candidates = self.where("status = ? and complete_date is not ? and open_date is not ? ", "Completed", nil, nil)
     if candidates.present?
@@ -228,5 +196,6 @@ class Audit < ActiveRecord::Base
       "N/A"
     end
   end
+
 
 end

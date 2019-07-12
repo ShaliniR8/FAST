@@ -23,7 +23,6 @@ class Recommendation < ActiveRecord::Base
   after_create :create_owner_transaction
 
 
-
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
@@ -32,7 +31,6 @@ class Recommendation < ActiveRecord::Base
       { field: 'title',                         title: 'Title',                             num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       { field: 'get_source',                    title: 'Source of Input',                   num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {field: 'created_by_id',                  title: 'Created By',                        num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-
 
       {                                                                                                   type: 'newline',      visible: 'show'},
       { field: 'response_date',                 title: 'Scheduled Response Date',           num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
@@ -50,7 +48,6 @@ class Recommendation < ActiveRecord::Base
       { field: 'final_comment',                 title: 'Final Comment',                     num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
-
 
 
   def get_source
@@ -71,7 +68,6 @@ class Recommendation < ActiveRecord::Base
   def get_privileges
     self.privileges || [] rescue []
   end
-
 
 
   def self.get_custom_options(title)
@@ -99,37 +95,14 @@ class Recommendation < ActiveRecord::Base
   end
 
 
-
   def can_assign?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       (self.immediate_action || self.owner.status == 'Completed')
   end
 
+
   def get_responsible_user_name
     self.responsible_user.full_name rescue ''
-  end
-
-  def get_response_date
-    self.response_date.strftime("%Y-%m-%d") rescue ''
-  end
-
-
-  def self.get_terms
-    {
-      "Title" => "title",
-      "Status" => "status",
-      "Responsible User" => "get_responsible_user_name",
-      "Scheduled Response Date" => "get_response_date",
-      "Description of Recommendation" => "description",
-      "Responsible Department" => "department",
-      "Immediate Action (Yes/No)" => "get_immediate_action",
-      "Action" => "recommended_action"
-    }.sort.to_h
-  end
-
-
-  def get_immediate_action
-    immediate_action ? "Yes" : "No"
   end
 
 
@@ -150,6 +123,7 @@ class Recommendation < ActiveRecord::Base
     end
   end
 
+
   def get_source
     case owner.class.name
     when 'Investigation'
@@ -164,5 +138,6 @@ class Recommendation < ActiveRecord::Base
       "<b style='color:grey'>N/A</b>".html_safe
     end
   end
+
 
 end

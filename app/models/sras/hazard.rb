@@ -122,15 +122,6 @@ class Hazard < ActiveRecord::Base
   end
 
 
-  # Search terms used in Advanced Search from index page
-  def self.get_terms
-    {
-      "Status"                      => "status",
-      "Description"                 => "description",
-    }.sort_by{|k, v| k}
-  end
-
-
     def self.get_avg_complete
       candidates=self.where("status=? and close_date is not ? and created_at is not ?","Completed",nil,nil)
       if candidates.present?

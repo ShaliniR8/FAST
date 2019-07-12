@@ -45,27 +45,12 @@ class Sra < ActiveRecord::Base
   end
 
 
-  def self.progress2
-    {
-      :"Assigned"         => {percentage: "25%"},
-      :"Under Review"     => {percentage: "50%"},
-      :"Pending Approval" => {percentage: "75%"},
-      :"Completed"        => {percentage: "100%"},
-    }
-  end
-
-
-  def get_progress
-    self.class.progress2[status.to_sym][:percentage]
-  end
-
-
-
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     meta_fields = BaseConfig.get_sra_meta_fields
     meta_fields.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
+
 
   def get_source
     if self.record.present?
@@ -76,6 +61,7 @@ class Sra < ActiveRecord::Base
       "<b style='color:grey'>N/A</b>".html_safe
     end
   end
+
 
   def self.get_custom_options(title)
     CustomOption
@@ -90,69 +76,14 @@ class Sra < ActiveRecord::Base
     self.approver.present? ? self.approver.full_name : ""
   end
 
-  def reviewer_name
-    self.reviewer.present? ? self.reviewer.full_name : ""
-  end
-
-  def manager_name
-    self.responsible_user.present? ? self.responsible_user.full_name : ""
-  end
-
-  def need_approval
-    self.reviewer.present? || self.approver.present?
-  end
 
   def overdue
     self.scheduled_completion_date.present? ? self.scheduled_completion_date<Time.now.to_date&&self.status!="Completed" : false
   end
+
+
   def get_completion_date
     self.scheduled_completion_date.present? ? self.scheduled_completion_date.strftime("%Y-%m-%d") : ""
-  end
-
-  def load_departments
-    if self.departments.present?
-      self.departments
-    else
-      []
-    end
-  end
-  def load_manuals
-    if self.manuals.present?
-      self.manuals
-    else
-      []
-    end
-  end
-  def load_programs
-    if self.programs.present?
-      self.programs
-    else
-      []
-    end
-  end
-
-  def load_compliances
-    if self.compliances.present?
-      self.compliances
-    else
-      []
-    end
-  end
-
-  def all_programs
-    (self.load_programs.push(self.other_program)).reject(&:empty?).join(", ")
-  end
-
-  def all_manuals
-    (self.load_manuals.push(self.other_manual)).reject(&:empty?).join(", ")
-  end
-
-  def all_departments
-    (self.load_departments.push(self.other_department)).reject(&:empty?).join(", ")
-  end
-
-  def all_compliances
-    (self.load_compliances.push(self.other_compliance).reject(&:empty?).join(", "))
   end
 
 

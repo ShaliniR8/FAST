@@ -176,29 +176,6 @@ class Inspection < ActiveRecord::Base
   end
 
 
-  def self.get_terms
-    {
-      "Title"                         =>  :title,
-      "Status"                        =>  "status",
-      "Lead Inspector"                =>  "inspector_name",
-      "Final Approver"                =>  "approver_name",
-      "Inspection Department"         =>  :department,
-      "Department being Inspected"    =>  :inspection_department,
-      "Scheduled Completion Date"     =>  "get_completion_date",
-      "Vendor"                        =>  "vendor",
-      "Type"                          =>  "inspection_type",
-      "Internal/External/Supplier"    =>  "supplier",
-      "Location"                      =>  "location",
-      "Process"                       =>  :process,
-      "Planned"                       =>  'get_planned',
-      "Station Code"                  =>  "station_code",
-      "Objective and Scope"           =>  "objective",
-      "References and Requirements"   =>  "reference",
-      "Inspection Instructions"       =>  "instruction"
-    }.sort.to_h
-  end
-
-
   def self.get_avg_complete
     candidates=self.where("status=? and complete_date is not ? and open_date is not ? ","Completed",nil,nil)
     if candidates.present?

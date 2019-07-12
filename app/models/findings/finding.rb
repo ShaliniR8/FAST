@@ -37,10 +37,10 @@ class Finding < ActiveRecord::Base
       {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {field: 'get_source',                 title: 'Source of Input',               num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'created_by_id',              title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',              title: 'Created By',                    num_cols: 6,  type: 'user',         visible: 'show',            required: false},
 
       {field: 'responsible_user_id',        title: 'Responsible User',              num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'index,form,show',       required: false},
+      {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'completion_date',            title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
       {field: 'reference',                  title: 'Reference or Requirement',      num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'regulatory_violation',       title: 'Regulatory Violation',          num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
@@ -65,13 +65,13 @@ class Finding < ActiveRecord::Base
       {field: 'other',                      title: 'Other',                         num_cols: 6,  type: 'text',         visible: 'form,show',       required: false},
       {field: 'final_comment',              title: 'Final Comment',                 num_cols: 12, type: 'text',         visible: 'show',            required: false},
 
-      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',                 title: 'Baseline Likelihood',           num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity',                   title: 'Baseline Severity',             num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor',                title: 'Baseline Risk',                 num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',           title: 'Mitigated Likelihood',          num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity_after',             title: 'Mitigated Severity',            num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor_after',          title: 'Mitigated Risk',                num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
 
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
@@ -143,11 +143,6 @@ class Finding < ActiveRecord::Base
   end
 
 
-  def self.get_yesno
-    ['Yes', 'No']
-  end
-
-
   def self.get_headers
     [
       { :field => :get_id,                              :title => "ID"                                                                        },
@@ -174,25 +169,6 @@ class Finding < ActiveRecord::Base
   def can_assign?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       (self.immediate_action || self.owner.status == 'Completed')
-  end
-
-
-  def self.get_terms
-    {
-      "Status" => "status",
-      "Responsible User" => "get_responsible_user_name",
-      "Final Approver" => "get_approver_name",
-      "Scheduled Completion Date" => "get_completion_date",
-      "Severity" => "severity",
-      "Likelihood" => "likelihood",
-      "Risk Factor" => "risk_factor",
-      "Descrption of Finding" => "description",
-      "Classification" => "classification",
-      "Reference or Requirement" => "reference",
-      "Likelihood (Mitigated)" => "likelihood_after",
-      "Severity (Mitigated)" => "severity_after",
-      "Risk Factor (Mitigated)" => "risk_factor_after"
-    }.sort.to_h
   end
 
 

@@ -152,26 +152,6 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-  def emp_action
-    return emp ? "Yes" : "No"
-  end
-
-
-  def dep_action
-    return dep ? "Yes" : "No"
-  end
-
-
-  def im_action
-    return immediate_action ? "Yes" : "No"
-  end
-
-
-  def com_action
-    return comprehensive_action ? "Yes" : "No"
-  end
-
-
   def self.get_headers
     [
       { :field => :get_id,                          :title => "ID"                                                                      },
