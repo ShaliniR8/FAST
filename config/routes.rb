@@ -565,7 +565,6 @@ PrdgSession::Application.routes.draw do |map|
   # SRA Module
   resources :sras do
     member do
-      get 'enable'
       get 'mitigate'
       get 'baseline'
       get 'carryover'
@@ -582,6 +581,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'get_agenda'
       get 'override_status'
       get 'comment'
+      get 'viewer_access'
     end
     collection do
       get 'advanced_search'

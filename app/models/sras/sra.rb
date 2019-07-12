@@ -1,5 +1,6 @@
 class Sra < ActiveRecord::Base
   extend AnalyticsFilters
+  include StandardWorkflow
   include RiskHandling
 
 #Concerns List
@@ -177,33 +178,11 @@ class Sra < ActiveRecord::Base
   end
 
 
-  def can_complete? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    self.status == 'Assigned' && (
-      (current_user_id == self.responsible_user_id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('sras','admin'))
+  def can_approve?(user, form_conds: false, user_conds: false)
+    super(user, form_conds: form_conds, user_conds: user_conds) || (
+      self.status == 'Pending Review' && ( self.reviewer_id == user.id || has_admin_rights?(user) )
+    )
   end
 
-
-  def can_approve? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    current_user_object_admin = (current_user.admin? || current_user.has_access('sras','admin'))
-    case self.status
-    when 'Pending Review'
-      current_user_object_admin || (current_user_id == self.reviewer_id rescue false)
-    when 'Pending Approval'
-      current_user_object_admin || (current_user_id == self.approver_id rescue false)
-    else
-      false
-    end
-  end
-
-
-  def can_reopen? current_user
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('sras','admin'))
-  end
 
 end

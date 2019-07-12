@@ -1,5 +1,6 @@
 class RiskControl < ActiveRecord::Base
   extend AnalyticsFilters
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -79,28 +80,6 @@ class RiskControl < ActiveRecord::Base
     else
       self.id
     end
-  end
-
-
-  def can_complete? current_user
-    (current_user.id == @risk_control.responsible_user_id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('sras','admin')
-  end
-
-
-  def can_approve? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    self.status == 'Pending Approval' && (current_user_id == self.approver_id ||
-      current_user.admin? ||
-      current_user.has_access('sras','admin'))
-  end
-
-
-  def can_reopen? current_user
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('sras','admin'))
   end
 
 

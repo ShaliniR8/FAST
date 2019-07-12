@@ -235,7 +235,7 @@ class SrasController < ApplicationController
   def approve
     @owner = Sra.find(params[:id]).becomes(Sra)
     pending_approval = @owner.status == 'Pending Approval'
-    status = params[:commit] == 'Approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
+    status = params[:commit].downcase == 'approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
     field = pending_approval ? :approver_comment : :reviewer_comment
     render :partial => '/forms/workflow_forms/process', locals: {status: status, field: field }
   end
@@ -325,7 +325,7 @@ class SrasController < ApplicationController
 
 
 
-  def enable
+  def viewer_access
     @sra=Sra.find(params[:id])
     @sra.viewer_access=!@sra.viewer_access
     Transaction.build_for(

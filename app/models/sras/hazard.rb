@@ -1,5 +1,6 @@
 class Hazard < ActiveRecord::Base
   extend AnalyticsFilters
+  include StandardWorkflow
   include RiskHandling
 
 #Concerns List
@@ -128,13 +129,6 @@ class Hazard < ActiveRecord::Base
       "Description"                 => "description",
     }.sort_by{|k, v| k}
   end
-
-
-    def can_reopen? current_user
-      BaseConfig.airline[:allow_reopen_report] && (
-        current_user.admin? ||
-        current_user.has_access('sras','admin'))
-    end
 
 
     def self.get_avg_complete
