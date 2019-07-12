@@ -1,5 +1,6 @@
 class Investigation < ActiveRecord::Base
   extend AnalyticsFilters
+  include GroupAccessHandling
   include StandardWorkflow
   include RiskHandling
 
@@ -29,9 +30,6 @@ class Investigation < ActiveRecord::Base
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
 
-  serialize :privileges
-
-  before_create :set_priveleges
   after_create :create_transaction
 
 
@@ -110,18 +108,6 @@ class Investigation < ActiveRecord::Base
       </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
-    end
-  end
-
-
-  def get_privileges
-    self.privileges.present? ?  self.privileges : []
-  end
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges=[]
     end
   end
 

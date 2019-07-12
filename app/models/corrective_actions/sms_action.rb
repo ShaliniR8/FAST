@@ -1,7 +1,8 @@
 class SmsAction < ActiveRecord::Base
   extend AnalyticsFilters
-  include StandardWorkflow
   include RiskHandling
+  include GroupAccessHandling
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -19,9 +20,6 @@ class SmsAction < ActiveRecord::Base
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
   has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
 
-  serialize :privileges
-
-  before_create   :set_priveleges
   after_create :create_transaction
   after_create -> { create_owner_transaction(action:'Add Corrective Action') }
 
@@ -96,18 +94,6 @@ class SmsAction < ActiveRecord::Base
       "Pending Approval"  => { :score => 75,  :color => "warning"},
       "Completed"         => { :score => 100, :color => "success"},
     }
-  end
-
-
-  def get_privileges
-    self.privileges.present? ?  self.privileges : []
-  end
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges = []
-    end
   end
 
 

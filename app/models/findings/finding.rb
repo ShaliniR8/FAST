@@ -1,7 +1,8 @@
 class Finding < ActiveRecord::Base
   extend AnalyticsFilters
-  include StandardWorkflow
+  include GroupAccessHandling
   include RiskHandling
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -22,8 +23,6 @@ class Finding < ActiveRecord::Base
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
 
-  serialize       :privileges
-  before_create   :set_priveleges
   after_create    :create_transaction
   after_create    :create_owner_transaction
 
@@ -108,18 +107,6 @@ class Finding < ActiveRecord::Base
 
   def get_type
     type.titleize
-  end
-
-
-  def get_privileges
-    self.privileges.present? ?  self.privileges : []
-  end
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges = []
-    end
   end
 
 

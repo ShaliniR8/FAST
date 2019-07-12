@@ -1,6 +1,7 @@
 class Recommendation < ActiveRecord::Base
   extend AnalyticsFilters
   include StandardWorkflow
+  include GroupAccessHandling
 
 #Concerns List
   include Attachmentable
@@ -16,9 +17,6 @@ class Recommendation < ActiveRecord::Base
 
   has_many :descriptions, foreign_key: 'owner_id', class_name: 'RecommendationDescription', dependent: :destroy
 
-  serialize :privileges
-
-  before_create :set_priveleges
   after_create :create_transaction
   after_create :create_owner_transaction
 
@@ -65,24 +63,12 @@ class Recommendation < ActiveRecord::Base
   end
 
 
-  def get_privileges
-    self.privileges || [] rescue []
-  end
-
-
   def self.get_custom_options(title)
     CustomOption
       .where(:title => title)
       .first
       .options
       .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges = []
-    end
   end
 
 

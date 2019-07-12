@@ -1,5 +1,6 @@
 class Audit < ActiveRecord::Base
   extend AnalyticsFilters
+  include GroupAccessHandling
   include StandardWorkflow
 
 #Concerns List
@@ -23,14 +24,11 @@ class Audit < ActiveRecord::Base
 
   has_many    :checklists, as: :owner, dependent: :destroy
 
-  serialize :privileges
-
   accepts_nested_attributes_for :items
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true
   accepts_nested_attributes_for :checklists
 
-  before_create :set_priveleges
   after_create :create_transaction
 
 
@@ -91,18 +89,6 @@ class Audit < ActiveRecord::Base
 
   def get_status_color
     self.class.progress[self.status][:color]
-  end
-
-
-  def get_privileges
-    self.privileges.present? ? self.privileges : []
-  end
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges=[]
-    end
   end
 
 

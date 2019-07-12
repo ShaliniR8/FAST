@@ -1,5 +1,6 @@
 class Evaluation < ActiveRecord::Base
   extend AnalyticsFilters
+  include GroupAccessHandling
   include StandardWorkflow
 
 #Concerns List
@@ -27,9 +28,7 @@ class Evaluation < ActiveRecord::Base
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :items
 
-  before_create :set_priveleges
   after_create :create_transaction
-  serialize :privileges
 
 
   def self.get_meta_fields(*args)
@@ -91,18 +90,6 @@ class Evaluation < ActiveRecord::Base
       "Pending Approval"  => { :score => 75,  :color => "warning"},
       "Completed"         => { :score => 100, :color => "success"},
     }
-  end
-
-
-  def get_privileges
-    self.privileges.present? ?  self.privileges : []
-  end
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges=[]
-    end
   end
 
 
