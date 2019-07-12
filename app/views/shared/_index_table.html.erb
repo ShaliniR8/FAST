@@ -88,7 +88,6 @@
                       <%else%>
                         <%=""%>
                       <%end%>
-                      <%#field_value == nil || field_value == "" ? "" : %>
                     <%when "textarea"%>
                       <%=field_value[0..50] + "..."%>
                     <%when "select"%>
@@ -141,13 +140,6 @@
   .table tbody tr > td.green {
     background-color: mediumseagreen !important;
   }
-
-/*  .percent {
-    background-color: white;
-    background-image: linear-gradient(to right, mediumseagreen, mediumseagreen);
-    background-size: 1% 100%;
-    background-repeat: no-repeat;
-  }*/
 </style>
 
 
@@ -166,18 +158,6 @@
       window.location = ("/<%="#{@table_name}"%>/" + $(this).closest("tr").attr('record_id'));
     }
   });
-
-
-
-  // $('#records_table tbody tr').on('click',function() {
-  //  <%if (defined? open_new_tab) && open_new_tab%>
-  //    window.open("/<%="#{@table_name}"%>/" + $(this).attr('record_id'), '_blank');
-  //  <%else%>
-  //    window.location = ("/<%="#{@table_name}"%>/"+$(this).attr('record_id'));
-  //  <%end%>
-  // });
-
-
 
 
   $('#records_table').DataTable({
