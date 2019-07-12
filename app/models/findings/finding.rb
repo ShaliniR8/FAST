@@ -1,6 +1,7 @@
 class Finding < ActiveRecord::Base
   extend AnalyticsFilters
   include GroupAccessHandling
+  include ModelHelpers
   include RiskHandling
   include StandardWorkflow
 
@@ -76,27 +77,8 @@ class Finding < ActiveRecord::Base
   end
 
 
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-
   def get_source
     "<b style='color:grey'>N/A</b>".html_safe
-  end
-
-
-  def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Assigned"          => { :score => 50,  :color => "warning"},
-      "Pending Approval"  => { :score => 75,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
-    }
   end
 
 
@@ -120,16 +102,6 @@ class Finding < ActiveRecord::Base
   end
 
 
-  def overdue
-    self.completion_date.present? ? self.completion_date < Time.now.to_date && self.status != "Completed" : false
-  end
-
-
-  def get_responsible_user_name
-    self.responsible_user.present? ? self.responsible_user.full_name : ""
-  end
-
-
   def self.get_headers
     [
       { :field => :get_id,                              :title => "ID"                                                                        },
@@ -144,31 +116,9 @@ class Finding < ActiveRecord::Base
   end
 
 
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
-  end
-
-
   def can_assign?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       (self.immediate_action || self.owner.status == 'Completed')
-  end
-
-
-  def self.get_avg_complete
-    candidates = self.where("status=? and complete_date is not ? and open_date is not ? ","Completed", nil, nil)
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.complete_date - x.open_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
   end
 
 

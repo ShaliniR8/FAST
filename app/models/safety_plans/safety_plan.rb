@@ -1,5 +1,6 @@
 class SafetyPlan < ActiveRecord::Base
   extend AnalyticsFilters
+  include ModelHelpers
 
 #Concerns List
   include Attachmentable
@@ -36,35 +37,8 @@ class SafetyPlan < ActiveRecord::Base
   end
 
 
-  def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Evaluated"         => { :score => 50,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
-    }
-  end
-
-
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-
   def self.results
     ['Satisfactory','Unsatisfactory']
-  end
-
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
   end
 
 

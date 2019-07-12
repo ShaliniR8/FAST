@@ -1,8 +1,9 @@
 class SmsAction < ActiveRecord::Base
   extend AnalyticsFilters
-  include RiskHandling
-  include GroupAccessHandling
   include StandardWorkflow
+  include GroupAccessHandling
+  include ModelHelpers
+  include RiskHandling
 
 #Concerns List
   include Attachmentable
@@ -78,25 +79,6 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-  def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Assigned"          => { :score => 50,  :color => "warning"},
-      "Pending Approval"  => { :score => 75,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
-    }
-  end
-
-
   def get_status
     verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0
     extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
@@ -115,11 +97,6 @@ class SmsAction < ActiveRecord::Base
   end
 
 
-  def responsible_user_name
-    self.responsible_user.full_name rescue ''
-  end
-
-
   def schedule_date
     self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
   end
@@ -127,14 +104,6 @@ class SmsAction < ActiveRecord::Base
 
   def get_completion_date
     self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
-  end
-
-
-  def overdue
-    if self.schedule_completion_date.present?
-      self.status != "Completed" && self.schedule_completion_date < Time.now.to_date
-    end
-    false
   end
 
 
@@ -149,15 +118,6 @@ class SmsAction < ActiveRecord::Base
       { :field => :display_after_risk_factor,       :title => "Mitigated Risk",                   :html_class => :get_after_risk_color  },
       { :field => :status,                          :title => "Status"                                                                  },
     ]
-  end
-
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
   end
 
 

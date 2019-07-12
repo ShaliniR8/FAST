@@ -1,6 +1,7 @@
 class Sra < ActiveRecord::Base
   extend AnalyticsFilters
   include StandardWorkflow
+  include ModelHelpers
   include RiskHandling
 
 #Concerns List
@@ -34,16 +35,6 @@ class Sra < ActiveRecord::Base
 
   after_create :create_transaction
 
-  def self.progress
-    {
-      "New"                     => { :score => 0,   :color => "default"},
-      "Assigned"                => { :score => 25,  :color => "default"},
-      "Pending Review"          => { :score => 50,  :color => "warning"},
-      "Pending Approval"        => { :score => 75,  :color => "warning"},
-      "Completed"               => { :score => 100, :color => "success"},
-    }
-  end
-
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -63,36 +54,13 @@ class Sra < ActiveRecord::Base
   end
 
 
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-
   def approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
 
 
-  def overdue
-    self.scheduled_completion_date.present? ? self.scheduled_completion_date<Time.now.to_date&&self.status!="Completed" : false
-  end
-
-
   def get_completion_date
     self.scheduled_completion_date.present? ? self.scheduled_completion_date.strftime("%Y-%m-%d") : ""
-  end
-
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
   end
 
 

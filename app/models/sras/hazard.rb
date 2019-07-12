@@ -1,6 +1,7 @@
 class Hazard < ActiveRecord::Base
   extend AnalyticsFilters
   include StandardWorkflow
+  include ModelHelpers
   include RiskHandling
 
 #Concerns List
@@ -45,15 +46,6 @@ class Hazard < ActiveRecord::Base
       {field: 'severity_after',     title: 'Mitigated Severity',    num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',  title: 'Mitigated Risk',        num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
-  end
-
-
-  def self.progress
-    {
-      "New"       => { :score => 25,  :color => "default"},
-      "Rejected"    => { :score => 100, :color => "warning"},
-      "Completed"   => { :score => 100, :color => "success"},
-    }
   end
 
 
@@ -110,15 +102,6 @@ class Hazard < ActiveRecord::Base
   def get_root_causes
     root_cause_arr = root_causes.map{|x| "<li>#{x.cause_option.name}</li>"}.join("").html_safe
     "<ul class='table_ul'>#{root_cause_arr}</ul>".html_safe
-  end
-
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
   end
 
 

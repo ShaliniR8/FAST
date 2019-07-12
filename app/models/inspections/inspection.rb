@@ -1,6 +1,7 @@
 class Inspection < ActiveRecord::Base
   extend AnalyticsFilters
   include GroupAccessHandling
+  include ModelHelpers
   include StandardWorkflow
 
 #Concerns List
@@ -63,31 +64,12 @@ class Inspection < ActiveRecord::Base
   end
 
 
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-
   def self.user_levels
     {
       0  => 'N/A',
       10 => 'Viewer',
       20 => 'Inspector',
       30 => 'Admin',
-    }
-  end
-
-
-  def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Assigned"          => { :score => 50,  :color => "warning"},
-      "Pending Approval"  => { :score => 75,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
     }
   end
 
@@ -120,59 +102,14 @@ class Inspection < ActiveRecord::Base
   end
 
 
-  def self.get_avg_complete
-    candidates=self.where("status=? and completion_date != ? and open_date !=? ","Completed",nil,nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.completion_date-x.oepn_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
-
   def get_completion_date
     self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
-  end
-
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
-  end
-
-
-  def overdue
-    self.completion.present? ? self.completion<Time.now.to_date&&self.status!="Completed" : false
-  end
-
-
-  def get_planned
-    return planned ? "Yes" : "No"
   end
 
 
   def can_complete?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       self.items.all?{ |x| x.status == 'Completed' }
-  end
-
-
-  def self.get_avg_complete
-    candidates=self.where("status=? and complete_date is not ? and open_date is not ? ","Completed",nil,nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.complete_date-x.open_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
   end
 
 
