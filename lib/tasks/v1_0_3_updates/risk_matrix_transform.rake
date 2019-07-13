@@ -32,10 +32,10 @@ namespace :version_1_0_3 do
       end
     when "SCX"
       puts "SCX risk matrix transform"
-    when "NAC"
-      puts "NAC risk matrix transform"
-      matrix_dic = NAC_Config::MATRIX_INFO[:risk_table][:rows]
-      risk_dic = NAC_Config::MATRIX_INFO[:risk_table_index]
+    when "NAMS"
+      puts "NAMS risk matrix transform"
+      matrix_dic = NAMS_Config::MATRIX_INFO[:risk_table][:rows]
+      risk_dic = NAMS_Config::MATRIX_INFO[:risk_table_index]
       [
         'Report',
         'Record',

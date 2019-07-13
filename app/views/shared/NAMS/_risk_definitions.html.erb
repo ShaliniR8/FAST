@@ -3,7 +3,7 @@
   <h4><b>RISK DEFINITIONS</b></h4>
   <table class="table table-bordered table-fixed table-centered">
     <tr>
-      <%NAC_Config::MATRIX_INFO[:risk_definitions].each do |k, v| %>
+      <%NAMS_Config::MATRIX_INFO[:risk_definitions].each do |k, v| %>
         <td bgcolor="<%=k%>" width="20%" style="color:#34495E">
           <h4><b><%=v[:rating]%></b></h4>
         </td>

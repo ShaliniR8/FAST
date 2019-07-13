@@ -28,7 +28,9 @@ module ControllerAuthentication
     # Rails.logger.info("CURRENT USER_ID END")
     begin
       if defined?(current_token) && current_token != nil
-        @current_user = current_token.user
+        user = current_token.user
+        session[:user_id] = user.id
+        @current_user = user
       elsif session[:simulated_id]
         @current_user ||= User.find(session[:simulated_id]) if session[:user_id]
       elsif session[:user_id]

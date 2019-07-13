@@ -1,4 +1,4 @@
-class NAC_Config
+class NAMS_Config
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
@@ -8,16 +8,15 @@ class NAC_Config
   def self.airline_config
     {
       :version                                        => "1.0.3",
-
       :name                                           => 'Northern Air Cargo',
-      :code                                           => "NAC",
+      :code                                           => "NAMS",
       :base_risk_matrix                               => false,
       :event_summary                                  => false,
       :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => false,
       :allow_set_alert                                => false,
       :has_verification                               => false,
-      :has_mobile_app                                 => false,
+      :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
       :time_zone                                      => 'Alaska',
 
@@ -33,7 +32,7 @@ class NAC_Config
       # Safety Assurance Module
       :allow_reopen_report                            => false,
       :has_root_causes                                => false,
-      :enable_recurrence                              => true,
+      :enable_recurrence                              => false,
 
 
       # SMS IM Module
