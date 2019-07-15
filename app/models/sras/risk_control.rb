@@ -30,7 +30,7 @@ class RiskControl < ActiveRecord::Base
       {field: 'approver_id',                  title: 'Final Approver',                  num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
       {field: 'follow_up_date',               title: 'Date for Follow-Up/Monitor Plan', num_cols: 6,  type: 'date',     visible: 'form,show',       required: false},
       {field: 'control_type',                 title: 'Type',                            num_cols: 6,  type: 'datalist', visible: 'form,show',       required: false, options: get_custom_options('Risk Control Types')},
-      {field: 'description',                  title: 'Description of Hazard',           num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
+      {field: 'description',                  title: 'Description of Risk Control',     num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
       {field: 'notes',                        title: 'Notes',                           num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
       {field: 'final_comment',                title: 'Final Comment',                   num_cols: 12, type: 'textarea', visible: 'show'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
