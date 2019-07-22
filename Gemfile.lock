@@ -145,6 +145,7 @@ DEPENDENCIES
   mysql2 (< 0.3)
   net-sftp
   net-ssh
+  nokogiri
   oauth (~> 0.4.7)
   oauth-plugin (~> 0.5.1)
   oauth2 (~> 1.4.0)

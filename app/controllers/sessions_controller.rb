@@ -33,19 +33,24 @@ class SessionsController < ApplicationController
 
 
   def destroy
-    session[:user_id] = nil
-    session[:simulated_id] = nil
-    session[:digest] = nil
-    session[:last_active] = nil
     respond_to do |format|
       format.html do
         if BaseConfig.airline[:enable_sso]
           redirect_to '/saml/logout'
+        else
+          session[:user_id] = nil
+          session[:simulated_id] = nil
+          session[:digest] = nil
+          session[:last_active] = nil
+          flash[:notice] = "You have been logged out."
+          redirect_to new_session_path
         end
-        flash[:notice] = "You have been logged out."
-        redirect_to new_session_path
       end
       format.json do
+        session[:user_id] = nil
+        session[:simulated_id] = nil
+        session[:digest] = nil
+        session[:last_active] = nil
         render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
       end
     end
