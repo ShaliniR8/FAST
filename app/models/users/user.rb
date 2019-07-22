@@ -162,6 +162,23 @@ class User < ActiveRecord::Base
     self.access_levels.where(report_type: report_type).first.level
   end
 
+  def self.get_meta_fields(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    headers_table = [
+        { field: "employee_number",        title: "Employee #",       type: 'text',      visible: 'index', required: false},
+        { field: "id",                     title: "ID",               type: 'text',      visible: 'index', required: false},
+        { field: "level" ,                 title: "Type",             type: 'text',      visible: 'index', required: false},
+        { field: "username",               title: 'Username',         type: 'text',      visible: 'index', required: false},
+        { field: "full_name",              title: 'Name',             type: 'text',      visible: 'index', required: false},
+        { field: "email",                  title: "Email",            type: 'text',      visible: 'index', required: false},
+        { field: "account_status",         title: "Account Status",   type: 'text',      visible: 'index', required: false},
+        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: 'index', required: false},      
+      ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    if (BaseConfig.airline[:has_mobile_app])
+      headers_table.push({ field: 'android_version', title: 'Android Version', type: 'text', visible: 'index', required: false})
+    end
+    headers_table
+  end
 
   def self.get_headers_table
     headers_table = [

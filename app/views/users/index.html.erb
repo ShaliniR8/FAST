@@ -1,9 +1,11 @@
 <div class='item active mt50' style='height:auto;'>
   <div class='grid per90 center-block'>
-    <%=render '/shared/record_table',
+    <%#=render '/shared/record_table',
       :btn_name => 'New',
       :btn_path => new_user_path,
       :panel => 'steelblue'%>
+    <%btns = [{:btn_name => 'New', :btn_path => new_user_path, :btn_class => 'btn btn-success'}]%>
+    <%=render "/forms/index_fields", :btns => btns%>
 
     <div class='col-xs-12'>
       <div class='panel panel-steelblue'>

@@ -10,7 +10,9 @@ class UsersController < ApplicationController
       return
     end
 
-    @headers = User.get_headers_table
+    @headers = User.get_meta_fields('index')
+    # @headers = User.get_headers_table
+
     @records = User.where({airport: current_user.airport})
 
     active_users = @records.where('disable = ? OR disable IS ?', false, nil)
@@ -27,7 +29,7 @@ class UsersController < ApplicationController
         { :label => 'Total Android Users', :value => android_users.count },
       ])
     end
-
+    @table = Object.const_get("User")
     @table_name = "users"
     @title = "Users"
     #@users.keep_if{|u| !u.disable}
