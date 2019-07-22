@@ -1,4 +1,5 @@
 namespace :ultipro do
+  require 'securerandom'
   Rails.logger = Logger.new("log/ultipro_migration.log")
   @filepath = '/home/jiaming/dylan/Ultipro_POC.xml'
   #This is to compare the new file with the prior file
@@ -55,25 +56,27 @@ namespace :ultipro do
         Rails.logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
         @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
         @log_data = []
-        Hash.from_xml(data_dump)['wbat_poc']['poc']
-          .map{ |poc| [poc['user_name'], poc]}
-          .to_h
-          .each do |username, user_hash|
-            @err_username = username #Used for error logging
-            @err_user_hash = user_hash  #Used for error logging
-            @log_entry = ""
-            if @users.key?(username)
-              user = @users[username]
-            else
-              user = generate_user user_hash
-              next if user.nil?
-              @log_entry << " Account Created"
+        User.transaction do
+          Hash.from_xml(data_dump)['wbat_poc']['poc']
+            .map{ |poc| [poc['user_name'], poc]}
+            .to_h
+            .each do |username, user_hash|
+              @err_username = username #Used for error logging
+              @err_user_hash = user_hash  #Used for error logging
+              @log_entry = ""
+              if @users.key?(username)
+                user = @users[username]
+              else
+                user = generate_user user_hash
+                next if user.nil?
+                @log_entry << " Account Created"
+              end
+              update_privileges user, user_hash
+              if !@log_entry.empty?
+                @log_data << ("  [User] #{user.username}:" << @log_entry)
+              end
             end
-            update_privileges user, user_hash
-            if !@log_entry.empty?
-              @log_data << ("  [User] #{user.username}:" << @log_entry)
-            end
-          end
+        end
         IO.copy_stream(@filepath, @filepath_prior) #Update Historical File
         Rails.logger.info '###################################'
         Rails.logger.info '### ULTIPRO MIGRATION COMPLETED ###'
@@ -184,7 +187,7 @@ namespace :ultipro do
           full_name: "#{user_hash['first_name']} #{user_hash['last_name']}",
           first_name: user_hash['first_name'],
           last_name: user_hash['last_name'],
-          password: 'ObfUsCaTeD_pAsSwOrD',
+          password: SecureRandom.urlsafe_base64(20),
           employee_number: user_hash['employee_number'],
           level: map_account_level(user_hash['employee_group'])
         })
