@@ -304,7 +304,8 @@ include Transactionable
           :statement => (self.statement.present? ? self.statement : ""),
           :likelihood_after => self.likelihood_after,
           :severity_after => self.severity_after,
-          :risk_factor_after => self.risk_factor_after
+          :risk_factor_after => self.risk_factor_after,
+          :anonymous => self.submission.present? ? self.submission.anonymous : self.anonymous
         })
         self.record_fields.each do |f|
           if f.map_field.present?
