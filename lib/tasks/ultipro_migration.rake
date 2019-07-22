@@ -1,45 +1,17 @@
 namespace :ultipro do
   require 'securerandom'
   Rails.logger = Logger.new("log/ultipro_migration.log")
-  @filepath = '/home/jiaming/dylan/Ultipro_POC.xml'
-  #This is to compare the new file with the prior file
-  @filepath_prior = '/home/jiaming/dylan/Ultipro_POC_prior.xml'
-  @expand_output = false #Shows full account generation details
-  @dry_run = false #Prevents the saving of data to the database
 
-  #The following identifies what account type is associated with each employee-group
-  @group_mapping = {
-    'dispatch'    => 'Analyst',
-    'fight-crew'  => 'Pilot',
-    'ground'      => 'Ground',
-    'maintenance' => 'Staff',
-    'other'       => 'Staff'
-  } #Cabin
-  @tracked_privileges = [
-    'Ground: Incident Submitter',
-    'Ground: General Submitter',
-    'Other: General Submitter',
-    'Flight Crew: ASAP Submitter',
-    'Flight Crew: Incident Submitter',
-    'Flight Crew: Fatigue Submitter',
-    'Dispatch: ASAP Submitter',
-    'Dispatch: Incident Submitter',
-    'Dispatch: Fatigue Submitter',
-    'Maintenance: ASAP Submitter',
-    'Maintenance: Incident Submitter',
-    'Maitnenance: Fatigue Submitter',
-    'Cabin: ASAP Submitter',
-    'Cabin: Incident Submitter',
-    'Cabin: Fatigue Submitter'
-  ]
 
   ### Tasks
 
-    task :update_userbase, [:filepath] => [:environment] do |t, args|
+    task :update_userbase => [:environment] do |t, args|
       Rails.logger.info '##############################'
       Rails.logger.info '### UPDATING USER DATABASE ###'
       Rails.logger.info '##############################'
       Rails.logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
+
+      assign_configs
 
       begin
         data_dump = File.read(@filepath).sub(/^\<\?.*\?\>$/, '')
@@ -165,6 +137,16 @@ namespace :ultipro do
 
 
  ### Helper Methods
+
+    def assign_configs
+      configs = Object.const_get("#{YAML.load_file("#{::Rails.root}/config/airline_code.yml")}_Config")::ULTIPRO_DATA
+      @filepath = configs[:filepath]
+      @filepath_prior = configs[:filepath_prior]
+      @expand_output =  configs[:expand_output]
+      @dry_run = configs[:dry_run]
+      @group_mapping = configs[:group_mapping]
+      @tracked_privileges = configs[:tracked_privileges]
+    end
 
     def generate_privilege title
       priv = Privilege.new({

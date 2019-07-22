@@ -314,6 +314,40 @@ class SCX_Config
     user
   end
 
+  ULTIPRO_DATA = {
+    filepath: '/home/jiaming/dylan/Ultipro_POC.xml',
+    #This is to compare the new file with the prior file
+    filepath_prior: '/home/jiaming/dylan/Ultipro_POC_prior.xml',
+    expand_output: false, #Shows full account generation details
+    dry_run: false, #Prevents the saving of data to the database
+
+    #The following identifies what account type is associated with each employee-group
+    group_mapping: {
+      'dispatch'    => 'Analyst',
+      'fight-crew'  => 'Pilot',
+      'ground'      => 'Ground',
+      'maintenance' => 'Staff',
+      'other'       => 'Staff'
+    }, #Cabin
+    tracked_privileges: [
+      'Ground: Incident Submitter',
+      'Ground: General Submitter',
+      'Other: General Submitter',
+      'Flight Crew: ASAP Submitter',
+      'Flight Crew: Incident Submitter',
+      'Flight Crew: Fatigue Submitter',
+      'Dispatch: ASAP Submitter',
+      'Dispatch: Incident Submitter',
+      'Dispatch: Fatigue Submitter',
+      'Maintenance: ASAP Submitter',
+      'Maintenance: Incident Submitter',
+      'Maitnenance: Fatigue Submitter',
+      'Cabin: ASAP Submitter',
+      'Cabin: Incident Submitter',
+      'Cabin: Fatigue Submitter'
+    ],
+  }
+
 #ALL FOLLOWING MAY NEED CORRECTION/REVISION
 
   # Calculate the severity based on #{BaseConfig.airline[:code]}'s risk matrix
