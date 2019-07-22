@@ -10,6 +10,10 @@ PrdgSession::Application.routes.draw do |map|
   match '/oauth/request_token', :to => 'oauth#request_token', :as => :request_token
   match '/oauth/authorize',     :to => 'oauth#authorize',     :as => :authorize
   match '/oauth',               :to => 'oauth#index',         :as => :oauth
+  match '/saml/consume',        :to => 'saml#consume',        :as => :consume
+  match '/saml/metadata',       :to => 'saml#metadata',       :as => :metadata
+  match '/saml/init',           :to => 'saml#init',           :as => :init
+  match '/saml/logout',         :to => 'saml#logout',         :as => :saml
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'

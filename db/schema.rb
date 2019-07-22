@@ -10,7 +10,8 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190608002403) do
+
+ActiveRecord::Schema.define(:version => 20190610211431) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -1393,6 +1394,7 @@ ActiveRecord::Schema.define(:version => 20190608002403) do
     t.datetime "reset_sent_at"
     t.integer  "android_version"
     t.datetime "last_seen_at"
+    t.string   "sso_id"
   end
 
   create_table "verifications", :force => true do |t|

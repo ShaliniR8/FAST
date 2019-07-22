@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
 
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100
+    elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso]
        redirect_to logout_path
     else
       session[:last_active] = Time.now
