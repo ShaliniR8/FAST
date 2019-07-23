@@ -11,7 +11,7 @@ class ChecklistItem < ActiveRecord::Base
       {field: 'department',           title: 'Department',          num_cols: 6,  type: 'text',       visible: 'index,form,show', required: false},
       {field: "reference_number",     title: "Reference Number",    num_cols: 6,  type: "text",       visible: 'index,form,show', required: false},
       {field: "reference",            title: "Reference",           num_cols: 12, type: "textarea",   visible: 'index,form,show', required: false},
-      {field: "expectation",          title: "Requirement",         num_cols: 12, type: "textarea",   visible: 'index,form,show', required: false},
+      {field: "requirement",          title: "Requirement",         num_cols: 12, type: "textarea",   visible: 'index,form,show', required: false},
       {field: "status",               title: "Status",              num_cols: 12, type: 'select',     visible: 'index,show',      required: false},
       {field: "level_of_compliance",  title: "Level of Compliance", num_cols: 12, type: 'select',     visible: 'index,show',      required: false},
       {field: "comment",              title: "Comment",             num_cols: 12, type: 'textarea',   visible: 'index,show',      required: false},
