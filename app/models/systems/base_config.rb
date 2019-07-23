@@ -61,6 +61,19 @@ class BaseConfig
     end
   end
 
+  MODULES =
+  {
+    "ASAP" => { :display_name => "ASAP",
+    },
+    "SMS IM" => { :display_name => "SMS IM",
+    },
+    "SMS" => { :display_name => "Safety Assurance",
+    },
+    "SRM" => { :display_name => "Safety Risk Management",
+    }
+  }
+
+
   def self.airline_code
     Object.const_get('AIRLINE_CODE')
   end
