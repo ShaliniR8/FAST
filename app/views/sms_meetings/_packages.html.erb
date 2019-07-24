@@ -27,7 +27,7 @@
               <%@package_headers.each do |h|%>
                 <td class="<%=h[:html_class].present? ? package.send(h[:html_class]) : ''%>"><%=package.send(h[:field])%></td>
               <%end%>
-              <td colspan="4"><%if package.minutes.present?%><%=package.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
+              <td><%if package.minutes.present?%><%=package.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
               <td>
                 <%=link_to "View", package_path(package), :class=>"btn btn-info mb5", :disable_with => "Redirecting..."%>
                 <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
@@ -54,6 +54,7 @@
       path=$(this).attr('route');
       $.get(path,function(data){
         $(".modal-content").html(data);
+        $(window).trigger('resize');
       });
     });
     $('.carryover_btn').on('click',function(){
@@ -66,6 +67,7 @@
     $(".minutes_btn").on('click',function(){
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);
+        $(window).trigger('resize');
       });
     });
   });

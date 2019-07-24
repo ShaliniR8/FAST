@@ -1,19 +1,22 @@
 class SmsAction < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Costable
+  include Transactionable
+
+#Associations List
   belongs_to  :approver,                foreign_key: "approver_id",               class_name: "User"
   belongs_to  :responsible_user,        foreign_key: "responsible_user_id",       class_name: "User"
   belongs_to  :created_by,              foreign_key: 'created_by_id',             class_name: 'User'
-  has_many    :costs,                   foreign_key: "owner_id",                  class_name: "ActionCost",               :dependent => :destroy
-  has_many    :transactions,            foreign_key: "owner_id",                  class_name: "SmsActionTransaction",     :dependent => :destroy
-  has_many    :attachments,             foreign_key: 'owner_id',                  class_name: 'SmsActionAttachment',      :dependent => :destroy
+  belongs_to  :owner,                   polymorphic: true
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
   has_many    :notices,                 foreign_key: "owner_id",                  class_name: "SmsActionNotice",          :dependent => :destroy
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
   has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
-  accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
+
   after_create -> { create_transaction('Create') }
-
-
   after_create    :owner_transaction
   before_create   :set_priveleges
   serialize :privileges
@@ -51,19 +54,30 @@ class SmsAction < ActiveRecord::Base
       {field: 'sms_actions_comment',            title: 'Corrective Action Comment',         num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'final_comment',                  title: 'Final Comment',                     num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
 
-      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',                     title: 'Baseline Likelihood',               num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity',                       title: 'Baseline Severity',                 num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor',                    title: 'Baseline Risk',                     num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',               title: 'Mitigated Likelihood',              num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity_after',                 title: 'Mitigated Severity',                num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor_after',              title: 'Mitigated Risk',                    num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 
   def get_source
-    "<b style='color:grey'>N/A</b>".html_safe
+    case self.owner_type
+    when 'Investigation'
+      "<a style='font-weight:bold' href='/investigations/#{owner.id}'>
+        Investigation ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    when 'Finding'
+      "<a style='font-weight:bold' href='/findings/#{owner.id}'>
+        Finding ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
   end
 
 
@@ -111,31 +125,22 @@ class SmsAction < ActiveRecord::Base
 
 
   def create_transaction(action)
-    SmsActionTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
+    )
   end
 
 
 
-  def owner_transaction
-    if self.type == "FindingAction"
-      FindingTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.get_id} - #{self.title}",
-        :owner_id => self.finding.id,
-        :stamp => Time.now)
-    elsif self.type == "InvestigationAction"
-      InvestigationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.get_id} - #{self.title}",
-        :owner_id => self.investigation.id,
-        :stamp => Time.now)
-    end
+  def owner_transaction #TODO Ensure polymorphism cooperates with sms_action
+    Transaction.build_for(
+      self.owner,
+      'Add Corrective Action',
+      (session[:simulated_id] || session[:user_id]),
+      "##{self.get_id} - #{self.title}"
+    )
   end
 
 
@@ -153,6 +158,10 @@ class SmsAction < ActiveRecord::Base
 
 
   def schedule_date
+    self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
+  end
+
+  def get_completion_date
     self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
   end
 
@@ -326,41 +335,6 @@ class SmsAction < ActiveRecord::Base
       self.id
     end
   end
-
-
-
-  def self.get_search_terms
-    {
-      'Title' => :title,
-      'Status'=> :status,
-      'Responsible Department' => :responsible_department,
-      'Resonsible User' => "responsible_user_name",
-      'Employee Corrective Action (Yes/No)' => 'emp_action',
-      'Company Correctvie Action (Yes/No)' => 'dep_action',
-      'Immediate Action Taken (Yes/No)' => 'im_action',
-      'Immediate Action Comment' => :immediate_action_comment,
-      'Comprehensive Action' => 'com_action',
-      'Comprehensive Action Comment' => :comprehensive_action_comment,
-      'Scheduled Completion Date' => 'schedule_date',
-      'Final Approver' => 'approver_name',
-      'Action' => :action_taken,
-      'Description' => :description
-    }.sort.to_h
-  end
-
-
-
-  def self.terms
-    {
-      :status => {:type => "select", :options => ['New', 'Assigned', 'Completed', 'Pending Approval']},
-      :recommendation => {:type => "select", :options => {'Yes' => true,'No' => false}},
-      :description => {:type => "text"},
-      :responsible_department => {:type => "select", :options => self.departments},
-      :action_taken => {:type => "datalist", :options => self.get_actions}
-    }
-  end
-
-
 
   def self.get_avg_complete
     candidates = self.where("status = ? and complete_date is not ? and created_at is not null",

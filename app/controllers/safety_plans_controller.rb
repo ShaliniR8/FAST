@@ -44,12 +44,12 @@ class SafetyPlansController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:safety_plan][:status]}"
     end
     @owner.update_attributes(params[:safety_plan])
-    SafetyPlanTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     redirect_to @owner
   end
 
@@ -71,7 +71,7 @@ class SafetyPlansController < ApplicationController
 
   def new_attachment
     @owner=SafetyPlan.find(params[:id])
-    @attachment=SafetyPlanAttachment.new
+    @attachment=Attachment.new
     @evaluate=params[:evaluate]
     render :partial=>"shared/attachment_modal"
   end
@@ -87,11 +87,19 @@ class SafetyPlansController < ApplicationController
     send_data pdf.to_pdf, :filename => "Safety_Plan_##{@safety_plan.get_id}.pdf"
   end
 
-
+  def comment
+    @owner = SafetyPlan.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
   def complete
     safety_plan=SafetyPlan.find(params[:id])
-    SafetyPlanTransaction.create(:users_id=>current_user.id,:action=>"Complete",:owner_id=>safety_plan.id,:stamp=>Time.now)
+    Transaction.build_for(
+      safety_plan,
+      'Complete',
+      current_user.id
+    )
     safety_plan.status="Completed"
     safety_plan.date_completed = Time.now
     if safety_plan.save

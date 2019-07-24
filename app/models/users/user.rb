@@ -162,13 +162,14 @@ class User < ActiveRecord::Base
 
   def self.get_headers_table
     headers_table = [
-      { field: "employee_number",                 title: "Employee #"},
-      { field: "id",                              title: "ID"},
-      { field: "level" ,            size: "",     title: "Type"},
-      { field: "username",          size: "",     title: 'Username'},
-      { field: "full_name",         size: "",     title: 'Name'},
-      { field: "email",             size: "",     title: "Email"},
-      { field: "account_status",    size: "",     title: "Account Status"}
+      { field: "employee_number",        title: "Employee #"},
+      { field: "id",                     title: "ID"},
+      { field: "level" ,                 title: "Type"},
+      { field: "username",               title: 'Username'},
+      { field: "full_name",              title: 'Name'},
+      { field: "email",                  title: "Email"},
+      { field: "account_status",         title: "Account Status"},
+      { field: "get_last_seen_at",       title: "Last Seen At",     :type => 'datetime'},
     ]
     if (BaseConfig.airline[:has_mobile_app])
       headers_table.push({ field: 'android_version', title: 'Android Version'})
@@ -212,6 +213,11 @@ class User < ActiveRecord::Base
     else
       "Active"
     end
+  end
+
+
+  def get_last_seen_at
+    last_seen_at.localtime rescue ''
   end
 
 

@@ -15,33 +15,47 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-class InvestigationsController < ApplicationController
+class InvestigationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('investigation') }
+  before_filter :define_owner, only:[
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :destroy,
+    :edit,
+    :new_attachment,
+    :new_contact,
+    :new_cost,
+    :new_signature,
+    :new_task,
+    :override_status,
+    :reopen,
+    :show,
+    :update,
+    :viewer_access
 
+  ]
+
+  def define_owner
+    @class = Object.const_get('Investigation')
+    @owner = Investigation.find(params[:id])
+  end
 
   def new_recommendation
     @predefined_actions = SmsAction.get_actions
     @departments = SmsAction.departments
     load_options
     @finding = Investigation.find(params[:id])
-    @recommendation = InvestigationRecommendation.new
-    @fields = InvestigationRecommendation.get_meta_fields('form')
+    @recommendation = Recommendation.new
+    @fields = Recommendation.get_meta_fields('form')
     render :partial => "findings/new_recommendation"
   end
 
 
-
-  def new_contact
-    @audit = Investigation.find(params[:id])
-    @contact = InvestigationContact.new
-    render :partial => 'audits/contact'
-  end
-
-
-
   def new
-    @investigation = Investigation.new
+    @owner = Investigation.new
     if params[:record].present?
       @record = Record.find(params[:record])
     end
@@ -51,53 +65,18 @@ class InvestigationsController < ApplicationController
     end
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@investigation, "investigation", "severity_extra", "probability_extra")
-  end
-
-
-
-  def new_attachment
-    @owner = Investigation.find(params[:id])
-    @attachment = InvestigationAttachment.new
-    render :partial => "shared/attachment_modal"
-  end
-
-
-
-  def assign
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def complete
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    render :partial => '/forms/workflow_forms/process'
-  end
-
-  def approve
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def override_status
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-    render :partial => '/forms/workflow_forms/override_status'
+    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
   end
 
 
   def edit
-    @investigation = Investigation.find(params[:id])
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@investigation, "investigation", "severity_extra", "probability_extra")
+    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
   end
 
 
-
   def update
-    @owner = Investigation.find(params[:id]).becomes(Investigation)
-
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -128,17 +107,15 @@ class InvestigationsController < ApplicationController
     end
     @owner.update_attributes(params[:investigation])
     @owner.status = update_status || @owner.status
-    InvestigationTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to investigation_path(@owner)
   end
-
 
 
   def create
@@ -153,8 +130,6 @@ class InvestigationsController < ApplicationController
 
     end
   end
-
-
 
   def index
     @table = Object.const_get("Investigation")
@@ -202,64 +177,14 @@ class InvestigationsController < ApplicationController
   helper_method :load_options
 
 
-
   def show
-    @investigation = Investigation.find(params[:id])
     @type = 'investigations'
     @cause_headers = InvestigationCause.get_headers
     @desc_headers = InvestigationDescription.get_headers
     load_options
     @fields = Investigation.get_meta_fields('show')
-    @recommendation_fields = InvestigationRecommendation.get_meta_fields('show')
+    @recommendation_fields = Recommendation.get_meta_fields('show')
     load_special_matrix(@investigation)
-  end
-
-
-  def new_cause
-  end
-
-
-  def  new_finding
-    @audit = Investigation.find(params[:id])
-    @finding = InvestigationFinding.new
-    @classifications = Finding.get_classifications
-    form_special_matrix(@finding, "investigation[findings_attributes][0]", "severity_extra", "probability_extra")
-    load_options
-    @fields = Finding.get_meta_fields('form')
-    render :partial => "audits/finding"
-  end
-
-
-
-  def new_action
-    @namespace = "finding"
-    @privileges = Privilege.find(:all)
-    @finding = Investigation.find(params[:id])
-    @action = SmsAction.new
-    @departments = SmsAction.departments
-    @users = User.find(:all).keep_if{|u| !u.disable}
-    @headers = User.get_headers
-    @predefined_actions = SmsAction.get_actions
-    load_options
-    @fields = SmsAction.get_meta_fields('form')
-    form_special_matrix(@action, "investigation[corrective_actions_attributes][0]", "severity_extra", "probability_extra")
-    render :partial => "findings/action"
-  end
-
-
-
-  def new_task
-    @audit = Investigation.find(params[:id])
-    load_options
-    @task = InvestigationTask.new
-    render :partial=>'audits/task'
-  end
-
-
-  def new_cost
-    @cost = InvestigationCost.new
-    @corrective_action = Investigation.find(params[:id])
-    render :partial => "sms_actions/new_cost"
   end
 
 
@@ -275,100 +200,6 @@ class InvestigationsController < ApplicationController
   end
 
 
-
-  def destroy
-    Investigation.find(params[:id]).destroy
-    redirect_to investigations_path, flash: {danger: "Investigation ##{params[:id]} deleted."}
-  end
-
-
-
-  def viewer_access
-    investigation = Investigation.find(params[:id])
-    investigation.viewer_access = !investigation.viewer_access
-      if investigation.viewer_access
-        content = "Viewer Access Enabled"
-      else
-        content = "Viewer Access Disabled"
-      end
-      InvestigationTransaction.create(
-        :users_id => current_user.id,
-        :action => "Viewer Access",
-        :owner_id => investigation.id,
-        :content => content,
-        :stamp => Time.now
-      )
-    investigation.save
-    redirect_to investigation_path(investigation)
-  end
-
-
-
-  def new_cause
-    @investigation = Investigation.find(params[:id])
-    @categories = InvestigationCause.categories.keys
-    render :partial => "new_cause"
-  end
-
-
-
-  def new_desc
-    @finding = Investigation.find(params[:id])
-    @categories = InvestigationDescription.categories.keys
-    render :partial => "new_desc"
-  end
-
-
-
-  def add_causes
-    if params[:causes].present?
-      params[:causes].each_pair do |k,v|
-        if v.present?
-          InvestigationCause.create(
-            :owner_id => params[:id],
-            :category => params[:category],
-            :attr => k,
-            :value => v
-          )
-        end
-      end
-    end
-    redirect_to investigation_path(params[:id])
-  end
-
-
-
-  def add_desc
-    if params[:causes].present?
-      params[:causes].each_pair do |k,v|
-        if v.present?
-          InvestigationDescription.create(
-            :owner_id => params[:id],
-            :category => params[:category],
-            :attr => k,
-            :value => v)
-        end
-      end
-    end
-    redirect_to investigation_path(params[:id])
-  end
-
-
-
-  def retract_cause_attributes
-    @attributes = InvestigationCause.categories[params[:category]]
-    render :partial => "/findings/attributes"
-  end
-
-
-
-  def retract_desc_attributes
-    @attributes = InvestigationDescription.categories[params[:category]]
-    render :partial => "/findings/attributes"
-  end
-
-
-
   def mitigate
     @owner = Investigation.find(params[:id])
     mitigate_special_matrix("investigation", "mitigated_severity", "mitigated_probability")
@@ -380,7 +211,7 @@ class InvestigationsController < ApplicationController
     end
   end
 
-   def baseline
+  def baseline
     @owner = Investigation.find(params[:id])
     load_options
     form_special_matrix(@owner, "investigation", "severity_extra", "probability_extra")
@@ -390,14 +221,6 @@ class InvestigationsController < ApplicationController
       render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
     end
   end
-
-
-
-  def reopen
-    @investigation = Investigation.find(params[:id])
-    reopen_report(@investigation)
-  end
-
 
 
 end

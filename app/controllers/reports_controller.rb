@@ -94,11 +94,11 @@ class ReportsController < ApplicationController
   def meeting_ready
     report = Report.find(params[:id])
     report.status = "Meeting Ready"
-    ReportTransaction.create(
-      :users_id => current_user.id,
-      :action => "Meeting Ready",
-      :owner_id => report.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      report,
+      'Meeting Ready',
+      current_user.id
+    )
     if report.save
       redirect_to report_path(report)
     end
@@ -111,21 +111,20 @@ class ReportsController < ApplicationController
     report = Report.find(params[:id])
     report.agendas.map(&:destroy)
     report.report_meetings.each do |x|
-      MeetingTransaction.create(
-        :users_id => current_user.id,
-        :action => "Carry Over Event",
-        :content => "Event ##{report.get_id} Carried Over",
-        :owner_id => x.meeting_id,
-        :stamp => Time.now)
-      ReportTransaction.create(
-        :users_id => current_user.id,
-        :action => "Carried Over",
-        :content => "Event Carried Over from Meeting ##{x.meeting_id}",
-        :owner_id => report.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        x,
+        'Carry Over Event',
+        current_user.id,
+        "Event ##{report.get_id} Carried Over"
+      )
+      Transaction.build_for(
+        report,
+        'Carried Over',
+        current_user.id,
+        "Event Carried Over from Meeting ##{x.meeting_id}"
+      )
       x.destroy
     end
-    # report.report_meetings.each{|x| x.destroy}
     report.status = "Meeting Ready"
     report.save
   end
@@ -164,21 +163,21 @@ class ReportsController < ApplicationController
         record.report = @report
         record.status = "Linked"
         record.viewer_access = true
-        RecordTransaction.create(
-          :users_id => current_user.id,
-          :action => "Add to Event",
-          :owner_id => record.id,
-          :stamp => Time.now)
+        Transaction.build_for(
+          record,
+          'Add to Event',
+          current_user.id
+        )
         record.save
       end
     end
     content = params[:content].blank? ? "User Created Event" : params[:content]
-    transaction = ReportTransaction.new(
-      :action => "Create",
-      :user => current_user,
-      :content => content)
-    transaction.report = @report
-    transaction.save
+    Transaction.build_for(
+      @report,
+      'Create',
+      'current_user',
+      content
+    )
     redirect_to report_path(@report), flash: {success: "Event created."}
   end
 
@@ -236,24 +235,24 @@ class ReportsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:report][:status]}"
     when 'Add Meeting Minutes'
       redirect_path = meeting_path(@owner.meetings.first)
-      MeetingTransaction.create(
-        users_id: current_user.id,
-        action:   params[:commit],
-        owner_id: @owner.meetings.first.id,
-        content:  "#{params[:commit]} - ##{@owner.id}",
-        stamp:    Time.now)
+      Transaction.build_for(
+        @owner.meetings.first.id,
+        params[:commit],
+        current_user.id,
+        "#{params[:commit]} - ##{@owner.id}"
+      )
     when 'Close Event'
       close_records(@owner)
       redirect_path = params[:redirect_path]
     end
 
     @owner.update_attributes(params[:report])
-    ReportTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to redirect_path || report_path(@owner)
   end
@@ -283,6 +282,12 @@ class ReportsController < ApplicationController
     render :partial => 'reports/close'
   end
 
+
+  def comment
+    @owner = Report.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def print
@@ -370,18 +375,18 @@ class ReportsController < ApplicationController
     mr.report = @report
     mr.meeting = @meeting
     @report.status = "Under Review"
-    ReportTransaction.create(
-      :users_id => current_user.id,
-      :action => "Under Review",
-      :content => "Add to Meeting ##{@meeting.id}",
-      :owner_id => @report.id,
-      :stamp => Time.now)
-    MeetingTransaction.create(
-      :users_id => current_user.id,
-      :action => "Added Event",
-      :content => "Event ##{@report.get_id}",
-      :owner_id => @meeting.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      @report,
+      'Under Review',
+      current_user.id,
+      "Add to Meeting ##{@meeting.id}"
+    )
+    Transaction.build_for(
+      @meeting,
+      'Added Event',
+      current_user.id,
+      "Event ##{@report.get_id}"
+    )
     if mr.save && @report.save
       render :partial=> "report"
     end
@@ -402,7 +407,7 @@ class ReportsController < ApplicationController
 
   def new_attachment
     @owner = Report.find(params[:id])
-    @attachment = ReportAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 
@@ -475,16 +480,16 @@ class ReportsController < ApplicationController
         notify(record.submission.created_by,
           "Your submission ##{submission.id} has been closed by analyst." + g_link(submission),
           true, "Submission ##{submission.id} Closed")
-        SubmissionTransaction.create(
-          users_id: current_user.id,
-          action:   'Close',
-          owner_id: submission.id,
-          stamp:    Time.now)
-        RecordTransaction.create(
-          users_id: current_user.id,
-          action:   'Close',
-          owner_id: record.id,
-          stamp:    Time.now)
+        Transaction.build_for(
+          submission.id,
+          'Close',
+          current_user.id
+        )
+        Transaction.build_for(
+          record.id,
+          'Close',
+          current_user.id,
+        )
       end
     end
   end

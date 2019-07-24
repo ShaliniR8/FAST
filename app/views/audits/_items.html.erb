@@ -71,4 +71,26 @@
   $(function(){
     $('#item_table').dataTable();
   });
+'#{eval("new_contact_#{owner_class}_path(owner)")}'
+  $(document).ready(function(){
+    $('#requirement_btn').on('click',function(){
+      $.get('<%=eval("new_requirement_#{@owner.class.name.underscore}_path(@owner)")%>',function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#checklist_btn').on('click',function(){
+      $.get('<%=eval("new_checklist_#{@owner.class.name.underscore}_path(@owner)")%>',function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#update_checklist_btn').on('click',function(){
+      $.get('<%=eval("update_checklist_#{@owner.class.name.underscore}_path(@owner)")%>',function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+  });
 </script>

@@ -1,13 +1,16 @@
 class Meeting < ActiveRecord::Base
 
-  has_many :invitations, foreign_key: "meetings_id",class_name: "Invitation", :dependent => :destroy
-  has_many :report_meetings, foreign_key: "meeting_id",class_name: "ReportMeeting", :dependent => :destroy
-  has_many :attachments,foreign_key: "owner_id",class_name: "MeetingAttachment", :dependent => :destroy
-  has_many :comments,foreign_key:"owner_id",class_name: "MeetingComment",:dependent=>:destroy
-  has_many :agendas,foreign_key: "owner_id",class_name: "AsapAgenda",:dependent=>:destroy
-  has_many :transactions,foreign_key:"owner_id",class_name:"MeetingTransaction",:dependent=>:destroy
-  has_many :reports, foreign_key:"owner_id", class_name: "Reports"
-  has_many :notices, foreign_key:"owner_id", class_name:"MeetingNotice",:dependent=>:destroy
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Associations List
+  has_many :invitations,        foreign_key: "meetings_id",    class_name: "Invitation",         :dependent => :destroy
+  has_many :report_meetings,    foreign_key: "meeting_id",     class_name: "ReportMeeting",      :dependent => :destroy
+  has_many :agendas,            foreign_key: "owner_id",       class_name: "AsapAgenda",         :dependent=>:destroy
+  has_many :reports,            foreign_key:"owner_id",        class_name: "Reports"
+  has_many :notices,            foreign_key:"owner_id",        class_name:"MeetingNotice",       :dependent=>:destroy
 
   has_one :host, foreign_key: "meetings_id", class_name: "Host"
 
@@ -15,11 +18,10 @@ class Meeting < ActiveRecord::Base
   accepts_nested_attributes_for :invitations
   accepts_nested_attributes_for :host
   accepts_nested_attributes_for :report_meetings
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :agendas
   accepts_nested_attributes_for :reports
+
   before_create :init_status
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
   validates :review_start, presence: true
   validates :review_end, presence: true
   validates :meeting_start, presence: true
@@ -61,11 +63,11 @@ class Meeting < ActiveRecord::Base
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      MeetingTransaction.create(
-        :users_id => session[:user_id],
-        :action => action,
-        :owner_id => self.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil)
+      )
     end
   end
 

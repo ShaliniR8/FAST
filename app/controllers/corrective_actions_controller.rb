@@ -139,12 +139,12 @@ class CorrectiveActionsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:corrective_action][:status]}"
     end
     @owner.update_attributes(params[:corrective_action])
-    CorrectiveActionTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to corrective_action_path(@owner)
   end
@@ -184,12 +184,16 @@ class CorrectiveActionsController < ApplicationController
 
   def new_attachment
     @owner = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
-    @attachment = CorrectiveActionAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 
 
-
+  def comment
+    @owner = CorrectiveAction.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
   def print
     @deidentified = params[:deidentified]

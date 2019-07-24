@@ -36,12 +36,12 @@ class SrmMeetingsController < ApplicationController
 
     #change the status of all linked SRAs
     @meeting.sras.each do |x|
-      SraTransaction.create(
-        :users_id => current_user.id,
-        :action => "Remove from Meeting",
-        :content => "Meeting Deleted",
-        :owner_id =>x.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        x,
+        'Remove from Meeting',
+        current_user.id,
+        'Meeting Deleted'
+      )
       x.status = "Open"
       x.meeting_id = nil
       x.save
@@ -62,18 +62,18 @@ class SrmMeetingsController < ApplicationController
       params[:sras].each_pair do |index, value|
         sra = Sra.find(value)
         sra.meeting_id = @meeting.id
-        SraTransaction.create(
-          :users_id => current_user.id,
-          :action => "Add to Meeting",
-          :content => "Add to Meeting ##{@meeting.id}",
-          :owner_id => sra.id,
-          :stamp => Time.now)
-        MeetingTransaction.create(
-          :users_id => current_user.id,
-          :action => "Added SRA",
-          :content => "SRA ##{sra.get_id}",
-          :owner_id => @meeting.id,
-          :stamp => Time.now)
+        Transaction.build_for(
+          sra,
+          'Add to Meeting',
+          current_user.id,
+          "Add to Meeting ##{@meeting.id}"
+        )
+        Transaction.build_for(
+          @meeting,
+          'Added SRA',
+          current_user.id,
+          "SRA ##{sra.get_id}"
+        )
         sra.save
       end
     end
@@ -144,19 +144,19 @@ class SrmMeetingsController < ApplicationController
     if !params[:sras].blank?
       params[:sras].each_pair do |index, value|
         sra = Sra.find(value)
-        sra.meeting_id = @owner.id
-        SraTransaction.create(
-          :users_id => current_user.id,
-          :action => "Add to Meeting",
-          :content => "Add to Meeting ##{@owner.id}",
-          :owner_id => sra.id,
-          :stamp=>Time.now)
-        MeetingTransaction.create(
-          :users_id => current_user.id,
-          :action => "Added SRA",
-          :content => "SRA ##{sra.get_id}",
-          :owner_id => @owner.id,
-          :stamp => Time.now)
+        sra.meeting_id=@owner.id
+        Transaction.build_for(
+          sra,
+          'Add to Meeting',
+          current_user.id,
+          "Add to Meeting ##{@owner.id}"
+        )
+        Transaction.build_for(
+          @owner,
+          'Added SRA',
+          current_user.id,
+          "SRA ##{sra.get_id}"
+        )
         sra.save
       end
     end
@@ -170,6 +170,7 @@ class SrmMeetingsController < ApplicationController
         "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
         true,
         "Meeting ##{@owner.get_id} Closed")
+      status = 'Closed'
     end
 
     if params[:invitations].present?
@@ -197,12 +198,13 @@ class SrmMeetingsController < ApplicationController
     end
 
     @owner.update_attributes(params[:meeting])
-    MeetingTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
+    @owner.status = status unless !defined?(status)
     @owner.save
     redirect_to srm_meeting_path(@owner)
   end
@@ -236,11 +238,11 @@ class SrmMeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id]).becomes(Meeting)
     @meeting.status = "Open"
     @meeting.save
-    MeetingTransaction.create(
-      :users_id => current_user.id,
-      :action => "Reopen",
-      :owner_id => @meeting.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      @meeting,
+      'Reopen',
+      current_user.id
+    )
     redirect_to meeting_path(@meeting)
   end
 
@@ -313,18 +315,18 @@ class SrmMeetingsController < ApplicationController
       params[:sras].each do |sid|
         sra = Sra.find(sid)
         sra.meeting_id = meeting.id
-        SraTransaction.create(
-          :users_id => current_user.id,
-          :action => "Add to Meeting",
-          :content => "Add to Meeting ##{meeting.id}",
-          :owner_id => sra.id,
-          :stamp => Time.now)
-        MeetingTransaction.create(
-          :users_id => current_user.id,
-          :action => "Added SRA",
-          :content => "SRA ##{sra.get_id}",
-          :owner_id => meeting.id,
-          :stamp => Time.now)
+        Transaction.build_for(
+          sra,
+          'Add to Meeting',
+          current_user.id,
+          "Add to Meeting ##{meeting.id}"
+        )
+        Transaction.build_for(
+          meeting,
+          'Added SRA',
+          current_user.id,
+          :content => "SRA ##{sra.get_id}"
+        )
         sra.save
       end
     end
@@ -334,7 +336,7 @@ class SrmMeetingsController < ApplicationController
 
   def new_attachment
     @owner=Meeting.find(params[:id]).becomes(Meeting)
-    @attachment=MeetingAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 

@@ -1,9 +1,15 @@
 class WAA_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
+
   def self.airline_config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'World Atlantic Airlines',
       :code                                           => "WAA",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,
@@ -13,7 +19,7 @@ class WAA_Config
       :has_verification                               => false,
       :has_mobile_app                                 => false,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Central Time (US & Canada)',
 
 
       # Safety Reporting Module

@@ -1,5 +1,10 @@
 class MAC_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
+
   FAA_INFO = {
     "CHDO"=>"ACE-FSDO-09",
     "Region"=>"Central",
@@ -8,6 +13,7 @@ class MAC_Config
   }
 
 
+# :name => 'Mountain Air Cargo', #This should be in an self.airline_config function that returns a hash
 
   MATRIX_INFO = {
     severity_table: {

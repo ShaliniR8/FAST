@@ -18,45 +18,53 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-class SmsActionsController < ApplicationController
+class SmsActionsController < SafetyAssuranceController
 
   before_filter :load_options
   before_filter(only: [:show]) { check_group('sms_action') }
+  before_filter :define_owner, only: [
+    :approve,
+    :assign,
+    :comment,
+    :complete,
+    :destroy,
+    :edit,
+    :new_attachment,
+    :new_cost,
+    :override_status,
+    :reopen,
+    :show,
+    :update
+  ]
 
-
-  def destroy
-    corrective_action = SmsAction.find(params[:id])
-    corrective_action.destroy
-    redirect_to sms_actions_path,
-      flash: {danger: "Corrective Action ##{params[:id]} deleted."}
+  def define_owner
+    @class = Object.const_get('SmsAction')
+    @owner = @class.find(params[:id])
   end
 
 
-
   def new
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Action" : "SmsAction"
-    @owner = Object.const_get(params[:owner_type])
+    @table = 'SmsAction'
+    @parent = Object.const_get(params[:owner_type])
       .find(params[:owner_id])
       .becomes(Object.const_get(params[:owner_type])) rescue nil
-    @corrective_action = Object.const_get(@table).new
-    @corrective_action.open_date = Time.now
+    @owner = Object.const_get(@table).new
+    @owner.open_date = Time.now
     @users = User.where(:disable => 0)
     @headers = User.get_headers
     load_options
     @fields = SmsAction.get_meta_fields('form')
     form_special_matrix(
-      @corrective_action,
+      @owner,
       "sms_action",
       "severity_extra",
       "probability_extra")
   end
 
 
-
   def create
-    @table = params[:owner_type].present? ? "#{params[:owner_type]}Action" : "SmsAction"
-    corrective_action = Object.const_get(@table).create(params[:sms_action])
-    redirect_to corrective_action.becomes(SmsAction), flash: {success: "Corrective Action created."}
+    owner = SmsAction.create(params[:sms_action])
+    redirect_to owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
   end
 
 
@@ -77,21 +85,19 @@ class SmsActionsController < ApplicationController
 
 
   def show
-    @corrective_action = SmsAction.find(params[:id])
-    load_special_matrix(@corrective_action)
+    load_special_matrix(@owner)
     load_options
     @fields = SmsAction.get_meta_fields('show')
-    @type = get_car_owner(@corrective_action) || 'sms_actions'
+    @type = get_car_owner(@owner) || 'sms_actions'
   end
 
 
 
   def edit
-    @corrective_action = SmsAction.find(params[:id])
     load_options
     @fields = SmsAction.get_meta_fields('form')
-    form_special_matrix(@corrective_action, "sms_action", "severity_extra", "probability_extra")
-    @type = get_car_owner(@corrective_action)
+    form_special_matrix(@owner, "sms_action", "severity_extra", "probability_extra")
+    @type = get_car_owner(@owner)
     @users.keep_if{|u| u.has_access(@type, 'edit')}
   end
 
@@ -108,37 +114,12 @@ class SmsActionsController < ApplicationController
   helper_method :load_options
 
 
-  def override_status
-    @owner = SmsAction.find(params[:id]).becomes(SmsAction)
-    render :partial => '/forms/workflow_forms/override_status'
-  end
-
-  def assign
-    @owner = SmsAction.find(params[:id]).becomes(SmsAction)
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
   def reassign
-    @corrective_action = SmsAction.find(params[:id])
+    @owner = SmsAction.find(params[:id])
     render :partial => "reassign"
   end
 
-  def complete
-    @owner = SmsAction.find(params[:id]).becomes(SmsAction)
-    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
-    render :partial => 'forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def approve
-    @owner = SmsAction.find(params[:id]).becomes(SmsAction)
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-
-
   def update
-    @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     case params[:commit]
     when 'Reassign'
       notify(@owner.responsible_user,
@@ -169,37 +150,14 @@ class SmsActionsController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
     end
     @owner.update_attributes(params[:sms_action])
-    SmsActionTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        content:    transaction_content,
-        stamp:      Time.now
-      )
+    Transaction.build_for(
+      @owner,
+      params[:commit],
+      current_user.id,
+      transaction_content
+    )
     @owner.save
     redirect_to sms_action_path(@owner)
-  end
-
-
-
-  def get_term
-    all_terms = SmsAction.terms
-    @item = all_terms[params[:term].to_sym]
-    render :partial => "corrective_actions/term"
-  end
-
-
-  def new_cost
-    @cost = ActionCost.new
-    @corrective_action = SmsAction.find(params[:id]).becomes(SmsAction)
-    render :partial => "new_cost"
-  end
-
-
-  def new_attachment
-      @owner = SmsAction.find(params[:id]).becomes(SmsAction)
-      @attachment = SmsActionAttachment.new
-      render :partial => "shared/attachment_modal"
   end
 
 
@@ -236,12 +194,6 @@ class SmsActionsController < ApplicationController
     else
       render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
     end
-  end
-
-
-  def reopen
-    @sms_action = SmsAction.find(params[:id]).becomes(SmsAction)
-    reopen_report(@sms_action)
   end
 
 

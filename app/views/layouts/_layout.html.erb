@@ -273,6 +273,7 @@
           </a>
         </div>
 
+        <%if current_user.id.present?%>
         <div class="collapse navbar-collapse" id="myNavbar">
 
           <!-- Module based menu -->
@@ -392,6 +393,7 @@
                 <%end%>
 
                 <li><a href="#" class="dropdown-menu-header">Reference</a></li>
+                <li class="menu-link"><%=link_to "User Guides", user_guides_documents_path%></li>
                 <li class="menu-link"><%=link_to "Version History", revision_history_documents_path%></li>
                 <%if current_user.has_access("documents","index")%>
                   <li class="menu-link"><%=link_to "Documents", documents_path%></li>
@@ -404,20 +406,23 @@
 
           </ul>
         </div>
+        <%end%>
       </div>
     </nav>
 
     <div class="module_label">
       <span class="pull-right">
-        <%= case session[:mode]
-          when "SMS"
-            "Safety Assurance Module"
-          when "SMS IM"
-            "SMS IM Module"
-          when "ASAP"
-            "Safety Reporting Module"
-          when "SRM"
-            "SRA (SRM) Module"
+        <% prefix = "#{BaseConfig.airline[:name]}
+          #{" <span style='color:red'>#{Rails.env.titleize}</span>" if !Rails.env.production?} | "%>
+        <%=case session[:mode]
+          when 'SMS'
+            "#{prefix}Safety Assurance Module".html_safe
+          when 'SMS IM'
+            "#{prefix}SMS IM Module".html_safe
+          when 'ASAP'
+            "#{prefix}Safety Reporting Module".html_safe
+          when 'SRM'
+            "#{prefix}SRA (SRM) Module".html_safe
           end
         %>
       </span>

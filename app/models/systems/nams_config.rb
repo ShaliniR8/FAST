@@ -1,11 +1,16 @@
 class NAMS_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
 
   def self.airline_config
     {
       :version                                        => "1.0.3",
 
       :code                                           => "NAMS",
+      :name                                           => 'Northern Air Cargo',
       :base_risk_matrix                               => false,
       :event_summary                                  => false,
       :event_tabulation                               => false,
@@ -14,7 +19,7 @@ class NAMS_Config
       :has_verification                               => false,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Alaska',
 
 
       # Safety Reporting Module

@@ -4,7 +4,8 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -14,251 +15,73 @@
       <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
         <div class="panel-title">
           <div class="top_text">
-            Audit #<%=@audit.get_id%>:
-            <%="#{@audit.title}"%>
+            <%="Audit ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
+            <%= render '/forms/btns/render_btns',
+              btns: [
+                'delete',
+                'override_status',
+                'edit',
+                'sign',
+                'deid_pdf',
+                'pdf',
+                'viewer_access',
+                'send_message',
+                'expand_all',
+                'private_link'
+              ],
+              owner: @owner %>
 
-            <%if current_user.admin? ||
-                  current_user.has_access('audits','admin') ||
-                  current_user.has_access("audits","destroy")%>
-              <%=link_to "Delete",
-                audit_path(@audit),
-                :method => "delete",
-                :confirm => 'Are you sure?',
-                :class => "btn btn-danger pull-right mr5 mb5"%>
-            <%end%>
-
-            <%if current_user.admin? ||
-                  current_user.has_access('audits','admin')%>
-              <%=link_to 'Override Status', '#',
-                :class => 'btn btn-danger pull-right mr5 mb5',
-                :id => 'override_status_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-
-            <%if @audit.status != 'Completed' && (
-                  current_user.admin? ||
-                  current_user.has_access('audits','admin') ||
-                  current_user.has_access('audits','edit'))%>
-              <%=link_to "Edit",
-                edit_audit_path(@audit),
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Editing..."%>
-            <%end%>
-
-            <%=link_to "De-ID PDF",
-              print_audit_path(
-                @audit,
-                :format => :pdf,
-                :deidentified => true),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%=link_to "PDF",
-              print_audit_path(
-                @audit,
-                :format => :pdf,
-                :deidentified => false),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%if current_user.admin? ||
-                  current_user.has_access('audits','admin') ||
-                  current_user.has_access("audits","edit")%>
-              <%=link_to @audit.viewer_access ? "Disable Viewer Access" : "Enable Viewer Access",
-                viewer_access_audit_path(@audit),
-                :class=>"btn btn-warning pull-right mr5 mb5"%>
-            <%end%>
-
-            <%=link_to "Send Message",
-              new_message_path(:link=>audit_path(@audit),
-              :link_type=>"Audit",
-              :link_id=>@audit.id),
-              :class=>"btn btn-warning pull-right mr5 mb5"%>
-
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 expandall pull-right mb5"%>
           </div>
         </div>
       </div>
 
       <div class="panel-body">
         <div class="col-xs-12 mb15">
-
-          <%if @audit.status == "New"%>
-            <%if @audit.approver == current_user ||
-                  current_user.admin? ||
-                  current_user.has_access('audits','admin')%>
-              <%=link_to "Assign", "#",
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :id => 'assign_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-          <%elsif @audit.status == "Assigned"%>
-            <% if @audit.can_complete? current_user %>
-              <%=link_to "Complete", "#",
-                :class => "btn btn-warning pull-right complete_btn mr5 mb5",
-                :id => 'complete',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-          <%elsif @audit.status=="Pending Approval" %>
-            <% if @audit.can_approve? current_user %>
-              <%=link_to "Approve", "#",
-                :class=>"btn btn-success pull-right mr5 approve_btn mb5",
-                :id=>'approve',
-                "data-toggle"=>"modal",
-                "data-target"=>".bs-example-modal-lg"%>
-
-              <%=link_to "Reject", "#",
-                :class=>"btn btn-danger pull-right mr5 approve_btn mb5",
-                :id=>'reject',
-                "data-toggle"=>"modal",
-                "data-target"=>".bs-example-modal-lg"%>
-            <%end%>
-
-          <% elsif @audit.status == "Completed"%>
-            <%if @audit.can_reopen? current_user %>
-              <%= link_to "Reopen",
-                reopen_audit_path(@audit),
-                :class => "btn btn-success pull-right mr5"%>
-            <%end%>
-          <%end%>
-
-          <%if !['Pending Approval', 'Completed'].include? @audit.status%>
-
-            <%=link_to "Add Task",
-              "#",
-              :class=>"btn btn-success pull-right mr5 mb5",
-              :id=>'task_btn',
-              "data-toggle"=>"modal",
-              "data-target"=>".bs-example-modal-lg"%>
-
-            <%=link_to "Add Contact",
-              "#",
-              :class=>"btn btn-success pull-right mr5 mb5",
-              :id=>'contact_btn',
-              "data-toggle"=>"modal",
-              "data-target"=>".bs-example-modal-lg"%>
-
-            <%=link_to "Add Finding",
-              new_finding_path(
-                :owner_id => @audit.id,
-                :owner_type => @audit.class.name),
-              :class => "btn btn-success pull-right mr5 mb5",
-              :disable_with => "Adding..."%>
-          <%end%>
-
-          <%=link_to "Add Comment",
-            "#",
-            :class=>"btn btn-success pull-right mr5 mb5",
-            :id=>'comment_btn',
-            "data-toggle"=>"modal",
-            "data-target"=>".bs-example-modal-lg"%>
+          <%= render '/forms/btns/render_btns',
+            btns: [
+              'assign',
+              'complete',
+              'approve_reject',
+              'reopen',
+              'contact',
+              #'task',
+              'cost',
+              'finding',
+              'comment'
+            ],
+            owner: @owner %>
 
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @audit%>
-        <%=render '/checklists/checklist_types', :owner => @audit, :type => 'audit'%>
-        <%=render "/ims/show_task", :owner => @audit, :fields => AuditTask.get_meta_fields('show')%>
-        <%=render "/ims/show_contact", :owner => @audit, :fields => AuditContact.get_meta_fields('show')%>
-        <%=render '/findings/show_all', :owner => @audit, :show_btn => false%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
 
-        <div class="col-xs-12"><%=render "/audits/show_comment", :owner => @audit%></div>
-        <%=render "/forms/attachments_show", :owner => @audit%>
-        <%=render "/records/transactions", :owner => @audit%>
+        <%=render "/ims/show_task", :owner => @owner, :fields => SmsTask.get_meta_fields('show')%>
+        <%=render "/ims/show_contact", :owner => @owner, :fields => Contact.get_meta_fields('show')%>
+
+        <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
+        <%=render '/forms/cost', :owner => @owner%>
+
+        <%=render 'forms/signatures/show_signatures', owner: @owner %>
+
+
+        <%=render "/forms/show_comment", :owner => @owner%>
+        <%=render "/forms/attachments_show", :owner => @owner%>
+        <%=render "/records/transactions", :owner => @owner%>
 
       </div>
     </div>
   </div>
 </div>
 
-<style>
-  .datepicker{
-    z-index: 1200!important;
-  }
-</style>
-
 
 <script>
   $(document).ready(function(){
-    $('#task_btn').on('click',function(){
-      $.get("<%=new_task_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#contact_btn').on('click',function(){
-      $.get("<%=new_contact_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#requirement_btn').on('click',function(){
-      $.get("<%=new_requirement_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#checklist_btn').on('click',function(){
-      $.get("<%=new_checklist_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_audit_path(@audit)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.complete_btn').on('click',function(){
-      var commit=$(this).attr('id');
-      $.get("<%=complete_audit_path(@audit)%>?commit="+commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      var commit=$(this).attr('id');
-      $.get("<%=approve_audit_path(@audit)%>?commit="+commit,function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $("#select_checklist_btn").on('click', function(){
-      $.get("<%=select_checklist_checklist_templates_path%>?owner_class=<%=@audit.class.name%>&owner_id=<%=@audit.id%>",
-        function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#update_checklist_btn').on('click',function(){
-      $.get("<%=update_checklist_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_audit_path(@audit)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
 
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_audit_path(@audit)%>", function(data){
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_audit_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

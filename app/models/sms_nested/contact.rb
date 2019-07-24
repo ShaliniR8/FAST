@@ -1,4 +1,8 @@
 class Contact < ActiveRecord::Base
+  belongs_to :owner, polymorphic: true
+
+
+  after_create :transaction_log
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -18,6 +22,15 @@ class Contact < ActiveRecord::Base
       { field: "zip",               title: "Zip",                           num_cols: 6,  type: "text",         visible: 'form,show',   required: false},
       { field: "notes",             title: "Notes",                         num_cols: 12, type: "textarea",     visible: 'form,show',   required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+  def transaction_log
+    Transaction.build_for(
+      self.owner,
+      'Add Contact',
+      session[:user_id],
+      "##{self.id} #{self.contact_name}"
+    )
   end
 
 end

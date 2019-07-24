@@ -51,37 +51,35 @@
       </div>
 
       <div class="panel-body">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="pull-right mb10">
-              <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
-                <%if @meeting.status == "Open"%>
-                  <%=link_to 'Close Meeting', '#',
-                    :class => 'btn btn-danger pull-right mr5 mb5',
-                    :id => 'close',
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
-                  <%=link_to "Add Comment",
-                    "#",
-                    :class => "btn btn-success mb5 pull-right mr5",
-                    :id => 'comment_btn',
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
-                  <%=link_to "Add Events",
-                    "#",
-                    :class => "btn btn-success mb5 pull-right mr5",
-                    :id => "new_report_btn",
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
-                <%elsif @meeting.status == "Closed"%>
-                  <%=link_to "Reopen Meeting",
-                    reopen_meeting_path(@meeting),
-                    :class=>"btn btn-success pull-right mr5 mb5",
-                    :confirm => "Are you sure?",
-                    :disable_with => "Reopening..."%>
-                <%end%>
+        <div class="col-xs-12 mb15">
+          <div class="pull-right mb10">
+            <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
+              <%if @meeting.status == "Open"%>
+                <%=link_to 'Close Meeting', '#',
+                  :class => 'btn btn-danger pull-right mr5 mb5',
+                  :id => 'close',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+                <%=link_to "Add Comment",
+                  "#",
+                  :class => "btn btn-success mb5 pull-right mr5",
+                  :id => 'comment_btn',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+                <%=link_to "Add Events",
+                  "#",
+                  :class => "btn btn-success mb5 pull-right mr5",
+                  :id => "new_report_btn",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%elsif @meeting.status == "Closed"%>
+                <%=link_to "Reopen Meeting",
+                  reopen_meeting_path(@meeting),
+                  :class=>"btn btn-success pull-right mr5 mb5",
+                  :confirm => "Are you sure?",
+                  :disable_with => "Reopening..."%>
               <%end%>
-            </div>
+            <%end%>
           </div>
         </div>
 
@@ -104,12 +102,12 @@
               </div>
             </div>
           </div>
-
-
           <%=render "all_reports"%>
+        </div>
 
-          <%=render "/audits/show_comment", :owner => @meeting%>
+        <%=render "/forms/show_comment", :owner => @meeting%>
 
+        <div class="col-xs-12">
           <div class="panel panel-lightskyblue">
             <div class="panel-heading click-heading collapsed">
               <div class="panel-title">
@@ -135,11 +133,10 @@
             </div>
           </div>
         </div>
-
         <%=render "/forms/attachments_show", :owner => @meeting%>
         <%=render "records/transactions", :owner => @meeting%>
-
       </div>
+
     </div>
   </div>
 </div>

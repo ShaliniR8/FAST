@@ -1,17 +1,18 @@
 class CorrectiveAction < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Associations List
   belongs_to  :report,                foreign_key: 'reports_id',          class_name: 'Report'
   belongs_to  :record,                foreign_key: 'records_id',          class_name: 'Record'
   belongs_to  :responsible_user,      foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to  :approver,              foreign_key: 'approver_id',         class_name: 'User'
   belongs_to  :created_by,            foreign_key: 'created_by_id',       class_name: 'User'
 
-  has_many :attachments,    foreign_key: 'owner_id',  class_name: 'CorrectiveActionAttachment',   dependent: :destroy
-  has_many :transactions,   foreign_key: 'owner_id',  class_name: 'CorrectiveActionTransaction',  dependent: :destroy
   has_many :notices,        foreign_key: 'owner_id',  class_name: 'CorrectiveActionNotice',       dependent: :destroy
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
 
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }
@@ -94,31 +95,31 @@ class CorrectiveAction < ActiveRecord::Base
 
 
   def create_transaction(action)
-    CorrectiveActionTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      session[:user_id]
+    )
   end
 
 
 
   def create_report_record_transaction()
     if self.record.present?
-      RecordTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.record.get_id}",
-        :owner_id => self.record.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        self.record,
+        'Add Corrective Action',
+        session[:user_id],
+        "##{self.record.get_id}"
+      )
     end
     if self.report.present?
-      ReportTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.report.get_id}",
-        :owner_id => self.report.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        self.report,
+        'Add Corrective Action',
+        session[:user_id],
+        "##{self.report.get_id}",
+      )
     end
   end
 

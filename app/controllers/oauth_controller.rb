@@ -1,9 +1,7 @@
 require 'oauth/controllers/provider_controller'
 class OauthController < ApplicationController
   include OAuth::Controllers::ProviderController
-  # oauthenticate :strategies => :token , :interactive => true
   skip_before_filter :authenticate_user!
-  #before_filter :authenticate_user
 
 
   protected
@@ -16,30 +14,25 @@ class OauthController < ApplicationController
   # should authenticate and return a user if valid password.
   # This example should work with most Authlogic or Devise. Uncomment it
   def authenticate_user(username,password)
-    #prepend ProviderController
     Rails.logger.info "authenticate_user"
     user = User.authenticate(username, password)
     if user
       Rails.logger.info user.inspect
       session[:user_id] = user.id
-      session[:mode] = "ASAP"
-      #Rails.logger.info session.inspect
-      #flash[:notice] = "Logged in successfully."
-      #if current_user.level == "Employee"
-      #  redirect_to(work_requests_path)
-      #else
-        #redirect_to_target_or_default(root_url)
-      #end
-      user
     else
-      #Rails.logger.info 'not authenticated'
-
-      flash.now[:error] = "Invalid login or password."
-      render :action => 'new'
-      nil
+      respond_to do |format|
+        format.html do
+          flash.now[:error] = 'Invalid login or password.'
+          render :action => 'new'
+        end
+        format.json {}
+      end
     end
+    user
   end
 
-  #alias :login_required :authenticate_user
+  def oauth2_error(error = 'Wrong username or password.')
+    render :json => { :error => error }.to_json, :status => 400
+  end
 
 end

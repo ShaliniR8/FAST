@@ -53,11 +53,11 @@ class ImsController < ApplicationController
   def schedule
     im = Im.find(params[:id])
     im.status = 'Open'
-    ImTransaction.create(
-      :users_id => current_user.id,
-      :action => "Open",
-      :owner_id => params[:id],
-      :stamp => Time.now)
+    Transaction.build_for(
+      im,
+      'Open',
+      current_user.id
+    )
     im.date_open = Time.now.to_date
     im.save
     if im.evaluator.present?
@@ -128,12 +128,12 @@ class ImsController < ApplicationController
     if im.update_attributes(params[:im])
       if new_status.present?
         if old_status == "Pending Review" && new_status == "Completed"
-          ImTransaction.create(
-            :users_id => current_user.id,
-            :action => "Completed",
-            :content => "Approved",
-            :owner_id => params[:id],
-            :stamp => Time.now)
+          Transaction.build_for(
+            im,
+            'Completed',
+            current_user.id,
+            'Approved'
+          )
           im.date_complete=Time.now.to_date
           im.save
           notify(
@@ -142,11 +142,11 @@ class ImsController < ApplicationController
             true,
             "IM ##{im.get_id} Approved")
         elsif old_status == "Pending Review" && new_status == "Open"
-          ImTransaction.create(
-            :users_id => current_user.id,
-            :action => "Rejected",
-            :owner_id => params[:id],
-            :stamp => Time.now)
+          Transaction.build_for(
+            im,
+            'Rejected',
+            current_user.id
+          )
           notify(
             im.evaluator,
             "IM ##{im.get_id} has been rejected by preliminary reviewer." + g_link(im),
@@ -163,7 +163,7 @@ class ImsController < ApplicationController
     load_options
     @im = @base.clone
     @base.attachments.each do |x|
-      temp = ImAttachment.new(:name=>x.name, :caption=>x.caption)
+      temp = Attachment.new(:name=>x.name, :caption=>x.caption)
       @im.attachments.push(temp)
     end
     @im.save
@@ -173,13 +173,13 @@ class ImsController < ApplicationController
   def new_task
     @im = Im.find(params[:id])
     load_options
-    @task = ImTask.new
+    @task = @im.tasks.new
     render :partial => 'task'
   end
 
   def new_contact
     @im = Im.find(params[:id])
-    @contact = Contact.new
+    @contact = @im.contacts.new
     render :partial => 'contact'
   end
 
@@ -228,7 +228,11 @@ class ImsController < ApplicationController
           Object.const_get(im.type+'Item').create(row.to_hash.merge({:owner_id=>im.id}))
         end
       end
-      ImTransaction.create(:users_id=>current_user.id, :action=> "Upload Checklist", :owner_id=>params[:id], :stamp=>Time.now)
+      Transaction.build_for(
+        im,
+        'Upload Checklist',
+        current_user.id
+      )
       redirect_to im_path(im)
   end
 
@@ -245,7 +249,7 @@ class ImsController < ApplicationController
 
   def new_attachment
     @owner=Im.find(params[:id]).becomes(Im)
-    @attachment=ImAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 
@@ -267,7 +271,11 @@ class ImsController < ApplicationController
     im = Im.find(params[:id])
     if im.reviewer.present?
       im.date_complete=Time.now.to_date
-      ImTransaction.create(:users_id=>current_user.id,:action=>"Pending Review",:owner_id=>params[:id],:stamp=>Time.now)
+      Transaction.build_for(
+        im,
+        'Pending Review',
+        current_user.id
+      )
       notify(
         im.reviewer,
         "IM Plan ##{im.get_id} needs your review." + g_link(im),
@@ -276,7 +284,11 @@ class ImsController < ApplicationController
       im.status="Pending Review"
       im.save
     else
-      ImTransaction.create(:users_id=>current_user.id,:action=>"Complete",:owner_id=>params[:id],:stamp=>Time.now)
+      Transaction.build_for(
+        im,
+        'Complete',
+        current_user.id
+      )
       im.status="Completed"
       im.save
     end
@@ -307,7 +319,11 @@ class ImsController < ApplicationController
   def enable
     @im=Im.find(params[:id])
     @im.viewer_access=!@im.viewer_access
-    ImTransaction.create(:users_id=>current_user.id,:action=>"#{(@im.viewer_access ? 'Enable' : 'Disable')} Viewer Access",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      @im,
+      "#{(@im.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
+      current_user.id
+    )
     @im.save
     redirect_to im_path(@im)
   end

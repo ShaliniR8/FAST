@@ -1,18 +1,19 @@
 class RiskControl < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Costable
+  include Transactionable
+
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"
   belongs_to  :approver,          foreign_key: 'approver_id',           class_name: 'User'
   belongs_to  :responsible_user,  foreign_key: 'responsible_user_id',   class_name: 'User'
   belongs_to  :hazard,            foreign_key: 'hazard_id'
-  has_many    :costs,             foreign_key: 'owner_id',              class_name: 'ControlCost'
-  has_many    :transactions,      foreign_key: 'owner_id',              class_name: 'RiskControlTransaction',   dependent: :destroy
-  has_many    :attachments,       foreign_key: 'owner_id',              class_name: 'RiskControlAttachment',    dependent: :destroy
   has_many    :descriptions,      foreign_key: 'owner_id',              class_name: 'RiskControlDescription',   dependent: :destroy
   has_many    :notices,           foreign_key: 'owner_id',              class_name: 'RiskControlNotice',        dependent: :destroy
 
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
-
 
   after_create -> { create_transaction('Create') }
 
@@ -30,7 +31,7 @@ class RiskControl < ActiveRecord::Base
       {field: 'approver_id',                  title: 'Final Approver',                  num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
       {field: 'follow_up_date',               title: 'Date for Follow-Up/Monitor Plan', num_cols: 6,  type: 'date',     visible: 'form,show',       required: false},
       {field: 'control_type',                 title: 'Type',                            num_cols: 6,  type: 'datalist', visible: 'form,show',       required: false, options: get_custom_options('Risk Control Types')},
-      {field: 'description',                  title: 'Description of Risk Control',     num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
+      {field: 'description',                  title: 'Description of Risk Control/Mitigation Plan',           num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
       {field: 'notes',                        title: 'Notes',                           num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
       {field: 'final_comment',                title: 'Final Comment',                   num_cols: 12, type: 'textarea', visible: 'show'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
@@ -50,8 +51,17 @@ class RiskControl < ActiveRecord::Base
 
 
   def create_transaction(action)
-    RiskControlTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
-    HazardTransaction.create(:users_id=>session[:user_id], :action=>"Add Risk Control", :content=>"##{self.get_id} #{self.title}",:owner_id=>self.hazard.id, :stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      session[:user_id]
+    )
+    Transaction.build_for(
+      self.hazard,
+      'Add Risk Control',
+      session[:user_id],
+      "##{self.get_id} #{self.title}"
+    )
   end
 
   def release

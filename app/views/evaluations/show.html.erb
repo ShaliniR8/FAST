@@ -12,178 +12,67 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            Evaluation #<%=@evaluation.get_id%>:
-            <%="#{@evaluation.title}"%>
+            <%="Evaluation ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access("evaluations", "edit")%>
-
-              <%if current_user.admin? ||
-                    current_user.has_access('evaluations','admin') ||
-                    current_user.has_access("evaluations", "destroy")%>
-               <%=link_to "Delete",
-                evaluation_path(@evaluation),
-                :method => "delete",
-                :confirm => 'Are you sure?',
-                :class => "btn btn-danger pull-right mr5 mb5"%>
-              <%end%>
-
-              <%if current_user.admin?
-                    current_user.has_access('evaluations','admin')%>
-                <%=link_to 'Override Status', '#',
-                  :class => 'btn btn-danger pull-right mr5 mb5',
-                  :id => 'override_status_btn',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-              <%end%>
-
-
-              <%if @evaluation.status != 'Completed' && (
-                    current_user.admin? ||
-                    current_user.has_access('evaluations','admin') ||
-                    current_user.has_access('evaluations',"edit"))%>
-                <%=link_to "Edit",
-                  edit_evaluation_path(@evaluation),
-                  :class => "btn btn-warning pull-right mr5 mb5",
-                  :disable_with => "Editing..."%>
-              <%end%>
-
-              <%=link_to "De-ID PDF",
-                print_evaluation_path(
-                  @evaluation,
-                  :format => :pdf,
-                  :deidentified => true),
-                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-              <%=link_to "PDF",
-                print_evaluation_path(
-                  @evaluation,
-                  :format => :pdf,
-                  :deidentified => false),
-                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-            <%end%>
-
-            <%if current_user.admin? ||
-                  current_user.has_access('evaluations','admin') ||
-                  current_user.has_access('evaluations','edit')%>
-              <%=link_to @evaluation.viewer_access ? 'Disable Viewer Access' : 'Enable Viewer Access',
-                viewer_access_evaluation_path(@evaluation),
-                :class => "btn btn-warning pull-right mr5 mb5"%>
-            <%end%>
-
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => evaluation_path(@evaluation),
-                :link_type => "Evaluation",
-                :link_id => @evaluation.id),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
-
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 expandall pull-right mb5"%>
+            <%= render '/forms/btns/render_btns',
+              btns: [
+                'delete',
+                'override_status',
+                'edit',
+                'sign',
+                'deid_pdf',
+                'pdf',
+                'viewer_access',
+                'send_message',
+                'expand_all'
+              ],
+              owner: @owner %>
           </div>
         </div>
       </div>
       <div class="panel-body">
         <div class="col-xs-12 mb15">
 
-          <%if @evaluation.status == "New"%>
-            <%if @evaluation.approver == current_user ||
-                  current_user.admin? ||
-                  current_user.has_access('evaluations','admin')%>
-              <%=link_to "Assign", "#",
-                :id => 'assign_btn',
-                :class => "btn btn-warning pull-right mr5 mb5",
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
+          <%= render '/forms/btns/render_btns',
+            btns: [
+              'assign',
+              'complete',
+              'approve_reject',
+              'reopen',
+              'task',
+              'cost',
+              'contact',
+              'finding',
+              'comment'
+            ],
+            owner: @owner %>
 
-          <%elsif @evaluation.status == "Assigned"%>
-            <%if @evaluation.can_complete? current_user %>
-              <%=link_to 'Complete', '#',
-                :id => 'complete',
-                :class => 'btn btn-warning pull-right complete_btn mr5 mb5',
-                'data-toggle' => 'modal',
-                'data-target' => '.bs-example-modal-lg' %>
-            <%end%>
-
-          <%elsif @evaluation.status == "Pending Approval"%>
-            <%if @evaluation.can_approve? current_user %>
-              <%=link_to "Approve",
-                "#",
-                :class => "btn btn-success pull-right mr5 approve_btn mb5",
-                :id => 'approve',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-
-              <%=link_to "Reject",
-                "#",
-                :class => "btn btn-danger pull-right mr5 approve_btn mb5",
-                :id => 'reject',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-          <%elsif @evaluation.status == 'Completed'%>
-            <%if @evaluation.can_reopen? current_user %>
-              <%=link_to "Reopen",
-                reopen_evaluation_path(@evaluation),
-                :class => "btn btn-success pull-right mr5",
-                :disable_with => "Reopening...",
-                :confirm => "Are you sure?"%>
-            <%end%>
-          <%end%>
-
-
-          <% if !['Completed', 'Pending Approval'].include? @evaluation.status %>
-            <%=link_to "Add Task",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'task_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
-            <%=link_to "Add Contact",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'contact_btn',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
-            <%=link_to "Add Finding",
-              new_finding_path(
-                :owner_id => @evaluation.id,
-                :owner_type => @evaluation.class.name),
-              :class => "btn btn-success pull-right mr5 mb5",
-              :disable_with => "Adding..."%>
-          <%end%>
-
-          <%if !current_user.has_access('evaluations','viewer')%>
-            <%=link_to "Add Comment",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => 'comment_btn',
-              "data-toggle" => "modal",
-              "data-target"=>".bs-example-modal-lg"%>
-          <%end%>
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @evaluation%>
-        <%=render '/checklists/checklist_types', :owner => @evaluation, :type => 'evaluation'%>
+        <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'evaluation'%>
         <%=render "/ims/show_task",
-          :owner => @evaluation,
-          :fields => EvaluationTask.get_meta_fields('show')%>
+          :owner => @owner,
+          :fields => SmsTask.get_meta_fields('show')%>
         <%=render "/ims/show_contact",
-          :owner => @evaluation,
+          :owner => @owner,
           :type=>'evaluation',
-          :fields => EvaluationContact.get_meta_fields('show')%>
+          :fields => Contact.get_meta_fields('show')%>
+        <%=render "/audits/show_requirements",
+          :owner => @owner,
+          :type => 'evaluation'%>
+
         <%=render "/findings/show_all",
-          :owner => @evaluation,
+          :owner => @owner,
           :type => 'evaluations',
           :show_btn => false%>
 
-        <%=render "/forms/attachments_show", :owner => @evaluation%>
-        <%=render "/records/transactions", :owner => @evaluation%>
+        <%=render "/forms/cost", :owner => @owner%>
+        <%=render 'forms/signatures/show_signatures', owner: @owner %>
+        <%=render "/forms/show_comment", :owner => @owner%>
+        <%=render "/forms/attachments_show", :owner => @owner%>
+        <%=render "/records/transactions", :owner => @owner%>
       </div>
     </div>
   </div>
@@ -200,74 +89,11 @@
 
 <script>
   $(document).ready(function(){
-    $('#task_btn').on('click',function(){
-      $.get("<%=new_task_evaluation_path(@evaluation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#contact_btn').on('click',function(){
-      $.get("<%=new_contact_evaluation_path(@evaluation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_evaluation_path(@evaluation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#requirement_btn').on('click',function(){
-      $.get("<%=new_requirement_evaluation_path(@evaluation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_evaluation_path(@evaluation)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.complete_btn').on('click',function(){
-      var commit=$(this).attr('id');
-      $.get("<%=complete_evaluation_path(@evaluation)%>?commit="+commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      var commit=$(this).attr('id');
-      $.get("<%=approve_evaluation_path(@evaluation)%>?commit="+commit,function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#checklist_btn').on('click',function(){
-      $.get("<%=new_checklist_evaluation_path(@evaluation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_evaluation_path(@evaluation)%>",function(data){
+      $.get("<%=new_attachment_evaluation_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
-    $('#update_checklist_btn').on('click',function(){
-      $.get("<%=update_checklist_evaluation_path(@evaluation)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_evaluation_path(@evaluation)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
   });
 </script>

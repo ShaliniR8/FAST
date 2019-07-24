@@ -1,10 +1,14 @@
 class Package < ActiveRecord::Base
-  has_many :sms_agendas,foreign_key:"event_id",class_name:"SmsAgenda",:dependent=>:destroy
 
-  has_many :transactions,foreign_key:"owner_id",class_name:"PackageTransaction",:dependent=>:destroy
-  has_many :attachments,foreign_key:'owner_id',class_name:'PackageAttachment', :dependent => :destroy
-  belongs_to :meeting,foreign_key:"meeting_id",class_name:"Meeting"
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
+#Concern List
+  include Attachmentable
+  include Transactionable
+
+#Associations List
+  has_many :sms_agendas,    foreign_key:"event_id",   class_name:"SmsAgenda",            :dependent=>:destroy
+
+  belongs_to :meeting,      foreign_key:"meeting_id", class_name:"Meeting"
+
 
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }
@@ -12,7 +16,11 @@ class Package < ActiveRecord::Base
   extend AnalyticsFilters
 
   def create_transaction(action)
-    PackageTransaction.create(:users_id=>session[:user_id],:action=>action,:owner_id=>self.id,:stamp=>Time.now)
+    Transaction.build_for(
+      self,
+      action,
+      session[:user_id]
+    )
     #ImTransaction.create(:users_id=>session[:user_id],:action=>"Add Package", :content=>"Add Package ##{self.get_id}", :onwer_id=>self.im.id,:stamp=>Time.now)
   end
 

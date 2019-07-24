@@ -1,23 +1,13 @@
 <tr class="field_group to_delete">
-
   <%if source == 'Existing'%>
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
-      <%if checklist_row.is_header && checklist_cell.checklist_header_item.editable%>
-        <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
-          <%header_item = checklist_cell.checklist_header_item%>
-          <%=render 'checklist_row_fields_td',
-            :header_item => header_item,
-            :checklist_cell => checklist_cell,
-            :f => cell_form%>
-        <%end%>
-      <%else%>
-        <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
-          <%header_item = checklist_cell.checklist_header_item%>
-          <%=render 'checklist_row_fields_td',
-            :header_item => header_item,
-            :checklist_cell => checklist_cell,
-            :f => cell_form%>
-        <%end%>
+      <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
+        <%header_item = checklist_cell.checklist_header_item%>
+        <%=render 'checklist_row_fields_td',
+          :source => source,
+          :header_item => header_item,
+          :checklist_cell => checklist_cell,
+          :f => cell_form%>
       <%end%>
     <%end%>
 
@@ -28,6 +18,7 @@
       <%=f.fields_for :checklist_cells, new_checklist_cell do |cell_form|%>
         <%header_item = checklist_cell.checklist_header_item%>
         <%=render 'checklist_row_fields_td',
+          :source => source,
           :header_item => header_item,
           :checklist_cell => checklist_cell,
           :f => cell_form%>
@@ -36,7 +27,7 @@
 
 
   <%else%>
-    <%locals[:checklist_header].checklist_header_items.each do |header_item|%>
+    <%locals[:checklist_header].checklist_header_items.order("display_order").each do |header_item|%>
       <%checklist_cell = ChecklistCell.new%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
         <%=render 'checklist_row_fields_td',
@@ -54,7 +45,6 @@
       <%is_header = (defined? checklist_row) && checklist_row.is_header || false%>
       <%=link_to "<i class='glyphicon glyphicon-header'></i>".html_safe, '#',
         :class => "btn #{is_header ? 'btn-success' : 'btn-default'} header_toggle_btn"%>
-
       <%=f.hidden_field :_destroy, :id => "delete_row"%>
       <%=link_to "<i class='glyphicon glyphicon-trash'></i>".html_safe, '#', :class => "btn btn-danger remove_btn"%>
     </td>

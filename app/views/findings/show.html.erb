@@ -13,171 +13,48 @@
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
-              Finding #<%=@finding.get_id%>: <%=@finding.title%>
+              <%="Finding ##{@owner.get_id}: #{@owner.title}"%>
             </div>
-
             <div class="top_buttons pull-right">
-              <%if current_user.admin? ||
-                    current_user.has_access(@type, 'admin') ||
-                    current_user.has_access(@type,"destroy")%>
-                <%=link_to "Delete",
-                  finding_path(@finding),
-                  :method => "delete",
-                  :confirm => 'Are you sure?',
-                  :class => "btn btn-danger pull-right mr5 mb5"%>
-              <%end%>
-
-              <%if current_user.admin? ||
-                    current_user.has_access(@type,'admin')%>
-                <%=link_to 'Override Status', '#',
-                  :class => 'btn btn-danger pull-right mr5 mb5',
-                  :id => 'override_status_btn',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-              <%end%>
-
-
-              <%if @finding.status != 'Completed' && (
-                    current_user.admin? ||
-                    current_user.has_access(@type,'admin') ||
-                    current_user.has_access(@type,"edit"))%>
-                <%=link_to "Edit",
-                  edit_finding_path(@finding),
-                  :class => "btn btn-warning pull-right mr5 mb5",
-                  :disable_with => "Editing..."%>
-              <%end%>
-
-              <%=link_to "De-ID PDF",
-                print_finding_path(
-                  @finding,
-                  :format => :pdf,
-                  :deidentified => true),
-                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-              <%=link_to "PDF",
-                print_finding_path(
-                  @finding,
-                  :format => :pdf,
-                  :deidentified => false),
-                :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-
-              <%if @finding.type == "AuditFinding"%>
-                <%=link_to "View Audit",
-                  audit_path(@finding.owner),
-                  :class => "btn btn-info pull-right mr5 mb5",
-                  :disable_with => "Redirecting..."%>
-              <%elsif @finding.type == "InspectionFinding"%>
-                <%=link_to "View Inspection",
-                  inspection_path(@finding.owner),
-                  :class => "btn btn-info pull-right mr5 mb5",
-                  :disable_with => "Redirecting..."%>
-              <%elsif @finding.type == "InvestigationFinding"%>
-                <%=link_to "View Investigation",
-                  investigation_path(@finding.owner),
-                  :class => "btn btn-info pull-right mr5 mb5",
-                  :disable_with => "Redirecting..."%>
-              <%elsif @finding.type == "EvaluationFinding"%>
-                <%=link_to "View Evaluation",
-                  evaluation_path(@finding.owner),
-                  :class => "btn btn-info pull-right mr5 mb5",
-                  :disable_with => "Redirecting..."%>
-              <%end%>
-
-              <%=link_to "Send Message",
-                new_message_path(
-                  :link => finding_path(@finding),
-                  :link_type => "Finding",
-                  :link_id => @finding.id),
-                :class => "btn btn-warning pull-right mr5 mb5"%>
-              <%=link_to "Expand All", "#",
-                :class => "btn btn-default mr5 expandall pull-right mb5"%>
+              <%= render '/forms/btns/render_btns',
+                btns: [
+                  'delete',
+                  'override_status',
+                  'edit',
+                  'deid_pdf',
+                  'pdf',
+                  'view_parent',
+                  'send_message',
+                  'expand_all'
+                ],
+                owner: @owner %>
             </div>
           </div>
         </div>
 
         <div class="panel-body">
-
           <div class="col-xs-12 mb20">
 
-            <%if @finding.status == "New"%>
-              <%if @finding.can_assign?%>
-                <%if @finding.approver == current_user ||
-                    @finding.created_by == current_user ||
-                    current_user.admin? ||
-                    current_user.has_access(@type,'admin')%>
-                  <%=link_to 'Assign', '#',
-                    :id => 'assign_btn',
-                    :class => 'btn btn-warning pull-right mr5',
-                    'data-toggle' => 'modal',
-                    'data-target' => '.bs-example-modal-lg'%>
-                <%end%>
-              <%else%>
-                <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
-              <%end%>
+            <%= render 'forms/btns/render_btns',
+              btns: [
+                'assign',
+                'complete',
+                'recommendation',
+                'sms_action',
+                'approve_reject',
+                'reopen',
+                'comment'
+              ],
+              owner: @owner %>
 
-            <%elsif @finding.status == "Assigned" %>
-              <%if current_user.admin? || @finding.responsible_user == current_user || current_user.has_access(@type,'admin')%>
-                <%=link_to "Complete", "#",
-                  :class => "btn btn-warning pull-right complete_btn mr5 mb5",
-                  :id => 'complete',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-
-                <%=link_to "Add Recommendation",
-                  new_recommendation_path(
-                    :owner_id => @finding.id,
-                    :owner_type => @finding.becomes(Finding).class.name),
-                  :class => "btn btn-success pull-right mr5 mb5",
-                  :disable_with => "Adding..."%>
-
-                <%=link_to "Add Comment",
-                  "#",
-                  :class => "btn btn-success pull-right mr5 mb5",
-                  :id => 'comment_btn',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-
-                <%=link_to "Add Corrective Action",
-                  new_sms_action_path(
-                    :owner_id => @finding.id,
-                    :owner_type => @finding.becomes(Finding).class.name),
-                  :class => "btn btn-success pull-right mr5 mb5",
-                  :disable_with => "Adding..."%>
-              <%end%>
-
-
-            <%elsif @finding.status == "Pending Approval"%>
-              <%if current_user.admin? || @finding.approver == current_user%>
-                <%=link_to "Approve",
-                  approve_finding_path(@finding, {:approve => true}),
-                  :class => "btn btn-success pull-right mr5 approve_btn mb5",
-                  :id => 'approve',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-                <%=link_to "Reject", "#",
-                  :class => "btn btn-danger pull-right mr5 approve_btn mb5",
-                  :id => 'reject',
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
-              <%end%>
-
-            <%elsif @finding.status == "Completed" && current_user.has_access("findings","new") %>
-              <%if BaseConfig.airline[:allow_reopen_report] %>
-                <%=link_to "Reopen",
-                  reopen_finding_path(@finding),
-                  :class => "btn btn-success pull-right mr5",
-                  :disable_with => "Reopening...",
-                  :confirm => "Are you sure?"%>
-              <%end%>
+            <%if @owner.status == "New" && !@owner.can_assign?%>
+              <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
             <%end%>
-
-
-
           </div>
 
-          <%=render '/findings/show', :owner => @finding, :show_btn => true%>
-          <%=render "/forms/attachments_show", :owner => @finding%>
-          <%=render "/records/transactions", :owner => @finding%>
+          <%=render '/findings/show', :owner => @owner, :show_btn => true%>
+          <%=render "/forms/attachments_show", :owner => @owner%>
+          <%=render "/records/transactions", :owner => @owner%>
 
         </div>
       </div>
@@ -199,64 +76,23 @@
 
 <script>
   $(document).ready(function(){
-
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_finding_path(@finding)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
-    $(".complete_btn").on('click',function(){
-      var commit = $(this).attr('id');
-      $.get("<%=complete_finding_path(@finding)%>?commit=" + commit,function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      var commit = $(this).attr('id');
-      $.get("<%=approve_finding_path(@finding)%>" + "?commit=" + commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $("#action_btn").on('click',function(){
-      $.get("<%=new_action_finding_path(@finding)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_finding_path(@finding)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#att_btn').on('click',function(){
-      $.get("<%=new_attachment_finding_path(@finding)%>",function(data){
+      $.get("<%=new_attachment_finding_path(@owner)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#mitigate_btn').on('click',function(){
-        $.get("<%=mitigate_finding_path(@finding)%>",function(data){
+        $.get("<%=mitigate_finding_path(@owner)%>",function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
     });
     $('#baseline_btn').on('click',function(){
-        $.get("<%=baseline_finding_path(@finding)%>",function(data){
+        $.get("<%=baseline_finding_path(@owner)%>",function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
     });
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_finding_path(@finding)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
   });
 </script>

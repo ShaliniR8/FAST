@@ -1,9 +1,16 @@
 class SessionsController < ApplicationController
   skip_before_filter :access_validation,:only=>[:destroy]
-
+  after_filter :track_activity, :only => [:create]
 
   def new
-    @categories = Category.all
+    respond_to do |format|
+      format.html do
+        @categories = Category.all
+      end
+      format.json do
+        render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
+      end
+    end
   end
 
 
@@ -25,13 +32,18 @@ class SessionsController < ApplicationController
   def destroy
     session[:user_id] = nil
     session[:simulated_id] = nil
+    session[:digest] = nil
     session[:last_active] = nil
-    flash[:notice] = "You have been logged out."
-    redirect_to new_session_path
+    respond_to do |format|
+      format.html do
+        flash[:notice] = "You have been logged out."
+        redirect_to new_session_path
+      end
+      format.json do
+        render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
+      end
+    end
   end
-
-
-
 
 
 
@@ -46,8 +58,6 @@ class SessionsController < ApplicationController
       send_data(stream, :type=>"json", :disposition => "inline")
     end
   end
-
-
 
 
 

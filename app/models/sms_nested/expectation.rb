@@ -25,4 +25,15 @@ class Expectation < ActiveRecord::Base
       Inspection.get_departments
     end
   end
+
+
+  def transaction_log
+    Transaction.build_for(
+      self.owner_id,
+      'Add Requirement',
+      session[:user_id],
+      self.title
+    )
+  end
+
 end

@@ -1,22 +1,23 @@
 class Finding < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Recommendationable
+  include SmsActionable
+  include Transactionable
+
+#Associations List
   belongs_to  :responsible_user,          foreign_key: "responsible_user_id",     class_name: "User"
   belongs_to  :approver,                  foreign_key: "approver_id",             class_name: "User"
   belongs_to  :created_by,                foreign_key: 'created_by_id',           class_name: 'User'
+  belongs_to  :owner,                     polymorphic: true
   has_many    :causes,                    foreign_key: "owner_id",                class_name: "FindingCause",             :dependent => :destroy
   has_many    :descriptions,              foreign_key: "owner_id",                class_name: "FindingDescription",       :dependent => :destroy
-  has_many    :corrective_actions,        foreign_key: "owner_id",                class_name: "FindingAction",            :dependent => :destroy
-  has_many    :transactions,              foreign_key: "owner_id",                class_name: "FindingTransaction",       :dependent => :destroy
-  has_many    :recommendations,           foreign_key: "owner_id",                class_name: "FindingRecommendation",    :dependent => :destroy
-  has_many    :comments,                  foreign_key: "owner_id",                class_name: "FindingComment",           :dependent => :destroy
-  has_many    :attachments,               foreign_key: 'owner_id',                class_name: 'FindingAttachment',        :dependent => :destroy
   has_many    :notices,                   foreign_key: "owner_id",                class_name: "FindingNotice",            :dependent => :destroy
 
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
-  accepts_nested_attributes_for :corrective_actions
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :recommendations
-  accepts_nested_attributes_for :comments
 
   after_create    :create_finding_transaction
   before_create   :set_priveleges
@@ -99,6 +100,9 @@ class Finding < ActiveRecord::Base
     }
   end
 
+  def get_owner
+    "#{self.owner_type.underscore}s"
+  end
 
 
   def get_type
@@ -147,54 +151,25 @@ class Finding < ActiveRecord::Base
 
 
   def create_finding_transaction
-    FindingTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      'Create',
+      session[:user_id]
     )
-    if self.type == "AuditFinding"
-      AuditTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    elsif self.type == "InspectionFinding"
-      InspectionTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    elsif self.type == "InvestigationFinding"
-      InvestigationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    elsif self.type == "EvaluationFinding"
-      EvaluationTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Finding",
-        :content => "##{self.get_id} #{self.title}",
-        :owner_id => self.owner.id,
-        :stamp => Time.now
-      )
-    end
+    Transaction.build_for( #TODO: Ensure Polymorphism for Findings works here
+      self.owner,
+      'Add Finding',
+      (session[:simulated_id] || session[:user_id]),
+      "##{self.get_id} #{self.title}"
+    )
   end
 
 
   def create_transaction(action)
-    FindingTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now
+    Transaction.build_for(
+      self,
+      action,
+      (session[:simulated_id] || session[:user_id])
     )
   end
 
@@ -214,48 +189,6 @@ class Finding < ActiveRecord::Base
     self.responsible_user.present? ? self.responsible_user.full_name : ""
   end
 
-  def release_actions
-    self.corrective_actions.each do |corrective_action|
-      if corrective_action.status == "Pending Release"
-        CorrectiveActionTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open",
-          :owner_id => corrective_action.id,
-          :stamp => Time.now
-        )
-        FindingTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open Corrective Action",
-          :content => "Corrective Action ##{corrective_action.get_id} #{corrective_action.title}",
-          :owner_id => self.id,
-          :stamp => Time.now
-        )
-        corrective_action.status = "Open"
-        corrective_action.open_date = Time.now.to_date
-        corrective_action.save
-      end
-    end
-    self.recommendations.each do |corrective_action|
-      if corrective_action.status == "Pending Release"
-        RecommendationTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open",
-          :owner_id => corrective_action.id,
-          :stamp => Time.now
-        )
-        FindingTransaction.create(
-          :users_id => session[:user_id],
-          :action => "Open Recommendation",
-          :content => "Recommendation ##{corrective_action.get_id} #{corrective_action.title}",
-          :owner_id => self.id,
-          :stamp => Time.now
-        )
-        corrective_action.status = "Open"
-        corrective_action.open_date = Time.now.to_date
-        corrective_action.save
-      end
-    end
-  end
 
   def self.get_yesno
     ['Yes', 'No']
@@ -377,10 +310,6 @@ class Finding < ActiveRecord::Base
     end
   end
 
-  def get_owner
-    self.type.gsub("Finding","")
-  end
-
   def self.get_likelihood
     ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
   end
@@ -391,21 +320,21 @@ class Finding < ActiveRecord::Base
     self.immediate_action || self.owner.status == 'Completed'
   end
 
-  def can_complete?
+  def can_complete? current_user
     current_user_id = session[:simulated_id] || session[:user_id]
     (current_user_id == self.responsible_user.id rescue false) ||
       current_user.admin? ||
       current_user.has_access('findings','admin')
   end
 
-  def can_approve?
+  def can_approve? current_user
     current_user_id = session[:simulated_id] || session[:user_id]
     (current_user_id == self.approver.id rescue true) ||
       current_user.admin? ||
       current_user.has_access('findings','admin')
   end
 
-  def can_reopen?(current_user)
+  def can_reopen? current_user
     BaseConfig.airline[:allow_reopen_report] && (
       current_user.admin? ||
       current_user.has_access('findings','admin'))
@@ -465,4 +394,31 @@ class Finding < ActiveRecord::Base
       "N/A"
     end
   end
+
+  def get_source
+    case owner.class.name
+    when 'Audit'
+      "<a style='font-weight:bold' href='/audits/#{owner.id}'>
+        Audit ##{owner.id}
+      </a>".html_safe
+    when 'Inspection'
+      "<a style='font-weight:bold' href='/inspections/#{owner.id}'>
+        Inspection ##{owner.id}
+      </a>".html_safe
+    when 'Evaluation'
+      "<a style='font-weight:bold' href='/evaluations/#{owner.id}'>
+        Evaluation ##{owner.id}
+      </a>".html_safe
+    when 'Investigation'
+      "<a style='font-weight:bold' href='/investigations/#{owner.id}'>
+        Investigation ##{owner.id}
+      </a>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+
+  end
+
+
+
 end

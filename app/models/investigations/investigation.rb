@@ -1,32 +1,30 @@
 class Investigation < ActiveRecord::Base
 
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Contactable
+  include Costable
+  include Findingable
+  include Recommendationable
+  include Signatureable
+  include SmsActionable
+  include SmsTaskable
+  include Transactionable
+
+#Associations List
   belongs_to :responsible_user,         :foreign_key => "responsible_user_id",  :class_name => "User"
   belongs_to :approver,                 :foreign_key => "approver_id",          :class_name => "User"
   belongs_to :record,                   :foreign_key => "record_id",            :class_name => "Record"
-  belongs_to :created_by,              foreign_key: 'created_by_id',           class_name: 'User'
-  has_many :attachments,                :foreign_key => 'owner_id',             :class_name => "InvestigationAttachment",       :dependent => :destroy
+  belongs_to :created_by,               foreign_key: 'created_by_id',           class_name: 'User'
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
-  has_many :corrective_actions,         :foreign_key => "owner_id",             :class_name => "InvestigationAction",           :dependent => :destroy
-  has_many :comments,                   :foreign_key => "owner_id",             :class_name => "InvestigationComment",          :dependent => :destroy
-  has_many :recommendations,            :foreign_key => "owner_id",             :class_name => "InvestigationRecommendation",   :dependent => :destroy
-  has_many :contacts,                   :foreign_key => "owner_id",             :class_name => "InvestigationContact",          :dependent => :destroy
-  has_many :findings,                   :foreign_key => "audit_id",             :class_name => "InvestigationFinding",          :dependent => :destroy
-  has_many :tasks,                      :foreign_key => "owner_id",             :class_name => "InvestigationTask",             :dependent => :destroy
-  has_many :costs,                      :foreign_key => "owner_id",             :class_name => "InvestigationCost",             :dependent => :destroy
   has_many :notices,                    :foreign_key => "owner_id",             :class_name => "InvestigationNotice",           :dependent => :destroy
-  has_many :transactions,               :foreign_key => "owner_id",             :class_name => "InvestigationTransaction",      :dependent => :destroy
 
-  accepts_nested_attributes_for :corrective_actions
-  accepts_nested_attributes_for :contacts
+  has_many    :checklists, as: :owner, dependent: :destroy
+
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :tasks
-  accepts_nested_attributes_for :costs
-  accepts_nested_attributes_for :recommendations
-  accepts_nested_attributes_for :findings
-  accepts_nested_attributes_for :comments
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
 
   after_create -> { create_transaction('Create') }
   before_create :set_priveleges
@@ -45,9 +43,10 @@ class Investigation < ActiveRecord::Base
     [
       {field: 'id',                         title: 'ID',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {field: 'title',                      title: 'Title',                         num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
+      {field: 'get_source',                 title: 'Source of Input',               num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',              title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',              title: 'Created By',                    num_cols: 6,  type: 'user',         visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'viewer_access',              title: 'Viewer Access',                 num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
@@ -95,7 +94,6 @@ class Investigation < ActiveRecord::Base
   end
 
 
-
   def self.progress
     {
       "New"               => { :score => 25,  :color => "default"},
@@ -105,6 +103,15 @@ class Investigation < ActiveRecord::Base
     }
   end
 
+  def get_source
+    if self.record.present?
+      "<a style='font-weight:bold' href='/records/#{self.record.id}'>
+        Report ##{self.record.id}
+      </a>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+  end
 
   def get_privileges
     self.privileges.present? ?  self.privileges : []
@@ -146,11 +153,12 @@ class Investigation < ActiveRecord::Base
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
-      InvestigationTransaction.create(users_id: (session[:user_id] rescue nil),
-          action: action,
-          owner_id: self.id,
-          content: defined?(session) ? '' : 'Recurring Investigation',
-          stamp: Time.now)
+      Transaction.build_for(
+        self,
+        action,
+        ((session[:simulated_id] || session[:user_id]) rescue nil),
+        defined?(session) ? '' : 'Recurring Investigation'
+      )
     end
   end
   def investigation_type

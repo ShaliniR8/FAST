@@ -1,19 +1,27 @@
 class Demo_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[audit]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[training]
+
   def self.airline_config
     {
       :version                                        => "1.0.3",
 
+      :name                                           => 'ProSafeT Demo',
       :code                                           => "BOE",
       :base_risk_matrix                               => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => true,
       :allow_set_alert                                => true,
+      :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
-      :enable_mailer                                  => true,
-
+      :enable_mailer                                  => false,
+      :track_log                                      => true,
+      :time_zone                                      => 'Pacific Time (US & Canada)',
 
       # Safety Reporting Module
       :submission_description                         => true,
@@ -21,10 +29,10 @@ class Demo_Config
       :enable_orm                                     => true,
       :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => true,
-      :checklist_version                              => '1',
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
-      :allow_reopen_report                            => true,
+      :allow_reopen_report                            => false,
       :has_root_causes                                => true,
       :enable_recurrence                              => true,
 
@@ -33,8 +41,6 @@ class Demo_Config
       :has_framework                                  => false,
     }
   end
-
-
 
   FAA_INFO = { #CORRECT/REVISE
     "CHDO"=>"ProSafeT",

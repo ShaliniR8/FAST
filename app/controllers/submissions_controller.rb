@@ -136,7 +136,7 @@ class SubmissionsController < ApplicationController
 
   def comment
     @owner = Submission.find(params[:id])
-    @comment = SubmissionNote.new
+    @comment = @owner.comments.new
     render :partial => "notes"
   end
 
@@ -172,7 +172,7 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
+    params[:submission][:completed] = 'Save for Later'.casecmp(params[:commit]) != 0
     params[:submission][:anonymous] = params[:anonymous] == '1' ? true : false
 
 
@@ -310,7 +310,7 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
-    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
+    params[:submission][:completed] = 'Save for Later'.casecmp(params[:commit]) != 0
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
