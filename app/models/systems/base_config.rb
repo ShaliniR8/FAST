@@ -11,6 +11,30 @@ class BaseConfig
     :risk_factor      => {"Green - Acceptable" => "lime", "Yellow - Acceptable with mitigation" => "yellow", "Orange - Unacceptable" => "orange"},
   }
 
+  MODULES =
+  {
+    "ASAP" => { :display_name => "ASAP", :objects => {}},
+    "SMS IM" => { :display_name => "SMS IM",},
+    "SMS" => { :display_name => "Safety Assurance",
+      :objects => {
+        "Audit" => "Audit",
+        "Inspection" => "Inspection",
+        "Evaluation" => "Evaluation",
+        "Investigation" => "Investigation",
+        "Finding" => "Finding",
+        "SmsAction" => "Corrective Action",
+      },
+    },
+    "SRM" => { :display_name => "Safety Risk Management",
+      :objects => {
+        "Sra" => "SRA",
+        "Hazard" => "Hazard",
+        "RiskControl" => "Risk Control",
+        "SafetyPlan" => "Safety Plan",
+      },
+    }
+  }
+
   def self.get_sra_meta_fields
     airline_class = Object.const_get("#{BaseConfig.airline_code}_Config")
     if airline_class.respond_to? :get_sra_meta_fields
@@ -60,19 +84,6 @@ class BaseConfig
       ]
     end
   end
-
-  MODULES =
-  {
-    "ASAP" => { :display_name => "ASAP",
-    },
-    "SMS IM" => { :display_name => "SMS IM",
-    },
-    "SMS" => { :display_name => "Safety Assurance",
-    },
-    "SRM" => { :display_name => "Safety Risk Management",
-    }
-  }
-
 
   def self.airline_code
     Object.const_get('AIRLINE_CODE')

@@ -1,0 +1,33 @@
+<div class="col-xs-12">
+  <a class="btn"
+    data-toggle="collapse"
+    data-target="#view_instructions">
+    View Instructions &raquo;
+  </a>
+  <%=render "shared/alerts"%>
+  <div class="collapse well" id="view_instructions">
+    <ol>
+      <li>Select the type object you would like to run query on.</li>
+      <li>Build a query.</li>
+        <ol>
+          <li>Add new conditions to your query. If no condition is added, result will include all reports.</li>
+          <li>Enter constraints.</li>
+            <ul>
+              <li><b>Condition Type</b>: The method that will be used for the comparison.</li>
+              <li><b>Field</b>: The field that data will be pulled from to compare.</li>
+              <li><b>Value</b>: The value of the field that is going to be compared with.</li>
+            </ul>
+          <li>Add nested conditions to your query.</li>
+            <ul>
+              <li>Nested conditions will run in parallel.</li>
+              <li><b>Nested Operator</b></li>
+                <ul>
+                  <li><b>AND</b>: If selected, result will satisfy all nested conditions.</li>
+                  <li><b>OR</b>: If selected, result will satisfy at least one nested conditions.</li>
+                </ul>
+            </ul>
+        </ol>
+      <li>Click on <b>Search</b> to run query.</li>
+    </ol>
+  </div>
+</div>

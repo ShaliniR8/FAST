@@ -1,0 +1,31 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
+    <div class="panel panel-warning">
+      <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
+        <div class="panel-title">
+          <div class="top_text">
+            <%="#{action_name.titleize} Query ##{@owner.id}"%>
+          </div>
+          <div class="top_buttons pull-right">
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <%=render "instructions"%>
+        <div class="col-xs-4"><%=render "select_target"%></div>
+        <div class="col-xs-8"><div id="building_query"></div></div>
+      </div>
+    </div>
+  </div>
+</div>

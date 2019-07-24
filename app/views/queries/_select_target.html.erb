@@ -1,0 +1,62 @@
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <div class="panel-title">
+      Step 1. Select a Target
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="table-responsive">
+      <table id="templates"
+        class="table table-bordered table-hover table-striped">
+        <thead>
+          <tr>
+            <th>Target Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%@types.stringify_keys.each do |k, v|%>
+            <tr><td data-id="<%=v%>"><%=k%></td></tr>
+          <%end%>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  $(function(){
+
+    <%if @owner.target.present?%>
+      clickTemplate($('td[data-id="<%=@owner.target%>"]'));
+      //clickTemplate($("td:contains('<%=@owner.target%>')"));
+    <%end%>
+
+    $("tbody tr td").on("click", function(){
+      clickTemplate($(this));
+    });
+  });
+
+  function clickTemplate(cell){
+    $("td").css("background-color", "transparent");
+    $(cell).css("background-color", "lightblue");
+    $.ajax({
+      url: "<%=load_conditions_block_queries_path%>",
+      type: 'GET',
+      data: {
+        <%if @owner.id.present?%>
+          "query_id": <%=@owner.id%>,
+        <%end%>
+        "target": $(cell).attr("data-id"),
+        "target_display_name": $(cell).html()},
+      success: function(response){$("#building_query").html(response);}
+    });
+  }
+</script>

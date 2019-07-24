@@ -109,6 +109,16 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :recurrences
+  resources :queries do
+    member do
+      get "add_visualization"
+      get "remove_visualization"
+      get "generate_visualization"
+    end
+    collection do
+      get 'load_conditions_block'
+    end
+  end
 
 
   # Configurations

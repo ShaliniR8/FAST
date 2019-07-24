@@ -1,0 +1,109 @@
+<div class="col-lg-12 col-md-12 col-sm-12 mt20 to_delete">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <div class="top_text">
+          Condition
+        </div>
+        <div class="top_buttons pull-right">
+          <span class="pull-right" onclick="removepanel(this)">
+            <i class="mt5 glyphicon glyphicon-remove btn btn-danger"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="col-xs-12 row">
+        <div id="to_delete_insert_space">
+
+          <div class="form-group col-xs-4 form-inline">
+            <%=label_tag :field, "Field"%>
+            <%=text_field_tag "name_space[field]", nil, {:list => "select_field", :class => "form-control ml5", :id => "field_select_all"}%>
+            <datalist id="select_field">
+              <%@fields.each do |field|%>
+                <option data-fieldtype="<%=field[:type]%>" value="<%=field[:title]%>"></option>
+              <%end%>
+            </datalist>
+          </div>
+
+          <div class="col-xs-4">
+            <%=label_tag :logical_type, "Condition Type"%>
+            <%=select_tag  "name_space[logic]", options_for_select(@logical_types), :include_blank => "", :class => "form-control"%>
+          </div>
+
+          <div class="form-group col-xs-4 form-inline">
+            <%=label_tag :value, "Value"%>
+            <div class="field_value">
+              <%=text_field_tag "name_space[value]", nil, :class => "form-control value_field"%>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="to_insert_insert_space" class="row mt5" style="display:none">
+        <div class="col-xs-12">
+          <div class="col-xs-3">
+            <%=label_tag :operator, "Nested Operator"%>
+            <%=select_tag  "name_space[operator]", options_for_select(@operators), :include_blank => "", :class => "form-control"%>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-xs-12 del">
+        <%=link_to_add_blocks "Add Nested Condition", "name_space", "insert_space"%>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<style>
+  .panel-default .panel-heading .panel-title {
+    padding: 0px !important;
+    min-height: 30px !important;
+  }
+  .required_label:after{
+    content: " *";
+    color: red;
+    display: inline;
+  }
+</style>
+
+
+<script>
+  $(function(){
+
+    $(document).on("change", "#field_select_all", function(){
+
+      var field_name = $(this).val();
+      var field_type = $("option[value='" + field_name + "']").data("fieldtype");
+      var field_value = $(this).parent().parent().find(".field_value");
+
+      var name = $(this).attr("name").replace("field", "value");
+
+      var html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="text">';
+
+      if (field_type == "date") {
+        $(field_value).html(html);
+        $(field_value).find(".value_field").flatpickr({
+          mode: "range",
+          dateFormat: 'Y-m-d',
+        });
+
+      } else if (field_type == "boolean_box") {
+        html = '<select class="form-control value_field" id="' + name + '" name="' + name + '">' +
+          '<option value></option>' +
+          '<option value="Yes">Yes</option>' +
+          '<option value="No">No</option></select>';
+        $(field_value).html(html);
+
+      } else {
+        $(field_value).html(html);
+      }
+
+    });
+  });
+</script>
