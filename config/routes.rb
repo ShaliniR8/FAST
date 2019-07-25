@@ -198,7 +198,7 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "users_index"
-      get 'get_user'
+      get 'current_json'
       get 'get_json'   #Added by BP July 14 2017
       get 'submission_json'
       get "notices_json"    #added by BL OCT 10 2018

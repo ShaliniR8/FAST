@@ -5,7 +5,7 @@ module Concerns
   module Mobile
     module Users extend ActiveSupport::Concern
 
-      def get_user
+      def current_json
         # Get only the data that we need from the user
         mobile_user_info = current_user.as_json(only: [:id, :full_name, :email])['user']
 
