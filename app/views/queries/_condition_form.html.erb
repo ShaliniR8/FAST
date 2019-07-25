@@ -93,7 +93,7 @@
     update_input_field($("#to_delete_<%=insert_space%> #field_select_all"), "<%=condition.value%>");
 
     $(document).on("change", "#field_select_all", function(){
-      update_input_field($(this), null);
+      update_input_field($(this), "");
     });
 
   });
