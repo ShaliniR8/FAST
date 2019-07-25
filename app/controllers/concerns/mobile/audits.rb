@@ -101,6 +101,19 @@ module Concerns
           # Creates id maps for checklist rows and checklist cells
           checklist[:checklist_rows] = checklist[:checklist_rows].reduce({}) do |checklist_rows, row|
             row[:checklist_cells] = row[:checklist_cells].reduce({}) do |checklist_cells, cell|
+              if cell['options'].present?
+                cell['options'] = cell['options']
+                  .split(';')
+                  .map!{ |option| option.strip }
+                  .delete_if{ |option| option.blank? }
+              end
+
+              cell['value'].strip! if cell['value'].present?
+
+              cell.delete_if do |key, value|
+                value.blank? if key.match(/options|value/)
+              end
+
               checklist_cells.merge({ cell['id'] => cell })
             end
             checklist_rows.merge({ row['id'] => row })

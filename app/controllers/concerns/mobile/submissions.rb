@@ -224,6 +224,8 @@ module Concerns
             end
           end
         end
+
+        templates_json.reduce({}){ |templates, template| templates.merge({ template['id'] => template }) }
       end
 
       ########################################################

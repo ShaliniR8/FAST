@@ -23,8 +23,6 @@ module Concerns
           :content,
         ]).map do |notice|
           notice = notice.first[1] # Drops { object: {contents} ... } to { {contents} ... }
-          notice['owner_id'] = nil
-          notice['type'] = nil
           content = notice['content']
           extracted_uri = URI.extract(content, /http(s)?/)[0]
           
