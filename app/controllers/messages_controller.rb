@@ -1,4 +1,5 @@
 class MessagesController < ApplicationController
+  before_filter :login_required
 
 
 
@@ -84,7 +85,7 @@ class MessagesController < ApplicationController
   def show
     @message = Message.find(params[:id])
     @report_link = @message.link
-    if current_user.present? && current_user.has_access_to(@message)
+    if current_user.has_access_to(@message)
       need_reply=@message.send_to.map{|x| x.user}.include? current_user
     else
       redirect_to root_url
