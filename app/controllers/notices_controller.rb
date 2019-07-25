@@ -18,7 +18,7 @@ class NoticesController < ApplicationController
     @notice = owner.notices.new(params[:notice])
     @notice.content = "From #{current_user.full_name}: #{@notice.content} #{g_link(owner)}"
     @notice.save
-    redirect_to "/#{Object.const_get(@table).table_name}/#{params[:notice][:owner_id]}"
+    redirect_to "/#{Object.const_get(@table).table_name}/#{@notice.owner_id}"
   end
 
   def destroy

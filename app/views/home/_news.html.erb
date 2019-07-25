@@ -4,7 +4,7 @@
       <div class="panel-title">News</div>
     </div>
     <div class="panel-body" style="height:250px;overflow-y:auto;overflow-x:hidden">
-      <%current_user.notices.where("DATE_ADD(created_at, INTERVAL 5 DAY) >= ?", Time.now.to_date ).reverse.each do |notice|%>
+      <%current_user.notices.where("(start_date IS NULL OR start_date < NOW()) AND DATE_ADD(created_at, INTERVAL 5 DAY) >= ?", Time.now.to_date ).reverse.each do |notice|%>
         <p>
           <b><%=datetime_to_string(notice.created_at.in_time_zone)%></b>
           <%=sanitize notice.content.html_safe%>
