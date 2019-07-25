@@ -61,7 +61,7 @@ class QueriesController < ApplicationController
     @target = params[:target]
     @target_display_name = params[:target_display_name]
     @fields = Object.const_get(@target).get_meta_fields('show', 'index').keep_if{|x| x[:field]}
-    @logical_types = ['Equals To', 'Not equal to', 'Greater than', 'Less than']
+    @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<']
     @operators = ["AND", "OR"]
     render :partial => "building_query"
   end
@@ -241,45 +241,69 @@ class QueriesController < ApplicationController
     field = @fields.select{|header| header[:title] == condition.field_name}.first
     if condition.value.present?
       case condition.logic
-      when "Equals To"
-        results = emit_comparison_helper(condition, records, field)
-      when "Not equal to"
-        results = emit_comparison_helper(condition, records, field)
-      when "Greater than"
-        results = records.select{|record| (record.send(field[:field]).to_f >= condition.value.to_f) rescue false}
-      when "Less than"
-        results = records.select{|record| (record.send(field[:field]).to_f <= condition.value.to_f) rescue false}
-      else
-        results = records
+      when "Equals To" then results = emit_helper(condition.value, records, field, false, "equals")
+      when "Not Equal To"then results = emit_helper(condition.value, records, field, true, "equals")
+      when "Contains"then results = emit_helper(condition.value, records, field, false, "contains")
+      when "Does Not Contain"then results = emit_helper(condition.value, records, field, true, "contains")
+      when ">="then results = emit_helper(condition.value, records, field, false, "numeric")
+      when "<"then results = emit_helper(condition.value, records, field, true, "numeric")
+      else results = records
       end
     else
       case condition.logic
-      when "Equals To"
-        results = records.select{|record| !record.send(field[:field]).present?}
-      when "Not equal to"
-        results = records.select{|record| record.send(field[:field]).present?}
-      else
-        results = []
+      when "Equals To" then results = records.select{|record| record.send(field[:field]) == ""}
+      when "Not Equal To" then results = records.select{|record| record.send(field[:field]) != ""}
+      when "Contains" then results = records
+      when "Does Not Contain" then results = []
+      else results = []
       end
     end
     return results
   end
 
-  def emit_comparison_helper(condition, records, field)
-    xor = condition.logic == "Equals To" ? false : true
-    case field[:type]
-    when 'boolean_box'
-      return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == condition.value.downcase)}
-    when 'user'
-      matching_users = User.where("full_name LIKE ?", "%#{condition.value}%").map(&:id)
-      return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
-    when 'date'
-      start_date = condition.value.split("to")[0]
-      end_date = condition.value.split("to")[1]
-      records.select{|x| (xor ^ (x.send(field[:field]) >= start_date.to_date && x.send(field[:field]) <= end_date.to_date)) rescue false}
-    else
-      records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase.include? condition.value.downcase) rescue false}
+  def emit_helper(search_value, records, field, xor, logic_type)
+    case logic_type
+    when "equals"
+      case field[:type]
+      when 'boolean_box'
+        return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
+      when 'user'
+        matching_users = User.where("full_name = ?", search_value).map(&:id)
+        return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
+      else
+        return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.to_s.downcase)}
+      end
+    when "contains"
+      case field[:type]
+      when 'boolean_box'
+        return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
+      when 'user'
+        matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:id)
+        return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
+      when 'date'
+        start_date = search_value.split("to")[0]
+        end_date = search_value.split("to")[1] || search_value.split("to")[0]
+        return records.select{|x| xor ^ ((x.send(field[:field]) >= start_date.to_date && x.send(field[:field]) <= end_date.to_date) rescue false)}
+      else
+        return records.select{|record| xor ^ ((record.send(field[:field]).to_s.downcase.include? search_value.downcase) rescue false)}
+      end
+    when "numeric"
+      case field[:type]
+      when 'date'
+        dates = search_value.split("to")
+        if dates.length > 1
+          start_date = dates[0]
+          end_date = dates[1]
+          return records.select{|x| xor ^ ((x.send(field[:field]) >= start_date.to_date && x.send(field[:field]) <= end_date.to_date) rescue false)}
+        else
+          date = dates[0]
+          return records.select{|x| xor ^ ((x.send(field[:field]) >= date.to_date) rescue false)}
+        end
+      else
+        return records.select{|record| xor ^ ((record.send(field[:field]).to_f >= search_value.to_f) rescue false)}
+      end
     end
+    return []
   end
 
   def create_query_condition(condition_hash, query_id, query_condition_id)
