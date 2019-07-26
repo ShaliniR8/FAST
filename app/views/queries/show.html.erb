@@ -19,6 +19,7 @@
           </div>
           <div class="top_buttons pull-right">
             <%=link_to "Edit", edit_query_path(@owner), class: "btn btn-warning", disable_with: "Editing..."%>
+            <%=link_to "Delete", query_path(@owner), method: :delete, class: "btn btn-danger", confirm: "Are you sure?"%>
           </div>
         </div>
       </div>

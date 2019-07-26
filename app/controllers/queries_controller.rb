@@ -55,6 +55,12 @@ class QueriesController < ApplicationController
     redirect_to query_path(@owner)
   end
 
+  def destroy
+    @owner = Query.find(params[:id])
+    @owner.destroy
+    redirect_to queries_path, flash: {danger: "Query deleted."}
+  end
+
   # on target select, load conditions block
   def load_conditions_block
     @owner = params[:query_id].present? ? Query.find(params[:query_id]) : Query.new
