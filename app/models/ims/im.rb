@@ -3,6 +3,7 @@ class Im < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Contactable
+  include Noticeable
   include SmsTaskable
   include Transactionable
 
@@ -11,7 +12,6 @@ class Im < ActiveRecord::Base
   belongs_to :reviewer,       foreign_key:"pre_reviewer",     class_name:"User"
   has_many :expectations,     foreign_key:"owner_id",         class_name:"FrameworkExpectation",  :dependent => :destroy
   has_many :items,            foreign_key:'owner_id',         class_name:"ChecklistItem",         :dependent => :destroy
-  has_many :notices,          foreign_key:"owner_id",         class_name:"ImNotice",              :dependent => :destroy
 
   accepts_nested_attributes_for :expectations
   accepts_nested_attributes_for :items

@@ -3,6 +3,7 @@ class CorrectiveAction < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Noticeable
   include Transactionable
 
 #Associations List
@@ -11,8 +12,6 @@ class CorrectiveAction < ActiveRecord::Base
   belongs_to  :responsible_user,      foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to  :approver,              foreign_key: 'approver_id',         class_name: 'User'
   belongs_to  :created_by,            foreign_key: 'created_by_id',       class_name: 'User'
-
-  has_many :notices,        foreign_key: 'owner_id',  class_name: 'CorrectiveActionNotice',       dependent: :destroy
 
   after_create -> { create_transaction('Create') }
   # after_update -> { create_transaction('Edit') }

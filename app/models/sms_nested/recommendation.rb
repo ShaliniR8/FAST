@@ -3,6 +3,7 @@ class Recommendation < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Noticeable
   include Transactionable
 
 #Associations List
@@ -12,7 +13,6 @@ class Recommendation < ActiveRecord::Base
   belongs_to :owner,               polymorphic: true
 
   has_many :descriptions, foreign_key: 'owner_id', class_name: 'RecommendationDescription', dependent: :destroy
-  has_many :notices,      foreign_key: 'owner_id', class_name: 'RecommendationNotice',      dependent: :destroy
 
   after_create :create_recommendation_transaction
   before_create :set_priveleges

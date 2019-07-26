@@ -11,12 +11,11 @@
 
 
 
-<%@fields = Notification.get_meta_fields('form')%>
-<%=form_for @notification do |f|%>
+<%=form_for @notice do |f|%>
   <div class="panel-warning">
     <div class="panel-heading">
       <div class="panel-title">
-        New Notification
+        New Notice
         <button type="button"
           class="close pull-right"
           data-dismiss="modal"
@@ -28,23 +27,23 @@
     <div class="panel-body" style="max-height:calc(100vh - 210px);overflow-y:auto">
       <div class="row">
         <%=f.hidden_field :users_id, :id => "users_id"%>
-        <%=hidden_field_tag :owner_type, @table%>
-        <%=f.hidden_field :owner_id, :value => @owner_id%>
-        <%#=render "forms/form_fields",
-          :f => f,
-          :fields => @fields,
-          :record => @notification%>
+        <%=hidden_field_tag :owner_type, owner_type%>
+        <%=hidden_field_tag :owner_id, owner_id%>
         <div class="col-xs-6 mb5">
-          <%=f.label :notify_date, "Notify Date", :class => "required_label"%>
-          <%=f.text_field :notify_date, :class => "form-control field-date required_field"%>
+          <%=f.label :start_date, "Notify Date", :class => "required_label"%>
+          <%=f.text_field :start_date, :class => "form-control field-date required_field"%>
         </div>
+<!--         <div class="col-xs-2 mb5">
+          <%=f.label :create_email, 'Send Emails', :class => 'required_label'%>
+          <%=f.check_box :create_email, :class => 'form-control required_field'%>
+        </div> -->
         <div class="col-xs-12">
-          <%=f.label :message, "Notify Message", :class => "required_label required_label"%>
-          <%=f.text_field :message, :class => "form-control required_field"%>
+          <%=f.label :content, "Notify Message", :class => "required_label"%>
+          <%=f.text_field :content, :class => "form-control required_field"%>
         </div>
 
         <div class="col-xs-12 mt20">
-          <%=render "/shared/notification_recipients"%>
+          <%=render "/shared/notice_recipients"%>
         </div>
       </div>
       <%=f.submit "Save",

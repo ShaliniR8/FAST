@@ -8,7 +8,7 @@
 
 javascript:
   $('#alert_btn').on('click', function(){
-    $.get('#{new_notification_path(owner_type: owner.class.name, owner_id: owner)}',
+    $.get('#{new_notice_path(owner_type: owner.class.name, owner_id: owner)}',
       function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
