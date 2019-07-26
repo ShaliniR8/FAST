@@ -95,7 +95,12 @@
         },
         beforeSend: function(){$('#loader_' + field_id).show();$("#chart_area_" + field_id).css({'opacity':0.5});},
         complete: function(){$('#loader_' + field_id).hide();$("#chart_area_" + field_id).css({'opacity':1});},
-        success: function(response){$("#chart_area_" + field_id).html(response);},
+        success: function(response){
+          $("#chart_area_" + field_id).html(response);
+          $("#generate_charts_btn_" + field_id).hide();
+          $("#field_select_all_" + field_id).prop("readonly", true);
+          $("#field_select_all_" + field_id).css("font-weight", "bold");
+        },
         error: function(response){console.log(response);},
       });
     });
