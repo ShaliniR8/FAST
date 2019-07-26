@@ -56,7 +56,15 @@ module StandardWorkflow
   end
 
   def has_admin_rights?(user)
-    user.admin? || user.has_access(self.permission, 'admin')
+    user.has_access(self.permission, 'admin', admin: true, strict: true)
   end
 
+  # Used to print debug information in the above functions. Use the following line to execute:
+  # debug_statement(user, form_confirmed, user_confirmed, form_conds, user_conds)
+  def debug_statement(user, form_confirmed, user_confirmed, form_conds, user_conds)
+    Rails.logger.debug "Form Confirmed?: #{form_confirmed}\nUser Confirmed?: #{user_confirmed}"
+    Rails.logger.debug "User involvement: #{[self.created_by_id, self.approver_id].include?(user.id)}
+      User Admin: #{has_admin_rights?(user)}
+      Special Conditions: #{user_conds}"
+  end
 end

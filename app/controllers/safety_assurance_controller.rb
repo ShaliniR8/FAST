@@ -83,6 +83,10 @@ class SafetyAssuranceController < ApplicationController
   end
 
   def override_status
+    if !current_user.admin?
+      redirect_to errors_path
+      return false
+    end
     render :partial => '/forms/workflow_forms/override_status'
   end
 

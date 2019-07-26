@@ -85,6 +85,8 @@ class User < ActiveRecord::Base
   end
 
 
+  # admin: will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
+  # strict: will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
   def has_access(con_name, act_name, strict:false, admin:false)
     con_name = con_name.downcase.pluralize if con_name.present?
 
@@ -101,13 +103,7 @@ class User < ActiveRecord::Base
         return false
       end
     end
-    strict ? (AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present) : true
-    # rule = AccessControl.where('action = ? AND entry = ?', act_name, con_name).first
-    # if rule.present?
-    #   (rule.privileges & privileges).size > 0
-    # else
-    #   true
-    # end
+    strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present?) : true
   end
 
 
