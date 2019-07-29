@@ -46,24 +46,26 @@ class BaseConfig
         "SafetyPlan" => "Safety Plan",
       }}
 
-  # Mobile Keys are used for initializing the app to specific portals.
-    # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
-     # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
-  MOBILE_KEY_MAP = {
-    Digest::SHA2.hexdigest 'test_admin' => BaseConfig::MOBILE_KEY
-    Digest::SHA2.hexdigest 'test_demo' => DemoConfig::MOBILE_KEY
-    Digest::SHA2.hexdigest 'test_scx' => ScxConfig::MOBILE_KEY
-  }
 
   # This Mobile Key is used for the admin/ProDIGIQ Staff config set; ensure all new portals are included in it
   MOBILE_KEY = {
-    key_name: 'Admin'
+    key_name: 'Admin',
     portals: [
       { label: 'Demo',               subdomain: 'demo' },
       { label: 'Sun Country',        subdomain: 'scx' },
       { label: 'Sun Country Direct', subdomain: 'scx' },
     ]
   }
+
+  # Mobile Keys are used for initializing the app to specific portals.
+    # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
+     # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
+  MOBILE_KEY_MAP = {
+    Digest::SHA2.hexdigest('test_admin') => BaseConfig::MOBILE_KEY,
+    # Digest::SHA2.hexdigest('test_demo') => DemoConfig::MOBILE_KEY,
+    Digest::SHA2.hexdigest('test_scx') => SCX_Config::MOBILE_KEY,
+  }
+
 
   def self.get_sra_meta_fields
     airline_class = Object.const_get("#{BaseConfig.airline_code}_Config")

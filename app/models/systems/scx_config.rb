@@ -6,7 +6,7 @@ class SCX_Config
   SYSTEM_ENVIRONMENTS = %w[training]
 
   MOBILE_KEY = {
-    key_name: 'SCX'
+    key_name: 'SCX',
     portals: [
       { label: 'Sun Country',          subdomain: 'scx' },
       # { label: 'Sun Country Training', subdomain: 'scx-training' },
@@ -315,10 +315,10 @@ class SCX_Config
   #The following must also be defined for SSO: This interprets the IdP's response info and matches it to an account
   def self.digest_response(response)
     #Unique digest statement to find user-identifying email from IdP:
-    Rails.logger.debug "######## SSO IMPLEMENTATION DATA ########\n nameid: #{response.nameid}\n attributes: #{response.attributes.to_h}"
+    # Rails.logger.debug "######## SSO IMPLEMENTATION DATA ########\n nameid: #{response.nameid}\n attributes: #{response.attributes.to_h}"
     user = User.where(sso_id: response.nameid).first
     if user.nil?
-      Rails.logger.info "SSO ERROR: Could not find user with Email address #{response.nameid}"
+      Rails.logger.info "SSO ERROR: Could not find user with SSO ID #{response.nameid}"
     end
     user
   end

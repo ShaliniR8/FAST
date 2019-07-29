@@ -8,7 +8,7 @@ class SamlController < ApplicationController
 
   def init
     request = OneLogin::RubySaml::Authrequest.new
-    redirect_to(request.create(saml_settings))
+    redirect_to(request.create(saml_settings, RelayState: params[:platform]))
   end
 
   def consume
@@ -21,10 +21,16 @@ class SamlController < ApplicationController
         session[:user_id] = user.id
         session[:mode]=""
         session[:last_active] = Time.now
-        redirect_to_target_or_default(root_url)
+        case params[:RelayState]
+        when 'mobile'
+          Rails.logger.debug 'User on mobile'
+          redirect_to_target_or_default(root_url)
+        else
+          redirect_to_target_or_default(root_url)
+        end
       end
     else
-      Rails.logger.debug "RESPONSE INVALID: #{response.errors}"
+      Rails.logger.info "RESPONSE INVALID: #{response.errors}"
       redirect_to saml_config::SAML_DATA[:access_point]
     end
   end

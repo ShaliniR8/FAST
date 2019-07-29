@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable, :updated_at
+    :android_version, :disable, :sso_id, :updated_at
 
 
 
