@@ -99,7 +99,7 @@
           $("#chart_area_" + field_id).html(response);
           $("#generate_charts_btn_" + field_id).hide();
           $("#field_select_all_" + field_id).prop("readonly", true);
-          $("#field_select_all_" + field_id).css("font-weight", "bold");
+          $("#field_select_all_" + field_id).css({"font-weight": "bold", "color": "steelblue"});
         },
         error: function(response){console.log(response);},
       });
