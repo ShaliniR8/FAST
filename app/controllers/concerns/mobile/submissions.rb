@@ -44,7 +44,7 @@ module Concerns
       end
 
       def submissions_as_json(*ids)
-        submissions = Submission.where(id: ids).includes(:submission_fields)
+        submissions = Submission.where(id: ids).includes(:submission_fields, :attachments)
 
         json = submissions.as_json(
           only: [
