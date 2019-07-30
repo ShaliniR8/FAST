@@ -31,6 +31,7 @@ PrdgSession::Application.routes.draw do |map|
 
   resources :sessions do
      get 'get_user_json'
+     post 'mobile_initalize'
   end
 
   resources :signatures, only:[:show]

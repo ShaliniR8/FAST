@@ -5,6 +5,14 @@ class SCX_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  MOBILE_KEY = {
+    key_name: 'SCX'
+    portals: [
+      { label: 'Sun Country',          subdomain: 'scx' },
+      # { label: 'Sun Country Training', subdomain: 'scx-training' },
+    ]
+  }
+
   def self.airline_config
     {
       :version                                        => "1.0.3",

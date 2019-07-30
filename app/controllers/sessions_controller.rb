@@ -56,6 +56,17 @@ class SessionsController < ApplicationController
     end
   end
 
+  def mobile_initialize
+
+    if BaseConfig::MOBILE_KEYS.key? param[:key]
+      config_file = BaseConfig::MOBILE_KEYS[param[:key]]
+      config_file[:key] = param[:key]
+      render json: config_file.to_json
+    else
+      nil #Return nil
+    end
+  end
+
 
 # -------------- BELOW ARE EVERYTHING FOR PROSAFET APP
   def get_user_json
