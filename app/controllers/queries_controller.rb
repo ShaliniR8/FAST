@@ -89,7 +89,7 @@ class QueriesController < ApplicationController
   # remove visualization box to query
   def remove_visualization
     @owner = Query.find(params[:id])
-    @owner.visualizations.delete(params["field_id"])
+    @owner.visualizations.delete(params["field_name"])
     @owner.save
     render :json => true
   end
@@ -119,7 +119,7 @@ class QueriesController < ApplicationController
     @owner.save
 
     @field = @object_type.get_meta_fields('show', 'index')
-      .select{|header| header[:title] == @label}.first
+      .select{|header| (header[:title] == @label && header[:field].present?)}.first
 
     result_id = []
     @result.each{ |r| result_id << r.id }
@@ -130,7 +130,7 @@ class QueriesController < ApplicationController
     # Create Hash for each checkbox options
     if @field[:type] == "checkbox"
       temp_hash = Hash.new
-      temp_hash = Hash[@field[:options].collect{|item| [item, 0]}]
+      temp_hash = Hash[@field[:options].collect{|item| [item.gsub("'",""), 0]}]
       @data = @data.merge(temp_hash)
 
     elsif @field[:type] == "boolean_box"
@@ -144,7 +144,7 @@ class QueriesController < ApplicationController
           .map{|x| x.send(@field[:field])}
           .compact
           .uniq
-          .collect{|item| [item, 0]}
+          .collect{|item| [(item.gsub("\r\n", " ").gsub("'", "") rescue item), 0]}
       ]
     end
     @data["*No Input"] = 0 if show_empty_value
@@ -165,6 +165,7 @@ class QueriesController < ApplicationController
         value ? @data["Yes"] += 1 : @data["No"] += 1
       else
         if value.present?
+          value = value.gsub("\r\n", " ") if @field[:type] == 'textarea'
           if @data[value].present?
             @data[value] += 1
           end
@@ -257,8 +258,18 @@ class QueriesController < ApplicationController
       end
     else
       case condition.logic
-      when "Equals To" then results = records.select{|record| record.send(field[:field]) == ""}
-      when "Not Equal To" then results = records.select{|record| record.send(field[:field]) != ""}
+      when "Equals To"
+        if field[:type] == 'checkbox'
+          results = emit_helper(condition.value, records, field, false, "equals")
+        else
+          results = records.select{|record| (record.send(field[:field]) == "" || record.send(field[:field]) == nil) rescue true}
+        end
+      when "Not Equal To"
+        if field[:type] == 'checkbox'
+          results = emit_helper(condition.value, records, field, true, "equals")
+        else
+          results = records.select{|record| (record.send(field[:field]) != "" && record.send(field[:field]) != nil) rescue true}
+        end
       when "Contains" then results = records
       when "Does Not Contain" then results = []
       else results = []
@@ -273,9 +284,15 @@ class QueriesController < ApplicationController
       case field[:type]
       when 'boolean_box'
         return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
+      when 'checkbox'
+        return records.select{|record| xor ^ (record.send(field[:field]).reject(&:empty?).join("").to_s.downcase == search_value.downcase)}
       when 'user'
         matching_users = User.where("full_name = ?", search_value).map(&:id)
         return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
+      when 'date'
+        start_date = search_value.split("to")[0]
+        end_date = search_value.split("to")[1] || search_value.split("to")[0]
+        return records.select{|x| xor ^ ((x.send(field[:field]) >= start_date.to_date && x.send(field[:field]) <= end_date.to_date) rescue false)}
       else
         return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.to_s.downcase)}
       end

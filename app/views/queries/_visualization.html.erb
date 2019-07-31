@@ -8,7 +8,7 @@
         <div class="top_buttons pull-right">
           <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, "#",
             :class => "remove_btn btn btn-danger pull-right",
-            "data-id" => "#{field_name.present? ? field_name : field_id}"%>
+            "data-id" => "#{field_id}"%>
         </div>
       </div>
     </div>
@@ -107,15 +107,18 @@
 
     $(document).delegate(".remove_btn", "click", function (e){
       e.preventDefault();
-      $(this).closest('.visualization_box').remove();
       var field_id = $(this).data("id");
+      var field_name = $("#field_select_all_" + field_id).val();
+      $(this).closest('.visualization_box').remove();
       $.ajax({
-        url: "<%=remove_visualization_query_path(@owner)%>",
         type: "GET",
-        data: {"field_id": $(this).data("id")},
+        url: "<%=remove_visualization_query_path(@owner)%>",
+        data: {
+          "field_name": field_name,
+        },
         beforeSend: function(){$('#loader_' + field_id).show();$("#chart_area_" + field_id).css({'opacity':0.5});},
         complete: function(){$('#loader_' + field_id).hide();$("#chart_area_" + field_id).css({'opacity':1});},
-        success: function(response){console.log(response);},
+        success: function(response){},
         error: function(response){console.log(response);}
       });
     });

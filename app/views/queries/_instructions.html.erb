@@ -7,27 +7,42 @@
   <%=render "shared/alerts"%>
   <div class="collapse well" id="view_instructions">
     <ol>
-      <li>Select the type object you would like to run query on.</li>
-      <li>Build a query.</li>
-        <ol>
-          <li>Add new conditions to your query. If no condition is added, result will include all reports.</li>
-          <li>Enter constraints.</li>
-            <ul>
-              <li><b>Condition Type</b>: The method that will be used for the comparison.</li>
-              <li><b>Field</b>: The field that data will be pulled from to compare.</li>
-              <li><b>Value</b>: The value of the field that is going to be compared with.</li>
+      <li>Select the object type you would like to run the query on.</li>
+      <li>Build the query.</li>
+      <ol type="I">
+        <li>Add conditions to the query. 
+          <ul>
+            <li>If no conditions are added, all results will be included in the report.</li>
+          </ul>
+        <li>Add nested conditions to your query.</li>
+          <ul>
+            <li>Select the Nested Operator</li>
+              <ul type="disc">
+                <li>AND: The result will satisfy all nested conditions.</li>
+                <li>OR: The result will satisfy at least one nested condition.</li>
+              </ul>
+          </ul>
+        <li>Enter constraints.</li>
+          <ul>
+            <li>Field: The field that data will be compared from.</li>
+            <li>Condition Type: The method that will be used for comparison.</li>
+            <ul type="disc">
+              <li>Equals To: Search for fields that have an exact value.</li>
+              <li>Not Equal To: Search for fields that do not have an exact value.</li>
+              <li>Contains: Search for fields that contain a value and fields that have multiple options selected.</li>
+              <li>Does Not Contain: Search for fields that do not contain a value.</li>
+              <li>>= Search for fields greater than or equal to a number.</li>
+              <li>< Search for fields less than a number.</li>
             </ul>
-          <li>Add nested conditions to your query.</li>
-            <ul>
-              <li>Nested conditions will run in parallel.</li>
-              <li><b>Nested Operator</b></li>
-                <ul>
-                  <li><b>AND</b>: If selected, result will satisfy all nested conditions.</li>
-                  <li><b>OR</b>: If selected, result will satisfy at least one nested conditions.</li>
-                </ul>
-            </ul>
+            <li>Value: The value that data will be compared to.</li>
+            <ul type="disc">
+              <li>Date Range: Click two dates to select a date range. Click on the same date twice to select a single date.</li>
+              <li>Yes or No: Select the response to a field.</li>
+              <li>Text: Enter text to search from a field.</li>
+            </ul>          
+          </ul>        
         </ol>
-      <li>Click on <b>Search</b> to run query.</li>
+      <li>Click on Save to run the query.</li>
     </ol>
   </div>
 </div>
