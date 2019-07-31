@@ -10,7 +10,6 @@
 
       <div class="panel-body">
 
-
         <div class="col-xs-4" style="overflow-y:auto;height:100vh;">
           <h3><b>Table of Contents</b></h3>
           <div class="sidenav">
@@ -30,31 +29,28 @@
         <div class="col-xs-8">
           <div class="main">
             <div id="user_guide_content">
-              <%=render "documents/user_guides/template", :topic_name => 'Welcome!', :href => 'summary'%>
+              <%=render "documents/user_guides/template", :topic_name => @topic_name, :href => @href%>
             </div>
           </div>
         </div>
-
 
       </div>
     </div>
   </div>
 </div>
 
+
 <style>
   .sidenav li {
     font-weight: normal !important;
   }
   .sidenav a{
-    /*cursor: pointer;*/
     color: darkslategray;
   }
-
   .sidenav a:hover {
     font-weight: bold;
     color: darkslategray !important
   }
-
   .sidenav {
     width: 100%;
     z-index: 1;
@@ -101,8 +97,6 @@
       e.preventDefault();
       var href = $(this).attr("href");
       var name = $(this).text();
-      console.log(href);
-      console.log(name);
       if (href != undefined){
         $.get("<%=load_content_documents_path%>?topic_name=" + name + "&href=" + href, function(data){
           $("#user_guide_content").html(data);

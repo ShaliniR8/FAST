@@ -7,10 +7,10 @@
   <%=render "shared/alerts"%>
   <div class="collapse well" id="view_instructions">
     <ol>
-      <li>Select the object type you would like to run the query on.</li>
+      <li>Select a Target you would like to run the query on.</li>
       <li>Build the query.</li>
       <ol type="I">
-        <li>Add conditions to the query. 
+        <li>Add conditions to the query.
           <ul>
             <li>If no conditions are added, all results will be included in the report.</li>
           </ul>
@@ -39,10 +39,17 @@
               <li>Date Range: Click two dates to select a date range. Click on the same date twice to select a single date.</li>
               <li>Yes or No: Select the response to a field.</li>
               <li>Text: Enter text to search from a field.</li>
-            </ul>          
-          </ul>        
+            </ul>
+          </ul>
         </ol>
       <li>Click on Save to run the query.</li>
+      <li><%=link_to "Click to see some examples.", user_guides_documents_path(topic_name: "Query Center", href: "query_center")%></li>
     </ol>
   </div>
 </div>
+
+<style>
+  #view_instructions li{
+    font-weight: normal !important;
+  }
+</style>
