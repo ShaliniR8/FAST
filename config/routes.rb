@@ -114,6 +114,7 @@ PrdgSession::Application.routes.draw do |map|
       get "add_visualization"
       get "remove_visualization"
       get "generate_visualization"
+      get "generate_visualization_dynamic"
     end
     collection do
       get 'load_conditions_block'

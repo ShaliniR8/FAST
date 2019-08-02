@@ -1,9 +1,9 @@
 <%=form_for @owner do |f|%>
 
-  <%=f.hidden_field :target, :value => @target%>
+  <%=f.hidden_field :target, :value => @target || @templates.map(&:id).join(",")%>
   <%=f.hidden_field :created_by_id, :value => current_user.id%>
 
-  <div class="panel panel-primary">
+  <div class="panel panel-lightblue">
     <div class="panel-heading">
       <div class="panel-title">
         <div class="top_text">

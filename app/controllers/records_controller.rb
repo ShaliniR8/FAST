@@ -829,7 +829,6 @@ class RecordsController < ApplicationController
     result_id = []
     @result.each{ |r| result_id << r.id }
 
-
     # Create Hash to store value and occurance
     @data = Hash.new
     @fields_id = @fields.collect{|x| x.id}

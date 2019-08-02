@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
 
 
-<div class="panel panel-primary">
+<div class="panel panel-lightblue">
   <div class="panel-heading">
     <div class="panel-title">
       Step 1. Select a Target
@@ -20,8 +20,14 @@
           </tr>
         </thead>
         <tbody>
-          <%@types.stringify_keys.each do |k, v|%>
-            <tr><td data-id="<%=v%>"><%=k%></td></tr>
+          <%if @types.length > 0%>
+            <%@types.stringify_keys.each do |k, v|%>
+              <tr><td data-target-name="<%=v%>"><%=k%></td></tr>
+            <%end%>
+          <%else%>
+            <%@templates.stringify_keys.each do |k, v|%>
+              <tr><td data-template-id="<%=v%>"><%=k%></td></tr>
+            <%end%>
           <%end%>
         </tbody>
       </table>
@@ -35,18 +41,39 @@
   $(function(){
 
     <%if @owner.target.present?%>
-      clickTemplate($('td[data-id="<%=@owner.target%>"]'));
-      //clickTemplate($("td:contains('<%=@owner.target%>')"));
+      <%if @types.present?%>
+        clickTemplate($('td[data-target-name="<%=@owner.target%>"]'));
+      <%else%>
+        <%@owner.target.split(",").each do |template|%>
+          $("td[data-template-id='" + <%=template%> + "']").css("background-color", "lightblue");
+        <%end%>
+        clickTemplate(null, true);
+      <%end%>
     <%end%>
 
     $("tbody tr td").on("click", function(){
-      clickTemplate($(this));
+      clickTemplate($(this), <%=@templates.length > 0%>);
     });
   });
 
-  function clickTemplate(cell){
-    $("td").css("background-color", "transparent");
-    $(cell).css("background-color", "lightblue");
+  function clickTemplate(cell, allow_multiple){
+
+    if (allow_multiple) {
+      if($(cell).css("background-color") === "rgb(173, 216, 230)")
+        $(cell).css("background-color", "transparent");
+      else
+        $(cell).css("background-color", "lightblue");
+    } else {
+      $("td").css("background-color", "transparent");
+      $(cell).css("background-color", "lightblue");
+    }
+
+    var templates = getSelectedTemplates();
+    var display_name = getDisplayName();
+
+    console.log(templates);
+    console.log(display_name);
+
     $.ajax({
       url: "<%=load_conditions_block_queries_path%>",
       type: 'GET',
@@ -54,9 +81,37 @@
         <%if @owner.id.present?%>
           "query_id": <%=@owner.id%>,
         <%end%>
-        "target": $(cell).attr("data-id"),
-        "target_display_name": $(cell).html()},
-      success: function(response){$("#building_query").html(response);}
+        "target": $(cell).attr("data-target-name"),
+        "templates": templates,
+        "target_display_name": display_name
+      },
+      beforeSend: function(){$('#step2_loader').show();$("#building_query").css({'opacity':0.5});},
+      complete: function(){$('#step2_loader').hide();$("#building_query").css({'opacity':1});},
+      success: function(response){$("#building_query").html(response);},
+      error: function(response){console.log(response);}
     });
   }
+
+
+  function getSelectedTemplates() {
+    var templates = [];
+    $("td").each(function(){
+      if ($(this).css("background-color") === "rgb(173, 216, 230)") {
+        templates.push($(this).attr("data-template-id"));
+      }
+    });
+    return templates;
+  }
+
+  function getDisplayName() {
+    var names = [];
+    $("td").each(function(){
+      if ($(this).css("background-color") === "rgb(173, 216, 230)") {
+        names.push($(this).html());
+      }
+    });
+    return names.join(", ");
+  }
+
+
 </script>

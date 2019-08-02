@@ -18,7 +18,8 @@ class Query < ActiveRecord::Base
   end
 
   def get_target
-    BaseConfig::MODULES.values.map{|x| x[:objects]}.compact.inject(:merge)[target]
+    BaseConfig::MODULES.values.map{|x| x[:objects]}.compact.inject(:merge)[target] ||
+    Template.where(:id => target.split(",")).map(&:name).join(", ")
   end
 
 

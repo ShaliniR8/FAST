@@ -13,9 +13,17 @@ class BaseConfig
 
   MODULES =
   {
-    "ASAP" => { :display_name => "ASAP", :objects => {}},
-    "SMS IM" => { :display_name => "SMS IM",},
-    "SMS" => { :display_name => "Safety Assurance",
+    "ASAP" => {
+      :display_name => "ASAP",
+      :objects => {},
+      :templates => true},
+
+    "SMS IM" => {
+      :display_name => "SMS IM",
+      :objects => {}},
+
+    "SMS" => {
+      :display_name => "Safety Assurance",
       :objects => {
         "Audit" => "Audit",
         "Inspection" => "Inspection",
@@ -23,16 +31,16 @@ class BaseConfig
         "Investigation" => "Investigation",
         "Finding" => "Finding",
         "SmsAction" => "Corrective Action",
-      },
-    },
-    "SRM" => { :display_name => "Safety Risk Management",
+      }},
+
+    "SRM" => {
+      :display_name => "Safety Risk Management",
       :objects => {
         "Sra" => "SRA",
         "Hazard" => "Hazard",
         "RiskControl" => "Risk Control",
         "SafetyPlan" => "Safety Plan",
-      },
-    }
+      }}
   }
 
   def self.get_sra_meta_fields
