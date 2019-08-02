@@ -79,6 +79,9 @@ class Hazard < ActiveRecord::Base
     end
   end
 
+  def owner
+    self.sra
+  end
 
   def self.root_causes
     custom_options = CustomOption.where(:title => "Manuals").first

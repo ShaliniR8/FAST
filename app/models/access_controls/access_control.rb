@@ -536,6 +536,7 @@ class AccessControl < ActiveRecord::Base
       'Submitter'           => 'submitter',
       'Safety Enhancement'  => 'enhance',
       'Summary'             => 'summary',
+      'Module'              => 'module',
       'Tabulation'          => 'tabulation',
       'Access'              => 'query_all',
       'Admin'               => 'admin',

@@ -384,7 +384,7 @@ module ApplicationHelper
 
 
   def define_session_permissions
-    user = current_user
+    user = User.find(session[:simulated_id] || session[:user_id])
     accesses = Hash.new{ |h, k| h[k] = [] }
     user.privileges.includes(:access_controls).map{ |priv|
       priv.access_controls.each do |acs|

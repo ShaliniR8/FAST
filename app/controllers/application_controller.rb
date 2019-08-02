@@ -71,8 +71,8 @@ class ApplicationController < ActionController::Base
     else
       if current_user.disable
         redirect_to logout_path
-      elsif !current_user.has_access(controller_name,action_name)
-        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict))
+      elsif !current_user.has_access(controller_name,action_name,admin:true)
+        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict:strict))
       end
     end
   end

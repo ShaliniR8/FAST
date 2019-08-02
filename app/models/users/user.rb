@@ -88,8 +88,6 @@ class User < ActiveRecord::Base
   # admin: will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
   # strict: will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
   def has_access(con_name, act_name, strict:false, admin:false)
-    con_name = con_name.downcase.pluralize if con_name.present?
-
     return true if admin && self.admin?
     rules = Rails.application.config.restricting_rules
     if rules.key?(con_name) && rules[con_name].include?(act_name)
@@ -98,10 +96,8 @@ class User < ActiveRecord::Base
       rescue
         return false #rescue for if session has expired
       end
-      return true if permissions.key?(con_name) && permissions[con_name].include?(admin) && admin
-      unless permissions.key?(con_name) && permissions[con_name].include?(act_name)
-        return false
-      end
+      return (admin && permissions.key?(con_name) && permissions[con_name].include?('admin')) ||
+        (permissions.key?(con_name) && permissions[con_name].include?(act_name))
     end
     strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present?) : true
   end

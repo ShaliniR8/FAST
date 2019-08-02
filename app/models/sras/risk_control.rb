@@ -40,6 +40,9 @@ class RiskControl < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def owner
+    self.hazard
+  end
 
   def get_approver_name
     self.approver.present? ? self.approver.full_name : ""
