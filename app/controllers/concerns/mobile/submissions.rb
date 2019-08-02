@@ -28,13 +28,16 @@ module Concerns
 
         # Get ids of the 3 most recent submissions by event_date
         recent_submissions = @records
-          .order(:event_date)
           .last(3)
           .as_json(only: :id)
           .map{ |submission| submission['submission']['id'] }
 
         # Get ids of the 3 most recent
         json[:recent_submissions] = submissions_as_json(*recent_submissions)
+
+        # Get timezone data for timezone fields
+        timezoneField = Field.where(data_type: 'timezone').first
+        json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
 
         render :json => json
       end
@@ -132,36 +135,49 @@ module Concerns
             # LOSAV fields
             new_fields = []
             follow_fields = nil
+            master_fields = nil
             losav_options = nil
             # check for legacy LOSAV fields, convert to nested fields
             category[:fields].each do |child_field|
+              # Rename LOSAV fields to include the name of their master field
+              # Rename master field to include 'Condition'
+              if (child_field['element_class'].match(/master|follow/i))
+                master_fields ||= category[:fields]
+                  .select{ |field| field['element_class'].include? 'master' }
+                  .map{ |field| { element_id: field['element_id'], label: field['label'] } }
+                if (child_field['element_class'] == 'master')
+                  child_field['label'] = "#{child_field['label']}: Condition"
+                else
+                  master_field = master_fields.find{ |master_field| child_field['element_id'] == master_field[:element_id] }
+                  child_field['label'] = "#{master_field[:label]}: #{child_field['label']}"
+                end
+              end
               if (child_field['element_class'].include? 'sub')
                 # load LOSAV JSON and filter out the follow fields
                 losav_options ||= JSON.parse(File.read(Rails.root.join('public', 'javascripts', 'templates', 'losav_options.json')))
                 follow_fields ||= category[:fields].select{ |field| field['element_class'].include? 'follow' }
 
                 parent_class = child_field['element_class'].gsub(/follow|sub/, '').strip
-                follow_fields.each do |parent_field|
-                  # find the parent field
-                  if (parent_field['element_id'] == child_field['element_id'] && parent_field['element_class'].include?(parent_class))
-                    # create new nested fields based on parent id and LOSAV JSON
-                    parent_field['options']
-                      .split(';')
-                      .map!{ |option| option.strip }
-                      .delete_if{ |option| option.blank? }
-                      .each do |option|
-                        new_field = child_field.clone
-                        new_field['nested_field_id'] = parent_field['id']
-                        new_field['nested_field_value'] = option
-                        new_field['options'] = losav_options[option].join(';')
-                        new_fields.push(new_field)
-                      end
 
-                    # set child_field to be deleted, replaced by new fields
-                    child_field['deleted'] = true
-                    break
-                  end
+                parent_field = follow_fields.find do |parent_field|
+                  parent_field['element_id'] == child_field['element_id'] && parent_field['element_class'].include?(parent_class)
                 end
+
+                # create new nested fields based on parent id and LOSAV JSON
+                parent_field['options']
+                  .split(';')
+                  .delete_if{ |option| option.blank? }
+                  .each do |option|
+                    new_field = child_field.clone
+                    new_field['nested_field_id'] = parent_field['id']
+                    new_field['nested_field_value'] = option
+                    new_field['options'] = losav_options[option].join(';')
+                    new_fields.push(new_field)
+                  end
+
+                # set child_field to be deleted, replaced by new fields
+                child_field['deleted'] = true
+
               end
             end
             # add created fields if any were made
@@ -169,11 +185,12 @@ module Concerns
 
             # convert field_orders to arrays, where nested_fields have parent order and sibling order
             nested_fields = []
+            field_orders = category[:fields].map{ |field| { id: field['id'], field_order: field['field_order'] } }
             category[:fields].each do |field|
               field['field_order'] = [field['field_order']]
               if (field['nested_field_id'] != nil)
-                parent_field = Field.find(field['nested_field_id'])
-                field['field_order'].unshift(parent_field['field_order'])
+                parent_field = field_orders.find{ |parent_field| parent_field[:id] == field['nested_field_id'] }
+                field['field_order'].unshift(parent_field[:field_order])
               end
             end
 
@@ -185,13 +202,17 @@ module Concerns
         templates_json.each do |template|
           # remove deleted categories
           template[:categories].delete_if{ |category| category['deleted'] }
-          template[:categories].each do |category|
+          template[:categories].each.with_index do |category, categoryIndex|
+            category[:index] = categoryIndex
+
             # these keys are no longer necessary
             category.delete_if{ |key| key.match /category_order|deleted/ }
 
             # remove deleted fields
             category[:fields].delete_if{ |field| field['deleted'] }
-            category[:fields].each do |field|
+            category[:fields].each.with_index do |field, fieldIndex|
+              field[:index] = fieldIndex
+
               # reduce redundancy by setting fields with element_class of "required_field" as required
               field['required'] = true if field['element_class'] == 'required_field'
 
@@ -206,7 +227,6 @@ module Concerns
               # replace options string with an array, and remove empty values
               field['options'] = field['options']
                 .split(';')
-                .map!{ |option| option.strip }
                 .delete_if{ |option| option.blank? }
 
               field.delete_if do |key, value|
