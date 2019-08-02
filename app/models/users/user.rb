@@ -106,6 +106,7 @@ class User < ActiveRecord::Base
   def accessible_modules
     num = 0
     modules = AccessControl.where('action = ?', "module")
+    return modules.length if self.admin?
     all_access = get_all_access
     modules.each do |x|
       if all_access.include? x

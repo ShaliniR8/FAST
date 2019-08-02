@@ -1,13 +1,17 @@
-<%audit_new = current_user.has_access("audits", "new")%>
-<%audit_index = current_user.has_access("audits","index")%>
+<%audit_new = current_user.has_access('audits', 'new', admin: true) %>
+<%audit_index = current_user.has_access('audits','index', admin: true) %>
 <%audit_admin = current_user.has_access('audits', 'admin', admin: true) %>
 <%if audit_admin || audit_new || audit_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Audits<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
-      <%if audit_admin || audit_index%><li><a href=<%=audits_path%>>All</a></li><%end%>
-      <%if audit_admin || audit_new%><li><a href=<%=new_audit_path%>>New</a></li><%end%>
-      <%if BaseConfig.airline[:enable_recurrence] && audit_admin%>
+      <% if audit_index %>
+        <li><a href=<%=audits_path%>>All</a></li>
+      <%end%>
+      <% if audit_new %>
+        <li><a href=<%=new_audit_path%>>New</a></li>
+      <%end%>
+      <% if BaseConfig.airline[:enable_recurrence] && audit_admin %>
         <li><a href=<%="#{recurrences_path}?form_type=Audit"%>>Recurring Audits</a></li>
         <li><a href=<%="#{new_recurrence_path}?form_type=Audit"%>>New Recurring Audit</a></li>
       <%end%>
@@ -16,16 +20,20 @@
 <%end%>
 
 
-<%inspection_new = current_user.has_access("inspections", "new")%>
-<%inspection_index = current_user.has_access("inspections", 'index')%>
+<%inspection_new = current_user.has_access('inspections', 'new', admin: true) %>
+<%inspection_index = current_user.has_access('inspections', 'index', admin: true) %>
 <%inspection_admin = current_user.has_access('inspections', 'admin', admin: true) %>
 <%if inspection_admin || inspection_new || inspection_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Inspections<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
-      <%if inspection_admin || inspection_index%><li><a href=<%=inspections_path%>>All</a></li><%end%>
-      <%if inspection_admin || inspection_new%><li><a href=<%=new_inspection_path%>>New</a></li><%end%>
-      <%if BaseConfig.airline[:enable_recurrence] && inspection_admin%>
+      <% if inspection_index %>
+        <li><a href=<%=inspections_path%>>All</a></li>
+      <%end%>
+      <% if inspection_new %>
+        <li><a href=<%=new_inspection_path%>>New</a></li>
+      <%end%>
+      <% if BaseConfig.airline[:enable_recurrence] && inspection_admin %>
         <li><a href=<%="#{recurrences_path}?form_type=Inspection"%>>Recurring Inspections</a></li>
         <li><a href=<%="#{new_recurrence_path}?form_type=Inspection"%>>New Recurring Inspection</a></li>
       <%end%>
@@ -34,16 +42,20 @@
 <%end%>
 
 
-<%evaluation_new = current_user.has_access("evaluations", "new")%>
-<%evaluation_index = current_user.has_access("evaluations", 'index')%>
+<%evaluation_new = current_user.has_access('evaluations', 'new', admin: true) %>
+<%evaluation_index = current_user.has_access('evaluations', 'index', admin: true) %>
 <%evaluation_admin = current_user.has_access('evaluations', 'admin', admin: true) %>
 <%if evaluation_admin || evaluation_new || evaluation_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Evaluations<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
-      <%if evaluation_admin || evaluation_index%><li><a href=<%=evaluations_path%>>All</a></li><%end%>
-      <%if evaluation_admin || evaluation_new%><li><a href=<%=new_evaluation_path%>>New</a></li><%end%>
-      <%if BaseConfig.airline[:enable_recurrence] && evaluation_admin%>
+      <% if evaluation_index %>
+        <li><a href=<%=evaluations_path%>>All</a></li>
+      <%end%>
+      <% if evaluation_new %>
+        <li><a href=<%=new_evaluation_path%>>New</a></li>
+      <%end%>
+      <% if BaseConfig.airline[:enable_recurrence] && evaluation_admin %>
         <li><a href=<%="#{recurrences_path}?form_type=Evaluation"%>>Recurring Evaluations</a></li>
         <li><a href=<%="#{new_recurrence_path}?form_type=Evaluation"%>>New Recurring Evaluation</a></li>
       <%end%>
@@ -52,21 +64,25 @@
 <%end%>
 
 
-<%investigation_new = current_user.has_access('investigations', 'new')%>
-<%investigation_index = current_user.has_access('investigations','index')%>
+<%investigation_new = current_user.has_access('investigations', 'new', admin: true) %>
+<%investigation_index = current_user.has_access('investigations','index', admin: true) %>
 <%investigation_admin = current_user.has_access('investigations','admin', admin: true) %>
 <%if investigation_admin || investigation_new || investigation_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Investigations<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
-      <%if investigation_index%><li><a href=<%=investigations_path%>>All</a></li><%end%>
-      <%if investigation_new%><li><a href=<%=new_investigation_path%>>New</a></li><%end%>
+      <% if investigation_index %>
+        <li><a href=<%=investigations_path%>>All</a></li>
+      <%end%>
+      <% if investigation_new %>
+        <li><a href=<%=new_investigation_path%>>New</a></li>
+      <%end%>
     </ul>
   </li>
 <%end%>
 
 
-<%finding_index = current_user.has_access("findings", "index")%>
+<% finding_index = current_user.has_access('findings', 'index', admin: true) %>
 <%if finding_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Findings<b class="caret"></b></a>
@@ -81,8 +97,8 @@
 <%end%>
 
 
-<%sms_action_index = current_user.has_access("sms_actions", "index")%>
-<%sms_action_new = current_user.has_access("sms_actions", "new")%>
+<%sms_action_index = current_user.has_access('sms_actions', 'index', admin: true) %>
+<%sms_action_new = current_user.has_access('sms_actions', 'new', admin: true) %>
 <%if sms_action_index || sms_action_new%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Corrective Actions<b class="caret"></b></a>
@@ -95,7 +111,7 @@
   </li>
 <%end%>
 
-<%if current_user.has_access("recommendations","index")%>
+<%if current_user.has_access('recommendations','index', admin: true) %>
 <li class="dropdown">
   <a href="#" data-toggle="dropdown">Recommendations<b class="caret"></b></a>
   <ul class="dropdown-menu dropdown-notification" role="menu">
