@@ -4,16 +4,17 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
 
 
-<%template_full_access = current_user.has_template_access(@record.template.name).include? "full"%>
-<%template_viewer_access = current_user.has_template_access(@record.template.name).include? "viewer"%>
-<%submission_show_access = current_user.has_access("submissions","show")%>
-<%record_edit_access = current_user.has_access("records", "edit")%>
-<%record_delete_access = current_user.has_access("records","destroy")%>
-<%report_show_access = current_user.has_access("reports","show")%>
-<%sa_module_access = current_user.has_access('Safety Assurance','module')%>
-<%sra_module_access = current_user.has_access('Safety Risk Management','module')%>
+<%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
+<%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer'%>
+<%submission_show_access = current_user.has_access('submissions','show', admin: true)%>
+<%record_edit_access = current_user.has_access('records', 'edit', admin: true)%>
+<%record_delete_access = current_user.has_access('records','destroy', admin: true)%>
+<%report_show_access = current_user.has_access('reports','show', admin: true)%>
+<%report_admin_access = current_user.has_access('reports', 'admin', admin: true)%>
+<%sa_module_access = current_user.has_access('Safety Assurance','module', admin: true)%>
+<%sra_module_access = current_user.has_access('Safety Risk Management','module', admin: true)%>
 
-<div class="item active mt50" style="height:auto;">
+<div class='item active mt50' style="height:auto;">
   <div class="grid per90 center-block">
     <div class="col-lg-12">
       <%=render "access_controls/new_modal"%>
@@ -29,9 +30,9 @@
 
               <a class="btn btn-default expandall mb5">Expand All</a>
 
-              <%if template_full_access || template_viewer_access%>
+              <%if template_full_access || template_viewer_access || report_admin_access%>
 
-                <%if record_edit_access%>
+                <%if record_edit_access %>
                   <%if @record.submission.present? && !@record.submission.anonymous?%>
                     <%=link_to "Message Submitter",
                       new_message_path(

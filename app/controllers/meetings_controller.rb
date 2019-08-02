@@ -205,7 +205,7 @@ class MeetingsController < ApplicationController
 
   def index
     @records = Meeting.includes(:invitations, :host).where('meetings.type is null')
-    unless current_user.admin?
+    unless current_user.has_access('meetings', 'admin', admin: true )
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end

@@ -320,7 +320,8 @@ class AccessControl < ActiveRecord::Base
         "New"=>"new",
         "View"=>"show",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "records"=>{
         "View Summary" => "summary",
@@ -331,13 +332,15 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Query"=>"query",
         "De-Identified" => "deid",
+        "Admin"=>"admin"
       },
       "reports"=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "trackings"=>{
         "New"=>"new",
@@ -351,14 +354,16 @@ class AccessControl < ActiveRecord::Base
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "faa_reports"=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Listing"=>"index",
-        "Safety Enhancement"=>"enhance"
+        "Safety Enhancement"=>"enhance",
+        "Admin"=>"admin"
       },
       "corrective_actions"=>{
         "New"=>"new",
@@ -452,7 +457,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'risk_controls'=>{
         "New"=>"new",
@@ -469,7 +475,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'srm_meetings'=>{
         "New"=>"new",
@@ -477,7 +484,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'ims'=>{
         "New"=>"new",
@@ -485,22 +493,26 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"},
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
+      },
       'packages'=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"},
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
+      },
       'sms_meetings'=>{
-
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
        },
        'ASAP'=>{
         'Module'=>'module'

@@ -237,15 +237,17 @@ class SubmissionsController < ApplicationController
       if @record.user_id == current_user.id
         redirect_to continue_submission_path(@record)
       else
-        redirect_to root_url
+        redirect_to errors_path
       end
     end
     @template = @record.template
     access_level=current_user.has_template_access(@template.name)
-    if access_level == "" && @record.user_id != current_user.id
-        redirect_to root_url
-    elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
-        redirect_to root_url
+    unless current_user.has_access('submissions', 'admin', admin: true)
+      if access_level == "" && @record.user_id != current_user.id
+          redirect_to errors_path
+      elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
+          redirect_to errors_path
+      end
     end
   end
 
