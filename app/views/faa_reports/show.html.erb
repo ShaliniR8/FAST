@@ -16,7 +16,7 @@
               Year <%=@report.year%>, <%=@report.get_fiscal_quarter%>
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.has_access("faa_reports","edit")%>
+              <%if current_user.has_access('faa_reports', 'edit', admin: true)%>
                 <%=link_to "Delete",
                   faa_report_path(@report),
                   :method => "delete",
@@ -29,7 +29,7 @@
               <%=link_to "Word",
                 export_word_faa_report_path(@report, :format => "docx" ),
                 :class => "btn btn-darkturquoise mb5 mr5 pull-right"%>
-              <%if current_user.has_access("faa_reports","edit")%>
+              <%if current_user.has_access('faa_reports', 'edit', admin: true)%>
                 <%=link_to "Edit",
                   "#",
                   :class => "pull-right btn btn-warning mr5 mb5 edit_btn",
@@ -45,7 +45,7 @@
 
         <div class="panel-body">
           <div class="row">
-            <%if current_user.has_access("faa_reports","enhance")%>
+            <%if current_user.has_access('faa_reports', 'enhance', admin: true)%>
               <%=link_to 'Add Safety Enhancement', "#",
                 :class => "pull-right btn btn-success mr20 mb10",
                 "data-toggle" => "modal",
