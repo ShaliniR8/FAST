@@ -24,7 +24,11 @@ class Query < ActiveRecord::Base
   end
 
   def get_templates
-    Template.where(:id => templates).map(&:name).join(", ")
+    if templates.present?
+      Template.where(:id => templates).map(&:name).join(", ")
+    else
+      "N/A"
+    end
   end
 
   def make_copy

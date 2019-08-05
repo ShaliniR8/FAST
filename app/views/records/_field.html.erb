@@ -119,7 +119,7 @@
     </div>
 
   <%elsif field.display_type == "datalist"%>
-    <%= f.text_field :value,
+    <%= rf.text_field :value,
       {:list=>"#{field.id}",
       :class=>"form-control",
       :value=>record_field.value}%>

@@ -77,14 +77,14 @@
                     :disable_with => "Redirecting..."%>
                 <%end%>
 
-                <%if @record.investigation.present? && sa_module_access%>
+                <%if false && @record.investigation.present? && sa_module_access%>
                   <%=link_to "View Investigation",
                     investigation_path(@record.investigation),
                     :class=>"btn btn-info mb5",
                     :disable_with => "Redirecting..."%>
                 <%end%>
 
-                <%if @record.sra.present? && sra_module_access%>
+                <%if false && @record.sra.present? && sra_module_access%>
                   <%=link_to "View SRA(SRM)",
                     sra_path(@record.sra),
                     :class=>"btn btn-info mb5",
@@ -203,7 +203,7 @@
           </div>
 
           <div class="col-xs-12 mb20">
-            <%if sra_module_access &&
+            <%if false && sra_module_access &&
               @record.status != "Closed" &&
               @record.status != "New" &&
               !@record.sra.present?%>
@@ -213,7 +213,7 @@
                 :disable_with => "Redirecting..."%>
             <%end%>
 
-            <%if sa_module_access &&
+            <%if false && sa_module_access &&
               @record.status != "Closed" &&
               @record.status != "New" &&
               !@record.investigation.present?%>

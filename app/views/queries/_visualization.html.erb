@@ -102,8 +102,7 @@
           $("#field_select_all_" + field_id).css({"font-weight": "bold", "color": "steelblue"});
         },
         error: function(response){
-          console.log(response);
-          $("#chart_area_" + field_id).html("<b style='color:red'>Please enter a valid Data Field.</b>");
+          $("#chart_area_" + field_id).html(response);
         },
       });
     });

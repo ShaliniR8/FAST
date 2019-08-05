@@ -21,6 +21,7 @@ class BaseConfig
         "Report" => "Event",
         "CorrectiveAction" => "Corrective Action",
       }},
+
     "SMS IM" => {
       :display_name => "SMS IM",
       :objects => {}},
