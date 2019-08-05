@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190627153741) do
+ActiveRecord::Schema.define(:version => 20190803001138) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -197,9 +197,9 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
     t.text     "value"
+    t.text     "options"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "options"
   end
 
   create_table "checklist_header_items", :force => true do |t|
@@ -390,6 +390,18 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "description"
+  end
+
+  create_table "distribution_list_users", :force => true do |t|
+    t.integer "user_id"
+    t.integer "distribution_list_id"
+  end
+
+  create_table "distribution_lists", :force => true do |t|
+    t.string   "name"
+    t.integer  "created_by_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "documents", :force => true do |t|
@@ -917,21 +929,25 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.text     "example"
   end
 
-  create_table "query_conditions", :force => true do |t|
-    t.integer  "query_statement_id"
-    t.string   "condition_type"
-    t.string   "condition_value"
+  create_table "queries", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "template_id"
-    t.string   "classname"
-    t.integer  "field_id"
-    t.string   "fieldname"
-    t.integer  "category_id"
-    t.string   "category_name"
-    t.text     "value"
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.string   "title"
+    t.integer  "created_by_id"
+    t.string   "target"
+    t.text     "templates"
+    t.text     "visualizations"
+  end
+
+  create_table "query_conditions", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "query_id"
+    t.integer  "query_condition_id"
+    t.string   "logic"
+    t.string   "field_name"
+    t.string   "value"
+    t.string   "operator"
   end
 
   create_table "query_statements", :force => true do |t|
@@ -1425,8 +1441,14 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.datetime "reset_sent_at"
     t.integer  "android_version"
     t.datetime "last_seen_at"
+<<<<<<< HEAD
     t.string   "sso_id"
     t.datetime "privileges_last_updated"
+=======
+    t.datetime "privileges_last_updated"
+    t.string   "sso_id"
+    t.integer  "mobile_fetch_months",                  :default => 3, :null => false
+>>>>>>> Added mobile_fetch_months to the users table (thanks Dylan)
   end
 
   create_table "verifications", :force => true do |t|
