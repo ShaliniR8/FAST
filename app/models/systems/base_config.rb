@@ -15,9 +15,12 @@ class BaseConfig
   {
     "ASAP" => {
       :display_name => "ASAP",
-      :objects => {},
-      :templates => true},
-
+      :objects => {
+        "Submission" => "Submission",
+        "Record" => "Report",
+        "Report" => "Event",
+        "CorrectiveAction" => "Corrective Action",
+      }},
     "SMS IM" => {
       :display_name => "SMS IM",
       :objects => {}},

@@ -42,6 +42,7 @@ class QueriesController < ApplicationController
   end
 
   def create
+    params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
@@ -49,6 +50,7 @@ class QueriesController < ApplicationController
 
   def update
     @owner = Query.find(params[:id])
+    params[:query][:templates] = params[:query][:templates].split(",")
     @owner.update_attributes(params[:query])
     @owner.query_conditions.destroy_all
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
@@ -61,7 +63,7 @@ class QueriesController < ApplicationController
     redirect_to queries_path, flash: {danger: "Query deleted."}
   end
 
-  # on target select, load conditions block
+  # on target select, load conditions block - primarily used to show only relevant fields
   def load_conditions_block
     @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<']
     @operators = ["AND", "OR"]
@@ -71,11 +73,9 @@ class QueriesController < ApplicationController
     @templates = Template.where(:id => params[:templates])
 
     @target_display_name = params[:target_display_name]
-    @fields = []
+    @fields = Object.const_get(@target).get_meta_fields('show', 'index').keep_if{|x| x[:field]}
 
-    if @target.present?
-      @fields = Object.const_get(@target).get_meta_fields('show', 'index').keep_if{|x| x[:field]}
-    else
+    if @templates.length > 0
       @templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
         @fields << {
           title: field.label,
@@ -84,28 +84,27 @@ class QueriesController < ApplicationController
         }
       }
     end
-
+    @fields.sort_by{|field| field[:title]}
     render :partial => "building_query"
   end
+
+
 
   # add visualization box to query
   def add_visualization
     @owner = Query.find(params[:id])
-    begin
-      @object_type = Object.const_get(@owner.target)
-      @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
-    rescue
-      @object_type = "Record"
-      @fields = []
-      templates = Template.where(:id => @owner.target.split(","))
-      templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
-        @fields << {
-          title: field.label,
-          field: field.label,
-          type: field.data_type,
-        }
+    @object_type = Object.const_get(@owner.target)
+    @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
+
+    templates = Template.where(:id => @owner.templates)
+    templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
+      @fields << {
+        title: field.label,
+        field: field.label,
+        type: field.data_type,
       }
-    end
+    }
+
     @owner.visualizations ||= []
     @owner.visualizations << Time.now.strftime("%Y%m%d%H%M%S")
     @owner.save
@@ -124,48 +123,31 @@ class QueriesController < ApplicationController
   end
 
 
-
-
-
-
-
-
-
-
-
-
-  # draws charts
+  # generate visualization charts
   def generate_visualization
 
     # determines if empty value should be take into account
     show_empty_value = false
 
-    dynamic_field = true
-
-
     @owner = Query.find(params[:id])
-
-    if dynamic_field
-      @title = "Record"
-    else
-      @title = @owner.target
-    end
-    @object_type = Object.const_get(@title)
+    @label = params[:field_name]
+    @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
 
-    @label = params[:field_name]
-
-    if dynamic_field
-      @fields = Field.where(:label => @label)
-    else
-      @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
-    end
-
     records = params[:records].split(",") || []
-
     @result = @object_type.where(:id => records)
 
+
+    @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:title] == @label}
+
+    @template_fields = []
+    Template.preload(:fields).where(:id => @owner.templates).map(&:fields).flatten.select{|x| x.label == @label}.each{|field|
+      @template_fields << field
+    }
+    @fields = @target_fields + @template_fields
+
+    dynamic_field = (@target_fields.map{|x| x[:title]}.include? @label) == false
 
     visualization_index = @owner.visualizations.index(params["field_id"].titleize) ||
       @owner.visualizations.index(params["field_name"])
@@ -224,20 +206,17 @@ class QueriesController < ApplicationController
     # Create key value pair for unique values
     else
       if dynamic_field
-        @data = Hash[RecordField.where(
-          :fields_id => @fields.collect{|x| x.id},
-          :records_id => result_id)
-        .select(:value)
-        .map(&:value)
-        .uniq
-        .collect{|item| [item, 0]}]
+        if @owner.target == "Submission"
+          @data = Hash[SubmissionField.where(:fields_id => @fields.collect{|x| x.id}, :submissions_id => result_id)
+            .select(:value).map(&:value).uniq.collect{|item| [item, 0]}]
+        elsif @owner.target == "Record"
+          @data = Hash[RecordField.where(:fields_id => @fields.collect{|x| x.id}, :records_id => result_id)
+            .select(:value).map(&:value).uniq.collect{|item| [item, 0]}]
+        end
       else
         @data = Hash[
-          @result
-            .map{|x| x.send(@field[:field])}
-            .compact
-            .uniq
-            .collect{|item| [(item.gsub("\r\n", " ").gsub("'", "") rescue item), 0]}
+          @result.map{|x| x.send(@field[:field])}
+            .compact.uniq.collect{|item| [(item.gsub("\r\n", " ").gsub("'", "") rescue item), 0]}
         ]
       end
     end
@@ -249,6 +228,7 @@ class QueriesController < ApplicationController
       value = value.present? ? value : (show_empty_value ? "*No Input" : nil)
       if field_type == 'checkbox'
         if value.present?
+          value = dynamic_field ? value.split(";") : value
           value.each do |v|
             if @data[v].present?
               @data[v] += 1
@@ -301,58 +281,47 @@ class QueriesController < ApplicationController
 
   private
 
+
   def load_options
-    @templates = {}
-    @types = {}
-    if BaseConfig::MODULES[session[:mode]][:templates]
-      @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
-    else
-      @types = BaseConfig::MODULES[session[:mode]][:objects].invert
-    end
+    @types = BaseConfig::MODULES[session[:mode]][:objects].invert
+    @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
   end
 
-  # applies selected query and defines/sets related variables
+
   def apply_query
-    begin
-      @dynamic_form = false
-      @title = BaseConfig::MODULES[session[:mode]][:objects][@owner.target].pluralize
-      @object_type = Object.const_get(@owner.target)
-      @table_name = @object_type.table_name
-      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? !x.template : true}
-      @headers = @object_type.get_meta_fields('index')
-      @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
+    @title = BaseConfig::MODULES[session[:mode]][:objects][@owner.target].pluralize
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
 
-      @owner.query_conditions.each do |condition|
-        records = records & expand_emit(condition, records)
-      end
+    @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
 
-    rescue
-      @dynamic_form = true
-      @title = "Reports"
-      @object_type = Object.const_get("Record")
-      @table_name = "records"
-
-      records = @object_type.preload(:record_fields).where(:templates_id => @owner.target.split(","))
-      record_fields = records.map(&:record_fields).flatten
-      @headers = @object_type.get_meta_fields('index')
-      @fields = []
-      Template.where(:id => @owner.target.split(",")).map(&:fields).flatten.uniq{|field| field.label}.each{|field|
-        @fields << {
-          title: field.label,
-          field: field.label,
-          data_type: field.data_type,
-          field_type: field.display_type,
-        }
+    @template_fields = []
+    Template.where(:id => @owner.templates).map(&:fields).flatten.uniq{|field| field.label}.each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
       }
+    }
 
-      @owner.query_conditions.each do |condition|
-        records = records & expand_emit(condition, record_fields)
-      end
+    @fields = @target_fields + @template_fields
 
+    if @title == "Submissions"
+      records = @object_type.preload(:submission_fields).where(:templates_id => @owner.templates)
+    elsif @title == "Reports"
+      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+    else
+      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
     end
+
+    @owner.query_conditions.each do |condition|
+      records = records & expand_emit(condition, records)
+    end
+
     @records = records
   end
-
 
 
 
@@ -371,7 +340,15 @@ class QueriesController < ApplicationController
         end
       end
     else
-      results = emit(condition, records)
+      if @target_fields.map{|x| x[:title]}.include? condition.field_name
+        results = emit(condition, records, false)
+      else
+        if @owner.target == "Submission"
+          results = emit(condition, records, "Submission")
+        elsif @owner.target = "Record"
+          results = emit(condition, records, "Record")
+        end
+      end
     end
     results
   end
@@ -380,30 +357,30 @@ class QueriesController < ApplicationController
 
 
   # applies basic condition block
-  def emit(condition, records)
+  def emit(condition, records, from_template)
     field = @fields.select{|header| header[:title] == condition.field_name}.first
     if field.present?
       if condition.value.present?
         case condition.logic
-        when "Equals To" then results = emit_helper(condition.value, records, field, false, "equals")
-        when "Not Equal To" then results = emit_helper(condition.value, records, field, true, "equals")
-        when "Contains" then results = emit_helper(condition.value, records, field, false, "contains")
-        when "Does Not Contain" then results = emit_helper(condition.value, records, field, true, "contains")
-        when ">=" then results = emit_helper(condition.value, records, field, false, "numeric")
-        when "<" then results = emit_helper(condition.value, records, field, true, "numeric")
+        when "Equals To" then results = emit_helper(condition.value, records, field, false, "equals", from_template)
+        when "Not Equal To" then results = emit_helper(condition.value, records, field, true, "equals", from_template)
+        when "Contains" then results = emit_helper(condition.value, records, field, false, "contains", from_template)
+        when "Does Not Contain" then results = emit_helper(condition.value, records, field, true, "contains", from_template)
+        when ">=" then results = emit_helper(condition.value, records, field, false, "numeric", from_template)
+        when "<" then results = emit_helper(condition.value, records, field, true, "numeric", from_template)
         else results = records
         end
       else
         case condition.logic
         when "Equals To"
           if field[:type] == 'checkbox'
-            results = emit_helper(condition.value, records, field, false, "equals")
+            results = emit_helper(condition.value, records, field, false, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) == "" || record.send(field[:field]) == nil) rescue true}
           end
         when "Not Equal To"
           if field[:type] == 'checkbox'
-            results = emit_helper(condition.value, records, field, true, "equals")
+            results = emit_helper(condition.value, records, field, true, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) != "" && record.send(field[:field]) != nil) rescue true}
           end
@@ -418,18 +395,20 @@ class QueriesController < ApplicationController
 
 
 
-  def emit_helper(search_value, records, field, xor, logic_type)
-    if @dynamic_form
-      return emit_helper_dynamic(search_value, records, field, xor, logic_type)
+  def emit_helper(search_value, records, field, xor, logic_type, from_template)
+    if from_template == "Submission"
+      submission_fields = records.map(&:submission_fields).flatten
+      return emit_helper_dynamic(search_value, submission_fields, field, xor, logic_type, "Submission")
+    elsif from_template == "Record"
+      record_fields = records.map(&:record_fields).flatten
+      return emit_helper_dynamic(search_value, record_fields, field, xor, logic_type, "Record")
     else
       return emit_helper_basic(search_value, records, field, xor, logic_type)
     end
   end
 
 
-
-
-  def emit_helper_dynamic(search_value, records, field, xor, logic_type)
+  def emit_helper_dynamic(search_value, records, field, xor, logic_type, target_name)
     fields = Field.where(:label => field[:title]).map(&:id)
     related_fields = records.select{|x| fields.include? x.fields_id}
 
@@ -484,7 +463,14 @@ class QueriesController < ApplicationController
         result = related_fields.select{|record| xor ^ ((x.value.to_f >= search_value.to_f) rescue false)}
       end
     end
-    return result.map(&:record)
+    if target_name == "Submission"
+      return result.map(&:submission)
+    elsif target_name == "Record"
+      return result.map(&:record)
+    else
+      return []
+    end
+
   end
 
 

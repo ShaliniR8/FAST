@@ -5,6 +5,7 @@ class CreateQueryAndQueryConditionsTable < ActiveRecord::Migration
       t.string :title
       t.integer :created_by_id
       t.string :target
+      t.text :templates
       t.text :visualizations
     end
 

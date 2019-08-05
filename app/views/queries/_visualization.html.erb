@@ -1,5 +1,5 @@
 <div class="col-xs-6 visualization_box" id="visualization_<%=field_id%>">
-  <div class="panel panel-default">
+  <div class="panel panel-lightsteelblue">
     <div class="panel-heading">
       <div class="panel-title">
         <div class="top_text">
@@ -101,7 +101,10 @@
           $("#field_select_all_" + field_id).prop("readonly", true);
           $("#field_select_all_" + field_id).css({"font-weight": "bold", "color": "steelblue"});
         },
-        error: function(response){console.log(response);},
+        error: function(response){
+          console.log(response);
+          $("#chart_area_" + field_id).html("<b style='color:red'>Please enter a valid Data Field.</b>");
+        },
       });
     });
 

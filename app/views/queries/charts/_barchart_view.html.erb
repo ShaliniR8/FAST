@@ -1,13 +1,11 @@
 <div id="bar_chart_div-<%=@field_name%>" style="width:'100%'"></div>
 <div class="mr5" id="bar_chart_download" align="right"></div>
 
-
 <script>
-
   google.charts.load("current", {packages:["corechart"]});
   google.charts.setOnLoadCallback(drawBarChart);
-  var colorArray = colorInterpolation(<%=@data.length%>);
 
+  var colorArray = colorInterpolation(<%=@data.length%>);
 
   function drawBarChart(){
     $("bar_chart_div-<%=@field_name%>").html("");
