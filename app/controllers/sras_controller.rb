@@ -62,11 +62,6 @@ class SrasController < ApplicationController
   def create
     sra = Sra.create(params[:sra])
     sra.status = 'New'
-    if sra.record_id.present?
-      @record = Record.find(sra.record_id)
-      @record.sra_id = sra.id
-      @record.save
-    end
     if params[:matrix_id].present?
       connection = SraMatrixConnection.create(
         :matrix_id => params[:matrix_id],

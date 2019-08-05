@@ -5,12 +5,13 @@ class Record < ActiveRecord::Base
 #Concerns List
 include Attachmentable
 include Commentable
+include Investigationable
+include Sraable
 include Transactionable
 
 #Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
-  has_one     :investigation,       :foreign_key => "record_id",        :class_name => "Investigation"
-  has_one     :sra,                 :foreign_key => "record_id",        :class_name => "Sra"
+  has_one     :investigation,       as: :owner
 
   belongs_to  :template,            :foreign_key => "templates_id",     :class_name => "Template"
   belongs_to  :created_by,          :foreign_key => "users_id",         :class_name => "User"

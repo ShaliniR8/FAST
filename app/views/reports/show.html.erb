@@ -44,6 +44,22 @@
                   :disable_with => "Editing..."%>
               <%end%>
 
+              <%if @report.investigation.present? &&
+                current_user.has_access('Safety Assurance','module', admin: true) %>
+                <%=link_to "View Investigation",
+                  investigation_path(@report.investigation),
+                  :class=>"btn btn-info mb5",
+                  :disable_with => "Redirecting..."%>
+              <%end%>
+
+              <%if @report.sra.present? &&
+                current_user.has_access('Safety Risk Management','module', admin: true) %>
+                <%=link_to "View SRA(SRM)",
+                  sra_path(@report.sra),
+                  :class=>"btn btn-info mb5",
+                  :disable_with => "Redirecting..."%>
+              <%end%>
+
               <%=link_to "De-ID PDF",
                 print_report_path(
                   @report,
@@ -111,12 +127,34 @@
                   'data-target' => '.bs-example-modal-lg',
                   :route => close_report_path(@report, :redirect_path => report_path(@report))%>
               <%end%>
+
             <%end%>
+
             <%=link_to "Add Comment", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
+              :class => "btn btn-success pull-right ml5 mb5",
               :id => 'comment_btn',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>
+
+            <%if current_user.has_access('Safety Risk Management','module', admin: true) &&
+              @report.status != "Closed" &&
+              @report.status != "New" &&
+              !@report.sra.present?%>
+              <%=link_to "Launch SRA(SRM)",
+                new_sra_path(owner_id:@report.id, owner_type:@report.class),
+                :class=>"btn btn-warning pull-right ml5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
+
+            <%if current_user.has_access('Safety Assurance', 'module', admin: true) &&
+              @report.status != "Closed" &&
+              @report.status != "New" &&
+              !@report.investigation.present?%>
+              <%=link_to "Launch Investigation",
+                new_investigation_path(owner_id:@report.id, owner_type:@report.class),
+                :class=>"btn btn-warning pull-right ml5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
           </div>
 
           <%=render "closing_note"%>

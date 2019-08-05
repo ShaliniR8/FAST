@@ -24,7 +24,7 @@
                 'deid_pdf',
                 'pdf',
                 'view_meeting',
-                'view_report',
+                'view_parent',
                 'viewer_access',
                 'send_message',
                 'expand_all'
@@ -105,7 +105,7 @@
           <%#=render "/sections/display", :section => section%>
         <%end%>
 
-        <%=render '/forms/list_records', :records => Array(@sra.record), :title => 'Report'%>
+        <%=render '/forms/list_records', :records => Array(@sra.owner), :title => 'Report'%>
 
         <%=render "/forms/show_comment", :owner => @sra%>
         <%=render "/forms/attachments_show", :owner => @sra%>

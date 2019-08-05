@@ -3,6 +3,8 @@ class Report < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Investigationable
+  include Sraable
   include Transactionable
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'

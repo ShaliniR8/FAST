@@ -19,9 +19,9 @@ class Investigation < ActiveRecord::Base
   include Transactionable
 
 #Associations List
+  belongs_to :owner,                    polymorphic: true
   belongs_to :responsible_user,         :foreign_key => "responsible_user_id",  :class_name => "User"
   belongs_to :approver,                 :foreign_key => "approver_id",          :class_name => "User"
-  belongs_to :record,                   :foreign_key => "record_id",            :class_name => "Record"
   belongs_to :created_by,               foreign_key: 'created_by_id',           class_name: 'User'
   has_many :causes,                     :foreign_key => "owner_id",             :class_name => "InvestigationCause",            :dependent => :destroy
   has_many :descriptions,               :foreign_key => "owner_id",             :class_name => "InvestigationDescription",      :dependent => :destroy
@@ -84,15 +84,25 @@ class Investigation < ActiveRecord::Base
 
 
   def get_source
-    if self.record.present?
-      "<a style='font-weight:bold' href='/records/#{self.record.id}'>
-        Report ##{self.record.id}
+    if self.owner.present?
+      "<a style='font-weight:bold' href='/#{owner_titleize.downcase.pluralize}/#{self.owner_id}'>
+        #{owner_titleize} ##{self.owner_id}
       </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end
   end
 
+  def owner_titleize
+    case owner_type
+    when 'Record'
+      'Report'
+    when 'Report'
+      'Event'
+    else
+      owner_type.titleize
+    end
+  end
 
   def investigation_type
     self.inv_type

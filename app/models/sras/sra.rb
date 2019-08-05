@@ -24,7 +24,7 @@ class Sra < ActiveRecord::Base
   belongs_to :reviewer,               :foreign_key => "reviewer_id",            :class_name => "User"
   belongs_to :responsible_user,       :foreign_key => "responsible_user_id",    :class_name => "User"
   belongs_to :meeting,                :foreign_key => "meeting_id",   :class_name => "SrmMeeting"
-  belongs_to :record,                 :foreign_key => "record_id",    :class_name => "Record"
+  belongs_to :owner,                  polymorphic: true
 
   serialize :departments
   serialize :manuals
@@ -44,12 +44,23 @@ class Sra < ActiveRecord::Base
 
 
   def get_source
-    if self.record.present?
-      "<a style='font-weight:bold' href='/records/#{self.record.id}'>
-        Report ##{self.record.id}
+    if self.owner.present?
+      "<a style='font-weight:bold' href='/#{owner_titleize.downcase.pluralize}/#{self.owner_id}'>
+        #{self.owner_titleize} ##{self.owner_id}
       </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
+    end
+  end
+
+  def owner_titleize
+    case owner_type
+    when 'Record'
+      'Report'
+    when 'Report'
+      'Event'
+    else
+      owner_type.titleize
     end
   end
 

@@ -120,14 +120,8 @@ class InvestigationsController < SafetyAssuranceController
 
   def create
     investigation = Investigation.new(params[:investigation])
-    if investigation.record_id.present?
-      @record = Record.find(investigation.record_id)
-      @record.investigation_id = investigation.id
-      @record.save
-    end
     if investigation.save
       redirect_to investigation_path(investigation), flash: {success: "Investigation created."}
-
     end
   end
 
