@@ -27,5 +27,17 @@ class Query < ActiveRecord::Base
     Template.where(:id => templates).map(&:name).join(", ")
   end
 
+  def make_copy
+    query = self.clone
+    query.title = "Copy of #{query.title}"
+    query.created_by_id = session[:user_id]
+    query.query_conditions = []
+    self.query_conditions.each do |condition|
+      query.query_conditions << condition.make_copy
+    end
+    query.save
+    query
+  end
+
 
 end

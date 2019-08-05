@@ -13,4 +13,14 @@ class QueryCondition < ActiveRecord::Base
   def get_field_name() field_name end
   def get_value() value.present? ? value : "*Empty Value*" end
 
+  def make_copy
+    condition = self.clone
+    condition.query_conditions = []
+    self.query_conditions.each do |sub_condition|
+      condition.query_conditions << sub_condition.make_copy
+    end
+    condition.save
+    condition
+  end
+
 end

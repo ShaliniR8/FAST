@@ -57,6 +57,12 @@ class QueriesController < ApplicationController
     redirect_to query_path(@owner)
   end
 
+  def clone
+    @owner = Query.find(params[:id])
+    @query = @owner.make_copy
+    redirect_to edit_query_path(@query)
+  end
+
   def destroy
     @owner = Query.find(params[:id])
     @owner.destroy
