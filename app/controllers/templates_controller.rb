@@ -20,10 +20,12 @@ end
 class TemplatesController < ApplicationController
   # before_filter :login_required
   before_filter :oauth_load # Kaushik Mahorker KM
+
   def index
     @title = "Safety Reports Templates"
-    @headers = Template.get_headers
+    @headers = Template.get_meta_fields('index')
     @table_name = "templates"
+    @table = Object.const_get("Template")
     @records = Template.find(:all)
   end
 
