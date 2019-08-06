@@ -9,7 +9,7 @@ class RecurrencesController < ApplicationController
   end
 
   def child_access_validation(con_name, act_name)
-    redirect_to errors_path unless current_user.has_access(con_name, act_name, admin: true)
+    redirect_to errors_path unless current_user.has_access(con_name.downcase.pluralize, act_name, admin: true)
   end
   helper_method :child_access_validation
 
@@ -52,13 +52,14 @@ class RecurrencesController < ApplicationController
 
   def index
     if params.key? :form_type
+      child_access_validation(params[:form_type].downcase.pluralize,'admin')
       @table = Recurrence.where(form_type: Object.const_get(params[:form_type]))
     else
+      redirct_to errors_path unless current_user.admin?
       @table = Recurrence
     end
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    child_access_validation(@table.name,'admin')
     handle_search
   end
 
