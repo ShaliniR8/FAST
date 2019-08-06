@@ -2,8 +2,8 @@ module AnalyticsFilters
 
 
   def can_be_accessed(current_user)
-    templates = Template.where(:name => current_user.get_all_templates).map(&:id)
-    templates = Template.all.map(&:id) if current_user.has_access(self.name.downcase.pluralize, 'admin', admin: true, strict: true)
+    templates = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: true, strict: true) ?
+      Template.all.map(&:id) : Template.where(:name => current_user.get_all_templates).map(&:id)
     if self.to_s == "Submission"
       preload(:template).where("submissions.templates_id IN (?) OR submissions.user_id = ?", templates, current_user.id)
     else
