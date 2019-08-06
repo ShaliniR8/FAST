@@ -120,14 +120,8 @@ class InvestigationsController < SafetyAssuranceController
 
   def create
     investigation = Investigation.new(params[:investigation])
-    if investigation.record_id.present?
-      @record = Record.find(investigation.record_id)
-      @record.investigation_id = investigation.id
-      @record.save
-    end
     if investigation.save
       redirect_to investigation_path(investigation), flash: {success: "Investigation created."}
-
     end
   end
 
@@ -136,7 +130,7 @@ class InvestigationsController < SafetyAssuranceController
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
-    @records = @records.keep_if{|x| x[:template].nil? || x[:template] == 0}
+    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
     if !current_user.admin? && !current_user.has_access('investigations','admin')
       cars = Investigation.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)

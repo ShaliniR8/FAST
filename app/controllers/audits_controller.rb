@@ -250,9 +250,9 @@ class AuditsController < SafetyAssuranceController
 private
 
   def filter_audits
-    @records = @records.keep_if{|x| x[:template].nil? || x[:template] == 0}
-    if !current_user.admin? && !current_user.has_access('audits','admin')
-      cars = Audit.where('(status in (:status) AND responsible_user_id = :id) OR approver_id = :id',
+    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
+    if !current_user.has_access('audits','admin', admin: true, strict: true)
+      cars = Audit.where('(status in (:status) AND responsible_user_id = :id) OR approver_id = :id OR created_by_id = :id',
         { status: ['Assigned', 'Pending Approval', 'Completed'], id: current_user[:id] }
       )
       if current_user.has_access('audits','viewer')

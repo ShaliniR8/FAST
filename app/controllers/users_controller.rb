@@ -94,6 +94,8 @@ class UsersController < ApplicationController
         a.destroy
       end
     end
+    user.privileges_last_updated = DateTime.now
+    user.save!
     redirect_to user_path(user), flash: {success: "Privileges updated."}
   end
 
@@ -279,6 +281,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     if current_user.admin?
       session[:simulated_id] = @user.id
+      define_session_permissions
     else
       flash[:error] = "Only Administrators may simulate Accounts"
     end

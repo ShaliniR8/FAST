@@ -42,10 +42,15 @@ class Privilege < ActiveRecord::Base
 
   def users
     if self.roles.present?
-      self.roles.map{|x| x.user}
+      self.roles.map{|x| x.user}.compact
     else
       []
     end
+  end
+
+  def update_user_modified_dates
+    user_ids = self.users.map(&:id)
+    User.where(id: user_ids).update_all(privileges_last_updated: DateTime.now)
   end
 
 

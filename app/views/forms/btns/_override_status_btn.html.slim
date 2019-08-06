@@ -1,5 +1,5 @@
 - if current_user.admin? || \
-    current_user.has_access(permission,'admin')
+    current_user.has_access(permission,'admin', strict: true)
   = link_to 'Override Status',
     '#',
     class: 'btn btn-danger pull-right mr5 mb5',

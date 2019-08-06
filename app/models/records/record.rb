@@ -1,14 +1,17 @@
 class Record < ActiveRecord::Base
+  extend AnalyticsFilters
+  include RiskHandling
 
 #Concerns List
 include Attachmentable
 include Commentable
+include Investigationable
+include Sraable
 include Transactionable
 
 #Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
-  has_one     :investigation,       :foreign_key => "record_id",        :class_name => "Investigation"
-  has_one     :sra,                 :foreign_key => "record_id",        :class_name => "Sra"
+  has_one     :investigation,       as: :owner
 
   belongs_to  :template,            :foreign_key => "templates_id",     :class_name => "Template"
   belongs_to  :created_by,          :foreign_key => "users_id",         :class_name => "User"
@@ -22,11 +25,6 @@ include Transactionable
   has_many    :reactions,           :foreign_key => "owner_id",         :class_name => "RecordReaction",        :dependent => :destroy
   has_many    :corrective_actions,  :foreign_key => "records_id",       :class_name => "CorrectiveAction",      :dependent => :destroy
 
-  serialize :severity_extra
-  serialize :probability_extra
-  serialize :mitigated_severity
-  serialize :mitigated_probability
-
   accepts_nested_attributes_for :suggestions
   accepts_nested_attributes_for :descriptions
   accepts_nested_attributes_for :causes
@@ -36,12 +34,8 @@ include Transactionable
   accepts_nested_attributes_for :descriptions
 
 
-  after_create -> { creation_transaction }
+  after_create -> { create_transaction(context: 'Generated report from user submission.') }
 
-
-  before_create :set_extra
-
-  extend AnalyticsFilters
 
 
 
@@ -83,7 +77,6 @@ include Transactionable
   end
 
 
-
   def reopen(new_status)
     self.status = new_status
     Transaction.build_for(
@@ -93,7 +86,6 @@ include Transactionable
     )
     self.save
   end
-
 
 
   # whether the current user can access this record
@@ -111,7 +103,6 @@ include Transactionable
   end
 
 
-
   def getTimeZone()
     ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
      "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
@@ -122,7 +113,6 @@ include Transactionable
      "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
      "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
-
 
 
   def set_extra
@@ -139,42 +129,6 @@ include Transactionable
       self.mitigated_probability = []
     end
   end
-
-
-
-  def get_extra_severity
-    self.severity_extra.present? ?  self.severity_extra : []
-  end
-
-
-
-  def get_extra_probability
-    self.probability_extra.present? ?  self.probability_extra : []
-  end
-
-
-
-  def get_mitigated_probability
-    self.mitigated_probability.present? ?  self.mitigated_probability : []
-  end
-
-
-
-  def get_mitigated_severity
-    self.mitigated_severity.present? ?  self.mitigated_severity : []
-  end
-
-
-
-  def creation_transaction
-    Transaction.build_for(
-      self,
-      'Create',
-      (self.anonymous? ? '' : session[:user_id]),
-      'Generated report from user submission'
-    )
-  end
-
 
 
   def self.get_headers
@@ -205,119 +159,6 @@ include Transactionable
   end
 
 
-
-  def get_before_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_before_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].key(display_before_risk_factor)
-    end
-  end
-
-
-
-  def get_after_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_after_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].key(display_after_risk_factor)
-    end
-  end
-
-
-
-  def display_before_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity
-    else
-      get_risk_values[:severity_1].present? ? get_risk_values[:severity_1] : "N/A"
-    end
-  end
-
-
-
-  def display_before_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood
-    else
-      get_risk_values[:probability_1].present? ? get_risk_values[:probability_1] : "N/A"
-    end
-  end
-
-
-
-  def display_before_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor.present? ? risk_factor : "N/A"
-    else
-      get_risk_values[:risk_1].present? ? get_risk_values[:risk_1] : "N/A"
-    end
-  end
-
-
-
-  def display_after_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity_after
-    else
-      get_risk_values[:severity_2].present? ? get_risk_values[:severity_2] : "N/A"
-    end
-  end
-
-
-
-  def display_after_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood_after
-    else
-      get_risk_values[:probability_2].present? ? get_risk_values[:probability_2] : "N/A"
-    end
-  end
-
-
-
-  def display_after_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor_after.present? ? risk_factor_after : "N/A"
-    else
-      get_risk_values[:risk_2].present? ? get_risk_values[:risk_2] : "N/A"
-    end
-  end
-
-
-
-  def get_risk_values
-    airport_config = Object.const_get("#{BaseConfig.airline[:code]}_Config")
-    matrix_config = airport_config::MATRIX_INFO
-    @severity_table = matrix_config[:severity_table]
-    @probability_table = matrix_config[:probability_table]
-    @risk_table = matrix_config[:risk_table]
-
-    @severity_score = airport_config.calculate_severity(severity_extra)
-    @sub_severity_score = airport_config.calculate_severity(mitigated_severity)
-    @probability_score = airport_config.calculate_severity(probability_extra)
-    @sub_probability_score = airport_config.calculate_severity(mitigated_probability)
-
-    @print_severity = airport_config.print_severity(self, @severity_score)
-    @print_probability = airport_config.print_probability(self, @probability_score)
-    @print_risk = airport_config.print_risk(@probability_score, @severity_score)
-
-    @print_sub_severity = airport_config.print_severity(self, @sub_severity_score)
-    @print_sub_probability = airport_config.print_probability(self, @sub_probability_score)
-    @print_sub_risk = airport_config.print_risk(@sub_probability_score, @sub_severity_score)
-
-    {
-      :severity_1       => @print_severity,
-      :severity_2       => @print_sub_severity,
-      :probability_1    => @print_probability,
-      :probability_2    => @print_sub_probability,
-      :risk_1           => @print_risk,
-      :risk_2           => @print_sub_risk,
-    }
-  end
-
-
-
   def get_viewer_access
     if self.viewer_access
       "Yes"
@@ -325,7 +166,6 @@ include Transactionable
       "No"
     end
   end
-
 
 
   def get_id
@@ -337,25 +177,9 @@ include Transactionable
   end
 
 
-
   def get_event_date
     self.event_date.strftime("%Y-%m-%d %H:%M:%S")
   end
-
-
-
-
-  def create_transaction(action, content)
-    if !self.changes()['viewer_access'].present?
-      Transaction.build_for(
-        self,
-        action,
-        (session[:simulated_id] || session[:user_id]),
-        content
-      )
-    end
-  end
-
 
 
   def self.get_terms
@@ -376,12 +200,10 @@ include Transactionable
   end
 
 
-
   def get_field(id)
     f = self.record_fields.find_by_fields_id(id)
     f.present? ? f.value : ""
   end
-
 
 
   def get_field_by_label(label)
@@ -392,7 +214,6 @@ include Transactionable
   end
 
 
-
   def submit_name
     if self.anonymous?
       'Anonymous'
@@ -400,7 +221,6 @@ include Transactionable
       self.created_by.full_name
     end
   end
-
 
 
   def get_description
@@ -416,11 +236,9 @@ include Transactionable
   end
 
 
-
   def get_template
     self.template.name
   end
-
 
 
   def submitted_date
@@ -428,17 +246,14 @@ include Transactionable
   end
 
 
-
   def updated_date
     self.updated_at.strftime("%Y-%m-%d") rescue ''
   end
 
 
-
   def self.getStatus
     ["New", "In Progress", "Closed"]
   end
-
 
 
   def self.build(template)
@@ -448,17 +263,14 @@ include Transactionable
   end
 
 
-
   def categories
     self.template.categories
   end
 
 
-
   def all_causes
     self.suggestions + self.descriptions + self.causes + self.detections + self.reactions
   end
-
 
 
   def time_diff(base)
@@ -470,37 +282,9 @@ include Transactionable
   end
 
 
-
   def get_date
     self.event_date.strftime("%Y-%m-%d") rescue ''
   end
-
-
-
-  def self.get_likelihood
-    ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
-  end
-
-
-
-  def likelihood_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood).to_i
-    else
-      self.likelihood.to_i
-    end
-  end
-
-
-
-  def likelihood_after_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood_after).to_i
-    else
-      self.likelihood_after.to_i
-    end
-  end
-
 
 
   def convert(copy=true)
@@ -575,7 +359,6 @@ include Transactionable
   end
 
 
-
   def self.get_avg_complete(current_user)
     candidates = self.where("status = ? and close_date is not ?", "Closed", nil)
     candidates.keep_if{|r| current_user.has_access(r.template.name, "full" ) }
@@ -588,7 +371,6 @@ include Transactionable
       "N/A"
     end
   end
-
 
 
   def satisfy(conditions)
@@ -652,9 +434,6 @@ include Transactionable
   end
 
 
-
-
-
   def has_emp
     self.corrective_actions.each do |c|
       if c.employee
@@ -670,7 +449,6 @@ include Transactionable
     end
     false
   end
-
 
 
   def has_com
@@ -690,7 +468,6 @@ include Transactionable
   end
 
 
-
   def get_instructions
     case status
     when 'New'
@@ -708,7 +485,6 @@ include Transactionable
 
     end
   end
-
 
 
 end

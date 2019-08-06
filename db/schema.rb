@@ -10,8 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-
-ActiveRecord::Schema.define(:version => 20190620212706) do
+ActiveRecord::Schema.define(:version => 20190627153741) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -26,6 +25,13 @@ ActiveRecord::Schema.define(:version => 20190620212706) do
     t.string   "report_type"
     t.integer  "level",       :default => 0
     t.integer  "user_id"
+  end
+
+  create_table "activity_trackers", :force => true do |t|
+    t.integer  "user_id"
+    t.datetime "last_active"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "agendas", :force => true do |t|
@@ -206,6 +212,7 @@ ActiveRecord::Schema.define(:version => 20190620212706) do
     t.boolean  "editable",            :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "size"
   end
 
   create_table "checklist_headers", :force => true do |t|
@@ -1399,7 +1406,7 @@ ActiveRecord::Schema.define(:version => 20190620212706) do
     t.string   "email_notifications"
     t.string   "role"
     t.string   "unique_id"
-    t.string   "airline",             :limit => 3
+    t.string   "airline",                 :limit => 3
     t.string   "job_title"
     t.string   "address"
     t.string   "city"
@@ -1415,6 +1422,7 @@ ActiveRecord::Schema.define(:version => 20190620212706) do
     t.integer  "android_version"
     t.datetime "last_seen_at"
     t.string   "sso_id"
+    t.datetime "privileges_last_updated"
   end
 
   create_table "verifications", :force => true do |t|

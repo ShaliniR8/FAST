@@ -18,7 +18,7 @@
               Event #<%=@report.get_id%>: <%=@report.name%>
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.has_access("reports","destroy")%>
+              <%if current_user.has_access('reports','destroy', admin: true, strict: true)%>
                 <%=link_to 'Delete',
                   report_path(@report),
                   :method=>"delete",
@@ -27,7 +27,7 @@
               <%end%>
 
 
-              <%if current_user.admin?%>
+              <%if current_user.has_access('reports', 'admin', admin: true, strict: true)%>
                 <%=link_to 'Override Status', '#',
                   :class => 'btn btn-danger pull-right ml5 mb5',
                   :id => 'override_status_btn',
@@ -36,12 +36,28 @@
               <%end%>
 
               <%if @report.status != "Closed" &&
-                current_user.has_access("reports", "edit")%>
-                <%=link_to "Edit",
+                current_user.has_access('reports', 'edit', admin: true)%>
+                <%=link_to 'Edit',
                   edit_report_path(@report),
                   :id => "edit-btn",
                   :class => "btn btn-warning pull-right ml5 mb5",
                   :disable_with => "Editing..."%>
+              <%end%>
+
+              <%if @report.investigation.present? &&
+                current_user.has_access('Safety Assurance','module', admin: true, strict: true) %>
+                <%=link_to "View Investigation",
+                  investigation_path(@report.investigation),
+                  :class=>"btn btn-info mb5",
+                  :disable_with => "Redirecting..."%>
+              <%end%>
+
+              <%if @report.sra.present? &&
+                current_user.has_access('Safety Risk Management','module', admin: true, strict: true) %>
+                <%=link_to "View SRA(SRM)",
+                  sra_path(@report.sra),
+                  :class=>"btn btn-info mb5",
+                  :disable_with => "Redirecting..."%>
               <%end%>
 
               <%=link_to "De-ID PDF",
@@ -58,7 +74,7 @@
                 :class => 'btn btn-darkturquoise pull-right ml5 mb5'%>
 
               <%if @report.meetings.present? &&
-                current_user.has_access("meetings", "show")%>
+                current_user.has_access('meetings', 'show', admin: true)%>
                 <%=link_to "View Meeting",
                   meeting_path(@report.meetings.first),
                   :class => "btn btn-info pull-right mb5 ml5",
@@ -77,7 +93,7 @@
         </div>
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
-            <%if current_user.has_access("reports","edit")%>
+            <%if current_user.has_access('reports','edit', admin: true)%>
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
                   reopen_report_path(@report),
@@ -89,7 +105,7 @@
                   :title => "This will the Event and all the included Reports"%>
               <%end%>
               <%if @report.status != "Closed" &&
-                current_user.has_access("corrective_actions","new")%>
+                current_user.has_access('corrective_actions','new', admin: true)%>
                 <%=link_to "Add Corrective Action",
                   new_corrective_action_path(:report => @report.id),
                   :class => "btn btn-success pull-right ml5 mb5",
@@ -111,12 +127,34 @@
                   'data-target' => '.bs-example-modal-lg',
                   :route => close_report_path(@report, :redirect_path => report_path(@report))%>
               <%end%>
+
             <%end%>
+
             <%=link_to "Add Comment", "#",
-              :class => "btn btn-success pull-right mr5 mb5",
+              :class => "btn btn-success pull-right ml5 mb5",
               :id => 'comment_btn',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>
+
+            <%if current_user.has_access('Safety Risk Management','module', admin: true, strict: true) &&
+              @report.status != "Closed" &&
+              @report.status != "New" &&
+              !@report.sra.present?%>
+              <%=link_to "Launch SRA(SRM)",
+                new_sra_path(owner_id:@report.id, owner_type:@report.class),
+                :class=>"btn btn-warning pull-right ml5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
+
+            <%if current_user.has_access('Safety Assurance', 'module', admin: true, strict: true) &&
+              @report.status != "Closed" &&
+              @report.status != "New" &&
+              !@report.investigation.present?%>
+              <%=link_to "Launch Investigation",
+                new_investigation_path(owner_id:@report.id, owner_type:@report.class),
+                :class=>"btn btn-warning pull-right ml5 mb5",
+                :disable_with => "Redirecting..."%>
+            <%end%>
           </div>
 
           <%=render "closing_note"%>
@@ -137,7 +175,7 @@
               :show_btns => true %>
           <%end%>
 
-          <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
+          <%can_change = @report.status != "Closed" && current_user.has_access('reports', 'edit', admin: true)%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'description', :can_change => can_change%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'cause', :can_change => can_change%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'detection', :can_change => can_change%>

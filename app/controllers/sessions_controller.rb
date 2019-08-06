@@ -24,6 +24,7 @@ class SessionsController < ApplicationController
       session[:user_id] = user.id
       session[:mode] = ""
       session[:last_active] = Time.now
+      define_session_permissions
       redirect_to_target_or_default(root_url)
     else
       flash.now[:danger] = "Invalid username or password."

@@ -381,4 +381,18 @@ module ApplicationHelper
     android_version_json = JSON.parse Net::HTTP.get(android_version_uri)
     android_version_json['version']
   end
+
+
+  def define_session_permissions
+    user = User.find(session[:simulated_id] || session[:user_id])
+    accesses = Hash.new{ |h, k| h[k] = [] }
+    user.privileges.includes(:access_controls).map{ |priv|
+      priv.access_controls.each do |acs|
+        accesses[acs.entry] << acs.action
+      end
+    }
+    accesses.update(accesses) { |key, val| val.uniq }
+    session[:permissions] = accesses.to_json
+  end
+
 end

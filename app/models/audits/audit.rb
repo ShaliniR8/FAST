@@ -1,5 +1,8 @@
 class Audit < ActiveRecord::Base
   extend AnalyticsFilters
+  include GroupAccessHandling
+  include ModelHelpers
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -22,16 +25,12 @@ class Audit < ActiveRecord::Base
 
   has_many    :checklists, as: :owner, dependent: :destroy
 
-  serialize :privileges
-
   accepts_nested_attributes_for :items
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true
   accepts_nested_attributes_for :checklists
 
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
-  before_create :set_priveleges
+  after_create :create_transaction
 
 
   def self.get_meta_fields(*args)
@@ -64,7 +63,6 @@ class Audit < ActiveRecord::Base
   end
 
 
-
   def self.user_levels
     {
       0  => 'N/A',
@@ -75,42 +73,19 @@ class Audit < ActiveRecord::Base
   end
 
 
-
-  def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Assigned"          => { :score => 50,  :color => "warning"},
-      "Pending Approval"  => { :score => 75,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
-    }
-  end
-
   def get_status_score
     self.class.progress[self.status][:score]
   end
+
 
   def get_status_color
     self.class.progress[self.status][:color]
   end
 
 
-  def get_privileges
-    self.privileges.present? ? self.privileges : []
-  end
-
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges=[]
-    end
-  end
-
-
   def clear_checklist
     self.items.each {|x| x.destroy}
   end
-
 
 
   def open_checklist
@@ -121,18 +96,9 @@ class Audit < ActiveRecord::Base
   end
 
 
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
   def deletable
       self.status == "New" || self.status == "Scheduled" || self.status == "Open"
   end
-
 
 
   def auditor_name
@@ -140,11 +106,9 @@ class Audit < ActiveRecord::Base
   end
 
 
-
   def approver_name
     self.approver.present? ? self.approver.full_name : ""
   end
-
 
 
   def get_completion_date
@@ -152,11 +116,9 @@ class Audit < ActiveRecord::Base
   end
 
 
-
   def type
     "Audit"
   end
-
 
 
   def self.get_headers
@@ -172,79 +134,10 @@ class Audit < ActiveRecord::Base
   end
 
 
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
+  def can_complete?(user, form_conds: false, user_conds: false)
+    super(user, form_conds: form_conds, user_conds: user_conds) &&
+      self.items.all?{ |x| x.status == "Completed" }
   end
 
-
-  def can_complete? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    result= (self.responsible_user_id == current_user_id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('audits','admin')
-    self.items.each{|x| result = result && x.status == "Completed"}
-    result
-  end
-
-  def can_approve? current_user
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.approver.id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('audits','admin')
-  end
-
-  def can_reopen? current_user
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('audits','admin'))
-  end
-
-  def overdue
-    self.completion.present? ? self.completion < Time.now.to_date && self.status != "Completed" : false
-  end
-
-
-
-  def self.get_terms
-    {
-      "Title"                         =>  "title",
-      "Status"                        =>  "status",
-      "Lead Auditor"                  =>  "auditor_name",
-      "Final Approver"                =>  "approver_name",
-      "Scheduled Completion Date"     =>  "get_completion_date",
-      "Vendor"                        =>  "vendor",
-      "Type"                          =>  "audit_type",
-      "Supplier"                      =>  "supplier",
-      "Location"                      =>  "location",
-      "Objective and Scope"           =>  "objective",
-      "References and Requirements"   =>  "reference",
-      "Audit Instructions"            =>  "instruction",
-      "Auditing Department"           =>  :department,
-      "Department Being Audited"      =>  :audit_department,
-      "Station Code"                  =>  :station_code,
-      "Process"                       =>  :process,
-      "Planned"                       =>  :planned,
-      "Internal/External/Supplier"    =>  :supplier
-    }.sort.to_h
-  end
-
-
-
-  def self.get_avg_complete
-    candidates = self.where("status = ? and complete_date is not ? and open_date is not ? ", "Completed", nil, nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum += (x.complete_date - x.open_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
 
 end

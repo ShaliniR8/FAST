@@ -4,7 +4,7 @@
     <div class="grid per90 center-block">
 
       <div class="row">
-        <%if current_user.has_access('ASAP','module')%>
+        <%if current_user.has_access('ASAP', 'module', admin: true)%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'ASAP')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/Safety_Reporting.png" width="150" height="150" />
@@ -12,7 +12,7 @@
             <div id="asap">Safety Reporting</div>
           </div>
         <%end%>
-        <%if current_user.has_access('SMS IM','module')%>
+        <%if current_user.has_access('SMS IM', 'module', admin: true)%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/SMSIM.png" width="150" height="150" />
@@ -20,7 +20,7 @@
             <div id="smsim">SMS IM</div>
           </div>
         <%end%>
-        <%if current_user.has_access('Safety Assurance','module')%>
+        <%if current_user.has_access('Safety Assurance', 'module', admin: true)%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SMS')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/SA.png" width="150" height="150" />
@@ -28,7 +28,7 @@
             <div id="sa">Safety Assurance</div>
           </div>
         <%end%>
-        <%if current_user.has_access('Safety Risk Management','module')%>
+        <%if current_user.has_access('Safety Risk Management', 'module', admin: true)%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SRM')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/SRA.png" width="150" height="150" />

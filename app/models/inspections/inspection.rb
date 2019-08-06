@@ -1,4 +1,8 @@
 class Inspection < ActiveRecord::Base
+  extend AnalyticsFilters
+  include GroupAccessHandling
+  include ModelHelpers
+  include StandardWorkflow
 
 #Concerns List
   include Attachmentable
@@ -22,13 +26,9 @@ class Inspection < ActiveRecord::Base
 
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :items
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
 
-    before_create :set_priveleges
-  serialize :privileges
+  after_create :create_transaction
 
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -37,7 +37,7 @@ class Inspection < ActiveRecord::Base
       {field: 'title',                    title: 'Title',                       num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
       {                                                                                       type: 'newline',      visible: 'show'},
       {field: 'status',                   title: 'Status',                      num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',           title: 'Created By',                   num_cols: 6,  type: 'user',         visible: 'show',            required: false},
 
       {                                                                                       type: 'newline',      visible: 'show'},
       {field: 'viewer_access',            title: 'Viewer Access',               num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
@@ -63,13 +63,6 @@ class Inspection < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
 
   def self.user_levels
     {
@@ -81,48 +74,9 @@ class Inspection < ActiveRecord::Base
   end
 
 
-  def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Assigned"          => { :score => 50,  :color => "warning"},
-      "Pending Approval"  => { :score => 75,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
-    }
-  end
-
-
-
-  def get_privileges
-    self.privileges.present? ?  self.privileges : []
-  end
-
-
-
-  def set_priveleges
-    if self.privileges.blank?
-      self.privileges=[]
-    end
-  end
-
-
-
-  def create_transaction(action)
-    if !self.changes()['viewer_access'].present?
-      Transaction.build_for(
-        self,
-        action,
-        ((session[:simulated_id] || session[:user_id]) rescue nil),
-        defined?(session) ? '' : 'Recurring Inspection'
-      )
-    end
-  end
-
-
-
   def clear_checklist
     self.items.each {|x| x.destroy}
   end
-
 
 
   def open_checklist
@@ -138,11 +92,9 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
   def inspector_name
     self.responsible_user.present? ?  self.responsible_user.full_name : ""
   end
-
 
 
   def approver_name
@@ -150,113 +102,15 @@ class Inspection < ActiveRecord::Base
   end
 
 
-
-  def self.get_avg_complete
-    candidates=self.where("status=? and completion_date != ? and open_date !=? ","Completed",nil,nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.completion_date-x.oepn_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
-
-
   def get_completion_date
     self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
   end
 
 
-
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
+  def can_complete?(user, form_conds: false, user_conds: false)
+    super(user, form_conds: form_conds, user_conds: user_conds) &&
+      self.items.all?{ |x| x.status == 'Completed' }
   end
 
 
-
-  def release_findings
-    self.findings.each do |f|
-      if f.status=="Pending Release"
-        f.status="Open"
-        f.open_date=Time.now.to_date
-        f.save
-      end
-    end
-  end
-
-  def overdue
-    self.completion.present? ? self.completion<Time.now.to_date&&self.status!="Completed" : false
-  end
-
-
-
-  def get_planned
-    return planned ? "Yes" : "No"
-  end
-
-  def can_complete?(current_user)
-    current_user_id = session[:simulated_id] || session[:user_id]
-    result = (current_user_id == self.responsible_user_id rescue false) ||
-      current_user.admin? ||
-      current_user.has_access('inspections','admin')
-    self.items.each{|x| result=result&&x.status=='Completed'}
-    result
-  end
-
-  def can_approve?(current_user)
-    current_user_id = session[:simulated_id] || session[:user_id]
-    (current_user_id == self.approver.id rescue true) ||
-      current_user.admin? ||
-      current_user.has_access('inspections','admin')
-  end
-
-  def can_reopen?(current_user)
-    BaseConfig.airline[:allow_reopen_report] && (
-      current_user.admin? ||
-      current_user.has_access('inspections','admin'))
-  end
-
-
-  def self.get_terms
-    {
-      "Title"                         =>  :title,
-      "Status"                        =>  "status",
-      "Lead Inspector"                =>  "inspector_name",
-      "Final Approver"                =>  "approver_name",
-      "Inspection Department"         =>  :department,
-      "Department being Inspected"    =>  :inspection_department,
-      "Scheduled Completion Date"     =>  "get_completion_date",
-      "Vendor"                        =>  "vendor",
-      "Type"                          =>  "inspection_type",
-      "Internal/External/Supplier"    =>  "supplier",
-      "Location"                      =>  "location",
-      "Process"                       =>  :process,
-      "Planned"                       =>  'get_planned',
-      "Station Code"                  =>  "station_code",
-      "Objective and Scope"           =>  "objective",
-      "References and Requirements"   =>  "reference",
-      "Inspection Instructions"       =>  "instruction"
-    }.sort.to_h
-  end
-
-
-
-  def self.get_avg_complete
-    candidates=self.where("status=? and complete_date is not ? and open_date is not ? ","Completed",nil,nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.complete_date-x.open_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
 end

@@ -17,7 +17,7 @@
             Meeting #<%=@meeting.get_id%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access("meetings","destroy")%>
+            <%if current_user.has_access('meetings', 'destroy', admin: true)%>
               <%=link_to 'Delete',
                 meeting_path(@meeting),
                 :method => "delete",
@@ -33,7 +33,9 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <%if @meeting.has_user(current_user) && @meeting.status != "Closed"%>
+            <% if current_user.has_access('meetings', 'edit', admin: true) &&
+              @meeting.has_user(current_user) &&
+              @meeting.status != 'Closed' %>
               <%=link_to "Edit",
                 edit_meeting_path(@meeting),
                 :id => "edit-btn",
@@ -53,7 +55,8 @@
       <div class="panel-body">
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
-            <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
+            <% if current_user.has_access('meetings','edit', admin: true) &&
+              @meeting.has_user(current_user) %>
               <%if @meeting.status == "Open"%>
                 <%=link_to 'Close Meeting', '#',
                   :class => 'btn btn-danger pull-right mr5 mb5',

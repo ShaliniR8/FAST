@@ -7,6 +7,8 @@ class AccessControl < ActiveRecord::Base
 
 
   after_create :set_viewer_access
+  after_create :update_rules_config
+  after_destroy :update_rules_config
   validates :action, presence: true, allow_blank: false
   validates :entry, presence: true, allow_blank: false
 
@@ -318,7 +320,8 @@ class AccessControl < ActiveRecord::Base
         "New"=>"new",
         "View"=>"show",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "records"=>{
         "View Summary" => "summary",
@@ -329,13 +332,15 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Query"=>"query",
         "De-Identified" => "deid",
+        "Admin"=>"admin"
       },
       "reports"=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "trackings"=>{
         "New"=>"new",
@@ -349,14 +354,16 @@ class AccessControl < ActiveRecord::Base
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "faa_reports"=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Listing"=>"index",
-        "Safety Enhancement"=>"enhance"
+        "Safety Enhancement"=>"enhance",
+        "Admin"=>"admin"
       },
       "corrective_actions"=>{
         "New"=>"new",
@@ -450,7 +457,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'risk_controls'=>{
         "New"=>"new",
@@ -467,7 +475,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'srm_meetings'=>{
         "New"=>"new",
@@ -475,7 +484,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'ims'=>{
         "New"=>"new",
@@ -483,22 +493,26 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"},
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
+      },
       'packages'=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"},
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
+      },
       'sms_meetings'=>{
-
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
        },
        'ASAP'=>{
         'Module'=>'module'
@@ -534,6 +548,7 @@ class AccessControl < ActiveRecord::Base
       'Submitter'           => 'submitter',
       'Safety Enhancement'  => 'enhance',
       'Summary'             => 'summary',
+      'Module'              => 'module',
       'Tabulation'          => 'tabulation',
       'Access'              => 'query_all',
       'Admin'               => 'admin',
@@ -652,7 +667,15 @@ class AccessControl < ActiveRecord::Base
     end
   end
 
-
+  def update_rules_config
+    restricting_rules = Hash.new{ |h, k| h[k] = [] }
+    AccessControl.all.each do |acs|
+      restricting_rules[acs.entry] << acs.action
+    end
+    restricting_rules.update(restricting_rules) { |key, val| val.uniq }
+    Rails.application.config.restricting_rules = restricting_rules
+    Rails.logger.info "[INFO] Access Rules have been updated- restricting_rules application config updated"
+  end
 
   def self.get_headers
     [

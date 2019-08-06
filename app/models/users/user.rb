@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable
+    :android_version, :disable, :updated_at
 
 
 
@@ -85,25 +85,28 @@ class User < ActiveRecord::Base
   end
 
 
-  def has_access(con_name, act_name)
-    rule = AccessControl.where('action = ? AND entry = ?', act_name, con_name).first
-    if rule.present?
-      (rule.privileges & privileges).size > 0
-    else
-      true
+  # admin: will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
+  # strict: will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
+  def has_access(con_name, act_name, strict:false, admin:false)
+    return true if admin && self.admin?
+    rules = Rails.application.config.restricting_rules
+    if rules.key?(con_name) && rules[con_name].include?(act_name)
+      begin
+        permissions = JSON.parse(session[:permissions])
+      rescue
+        return false #rescue for if session has expired
+      end
+      return (admin && permissions.key?(con_name) && permissions[con_name].include?('admin')) ||
+        (permissions.key?(con_name) && permissions[con_name].include?(act_name))
     end
-    # if rule.present?
-    #   access = rule.first
-    #   self.get_all_access.include? access
-    # else
-    #   true
-    # end
+    strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present?) : true
   end
 
 
   def accessible_modules
     num = 0
     modules = AccessControl.where('action = ?', "module")
+    return modules.length if self.admin?
     all_access = get_all_access
     modules.each do |x|
       if all_access.include? x
