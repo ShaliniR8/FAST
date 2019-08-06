@@ -109,6 +109,18 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :recurrences
+  resources :queries do
+    member do
+      get "clone"
+      get "add_visualization"
+      get "remove_visualization"
+      get "generate_visualization"
+      get "generate_visualization_dynamic"
+    end
+    collection do
+      get 'load_conditions_block'
+    end
+  end
 
 
   # Configurations
@@ -263,7 +275,7 @@ PrdgSession::Application.routes.draw do |map|
       get "detailed_search"
       get "custom_view"
       get "dynamic_categories"
-      get "observation_phases_trend"
+      post "observation_phases_trend"
       get "query"
       get "query_all"
       get "update_listing_table"

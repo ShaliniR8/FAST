@@ -1,8 +1,7 @@
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
-    <%=render "/shared/record_table",
-      :btn_name => "New",
-      :btn_path => new_template_path,
-      :panel => 'steelblue'%>
+    <%=render "/forms/index_fields", :btns => [
+        {btn_name: 'New', btn_path: new_template_path, btn_class: 'btn-success'},
+      ]%>
   </div>
 </div>

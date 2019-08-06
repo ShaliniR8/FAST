@@ -363,7 +363,10 @@ module ApplicationHelper
     return ''
   end
 
-
+  def load_objects(module_name)
+    @types = BaseConfig::MODULES[module_name][:objects].invert
+    @types
+  end
 
 
   def date_to_string(date)

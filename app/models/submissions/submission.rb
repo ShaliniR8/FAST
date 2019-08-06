@@ -28,11 +28,11 @@ class Submission < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
-      {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'description',    title: 'Event Title',     num_cols: 12, type: 'text', visible: 'index,show', required: false},
+      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text',     visible: 'index,show', required: false},
+      {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text',     visible: 'index,show', required: false},
+      {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user',     visible: 'index,show', required: false},
+      {field: 'event_date',     title: 'Event Date/Time', num_cols: 6,  type: 'datetime', visible: 'index,show', required: false},
+      {field: 'description',    title: 'Event Title',     num_cols: 12, type: 'text',     visible: 'index,show', required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

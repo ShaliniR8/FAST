@@ -10,7 +10,6 @@
 
       <div class="panel-body">
 
-
         <div class="col-xs-4" style="overflow-y:auto;height:100vh;">
           <h3><b>Table of Contents</b></h3>
           <div class="sidenav">
@@ -27,71 +26,31 @@
           </div>
         </div>
 
-
-        <%if false%>
-        <div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height:100vh;">
-          <h3><b>Table of Contents</b></h3>
-          <div class="sidenav">
-            <ol>
-              <li><a class="doc" href="administrative">Administrative</a></li>
-              <ol type="a">
-                <li><a class="tv" href="privileges">User Privileges</a></li>
-                <li><a class="tv" href="custom_orms">Creating/Editing a Custom ORM</a></li>
-                <li><a class="tv" href="risk_matrix">Risk Matrix Customization</a></li>
-              </ol>
-              <li><a class="doc" href="safety_reporting">Safety Reporting</a></li>
-              <ol type="a">
-                <li><a class="tv" href="sr_dashboard">Dashboard Walkthrough</a></li>
-                <li><a class="tv" href="file_report">Filing a Safety Report</a></li>
-                <li><a class="tv" href="file_orm">Filing an ORM</a>
-                </li>
-              </ol>
-              <li><a class="doc" href="safety_assurance">Safety Assurance</a></li>
-              <ol type="a" >
-                <li><a class="tv" href="audit">Create a New Audit</a></li>
-              </ol>
-              <li><a class="doc" href="sra">Safety Risk Assessment</a></li>
-              <ol type="a">
-                <li><a class="tv" href="srm">Create an SRA/M</a></li>
-                <li><a class="tv" href="srm_dashboard">Dashboard Walkthrough</a></li>
-              </ol>
-              <li><a class="doc" href="sms_im">SMS-IM</a></li>
-              <ol type="a">
-                <li><a class="tv" href="sms_dashboard">Dashboard Walkthrough</a></li>
-              </ol>
-            </ol>
-          </div>
-        </div>
-        <%end%>
-
         <div class="col-xs-8">
           <div class="main">
             <div id="user_guide_content">
-              <%=render "documents/user_guides/template", :topic_name => 'Welcome!', :href => 'summary'%>
+              <%=render "documents/user_guides/template", :topic_name => @topic_name, :href => @href%>
             </div>
           </div>
         </div>
-
 
       </div>
     </div>
   </div>
 </div>
 
+
 <style>
   .sidenav li {
     font-weight: normal !important;
   }
   .sidenav a{
-    /*cursor: pointer;*/
     color: darkslategray;
   }
-
   .sidenav a:hover {
     font-weight: bold;
     color: darkslategray !important
   }
-
   .sidenav {
     width: 100%;
     z-index: 1;
@@ -106,7 +65,7 @@
     text-decoration: none;
     display: block;
   }
-  .sidenav .doc{
+  .sidenav .title{
     font-size: 16px;
   }
   @media screen and (max-height: 450px) {
@@ -138,8 +97,6 @@
       e.preventDefault();
       var href = $(this).attr("href");
       var name = $(this).text();
-      console.log(href);
-      console.log(name);
       if (href != undefined){
         $.get("<%=load_content_documents_path%>?topic_name=" + name + "&href=" + href, function(data){
           $("#user_guide_content").html(data);

@@ -6,11 +6,9 @@
           Visualization
         </div>
         <div class="top_buttons pull-right">
-          <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe,
-            "#",
+          <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, "#",
             :class => "remove_btn btn btn-danger pull-right"%>
         </div>
-
       </div>
     </div>
     <div class="panel-body">
@@ -24,7 +22,7 @@
                 :class => "form-control ml5",
                 :id => "field_select_all"}%>
             <datalist id="select_field">
-              <% @fields.each do |x|%>
+              <%@fields.each do |x|%>
                 <option value="<%=x[:title]%>"></option>
               <%end%>
             </datalist>
@@ -73,6 +71,7 @@
   $(document).ready(function(){
 
     $("#generate_charts_btn").on("click", function(e){
+      e.preventDefault();
       $.get('<%=draw_chart_home_index_path%>?' +
         'object_type=<%=@object_type%>' +
         '&records_id=<%=@records.map(&:id).join(",")%>' +

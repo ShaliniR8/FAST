@@ -44,6 +44,8 @@ class DocumentsController < ApplicationController
   end
 
   def user_guides
+    @topic_name = params[:topic_name] || "Welcome!"
+    @href = params[:href] || "summary"
   end
 
   def load_content

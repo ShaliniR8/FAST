@@ -51,6 +51,12 @@ class BOE_Config
     "ASAP MOU Holder FAA Designator"=>"BASE"
   }
 
+  OBSERVATION_PHASES = [
+    "Observation Phase",
+    "Condition",
+    "Threat", "Sub Threat",
+    "Error", "Sub Error",
+    "Human Factor", "Comment"]
 
   MATRIX_INFO = {
     severity_table: {

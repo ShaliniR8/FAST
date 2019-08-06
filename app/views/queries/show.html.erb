@@ -1,0 +1,75 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
+    <div class="panel panel-steelblue">
+      <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
+        <div class="panel-title">
+          <div class="top_text">
+            <%="Query ##{@owner.id} #{@owner.title}"%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%=link_to "Make a Copy", clone_query_path(@owner), class: "btn btn-info", confirm: "Are you sure?"%>
+            <%=link_to "Edit", edit_query_path(@owner), class: "btn btn-warning", disable_with: "Editing..."%>
+            <%=link_to "Delete", query_path(@owner), method: :delete, class: "btn btn-danger", confirm: "Are you sure?"%>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+
+        <div class="col-xs-12 pull-right mb10">
+          <%if BaseConfig.airline[:observation_phases_trend] && (@owner.target == "Submission" || @owner.target == "Record")%>
+            <%=form_tag observation_phases_trend_records_path, :method => :post do%>
+              <%=hidden_field_tag :records, @records.map(&:id).join(",")%>
+              <%=submit_tag "Observation Phases", class: "btn btn-primary pull-right", disable_with: "Redirecting..."%>
+            <%end%>
+          <%end%>
+        </div>
+
+        <div class="col-xs-12"><%=render "conditions"%></div>
+        <div class="col-xs-12"><%=render "visualizations"%></div>
+        <%=render "results"%>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .centered {
+    margin: auto;
+    width: 50%;
+    border: 3px solid white;
+    padding: 10px;
+  }
+  .loading-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .loader {
+    text-align: center;
+    animation: spin 1s ease-in-out infinite;
+    width: 50px;
+    height: 50px;
+    -webkit-animation: spin .8s ease-in-out infinite;
+    border: 5px solid rgba(255,255,255,.5);
+    border-radius: 80%;
+    border-top-color: #33b5e5;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+

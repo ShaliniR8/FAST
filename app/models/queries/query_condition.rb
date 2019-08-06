@@ -1,9 +1,26 @@
 class QueryCondition < ActiveRecord::Base
-  belongs_to :statement,            :foreign_key => "query_statement_id",       :class_name => "QueryStatement"
-  belongs_to :field,                :foreign_key => "field_id",                 :class_name => "Field"
-  belongs_to :template,             :foreign_key => "template_id",              :class_name => "Template"
-  belongs_to :category,             :foreign_key => "category_id",              :class_name => "Category"
 
-  #serialize :value
+
+  belongs_to :query, foreign_key: :query_id, class_name: "Query"
+  belongs_to :query_condition, foreign_key: :query_condition_id, class_name: "QueryCondition"
+
+  has_many :query_conditions, foreign_key: :query_condition_id, class_name: 'QueryCondition', dependent: :destroy
+
+  accepts_nested_attributes_for :query_conditions
+
+
+  def get_logic() logic end
+  def get_field_name() field_name end
+  def get_value() value.present? ? value : "*Empty Value*" end
+
+  def make_copy
+    condition = self.clone
+    condition.query_conditions = []
+    self.query_conditions.each do |sub_condition|
+      condition.query_conditions << sub_condition.make_copy
+    end
+    condition.save
+    condition
+  end
 
 end

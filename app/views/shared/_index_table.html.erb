@@ -80,7 +80,9 @@
                     <%when "checkbox"%>
                       <%=field_value%>
                     <%when "user"%>
-                      <%if field_value != nil && field_value != ""%>
+                      <%if field_value == "Anonymous"%>
+                        Anonymous
+                      <%elsif field_value != nil && field_value != ""%>
                         <%user = User.find(field_value)%>
                         <%if user.present?%>
                           <%=User.find(field_value).full_name%>
@@ -89,7 +91,7 @@
                         <%=""%>
                       <%end%>
                     <%when "textarea"%>
-                      <%=field_value[0..50] + "..."%>
+                      <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
                     <%when "select"%>
                       <%if field_display.present?%>
                         <%=field_display[field_value]%>

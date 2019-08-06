@@ -1,0 +1,84 @@
+<%@field_name = @field[:title].parameterize.underscore%>
+<%@label = @field[:title]%>
+
+<div class="row">
+  <ul class="nav nav-tabs">
+    <li class="active">
+      <a class="nav-item nav-link active"
+        id="nav-yearly-tab-<%=@field_name%>"
+        data-toggle="tab"
+        href="#nav-yearly-<%=@field_name%>"
+        role="tab"
+        aria-controls="nav-yearly-<%=@field_name%>"
+        aria-selected="true">
+        Yearly
+      </a>
+    </li>
+    <li>
+      <a class="nav-item nav-link"
+        id="nav-monthly-tab-<%=@field_name%>"
+        data-toggle="tab"
+        href="#nav-monthly-<%=@field_name%>"
+        role="tab"
+        aria-controls="nav-monthly-<%=@field_name%>"
+        aria-selected="false">
+        Monthly
+      </a>
+    </li>
+    <li>
+      <a class="nav-item nav-link active"
+        id="nav-daily-tab-<%=@field_name%>"
+        data-toggle="tab"
+        href="#nav-daily-<%=@field_name%>"
+        role="tab"
+        aria-controls="nav-daily-<%=@field_name%>"
+        aria-selected="false">
+        Daily
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane in active"
+      id="nav-yearly-<%=@field_name%>"
+      role="tabpanel"
+      aria-labelledby="nav-yearly-tab-<%=@field_name%>">
+      <%= render "/queries/charts/yearly_view"%>
+    </div>
+    <div class="tab-pane"
+      id="nav-monthly-<%=@field_name%>"
+      role="tabpanel"
+      aria-labelledby="nav-monthly-tab-<%=@field_name%>">
+      <%= render "/queries/charts/monthly_view"%>
+    </div>
+    <div class="tab-pane"
+      id="nav-daily-<%=@field_name%>"
+      role="tabpanel"
+      aria-labelledby="nav-daily-tab-<%=@field_name%>">
+      <%= render "/queries/charts/daily_view"%>
+    </div>
+  </div>
+</div>
+
+
+<style>
+.tab-content>.tab-pane {
+  height: 1px;
+  overflow: hidden;
+  display: block;
+ visibility: hidden;
+}
+.tab-content>.active {
+  height: auto;
+  overflow: auto;
+  visibility: visible;
+}
+
+</style>
+
+
+
+
+
+
+

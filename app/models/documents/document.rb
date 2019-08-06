@@ -30,14 +30,15 @@ class Document < ActiveRecord::Base
 
   def self.get_user_guides
     [
-      {name: 'Administrative', href: 'administrative', class: 'doc',
+      {name: 'Administrative', href: 'administrative', class: 'doc title',
         topics: [
-          {name: 'User Privileges',               href: 'privileges',   class: 'tv'},
-          {name: 'Creating/Editing a Custom ORM', href: 'custom_orms',  class: 'tv'},
-          {name: 'Risk Matrix Customization',     href: 'risk_matrix',  class: ''},
+          {name: 'User Privileges',               href: 'privileges',     class: 'tv'},
+          {name: 'Creating/Editing a Custom ORM', href: 'custom_orms',    class: 'tv'},
+          {name: 'Risk Matrix Customization',     href: 'risk_matrix',    class: ''},
+          {name: 'Query Center',                  href: 'query_center',   class: 'doc'},
         ]
       },
-      {name: 'Safety Reporting', href: 'safety_reporting', class: 'doc',
+      {name: 'Safety Reporting', href: 'safety_reporting', class: 'doc title',
         topics: [
           {name: 'Dashboard Walkthrough',             href: 'sr_dashboard',     class: ''},
           {name: 'Filing a Safety Report',            href: 'file_report',      class: 'tv'},
@@ -45,21 +46,21 @@ class Document < ActiveRecord::Base
           {name: 'Filing an ORM',                     href: 'file_orm',         class: 'tv'},
         ]
       },
-      {name: 'Safety Assurance', href: 'safety_assurance', class: 'doc',
+      {name: 'Safety Assurance', href: 'safety_assurance', class: 'doc title',
         topics: [
           {name: 'Dashboard Walkthrough', href: 'sa_dashboard', class: ''},
           {name: 'Create a New Audit',    href: 'audit',        class: 'tv'},
         ]
       },
 
-      {name: 'Safety Risk Assessment (SRA/SRM)', href: 'sra', class: 'doc',
+      {name: 'Safety Risk Assessment (SRA/SRM)', href: 'sra', class: 'doc title',
         topics: [
           {name: 'Dashboard Walkthrough', href: 'srm_dashboard',  class: 'tv'},
           {name: 'Create an SRA/M',       href: 'srm',            class: 'tv'},
         ]
       },
 
-      {name: 'SMS-IM', href: 'sms_im', class: 'doc',
+      {name: 'SMS-IM', href: 'sms_im', class: 'doc title',
         topics: [
           {name: 'Dashboard Walkthrough', href: 'sms_dashboard', class: 'tv'},
         ]

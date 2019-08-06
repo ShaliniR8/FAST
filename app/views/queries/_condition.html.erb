@@ -1,0 +1,20 @@
+<li>
+  <%if condition.query_conditions.present?%>
+    <%if condition.operator == "AND"%>
+      <span class="condition_badge badge badge-danger"><%=condition.operator%></span>
+    <%elsif condition.operator == "OR"%>
+      <span class="condition_badge badge badge-warning"><%=condition.operator%></span>
+    <%end%>
+    <ul>
+      <%condition.query_conditions.each do |sub_condition|%>
+        <%=render "condition", :condition => sub_condition%>
+      <%end%>
+    </ul>
+  <%else%>
+    <span>
+      <span class="condition_badge badge badge-success mt5"><%=condition.get_field_name%></span>
+      <span class="condition_badge badge badge-warning mt5"><%=condition.get_logic%></span>
+      <span class="condition_badge badge badge-success mt5"><%=condition.get_value%></span>
+    </span>
+  <%end%>
+</li>

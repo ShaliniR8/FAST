@@ -1,0 +1,97 @@
+<%=form_for @owner do |f|%>
+
+  <%=f.hidden_field :target, :value => @target%>
+  <%=f.hidden_field :templates, :value => @templates.map(&:id).join(",")%>
+  <%=f.hidden_field :created_by_id, :value => current_user.id%>
+
+  <div class="panel panel-lightblue">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <div class="top_text">
+          Step 2. <font style="font-weight:normal">Build Query for <%=@target_display_name%></font>
+        </div>
+        <div class="top_buttons pull-right">
+          <%=f.submit "Save", class: "btn btn-success pull-right", disable_with: "Saving..."%>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <div class="form-group row col-xs-12">
+        <%=f.label :title, "Query Name", class: "col-sm-3 col-form-label"%>
+        <div class="col-sm-9">
+          <%=f.text_field :title, class: "form-control form-control-plaintext"%>
+        </div>
+      </div>
+
+      <div id="to_insert_base" class="row">
+        <%@owner.query_conditions.each do |condition|%>
+          <%=render "condition_form",
+            condition: condition,
+            name_space: "base[#{condition.id}]",
+            insert_space: "base_#{condition.id}",
+            is_operator: condition.query_conditions.present?%>
+        <%end%>
+      </div>
+
+      <div class="col-xs-12">
+        <%=link_to_add_blocks "Add New Condition", "base", "base"%>
+      </div>
+
+    </div>
+  </div>
+
+<%end%>
+
+
+<script>
+
+  function add_blocks(base_area, namespace, insert_space){
+    var content = "<%=escape_javascript(render('condition_block'))%>";
+    var uid = new Date().getTime();
+    var name_space = namespace + "[" + uid + "]";
+    var regexp = new RegExp("name_space", "g");
+    var regexp2 = new RegExp("insert_space", "g");
+    var insertposition = $("#to_insert_" + insert_space);
+    $(insertposition).show();
+    var deleteposition = $("#to_delete_" + insert_space);
+    var insertspace = insert_space + "_" + uid;
+    $(content.replace(regexp, name_space).replace(regexp2, insertspace)).appendTo(insertposition);
+    $(deleteposition).remove();
+    inject(insertspace);
+  }
+
+  function inject(insert_space){
+    var id_space = "#" + insert_space;
+    $(id_space + '.cat_select option').hide();
+    $(id_space + '.field_select option').hide();
+    $(".temp_select").on('change', function(){
+      update_nested_block($(this));
+    });
+  }
+
+  function update_nested_block(operator) {
+    temp_id = $(operator).val();
+    $(id_space + '.field_select option').hide();
+    $(id_space + '.cat_select').val("");
+    $(id_space + '.field_select').val("");
+    $(id_space + '.cat_select option').each(function(){
+      cat_ids = $(operator).val().split("-");
+      cat_temp = cat_ids[0];
+      if (cat_temp != temp_id){
+        $(operator).hide();
+      }else{
+        $(operator).show();
+      }
+    });
+  }
+
+</script>
+
+
+<style>
+  .well ul > li,
+  .well ol > li{
+    font-weight: normal
+  }
+</style>
