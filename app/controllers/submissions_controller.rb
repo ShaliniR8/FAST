@@ -242,7 +242,7 @@ class SubmissionsController < ApplicationController
     end
     @template = @record.template
     access_level=current_user.has_template_access(@template.name)
-    unless current_user.has_access('submissions', 'admin', admin: true)
+    unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
       if access_level == "" && @record.user_id != current_user.id
           redirect_to errors_path
       elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")

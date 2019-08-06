@@ -11,7 +11,7 @@
             <%="Safety Plan ##{@safety_plan.get_id}: #{@safety_plan.title}"%>
           </div>
           <div class="top_buttons pull-right">
-            <% if current_user.has_access('safety_plans', 'destroy', admin: true) %>
+            <% if current_user.has_access('safety_plans', 'destroy', admin: true, strict: true) %>
               <%=link_to "Delete",
                 safety_plan_path(@safety_plan),
                 :method => "delete",
@@ -20,7 +20,7 @@
                 :disable_with => "Deleting..."%>
             <%end%>
 
-            <% if current_user.has_access('safet_plans', 'admin', admin: true) %>
+            <% if current_user.has_access('safet_plans', 'admin', admin: true, strict: true) %>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',

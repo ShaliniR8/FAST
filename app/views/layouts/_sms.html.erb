@@ -1,6 +1,6 @@
 <%audit_new = current_user.has_access('audits', 'new', admin: true) %>
 <%audit_index = current_user.has_access('audits','index', admin: true) %>
-<%audit_admin = current_user.has_access('audits', 'admin', admin: true) %>
+<%audit_admin = current_user.has_access('audits', 'admin', admin: true, strict: true) %>
 <%if audit_admin || audit_new || audit_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Audits<b class="caret"></b></a>
@@ -22,7 +22,7 @@
 
 <%inspection_new = current_user.has_access('inspections', 'new', admin: true) %>
 <%inspection_index = current_user.has_access('inspections', 'index', admin: true) %>
-<%inspection_admin = current_user.has_access('inspections', 'admin', admin: true) %>
+<%inspection_admin = current_user.has_access('inspections', 'admin', admin: true, strict: true) %>
 <%if inspection_admin || inspection_new || inspection_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Inspections<b class="caret"></b></a>
@@ -44,7 +44,7 @@
 
 <%evaluation_new = current_user.has_access('evaluations', 'new', admin: true) %>
 <%evaluation_index = current_user.has_access('evaluations', 'index', admin: true) %>
-<%evaluation_admin = current_user.has_access('evaluations', 'admin', admin: true) %>
+<%evaluation_admin = current_user.has_access('evaluations', 'admin', admin: true, strict: true) %>
 <%if evaluation_admin || evaluation_new || evaluation_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Evaluations<b class="caret"></b></a>
@@ -66,7 +66,7 @@
 
 <%investigation_new = current_user.has_access('investigations', 'new', admin: true) %>
 <%investigation_index = current_user.has_access('investigations','index', admin: true) %>
-<%investigation_admin = current_user.has_access('investigations','admin', admin: true) %>
+<%investigation_admin = current_user.has_access('investigations','admin', admin: true, strict: true) %>
 <%if investigation_admin || investigation_new || investigation_index%>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Investigations<b class="caret"></b></a>
