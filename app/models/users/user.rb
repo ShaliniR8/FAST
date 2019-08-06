@@ -51,12 +51,9 @@ class User < ActiveRecord::Base
     self.privileges.each do |p|
       result.concat(p.access_controls)
     end
-    if !result.blank?
-      result.uniq
-    else
-      []
-    end
+    result.uniq
   end
+
 
   def get_all_templates
     result = privileges
@@ -68,10 +65,10 @@ class User < ActiveRecord::Base
       .uniq
   end
 
+
   def get_all_submitter_templates
     result = privileges.map(&:access_controls).flatten.select{|x| x[:action] == "full" || x[:action] == "submitter"}.map{|x| x[:entry]}.uniq
   end
-
 
 
   def has_template_access(template_name)
@@ -104,18 +101,10 @@ class User < ActiveRecord::Base
 
 
   def accessible_modules
-    num = 0
-    modules = AccessControl.where('action = ?', "module")
-    return modules.length if self.admin?
-    all_access = get_all_access
-    modules.each do |x|
-      if all_access.include? x
-        num = num + 1
-      end
-    end
-    num
+    modules = AccessControl.where(action: 'module')
+    return modules.map{|rule| rule.entry} if self.admin?
+    (modules & get_all_access).map{|rule| rule.entry}
   end
-
 
 
   def privilege_ids
@@ -172,13 +161,14 @@ class User < ActiveRecord::Base
         { field: "full_name",              title: 'Name',             type: 'text',      visible: 'index', required: false},
         { field: "email",                  title: "Email",            type: 'text',      visible: 'index', required: false},
         { field: "account_status",         title: "Account Status",   type: 'text',      visible: 'index', required: false},
-        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: 'index', required: false},      
+        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: 'index', required: false},
       ].select{|f| (f[:visible].split(',') & visible_fields).any?}
     if (BaseConfig.airline[:has_mobile_app])
       headers_table.push({ field: 'android_version', title: 'Android Version', type: 'text', visible: 'index', required: false})
     end
     headers_table
   end
+
 
   def self.get_headers_table
     headers_table = [
@@ -196,7 +186,6 @@ class User < ActiveRecord::Base
     end
     headers_table
   end
-
 
 
   def self.get_account_details
@@ -259,9 +248,6 @@ class User < ActiveRecord::Base
       self.inbox_messages.select{|x| x.status == "Unread"}.length
   end
 
-  # def num_inprogress_submission()
-  #   Submission.where("user_id = ?", self.id)
-  # end
 
   #Returns a random token
   def self.new_token
@@ -325,9 +311,6 @@ class User < ActiveRecord::Base
   def encrypt_password(pass)
     Digest::SHA1.hexdigest([pass, password_salt].join)
   end
-
-
-
 
 
   # determines if position needs to be

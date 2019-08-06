@@ -18,7 +18,6 @@ class SessionsController < ApplicationController
 
 
   def create
-    puts "== crea#{session[:return_to]}"
     user = User.authenticate(params[:login], params[:password])
     if user
       session[:user_id] = user.id

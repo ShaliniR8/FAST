@@ -171,10 +171,11 @@ class HomeController < ApplicationController
       redirect_to root_url
       return
     end
-    num = current_user.accessible_modules
-    case num
+    accessible_modules = current_user.accessible_modules
+    case accessible_modules.length
     when 1
-      @size="col-xs-12"
+      single_landing_page = module_display_to_mode(accessible_modules.first)
+      redirect_to choose_module_home_index_path(:mode => single_landing_page)
     when 2
       @size="col-xs-12 col-sm-6"
     when 3

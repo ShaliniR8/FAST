@@ -97,7 +97,7 @@ module ApplicationHelper
       @probability_field = "probability_extra"
     end
     special_matrix
-  end 
+  end
 
   def choose_load_special_matrix_form(target, risk_type)
     airline_config = Object.const_get("#{BaseConfig.airline_code}_Config")
@@ -120,7 +120,7 @@ module ApplicationHelper
     load_special_matrix(target)
 
     @notes = target.statement
-    
+
     @severity_score = calculate_severity(target.severity_extra)
     @sub_severity_score = calculate_severity(target.mitigated_severity)
 
@@ -424,6 +424,11 @@ module ApplicationHelper
     }
     accesses.update(accesses) { |key, val| val.uniq }
     session[:permissions] = accesses.to_json
+  end
+
+  def module_display_to_mode module_display
+    mode, val = BaseConfig::MODULES.select{|k, hash| hash[:display_name] == module_display}.first
+    mode
   end
 
 end
