@@ -16,7 +16,7 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 
 class QueriesController < ApplicationController
-
+  before_filter :login_required
   before_filter :set_table
   before_filter :load_options, :only => [:edit, :new, :index]
 
@@ -102,7 +102,7 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
 
-    templates = Template.where(:id => @owner.templates)
+    templates = Template.preload(:categories, :fields).where(:id => @owner.templates)
     templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @fields << {
         title: field.label,
@@ -150,7 +150,7 @@ class QueriesController < ApplicationController
       @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:title] == @label}
 
       @template_fields = []
-      Template.preload(:fields).where(:id => @owner.templates).map(&:fields).flatten.select{|x| x.label == @label}.each{|field|
+      Template.preload(:categories, :fields).where(:id => @owner.templates).map(&:fields).flatten.select{|x| x.label == @label}.each{|field|
         @template_fields << field
       }
       @fields = @target_fields + @template_fields
@@ -291,6 +291,10 @@ class QueriesController < ApplicationController
 
 
   def apply_query
+    if !session[:mode].present?
+      redirect_to choose_module_home_index_path
+      return
+    end
     @title = BaseConfig::MODULES[session[:mode]][:objects][@owner.target].pluralize
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
@@ -299,7 +303,7 @@ class QueriesController < ApplicationController
     @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
 
     @template_fields = []
-    Template.where(:id => @owner.templates).map(&:fields).flatten.uniq{|field| field.label}.each{|field|
+    Template.preload(:categories, :fields).where(:id => @owner.templates).map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @template_fields << {
         title: field.label,
         field: field.label,
@@ -331,6 +335,10 @@ class QueriesController < ApplicationController
 
 
   def load_options
+    if !session[:mode].present?
+      redirect_to choose_module_home_index_path
+      return
+    end
     @types = BaseConfig::MODULES[session[:mode]][:objects].invert
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
   end
@@ -495,8 +503,12 @@ class QueriesController < ApplicationController
       when 'checkbox'
         return records.select{|record| xor ^ (record.send(field[:field]).reject(&:empty?).join("").to_s.downcase == search_value.downcase)}
       when 'user'
-        matching_users = User.where("full_name = ?", search_value).map(&:id)
-        return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
+        if search_value == "Anonymous"
+          return records.select{|record| xor ^ (record.send(field[:field]) == search_value)}
+        else
+          matching_users = User.where("full_name = ?", search_value).map(&:id)
+          return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
+        end
       when 'date', 'datetime'
         start_date = search_value.split("to")[0]
         end_date = search_value.split("to")[1] || search_value.split("to")[0]
