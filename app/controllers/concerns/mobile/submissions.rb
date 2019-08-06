@@ -26,11 +26,18 @@ module Concerns
 
         json[:templates] = submission_templates_as_json
 
-        # Get ids of the 3 most recent submissions by id
-        recent_submissions = @records
+        # Get ids of the 3 most recent completed submissions and 3 most recent in progress submissions
+        recent_completed_submissions = @records.where(completed: true)
           .last(3)
           .as_json(only: :id)
           .map{ |submission| submission['submission']['id'] }
+
+        recent_in_progress_submissions = @records.where(completed: false)
+          .last(3)
+          .as_json(only: :id)
+          .map{ |submission| submission['submission']['id'] }
+
+        recent_submissions = recent_completed_submissions + recent_in_progress_submissions
 
         json[:recent_submissions] = submissions_as_json(*recent_submissions)
 
