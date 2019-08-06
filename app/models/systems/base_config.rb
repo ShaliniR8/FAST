@@ -11,6 +11,7 @@ class BaseConfig
     :risk_factor      => {"Green - Acceptable" => "lime", "Yellow - Acceptable with mitigation" => "yellow", "Orange - Unacceptable" => "orange"},
   }
 
+
   MODULES =
   {
     "ASAP" => {

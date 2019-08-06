@@ -27,7 +27,7 @@ class Demo_Config
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => true,
-      :observation_phases_trend                       => false,
+      :observation_phases_trend                       => true,
       :allow_template_nested_fields                   => true,
       :checklist_version                              => '3',
 

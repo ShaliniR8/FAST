@@ -67,21 +67,8 @@
       selectTarget($('td[data-target-name="<%=@owner.target%>"]'));
     <%end%>
 
-    <%if @owner.templates.present?%>
-      <%@owner.templates.each do |template|%>
-        $("td[data-template-id='" + <%=template%> + "']").css("background-color", "lightblue");
-      <%end%>
-      selectTemplates(null);
-    <%end%>
-
-
-    $("#targets tbody tr td").on("click", function(){
-      selectTarget($(this));
-    });
-
-    $("#templates tbody tr td").on("click", function(){
-      selectTemplates($(this));
-    });
+    $("#targets tbody tr td").on("click", function(){selectTarget($(this));});
+    $("#templates tbody tr td").on("click", function(){selectTemplates($(this));});
   });
 
 
@@ -133,7 +120,15 @@
       },
       beforeSend: function(){$('#step2_loader').show();$("#building_query").css({'opacity':0.5});},
       complete: function(){$('#step2_loader').hide();$("#building_query").css({'opacity':1});},
-      success: function(response){$("#building_query").html(response);},
+      success: function(response){
+        $("#building_query").html(response);
+        <%if @owner.templates.present?%>
+          <%@owner.templates.each do |template|%>
+            $("td[data-template-id='" + <%=template%> + "']").css("background-color", "lightblue");
+          <%end%>
+          selectTemplates(null);
+        <%end%>
+      },
       error: function(response){console.log(response);}
     });
 

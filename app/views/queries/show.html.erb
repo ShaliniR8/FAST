@@ -25,6 +25,16 @@
         </div>
       </div>
       <div class="panel-body">
+
+        <div class="col-xs-12 pull-right mb10">
+          <%if BaseConfig.airline[:observation_phases_trend]%>
+            <%=form_tag observation_phases_trend_records_path, :method => :post do%>
+              <%=hidden_field_tag :records, @records.map(&:id).join(",")%>
+              <%=submit_tag "Observation Phases", class: "btn btn-primary pull-right", disable_with: "Redirecting..."%>
+            <%end%>
+          <%end%>
+        </div>
+
         <div class="col-xs-12"><%=render "conditions"%></div>
         <div class="col-xs-12"><%=render "visualizations"%></div>
         <%=render "results"%>

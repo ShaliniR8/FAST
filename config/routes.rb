@@ -275,7 +275,7 @@ PrdgSession::Application.routes.draw do |map|
       get "detailed_search"
       get "custom_view"
       get "dynamic_categories"
-      get "observation_phases_trend"
+      post "observation_phases_trend"
       get "query"
       get "query_all"
       get "update_listing_table"

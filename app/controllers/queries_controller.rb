@@ -90,7 +90,7 @@ class QueriesController < ApplicationController
         }
       }
     end
-    @fields.sort_by{|field| field[:title]}
+    @fields = @fields.sort_by{|field| field[:title]}
     render :partial => "building_query"
   end
 
@@ -290,15 +290,6 @@ class QueriesController < ApplicationController
   end
 
 
-  private
-
-
-  def load_options
-    @types = BaseConfig::MODULES[session[:mode]][:objects].invert
-    @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
-  end
-
-
   def apply_query
     @title = BaseConfig::MODULES[session[:mode]][:objects][@owner.target].pluralize
     @object_type = Object.const_get(@owner.target)
@@ -334,6 +325,15 @@ class QueriesController < ApplicationController
     @records = records
   end
 
+
+
+  private
+
+
+  def load_options
+    @types = BaseConfig::MODULES[session[:mode]][:objects].invert
+    @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
+  end
 
 
   # applies nested condition blocks
