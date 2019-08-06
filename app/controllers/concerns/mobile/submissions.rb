@@ -26,13 +26,12 @@ module Concerns
 
         json[:templates] = submission_templates_as_json
 
-        # Get ids of the 3 most recent submissions by event_date
+        # Get ids of the 3 most recent submissions by id
         recent_submissions = @records
           .last(3)
           .as_json(only: :id)
           .map{ |submission| submission['submission']['id'] }
 
-        # Get ids of the 3 most recent
         json[:recent_submissions] = submissions_as_json(*recent_submissions)
 
         # Get timezone data for timezone fields
@@ -57,7 +56,8 @@ module Concerns
             :description,
             :event_date,
             :event_time_zone,
-            :templates_id
+            :templates_id,
+            :user_id,
           ],
           include: {
             submission_fields: {
@@ -79,6 +79,15 @@ module Concerns
 
       def format_submission_json(submission)
         json = submission['submission']
+
+        json[:submitted_by] = json[:anonymous] ? 'Anonymous' : User.find(json['user_id']).full_name rescue nil
+
+        json[:meta_field_titles] = Submission.get_meta_fields('show').reduce({}) do |meta_field_titles, meta_field|
+          field = meta_field[:field]
+          field = meta_field[:field].split('_').drop(1).join('_') if field.include? 'get'
+          field = 'submitted_by' if field == 'user_id'
+          meta_field_titles.merge({ field => meta_field[:title] })
+        end
 
         json[:submission_fields] = json[:submission_fields].reduce({}) do |submission_fields, submission_field|
           # Creates an id map based on template field id
