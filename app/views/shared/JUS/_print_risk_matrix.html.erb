@@ -1,17 +1,30 @@
 <%print_special_matrix(owner)%>
 
 <%if @print_risk.present? || @print_sub_risk.present? %>
-    <div class="category">
-        <h5><b>Risk Assessment</b></h5>
-        <%if !@print_risk.nil?%>
-            <b>Severity: </b><%= @print_severity %></br>
-            <b>Probability: </b><%= @print_probability %></br>
-            <b>Risk: </b><%= @print_risk %></br></br>
-        <%end%>
-        <%if !@print_sub_risk.nil?%>
-            <b>Severity after mitigation: </b><%= @print_sub_severity %></br>
-            <b>Probability after mitigation: </b><%= @print_sub_probability %></br>
-            <b>Risk after mitigation: </b><%= @print_sub_risk %></br>
-        <%end%>
+    <div class="col-xs-12">
+      <div class="sub_sub_title">Risk Assessment</div>
+        <div class="content">
+          <%if @notes.present?%>
+            <div class="col-xs-12">
+              <b>Notes:</b></br>
+              <%=simple_format(@notes)%>
+            </div>
+          <%end%>
+          <%if @print_risk.present?%>
+            <div class="col-xs-6">
+              <b>Baseline Severity: </b><%= @print_severity %></br>
+              <b>Baseline Probability: </b><%= @print_probability %></br>
+              <b>Baseline Risk: </b><%= @print_risk %></br></br>
+            </div>
+          <%end%>
+          <%if @print_sub_risk.present?%>
+            <div class="col-xs-6">
+              <b>Mitigated Severity: </b><%= @print_sub_severity %></br>
+              <b>Mitigated Probability: </b><%= @print_sub_probability %></br>
+              <b>Mitigated Risk: </b><%= @print_sub_risk %></br>
+            </div>
+          <%end%>
+        </div>
+      </div>
     </div>
 <%end%>

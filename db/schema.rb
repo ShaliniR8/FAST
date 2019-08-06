@@ -50,32 +50,31 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "user_poc_id"
   end
 
-  create_table "airports", :id => false, :force => true do |t|
-    t.integer "id",          :default => 0, :null => false
-    t.string  "arpt_ident"
-    t.string  "name"
-    t.string  "state_prov"
-    t.string  "icao"
-    t.string  "faa_host_id"
-    t.string  "loc_hdatum"
-    t.string  "wgs_datum"
-    t.string  "wgs_lat"
-    t.string  "wgs_dlat"
-    t.string  "wgs_long"
-    t.string  "wgs_dlong"
-    t.string  "elev"
-    t.string  "arpt_type"
-    t.string  "mag_var"
-    t.string  "wac"
-    t.string  "beacon"
-    t.string  "second_arpt"
-    t.string  "opr_agy"
-    t.string  "sec_name"
-    t.string  "sec_icao"
-    t.string  "sec_faa"
-    t.string  "sec_opr_agy"
-    t.string  "cycle_date"
-    t.string  "_id"
+  create_table "airports", :force => true do |t|
+    t.string "arpt_ident"
+    t.string "name"
+    t.string "state_prov"
+    t.string "icao"
+    t.string "faa_host_id"
+    t.string "loc_hdatum"
+    t.string "wgs_datum"
+    t.string "wgs_lat"
+    t.string "wgs_dlat"
+    t.string "wgs_long"
+    t.string "wgs_dlong"
+    t.string "elev"
+    t.string "arpt_type"
+    t.string "mag_var"
+    t.string "wac"
+    t.string "beacon"
+    t.string "second_arpt"
+    t.string "opr_agy"
+    t.string "sec_name"
+    t.string "sec_icao"
+    t.string "sec_faa"
+    t.string "sec_opr_agy"
+    t.string "cycle_date"
+    t.string "_id"
   end
 
   create_table "assignments", :force => true do |t|
@@ -198,9 +197,9 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
     t.text     "value"
-    t.text     "options"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "options"
   end
 
   create_table "checklist_header_items", :force => true do |t|
@@ -1011,6 +1010,8 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.text     "final_comment"
   end
 
+  add_index "records", ["templates_id"], :name => "fk_record_template"
+
   create_table "recurrences", :force => true do |t|
     t.string   "title"
     t.integer  "created_by_id"
@@ -1070,6 +1071,8 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
   end
+
+  add_index "reports", ["templates_id"], :name => "fk_report_template"
 
   create_table "responsible_users", :force => true do |t|
     t.integer  "owner_id"
@@ -1340,6 +1343,7 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
   end
 
   add_index "submissions", ["obj_id"], :name => "mg1"
+  add_index "submissions", ["templates_id"], :name => "fk_submission_template"
 
   create_table "tax_attributes", :force => true do |t|
     t.string "category"

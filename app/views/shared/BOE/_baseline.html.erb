@@ -12,24 +12,8 @@
       <%=f.hidden_field :likelihood,  :value => "", :id => "like"%>
       <%=f.hidden_field :risk_factor, :value => "", :id => "risk_fact"%>
 
-      <%=render "shared/instructions", :instruction =>
-        "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."%>
-
-        <div class="form-group col-xs-12">
-          <%=f.label :statement, "Notes"%>
-          <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-6">
-          <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_risk"%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_probability"%>
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-6">
-          <%=render "shared/#{BaseConfig.airline[:code]}/form_baseline_severity"%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/risk_rating"%>
-        </div>
-
+      <%=render "/shared/BOE/baseline_content", :f => f%>
+      
         <div class="col-xs-12">
           <%=f.submit "Save Baseline Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
         </div>

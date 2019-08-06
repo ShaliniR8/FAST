@@ -112,7 +112,7 @@ class BaseConfig
   end
 
   def self.observation_phases
-    Object.const_get(BaseConfig.airline[:code] + "_Config")::OBSERVATION_PHASES || []
+    Object.const_get(BaseConfig.airline[:code] + "_Config")::OBSERVATION_PHASES rescue []
   end
 
 

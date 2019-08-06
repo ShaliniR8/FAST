@@ -85,6 +85,32 @@ module ApplicationHelper
     special_matrix
   end
 
+  def load_special_matrix_form(target_name, risk_type, target=nil)
+    @target = target
+    @target_name = target_name
+    case risk_type
+    when 'mitigate'
+      @severity_field = "mitigated_severity"
+      @probability_field = "mitigated_probability"
+    when 'baseline'
+      @severity_field = "severity_extra"
+      @probability_field = "probability_extra"
+    end
+    special_matrix
+  end 
+
+  def choose_load_special_matrix_form(target, risk_type)
+    airline_config = Object.const_get("#{BaseConfig.airline_code}_Config")
+    if defined?(airline_config::RISK_ARRAY)
+      if (airline_config::RISK_ARRAY[risk_type.pluralize.to_sym][:form].present?)
+        form_type = airline_config::RISK_ARRAY[risk_type.pluralize.to_sym][:form]
+        load_special_matrix_form(risk_type, form_type, target)
+      end
+    else
+      load_special_matrix_form(risk_type, 'baseline', target)
+    end
+  end
+
   def load_special_matrix(target)
     @target = target
     special_matrix
@@ -93,6 +119,8 @@ module ApplicationHelper
   def print_special_matrix(target)
     load_special_matrix(target)
 
+    @notes = target.statement
+    
     @severity_score = calculate_severity(target.severity_extra)
     @sub_severity_score = calculate_severity(target.mitigated_severity)
 

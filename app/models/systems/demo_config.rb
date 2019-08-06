@@ -194,6 +194,7 @@ class Demo_Config
     Rails.logger.debug "Probability score: #{probability_score}, Severity score: #{severity_score}"
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
+      puts "==#{MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]}"
       return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]
     end
   end

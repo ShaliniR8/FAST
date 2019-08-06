@@ -67,11 +67,11 @@
                 <div class="row">
                   <%@sra.hazards.each do |hazard|%>
                     <%=render "/sras/show_hazard",
-                      :hazard => hazard,
+                      :owner => hazard,
                       :like => @like,
                       :color_matrix => @color_matrix,
                       :frequency => @frequency,
-                      :show_btns => true%>
+                      :show_btn => false%>
                   <%end%>
                 </div>
               </div>
