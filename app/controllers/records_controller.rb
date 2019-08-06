@@ -551,10 +551,7 @@ class RecordsController < ApplicationController
 
 
   def observation_phases_trend
-
     @records = Record.where(id: params[:records].split(","), :templates_id => 25)
-
-
     if params[:start_date].present?
       @start_date = Date.parse(params[:start_date])
       @records.keep_if{|x| x.event_date >= @start_date}

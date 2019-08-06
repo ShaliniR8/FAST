@@ -775,7 +775,6 @@ class HomeController < ApplicationController
         begin
           # get result from logic
           if expr['logic'] == "Equals To"
-            #byebug
             case field[:type]
             when "boolean_box"
               base.keep_if{|x| (x.send(field[:field]) ? 'Yes' : 'No').downcase == expr_val.downcase}
@@ -821,7 +820,6 @@ class HomeController < ApplicationController
             end
           end
         rescue => e
-          puts "------------------------ #{e}"
           redirect_to query_all_home_index_path, flash: {danger: "Invalid Input."}
         end
       end
