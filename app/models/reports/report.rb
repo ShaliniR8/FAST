@@ -48,7 +48,7 @@ class Report < ActiveRecord::Base
       {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_venue_options },
       {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'form,show',       required: false },
       {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show', required: true  },
-      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'form,show',       required: false },
+      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',            required: false },
 
       {field: 'eir',                  title: 'EIR Number',                num_cols: 6,    type: 'text',     visible: 'close',           required: false },
       {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
@@ -68,6 +68,8 @@ class Report < ActiveRecord::Base
       {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
 
+      {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting',         required: false},
+
 
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
@@ -80,6 +82,12 @@ class Report < ActiveRecord::Base
       "Under Review"    => { :score => 75,  :color => "warning"},
       "Closed"          => { :score => 100, :color => "success"},
     }
+  end
+
+  def additional_info
+    if attachments.length > 0 || records.map(&:attachments).flatten.length > 0
+      "<i class='fa fa-paperclip view_attachments'></i>".html_safe
+    end
   end
 
 
