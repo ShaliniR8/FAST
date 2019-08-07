@@ -207,6 +207,7 @@ class ReportsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Report.find(params[:id])
 
     if !params[:privileges].present?
@@ -244,15 +245,19 @@ class ReportsController < ApplicationController
     when 'Close Event'
       close_records(@owner)
       redirect_path = params[:redirect_path]
+    when 'Add Attachment'
+      transaction = false
     end
 
-    @owner.update_attributes(params[:report])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      @owner.update_attributes(params[:report])
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to redirect_path || report_path(@owner)
   end

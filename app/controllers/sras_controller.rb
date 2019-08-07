@@ -76,6 +76,7 @@ class SrasController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Sra.find(params[:id]).becomes(Sra)
     case params[:commit]
     when 'Assign'
@@ -133,15 +134,19 @@ class SrasController < ApplicationController
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to sra_path(@owner)
   end

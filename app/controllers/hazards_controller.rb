@@ -76,18 +76,23 @@ class HazardsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Hazard.find(params[:id])
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:hazard])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     redirect_to hazard_path(@owner)
   end
 

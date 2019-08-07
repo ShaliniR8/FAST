@@ -71,6 +71,7 @@ class InspectionsController < SafetyAssuranceController
 
 
   def update
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -98,15 +99,19 @@ class InspectionsController < SafetyAssuranceController
         true, 'Inspection Approved')
     when 'Override Status'
       transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:inspection])
     @owner.status = update_status || @owner.status
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to inspection_path(@owner)
   end

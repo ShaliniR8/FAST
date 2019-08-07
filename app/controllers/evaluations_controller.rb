@@ -70,6 +70,7 @@ class EvaluationsController < SafetyAssuranceController
 
 
   def update
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -97,15 +98,19 @@ class EvaluationsController < SafetyAssuranceController
         true, 'Evaluation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:evaluation][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:evaluation])
     @owner.status = update_status || @owner.status
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to evaluation_path(@owner)
   end

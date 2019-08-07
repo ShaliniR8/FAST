@@ -38,18 +38,23 @@ class SafetyPlansController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = SafetyPlan.find(params[:id])
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:safety_plan][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:safety_plan])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     redirect_to @owner
   end
 

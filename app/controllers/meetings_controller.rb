@@ -229,6 +229,7 @@ class MeetingsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
@@ -264,6 +265,8 @@ class MeetingsController < ApplicationController
         "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
         true,
         "Meeting ##{@owner.get_id} Closed")
+    when 'Add Attachment'
+      transaction = false
     end
 
     if params[:invitations].present?
@@ -291,12 +294,14 @@ class MeetingsController < ApplicationController
     end
 
     @owner.update_attributes(params[:meeting])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to meeting_path(@owner)
 
