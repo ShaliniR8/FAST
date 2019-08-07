@@ -58,7 +58,7 @@ class Report < ActiveRecord::Base
       {field: 'company_disposition',  title: 'Company Disposition',       num_cols: 6,    type: 'select',   visible: 'close',           required: false, options: company_dis },
       {field: 'narrative',            title: 'Narrative',                 num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
       {field: 'regulation',           title: 'Regulation',                num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
-      {field: 'notes',                title: 'Notes',                     num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
+      {field: 'notes',                title: 'Closing Notes',             num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
 
       {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
@@ -83,6 +83,16 @@ class Report < ActiveRecord::Base
       "Closed"          => { :score => 100, :color => "success"},
     }
   end
+
+
+  def is_asap
+    result = false
+    records.each do |x|
+      result = result || x.template.report_type == "asap"
+    end
+    return result
+  end
+
 
   def additional_info
     if attachments.length > 0 || records.map(&:attachments).flatten.length > 0

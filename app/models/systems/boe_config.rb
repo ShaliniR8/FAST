@@ -32,6 +32,7 @@ class BOE_Config
       :allow_template_nested_fields                   => false,
       :checklist_version                              => '1',
 
+
       # Safety Assurance Module
       :allow_reopen_report                            => true,
       :has_root_causes                                => false,

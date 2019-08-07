@@ -97,7 +97,7 @@
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
                   reopen_report_path(@report),
-                  :class=>"btn btn-success pull-right mr5 mb5",
+                  :class=>"btn btn-success pull-right ml5 mr5 mb5",
                   :confirm => "Are you sure?",
                   :disable_with => "Reopening...",
                   "data-toggle" => "tooltip",
