@@ -48,7 +48,8 @@ class SafetyAssuranceController < ApplicationController
       redirect_to errors_path
       return false
     end
-    render :partial => '/forms/workflow_forms/process'
+    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
+    render :partial => '/forms/workflow_forms/process', locals: {status: status}
   end
 
   def destroy
