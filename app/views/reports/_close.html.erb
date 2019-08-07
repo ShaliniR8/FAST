@@ -1,7 +1,7 @@
 <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
-<%=form_for @report do |f|%>
+<%=form_for @owner do |f|%>
   <div class="panel-warning">
     <div class="panel-heading">
       <div class="panel-title">Close Event
@@ -19,7 +19,7 @@
           <%=hidden_field_tag :redirect_path, params[:redirect_path]%>
           <%=f.hidden_field :status, :value => "Closed"%>
            <%=f.hidden_field :close_date, :value => Time.now%>
-          <%=render "forms/form_fields", :fields => @fields, :record => @report, :f => f%>
+          <%=render "forms/form_fields", :fields => @fields, :record => @owner, :f => f%>
           <%=f.submit "Close Event",
             :class => "btn btn-success pull-right mt5",
             :disable_with => "Processing..."%>

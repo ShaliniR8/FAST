@@ -283,8 +283,13 @@ class ReportsController < ApplicationController
 
   def close
     @fields = Report.get_meta_fields('close')
-    @report = Report.find(params[:id])
-    render :partial => 'reports/close'
+    @owner = Report.find(params[:id])
+    if @owner.is_asap
+      render :partial => 'reports/close'
+    else
+      params[:commit] = "close_event"
+      render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed', field: "notes"}
+    end
   end
 
 

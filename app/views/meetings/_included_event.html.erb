@@ -1,5 +1,5 @@
-<tr>
-  <%Report.get_meta_fields('index').each do |h|%>
+<tr data-id="<%=event.id%>">
+  <%@report_headers.each do |h|%>
     <td class="<%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
       <%=render "forms/show_field", :record => event, :field_hash => h%>
     </td>
@@ -12,10 +12,10 @@
       "data-toggle" => "modal",
       "data-target" => ".bs-example-modal-lg",
       :route => show_narrative_report_path(event, :meeting => meeting.id)%>
-    <%=link_to "<i class='glyphicon glyphicon-search'></i>".html_safe,
+    <%=link_to "<i class='fa fa-link'></i>".html_safe,
       report_path(event),
-      :class => "btn btn-info mb5",
-      :disable_with => "Redirecting..."%>
+      target: :_blank,
+      :class => "btn btn-info mb5"%>
     <%if meeting.has_user(current_user) ||
       meeting.host.users_id == current_user.id%>
       <%if current_user.has_access("meetings","edit") &&
@@ -45,3 +45,5 @@
     <%end%>
   </td>
 </tr>
+
+

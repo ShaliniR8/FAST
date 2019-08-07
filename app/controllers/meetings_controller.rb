@@ -163,8 +163,6 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def new
     @privileges = Privilege.find(:all)
     @meeting = Meeting.new
@@ -176,8 +174,6 @@ class MeetingsController < ApplicationController
     @report_headers = Report.get_meta_fields('form')
     @reports = Report.where("status = 'Meeting Ready'")
   end
-
-
 
 
   def show
@@ -194,13 +190,11 @@ class MeetingsController < ApplicationController
     end
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
-    @report_headers = Report.get_meta_fields('index')
+    @report_headers = Report.get_meta_fields('index', 'meeting')
     @reports = @meeting.reports.sort_by{|x| x.id}
     @users = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user == current_user && x.status == "Pending"}.first
   end
-
-
 
 
   def index

@@ -97,7 +97,7 @@
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
                   reopen_report_path(@report),
-                  :class=>"btn btn-success pull-right mr5 mb5",
+                  :class=>"btn btn-success pull-right ml5 mr5 mb5",
                   :confirm => "Are you sure?",
                   :disable_with => "Reopening...",
                   "data-toggle" => "tooltip",
@@ -161,9 +161,9 @@
 
           <%=render "closing_note"%>
           <%=render "record_table"%>
-          <%=render 'shared/choose_show_matrix', 
-            :owner => @report, 
-            :show_btn => true, 
+          <%=render 'shared/choose_show_matrix',
+            :owner => @report,
+            :show_btn => true,
             :type => 'reports',
             :allow_mitigate => true,
             # :color_matrix => @color_matrix,
@@ -205,7 +205,7 @@
 
 
           <%=render "/forms/show_comment", :owner => @report%>
-          <%=render "/forms/attachments_show", :owner => @report%>
+          <%=render "/forms/attachments_show", :owner => @report, :children_attachments => @report.records.map(&:attachments).flatten%>
           <%=render "/records/transactions", :owner => @report%>
 
         </div>
