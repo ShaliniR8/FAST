@@ -139,6 +139,7 @@
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
+    });
     $('#mitigate_btn').on('click',function(){
       $.get("<%=mitigate_sra_path(@sra)%>",function(data){
         $(".modal-content").html(data);
