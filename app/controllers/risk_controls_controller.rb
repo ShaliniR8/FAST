@@ -92,6 +92,7 @@ class RiskControlsController < ApplicationController
   end
 
   def update
+    transaction = true
     @owner = RiskControl.find(params[:id]).becomes(RiskControl)
     case params[:commit]
     when 'Assign'
@@ -118,14 +119,18 @@ class RiskControlsController < ApplicationController
         true, 'Risk Control Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:risk_control])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to risk_control_path(@owner)
   end

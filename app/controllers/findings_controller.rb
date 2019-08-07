@@ -141,6 +141,7 @@ class FindingsController < SafetyAssuranceController
 
 
   def update
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -166,14 +167,18 @@ class FindingsController < SafetyAssuranceController
         true, 'Finding Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:finding][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:finding])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content,
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content,
+      )
+    end
     @owner.save
     redirect_to finding_path(@owner)
   end

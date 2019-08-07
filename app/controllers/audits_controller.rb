@@ -166,9 +166,7 @@ class AuditsController < SafetyAssuranceController
         true, 'Audit Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
-    when 'Add Cost'
-      transaction = false
-    when 'Add Contact'
+    when 'Add Cost', 'Add Contact', 'Add Attachment'
       transaction = false
     end
     @owner.update_attributes(params[:audit])

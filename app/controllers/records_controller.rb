@@ -420,6 +420,7 @@ class RecordsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Record.find(params[:id])
 
     if params[:record][:record_fields_attributes].present?
@@ -445,15 +446,19 @@ class RecordsController < ApplicationController
         end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
 
     @owner.update_attributes(params[:record])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to record_path(@owner)
   end
