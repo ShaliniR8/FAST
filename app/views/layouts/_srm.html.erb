@@ -29,7 +29,7 @@
 
 
 
-<%if current_user.has_access('hazards', 'index', admin: true) %>
+<%if current_user.has_access('risk_controls', 'index', admin: true) %>
   <li><a href=<%=risk_controls_path%>>Risk Controls</a></li>
 <%end%>
 
