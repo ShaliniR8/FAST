@@ -11,6 +11,13 @@
     <div class="panel-body" style="display:none">
       <div class="col-xs-12">
 
+        <%
+          attachments = owner.attachments
+          if defined? children_attachments
+            attachments << children_attachments
+          end
+        %>
+
         <% if !defined?(show_btn) || show_btn %>
           <%=link_to "Add Attachment",
             "#",
@@ -29,7 +36,7 @@
             </tr>
           </thead>
           <tbody>
-            <%owner.attachments.each do |attachment|%>
+            <%attachments.each do |attachment|%>
               <tr attachment_id="<%=attachment.id%>">
                 <td><b><%=attachment.document_filename%></b></td>
                 <td><%=attachment.caption%></td>
