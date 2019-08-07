@@ -232,7 +232,6 @@ class AccessControl < ActiveRecord::Base
 
       'risk_controls'=>{
         "new"                 => generate_desc("Risk Control", "new"),
-        "new"                 => generate_desc("Risk Control", "new"),
         "show"                => generate_desc("Risk Control", "show"),
         "edit"                => generate_desc("Risk Control", "edit"),
         "destroy"             => generate_desc("Risk Control", "destroy"),
@@ -242,7 +241,6 @@ class AccessControl < ActiveRecord::Base
 
       'safety_plans'=>{
         "new"                 => generate_desc("Safety Plan", "new"),
-        "new"                 => generate_desc("Safety Plan", "new"),
         "show"                => generate_desc("Safety Plan", "show"),
         "edit"                => generate_desc("Safety Plan", "edit"),
         "destroy"             => generate_desc("Safety Plan", "destroy"),
@@ -251,7 +249,6 @@ class AccessControl < ActiveRecord::Base
       },
 
       'srm_meetings'=>{
-        "new"                 => generate_desc("SRM Meeting", "new"),
         "new"                 => generate_desc("SRM Meeting", "new"),
         "show"                => generate_desc("SRM Meeting", "show"),
         "edit"                => generate_desc("SRM Meeting", "edit"),
