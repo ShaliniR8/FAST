@@ -62,11 +62,6 @@ class SrasController < ApplicationController
   def create
     sra = Sra.create(params[:sra])
     sra.status = 'New'
-    if sra.record_id.present?
-      @record = Record.find(sra.record_id)
-      @record.sra_id = sra.id
-      @record.save
-    end
     if params[:matrix_id].present?
       connection = SraMatrixConnection.create(
         :matrix_id => params[:matrix_id],
@@ -81,6 +76,7 @@ class SrasController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Sra.find(params[:id]).becomes(Sra)
     case params[:commit]
     when 'Assign'
@@ -138,15 +134,19 @@ class SrasController < ApplicationController
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to sra_path(@owner)
   end
@@ -235,7 +235,7 @@ class SrasController < ApplicationController
   def approve
     @owner = Sra.find(params[:id]).becomes(Sra)
     pending_approval = @owner.status == 'Pending Approval'
-    status = params[:commit] == 'Approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
+    status = params[:commit].downcase == 'approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
     field = pending_approval ? :approver_comment : :reviewer_comment
     render :partial => '/forms/workflow_forms/process', locals: {status: status, field: field }
   end
@@ -325,7 +325,7 @@ class SrasController < ApplicationController
 
 
 
-  def enable
+  def viewer_access
     @sra=Sra.find(params[:id])
     @sra.viewer_access=!@sra.viewer_access
     Transaction.build_for(

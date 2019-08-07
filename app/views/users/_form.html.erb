@@ -81,6 +81,15 @@
                       </div>
                     </div>
 
+                    <% if BaseConfig.airline[:enable_sso] %>
+                      <div class="form-group row">
+                        <%= f.label :sso_id, 'SSO Identifying Value', :class => "col-sm-4 col-form-label required_label" %>
+                        <div class="col-sm-8">
+                          <%= f.text_field :sso_id, {:class=> "form-control required_field"}%>
+                        </div>
+                      </div>
+                    <%end%>
+
                     <%if @action == "new"%>
 
                       <div class="form-group row">

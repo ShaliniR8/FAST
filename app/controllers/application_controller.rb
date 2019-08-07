@@ -43,12 +43,16 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
-  def access_validation
+  def access_validation(strict=false)
     Rails.logger.debug("Action #{action_name}, Controller #{controller_name}")
+    if session[:last_active].present? && current_user.present?
+      Rails.logger.info("User ##{current_user.id}: #{current_user.full_name}")
+      define_session_permissions if (current_user.privileges_last_updated > session[:last_active])
+    end
 
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100
+    elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso]
        redirect_to logout_path
     else
       session[:last_active] = Time.now
@@ -67,10 +71,14 @@ class ApplicationController < ActionController::Base
     else
       if current_user.disable
         redirect_to logout_path
-      elsif !current_user.has_access(controller_name,action_name)
-        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer'))
+      elsif !current_user.has_access(controller_name,action_name,admin:true)
+        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict:strict))
       end
     end
+  end
+
+  def strict_access_validation
+    access_validation(true) || current_user.admin?
   end
 
 
@@ -84,7 +92,7 @@ class ApplicationController < ActionController::Base
       true
     else
       group_validation = false #to reduce calculation of whether user is part of the group if present
-      report_privileges = report.privileges.present? ? report.get_privileges : []
+      report_privileges = report.privileges.reject(&:blank?).present? ? report.get_privileges : []
       if !report_privileges.empty?
         current_user.privileges.each do |p|
           if report.get_privileges.include? p.id.to_s
@@ -548,9 +556,17 @@ class ApplicationController < ActionController::Base
 
   def notify(user, message, mailer=false, subject=nil)
     if user.present?
-      notice = Notice.create({
+      content = {
         :user => user,
-        :content => message})
+        :content => message,
+        :start_date => DateTime.now.beginning_of_day
+      }
+      begin
+        notice = @owner.notices.create(content)
+      rescue
+        Rails.logger.warn 'WARNING: notify failed, @owner not defined- defaulting to unidentified Notice'
+        notice = Notice.create(content)
+      end
       if mailer
         NotifyMailer.notify(user, message, subject)
       end

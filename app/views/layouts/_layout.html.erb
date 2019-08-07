@@ -171,13 +171,21 @@
         background-color: steelblue;
         color: white;
       }
+      .panel-lightsteelblue > .panel-heading {
+        background-color: lightsteelblue;
+        color: black;
+      }
+      .panel-lightblue > .panel-heading {
+        background-color: lightblue;
+        color: black;
+      }
       .panel-lightskyblue > .panel-heading {
         background-color: lightblue;
         color: darkslategrey;
       }
       .panel-tan > .panel-heading {
         background-color: tan;
-        color: white;
+        color: black;
       }
       .panel-rosybrown > .panel-heading {
         background-color: rosybrown;
@@ -379,16 +387,16 @@
 
                 <li><a href="#" class="dropdown-menu-header">Modules</a></li>
 
-                <%if current_user.has_access('ASAP','module') %>
+                <%if current_user.has_access('ASAP','module', admin: true) %>
                   <li class="menu-link"><%= link_to 'Safety Reporting', switch_errors_path(mode: 'ASAP') %></li>
                 <%end%>
-                <% if current_user.has_access('SMS IM','module') %>
+                <% if current_user.has_access('SMS IM','module', admin: true) %>
                   <li class="menu-link"><%= link_to 'SMS IM', switch_errors_path(:mode=>"SMS IM") %></li>
                 <%end%>
-                <% if current_user.has_access('Safety Assurance','module') %>
+                <% if current_user.has_access('Safety Assurance','module', admin: true) %>
                   <li class="menu-link"><%= link_to 'Safety Assurance', switch_errors_path(:mode=>"SMS") %></li>
                 <%end%>
-                <% if current_user.has_access('Safety Risk Management','module') %>
+                <% if current_user.has_access('Safety Risk Management','module', admin: true) %>
                   <li class="menu-link"><%= link_to 'SRA (SRM)', switch_errors_path(:mode=>"SRM") %></li>
                 <%end%>
 

@@ -5,8 +5,8 @@
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
-          <%=link_to "##{hazard.get_id} #{hazard.title}",
-            hazard_path(hazard),
+          <%=link_to "##{owner.get_id} #{owner.title}",
+            hazard_path(owner),
             :style=>"color:white"%>
         </b>
         <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
@@ -15,26 +15,22 @@
     <div class="panel-body" style="display:none">
       <div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
         <div class="col-xs-12 mt20">
-          <%=render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => hazard%>
+          <%=render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => owner%>
         </div>
-        <%if BaseConfig.airline[:base_risk_matrix]%>
-          <%=render "shared/bsk_risk_matrix_show",
-            :owner => hazard,
-            :type => "hazards",
-            :like => like,
-            :color_matrix => color_matrix,
-            :frequency => frequency,
-            :allow_mitigate => false,
-            :show_btns => false%>
-        <%else%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-            :owner => hazard,
-            :allow_mitigate => false,
-            :allow_baseline => false,
-            :show_btns => false%>
-        <%end%>
 
-        <%if BaseConfig.airline[:has_root_causes] && hazard.root_causes.present?%>
+        <%can_change = owner.status != "Rejected" && owner.status != "Completed"%>
+
+        <%=render 'shared/choose_show_matrix', 
+          :owner => owner, 
+          :show_btn => show_btn, 
+          :type => 'hazards',
+          :can_change => can_change
+          # :like => like,
+          # :color_matrix => color_matrix,
+          # :frequency => frequency,
+          %>
+
+        <%if BaseConfig.airline[:has_root_causes] && owner.root_causes.present?%>
           <div class="col-xs-12">
             <div class="panel clickable panel-lightskyblue">
               <div class="panel-heading click-heading collapsed">
@@ -47,16 +43,16 @@
               </div>
               <div class="panel-body" style="display:none">
                   <%=render '/root_causes/root_causes_table',
-                    :owner => hazard,
+                    :owner => owner,
                     :show_btns => false,
                     :headers => HazardRootCause.get_headers%>
               </div>
             </div>
           </div>
         <%end%>
-        <%=render '/hazards/descriptions', :owner => hazard,
+        <%=render '/hazards/descriptions', :owner => owner,
         :show_btns => false, :headers => Cause.get_meta_fields('show')%>
-        <%if hazard.risk_controls.present?%>
+        <%if owner.risk_controls.present?%>
           <div class="col-xs-12"%>
             <div class="panel clickable panel-info">
               <div class="panel-heading click-heading collapsed">
@@ -67,7 +63,7 @@
               </div>
               <div class="panel-body" style="display:none">
                 <div class="row">
-                  <%hazard.risk_controls.each do |risk_control|%>
+                  <%owner.risk_controls.each do |risk_control|%>
                     <%=render "hazards/show_risk_control",:risk_control=>risk_control%>
                   <%end%>
                 </div>

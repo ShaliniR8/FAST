@@ -70,6 +70,7 @@ class EvaluationsController < SafetyAssuranceController
 
 
   def update
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -97,15 +98,19 @@ class EvaluationsController < SafetyAssuranceController
         true, 'Evaluation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:evaluation][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:evaluation])
     @owner.status = update_status || @owner.status
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to evaluation_path(@owner)
   end
@@ -133,7 +138,7 @@ class EvaluationsController < SafetyAssuranceController
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
-    @records = @records.keep_if{|x| x[:template].nil? || x[:template] == 0}
+    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
     if !current_user.admin? && !current_user.has_access('evaluations','admin')
       cars = Evaluation.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
@@ -159,7 +164,7 @@ class EvaluationsController < SafetyAssuranceController
   def show
     load_options
     @fields = Evaluation.get_meta_fields('show')
-    if !@owner.viewer_access && !current_user.has_access('evaluations','viewer')
+    if !@owner.viewer_access && !current_user.has_access('evaluations', 'viewer', admin: true)
       redirect_to errors_path
       return
     end

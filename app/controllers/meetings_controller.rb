@@ -163,8 +163,6 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def new
     @privileges = Privilege.find(:all)
     @meeting = Meeting.new
@@ -176,8 +174,6 @@ class MeetingsController < ApplicationController
     @report_headers = Report.get_meta_fields('form')
     @reports = Report.where("status = 'Meeting Ready'")
   end
-
-
 
 
   def show
@@ -194,18 +190,16 @@ class MeetingsController < ApplicationController
     end
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
-    @report_headers = Report.get_meta_fields('index')
+    @report_headers = Report.get_meta_fields('index', 'meeting')
     @reports = @meeting.reports.sort_by{|x| x.id}
     @users = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user == current_user && x.status == "Pending"}.first
   end
 
 
-
-
   def index
     @records = Meeting.includes(:invitations, :host).where('meetings.type is null')
-    unless current_user.admin?
+    unless current_user.has_access('meetings', 'admin', admin: true, strict: true )
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end
@@ -229,6 +223,7 @@ class MeetingsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
@@ -264,6 +259,8 @@ class MeetingsController < ApplicationController
         "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
         true,
         "Meeting ##{@owner.get_id} Closed")
+    when 'Add Attachment'
+      transaction = false
     end
 
     if params[:invitations].present?
@@ -291,12 +288,14 @@ class MeetingsController < ApplicationController
     end
 
     @owner.update_attributes(params[:meeting])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to meeting_path(@owner)
 

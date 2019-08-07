@@ -171,10 +171,11 @@ class HomeController < ApplicationController
       redirect_to root_url
       return
     end
-    num = current_user.accessible_modules
-    case num
+    accessible_modules = current_user.accessible_modules
+    case accessible_modules.length
     when 1
-      @size="col-xs-12"
+      single_landing_page = module_display_to_mode(accessible_modules.first)
+      redirect_to choose_module_home_index_path(:mode => single_landing_page)
     when 2
       @size="col-xs-12 col-sm-6"
     when 3
@@ -678,38 +679,8 @@ class HomeController < ApplicationController
     #@submissions = Submission.where(:completed => 1).can_be_accessed(current_user).within_timerange(@start_date, @end_date).by_emp_groups(params[:emp_groups]).group_by{|x| x.template.name}
   end
 
-
-  def load_objects(module_name)
-    case module_name
-    when 'safety_assurance'
-      @types =
-        {
-          'Audit'.to_sym => 'Audit',
-          'Inspection'.to_sym => 'Inspection',
-          'Evaluation'.to_sym => 'Evaluation',
-          'Investigation'.to_sym => 'Investigation',
-          'Finding'.to_sym => 'Finding',
-          'Corrective Action'.to_sym => 'SmsAction',
-          'Recommendation'.to_sym => 'Recommendation',
-        }
-    else
-      @types =
-        {
-          'SRA'.to_sym => 'Sra',
-          'Hazard'.to_sym => 'Hazard',
-          'Risk Control'.to_sym => 'RiskControl',
-          'Safety Plan'.to_sym => 'SafetyPlan',
-        }
-    end
-  end
-
   def query_all
-    case session[:mode]
-    when 'SMS'
-      load_objects('safety_assurance')
-    else
-      load_objects('sra')
-    end
+    load_objects(session[:mode])
     @fields = []
     @types.each do |k, v|
       @fields << Object.const_get(v)
@@ -805,15 +776,18 @@ class HomeController < ApplicationController
         begin
           # get result from logic
           if expr['logic'] == "Equals To"
-            if field[:type] == 'boolean_box'
+            case field[:type]
+            when "boolean_box"
+              base.keep_if{|x| (x.send(field[:field]) ? 'Yes' : 'No').downcase == expr_val.downcase}
+            when "user"
               base.keep_if{|x|
-                (x.send(field[:field]) ? 'Yes' : 'No').downcase == expr_val.downcase}
+                (x.send(field[:field]).to_s.present?) &&
+                (expr_val.split(",").include? x.send(field[:field]).to_s)}
             else
               base.keep_if{|x|
                 (x.send(field[:field]).to_s.present?) &&
                 (x.send(field[:field]).to_s.downcase.include? expr_val.downcase)}
             end
-
           elsif expr['logic'] == "Not equal to"
             if field[:type] == 'boolean_box'
               base.keep_if{|x|

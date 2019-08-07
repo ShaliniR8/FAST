@@ -17,7 +17,7 @@
             Hazard #<%=@hazard.get_id%>: <%=@hazard.title%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access("hazards", "destroy")%>
+            <% if current_user.has_access('hazards', 'destroy', admin: true, strict: true) %>
               <%=link_to "Delete",
                 hazard_path(@hazard),
                 :method => "delete",
@@ -25,7 +25,7 @@
                 :class => "btn btn-danger pull-right mr5 mb5"%>
             <%end%>
 
-            <%if current_user.admin?%>
+            <% if current_user.has_access('hazards', 'admin', admin: true, strict: true) %>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',
@@ -34,8 +34,8 @@
             <%end%>
 
 
-            <%if @hazard.status == "New" &&
-              current_user.has_access("hazards", "edit")%>
+            <% if @hazard.status == "New" &&
+              current_user.has_access('hazards', 'edit', admin: true) %>
               <%=link_to "Edit",
                 edit_hazard_path(@hazard),
                 :class => "btn btn-warning pull-right mr5 mb5",
@@ -114,21 +114,17 @@
           :fields => Hazard.get_meta_fields('show'),
           :record => @hazard%>
 
-        <%if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'%>
-          <%=render "shared/bsk_risk_matrix_show",
-            :owner => @hazard,
-            :type => "hazards",
-            :like => @like,
-            :show_btns => true,
-            :color_matrix => @color_matrix,
-            :frequency => @frequency,
-            :allow_mitigate => true %>
-        <%else%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-            :owner => @hazard,
-            :show_btns => true,
-            :allow_mitigate => true%>
-        <%end%>
+        <%can_change = @hazard.status != "Completed" && current_user.has_access("hazards", "edit")%>
+        
+        <%=render 'shared/choose_show_matrix', 
+          :owner => @hazard, 
+          :show_btn => true, 
+          :type => 'hazards',
+          :allow_mitigate => true,
+          :can_change => can_change,
+          :like => @like,
+          :color_matrix => @color_matrix,
+          :frequency => @frequency%>
 
         <%if BaseConfig.airline[:has_root_causes]%>
           <%=render '/root_causes/root_causes',
@@ -140,7 +136,7 @@
         <%=render '/causes/all',
           :owner => @hazard,
           :cause_type => 'description',
-          :can_change => @hazard.status == "New" && current_user.has_access("hazards", "edit")%>
+          :can_change => @hazard.status == "New" && current_user.has_access('hazards', 'edit', admin: true)%>
 
         <%if @hazard.risk_controls.present?%>
           <div class="col-xs-12">

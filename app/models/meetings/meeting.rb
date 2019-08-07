@@ -3,6 +3,7 @@ class Meeting < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Noticeable
   include Transactionable
 
 #Associations List
@@ -10,7 +11,6 @@ class Meeting < ActiveRecord::Base
   has_many :report_meetings,    foreign_key: "meeting_id",     class_name: "ReportMeeting",      :dependent => :destroy
   has_many :agendas,            foreign_key: "owner_id",       class_name: "AsapAgenda",         :dependent=>:destroy
   has_many :reports,            foreign_key:"owner_id",        class_name: "Reports"
-  has_many :notices,            foreign_key:"owner_id",        class_name:"MeetingNotice",       :dependent=>:destroy
 
   has_one :host, foreign_key: "meetings_id", class_name: "Host"
 

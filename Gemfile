@@ -66,3 +66,5 @@ gem 'oauth-plugin', '~> 0.5.1'
 gem 'sinatra', '~> 1.2', '>= 1.2.9'
 gem 'oauth2', '~> 1.4.0'
 gem 'oauth', '~> 0.4.7'
+
+gem 'ruby-saml'

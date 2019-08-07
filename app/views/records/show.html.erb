@@ -4,16 +4,17 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
 
 
-<%template_full_access = current_user.has_template_access(@record.template.name).include? "full"%>
-<%template_viewer_access = current_user.has_template_access(@record.template.name).include? "viewer"%>
-<%submission_show_access = current_user.has_access("submissions","show")%>
-<%record_edit_access = current_user.has_access("records", "edit")%>
-<%record_delete_access = current_user.has_access("records","destroy")%>
-<%report_show_access = current_user.has_access("reports","show")%>
-<%sa_module_access = current_user.has_access('Safety Assurance','module')%>
-<%sra_module_access = current_user.has_access('Safety Risk Management','module')%>
+<%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
+<%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer'%>
+<%submission_show_access = current_user.has_access('submissions','show', admin: true)%>
+<%record_edit_access = current_user.has_access('records', 'edit', admin: true)%>
+<%record_delete_access = current_user.has_access('records','destroy', admin: true, strict: true)%>
+<%report_show_access = current_user.has_access('reports','show', admin: true)%>
+<%report_admin_access = current_user.has_access('reports', 'admin', admin: true, strict: true)%>
+<%sa_module_access = current_user.has_access('Safety Assurance','module', admin: true, strict: true)%>
+<%sra_module_access = current_user.has_access('Safety Risk Management','module', admin: true, strict: true)%>
 
-<div class="item active mt50" style="height:auto;">
+<div class='item active mt50' style="height:auto;">
   <div class="grid per90 center-block">
     <div class="col-lg-12">
       <%=render "access_controls/new_modal"%>
@@ -23,15 +24,15 @@
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
-              Report #<%=@record.get_id%>: <%="#{@record.template.name}"%>
+              Report #<%=@record.get_id%>: <%=@record.template.name%>
             </div>
             <div class="top_buttons pull-right">
 
               <a class="btn btn-default expandall mb5">Expand All</a>
 
-              <%if template_full_access || template_viewer_access%>
+              <%if template_full_access || template_viewer_access || report_admin_access%>
 
-                <%if record_edit_access%>
+                <%if record_edit_access %>
                   <%if @record.submission.present? && !@record.submission.anonymous?%>
                     <%=link_to "Message Submitter",
                       new_message_path(
@@ -135,9 +136,6 @@
                     :class=>"btn btn-danger mb5 "%>
                 <%end%>
 
-
-
-
               <%end%>
             </div>
           </div>
@@ -145,7 +143,7 @@
 
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12">
-            <%if template_full_access%>
+            <%if template_full_access || report_admin_access%>
               <%if @record.status == "Closed"%>
                 <%=link_to "Reopen",
                   reopen_record_path(@record),
@@ -173,7 +171,7 @@
                 <%=link_to "Add to Event",
                   add_reports_path(:template=>@record.template,:record=>@record),
                   :id => "report-btn",
-                  :class => "btn btn-success mr5 mb5  pull-right",
+                  :class => "btn btn-success mr5 mb5 pull-right",
                   :disable_with => "Adding..."%>
               <%end%>
 
@@ -207,7 +205,7 @@
               @record.status != "New" &&
               !@record.sra.present?%>
               <%=link_to "Launch SRA(SRM)",
-                new_sra_path(:record=>@record),
+                new_sra_path(owner_id:@record.id, owner_type:@record.class),
                 :class=>"btn btn-warning pull-right mr5 mb5",
                 :disable_with => "Redirecting..."%>
             <%end%>
@@ -217,7 +215,7 @@
               @record.status != "New" &&
               !@record.investigation.present?%>
               <%=link_to "Launch Investigation",
-                new_investigation_path(:record=>@record),
+                new_investigation_path(owner_id:@record.id, owner_type:@record.class),
                 :class=>"btn btn-warning pull-right mr5 mb5",
                 :disable_with => "Redirecting..."%>
             <%end%>
@@ -234,11 +232,7 @@
             <%end%>
           </div>
 
-
-          <%#=render "/shared/processing_instructions", :owner => @record%>
-
           <%=render "forms/show_fields", :fields => Record.get_meta_fields('show'), :record => @record%>
-
 
           <%if @record.submission.present?%>
             <%if @record.submission.comments.present?%>
@@ -264,25 +258,18 @@
 
           <%=render "/records/show_template_fields", :record => @record%>
 
-
-          <%if BaseConfig.airline[:base_risk_matrix]%>
-            <%=render "shared/bsk_risk_matrix_show",
-              :owner => @record,
-              :type => "records",
-              :like => @like,
-              :color_matrix => @color_matrix,
-              :frequency => @frequency,
-              :allow_mitigate => true,
-              :show_btns => true %>
-          <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-              :owner => @record,
-              :allow_mitigate => true,
-              :show_btns => true%>
-          <%end%>
-
-
           <%can_change = record_edit_access && @record.status != "Closed"%>
+
+          <%=render 'shared/choose_show_matrix', 
+            :owner => @record, 
+            :show_btn => true, 
+            :type => 'records',
+            :allow_mitigate => true,
+            :like => @like,
+            :color_matrix => @color_matrix,
+            :frequency => @frequency,
+            :can_change => can_change%>
+
           <%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => can_change%>
           <%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => can_change%>
           <%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => can_change%>

@@ -54,11 +54,7 @@ class SmsActionsController < SafetyAssuranceController
     @headers = User.get_headers
     load_options
     @fields = SmsAction.get_meta_fields('form')
-    form_special_matrix(
-      @owner,
-      "sms_action",
-      "severity_extra",
-      "probability_extra")
+    choose_load_special_matrix_form(@owner, 'sms_action')
   end
 
 
@@ -96,7 +92,7 @@ class SmsActionsController < SafetyAssuranceController
   def edit
     load_options
     @fields = SmsAction.get_meta_fields('form')
-    form_special_matrix(@owner, "sms_action", "severity_extra", "probability_extra")
+    choose_load_special_matrix_form(@owner, 'sms_action')
     @type = get_car_owner(@owner)
     @users.keep_if{|u| u.has_access(@type, 'edit')}
   end
@@ -120,6 +116,7 @@ class SmsActionsController < SafetyAssuranceController
   end
 
   def update
+    transaction = true
     case params[:commit]
     when 'Reassign'
       notify(@owner.responsible_user,
@@ -148,14 +145,18 @@ class SmsActionsController < SafetyAssuranceController
         true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:sms_action])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to sms_action_path(@owner)
   end
@@ -176,7 +177,7 @@ class SmsActionsController < SafetyAssuranceController
   def mitigate
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     load_options
-    mitigate_special_matrix("sms_action", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form('sms_action', 'mitigate', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
@@ -188,7 +189,7 @@ class SmsActionsController < SafetyAssuranceController
   def baseline
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     load_options
-    form_special_matrix(@owner, "sms_action", "severity_extra", "probability_extra")
+    load_special_matrix_form('sms_action', 'baseline', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/baseline"
     else

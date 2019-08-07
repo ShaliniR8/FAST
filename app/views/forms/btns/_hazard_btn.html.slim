@@ -1,0 +1,5 @@
+- if owner.status != 'Completed'
+  = link_to 'Add Hazard',
+      new_hazard_path( owner_id: owner.id, owner_type: owner.class.name ),
+      class: 'btn btn-success pull-right mr5 mb5',
+      disable_with: 'Adding...'

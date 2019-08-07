@@ -147,7 +147,7 @@ class ReportsController < ApplicationController
       .find(:all)
       .select{|x| x.status == "Open" && x.report.blank?} - @report.records
     @candidates.sort_by!{|x| x.event_date}.reverse!
-    form_special_matrix(@report, "report", "severity_extra", "probability_extra")
+    load_special_matrix_form('report', 'baseline', @report)
   end
 
 
@@ -192,7 +192,7 @@ class ReportsController < ApplicationController
       .sort_by!{|a| a.name}
     @action = "edit"
     @report = Report.find(params[:id])
-    form_special_matrix(@report, "report", "severity_extra", "probability_extra")
+    load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
     end
@@ -207,6 +207,7 @@ class ReportsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Report.find(params[:id])
 
     if !params[:privileges].present?
@@ -244,15 +245,19 @@ class ReportsController < ApplicationController
     when 'Close Event'
       close_records(@owner)
       redirect_path = params[:redirect_path]
+    when 'Add Attachment'
+      transaction = false
     end
 
-    @owner.update_attributes(params[:report])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      @owner.update_attributes(params[:report])
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to redirect_path || report_path(@owner)
   end
@@ -278,8 +283,13 @@ class ReportsController < ApplicationController
 
   def close
     @fields = Report.get_meta_fields('close')
-    @report = Report.find(params[:id])
-    render :partial => 'reports/close'
+    @owner = Report.find(params[:id])
+    if @owner.is_asap
+      render :partial => 'reports/close'
+    else
+      params[:commit] = "close_event"
+      render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed', field: "notes"}
+    end
   end
 
 
@@ -423,7 +433,7 @@ class ReportsController < ApplicationController
   def mitigate
     @owner=Report.find(params[:id])
     load_options
-    mitigate_special_matrix("report", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form('report', 'mitigate', @owner)
     if BaseConfig.airline[:base_risk_matrix]
         render :partial=>"shared/mitigate"
       else
@@ -435,7 +445,7 @@ class ReportsController < ApplicationController
   def baseline
     @owner=Report.find(params[:id])
     load_options
-    form_special_matrix(@owner, "report", "severity_extra", "probability_extra")
+    load_special_matrix_form('report', 'baseline', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial=>"shared/baseline"
     else

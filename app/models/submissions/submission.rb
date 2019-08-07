@@ -2,6 +2,8 @@ require 'open-uri'
 require 'fileutils'
 
 class Submission < ActiveRecord::Base
+  extend AnalyticsFilters
+  include Rails.application.routes.url_helpers
 
 #Concerns List
   include Attachmentable
@@ -19,26 +21,20 @@ class Submission < ActiveRecord::Base
   accepts_nested_attributes_for :submission_fields
 
   after_create :make_report
-  after_create :create_transaction
+  after_create -> { create_transaction(context: 'User Submitted Report.') }
   after_update :make_report
-
-  extend AnalyticsFilters
-  include Rails.application.routes.url_helpers
-
 
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
-      {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'description',    title: 'Event Title',     num_cols: 12, type: 'text', visible: 'index,show', required: false},
+      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text',     visible: 'index,show', required: false},
+      {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text',     visible: 'index,show', required: false},
+      {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user',     visible: 'index,show', required: false},
+      {field: 'event_date',     title: 'Event Date/Time', num_cols: 6,  type: 'datetime', visible: 'index,show', required: false},
+      {field: 'description',    title: 'Event Title',     num_cols: 12, type: 'text',     visible: 'index,show', required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
-
-
 
 
   def get_user_id
@@ -46,14 +42,11 @@ class Submission < ActiveRecord::Base
   end
 
 
-
-
   def getEventId
     if self.record.present? && self.record.report.present?
       self.record.report.id
     end
   end
-
 
 
   def getTimeZone()
@@ -66,7 +59,6 @@ class Submission < ActiveRecord::Base
      "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
      "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
-
 
 
   def self.export_all
@@ -97,7 +89,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def self.get_headers
     if BaseConfig.airline[:submission_description]
       [
@@ -118,28 +109,14 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_id
     custom_id || id
   end
 
 
-
   def get_event_date
     event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
   end
-
-
-
-  def create_transaction
-    Transaction.build_for(
-      self,
-      'Create',
-      self.anonymous? ? '' : (session[:simulated_id] || session[:user_id]),
-      'User Submitted Report.'
-    )
-  end
-
 
 
   def self.get_terms
@@ -154,12 +131,10 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_field(id)
     f = self.submission_fields.find_by_fields_id(id)
     f.present? ? f.value : ""
   end
-
 
 
   def get_field_by_label(label)
@@ -168,7 +143,6 @@ class Submission < ActiveRecord::Base
     f = self.submission_fields.where(:fields_id => fields_id)
     f.present? ? f.first.value : ""
   end
-
 
 
   def submit_name
@@ -184,17 +158,14 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_date
     event_date.strftime("%Y-%m-%d") rescue ''
   end
 
 
-
   def get_time
     event_date.strftime("%H:%M") rescue ''
   end
-
 
 
   def get_description
@@ -210,11 +181,9 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_template
     self.template.name
   end
-
 
 
   def submitted_date
@@ -222,11 +191,9 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def updated
     self.updated_at.strftime("%Y-%m-%d")
   end
-
 
 
   def self.build(template)
@@ -236,17 +203,14 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def categories
     self.template.categories
   end
 
 
-
   def time_diff(base)
     diff = ((self.event_date - base.event_date) / (24 * 60 * 60)).abs
   end
-
 
 
   # Can we find a better way to mass assign values to it?
@@ -281,10 +245,8 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def to_asap
   end
-
 
 
   def find_field(field_name)
@@ -301,7 +263,6 @@ class Submission < ActiveRecord::Base
       ""
     end
   end
-
 
 
   def get_narratives
@@ -321,7 +282,6 @@ class Submission < ActiveRecord::Base
       ''
     end
   end
-
 
 
   def satisfy(conditions)
@@ -377,7 +337,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def convert
     if self.template.map_template.present?
       temp_id = self.template.map_template_id
@@ -421,7 +380,6 @@ class Submission < ActiveRecord::Base
     end
     converted
   end
-
 
 
 end

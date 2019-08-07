@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable
+    :android_version, :disable, :updated_at
 
 
 
@@ -51,12 +51,9 @@ class User < ActiveRecord::Base
     self.privileges.each do |p|
       result.concat(p.access_controls)
     end
-    if !result.blank?
-      result.uniq
-    else
-      []
-    end
+    result.uniq
   end
+
 
   def get_all_templates
     result = privileges
@@ -68,10 +65,10 @@ class User < ActiveRecord::Base
       .uniq
   end
 
+
   def get_all_submitter_templates
     result = privileges.map(&:access_controls).flatten.select{|x| x[:action] == "full" || x[:action] == "submitter"}.map{|x| x[:entry]}.uniq
   end
-
 
 
   def has_template_access(template_name)
@@ -85,34 +82,29 @@ class User < ActiveRecord::Base
   end
 
 
-  def has_access(con_name, act_name)
-    rule = AccessControl.where('action = ? AND entry = ?', act_name, con_name).first
-    if rule.present?
-      (rule.privileges & privileges).size > 0
-    else
-      true
+  # admin: will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
+  # strict: will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
+  def has_access(con_name, act_name, strict:false, admin:false)
+    return true if admin && self.admin?
+    rules = Rails.application.config.restricting_rules
+    if rules.key?(con_name) && rules[con_name].include?(act_name)
+      begin
+        permissions = JSON.parse(session[:permissions])
+      rescue
+        return false #rescue for if session has expired
+      end
+      return (admin && permissions.key?(con_name) && permissions[con_name].include?('admin')) ||
+        (permissions.key?(con_name) && permissions[con_name].include?(act_name))
     end
-    # if rule.present?
-    #   access = rule.first
-    #   self.get_all_access.include? access
-    # else
-    #   true
-    # end
+    strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present?) : true
   end
 
 
   def accessible_modules
-    num = 0
-    modules = AccessControl.where('action = ?', "module")
-    all_access = get_all_access
-    modules.each do |x|
-      if all_access.include? x
-        num = num + 1
-      end
-    end
-    num
+    modules = AccessControl.where(action: 'module')
+    return modules.map{|rule| rule.entry} if self.admin?
+    (modules & get_all_access).map{|rule| rule.entry}
   end
-
 
 
   def privilege_ids
@@ -159,6 +151,24 @@ class User < ActiveRecord::Base
     self.access_levels.where(report_type: report_type).first.level
   end
 
+  def self.get_meta_fields(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    headers_table = [
+        { field: "employee_number",        title: "Employee #",       type: 'text',      visible: 'index', required: false},
+        { field: "id",                     title: "ID",               type: 'text',      visible: 'index', required: false},
+        { field: "level" ,                 title: "Type",             type: 'text',      visible: 'index', required: false},
+        { field: "username",               title: 'Username',         type: 'text',      visible: 'index', required: false},
+        { field: "full_name",              title: 'Name',             type: 'text',      visible: 'index', required: false},
+        { field: "email",                  title: "Email",            type: 'text',      visible: 'index', required: false},
+        { field: "account_status",         title: "Account Status",   type: 'text',      visible: 'index', required: false},
+        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: 'index', required: false},
+      ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    if (BaseConfig.airline[:has_mobile_app])
+      headers_table.push({ field: 'android_version', title: 'Android Version', type: 'text', visible: 'index', required: false})
+    end
+    headers_table
+  end
+
 
   def self.get_headers_table
     headers_table = [
@@ -176,7 +186,6 @@ class User < ActiveRecord::Base
     end
     headers_table
   end
-
 
 
   def self.get_account_details
@@ -239,9 +248,6 @@ class User < ActiveRecord::Base
       self.inbox_messages.select{|x| x.status == "Unread"}.length
   end
 
-  # def num_inprogress_submission()
-  #   Submission.where("user_id = ?", self.id)
-  # end
 
   #Returns a random token
   def self.new_token
@@ -305,9 +311,6 @@ class User < ActiveRecord::Base
   def encrypt_password(pass)
     Digest::SHA1.hexdigest([pass, password_salt].join)
   end
-
-
-
 
 
   # determines if position needs to be

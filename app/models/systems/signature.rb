@@ -3,6 +3,8 @@ class Signature < ActiveRecord::Base
 
   mount_uploader :path, SignatureUploader
 
+  # after_create :create_transaction #TODO: Uncommit when controller Update functions handle "Sign" commit
+
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['form', 'show'] : args)
     [

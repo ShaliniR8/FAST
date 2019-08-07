@@ -192,7 +192,7 @@ class RecordsController < ApplicationController
     load_options
     @action = "edit"
     @record = Record.find(params[:id])
-    form_special_matrix(@record, "record", "severity_extra", "probability_extra")
+    load_special_matrix_form("record", "baseline", @record)
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
     if !(access_level.include? "full")
@@ -420,6 +420,7 @@ class RecordsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Record.find(params[:id])
 
     if params[:record][:record_fields_attributes].present?
@@ -445,15 +446,19 @@ class RecordsController < ApplicationController
         end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
 
     @owner.update_attributes(params[:record])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to record_path(@owner)
   end
@@ -520,7 +525,7 @@ class RecordsController < ApplicationController
 
   def mitigate
     @owner = Record.find(params[:id])
-    mitigate_special_matrix("record", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form('record', 'mitigate', @owner)
     load_options
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/mitigate"
@@ -533,7 +538,7 @@ class RecordsController < ApplicationController
   def baseline
     @owner = Record.find(params[:id])
     load_options
-    form_special_matrix(@owner, "record", "severity_extra", "probability_extra")
+    load_special_matrix_form('record', 'baseline', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
@@ -551,7 +556,7 @@ class RecordsController < ApplicationController
 
 
   def observation_phases_trend
-    @records = Record.where(:templates_id => 25)
+    @records = Record.where(id: params[:records].split(","), :templates_id => 25)
     if params[:start_date].present?
       @start_date = Date.parse(params[:start_date])
       @records.keep_if{|x| x.event_date >= @start_date}
@@ -828,7 +833,6 @@ class RecordsController < ApplicationController
 
     result_id = []
     @result.each{ |r| result_id << r.id }
-
 
     # Create Hash to store value and occurance
     @data = Hash.new

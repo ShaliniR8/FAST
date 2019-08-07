@@ -111,6 +111,7 @@ class CorrectiveActionsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = CorrectiveAction.find(params[:id])
     case params[:commit]
     when 'Assign'
@@ -137,14 +138,18 @@ class CorrectiveActionsController < ApplicationController
         true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:corrective_action][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:corrective_action])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to corrective_action_path(@owner)
   end

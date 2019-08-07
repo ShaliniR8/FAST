@@ -22,11 +22,19 @@ class SafetyAssuranceController < ApplicationController
   #############################
 
   def approve
+    if !@owner.can_approve? current_user
+      redirect_to errors_path
+      return false
+    end
     status = params[:commit] == "approve" ? "Completed" : "Assigned"
     render :partial => '/forms/workflow_forms/process', locals: {status: status}
   end
 
   def assign
+    if !@owner.can_assign?(current_user)
+      redirect_to errors_path
+      return false
+    end
     render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
   end
 
@@ -36,7 +44,12 @@ class SafetyAssuranceController < ApplicationController
   end
 
   def complete
-    render :partial => '/forms/workflow_forms/process'
+    if !@owner.can_complete?(current_user)
+      redirect_to errors_path
+      return false
+    end
+    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
+    render :partial => '/forms/workflow_forms/process', locals: {status: status}
   end
 
   def destroy
@@ -71,10 +84,15 @@ class SafetyAssuranceController < ApplicationController
   end
 
   def override_status
+    if !current_user.admin?
+      redirect_to errors_path
+      return false
+    end
     render :partial => '/forms/workflow_forms/override_status'
   end
 
   def reopen
+    redirect_to errors_path if !@owner.can_reopen? current_user
     reopen_report(@owner)
   end
 

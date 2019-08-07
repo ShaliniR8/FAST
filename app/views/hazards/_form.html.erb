@@ -28,11 +28,7 @@
 
           <%=render "/forms/form_fields", :f => f, :fields => @fields, :record => @hazard%>
 
-          <%if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'%>
-            <%=render "shared/matrix", :f => f, :owner => @hazard%>
-          <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
-          <%end%>
+          <%=render "shared/choose_form_matrix", :f => f, :type => 'hazards'%>
 
           <%=render '/forms/attachments_form', :f => f, :owner => @hazard%>
 

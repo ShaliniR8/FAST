@@ -51,7 +51,7 @@ class HazardsController < ApplicationController
     @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     load_options
     @fields = Hazard.get_meta_fields('form')
-    form_special_matrix(@hazard, "hazard", "severity_extra", "probability_extra")
+    load_special_matrix_form("hazard", "baseline", @hazard)
   end
 
 
@@ -69,25 +69,30 @@ class HazardsController < ApplicationController
     @hazard = Hazard.find(params[:id])
     load_options
     @fields = Hazard.get_meta_fields('form')
-    form_special_matrix(@hazard, "hazard", "severity_extra", "probability_extra")
+    load_special_matrix_form("hazard", "baseline", @hazard)
   end
 
 
 
 
   def update
+    transaction = true
     @owner = Hazard.find(params[:id])
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:hazard])
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     redirect_to hazard_path(@owner)
   end
 
@@ -328,7 +333,7 @@ class HazardsController < ApplicationController
   def mitigate
     @owner=Hazard.find(params[:id])
     load_options
-    mitigate_special_matrix("hazard", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form("hazard", "mitigate", @owner)
     if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/mitigate"
     else
@@ -341,7 +346,7 @@ class HazardsController < ApplicationController
   def baseline
     @owner=Hazard.find(params[:id])
     load_options
-    form_special_matrix(@owner, "hazard", "severity_extra", "probability_extra")
+    load_special_matrix_form("hazard", "baseline", @owner)
     if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/baseline"
     else

@@ -10,6 +10,10 @@ PrdgSession::Application.routes.draw do |map|
   match '/oauth/request_token', :to => 'oauth#request_token', :as => :request_token
   match '/oauth/authorize',     :to => 'oauth#authorize',     :as => :authorize
   match '/oauth',               :to => 'oauth#index',         :as => :oauth
+  match '/saml/consume',        :to => 'saml#consume',        :as => :consume
+  match '/saml/metadata',       :to => 'saml#metadata',       :as => :metadata
+  match '/saml/init',           :to => 'saml#init',           :as => :init
+  match '/saml/logout',         :to => 'saml#logout',         :as => :saml
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
@@ -105,6 +109,18 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :recurrences
+  resources :queries do
+    member do
+      get "clone"
+      get "add_visualization"
+      get "remove_visualization"
+      get "generate_visualization"
+      get "generate_visualization_dynamic"
+    end
+    collection do
+      get 'load_conditions_block'
+    end
+  end
 
 
   # Configurations
@@ -259,7 +275,7 @@ PrdgSession::Application.routes.draw do |map|
       get "detailed_search"
       get "custom_view"
       get "dynamic_categories"
-      get "observation_phases_trend"
+      post "observation_phases_trend"
       get "query"
       get "query_all"
       get "update_listing_table"
@@ -561,7 +577,6 @@ PrdgSession::Application.routes.draw do |map|
   # SRA Module
   resources :sras do
     member do
-      get 'enable'
       get 'mitigate'
       get 'baseline'
       get 'carryover'
@@ -578,6 +593,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'get_agenda'
       get 'override_status'
       get 'comment'
+      get 'viewer_access'
     end
     collection do
       get 'advanced_search'

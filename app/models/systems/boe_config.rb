@@ -32,6 +32,7 @@ class BOE_Config
       :allow_template_nested_fields                   => false,
       :checklist_version                              => '1',
 
+
       # Safety Assurance Module
       :allow_reopen_report                            => true,
       :has_root_causes                                => false,
@@ -51,6 +52,12 @@ class BOE_Config
     "ASAP MOU Holder FAA Designator"=>"BASE"
   }
 
+  OBSERVATION_PHASES = [
+    "Observation Phase",
+    "Condition",
+    "Threat", "Sub Threat",
+    "Error", "Sub Error",
+    "Human Factor", "Comment"]
 
   MATRIX_INFO = {
     severity_table: {
@@ -192,6 +199,7 @@ class BOE_Config
   def self.print_risk(probability_score, severity_score)
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
+      puts "==#{MATRIX_INFO[:risk_table_dict][:yellow]}"
       return MATRIX_INFO[:risk_table_dict][lookup_table[severity_score][probability_score].to_sym] rescue nil
     end
   end

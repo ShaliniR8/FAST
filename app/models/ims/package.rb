@@ -1,4 +1,5 @@
 class Package < ActiveRecord::Base
+  extend AnalyticsFilters
 
 #Concern List
   include Attachmentable
@@ -10,19 +11,7 @@ class Package < ActiveRecord::Base
   belongs_to :meeting,      foreign_key:"meeting_id", class_name:"Meeting"
 
 
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
-
-  extend AnalyticsFilters
-
-  def create_transaction(action)
-    Transaction.build_for(
-      self,
-      action,
-      session[:user_id]
-    )
-    #ImTransaction.create(:users_id=>session[:user_id],:action=>"Add Package", :content=>"Add Package ##{self.get_id}", :onwer_id=>self.im.id,:stamp=>Time.now)
-  end
+  after_create :create_transaction
 
 
   def self.get_terms
@@ -38,6 +27,7 @@ class Package < ActiveRecord::Base
     }
   end
 
+
   def get_plan_due_date
     if self.plan_due_date.present?
       self.plan_due_date.strftime("%Y-%m-%d")
@@ -45,6 +35,7 @@ class Package < ActiveRecord::Base
       ""
     end
   end
+
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -75,6 +66,7 @@ class Package < ActiveRecord::Base
     ]
   end
 
+
   def self.get_headers
     [
       {:field=>"get_id", :title=>"ID"},
@@ -85,6 +77,7 @@ class Package < ActiveRecord::Base
     ]
   end
 
+
   def get_id
     if self.custom_id.present?
       self.custom_id
@@ -92,6 +85,7 @@ class Package < ActiveRecord::Base
       self.id
     end
   end
+
 
   def self.show_fields
     [
@@ -106,6 +100,7 @@ class Package < ActiveRecord::Base
       {:title=>"Meeting Minutes",:field=>"minutes",:long_text=>true}
     ]
   end
+
 
   def get_time(field)
     if self.send(field).present?
@@ -131,8 +126,6 @@ class Package < ActiveRecord::Base
       "N/A"
     end
   end
-
-
 
 
 end

@@ -65,18 +65,19 @@ class InvestigationsController < SafetyAssuranceController
     end
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
+    load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
 
   def edit
     load_options
     @fields = Investigation.get_meta_fields('form')
-    form_special_matrix(@owner, 'investigation', 'severity_extra', 'probability_extra')
+    load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
 
   def update
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -104,15 +105,19 @@ class InvestigationsController < SafetyAssuranceController
         true, 'Investigation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:investigation][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:investigation])
     @owner.status = update_status || @owner.status
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to investigation_path(@owner)
   end
@@ -120,14 +125,8 @@ class InvestigationsController < SafetyAssuranceController
 
   def create
     investigation = Investigation.new(params[:investigation])
-    if investigation.record_id.present?
-      @record = Record.find(investigation.record_id)
-      @record.investigation_id = investigation.id
-      @record.save
-    end
     if investigation.save
       redirect_to investigation_path(investigation), flash: {success: "Investigation created."}
-
     end
   end
 
@@ -136,7 +135,7 @@ class InvestigationsController < SafetyAssuranceController
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
-    @records = @records.keep_if{|x| x[:template].nil? || x[:template] == 0}
+    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
     if !current_user.admin? && !current_user.has_access('investigations','admin')
       cars = Investigation.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
@@ -202,7 +201,7 @@ class InvestigationsController < SafetyAssuranceController
 
   def mitigate
     @owner = Investigation.find(params[:id])
-    mitigate_special_matrix("investigation", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form("investigation", "mitigate", @owner)
     load_options
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/mitigate"
@@ -214,7 +213,7 @@ class InvestigationsController < SafetyAssuranceController
   def baseline
     @owner = Investigation.find(params[:id])
     load_options
-    form_special_matrix(@owner, "investigation", "severity_extra", "probability_extra")
+    load_special_matrix_form("investigation", "baseline", @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/baseline"
     else

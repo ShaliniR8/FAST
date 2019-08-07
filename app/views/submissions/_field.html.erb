@@ -107,7 +107,7 @@
           <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".airport_modal", :id=>"#{field.id}"%></span>
         </div>
       <%elsif field.display_type == "datalist"%>
-        <%= rf.text_field :value, {:list=>"#{field.id}", :class=>"field_select form-control "+required, "data-id" => field.id}%>
+        <%= rf.text_field :value, {:list => "#{field.id}", :class => "field_select form-control "+required, "data-id" => field.id}%>
         <datalist id="<%=field.id%>">
           <% field.getOptions.each do |opt|%>
             <option value="<%=opt%>"></option>
@@ -226,9 +226,12 @@
 
       <!-- Render Datalist fields -->
       <%elsif field.display_type == "datalist"%>
-        <%= rf.text_field :value, {:list=>"#{field.id}", :class=>"form-control"}%>
+        <%=rf.text_field :value, {
+          :list => "#{field.id}",
+          :class => 'form-control ' + field.element_class,
+          :id => field.element_id}%>
         <datalist id="<%=field.id%>">
-          <% field.getOptions.each do |opt|%>
+          <%field.getOptions.each do |opt|%>
             <option value="<%=opt%>"></option>
           <%end%>
         </datalist>

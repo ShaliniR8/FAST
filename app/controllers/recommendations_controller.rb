@@ -88,7 +88,7 @@ class RecommendationsController < SafetyAssuranceController
 
 
   def update
-
+    transaction = true
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
@@ -116,15 +116,19 @@ class RecommendationsController < SafetyAssuranceController
         true, 'Recommendation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:recommendation])
     @owner.status = update_status || @owner.status
-    Transaction.build_for(
-      @owner,
-      params[:commit],
-      current_user.id,
-      transaction_content
-    )
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to recommendation_path(@owner)
   end

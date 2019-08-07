@@ -26,7 +26,7 @@
                   'sign',
                   'deid_pdf',
                   'pdf',
-                  'view_report',
+                  'view_parent',
                   'viewer_access',
                   'send_message',
                   'expand_all'
@@ -58,28 +58,23 @@
           </div>
 
           <%=render '/forms/show_fields', :fields => @fields, :record => @owner %>
-          <%=render '/checklists/checklist_types', :owner => @owner, :type => 'investigation'%>
-
-          <%if BaseConfig.airline[:base_risk_matrix]%>
-            <%=render "shared/bsk_risk_matrix_show",
-            :owner => @owner,
-            :type => "investigations",
-            :like => @like,
-            :color_matrix => @color_matrix,
-            :frequency => @frequency,
-            :allow_mitigate => true,
-            :show_btns => true%>
-          <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-            :owner=>@owner,
-            :allow_mitigate => true,
-            :show_btns => true%>
-          <%end%>
-
+          <!-- <%#=render '/checklists/checklist_types', :owner => @owner, :type => 'investigation'%> -->
 
           <%can_change = @owner.status != "Completed" &&
             @owner.status != "Pending Approval" &&
             current_user.has_access("investigations","edit")%>
+            
+          <%=render 'shared/choose_show_matrix', 
+            :owner => @owner, 
+            :show_btn => true, 
+            :type => "investigations",
+            :like => @like,
+            :color_matrix => @color_matrix,
+            :frequency => @frequency,  
+            :allow_mitigate => true,
+            :can_change => can_change%>
+
+
           <%=render '/causes/all',
             :owner => @owner,
             :cause_type => 'description',
@@ -102,10 +97,10 @@
             :fields=> SmsTask.get_meta_fields('show')%>
 
           <%=render "/forms/cost", :owner => @owner%>
-        <%=render 'forms/signatures/show_signatures', owner: @owner %>
+          <%=render 'forms/signatures/show_signatures', owner: @owner %>
 
 
-          <%#=render "/records/show_template_fields", :record => @owner.record%>
+          <!-- <%#=render "/records/show_template_fields", :record => @owner.record%> -->
 
           <%=render "/forms/show_comment", :owner => @owner%>
           <%=render "/forms/attachments_show", :owner => @owner%>

@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <%=form_for @owner do |f|%>
+  <%= hidden_field_tag :redirect_path, params[:redirect_path]%>
   <% status = 'Completed' unless status %>
   <% field = :final_comment unless field %>
   <%=f.hidden_field :status, :value => status %>
@@ -9,7 +10,7 @@
   <div class="panel-warning">
     <div class="panel-heading">
       <div class="panel-title">
-        <%=params[:commit].titleize%> <%=@owner.class.name.titleize%>
+        <%=params[:commit].titleize%> <%#=@owner.class.name.titleize%>
         <button type="button"
           class="close pull-right"
           data-dismiss="modal"

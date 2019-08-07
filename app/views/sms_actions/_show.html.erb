@@ -1,18 +1,15 @@
 <%=render '/forms/show_fields', :fields => SmsAction.get_meta_fields('show'), :record => owner%>
 
-<%if BaseConfig.airline[:base_risk_matrix]%>
-  <%=render "shared/bsk_risk_matrix_show",
-    :owner => owner,
-    :type => "sms_actions",
-    :allow_mitigate => true,
-    :show_btns => show_btn%>
-<%else%>
-  <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-    :owner => owner,
-    :show_btns => show_btn%>
-<%end%>
+<%can_change = owner.status != "Pending Approval" && owner.status != "Completed"%>
 
-<%can_change = owner.status != "Pending Approval" && owner.status != "Completed" && show_btn%>
+<%=render 'shared/choose_show_matrix', 
+  :owner => owner, 
+  :show_btn => show_btn, 
+  :type => 'sms_actions',
+  :allow_mitigate => true,
+  :can_change => can_change%>
+
+
 
 <%=render '/causes/all',
   :owner => owner,
