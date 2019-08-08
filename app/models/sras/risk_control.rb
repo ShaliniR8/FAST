@@ -14,7 +14,7 @@ class RiskControl < ActiveRecord::Base
   belongs_to  :responsible_user,  foreign_key: 'responsible_user_id',   class_name: 'User'
   belongs_to  :hazard,            foreign_key: 'hazard_id'
   has_many    :descriptions,      foreign_key: 'owner_id',              class_name: 'RiskControlDescription',   dependent: :destroy
-  has_many    :notices,           foreign_key: 'owner_id',              class_name: 'RiskControlNotice',        dependent: :destroy
+  has_many    :notices,           foreign_key: 'owner_id',              dependent: :destroy
 
   accepts_nested_attributes_for :descriptions
 
