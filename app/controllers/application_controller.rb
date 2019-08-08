@@ -44,10 +44,17 @@ class ApplicationController < ActionController::Base
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
   def access_validation(strict=false)
+
+    if session[:digest].present?
+      if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
+        return
+      end
+    end
+
     Rails.logger.debug("Action #{action_name}, Controller #{controller_name}")
     if session[:last_active].present? && current_user.present?
       Rails.logger.info("User ##{current_user.id}: #{current_user.full_name}")
-      define_session_permissions if (current_user.privileges_last_updated > session[:last_active])
+      define_session_permissions if (current_user.privileges_last_updated > session[:last_active] rescue false)
     end
 
     if !session[:last_active].present?
@@ -56,15 +63,6 @@ class ApplicationController < ActionController::Base
        redirect_to logout_path
     else
       session[:last_active] = Time.now
-    end
-
-    if session[:digest].present?
-      if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
-        return
-      else
-        # redirect_to logout_path
-        # return
-      end
     end
 
     if current_user.blank?
