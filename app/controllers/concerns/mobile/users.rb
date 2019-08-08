@@ -10,12 +10,9 @@ module Concerns
         mobile_user_info = current_user.as_json(only: [:id, :full_name, :email])['user']
 
         # Get which modules the user has access to
-        mobile_user_info[:mobile_module_access] = [
-          'ASAP',
-          'Safety Assurance',
-          # 'SMS IM',
-          # 'Safety Risk Management',
-        ].select{|module_name| current_user.has_access(module_name, 'module')}
+        all_mobile_modules = ['ASAP', 'Safety Assurance']
+        mobile_user_info[:mobile_module_access] = current_user.accessible_modules
+          .select{ |module_name| all_mobile_modules.include? module_name }
 
         # Get and parse the user's notices
         mobile_user_info[:notices] = current_user.notices.as_json(only: [
