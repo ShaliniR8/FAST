@@ -92,8 +92,7 @@ class ApplicationController < ActionController::Base
       true
     else
       group_validation = false #to reduce calculation of whether user is part of the group if present
-      report_privileges = report.privileges.reject(&:blank?).present? ? report.get_privileges : []
-      if !report_privileges.empty?
+      if report.privileges.present? && !report.privileges.reject(&:blank?).empty?
         current_user.privileges.each do |p|
           if report.get_privileges.include? p.id.to_s
             group_validation = true

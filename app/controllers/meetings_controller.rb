@@ -25,10 +25,9 @@ class MeetingsController < ApplicationController
   before_filter :check_group,:only=>[:show]
 
 
-
   def check_group
     report=Meeting.find(params[:id]).becomes(Meeting)
-    if report.privileges.present?
+    if report.privileges.reject(&:blank?).present?
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
           return true
@@ -40,8 +39,6 @@ class MeetingsController < ApplicationController
       return true
     end
   end
-
-
 
 
   def reopen
@@ -57,15 +54,11 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def new_attachment
     @owner = Meeting.find(params[:id]).becomes(Meeting)
     @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
-
-
 
 
   def destroy
@@ -100,8 +93,6 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def comment
     @owner=Meeting.find(params[:id]).becomes(Meeting)
     @comment=@owner.comments.new
@@ -109,14 +100,10 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def set_table_name
     #Rails.logger.debug "#{controller_name}  #{action_name} set table!"
     @table_name="meetings"
   end
-
-
 
 
   def create
