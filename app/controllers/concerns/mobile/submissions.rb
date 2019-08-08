@@ -5,6 +5,10 @@ module Concerns
   module Mobile
     module Submissions extend ActiveSupport::Concern
 
+      def update_as_json(flash)
+        render :json => flash, :status => 200
+      end
+
       def index_as_json
         @records = Submission.where(user_id: current_user.id).includes(:template)
 

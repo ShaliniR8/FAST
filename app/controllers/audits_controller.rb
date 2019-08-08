@@ -184,7 +184,7 @@ class AuditsController < SafetyAssuranceController
     @owner.save
     respond_to do |format|
       format.html { redirect_to audit_path(@owner) }
-      format.json { render :json => { :success => 'Audit Updated.' }, :status => 200 }
+      format.json { update_as_json }
     end
   end
 

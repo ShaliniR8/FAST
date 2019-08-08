@@ -5,6 +5,10 @@ module Concerns
   module Mobile
     module Audits extend ActiveSupport::Concern
 
+      def update_as_json
+        render :json => { :success => 'Audit Updated.' }, :status => 200
+      end
+
       def index_as_json
         @records = Audit.all
         filter_audits

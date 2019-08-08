@@ -206,7 +206,7 @@ class SubmissionsController < ApplicationController
 
     if @record.save
       notify_notifiers(@record, params[:commit])
-      if params[:commit] == "Submit"
+      if params[:commit] == 'Submit'
         if params[:create_copy] == '1'
           converted = @record.convert
           notify_notifiers(converted, params[:commit])
@@ -214,17 +214,21 @@ class SubmissionsController < ApplicationController
       end
 
       respond_to do |format|
-        if params[:commit] == "Submit"
-          format.html { redirect_to submission_path(@record), flash: {success: "Submission submitted."} }
+        flash = {}
+        if params[:commit] == 'Submit'
+          flash = { success: 'Submission submitted.' }
+          format.html { redirect_to submission_path(@record), flash: flash }
         else
-          format.html { redirect_to incomplete_submissions_path, flash: {success: "Submission created in progress."} }
+          flash = { success: 'Submission created in progress.' }
+          format.html { redirect_to incomplete_submissions_path, flash: flash }
         end
-        format.json
+        format.json { update_as_json(flash) }
       end
 
     else
       respond_to do |format|
-        format.html { redirect_to new_submission_path(:template => @record.template), flash: {danger: @record.errors.full_messages.first} }
+        flash = { danger: @record.errors.full_messages.first }
+        format.html { redirect_to new_submission_path(:template => @record.template), flash: flash }
         format.json
       end
     end
@@ -318,18 +322,20 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
+<<<<<<< HEAD
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
+=======
+    params[:submission][:completed] = params[:commit] == 'Save for Later' ? false : true
+>>>>>>> 671ba1f... Created update_as_json for both the audits and submissions concerns, fixed boolean redundancy in submissions controller create
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
       if params[:commit] == "Save for Later"
         respond_to do |format|
-          format.html {
-            redirect_to incomplete_submissions_path,
-              flash: {success: "Submission ##{@record.id} updated."}
-          }
-          format.json
+          flash = { success: "Submission ##{@record.id} updated." }
+          format.html { redirect_to incomplete_submissions_path, flash: flash }
+          format.json { update_as_json(flash) }
         end
       else
         if params[:create_copy] == '1'
@@ -337,11 +343,9 @@ class SubmissionsController < ApplicationController
           notify_notifiers(converted, params[:commit])
         end
         respond_to do |format|
-          format.html {
-            redirect_to submission_path(@record),
-              flash: {success: params[:submission][:comments_attributes].present? ? "Notes added" : "Submission submitted."}
-          }
-          format.json
+          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added' : 'Submission submitted.' }
+          format.html { redirect_to submission_path(@record), flash: flash }
+          format.json { update_as_json(flash) }
         end
       end
     end
