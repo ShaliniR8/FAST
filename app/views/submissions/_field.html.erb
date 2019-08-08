@@ -28,21 +28,15 @@
           <%field_class = 'form-control'%>
         <%end%>
         <%=rf.text_field :value,
-          {
-            :class => required + " " + field_class + " " + field.element_class,
-            :placeholder => field.label,
-            :id=>field.element_id
-          }%>
-
+          {:class => required + " " + field_class + " " + field.element_class,
+          :placeholder => field.label,
+          :id=>field.element_id}%>
 
       <%elsif field.display_type == "textarea"%>
         <%=rf.text_area :value,
-          {
-            :class => required+" form-control"+" "+field.element_class,
-            :rows => 4,
-            :id => field.element_id
-          }%>
-
+          {:class => required + " form-control " + field.element_class,
+          :rows => 4,
+          :id => field.element_id}%>
 
       <%elsif field.display_type == "dropdown"%>
         <%if field.data_type == "timezone"%>
@@ -50,19 +44,25 @@
             <%=rf.select :value,
               field.getOptions,
               {:include_blank => ""},
-              {
-                :class=>'form-control tz atz timezone_field field_select' + required,
-                :id => "#{field.id}"
-              }%>
+              {:class => 'form-control tz atz timezone_field field_select ' + required,
+              :id => "#{field.id}"}%>
             <span class="input-group-addon tc">All</span>
           </div>
         <%else%>
           <%if field.get_label == "Please answer the question about whether this report should be submitted to NASA ASRS?" ||
             field.get_label == "If this report is not accepted into ASAP, should it be returned to normal incident reporting?" ||
             field.get_label == "Can a deidentified version of this report be published in internal airline safety publications?"%>
-            <%= rf.select :value, options_for_select(field.getOptions, "Yes"), { :include_blank => ""}, { :class => 'form-control'+" "+field.element_class, :id => field.element_id}%>
+            <%= rf.select :value,
+              options_for_select(field.getOptions, "Yes"),
+              { :include_blank => ""},
+              { :class => 'form-control'+" "+field.element_class, :id => field.element_id}%>
           <%else%>
-            <%= rf.select :value, options_for_select(field.getOptions), { :include_blank => ""}, { "data-id" => field.id, :class => required+' field_select form-control'+" "+field.element_class, :id => field.element_id}%>
+            <%=rf.select :value,
+              options_for_select(field.getOptions),
+              {:include_blank => ""},
+              {"data-id" => field.id,
+              :class => required + ' field_select form-control ' + field.element_class,
+              :id => field.element_id}%>
           <%end%>
         <%end%>
       <%elsif field.display_type == "checkbox"%>
@@ -102,12 +102,24 @@
         </div>
       <%elsif field.display_type == "airport"%>
         <div class="input-group">
-          <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport "+required,:readonly=>true,:id=>"airport#{field.id}"}%>
-          <%=rf.hidden_field :value, :id=>"airport-select#{field.id}"%>
-          <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".airport_modal", :id=>"#{field.id}"%></span>
+          <%=text_field_tag field.get_label, "",
+            {:class => "form-control ml5 airport " + required,
+              :readonly => true,
+              :id => "airport#{field.id}"}%>
+          <%=rf.hidden_field :value, :id => "airport-select#{field.id}"%>
+          <span class="input-group-btn">
+            <%=link_to "...", "#",
+              :class => "btn btn-info airport_button",
+              "data-toggle" => "modal",
+              "data-target" => ".airport_modal",
+              :id => "#{field.id}"%>
+          </span>
         </div>
       <%elsif field.display_type == "datalist"%>
-        <%= rf.text_field :value, {:list => "#{field.id}", :class => "field_select form-control "+required, "data-id" => field.id}%>
+        <%= rf.text_field :value,
+          {:list => "#{field.id}",
+          :class => "field_select form-control " + required,
+          "data-id" => field.id}%>
         <datalist id="<%=field.id%>">
           <% field.getOptions.each do |opt|%>
             <option value="<%=opt%>"></option>
@@ -131,14 +143,14 @@
         <% if field.element_id == "duty_on_time" || field.element_id == "duty_off_time"%>
           <td>
             <%=rf.text_field :value,
-              {:class=> 'form-control'+" "+field.element_class,
+              {:class=> required + ' form-control ' + field.element_class,
                 :placeholder=>field.label,
                 :id=>field.element_id}%>
           </td>
         <%else%>
           <td>
             <%=rf.text_field :value,
-              {:class=> "field-"+field.data_type+' form-control'+" "+field.element_class,
+              {:class=> "field-" + field.data_type + ' form-control ' + field.element_class + ' ' + required,
                 :placeholder=>field.label,
                 :id=>field.element_id}%>
           </td>
@@ -146,7 +158,7 @@
 
       <%elsif field.display_type == "textarea"%>
         <%=rf.text_area :value,
-          {:class=>required+" form-control"+" "+field.element_class,
+          {:class => required + " form-control " + field.element_class,
           :rows => 4,
           :placeholder=>field.label,
           :id=>field.element_id}%>
@@ -156,15 +168,18 @@
           <div class="input-group">
             <%=rf.select :value,
               options_for_select(field.getOptions, @record_field.value),
-              {:include_blank=>""},
-              {:class=>'form-control tz atz'+" "+field.element_class,:selected=>@record_field.value}%>
+              {:include_blank => ""},
+              {:class => required + ' form-control tz atz ' + field.element_class, :selected => @record_field.value}%>
             <span class="input-group-addon tc">All</span>
           </div>
         <%else%>
           <%=rf.select :value,
             field.getOptions,
-            {:include_blank=>""},
-            {:class=>'form-control'+" "+field.element_class,:selected=>@record_field.value,:id=>field.element_id}%>
+            {:include_blank => ""},
+            {:class => 'field_select form-control ' + required + " " + field.element_class,
+            :selected => @record_field.value,
+            "data-id" => field.id,
+            :id => field.element_id}%>
         <%end%>
       <%elsif field.display_type == "checkbox"%>
         </br>
@@ -209,7 +224,11 @@
           <%if (@record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/) rescue false)%>
             <%@record_field.value = User.find(@record_field.value).full_name rescue ''%>
           <%end%>
-          <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp",:readonly=>true,:id=>"emp#{field.id}", :value=> @record_field.value}%>
+          <%=text_field_tag field.get_label, "",
+            {:class => "form-control ml5 emp " + required,
+              :readonly => true,
+              :id => "emp#{field.id}",
+              :value =>  @record_field.value}%>
           <%=rf.hidden_field :value, :id=>"employee-select#{field.id}"%>
           <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info emp_button","data-toggle"=>"modal","data-target"=>".emp_modal", :id=>"#{field.id}"%></span>
         </div>
@@ -218,7 +237,11 @@
       <!-- Render Airport fields -->
       <%elsif field.display_type == "airport"%>
         <div class="input-group">
-          <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport",:readonly=>true,:id=>"airport#{field.id}", :value=> @record_field.value}%>
+          <%=text_field_tag field.get_label, "",
+            {:class=>"form-control ml5 airport " + required,
+              :readonly => true,
+              :id => "airport#{field.id}",
+              :value => @record_field.value}%>
           <%=rf.hidden_field :value, :id=>"airport-select#{field.id}"%>
           <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".airport_modal", :id=>"#{field.id}"%></span>
         </div>
@@ -228,7 +251,7 @@
       <%elsif field.display_type == "datalist"%>
         <%=rf.text_field :value, {
           :list => "#{field.id}",
-          :class => 'form-control ' + field.element_class,
+          :class => required + ' form-control ' + field.element_class,
           :id => field.element_id}%>
         <datalist id="<%=field.id%>">
           <%field.getOptions.each do |opt|%>

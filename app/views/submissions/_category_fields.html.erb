@@ -50,14 +50,23 @@
 
 
 <script>
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).val();
+    $(".nested_field_" + field_id).hide();
+    $(".nested_field_" + field_id + "_" + field_value).show();
+  }
+
+
   $(document).ready(function(){
 
+    $(".field_select").each(function(){
+      update_nested_fields($(this));
+    });
 
     $(".field_select").on("change", function(){
-      var field_id = $(this).attr("data-id");
-      var field_value = $(this).val();
-      $(".nested_field_" + field_id).hide();
-      $(".nested_field_" + field_id + "_" + field_value).show();
+      update_nested_fields($(this));
     });
 
 
