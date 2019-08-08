@@ -34,6 +34,7 @@ class BSK_Config
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
       :enable_recurrence                              => true,
+      :enable_shared_links                            => false,
 
 
       # SMS IM Module

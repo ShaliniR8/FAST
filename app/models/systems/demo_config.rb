@@ -35,6 +35,8 @@ class Demo_Config
       :allow_reopen_report                            => false,
       :has_root_causes                                => true,
       :enable_recurrence                              => true,
+      :enable_shared_links                            => true,
+
 
 
       # SMS IM Module

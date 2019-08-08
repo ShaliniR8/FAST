@@ -33,6 +33,7 @@ class NAMS_Config
       :allow_reopen_report                            => false,
       :has_root_causes                                => false,
       :enable_recurrence                              => false,
+      :enable_shared_links                            => false,
 
 
       # SMS IM Module

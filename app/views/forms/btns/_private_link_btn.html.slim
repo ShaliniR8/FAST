@@ -1,6 +1,7 @@
-- if current_user.admin? || \
+- if BaseConfig.airline[:enable_shared_links] && \
+  (current_user.admin? || \
   current_user.has_access(permission,'admin') || \
-  current_user.has_access(permission,'edit')
+  current_user.has_access(permission,'edit'))
   = link_to 'Share',
     '#',
     class: 'btn btn-lightblue pull-right mr5 mb5',
