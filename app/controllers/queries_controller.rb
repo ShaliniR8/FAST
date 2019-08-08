@@ -503,8 +503,8 @@ class QueriesController < ApplicationController
       when 'checkbox'
         return records.select{|record| xor ^ (record.send(field[:field]).reject(&:empty?).join("").to_s.downcase == search_value.downcase)}
       when 'user'
-        if search_value == "Anonymous"
-          return records.select{|record| xor ^ (record.send(field[:field]) == search_value)}
+        if search_value.downcase == "Anonymous".downcase
+          return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.downcase)}
         else
           matching_users = User.where("full_name = ?", search_value).map(&:id)
           return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
