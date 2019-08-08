@@ -11,8 +11,7 @@ class BaseConfig
     :risk_factor      => {"Green - Acceptable" => "lime", "Yellow - Acceptable with mitigation" => "yellow", "Orange - Unacceptable" => "orange"},
   }
 
-  MODULES =
-  {
+  MODULES = {
     "ASAP" => {
       :display_name => "ASAP",
       :objects => {
@@ -20,11 +19,13 @@ class BaseConfig
         "Record" => "Report",
         "Report" => "Event",
         "CorrectiveAction" => "Corrective Action",
-      }},
+      }
+    },
 
     "SMS IM" => {
       :display_name => "SMS IM",
-      :objects => {}},
+      :objects => {}
+    },
 
     "SMS" => {
       :display_name => "Safety Assurance",
@@ -35,7 +36,8 @@ class BaseConfig
         "Investigation" => "Investigation",
         "Finding" => "Finding",
         "SmsAction" => "Corrective Action",
-      }},
+      }
+    },
 
     "SRM" => {
       :display_name => "Safety Risk Management",
@@ -44,7 +46,9 @@ class BaseConfig
         "Hazard" => "Hazard",
         "RiskControl" => "Risk Control",
         "SafetyPlan" => "Safety Plan",
-      }}
+      }
+    }
+  }
 
 
   # This Mobile Key is used for the admin/ProDIGIQ Staff config set; ensure all new portals are included in it
