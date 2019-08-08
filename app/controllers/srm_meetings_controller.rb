@@ -204,8 +204,10 @@ class SrmMeetingsController < ApplicationController
       current_user.id,
       transaction_content
     )
-    @owner.status = status unless !defined?(status)
-    @owner.save
+    if status.present?
+      @owner.status = status
+      @owner.save
+    end
     redirect_to srm_meeting_path(@owner)
   end
 
@@ -325,7 +327,7 @@ class SrmMeetingsController < ApplicationController
           meeting,
           'Added SRA',
           current_user.id,
-          :content => "SRA ##{sra.get_id}"
+          "SRA ##{sra.get_id}"
         )
         sra.save
       end
