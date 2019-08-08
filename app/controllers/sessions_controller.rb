@@ -60,7 +60,7 @@ class SessionsController < ApplicationController
     if BaseConfig::MOBILE_KEY_MAP.key? params[:key]
       config_file = BaseConfig::MOBILE_KEY_MAP[params[:key]]
       config_file[:key] = params[:key]
-      render :json => config_file.to_json
+      render :json => config_file.to_json, :status => 200
       return
     else
       render :json => { error: 'Invalid Activation Key' }.to_json, :status => 401
