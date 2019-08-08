@@ -113,9 +113,12 @@ module Concerns
         templates = Template
           .includes({ categories: :fields }) # preload
           .all
-          .keep_if do |template|
+
+        unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+          templates.keep_if do |template|
             current_user.has_template_access(template.name).match /full|submitter/
           end
+        end
 
         # Get json data for templates
         templates_json = templates
