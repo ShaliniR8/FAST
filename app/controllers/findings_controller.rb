@@ -17,7 +17,7 @@ end
 
 
 class FindingsController < SafetyAssuranceController
-
+  before_filter :login_required
   before_filter(only: [:show]) { check_group('finding') }
   before_filter :define_owner, only: [
     :approve,
