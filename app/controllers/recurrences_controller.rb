@@ -112,12 +112,12 @@ class RecurrencesController < ApplicationController
 
   def destroy
     recurrence = Recurrence.find(params[:id])
-    type = Object.const_get(recurrence.form_type)
+    @type = Object.const_get(recurrence.form_type)
     child_access_validation(@type.name,'admin')
-    template = type.find(recurrence.template_id)
+    template = @type.find(recurrence.template_id)
     template.destroy
     recurrence.destroy
-    redirect_to "/recurrences?form_type=#{type}", flash: {danger: "Recurrence ##{params[:id]} deleted."}
+    redirect_to "/recurrences?form_type=#{@type}", flash: {danger: "Recurrence ##{params[:id]} deleted."}
   end
 
 end
