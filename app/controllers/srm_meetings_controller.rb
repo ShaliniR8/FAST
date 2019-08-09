@@ -163,7 +163,7 @@ class SrmMeetingsController < ApplicationController
 
     case params[:commit]
     when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
+      transaction_content = "Status overriden from #{@owner.status} to #{params[:srm_meeting][:status]}"
     when 'Close'
       send_notices(
         @owner.invitations,
@@ -196,8 +196,7 @@ class SrmMeetingsController < ApplicationController
         end
       end
     end
-
-    @owner.update_attributes(params[:meeting])
+    @owner.update_attributes(params[:srm_meeting])
     Transaction.build_for(
       @owner,
       params[:commit],

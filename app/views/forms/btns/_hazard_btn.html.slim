@@ -1,4 +1,5 @@
-- if owner.status != 'Completed'
+- if owner.status != 'Completed' &&\
+  current_user.has_access('hazard', 'new', admin: true, strict: true)
   = link_to 'Add Hazard',
       new_hazard_path( owner_id: owner.id, owner_type: owner.class.name ),
       class: 'btn btn-success pull-right mr5 mb5',
