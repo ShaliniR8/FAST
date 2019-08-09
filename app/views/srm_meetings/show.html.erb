@@ -67,7 +67,9 @@
         </div>
 
         <%if @current_inv.present?%>
-          <%=render "meetings/invitation_form"%>
+          <div class="col-xs-12">
+            <%=render "meetings/invitation_form"%>
+          </div>
         <%end%>
 
         <div class="col-xs-12">
