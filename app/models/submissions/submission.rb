@@ -21,8 +21,9 @@ class Submission < ActiveRecord::Base
   accepts_nested_attributes_for :submission_fields
 
   after_create :make_report
-  after_create -> { create_transaction(context: 'User Submitted Report.') }
   after_update :make_report
+
+  after_commit -> { create_transaction(context: 'User Submitted Report') }
 
 
   def self.get_meta_fields(*args)
@@ -216,7 +217,7 @@ class Submission < ActiveRecord::Base
   # Can we find a better way to mass assign values to it?
   def make_report
     if self.completed && self.records_id.blank?
-      record = Record.new(
+      record = Record.create(
         :templates_id       => self.templates_id,
         :description        => self.description,
         :event_date         => self.event_date,

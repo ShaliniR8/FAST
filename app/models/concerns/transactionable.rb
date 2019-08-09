@@ -7,13 +7,15 @@ module Transactionable
   end
 
   def create_transaction(action: 'Create', context: nil)
-    if !self.changes()['viewer_access'].present?
+    if !self.changes()['viewer_access'].present? &&
+      ((!self.respond_to?(:completed)) || (self.respond_to?(:completed) && self.completed?))
       Transaction.build_for(
         self,
         action,
         (
-          (self.respond_to?(:anonymous) && self.anonymous?) ? '' : (
-            (session[:simulated_id] || session[:user_id]) rescue nil )
+          (
+            (self.respond_to?(:anonymous) && self.anonymous?)
+          ) ? '' : ((session[:simulated_id] || session[:user_id]) rescue nil )
         ),
         context || (defined?(session) ? '' : "Recurring #{self.class.name.titleize}")
       )
