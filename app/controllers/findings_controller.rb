@@ -84,8 +84,8 @@ class FindingsController < SafetyAssuranceController
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
 
-    if !current_user.admin? && !current_user.has_access('findings','admin')
-      cars = Finding.where('status in (?) and responsible_user_id = ?',
+    if !current_user.has_access('findings','admin', admin: true, strict: true)
+      cars = Finding.where('status in (?) AND responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += Finding.where('approver_id = ?',  current_user.id)
       cars += Finding.where('created_by_id = ?', current_user.id)
