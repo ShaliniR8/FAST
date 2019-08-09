@@ -119,6 +119,11 @@ class Investigation < ActiveRecord::Base
   end
 
 
+  def get_completion_date
+    self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
+  end
+
+
   def type
     return "Investigation"
   end
