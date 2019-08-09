@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+
   has_many :templates,        foreign_key: 'users_id',  class_name: 'Template'
   has_many :submissions,      foreign_key: 'user_id',   class_name: 'Submission'
   has_many :notices,          foreign_key: 'users_id',  class_name: 'Notice',       dependent: :destroy
@@ -90,6 +91,16 @@ class User < ActiveRecord::Base
     if rules.key?(con_name) && rules[con_name].include?(act_name)
       begin
         permissions = JSON.parse(session[:permissions])
+        if !self.admin? && permissions.empty?
+          accesses = Hash.new{ |h, k| h[k] = [] }
+          self.privileges.includes(:access_controls).map{ |priv|
+            priv.access_controls.each do |acs|
+              accesses[acs.entry] << acs.action
+            end
+          }
+          accesses.update(accesses) { |key, val| val.uniq }
+          session[:permissions] = accesses.to_json
+        end
       rescue
         return false #rescue for if session has expired
       end
