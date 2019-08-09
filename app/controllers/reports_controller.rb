@@ -249,8 +249,8 @@ class ReportsController < ApplicationController
       transaction = false
     end
 
+    @owner.update_attributes(params[:report])
     if transaction
-      @owner.update_attributes(params[:report])
       Transaction.build_for(
         @owner,
         params[:commit],
