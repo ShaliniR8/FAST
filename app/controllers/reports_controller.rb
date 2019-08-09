@@ -378,7 +378,7 @@ class ReportsController < ApplicationController
 
 
   def add_meeting
-    @report_headers = Report.get_meta_fields('index')
+    @report_headers = Report.get_meta_fields('index', 'meeting')
     @meeting = Meeting.find(params[:meeting])
     @report = Report.find(params[:id])
     mr = ReportMeeting.new
