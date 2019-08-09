@@ -84,7 +84,7 @@ class SafetyAssuranceController < ApplicationController
   end
 
   def override_status
-    if !current_user.admin?
+    if !current_user.has_access(@owner.class.name.downcase.underscore, 'admin', admin: true, strict: true)
       redirect_to errors_path
       return false
     end
