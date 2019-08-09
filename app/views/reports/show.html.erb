@@ -138,7 +138,6 @@
 
             <%if current_user.has_access('Safety Risk Management','module', admin: true, strict: true) &&
               @report.status != "Closed" &&
-              @report.status != "New" &&
               !@report.sra.present?%>
               <%=link_to "Launch SRA(SRM)",
                 new_sra_path(owner_id:@report.id, owner_type:@report.class),
@@ -148,7 +147,6 @@
 
             <%if current_user.has_access('Safety Assurance', 'module', admin: true, strict: true) &&
               @report.status != "Closed" &&
-              @report.status != "New" &&
               !@report.investigation.present?%>
               <%=link_to "Launch Investigation",
                 new_investigation_path(owner_id:@report.id, owner_type:@report.class),
