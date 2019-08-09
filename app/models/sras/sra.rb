@@ -42,6 +42,15 @@ class Sra < ActiveRecord::Base
     meta_fields.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def self.progress
+  {
+    'New'               => { :score => 15,  :color => 'default'},
+    'Assigned'          => { :score => 35,  :color => 'warning'},
+    'Pending Review'    => { :score => 60,  :color => 'warning'},
+    'Pending Approval'  => { :score => 75,  :color => 'warning'},
+    'Completed'         => { :score => 100, :color => 'success'},
+  }
+end
 
   def get_source
     if self.owner.present?

@@ -37,6 +37,15 @@ class SafetyPlan < ActiveRecord::Base
   end
 
 
+  def self.progress
+  {
+    'New'               => { :score => 33,  :color => 'default'},
+    'Evaluated'         => { :score => 66,  :color => 'warning'},
+    'Completed'         => { :score => 100, :color => 'success'},
+  }
+end
+
+
   def self.results
     ['Satisfactory','Unsatisfactory']
   end
