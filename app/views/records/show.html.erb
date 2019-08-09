@@ -120,7 +120,7 @@
                   <%end%>
                 <%end%>
 
-                <%if current_user.admin? || record_edit_access%>
+                <%if current_user.admin?%>
                   <%=link_to 'Override Status', '#',
                     :class => 'btn btn-danger mb5',
                     :id => 'override_status_btn',
@@ -260,9 +260,9 @@
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
-          <%=render 'shared/choose_show_matrix', 
-            :owner => @record, 
-            :show_btn => true, 
+          <%=render 'shared/choose_show_matrix',
+            :owner => @record,
+            :show_btn => true,
             :type => 'records',
             :allow_mitigate => true,
             :like => @like,
