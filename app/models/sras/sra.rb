@@ -54,7 +54,7 @@ end
 
   def get_source
     if self.owner.present?
-      "<a style='font-weight:bold' href='/#{owner_titleize.downcase.pluralize}/#{self.owner_id}'>
+      "<a style='font-weight:bold' href='/#{owner_type.downcase.pluralize}/#{self.owner_id}'>
         #{self.owner_titleize} ##{self.owner_id}
       </a>".html_safe
     else
