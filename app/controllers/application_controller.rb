@@ -61,6 +61,7 @@ class ApplicationController < ActionController::Base
       session[:last_active] = Time.now
     elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso]
        redirect_to logout_path
+       return false
     else
       session[:last_active] = Time.now
     end
@@ -69,8 +70,12 @@ class ApplicationController < ActionController::Base
     else
       if current_user.disable
         redirect_to logout_path
+        return false
       elsif !current_user.has_access(controller_name,action_name,admin:true)
-        redirect_to errors_path unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict:strict))
+        unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict:strict))
+          redirect_to errors_path
+          return false
+        end
       end
     end
   end
