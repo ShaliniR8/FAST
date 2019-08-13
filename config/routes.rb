@@ -54,7 +54,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'address'
     end
   end
-  resources :errors do
+  resources :modes do
     collection do
       get 'switch'
     end

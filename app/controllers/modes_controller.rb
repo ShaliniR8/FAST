@@ -1,4 +1,4 @@
-class ErrorsController < ApplicationController
+class ModesController < ApplicationController
 
   def switch
     session[:mode] = params[:mode]
