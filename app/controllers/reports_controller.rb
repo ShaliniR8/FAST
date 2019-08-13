@@ -237,10 +237,10 @@ class ReportsController < ApplicationController
     when 'Add Meeting Minutes'
       redirect_path = meeting_path(@owner.meetings.first)
       Transaction.build_for(
-        @owner.meetings.first.id,
+        @owner.meetings.first,
         params[:commit],
         current_user.id,
-        "#{params[:commit]} - ##{@owner.id}"
+        "Event ##{@owner.get_id}"
       )
     when 'Close Event'
       close_records(@owner)
@@ -366,10 +366,10 @@ class ReportsController < ApplicationController
 
 
   def bind
-    @record=Record.find(params[:record])
-    @report=Report.find(params[:report])
-    @record.report=@report
-    @record.status="Linked"
+    @record = Record.find(params[:record])
+    @report = Report.find(params[:report])
+    @record.report = @report
+    @record.status = "Linked"
     @record.save
     redirect_to report_path(@report)
   end
@@ -406,13 +406,13 @@ class ReportsController < ApplicationController
 
 
   def get_agenda
-    @report=Report.find(params[:id])
-    @meeting=Meeting.find(params[:meeting])
-    @headers=AsapAgenda.get_headers
-    @status=AsapAgenda.get_status
-    @tof={"Yes"=>true,"No"=>false}
-    @accept_deline={"Accepted"=>true,"Declined"=>false}
-    render :partial=>"agenda"
+    @report = Report.find(params[:id])
+    @meeting = Meeting.find(params[:meeting])
+    @headers = AsapAgenda.get_headers
+    @status = AsapAgenda.get_status
+    @tof = {"Yes" => true,"No" => false}
+    @accept_deline = {"Accepted" => true, "Declined" => false}
+    render :partial => "agenda"
   end
 
   def new_attachment
@@ -456,9 +456,9 @@ class ReportsController < ApplicationController
 
 
   def new_minutes
-    @owner=Report.find(params[:id])
+    @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
-    render :partial=>"shared/add_minutes"
+    render :partial => "shared/add_minutes"
   end
 
   def show_narrative

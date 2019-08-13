@@ -119,7 +119,7 @@ class RiskControlsController < ApplicationController
         true, 'Risk Control Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
-    when 'Add Attachment'
+    when 'Add Attachment', 'Add Cost'
       transaction = false
     end
     @owner.update_attributes(params[:risk_control])

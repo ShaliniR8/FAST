@@ -18,17 +18,17 @@
             </thead>
             <tbody id="agendas">
               <%@sra.srm_agendas.each do |a|%>
-                <%if a.user_id==current_user.id%>
+                <%if a.user_id == current_user.id%>
                   <%=f.fields_for :srm_agendas,a do |x|%>
                     <tr>
-                      <td><%=x.text_field :title,:class=>"form-control"%></td>
-                      <td><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
+                      <td><%=x.text_field :title, :class => "form-control"%></td>
+                      <td><%=x.select :status, options_for_select(@status,a.status),{:include_blank => ""}, :class => "form-control"%></td>
                       <td><%=a.get_user%></td>
                       <td><%=a.get_created%></td>
                       <td><%=a.get_updated%></td>
-                      <td><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
-                      <td><%=x.select :accepted,options_for_select(@accept_deline,a.accepted),{:include_blank=>""},:class=>"form-control"%></td>
-                      <td><%=x.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
+                      <td><%=x.select :discussion, options_for_select(@tof,a.discussion),{:include_blank => ""}, :class => "form-control"%></td>
+                      <td><%=x.select :accepted, options_for_select(@accept_deline,a.accepted),{:include_blank => ""}, :class => "form-control"%></td>
+                      <td><%=x.text_area :comment, :rows => "2",:class => "form-control"%></td>
                     </tr>
                   <%end%>
                 <%else%>
@@ -48,7 +48,8 @@
           </table>
         </div>
         <div class="col-xs-12">
-          <%=f.submit "Submit",:class=>"btn btn-success pull-right", :disable_with => "Submitting..."%>
+          <%=hidden_field_tag :sra_id, @sra.id%>
+          <%=f.submit "Save Agenda",:class=>"btn btn-success pull-right", :disable_with => "Submitting..."%>
           <%=link_to_fields "Add",f,:srm_agendas,"SmsAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5"%>
         </div>
       <%end%>

@@ -360,11 +360,11 @@ class RecordsController < ApplicationController
     params[:record][:record_fields_attributes].each_value do |field|
       if field[:value].is_a?(Array)
         field[:value].delete("")
-        field[:value]=field[:value].join(";")
+        field[:value] = field[:value].join(";")
       end
     end
-    @record=Record.new(params[:record])
-    @record.status="New"
+    @record = Record.new(params[:record])
+    @record.status = "New"
     if @record.save
       redirect_to record_path(@record)
     end

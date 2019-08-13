@@ -78,6 +78,8 @@ class SrasController < ApplicationController
   def update
     transaction = true
     @owner = Sra.find(params[:id]).becomes(Sra)
+    sra_meeting = @owner.meeting
+    meeting_redirect = false
     case params[:commit]
     when 'Assign'
       notify(@owner.responsible_user,
@@ -136,6 +138,14 @@ class SrasController < ApplicationController
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
     when 'Add Attachment'
       transaction = false
+    when 'Add Meeting Minutes'
+      meeting_redirect = true
+      Transaction.build_for(
+        sra_meeting,
+        params[:commit],
+        current_user.id,
+        "SRA ##{@owner.get_id}"
+      )
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
@@ -148,7 +158,7 @@ class SrasController < ApplicationController
       )
     end
     @owner.save
-    redirect_to sra_path(@owner)
+    redirect_to meeting_redirect ? meeting_path(sra_meeting) : sra_path(@owner)
   end
 
 
@@ -264,13 +274,13 @@ class SrasController < ApplicationController
 
 
   def get_agenda
-    @sra=Sra.find(params[:id])
-    @meeting=SrmMeeting.find(params[:meeting])
-    @headers=SrmAgenda.get_headers
-    @status=SrmAgenda.get_status
-    @tof={"Yes"=>true,"No"=>false}
-    @accept_deline={"Accepted"=>true,"Declined"=>false}
-    render :partial=>"agenda"
+    @sra = Sra.find(params[:id])
+    @meeting = SrmMeeting.find(params[:meeting])
+    @headers = SrmAgenda.get_headers
+    @status = SrmAgenda.get_status
+    @tof = {"Yes" => true,"No" => false}
+    @accept_deline = {"Accepted" => true,"Declined" => false}
+    render :partial => "agenda"
   end
 
 
@@ -326,7 +336,7 @@ class SrasController < ApplicationController
 
 
   def viewer_access
-    @sra=Sra.find(params[:id])
+    @sra = Sra.find(params[:id])
     @sra.viewer_access=!@sra.viewer_access
     Transaction.build_for(
       @sra,
@@ -340,9 +350,9 @@ class SrasController < ApplicationController
 
 
   def new_minutes
-    @owner=Sra.find(params[:id])
+    @owner = Sra.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
-    render :partial=>"shared/add_minutes"
+    render :partial => "shared/add_minutes"
   end
 
 

@@ -41,7 +41,7 @@
                 @meeting.status == "Open" &&
                 @meeting.has_user(current_user)%>
             <%=link_to 'Close Meeting', '#',
-              :class => 'btn btn-danger',
+              :class => 'btn btn-danger pull-right',
               :id => 'close',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>

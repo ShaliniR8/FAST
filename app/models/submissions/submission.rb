@@ -23,7 +23,7 @@ class Submission < ActiveRecord::Base
   after_create :make_report
   after_update :make_report
 
-  after_commit -> { create_transaction(context: 'User Submitted Report') }
+  after_commit -> { create_transaction(context: 'User Submitted Report') if !self.description.include?('-- dual')}
 
 
   def self.get_meta_fields(*args)
@@ -226,12 +226,12 @@ class Submission < ActiveRecord::Base
         :anonymous          => self.anonymous,
         :event_time_zone    => self.event_time_zone
       )
-    self.attachments.each do |x|
-      temp = Attachment.new(
-        :name => x.name,
-        :caption => x.caption)
-      record.attachments.push(temp)
-    end
+      self.attachments.each do |x|
+        temp = Attachment.new(
+          :name => x.name,
+          :caption => x.caption)
+        record.attachments.push(temp)
+      end
       record.save
       self.records_id = record.id
       self.save
@@ -345,7 +345,7 @@ class Submission < ActiveRecord::Base
       converted = self.class.create({
         :anonymous        => self.anonymous,
         :templates_id     => temp_id,
-        :description      => self.description + " -- dual report of ##{self.id}",
+        :description      => self.description + " -- dual report",
         :event_date       => self.event_date,
         :user_id          => self.user_id,
         :event_time_zone  => self.event_time_zone,
@@ -378,6 +378,11 @@ class Submission < ActiveRecord::Base
       end
       converted.completed = self.completed
       converted.save
+      Transaction.build_for(
+        converted,
+        "Dual Report",
+        session[:user_id],
+        "Dual Report of ##{self.id}")
     end
     converted
   end

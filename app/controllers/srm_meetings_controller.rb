@@ -144,7 +144,7 @@ class SrmMeetingsController < ApplicationController
     if !params[:sras].blank?
       params[:sras].each_pair do |index, value|
         sra = Sra.find(value)
-        sra.meeting_id=@owner.id
+        sra.meeting_id = @owner.id
         Transaction.build_for(
           sra,
           'Add to Meeting',
@@ -171,6 +171,8 @@ class SrmMeetingsController < ApplicationController
         true,
         "Meeting ##{@owner.get_id} Closed")
       status = 'Closed'
+    when 'Save Agenda'
+      transaction_content = "SRA ##{params[:sra_id]}"
     end
 
     if params[:invitations].present?
