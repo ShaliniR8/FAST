@@ -105,6 +105,8 @@ module Concerns
           submission_fields.merge({ submission_field['fields_id'] => submission_field })
         end
 
+        json[:attachments] = json[:attachments].reduce({}){ |attachments, attachment| attachments.merge({ attachment['id'] => attachment }) }
+
         json
       end
 
