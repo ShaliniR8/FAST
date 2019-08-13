@@ -33,11 +33,7 @@ include Transactionable
   accepts_nested_attributes_for :record_fields
   accepts_nested_attributes_for :descriptions
 
-
-  after_create -> { create_transaction(context: 'Generated report from user submission.') }
-
-
-
+  after_create -> { create_transaction(context: 'Generated Report From User Submission.') if !self.description.include?('-- copy')}
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
@@ -295,7 +291,7 @@ include Transactionable
         converted = self.class.create({
           :status => self.status,
           :templates_id => temp_id,
-          :description => self.description,
+          :description => self.description + " -- copy report of ##{self.id}",
           :users_id => self.users_id,
           :event_date => self.event_date,
           :severity => self.severity,
@@ -332,12 +328,17 @@ include Transactionable
             end
           end
         end
+        Transaction.build_for(
+          converted,
+          "Copy",
+          session[:user_id],
+          "Copied Report From ##{self.id}")
       end
     else
       if self.template.map_template.present?
         temp_id = self.template.map_template_id
         new_temp = Template.find(temp_id)
-        self.update_attributes({:templates_id => temp_id})
+        self.update_attributes({:templates_id => temp_id, :description => (self.description + " -- converted from #{self.template.name}")})
         self.record_fields.each do |f|
           if f.map_field.present?
             f.update_attributes({:fields_id => f.field.map_id})
@@ -355,6 +356,11 @@ include Transactionable
             end
           end
         end
+        Transaction.build_for(
+          self,
+          "Convert",
+          session[:user_id],
+          "Report Converted From #{self.template.name}")
       end
     end
   end
