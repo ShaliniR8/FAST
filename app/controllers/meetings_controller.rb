@@ -26,7 +26,7 @@ class MeetingsController < ApplicationController
 
 
   def check_group
-    report=Meeting.find(params[:id]).becomes(Meeting)
+    report = Meeting.find(params[:id]).becomes(Meeting)
     if report.privileges.reject(&:blank?).present?
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
@@ -248,6 +248,8 @@ class MeetingsController < ApplicationController
         "Meeting ##{@owner.get_id} Closed")
     when 'Add Attachment'
       transaction = false
+    when 'Save Agenda'
+      transaction_content = "Event ##{params[:event_id]}"
     end
 
     if params[:invitations].present?
