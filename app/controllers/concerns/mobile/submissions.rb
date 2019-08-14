@@ -244,11 +244,6 @@ module Concerns
               # mark categories as required if they have any required fields
               category['required'] = true if field['required']
 
-              # remove label if show_label is false
-              if (!field['show_label'])
-                field['label'] = nil
-              end
-
               # replace options string with an array, and remove empty values
               field['options'] = field['options']
                 .split(';')
@@ -257,10 +252,10 @@ module Concerns
               field.delete_if do |key, value|
                 case key
                 # these keys are no longer necessary
-                when /field_order|deleted|show_label|element_class|element_id/
+                when /field_order|deleted|element_class|element_id/
                   true
                 # these keys are only relevant if they have a value
-                when /element_id|element_class|options|label|nested_field_value|nested_field_id|required/
+                when /element_id|element_class|options|label|nested_field_value|nested_field_id|required|show_label/
                   value.blank?
                 else
                   false
