@@ -57,9 +57,10 @@ class SessionsController < ApplicationController
   end
 
   def mobile_initialize
-    if BaseConfig::MOBILE_KEY_MAP.key? params[:key]
-      config_file = BaseConfig::MOBILE_KEY_MAP[params[:key]]
-      config_file[:key] = params[:key]
+    key = params[:key].downcase.gsub('o','0')
+    if BaseConfig::MOBILE_KEY_MAP.key? key
+      config_file = BaseConfig::MOBILE_KEY_MAP[key]
+      config_file[:key] = key
       render :json => config_file.to_json, :status => 200
       return
     else
