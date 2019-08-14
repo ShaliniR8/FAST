@@ -98,7 +98,7 @@ module Concerns
       def format_submission_json(submission)
         json = submission['submission']
 
-        json[:submitted_by] = json[:anonymous] ? 'Anonymous' : User.find(json['user_id']).full_name rescue nil
+        json[:submitted_by] = json['anonymous'] ? 'Anonymous' : User.find(json['user_id']).full_name rescue nil
 
         json[:submission_fields] = json[:submission_fields].reduce({}) do |submission_fields, submission_field|
           # Creates an id map based on template field id
