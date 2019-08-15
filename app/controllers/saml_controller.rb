@@ -25,12 +25,12 @@ class SamlController < ApplicationController
         when 'mobile'
           Rails.logger.debug 'User on mobile'
 
-          oauth_token = OauthToken.new
-          oauth_token.user = current_user
-          oauth_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
-          oauth_token.save
+          oauth2_token = Oauth2Token.new
+          oauth2_token.user = current_user
+          oauth2_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
+          oauth2_token.save
 
-          redirect_to "prosafet://oauth#token=#{oauth_token[:token]}"
+          redirect_to "prosafet://oauth#token=#{oauth2_token[:token]}"
         else
           redirect_to_target_or_default(root_url)
         end
