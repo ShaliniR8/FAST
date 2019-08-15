@@ -65,10 +65,9 @@ class BaseConfig
     # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
      # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
   MOBILE_KEY_MAP = {
-    Digest::SHA2.hexdigest('test_admin')[0..15] => BaseConfig::MOBILE_KEY,
-    # Digest::SHA2.hexdigest('test_demo')[0..15] => DemoConfig::MOBILE_KEY,
-    Digest::SHA2.hexdigest('test_scx')[0..15] => SCX_Config::MOBILE_KEY,
-  }
+    'test_admin' => BaseConfig::MOBILE_KEY,
+    'test_scx' => SCX_Config::MOBILE_KEY,
+  }.map{ |key, value| [Digest::SHA2.hexdigest(key)[0..15], value] }.to_h
 
 
   def self.get_sra_meta_fields
