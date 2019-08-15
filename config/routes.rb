@@ -141,7 +141,14 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :sections
-  resources :root_causes
+  resources :root_causes do
+    collection do
+      get 'new_root_cause'
+      get 'retract_categories'
+      post 'add'
+      get 'reload'
+    end
+  end
   resources :checklist_templates do
     member do
 

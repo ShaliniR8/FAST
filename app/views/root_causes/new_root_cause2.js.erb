@@ -22,7 +22,7 @@ swal({
     });
 
     // Update Root Cause section
-    $.get("<%=reload_root_causes_hazard_path(@owner)%>", function(data){
+    $.get("<%=reload_root_causes_path(owner_id: @owner.id, owner_type: @owner.class.name)%>", function(data){
       $("#root_causes_table").html(data);
     });
 
@@ -42,7 +42,7 @@ function update_options(section, second_id){
     if(second_id != ""){
       additional_params = "&second_id=" + second_id
     }
-    $.get("<%=retract_root_cause_categories_hazards_path%>?category=" + $(section).val() + additional_params, function(data){
+    $.get("<%=retract_categories_root_causes_path%>?category=" + $(section).val() + additional_params, function(data){
       $("#<%=@categories.first.level%>").html(data);
     });
   }

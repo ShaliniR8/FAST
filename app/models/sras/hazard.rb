@@ -8,6 +8,7 @@ class Hazard < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Transactionable
+  include RootCausable
 
 #Associations List
   belongs_to :sra,                :foreign_key => "sra_id",                 :class_name => "Sra"
@@ -16,7 +17,6 @@ class Hazard < ActiveRecord::Base
 
   has_many :risk_controls,        :foreign_key => "hazard_id",              :class_name => "RiskControl",         :dependent => :destroy
   has_many :descriptions,         :foreign_key => "owner_id",               :class_name => "HazardDescription",   :dependent => :destroy
-  has_many :root_causes,          :foreign_key => "owner_id",               :class_name => "HazardRootCause",     :dependent => :destroy
 
   accepts_nested_attributes_for :risk_controls
   accepts_nested_attributes_for :descriptions
@@ -102,7 +102,7 @@ class Hazard < ActiveRecord::Base
       ]
     end
   end
-  
+
 
   def get_root_causes
     root_cause_arr = root_causes.map{|x| "<li>#{x.cause_option.name}</li>"}.join("").html_safe

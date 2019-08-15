@@ -1,11 +1,11 @@
-<div class="col-sm-12 col-md-12 col-lg-12"%>
+<div class="col-sm-12 col-md-12 col-lg-12">
   <div class="just-padding">
 
     <div class="list-group list-group-root well">
 
       <div class="list-group-item">
         <%if option.children.present?%>
-          <a href="#list_<%=option.id%>" class="cat_<%=option.id%> glyphicon glyphicon-chevron-right" data-toggle="collapse"></a>
+          <a href="#list_<%=option.id%>" class="cat_<%=option.id%> glyphicon glyphicon-chevron-down" data-toggle="collapse"></a>
         <%end%>
         <%=option.name%>
         <div class="pull-right" aid="<%=option.id%>" id="<%=option.id%>">
@@ -15,7 +15,7 @@
         </div>
       </div>
 
-      <div class="list-group collapse" id="list_<%=option.id%>">
+      <div class="list-group" id="list_<%=option.id%>">
         <%option.children.each do |x|%>
           <%if !x.hidden?%>
             <%=render "sub_options2", :option => x, :root => root%>
@@ -77,8 +77,8 @@
   $(function(){
     $('.cat_<%=option.id%>').on('click', function() {
       $(this)
-        .toggleClass('glyphicon-chevron-right')
-        .toggleClass('glyphicon-chevron-down');
+        .toggleClass('glyphicon-chevron-down')
+        .toggleClass('glyphicon-chevron-right');
     });
 
     $("#<%=option.id%> .add_btn").on("click", function(){

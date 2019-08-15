@@ -169,6 +169,13 @@
             # :like => @like,
             :can_change => can_change%>
 
+          <%if BaseConfig.airline[:has_root_causes]%>
+            <%=render '/root_causes/root_causes',
+              :owner => @report,
+              :show_btns => true,
+              :headers => RootCause.get_headers%>
+          <%end%>
+
           <%=render '/causes/all', :owner => @report, :cause_type => 'description', :can_change => can_change%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'cause', :can_change => can_change%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'detection', :can_change => can_change%>
