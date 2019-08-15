@@ -6,6 +6,7 @@ class Report < ActiveRecord::Base
   include Investigationable
   include Sraable
   include Transactionable
+  include RootCausable
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :report_meetings,    foreign_key: 'report_id',   class_name: 'ReportMeeting',      dependent: :destroy
@@ -36,19 +37,19 @@ class Report < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     [
-      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
-      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
+      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',          required: false },
+      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',          required: false },
       {                                                                                   type: 'newline',  visible: 'show'                        },
-      {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show', required: true  },
-      {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show', required: true  },
+      {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: true  },
+      {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show',     required: true  },
       {                                                                                   type: 'newline',  visible: 'show'                        },
-      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',           required: false },
+      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',               required: false },
 
-      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_label_options },
-      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_venue_options },
-      {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'form,show',       required: false },
-      {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show', required: true  },
-      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',            required: false },
+      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_label_options },
+      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_venue_options },
+      {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'event_summary',       required: false },
+      {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show',     required: true  },
+      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',                required: false },
 
       {field: 'eir',                  title: 'EIR Number',                num_cols: 6,    type: 'text',     visible: 'close',           required: false },
       {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
