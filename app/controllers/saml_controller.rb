@@ -24,7 +24,13 @@ class SamlController < ApplicationController
         case params[:RelayState]
         when 'mobile'
           Rails.logger.debug 'User on mobile'
-          redirect_to_target_or_default(root_url)
+
+          oauth_token = OauthToken.new
+          oauth_token.user = current_user
+          oauth_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
+          oauth_token.save
+
+          redirect_to "prosafet://oauth#token=#{oauth_token[:token]}"
         else
           redirect_to_target_or_default(root_url)
         end
