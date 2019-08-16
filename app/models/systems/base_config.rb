@@ -50,14 +50,21 @@ class BaseConfig
     }
   }
 
-
   # This Mobile Key is used for the admin/ProDIGIQ Staff config set; ensure all new portals are included in it
   MOBILE_KEY = {
     key_name: 'Admin',
     portals: [
-      { label: 'Demo',               subdomain: 'demo' },
-      { label: 'Sun Country',        subdomain: 'scx' },
-      { label: 'Sun Country Direct', subdomain: 'scx' },
+      { label: 'Demo',                subdomain: 'demo' },
+      { label: 'Miami Air',           subdomain: 'bsk'},
+      { label: 'Miami Air Training',  subdomain: 'bsk-training'},
+      { label: 'Northern Air',        subdomain: 'nams' },
+      { label: 'Sun Country',         subdomain: 'scx', sso: true },
+      { label: 'Sun Country Direct',  subdomain: 'scx' },
+      { label: '<Dev 3000>',          subdomain: 'port=3000' },
+      { label: '<Dev 3001>',          subdomain: 'port=3001' },
+      { label: '<Dev 3002>',          subdomain: 'port=3002' },
+      { label: '<Dev 3003>',          subdomain: 'port=3003' },
+      { label: '<Dev 3004>',          subdomain: 'port=3004' },
     ]
   }
 
@@ -65,8 +72,11 @@ class BaseConfig
     # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
      # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
   MOBILE_KEY_MAP = {
-    'test_admin' => BaseConfig::MOBILE_KEY,
-    'test_scx' => SCX_Config::MOBILE_KEY,
+    'test_admin'  => BaseConfig::MOBILE_KEY,  # 1230-7002-B358-EF87
+    'test_demo'   => Demo_Config::MOBILE_KEY, # EF0F-2CC7-3F40-38F0
+    'test_bsk'    => BSK_Config::MOBILE_KEY,  # C493-5CF0-4ABB-BA9C
+    'test_nams'   => NAMS_Config::MOBILE_KEY, # 6E15-922C-830C-A6D9
+    'test_scx'    => SCX_Config::MOBILE_KEY,  # 4B94-FB7B-DDAD-6653
   }.map{ |key, value| [Digest::SHA2.hexdigest(key)[0..15], value] }.to_h
 
 

@@ -8,7 +8,7 @@ class SCX_Config
   MOBILE_KEY = {
     key_name: 'SCX',
     portals: [
-      { label: 'Sun Country',          subdomain: 'scx' },
+      { label: 'Sun Country', subdomain: 'scx', sso: true },
       # { label: 'Sun Country Training', subdomain: 'scx-training' },
     ]
   }

@@ -5,6 +5,13 @@ class Demo_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  MOBILE_KEY = {
+    key_name: 'Demo',
+    portals: [
+      { label: 'Demo', subdomain: 'demo' },
+    ]
+  }
+
   def self.airline_config
     {
       :version                                        => "1.0.3",
