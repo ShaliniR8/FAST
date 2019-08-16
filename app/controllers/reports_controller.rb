@@ -192,6 +192,7 @@ class ReportsController < ApplicationController
       .sort_by!{|a| a.name}
     @action = "edit"
     @report = Report.find(params[:id])
+    @fields = Report.get_meta_fields('form', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
     load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
@@ -277,7 +278,7 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show')
+    @fields = Report.get_meta_fields('show', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
   end
 
 

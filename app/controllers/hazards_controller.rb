@@ -147,7 +147,6 @@ class HazardsController < ApplicationController
   end
 
 
-
   def new_attachment
     @owner=Hazard.find(params[:id])
     @attachment=Attachment.new
@@ -155,90 +154,7 @@ class HazardsController < ApplicationController
   end
 
 
-
-  def new_root_cause
-    @hazard = Hazard.find(params[:id])
-    @root = CauseOption.find(1)
-    @categories = @root.children.keep_if{|x| !x.hidden?}
-    render :partial => "/root_causes/new_root_cause"
-  end
-
-
-
-  def new_root_cause2(first_id=nil, second_id=nil)
-    @owner = Hazard.find(params[:owner_id])
-    @root = CauseOption.find(1)
-    @categories = @root.children.keep_if{|x| !x.hidden?}
-    respond_to do |format|
-      format.js {render "/root_causes/new_root_cause2", layout: false, :locals => {:first_id => first_id, :second_id => second_id} }
-    end
-  end
-
-
-
-  def add_root_cause
-    @owner = Hazard.find(params[:owner_id])
-    if params[:root_causes].present?
-      if params[:root_causes][:cause_option_id].present?
-        root_cause = HazardRootCause.create(
-          :owner_id => @owner.id,
-          :user_id  => current_user.id,
-          :cause_option_id => params[:root_causes][:cause_option_id],
-          :cause_option_value => params[:root_causes][:cause_option_value])
-        ancestors = root_cause.cause_option.ancestors
-        first_id = ancestors[1].id
-        second_id = ancestors[2].id
-      end
-    end
-    first_id ||= nil
-    second_id ||= nil
-    new_root_cause2(first_id, second_id)
-  end
-
-
-
-  def reload_root_causes
-    @hazard = Hazard.find(params[:id])
-    @root_cause_headers = HazardRootCause.get_headers
-    render :partial => "/root_causes/root_causes_table",
-      :locals => {
-        :headers => HazardRootCause.get_headers,
-        :owner => @hazard,
-        :show_btns => true}
-  end
-
-
-
-  def retract_root_cause_categories
-    second_id = params[:second_id] if params[:second_id]
-    @cause_option = CauseOption.find(params[:category])
-    @categories = @cause_option.children.keep_if{|x| !x.hidden?}.sort_by{|x| x.name}
-    render_category = false
-    @categories.each do |x|
-      if x.children.length > 0
-        render_category = true
-      end
-    end
-    if render_category
-      if params[:category_only]
-        ancestor_ids = params[:ancestor_ids].present? ? params[:ancestor_ids].split(",").map(&:to_i) : []
-        render :partial => "/root_causes/select_category_in_trending", :locals => {:ancestor_ids => ancestor_ids}
-      else
-        render :partial => "/root_causes/new_root_cause_categories", :locals => {:second_id => second_id}
-      end
-    else
-      if params[:category_only]
-        false
-      else
-        @has_option = @categories.length > 0
-        render :partial => "/root_causes/new_root_cause_value"
-      end
-    end
-  end
-
-
   # Following are functions related to trending the root causes.
-
   def root_cause_trend
     @records = Hazard.find(:all)
     if params[:start_date].present?

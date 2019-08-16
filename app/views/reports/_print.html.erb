@@ -5,7 +5,7 @@
 <div class="content">
 
   <%=render "forms/print_fields",
-    :fields => Report.get_meta_fields('show'),
+    :fields => Report.get_meta_fields('show', BaseConfig.airline[:event_summary] ? 'event_summary' : ''),
     :owner => owner,
     :deidentified => deidentified%>
 

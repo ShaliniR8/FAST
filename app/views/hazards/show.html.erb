@@ -115,10 +115,10 @@
           :record => @hazard%>
 
         <%can_change = @hazard.status != "Completed" && current_user.has_access("hazards", "edit")%>
-        
-        <%=render 'shared/choose_show_matrix', 
-          :owner => @hazard, 
-          :show_btn => true, 
+
+        <%=render 'shared/choose_show_matrix',
+          :owner => @hazard,
+          :show_btn => true,
           :type => 'hazards',
           :allow_mitigate => true,
           :can_change => can_change,
@@ -130,7 +130,7 @@
           <%=render '/root_causes/root_causes',
             :owner => @hazard,
             :show_btns => true,
-            :headers => HazardRootCause.get_headers%>
+            :headers => RootCause.get_headers%>
         <%end%>
 
         <%=render '/causes/all',
