@@ -1,3 +1,4 @@
+#Checklists V1
 class ChecklistItem < ActiveRecord::Base
   belongs_to :submitter,foreign_key:"user_id",class_name:"User"
   has_many :packages,foreign_key: "owner_id",class_name: "Package"

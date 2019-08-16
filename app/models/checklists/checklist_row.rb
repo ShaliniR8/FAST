@@ -1,3 +1,4 @@
+# Checklists V3
 class ChecklistRow < ActiveRecord::Base
 
   has_many :checklist_cells, foreign_key: :checklist_row_id, dependent: :destroy

@@ -1,3 +1,4 @@
+# Checklists V3
 class ChecklistCell < ActiveRecord::Base
 
   belongs_to :checklist_row, foreign_key: :checklist_row_id, class_name: "ChecklistRow"

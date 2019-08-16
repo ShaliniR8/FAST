@@ -1,3 +1,4 @@
+# Checklists V3
 class ChecklistTemplate < ActiveRecord::Base
 
   has_many :checklist_questions, foreign_key: :owner_id, dependent: :destroy
