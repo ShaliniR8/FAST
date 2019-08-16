@@ -64,7 +64,7 @@ class SessionsController < ApplicationController
       render :json => config_file.to_json, :status => 200
       return
     else
-      render :json => { error: 'Invalid Activation Key' }.to_json, :status => 401
+      render :json => { error: 'Invalid Activation Key.' }.to_json, :status => 401
     end
   end
 
