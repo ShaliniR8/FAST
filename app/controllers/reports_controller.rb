@@ -142,6 +142,7 @@ class ReportsController < ApplicationController
       base.report = @report
       @report.records.push(base)
     end
+    @fields = Report.get_meta_fields('form', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
     @report_fields = Record.get_meta_fields('index')
     @candidates = Record
       .find(:all)
