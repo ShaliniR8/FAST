@@ -30,7 +30,9 @@ class SamlController < ApplicationController
           oauth2_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
           oauth2_token.save
 
-          redirect_to "prosafet://oauth?token=#{oauth2_token[:token]}"
+          @token = oauth2_token[:token]
+
+          render 'deep_link'
         else
           redirect_to_target_or_default(root_url)
         end
