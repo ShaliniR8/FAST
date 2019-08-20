@@ -28,7 +28,9 @@ class SamlController < ApplicationController
           oauth2_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
           oauth2_token.save
 
-          @url = "#{params[:RelayState].split('_').drop(1).join('_')}#{oauth2_token[:token]}"
+          deep_link = URI.unescape(params[:RelayState].split('_').drop(1).join('_'))
+
+          @url = "#{deep_link}#{oauth2_token[:token]}"
 
           render :partial => 'deep_link'
         else
