@@ -188,20 +188,22 @@ module Concerns
                   parent_field['element_id'] == child_field['element_id'] && parent_field['element_class'].include?(parent_class)
                 end
 
-                # create new nested fields based on parent id and LOSAV JSON
-                parent_field['options']
-                  .split(';')
-                  .delete_if{ |option| option.blank? }
-                  .each do |option|
-                    new_field = child_field.clone
-                    new_field['nested_field_id'] = parent_field['id']
-                    new_field['nested_field_value'] = option
-                    new_field['options'] = losav_options[option].join(';')
-                    new_fields.push(new_field)
-                  end
+                if parent_field
+                  # create new nested fields based on parent id and LOSAV JSON
+                  parent_field['options']
+                    .split(';')
+                    .delete_if{ |option| option.blank? }
+                    .each do |option|
+                      new_field = child_field.clone
+                      new_field['nested_field_id'] = parent_field['id']
+                      new_field['nested_field_value'] = option
+                      new_field['options'] = losav_options[option].join(';')
+                      new_fields.push(new_field)
+                    end
 
-                # set child_field to be deleted, replaced by new fields
-                child_field['deleted'] = true
+                  # set child_field to be deleted, replaced by new fields
+                  child_field['deleted'] = true
+                end
 
               end
             end
