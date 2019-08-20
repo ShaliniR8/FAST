@@ -32,7 +32,7 @@ class SamlController < ApplicationController
 
           @token = oauth2_token[:token]
 
-          render 'deep_link'
+          render :partial => 'deep_link'
         else
           redirect_to_target_or_default(root_url)
         end
