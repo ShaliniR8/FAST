@@ -22,15 +22,14 @@ class SamlController < ApplicationController
         session[:mode]=""
         session[:last_active] = Time.now
         case params[:RelayState]
-        when 'mobile'
-          Rails.logger.debug 'User on mobile'
-
+        when /mobile|mobile_dev/
           oauth2_token = Oauth2Token.new
           oauth2_token.user = current_user
           oauth2_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
           oauth2_token.save
 
           @token = oauth2_token[:token]
+          @url = params[:RelayState] === 'mobile' ? 'prosafet://' : 'exp://wg-qka.community.app.exp.direct:80/'
 
           render :partial => 'deep_link'
         else
@@ -56,7 +55,7 @@ class SamlController < ApplicationController
     end
   end
 
-  def sp_logout_request
+  def sp_logout_reques
     settings = saml_settings
 
     if settings.idp_slo_target_url.nil?
