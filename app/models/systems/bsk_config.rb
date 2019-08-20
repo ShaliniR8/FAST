@@ -7,7 +7,7 @@ class BSK_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => "1.1.0",
 
       :name                                           => 'Miami Air International',
       :code                                           => "BSK",
@@ -16,7 +16,7 @@ class BSK_Config
       :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => false,
       :allow_set_alert                                => false,
-      :has_verification                               => false,
+      :has_verification                               => true,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
       :time_zone                                      => 'Eastern Time (US & Canada)',
@@ -27,7 +27,7 @@ class BSK_Config
       :submission_time_zone                           => true,
       :enable_orm                                     => false,
       :observation_phases_trend                       => true,
-      :allow_template_nested_fields                   => false,
+      :allow_template_nested_fields                   => true,
       :checklist_version                              => '1',
 
       # Safety Assurance Module
