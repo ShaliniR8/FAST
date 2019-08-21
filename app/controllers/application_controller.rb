@@ -57,13 +57,15 @@ class ApplicationController < ActionController::Base
     end
 
     # expire oauth token
-    oauth_expiration = current_client_application.name == 'prosafet_app_personal' ? 1.week : 3.hours
-    oauth_expire_date = Time.now - oauth_expiration
+    if current_token.present?
+      oauth_expiration = current_client_application.name == 'prosafet_app_personal' ? 1.week : 3.hours
+      oauth_expire_date = Time.now - oauth_expiration
 
-    if current_token.present? && current_token.authorized_at < oauth_expire_date
-      Oauth2Token.where('user_id = :uid and client_application_id = :caid and authorized_at < :expire_date',
-        { uid: current_user.id, caid: current_client_application.id, expire_date: oauth_expire_date }).destroy_all
-      redirect_to logout_path
+      if current_token.authorized_at < oauth_expire_date
+        Oauth2Token.where('user_id = :uid and client_application_id = :caid and authorized_at < :expire_date',
+          { uid: current_user.id, caid: current_client_application.id, expire_date: oauth_expire_date }).destroy_all
+        redirect_to logout_path
+      end
     end
 
     if !session[:last_active].present?
