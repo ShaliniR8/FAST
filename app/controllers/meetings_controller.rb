@@ -27,7 +27,7 @@ class MeetingsController < ApplicationController
 
   def check_group
     report = Meeting.find(params[:id]).becomes(Meeting)
-    if report.privileges.reject(&:blank?).present?
+    if (report.privileges.reject(&:blank?).present? rescue false)
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
           return true
