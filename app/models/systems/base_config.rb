@@ -55,16 +55,18 @@ class BaseConfig
     key_name: 'Admin',
     portals: [
       { label: 'Demo',                subdomain: 'demo' },
-      { label: 'Miami Air',           subdomain: 'bsk'},
-      { label: 'Miami Air Training',  subdomain: 'bsk-training'},
+      { label: 'Miami Air',           subdomain: 'bsk' },
+      { label: 'Miami Air Training',  subdomain: 'bsk-training' },
       { label: 'Northern Air',        subdomain: 'nams' },
       { label: 'Sun Country',         subdomain: 'scx', sso: true },
+      { label: 'Sun Country Shared',  subdomain: 'scx', shared: true },
       { label: 'Sun Country Direct',  subdomain: 'scx' },
       { label: '<Dev 3000>',          subdomain: 'port=3000' },
       { label: '<Dev 3001>',          subdomain: 'port=3001' },
       { label: '<Dev 3002>',          subdomain: 'port=3002' },
       { label: '<Dev 3003>',          subdomain: 'port=3003' },
       { label: '<Dev 3004>',          subdomain: 'port=3004' },
+      { label: '<Dev 3004 Shared>',   subdomain: 'port=3004', shared: true },
     ]
   }
 

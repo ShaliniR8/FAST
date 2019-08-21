@@ -25,7 +25,7 @@ class SamlController < ApplicationController
         when /^mobile/
           oauth2_token = Oauth2Token.new
           oauth2_token.user = current_user
-          oauth2_token.client_application = ClientApplication.where(name: 'prosafet_iOS').first
+          oauth2_token.client_application = ClientApplication.where(name: 'prosafet_app_personal').first
           oauth2_token.save
 
           deep_link = URI.unescape(params[:RelayState].split('_').drop(1).join('_'))
