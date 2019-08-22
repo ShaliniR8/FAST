@@ -107,7 +107,7 @@ class User < ActiveRecord::Base
       return (admin && permissions.key?(con_name) && permissions[con_name].include?('admin')) ||
         (permissions.key?(con_name) && permissions[con_name].include?(act_name))
     end
-    strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name][act_name].present?) : true
+    strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name].invert[act_name].present?) : true
   end
 
 
