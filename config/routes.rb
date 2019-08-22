@@ -34,6 +34,7 @@ PrdgSession::Application.routes.draw do |map|
   end
 
   resources :signatures, only:[:show]
+  resources :errors
 
   # System Feature
   resources :automated_notifications do
