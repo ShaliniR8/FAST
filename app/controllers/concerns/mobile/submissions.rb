@@ -12,6 +12,11 @@ module Concerns
       def index_as_json
         @records = Submission.where(user_id: current_user.id).includes(:template)
 
+        fetch_months = current_user.mobile_fetch_months
+        if fetch_months > 0
+          @records = @records.where('created_at > ?', Time.now - fetch_months.months)
+        end
+
         json = {}
 
         # Convert to id map for fast lookup

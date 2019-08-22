@@ -13,6 +13,11 @@ module Concerns
         @records = Audit.all
         filter_audits
 
+        fetch_months = current_user.mobile_fetch_months
+        if fetch_months > 0
+          @records = @records.where('created_at > ?', Time.now - fetch_months.months)
+        end
+
         json = {}
 
         # Convert to id map for fast audit lookup

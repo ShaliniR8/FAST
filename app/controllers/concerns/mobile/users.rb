@@ -7,7 +7,7 @@ module Concerns
 
       def current_json
         # Get only the data that we need from the user
-        mobile_user_info = current_user.as_json(only: [:id, :full_name, :email])['user']
+        mobile_user_info = current_user.as_json(only: [:id, :full_name, :email, :mobile_fetch_months])['user']
 
         # Get which modules the user has access to
         all_mobile_modules = ['ASAP', 'Safety Assurance']
@@ -34,6 +34,11 @@ module Concerns
         end
 
         render :json => mobile_user_info
+      end
+
+      def mobile_months
+        current_user.update_attribute(:mobile_fetch_months, params[:months])
+        render :json => { success: 'User\'s mobile fetch months have been updated.' }, :status => 200
       end
 
       ########################################################
