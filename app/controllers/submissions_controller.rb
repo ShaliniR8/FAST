@@ -322,12 +322,8 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
-<<<<<<< HEAD
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
-=======
-    params[:submission][:completed] = params[:commit] == 'Save for Later' ? false : true
->>>>>>> 671ba1f... Created update_as_json for both the audits and submissions concerns, fixed boolean redundancy in submissions controller create
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
