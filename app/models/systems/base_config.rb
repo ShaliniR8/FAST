@@ -74,11 +74,11 @@ class BaseConfig
     # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
      # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
   MOBILE_KEY_MAP = {
-    'test_admin'  => BaseConfig::MOBILE_KEY,  # 1230-7002-B358-EF87
-    'test_demo'   => Demo_Config::MOBILE_KEY, # EF0F-2CC7-3F40-38F0
-    'test_bsk'    => BSK_Config::MOBILE_KEY,  # C493-5CF0-4ABB-BA9C
-    'test_nams'   => NAMS_Config::MOBILE_KEY, # 6E15-922C-830C-A6D9
-    'test_scx'    => SCX_Config::MOBILE_KEY,  # 4B94-FB7B-DDAD-6653
+    '[Admin Key]' => BaseConfig::MOBILE_KEY,  # 0D03-579F-421F-E903
+    'Demo Key'    => Demo_Config::MOBILE_KEY, # 353D-0FC5-E54E-9C2F
+    'BSK Key'     => BSK_Config::MOBILE_KEY,  # F9A1-67E8-DC44-4D8C
+    'NAMS Key'    => NAMS_Config::MOBILE_KEY, # F3E3-60E8-84C2-24CF
+    'SCX Key'     => SCX_Config::MOBILE_KEY,  # 33F1-4A88-339C-E6FD
   }.map{ |key, value| [Digest::SHA2.hexdigest(key)[0..15], value] }.to_h
 
 
