@@ -10,7 +10,9 @@ module Concerns
       end
 
       def index_as_json
-        @records = Submission.where(user_id: current_user.id).includes(:template)
+        @records = Submission.where(user_id: current_user.id)
+          .includes(:template)
+          .can_be_accessed(current_user)
 
         fetch_months = current_user.mobile_fetch_months
         if fetch_months > 0
