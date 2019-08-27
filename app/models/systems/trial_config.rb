@@ -5,6 +5,13 @@ class Trial_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  MOBILE_KEY = {
+    key_name: 'Trial',
+    portals: [
+      { label: 'Trial', subdomain: 'trial' },
+    ]
+  }
+
   def self.airline_config
     {
       :version                                        => "1.1.0",
