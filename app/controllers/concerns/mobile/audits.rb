@@ -102,9 +102,7 @@ module Concerns
         json[:checklists] = json[:checklists].reduce({}) do |checklists, checklist|
           # Gathers all checklist headers that belong to this audit's checklists
           id = checklist[:checklist_header]['id']
-          if checklist_headers[id].blank?
-            checklist_headers[id] = checklist[:checklist_header]
-          end
+          checklist_headers[id] ||= checklist[:checklist_header]
           checklist.delete(:checklist_header)
 
           # Creates id maps for checklist rows and checklist cells
@@ -146,18 +144,14 @@ module Concerns
         user_fields.map do |field|
           key = field[:field]
           user_id = json[key]
-          if user_id
-            json[key] = User.find(user_id).full_name rescue nil
-          end
+          json[key] = User.find(user_id).full_name rescue nil if user_id
         end
 
         # Creates a key map for all the meta field titles that will be shown
         json[:meta_field_titles] = {}
         @fields.each do |field|
           key = field[:field]
-          if json[key].present?
-            json[:meta_field_titles][key] = field[:title]
-          end
+          json[:meta_field_titles][key] = field[:title] if json[key].present?
         end
 
         json
