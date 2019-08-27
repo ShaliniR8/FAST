@@ -58,7 +58,7 @@ class SamlController < ApplicationController
     end
   end
 
-  def sp_logout_reques
+  def sp_logout_request
     settings = saml_settings
 
     if settings.idp_slo_target_url.nil?
