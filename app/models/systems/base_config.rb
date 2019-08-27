@@ -11,9 +11,7 @@ class BaseConfig
     :risk_factor      => {"Green - Acceptable" => "lime", "Yellow - Acceptable with mitigation" => "yellow", "Orange - Unacceptable" => "orange"},
   }
 
-
-  MODULES =
-  {
+  MODULES = {
     "ASAP" => {
       :display_name => "ASAP",
       :objects => {
@@ -21,11 +19,13 @@ class BaseConfig
         "Record" => "Report",
         "Report" => "Event",
         "CorrectiveAction" => "Corrective Action",
-      }},
+      }
+    },
 
     "SMS IM" => {
       :display_name => "SMS IM",
-      :objects => {}},
+      :objects => {}
+    },
 
     "SMS" => {
       :display_name => "Safety Assurance",
@@ -36,7 +36,8 @@ class BaseConfig
         "Investigation" => "Investigation",
         "Finding" => "Finding",
         "SmsAction" => "Corrective Action",
-      }},
+      }
+    },
 
     "SRM" => {
       :display_name => "Safety Risk Management",
@@ -45,8 +46,47 @@ class BaseConfig
         "Hazard" => "Hazard",
         "RiskControl" => "Risk Control",
         "SafetyPlan" => "Safety Plan",
-      }}
+      }
+    }
   }
+
+  # This Mobile Key is used for the admin/ProDIGIQ Staff config set; ensure all new portals are included in it
+  MOBILE_KEY = {
+    key_name: 'Admin',
+    portals: [
+      { label: 'Sun Country Shared',  subdomain: 'scx', shared: true },
+      { label: 'Sun Country Direct',  subdomain: 'scx' },
+      { label: '<Dev 3000>',          subdomain: 'port=3000' },
+      { label: '<Dev 3001>',          subdomain: 'port=3001' },
+      { label: '<Dev 3002>',          subdomain: 'port=3002' },
+      { label: '<Dev 3003>',          subdomain: 'port=3003' },
+      { label: '<Dev 3004>',          subdomain: 'port=3004' },
+    ].concat([
+      Trial_Config::MOBILE_KEY,
+      Demo_Config::MOBILE_KEY,
+      BSK_Config::MOBILE_KEY,
+      NAMS_Config::MOBILE_KEY,
+      SCX_Config::MOBILE_KEY,
+    ].map{ |config| config[:portals] }.flatten)
+  }
+
+  # Mobile Keys are used for initializing the app to specific portals.
+    # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
+     # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
+  MOBILE_KEY_MAP = {
+    '[Admin Key]' => BaseConfig::MOBILE_KEY,    # 0D03-579F-421F-E903
+    'Trial Key'   => Trial_Config::MOBILE_KEY,  # 6158-BC31-0338-233B
+    'Demo Key'    => Demo_Config::MOBILE_KEY,   # 353D-0FC5-E54E-9C2F
+    'BSK Key'     => BSK_Config::MOBILE_KEY,    # F9A1-67E8-DC44-4D8C
+    'NAMS Key'    => NAMS_Config::MOBILE_KEY,   # F3E3-60E8-84C2-24CF
+    'SCX Key'     => SCX_Config::MOBILE_KEY,    # 33F1-4A88-339C-E6FD
+  }.map{ |key, value| [Digest::SHA2.hexdigest(key)[0..15], value] }.to_h
+
+  # Put this into any ruby compiler to generate a human readable key
+    # require 'digest'
+    # key = '[Admin Key]'
+    # puts Digest::SHA2.hexdigest(key)[0..15].upcase.scan(/.{4}/).join('-')
+
 
   def self.get_sra_meta_fields
     airline_class = Object.const_get("#{BaseConfig.airline_code}_Config")

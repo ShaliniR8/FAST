@@ -56,6 +56,18 @@ class SessionsController < ApplicationController
     end
   end
 
+  def mobile_initialize
+    key = params[:key].downcase.gsub('o','0')
+    if BaseConfig::MOBILE_KEY_MAP.key? key
+      config_file = BaseConfig::MOBILE_KEY_MAP[key]
+      config_file[:key] = key
+      render :json => config_file.to_json, :status => 200
+      return
+    else
+      render :json => { error: 'Invalid Activation Key.' }.to_json, :status => 401
+    end
+  end
+
 
 # -------------- BELOW ARE EVERYTHING FOR PROSAFET APP
   def get_user_json

@@ -19,6 +19,7 @@ class OauthController < ApplicationController
     if user
       Rails.logger.info user.inspect
       session[:user_id] = user.id
+      define_session_permissions
     else
       respond_to do |format|
         format.html do

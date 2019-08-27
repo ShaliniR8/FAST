@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable, :updated_at
+    :android_version, :disable, :sso_id, :updated_at
 
 
 
@@ -83,8 +83,8 @@ class User < ActiveRecord::Base
   end
 
 
-  # admin: will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
-  # strict: will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
+  # admin: if set to true, will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
+  # strict: if set to true, will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
   def has_access(con_name, act_name, strict:false, admin:false)
     return true if admin && self.admin?
     rules = Rails.application.config.restricting_rules

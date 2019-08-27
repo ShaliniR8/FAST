@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20190627153741) do
+ActiveRecord::Schema.define(:version => 20190815161344) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -50,31 +50,32 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "user_poc_id"
   end
 
-  create_table "airports", :force => true do |t|
-    t.string "arpt_ident"
-    t.string "name"
-    t.string "state_prov"
-    t.string "icao"
-    t.string "faa_host_id"
-    t.string "loc_hdatum"
-    t.string "wgs_datum"
-    t.string "wgs_lat"
-    t.string "wgs_dlat"
-    t.string "wgs_long"
-    t.string "wgs_dlong"
-    t.string "elev"
-    t.string "arpt_type"
-    t.string "mag_var"
-    t.string "wac"
-    t.string "beacon"
-    t.string "second_arpt"
-    t.string "opr_agy"
-    t.string "sec_name"
-    t.string "sec_icao"
-    t.string "sec_faa"
-    t.string "sec_opr_agy"
-    t.string "cycle_date"
-    t.string "_id"
+  create_table "airports", :id => false, :force => true do |t|
+    t.integer "id",          :default => 0, :null => false
+    t.string  "arpt_ident"
+    t.string  "name"
+    t.string  "state_prov"
+    t.string  "icao"
+    t.string  "faa_host_id"
+    t.string  "loc_hdatum"
+    t.string  "wgs_datum"
+    t.string  "wgs_lat"
+    t.string  "wgs_dlat"
+    t.string  "wgs_long"
+    t.string  "wgs_dlong"
+    t.string  "elev"
+    t.string  "arpt_type"
+    t.string  "mag_var"
+    t.string  "wac"
+    t.string  "beacon"
+    t.string  "second_arpt"
+    t.string  "opr_agy"
+    t.string  "sec_name"
+    t.string  "sec_icao"
+    t.string  "sec_faa"
+    t.string  "sec_opr_agy"
+    t.string  "cycle_date"
+    t.string  "_id"
   end
 
   create_table "assignments", :force => true do |t|
@@ -130,10 +131,10 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "auditor_poc_id"
     t.integer  "approver_poc_id"
     t.text     "privileges"
+    t.integer  "recurrence_id"
     t.text     "final_comment"
     t.integer  "created_by_id"
     t.boolean  "template"
-    t.integer  "recurrence_id"
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -300,8 +301,7 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.datetime "updated_at"
   end
 
-  create_table "client_applications", :id => false, :force => true do |t|
-    t.integer  "id",                         :default => 0, :null => false
+  create_table "client_applications", :force => true do |t|
     t.string   "name"
     t.string   "url"
     t.string   "support_url"
@@ -312,6 +312,8 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "client_applications", ["key"], :name => "index_client_applications_on_key", :unique => true
 
   create_table "contacts", :force => true do |t|
     t.integer  "owner_id"
@@ -517,8 +519,8 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "responsible_user_id"
     t.date     "completion_date"
     t.text     "reference"
-    t.string   "regulatory_violation"
-    t.string   "policy_violation"
+    t.boolean  "regulatory_violation",    :default => false, :null => false
+    t.boolean  "policy_violation",        :default => false, :null => false
     t.boolean  "safety"
     t.string   "classification"
     t.boolean  "repeat"
@@ -685,7 +687,7 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "obj_id"
     t.integer  "approver_poc_id"
     t.integer  "investigator_poc_id"
-    t.integer  "record_id"
+    t.integer  "owner_id"
     t.text     "privileges"
     t.text     "investigator_comment"
     t.string   "severity_extra"
@@ -696,6 +698,7 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "created_by_id"
     t.boolean  "template"
     t.integer  "recurrence_id"
+    t.string   "owner_type"
   end
 
   create_table "issues", :force => true do |t|
@@ -782,16 +785,16 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.date     "notify_date"
   end
 
-  create_table "oauth_nonces", :id => false, :force => true do |t|
-    t.integer  "id",         :default => 0, :null => false
+  create_table "oauth_nonces", :force => true do |t|
     t.string   "nonce"
     t.integer  "timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "oauth_tokens", :id => false, :force => true do |t|
-    t.integer  "id",                                  :default => 0, :null => false
+  add_index "oauth_nonces", ["nonce", "timestamp"], :name => "index_oauth_nonces_on_nonce_and_timestamp", :unique => true
+
+  create_table "oauth_tokens", :force => true do |t|
     t.integer  "user_id"
     t.string   "type",                  :limit => 20
     t.integer  "client_application_id"
@@ -806,6 +809,8 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "oauth_tokens", ["token"], :name => "index_oauth_tokens_on_token", :unique => true
 
   create_table "occurrence_templates", :force => true do |t|
     t.integer  "parent_id"
@@ -917,21 +922,25 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.text     "example"
   end
 
-  create_table "query_conditions", :force => true do |t|
-    t.integer  "query_statement_id"
-    t.string   "condition_type"
-    t.string   "condition_value"
+  create_table "queries", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "template_id"
-    t.string   "classname"
-    t.integer  "field_id"
-    t.string   "fieldname"
-    t.integer  "category_id"
-    t.string   "category_name"
-    t.text     "value"
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.string   "title"
+    t.integer  "created_by_id"
+    t.string   "target"
+    t.text     "templates"
+    t.text     "visualizations"
+  end
+
+  create_table "query_conditions", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "query_id"
+    t.integer  "query_condition_id"
+    t.string   "logic"
+    t.string   "field_name"
+    t.string   "value"
+    t.string   "operator"
   end
 
   create_table "query_statements", :force => true do |t|
@@ -999,18 +1008,14 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.string   "severity_after"
     t.string   "risk_factor_after"
     t.date     "close_date"
-    t.integer  "investigation_id"
     t.boolean  "anonymous"
-    t.integer  "sra_id"
-    t.string   "event_time_zone"
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+    t.string   "event_time_zone"
     t.text     "final_comment"
   end
-
-  add_index "records", ["templates_id"], :name => "fk_record_template"
 
   create_table "recurrences", :force => true do |t|
     t.string   "title"
@@ -1061,18 +1066,16 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.text     "minutes"
     t.date     "close_date"
     t.text     "privileges"
+    t.string   "severity_extra"
+    t.string   "probability_extra"
+    t.string   "mitigated_severity"
+    t.string   "mitigated_probability"
     t.string   "venue"
     t.string   "crew"
     t.string   "icao"
     t.string   "event_label"
     t.datetime "event_date"
-    t.string   "severity_extra"
-    t.string   "probability_extra"
-    t.string   "mitigated_severity"
-    t.string   "mitigated_probability"
   end
-
-  add_index "reports", ["templates_id"], :name => "fk_report_template"
 
   create_table "responsible_users", :force => true do |t|
     t.integer  "owner_id"
@@ -1139,12 +1142,11 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.integer  "privileges_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "poc_id"
   end
 
   create_table "root_causes", :force => true do |t|
     t.integer  "owner_id"
-    t.string   "type"
+    t.string   "owner_type"
     t.integer  "cause_option_id"
     t.string   "cause_option_value"
     t.integer  "user_id"
@@ -1304,13 +1306,13 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.text     "statement"
     t.boolean  "viewer_access",             :default => false
     t.text     "minutes"
-    t.integer  "record_id"
+    t.integer  "owner_id"
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
-    t.datetime "followup_date"
     t.integer  "created_by_id"
+    t.string   "owner_type"
   end
 
   create_table "submission_fields", :force => true do |t|
@@ -1343,7 +1345,6 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
   end
 
   add_index "submissions", ["obj_id"], :name => "mg1"
-  add_index "submissions", ["templates_id"], :name => "fk_submission_template"
 
   create_table "tax_attributes", :force => true do |t|
     t.string "category"
@@ -1427,6 +1428,7 @@ ActiveRecord::Schema.define(:version => 20190627153741) do
     t.datetime "last_seen_at"
     t.string   "sso_id"
     t.datetime "privileges_last_updated"
+    t.integer  "mobile_fetch_months",                  :default => 3, :null => false
   end
 
   create_table "verifications", :force => true do |t|

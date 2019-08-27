@@ -98,6 +98,7 @@ class AccessControl < ActiveRecord::Base
         "show"                => generate_desc("Submission", "show"),
         "destroy"             => generate_desc("Submission", "destroy"),
         "index"               => generate_desc("Submission", "index"),
+        "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from access any previous submissions.",
       },
 
       "records"=>{
@@ -318,6 +319,7 @@ class AccessControl < ActiveRecord::Base
         "View"=>"show",
         "Delete"=>"destroy",
         "Listing"=>"index",
+        "Shared"=>"shared",
         "Admin"=>"admin"
       },
       "records"=>{
@@ -549,6 +551,7 @@ class AccessControl < ActiveRecord::Base
       'Tabulation'          => 'tabulation',
       'Access'              => 'query_all',
       'Admin'               => 'admin',
+      'Shared'              => 'shared'
     }
   end
 

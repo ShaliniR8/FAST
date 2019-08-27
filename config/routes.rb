@@ -4,16 +4,17 @@ PrdgSession::Application.routes.draw do |map|
   resources :oauth_clients
 
   #root :to => "oauth_clients#index"
-  match '/oauth/test_request',  :to => 'oauth#test_request',  :as => :test_request
-  match '/oauth/token',         :to => 'oauth#token',         :as => :token
-  match '/oauth/access_token',  :to => 'oauth#access_token',  :as => :access_token
-  match '/oauth/request_token', :to => 'oauth#request_token', :as => :request_token
-  match '/oauth/authorize',     :to => 'oauth#authorize',     :as => :authorize
-  match '/oauth',               :to => 'oauth#index',         :as => :oauth
-  match '/saml/consume',        :to => 'saml#consume',        :as => :consume
-  match '/saml/metadata',       :to => 'saml#metadata',       :as => :metadata
-  match '/saml/init',           :to => 'saml#init',           :as => :init
-  match '/saml/logout',         :to => 'saml#logout',         :as => :saml
+  match '/oauth/test_request',    :to => 'oauth#test_request',          :as => :test_request
+  match '/oauth/token',           :to => 'oauth#token',                 :as => :token
+  match '/oauth/access_token',    :to => 'oauth#access_token',          :as => :access_token
+  match '/oauth/request_token',   :to => 'oauth#request_token',         :as => :request_token
+  match '/oauth/authorize',       :to => 'oauth#authorize',             :as => :authorize
+  match '/oauth',                 :to => 'oauth#index',                 :as => :oauth
+  match '/saml/consume',          :to => 'saml#consume',                :as => :consume
+  match '/saml/metadata',         :to => 'saml#metadata',               :as => :metadata
+  match '/saml/init',             :to => 'saml#init',                   :as => :init
+  match '/saml/logout',           :to => 'saml#logout',                 :as => :saml
+  match '/mobile/initialize',     :to => 'sessions#mobile_initialize',  :as => :session
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
@@ -197,7 +198,8 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "users_index"
-      get 'get_user'
+      get 'current_json'
+      put 'mobile_months'
       get 'get_json'   #Added by BP July 14 2017
       get 'submission_json'
       get "notices_json"    #added by BL OCT 10 2018

@@ -13,7 +13,6 @@ class ApplicationController < ActionController::Base
   before_filter :set_last_seen_at
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
-
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
@@ -57,9 +56,21 @@ class ApplicationController < ActionController::Base
       define_session_permissions if (current_user.privileges_last_updated > session[:last_active] rescue false)
     end
 
+    # expire oauth token
+    if current_token.present?
+      oauth_expiration = current_client_application.name == 'prosafet_app_personal' ? 1.week : 3.hours
+      oauth_expire_date = Time.now - oauth_expiration
+
+      if current_token.authorized_at < oauth_expire_date
+        Oauth2Token.where('user_id = :uid and client_application_id = :caid and authorized_at < :expire_date',
+          { uid: current_user.id, caid: current_client_application.id, expire_date: oauth_expire_date }).destroy_all
+        redirect_to logout_path
+      end
+    end
+
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso]
+    elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso] && !current_token.present?
        redirect_to logout_path
        return false
     else
