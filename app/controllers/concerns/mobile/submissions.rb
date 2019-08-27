@@ -110,7 +110,9 @@ module Concerns
           submission_fields.merge({ submission_field['fields_id'] => submission_field })
         end
 
-        json[:attachments] = json[:attachments].reduce({}){ |attachments, attachment| attachments.merge({ attachment['id'] => attachment }) }
+        json[:attachments] = json[:attachments].reduce({}) do |attachments, attachment|
+          attachments.merge({ attachment['id'] => attachment })
+        end
 
         json
       end
@@ -190,7 +192,8 @@ module Concerns
                 parent_class = child_field['element_class'].gsub(/follow|sub/, '').strip
 
                 parent_field = follow_fields.find do |parent_field|
-                  parent_field['element_id'] == child_field['element_id'] && parent_field['element_class'].include?(parent_class)
+                  parent_field['element_id'] == child_field['element_id'] &&
+                    parent_field['element_class'].include?(parent_class)
                 end
 
                 if parent_field
