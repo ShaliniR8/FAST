@@ -21,12 +21,12 @@ class Config < Thor
   end
 
   desc 'wipe_tables', 'Clears all user-input fields; users, privileges, and rules are maintained'
-  def wipe_tables
+  def wipe_tables(environment='development')
     require File.expand_path('config/environment.rb')
     puts '############################'
     puts '|| WIPING DATABASE TABLES ||'
     puts '############################'
-    target_db = Rails.configuration.database_configuration[Rails.env]['database']
+    target_db = Rails.configuration.database_configuration[environment]['database']
     puts "This Database is the target: #{target_db}"
     puts 'To confirm the clearing of this database, please type out the full database name and hit ENTER'
     input = STDIN.gets
@@ -34,6 +34,9 @@ class Config < Thor
       puts 'Confirmation failed - aborting task'
       return
     end
+    spec = User.configurations[RAILS_ENV].clone
+    spec['database'] = target_db
+    ActiveRecord::Base.establish_connection(spec)
     %w[
       access_levels
       agendas
@@ -98,7 +101,7 @@ class Config < Thor
       verifications
       viewer_comments
     ].each do |table|
-      print "Truncating #{Rails.configuration.database_configuration[Rails.env]['database']}:#{table}..."
+      print "Truncating #{Rails.configuration.database_configuration[environment]['database']}:#{table}..."
       ActiveRecord::Base.connection.execute("TRUNCATE #{table}")
       puts ' Truncated!'
     end
