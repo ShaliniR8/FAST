@@ -16,7 +16,8 @@ class SamlController < ApplicationController
     if response.is_valid?(collect_errors = true)
       user = saml_config.digest_response response
       if user.nil?
-        redirect_to saml_config::SAML_DATA[:access_point]
+        render 'errors/sso_error'
+        return
       else
         session[:user_id] = user.id
         session[:mode]=""
