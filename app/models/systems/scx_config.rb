@@ -15,7 +15,7 @@ class SCX_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => "1.1.0",
 
       :name                                           => 'Sun Country Airlines',
       :code                                           => "SCX",
@@ -26,10 +26,10 @@ class SCX_Config
       :allow_set_alert                                => false,
       :has_verification                               => false,
       :has_extension                                  => false,
-      :has_mobile_app                                 => false,
+      :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
       :time_zone                                      => 'Central Time (US & Canada)',
-      :enable_sso                                     => true,
+      :enable_sso                                     => false,
 
       # Safety Reporting Module
       :submission_description                         => true,
@@ -54,10 +54,10 @@ class SCX_Config
 
 
   FAA_INFO = { #CORRECT/REVISE
-    "CHDO"=>"FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
-    "Region"=>"Anchorage",
+    "CHDO"=>"Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450",
+    "Region"=>"Great Lakes",
     "ASAP MOU Holder Name"=>"N/A",
-    "ASAP MOU Holder FAA Designator"=>"N/A"
+    "ASAP MOU Holder FAA Designator"=>"SCNA"
   }
 
   MATRIX_INFO = {
