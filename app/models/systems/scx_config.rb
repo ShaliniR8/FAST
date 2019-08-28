@@ -29,7 +29,7 @@ class SCX_Config
       :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
       :time_zone                                      => 'Central Time (US & Canada)',
-      :enable_sso                                     => false,
+      :enable_sso                                     => true,
 
       # Safety Reporting Module
       :submission_description                         => true,
