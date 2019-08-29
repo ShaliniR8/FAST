@@ -6,9 +6,15 @@ class BSK_Config
   SYSTEM_ENVIRONMENTS = %w[training]
 
   MOBILE_KEY = {
-    key_name: 'BSK',
+    key_name: 'Miami Air International',
     portals: [
       { label: 'Miami Air',          subdomain: 'bsk' },
+    ]
+  }
+
+  BETA_MOBILE_KEY = {
+    key_name: 'Miami Air International Training',
+    portals: [
       { label: 'Miami Air Training', subdomain: 'bsk-training' },
     ]
   }

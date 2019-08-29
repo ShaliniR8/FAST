@@ -6,7 +6,7 @@ class NAMS_Config
   SYSTEM_ENVIRONMENTS = %w[]
 
   MOBILE_KEY = {
-    key_name: 'NAMS',
+    key_name: 'Northen Air Cargo',
     portals: [
       { label: 'Northern Air', subdomain: 'nams' },
     ]

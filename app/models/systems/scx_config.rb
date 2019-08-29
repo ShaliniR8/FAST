@@ -6,10 +6,10 @@ class SCX_Config
   SYSTEM_ENVIRONMENTS = %w[training]
 
   MOBILE_KEY = {
-    key_name: 'SCX',
+    key_name: 'Sun Country Airlines',
     portals: [
       { label: 'Sun Country', subdomain: 'scx', sso: true },
-      # { label: 'Sun Country Training', subdomain: 'scx-training' },
+      { label: 'Sun Country Training', subdomain: 'scx-training', sso: true, shared: true },
     ]
   }
 
