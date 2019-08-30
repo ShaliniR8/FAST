@@ -60,14 +60,27 @@ class BaseConfig
       { label: '<Dev 3003>',  subdomain: 'port=3003' },
       { label: '<Dev 3004>',  subdomain: 'port=3004' },
     ].concat([
-      Trial_Config::MOBILE_KEY,
-      Demo_Config::MOBILE_KEY,
-      BSK_Config::MOBILE_KEY,
-      BSK_Config::BETA_MOBILE_KEY,
-      NAMS_Config::MOBILE_KEY,
-      SCX_Config::MOBILE_KEY,
-      SCX_Config::BETA_MOBILE_KEY,
-    ].map{ |config| config[:portals] }.flatten)
+      Trial_Config,
+      Demo_Config,
+      BSK_Config,
+      NAMS_Config,
+      SCX_Config,
+    ].map{ |config|
+      config::MOBILE_KEY = nil unless defined? config::MOBILE_KEY
+      config::BETA_MOBILE_KEY = nil unless defined? config::BETA_MOBILE_KEY
+      [config::MOBILE_KEY, config::BETA_MOBILE_KEY].map{ |key_config|
+        if (key_config.present?)
+          key_config[:portals].map do |portal|
+            airline_name = config.airline_config[:name]
+            airline_code = config.airline_config[:code]
+            airline_label = airline_name.include?('ProSafeT') ? airline_name : airline_code
+            portal.merge({ label: "#{airline_label} #{portal[:label]}" })
+          end
+        else
+          []
+        end
+      }.flatten
+    }.flatten)
   }
 
   # Mobile Keys are used for initializing the app to specific portals.

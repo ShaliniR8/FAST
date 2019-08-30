@@ -5,30 +5,12 @@ class SCX_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_KEY = {
-    key_name: 'Sun Country Airlines',
-    portals: [
-      { label: 'Sun Country',                   subdomain: 'scx', sso: true },
-      { label: 'Sun Country (Shared Device)',   subdomain: 'scx', sso: true, shared: true },
-      { label: 'Sun Country (Shared Account)',  subdomain: 'scx', shared: true },
-    ]
-  }
-
-  BETA_MOBILE_KEY = {
-    key_name: 'Sun Country Airlines Training',
-    portals: [
-      { label: 'Sun Country Training',                  subdomain: 'scx-training', sso: true },
-      { label: 'Sun Country Training (Shared Device)',  subdomain: 'scx-training', sso: true, shared: true },
-      { label: 'Sun Country Training (Shared Account)', subdomain: 'scx-training', shared: true },
-    ]
-  }
-
   def self.airline_config
     {
-      :version                                        => "1.1.0",
+      :version                                        => '1.1.0',
 
       :name                                           => 'Sun Country Airlines',
-      :code                                           => "SCX",
+      :code                                           => 'SCX',
       :base_risk_matrix                               => false,
       :event_summary                                  => false,
       :event_tabulation                               => false,
@@ -61,7 +43,25 @@ class SCX_Config
     }
   end
 
+  MOBILE_KEY = {
+    key_name: airline_config[:name],
+    portals: [
+      { label: 'General',                     subdomain: 'scx', sso: true },
+      { label: 'General (ProSafeT)',          subdomain: 'scx', },
+      { label: 'General (Shared)',            subdomain: 'scx', sso: true, shared: true },
+      { label: 'General (Shared) (ProSafeT)', subdomain: 'scx', shared: true },
+    ]
+  }
 
+  BETA_MOBILE_KEY = {
+    key_name: "#{airline_config[:name]} Training",
+    portals: [
+      { label: 'Training',                      subdomain: 'scx-training', sso: true },
+      { label: 'Training (ProSafeT)',           subdomain: 'scx-training', },
+      { label: 'Training (Shared)',             subdomain: 'scx-training', sso: true, shared: true },
+      { label: 'Training (Shared) (ProSafeT)',  subdomain: 'scx-training', shared: true },
+    ]
+  }
 
   FAA_INFO = { #CORRECT/REVISE
     "CHDO"=>"Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450",
