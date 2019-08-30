@@ -8,8 +8,18 @@ class SCX_Config
   MOBILE_KEY = {
     key_name: 'Sun Country Airlines',
     portals: [
-      { label: 'Sun Country', subdomain: 'scx', sso: true },
-      { label: 'Sun Country Training', subdomain: 'scx-training', sso: true, shared: true },
+      { label: 'Sun Country',                   subdomain: 'scx', sso: true },
+      { label: 'Sun Country (Shared Device)',   subdomain: 'scx', sso: true, shared: true },
+      { label: 'Sun Country (Shared Account)',  subdomain: 'scx', shared: true },
+    ]
+  }
+
+  BETA_MOBILE_KEY = {
+    key_name: 'Sun Country Airlines Training',
+    portals: [
+      { label: 'Sun Country Training',                  subdomain: 'scx-training', sso: true },
+      { label: 'Sun Country Training (Shared Device)',  subdomain: 'scx-training', sso: true, shared: true },
+      { label: 'Sun Country Training (Shared Account)', subdomain: 'scx-training', shared: true },
     ]
   }
 

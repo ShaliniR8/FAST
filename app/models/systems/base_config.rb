@@ -54,8 +54,11 @@ class BaseConfig
   MOBILE_KEY = {
     key_name: 'Admin',
     portals: [
-      { label: 'Sun Country Shared',  subdomain: 'scx', shared: true },
-      { label: 'Sun Country Direct',  subdomain: 'scx' },
+      { label: '<Dev 3000>',  subdomain: 'port=3000' },
+      { label: '<Dev 3001>',  subdomain: 'port=3001' },
+      { label: '<Dev 3002>',  subdomain: 'port=3002' },
+      { label: '<Dev 3003>',  subdomain: 'port=3003' },
+      { label: '<Dev 3004>',  subdomain: 'port=3004' },
     ].concat([
       Trial_Config::MOBILE_KEY,
       Demo_Config::MOBILE_KEY,
@@ -63,6 +66,7 @@ class BaseConfig
       BSK_Config::BETA_MOBILE_KEY,
       NAMS_Config::MOBILE_KEY,
       SCX_Config::MOBILE_KEY,
+      SCX_Config::BETA_MOBILE_KEY,
     ].map{ |config| config[:portals] }.flatten)
   }
 
@@ -77,6 +81,7 @@ class BaseConfig
     'BSK Beta Key'  => BSK_Config::BETA_MOBILE_KEY, # A6DE-FAB4-86B5-4FDA
     'NAMS Key'      => NAMS_Config::MOBILE_KEY,     # F3E3-60E8-84C2-24CF
     'SCX Key'       => SCX_Config::MOBILE_KEY,      # 33F1-4A88-339C-E6FD
+    'SCX Beta Key'  => SCX_Config::BETA_MOBILE_KEY, # 35E1-98A2-2C8F-A912
   }.map{ |key, value| [Digest::SHA2.hexdigest(key)[0..15], value] }.to_h
 
   # Put this into any ruby compiler to generate a human readable key
