@@ -213,7 +213,7 @@ class HazardsController < ApplicationController
     puts "#{CauseOption.find(cause_option_id).children.map(&:id)}"
     @records = RootCause
       .where(:cause_option_id => CauseOption.find(cause_option_id).descendants.map(&:id))
-      .map{|x| x.hazard}.uniq{|x| x.id}
+      .map{|x| x.owner}.uniq{|x| x.id}
     if params[:start_date].present?
       @start_date = Date.parse(params[:start_date])
       @records.keep_if{|x| x.created_at >= @start_date}

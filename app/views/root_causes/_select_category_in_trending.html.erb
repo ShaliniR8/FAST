@@ -19,7 +19,7 @@
         if ($(this).text() == "<%=CauseOption.find(ancestor_ids[@categories.first.level]).name%>")
           $(this).attr("selected", "selected");
        });
-      $.get("<%=retract_root_cause_categories_hazards_path%>?ancestor_ids=<%=ancestor_ids.join(',')%>&category_only=true&category=<%=ancestor_ids[@categories.first.level]%>", function(data){
+      $.get("<%=retract_categories_root_causes_path%>?ancestor_ids=<%=ancestor_ids.join(',')%>&category_only=true&category=<%=ancestor_ids[@categories.first.level]%>", function(data){
         if(data) $("#<%=@categories.first.level%>").html(data);
       });
     <%end%>
@@ -31,7 +31,7 @@
       });
       if ($(this).val() != ""){
         $(".category_id").val($(this).val());
-        $.get("<%=retract_root_cause_categories_hazards_path%>?category_only=true&category=" + $(this).val(), function(data){
+        $.get("<%=retract_categories_root_causes_path%>?category_only=true&category=" + $(this).val(), function(data){
           if(data) $("#<%=@categories.first.level%>").html(data);
         });
       }else{
