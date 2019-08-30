@@ -5,17 +5,10 @@ class NAMS_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[]
 
-  MOBILE_KEY = {
-    key_name: 'NAMS',
-    portals: [
-      { label: 'Northern Air', subdomain: 'nams' },
-    ]
-  }
-
   def self.airline_config
     {
-      :version                                        => "1.0.3",
-      :code                                           => "NAMS",
+      :version                                        => '1.0.3',
+      :code                                           => 'NAMS',
       :name                                           => 'Northern Air Cargo',
       :base_risk_matrix                               => false,
       :event_summary                                  => false,
@@ -47,6 +40,13 @@ class NAMS_Config
       :has_framework                                  => false,
     }
   end
+
+  MOBILE_KEY = {
+    key_name: airline_config[:name],
+    portals: [
+      { label: 'General', subdomain: 'nams' },
+    ]
+  }
 
 
   OBSERVATION_PHASES = ["Observation Phase", "Condition", "Threat", "Error", "Human Factor", "Comment"]

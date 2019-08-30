@@ -54,32 +54,47 @@ class BaseConfig
   MOBILE_KEY = {
     key_name: 'Admin',
     portals: [
-      { label: 'Sun Country Shared',  subdomain: 'scx', shared: true },
-      { label: 'Sun Country Direct',  subdomain: 'scx' },
-      { label: '<Dev 3000>',          subdomain: 'port=3000' },
-      { label: '<Dev 3001>',          subdomain: 'port=3001' },
-      { label: '<Dev 3002>',          subdomain: 'port=3002' },
-      { label: '<Dev 3003>',          subdomain: 'port=3003' },
-      { label: '<Dev 3004>',          subdomain: 'port=3004' },
+      { label: '<Dev 3000>',  subdomain: 'port=3000' },
+      { label: '<Dev 3001>',  subdomain: 'port=3001' },
+      { label: '<Dev 3002>',  subdomain: 'port=3002' },
+      { label: '<Dev 3003>',  subdomain: 'port=3003' },
+      { label: '<Dev 3004>',  subdomain: 'port=3004' },
     ].concat([
-      Trial_Config::MOBILE_KEY,
-      Demo_Config::MOBILE_KEY,
-      BSK_Config::MOBILE_KEY,
-      NAMS_Config::MOBILE_KEY,
-      SCX_Config::MOBILE_KEY,
-    ].map{ |config| config[:portals] }.flatten)
+      Trial_Config,
+      Demo_Config,
+      BSK_Config,
+      NAMS_Config,
+      SCX_Config,
+    ].map{ |config|
+      config::MOBILE_KEY = nil unless defined? config::MOBILE_KEY
+      config::BETA_MOBILE_KEY = nil unless defined? config::BETA_MOBILE_KEY
+      [config::MOBILE_KEY, config::BETA_MOBILE_KEY].map{ |key_config|
+        if (key_config.present?)
+          key_config[:portals].map do |portal|
+            airline_name = config.airline_config[:name]
+            airline_code = config.airline_config[:code]
+            airline_label = airline_name.include?('ProSafeT') ? airline_name : airline_code
+            portal.merge({ label: "#{airline_label} #{portal[:label]}" })
+          end
+        else
+          []
+        end
+      }.flatten
+    }.flatten)
   }
 
   # Mobile Keys are used for initializing the app to specific portals.
     # Note: These keys are not a direct security apparatus- this is a convenience tool to hide
      # elements from the user that they may mess with otherwise (distributes a config that has advanced settings)
   MOBILE_KEY_MAP = {
-    '[Admin Key]' => BaseConfig::MOBILE_KEY,    # 0D03-579F-421F-E903
-    'Trial Key'   => Trial_Config::MOBILE_KEY,  # 6158-BC31-0338-233B
-    'Demo Key'    => Demo_Config::MOBILE_KEY,   # 353D-0FC5-E54E-9C2F
-    'BSK Key'     => BSK_Config::MOBILE_KEY,    # F9A1-67E8-DC44-4D8C
-    'NAMS Key'    => NAMS_Config::MOBILE_KEY,   # F3E3-60E8-84C2-24CF
-    'SCX Key'     => SCX_Config::MOBILE_KEY,    # 33F1-4A88-339C-E6FD
+    '[Admin Key]'   => BaseConfig::MOBILE_KEY,      # 0D03-579F-421F-E903
+    'Trial Key'     => Trial_Config::MOBILE_KEY,    # 6158-BC31-0338-233B
+    'Demo Key'      => Demo_Config::MOBILE_KEY,     # 353D-0FC5-E54E-9C2F
+    'BSK Key'       => BSK_Config::MOBILE_KEY,      # F9A1-67E8-DC44-4D8C
+    'BSK Beta Key'  => BSK_Config::BETA_MOBILE_KEY, # A6DE-FAB4-86B5-4FDA
+    'NAMS Key'      => NAMS_Config::MOBILE_KEY,     # F3E3-60E8-84C2-24CF
+    'SCX Key'       => SCX_Config::MOBILE_KEY,      # 33F1-4A88-339C-E6FD
+    'SCX Beta Key'  => SCX_Config::BETA_MOBILE_KEY, # 35E1-98A2-2C8F-A912
   }.map{ |key, value| [Digest::SHA2.hexdigest(key)[0..15], value] }.to_h
 
   # Put this into any ruby compiler to generate a human readable key

@@ -5,14 +5,6 @@ class BSK_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_KEY = {
-    key_name: 'BSK',
-    portals: [
-      { label: 'Miami Air',          subdomain: 'bsk' },
-      { label: 'Miami Air Training', subdomain: 'bsk-training' },
-    ]
-  }
-
   def self.airline_config
     {
       :version                                        => "1.1.0",
@@ -49,6 +41,20 @@ class BSK_Config
       :has_framework                                  => true,
     }
   end
+
+  MOBILE_KEY = {
+    key_name: airline_config[:name],
+    portals: [
+      { label: 'General', subdomain: 'bsk' },
+    ]
+  }
+
+  BETA_MOBILE_KEY = {
+    key_name: "#{airline_config[:name]} Training",
+    portals: [
+      { label: 'Training', subdomain: 'bsk-training' },
+    ]
+  }
 
   def self.get_sra_meta_fields
     [
