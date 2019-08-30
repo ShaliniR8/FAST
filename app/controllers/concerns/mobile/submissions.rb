@@ -257,7 +257,7 @@ module Concerns
               # replace options string with an array, and remove empty values
               field['options'] = field['options']
                 .split(';')
-                .delete_if{ |option| option.blank? }
+                .delete_if{ |option| option.empty? }
 
               field.delete_if do |key, value|
                 case key
