@@ -22,20 +22,22 @@ class SamlController < ApplicationController
         session[:user_id] = user.id
         session[:mode]=""
         session[:last_active] = Time.now
-        case params[:RelayState]
-        when /^mobile/
+
+        platform, deep_link, shared = params[:RelayState].split('&')
+        case platform
+        when 'mobile'
+          deep_link = URI.unescape(deep_link)
+          client_application_name = shared == 'true'
+            ? 'prosafet_app_shared' : 'prosafet_app_personal'
+
           oauth2_token = Oauth2Token.new
           oauth2_token.user = current_user
-          oauth2_token.client_application = ClientApplication.where(name: 'prosafet_app_personal').first
+          oauth2_token.client_application = ClientApplication.where(name: client_application_name).first
           oauth2_token.save
-
-          deep_link = URI.unescape(params[:RelayState].split('_').drop(1).join('_'))
 
           @url = "#{deep_link}#{oauth2_token[:token]}"
 
           redirect_to @url
-
-          # render :partial => 'deep_link'
         else
           redirect_to_target_or_default(root_url)
         end
