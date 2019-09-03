@@ -20,14 +20,17 @@ class SamlController < ApplicationController
         return
       else
         session[:user_id] = user.id
-        session[:mode]=""
+        session[:mode] = ''
         session[:last_active] = Time.now
 
-        platform, deep_link, shared = params[:RelayState].split('&')
+        platform = 'web'
+        platform, deep_link, shared = params[:RelayState].split('&') if params[:RelayState].present?
+
         case platform
         when 'mobile'
           deep_link = URI.unescape(deep_link)
-          client_application_name = shared == 'true' ? 'prosafet_app_shared' : 'prosafet_app_personal'
+          client_application_name = shared == 'true' ?
+            'prosafet_app_shared' : 'prosafet_app_personal'
 
           oauth2_token = Oauth2Token.new
           oauth2_token.user = current_user
