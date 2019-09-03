@@ -18,7 +18,7 @@
                 <li><a class="<%=x[:class]%>" href="<%=x[:href]%>"><%=x[:name]%></a></li>
                 <ol type="a">
                   <%x[:topics].each do |y|%>
-                    <li><a class="<%=y[:class]%>" href="<%=y[:href]%>"><%=y[:name]%></a></li>
+                    <li><a class="<%=y[:class]%>" href="<%=y[:href]%>" data-content="<%=y[:content]%>"><%=y[:name]%></a></li>
                   <%end%>
                 </ol>
               <%end%>
@@ -97,8 +97,12 @@
       e.preventDefault();
       var href = $(this).attr("href");
       var name = $(this).text();
+      var content = $(this).data('content');
       if (href != undefined){
-        $.get("<%=load_content_documents_path%>?topic_name=" + name + "&href=" + href, function(data){
+        $.get("<%=load_content_documents_path%>?" +
+          "topic_name=" + name +
+          "&href=" + href +
+          "&content=" + content, function(data){
           $("#user_guide_content").html(data);
         });
       }else{

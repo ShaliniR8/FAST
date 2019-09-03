@@ -49,7 +49,11 @@ class DocumentsController < ApplicationController
   end
 
   def load_content
-    render :partial => "documents/user_guides/template", :locals => {:topic_name => params[:topic_name], :href => params[:href]}
+    render :partial => "documents/user_guides/template", :locals => {
+      :topic_name => params[:topic_name],
+      :href => params[:href],
+      :content => params[:content]
+    }
   end
 
 end
