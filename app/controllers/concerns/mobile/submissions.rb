@@ -26,7 +26,6 @@ module Concerns
             include: { template: { only: :name }}
           )
           .map { |submission|
-            submission = submission['submission']
             submission[:template_name] = submission[:template]['name']
             submission.delete(:template)
             submission
@@ -46,12 +45,12 @@ module Concerns
         recent_completed_submissions = @records.where(completed: true)
           .last(3)
           .as_json(only: :id)
-          .map{ |submission| submission['submission']['id'] }
+          .map{ |submission| submission['id'] }
 
         recent_in_progress_submissions = @records.where(completed: false)
           .last(3)
           .as_json(only: :id)
-          .map{ |submission| submission['submission']['id'] }
+          .map{ |submission| submission['id'] }
 
         recent_submissions = recent_completed_submissions + recent_in_progress_submissions
 
@@ -106,7 +105,7 @@ module Concerns
       end
 
       def format_submission_json(submission)
-        json = submission['submission']
+        json = submission
 
         json[:submitted_by] = json['anonymous'] ? 'Anonymous' : User.find(json['user_id']).full_name rescue nil
 
@@ -135,35 +134,33 @@ module Concerns
         end
 
         # Get json data for templates
-        templates_json = templates
-          .as_json(
-            only: [:id, :name, :map_template_id, :allow_anonymous],
-            include: {
-              categories: {
-                only: [:id, :title, :category_order, :description, :deleted],
-                include: {
-                  fields: {
-                    only: [
-                      :id,
-                      :label,
-                      :data_type,
-                      :options,
-                      :field_order,
-                      :show_label,
-                      :required,
-                      :display_type,
-                      :nested_field_id,
-                      :nested_field_value,
-                      :element_class,
-                      :element_id,
-                      :deleted,
-                    ]
-                  }
+        templates_json = templates.as_json(
+          only: [:id, :name, :map_template_id, :allow_anonymous],
+          include: {
+            categories: {
+              only: [:id, :title, :category_order, :description, :deleted],
+              include: {
+                fields: {
+                  only: [
+                    :id,
+                    :label,
+                    :data_type,
+                    :options,
+                    :field_order,
+                    :show_label,
+                    :required,
+                    :display_type,
+                    :nested_field_id,
+                    :nested_field_value,
+                    :element_class,
+                    :element_id,
+                    :deleted,
+                  ]
                 }
               }
             }
-          )
-          .map { |template| template['template'] }
+          }
+        )
 
         # sort categories and fields
         templates_json.each do |template|

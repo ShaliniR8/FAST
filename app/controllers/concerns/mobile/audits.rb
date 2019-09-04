@@ -23,14 +23,13 @@ module Concerns
         # Convert to id map for fast audit lookup
         json[:audits] = @records
           .as_json(only: [:id, :status, :title, :completion])
-          .map {|audit| audit['audit']}
           .reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
 
         # Get ids of the 3 most recent audits
         recent_audits = @records
           .last(3)
           .as_json(only: :id)
-          .map {|audit| audit['audit']['id'] }
+          .map {|audit| audit['id'] }
 
         json[:recent_audits] = audits_as_json(*recent_audits)
 
@@ -94,7 +93,7 @@ module Concerns
       end
 
       def format_audit_json(audit)
-        json = audit['audit'].delete_if{ |key, value| value.blank? }
+        json = audit.delete_if{ |key, value| value.blank? }
         # Default checklists to an empty array
         json[:checklists] = [] if json[:checklists].blank?
 
