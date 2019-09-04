@@ -61,6 +61,11 @@ module Concerns
         timezoneField = Field.where(data_type: 'timezone').first
         json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
 
+        json[:users] = User.all
+          .as_json(only: [:id, :full_name, :email])
+          .map { |user| user['user'] }
+          .reduce({}) { |users, user| users.merge({ user['id'] => user }) }
+
         render :json => json
       end
 
