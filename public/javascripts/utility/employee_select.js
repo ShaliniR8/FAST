@@ -23,8 +23,8 @@ $(document).ready(function(){
 			$("tbody tr").unbind();
 			$(".close").unbind();
 			$("tbody tr").on("click", function(){
-				$(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(3).text());
-				$(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(3).text());
+				$(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(1).text());
+				$(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
 				$('#emp_div').hide();
 				$('.emp_modal').modal('toggle');
 			});
@@ -38,5 +38,5 @@ $(document).ready(function(){
 
 	});
 
-	
+
 });

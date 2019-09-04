@@ -170,6 +170,8 @@ class QueriesController < ApplicationController
           field_type = @field.data_type
         elsif @field.display_type == "checkbox"
           field_type = @field.display_type
+        elsif @field.display_type == "employee"
+          field_type = @field.display_type
         else
           field_type = 'text'
         end
@@ -211,6 +213,18 @@ class QueriesController < ApplicationController
         @data["Yes"] = 0
         @data["No"] = 0
 
+      elsif field_type == "employee"
+        if @owner.target == "Submission"
+          submission_fields = SubmissionField.where(fields_id: @fields.collect{|x| x.id}, submissions_id: result_id)
+          uniq_employees = User.where("full_name in (?) OR id in (?)",
+            submission_fields.map(&:value), submission_fields.map(&:value))
+          @data = Hash[uniq_employees.collect{|employee| [employee.full_name, 0]}]
+        elsif @owner.target == "Record"
+          record_fields = RecordField.where(fields_id: @fields.collect{|x| x.id}, records_id: result_id)
+          uniq_employees = User.where("full_name in (?) OR id in (?)",
+            record_fields.map(&:value), record_fields.map(&:value))
+          @data = Hash[uniq_employees.collect{|employee| [employee.full_name, 0]}]
+        end
       # Create key value pair for unique values
       else
         if dynamic_field
@@ -243,8 +257,15 @@ class QueriesController < ApplicationController
               end
             end
           end
-        elsif field_type == "boolean_box" || field_type == "boolean"
+        elsif field_type == 'boolean_box' || field_type == 'boolean'
           value ? @data["Yes"] += 1 : @data["No"] += 1
+        elsif field_type == 'employee'
+          if value.present?
+            value = User.where('full_name = ? OR id = ?', value, value).first.full_name
+          else
+            value = show_empty_value ? '*No Input' : nil
+          end
+          @data[value] += 1 if @data[value].present?
         else
           if value.present?
             value = value.gsub("\r\n", " ") if field_type == 'textarea'
@@ -286,7 +307,6 @@ class QueriesController < ApplicationController
     rescue => e
       render :partial => "/queries/charts/invalid_input"
     end
-
   end
 
 
@@ -442,9 +462,10 @@ class QueriesController < ApplicationController
         end_date = search_value.split("to")[1] || search_value.split("to")[0]
         result = related_fields.select{|x| xor ^ ((x.value.to_date >= start_date.to_date && x.value.to_date <= end_date.to_date) rescue false)}
       else
-        case field[:display_type]
+        case field[:field_type]
         when 'employee'
-          matching_users = User.where("full_name = ?", search_value).map(&:id)
+          matching_users = User.where("full_name = ?", search_value).map(&:id).map(&:to_s) |
+            User.where("full_name = ?", search_value).map(&:full_name).map(&:to_s)
           result = related_fields.select{|x| xor ^ (matching_users.include? x.value)}
         else
           result = related_fields.select{|x| xor ^ (x.value.to_s.downcase == search_value.to_s.downcase)}
@@ -458,9 +479,10 @@ class QueriesController < ApplicationController
         end_date = search_value.split("to")[1] || search_value.split("to")[0]
         result = related_fields.select{|x| xor ^ ((x.value.to_date >= start_date.to_date && x.value.to_date <= end_date.to_date) rescue false)}
       else
-        case field[:display_type]
+        case field[:field_type]
         when 'employee'
-          matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:id)
+          matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:id).map(&:to_s) |
+            User.where("full_name LIKE ?", "%#{search_value}%").map(&:full_name).map(&:to_s)
           result = related_fields.select{|x| xor ^ (matching_users.include? x.value)}
         else
           result = related_fields.select{|x| xor ^ (x.value.to_s.downcase.include? search_value.to_s.downcase)}

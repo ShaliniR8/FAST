@@ -219,8 +219,6 @@ class User < ActiveRecord::Base
   def self.get_headers
     {
       "ID"          => "id",
-      "Type"        => "level",
-      "Username"    => "username",
       "Name"        => "full_name",
       "Email"       => "email"
     }
