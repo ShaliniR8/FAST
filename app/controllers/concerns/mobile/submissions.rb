@@ -21,6 +21,7 @@ module Concerns
           records = records.can_be_accessed(current_user) if completed
 
           records = records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
+          records
         end
 
         json = {}
