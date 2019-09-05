@@ -24,7 +24,7 @@ class SamlController < ApplicationController
         session[:last_active] = Time.now
 
         platform = 'web'
-        platform, deep_link, shared = params[:RelayState].split('&') if params[:RelayState].present?
+        platform, deep_link, shared = params[:RelayState].split('_') if params[:RelayState].present?
 
         case platform
         when 'mobile'
