@@ -431,4 +431,10 @@ module ApplicationHelper
     mode
   end
 
+  # used in mobile concerns, assumes that each element of the array has an id
+  def array_to_id_map(*args)
+    array, key = args
+    array.reduce({}) { |id_map, element| id_map.merge({ element[key || 'id'] => element }) }
+  end
+
 end

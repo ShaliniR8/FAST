@@ -10,26 +10,18 @@ module Concerns
       end
 
       def index_as_json
-        @records = Audit.all
-        filter_audits
-
         fetch_months = current_user.mobile_fetch_months
-        if fetch_months > 0
-          @records = @records.where('created_at > ?', Time.now - fetch_months.months)
-        end
+        @records = fetch_months > 0 ? Audit.where('created_at > ?', Time.now - fetch_months.months)
+          : Audit.all
+        filter_audits
 
         json = {}
 
         # Convert to id map for fast audit lookup
-        json[:audits] = @records
-          .as_json(only: [:id, :status, :title, :completion])
-          .reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
+        json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :completion])
 
         # Get ids of the 3 most recent audits
-        recent_audits = @records
-          .last(3)
-          .as_json(only: :id)
-          .map {|audit| audit['id'] }
+        recent_audits = @records.last(3).as_json(only: :id).map{ |audit| audit['id'] }
 
         json[:recent_audits] = audits_as_json(*recent_audits)
 
@@ -85,11 +77,7 @@ module Concerns
           }
         ).map { |audit| format_audit_json(audit) }
 
-        if (ids.length == 1)
-          json[0]
-        else
-          json.reduce({}) { |audits, audit| audits.merge({ audit['id'] => audit }) }
-        end
+        ids.length == 1 ? json[0] : array_to_id_map(json)
       end
 
       def format_audit_json(audit)
@@ -133,9 +121,7 @@ module Concerns
         json[:checklist_header_items] = checklist_headers.values
           .map{ |checklist_header| checklist_header[:checklist_header_items] }
           .flatten
-          .reduce({}) do |checklist_header_items, item|
-            checklist_header_items.merge({ item['id'] => item })
-          end
+        json[:checklist_header_items] = array_to_id_map json[:checklist_header_items]
 
         # Takes the id of each user field and replaces it with the
         # full name of the user corresponding to that id
