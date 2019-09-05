@@ -51,7 +51,7 @@ class Document < ActiveRecord::Base
           {name: 'Start a Corrective Action from Report',         href: 'standard_video',       content: 'car_from_report',      class: 'tv'},
           {name: 'Start a Corrective Action from Event',          href: 'standard_video',       content: 'car_from_event',       class: 'tv'},
           {name: 'Edit a Corrective Action',                      href: 'standard_video',       content: 'edit_car',             class: 'tv'},
-          {name: 'Corretive Action - Advanced Search',            href: 'standard_video',       content: 'car_advanced_search',  class: 'tv'},
+          {name: 'Corrective Action: Advanced Search',            href: 'standard_video',       content: 'car_advanced_search',  class: 'tv'},
           {name: 'Create an FAA Report',                          href: 'standard_video',       content: 'new_faa_report',       class: 'tv'},
           {name: 'Edit an FAA Report',                            href: 'standard_video',       content: 'edit_faa_reports',     class: 'tv'},
           {name: 'Filing an ORM',                                 href: 'standard_video',       content: 'file_orm',             class: 'tv'},
