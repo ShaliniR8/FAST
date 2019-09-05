@@ -519,15 +519,14 @@ class SubmissionsController < ApplicationController
 
 
   def airport_data
-    icao = "%"+params[:icao]+"%"
-    iata = "%"+params[:iata]+"%"
+    icao = "%"+params[:icao].upcase+"%"
+    iata = "%"+params[:iata].upcase+"%"
     arpt_name = "%"+params[:arpt_name]+"%"
     @field_id = params[:field_id]
     #@records = Airport.where("MATCH (icao) AGAINST (?) AND MATCH (faa_host_id) AGAINST (?) AND MATCH (name) AGAINST (?)", icao, iata, arpt_name)
-    @records = Airport.where("icao LIKE ? AND faa_host_id LIKE ? AND name LIKE ?", icao, iata, arpt_name)
+    @records = Airport.where("icao LIKE ? AND iata LIKE ? AND airport_name LIKE ?", icao, iata, arpt_name)
     @headers = Airport.get_header
     render :partial => "submissions/airports"
-    #render :partial => "records/record_table"
   end
 
   private

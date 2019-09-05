@@ -1,12 +1,12 @@
 class Airport < ActiveRecord::Base
-  attr_accessible :icao, :faa_host_id, :name
+  attr_accessible :icao, :iata, :airport_name
 
 
   def self.get_header
     {
       "ICAO"    => "icao",
-      "IATA"    => "faa_host_id",
-      "Name"    => "name",
+      "IATA"    => "iata",
+      "Name"    => "airport_name",
     }
   end
 end
