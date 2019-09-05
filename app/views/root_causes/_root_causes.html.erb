@@ -2,7 +2,7 @@
   <div class="panel panel-lightskyblue">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
-        <b>Root Causes</b>
+        <b><%=I18n.t("#{@i18nbase}.root_cause.title").pluralize%></b>
         <span class="pull-right clickable">
           <i class="mt5 glyphicon glyphicon-chevron-down"></i>
         </span>
@@ -15,7 +15,7 @@
           <%if owner.status != "Completed" &&
             owner.status != "Rejected" &&
             current_user.has_access(owner.class.table_name, 'edit', admin: true)%>
-            <%=link_to "Add Root Cause",
+            <%=link_to "Add #{I18n.t("#{@i18nbase}.root_cause.title")}",
               "#",
               :class => "btn btn-success pull-right mr5",
               :id => "add_root_cause_btn"%>
@@ -40,7 +40,7 @@
 
     $("#add_root_cause_btn").on("click", function(){
       console.log("here");
-      $.get("<%=new_root_cause_root_causes_path%>", {'owner_id' : <%=owner.id%>, 'owner_type': "<%=owner.class.name%>"});
+      $.get("<%=new_root_cause_root_causes_path%>", {'owner_id' : <%=owner.id%>, 'owner_type': "<%=owner.class.name%>", 'i18nbase': '<%=@i18nbase%>'});
     });
 
 

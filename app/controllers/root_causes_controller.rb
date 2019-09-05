@@ -20,7 +20,8 @@ class RootCausesController < ApplicationController
 
   def new_root_cause(first_id=nil, second_id=nil)
     @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @root = CauseOption.where(level: 0, name: "#{params[:owner_type].titleize} Root Causes").first
+    @i18nbase = params[:i18nbase]
+    @root = CauseOption.where(level: 0, name: "#{params[:owner_type].titleize}").first
     if @root.present?
       @categories = @root.children.keep_if{|x| !x.hidden?}
     end

@@ -1,5 +1,5 @@
 swal({
-  title: "New Root Cause",
+  title: "New <%=I18n.t("#{@i18nbase}.root_cause.title")%> ",
   html: "<%= escape_javascript render('/root_causes/new_root_cause', first_id: first_id, second_id: second_id) %>",
   customClass: "custom-swal",
   showCancelButton: false,

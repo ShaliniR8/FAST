@@ -269,6 +269,7 @@ class ReportsController < ApplicationController
 
   def show
     load_options
+    @i18nbase = 'sr.event'
     @report = Report.find(params[:id])
     @records = @report.records
     @action = "show"
