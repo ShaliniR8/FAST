@@ -10,28 +10,34 @@ module Concerns
       end
 
       def index_as_json
-        @records = Submission.where(user_id: current_user.id)
-          .includes(:template)
-          .can_be_accessed(current_user)
-
         fetch_months = current_user.mobile_fetch_months
-        @records = @records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
+
+        @complete_records, @incomplete_records = [true, false].map do |completed|
+          records = Submission.where({
+            user_id: current_user.id,
+            completed: completed,
+          }).includes(:template)
+
+          records = records.can_be_accessed(current_user) if completed
+
+          records = records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
+        end
 
         json = {}
 
         # Convert to id map for fast lookup
-        json[:submissions] = @records
-          .as_json(
+        json[:submissions] = [@complete_records, @incomplete_records].map{ |records|
+          records.as_json(
             only: [:id, :completed, :description, :event_date],
             include: { template: { only: :name }}
           )
-          .map { |submission|
-            submission = submission['submission']
+          .map do |submission|
             submission[:template_name] = submission[:template]['name']
             submission.delete(:template)
             submission
-          }
-          .reduce({}) { |submissions, submission| submissions.merge({ submission['id'] => submission }) }
+          end
+        }.flatten
+        json[:submissions] = array_to_id_map json[:submissions]
 
         json[:templates] = submission_templates_as_json
 
@@ -43,28 +49,19 @@ module Concerns
         end
 
         # Get ids of the 3 most recent completed submissions and 3 most recent in progress submissions
-        recent_completed_submissions = @records.where(completed: true)
-          .last(3)
-          .as_json(only: :id)
-          .map{ |submission| submission['submission']['id'] }
+        recent_submissions = [true, false].map do |completed|
+          records = completed ? @complete_records : @incomplete_records
+          records.last(3).as_json(only: :id).map{ |submission| submission['id'] }
+        end
 
-        recent_in_progress_submissions = @records.where(completed: false)
-          .last(3)
-          .as_json(only: :id)
-          .map{ |submission| submission['submission']['id'] }
-
-        recent_submissions = recent_completed_submissions + recent_in_progress_submissions
-
-        json[:recent_submissions] = submissions_as_json(*recent_submissions)
+        json[:recent_submissions] = submissions_as_json(*recent_submissions.flatten)
 
         # Get timezone data for timezone fields
         timezoneField = Field.where(data_type: 'timezone').first
         json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
 
-        json[:users] = User.all
-          .as_json(only: [:id, :full_name, :email])
-          .map { |user| user['user'] }
-          .reduce({}) { |users, user| users.merge({ user['id'] => user }) }
+        # Get id map of all users
+        json[:users] = array_to_id_map User.all.as_json(only: [:id, :full_name, :email])
 
         render :json => json
       end
@@ -98,35 +95,26 @@ module Concerns
           }
         ).map { |submission| format_submission_json(submission) }
 
-        if (ids.length == 1)
-          json[0]
-        else
-          json.reduce({}){ |submissions, submission| submissions.merge({ submission['id'] => submission }) }
-        end
+        ids.length == 1 ? json[0] : array_to_id_map(json)
       end
 
       def format_submission_json(submission)
-        json = submission['submission']
+        json = submission
 
         json[:submitted_by] = json['anonymous'] ? 'Anonymous' : User.find(json['user_id']).full_name rescue nil
 
-        json[:submission_fields] = json[:submission_fields].reduce({}) do |submission_fields, submission_field|
-          # Creates an id map based on template field id
-          submission_fields.merge({ submission_field['fields_id'] => submission_field })
-        end
+        # Creates an id map based on template field id
+        json[:submission_fields] = array_to_id_map json[:submission_fields], 'fields_id'
 
-        json[:attachments] = json[:attachments].reduce({}) do |attachments, attachment|
-          attachments.merge({ attachment['id'] => attachment })
-        end
+        # Attachments id map
+        json[:attachments] = array_to_id_map json[:attachments]
 
         json
       end
 
       def submission_templates_as_json
         # Get templates the user has access to
-        templates = Template
-          .includes({ categories: :fields }) # preload
-          .all
+        templates = Template.includes({ categories: :fields }).all
 
         unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
           templates.keep_if do |template|
@@ -135,35 +123,33 @@ module Concerns
         end
 
         # Get json data for templates
-        templates_json = templates
-          .as_json(
-            only: [:id, :name, :map_template_id, :allow_anonymous],
-            include: {
-              categories: {
-                only: [:id, :title, :category_order, :description, :deleted],
-                include: {
-                  fields: {
-                    only: [
-                      :id,
-                      :label,
-                      :data_type,
-                      :options,
-                      :field_order,
-                      :show_label,
-                      :required,
-                      :display_type,
-                      :nested_field_id,
-                      :nested_field_value,
-                      :element_class,
-                      :element_id,
-                      :deleted,
-                    ]
-                  }
+        templates_json = templates.as_json(
+          only: [:id, :name, :map_template_id, :allow_anonymous],
+          include: {
+            categories: {
+              only: [:id, :title, :category_order, :description, :deleted],
+              include: {
+                fields: {
+                  only: [
+                    :id,
+                    :label,
+                    :data_type,
+                    :options,
+                    :field_order,
+                    :show_label,
+                    :required,
+                    :display_type,
+                    :nested_field_id,
+                    :nested_field_value,
+                    :element_class,
+                    :element_id,
+                    :deleted,
+                  ]
                 }
               }
             }
-          )
-          .map { |template| template['template'] }
+          }
+        )
 
         # sort categories and fields
         templates_json.each do |template|
@@ -182,6 +168,7 @@ module Concerns
                 master_fields ||= category[:fields]
                   .select{ |field| field['element_class'].include? 'master' }
                   .map{ |field| { element_id: field['element_id'], label: field['label'] } }
+
                 if (child_field['element_class'] == 'master')
                   child_field['label'] = "#{child_field['label']}: Condition"
                 else
@@ -226,8 +213,10 @@ module Concerns
             # convert field_orders to arrays, where nested_fields have parent order and sibling order
             nested_fields = []
             field_orders = category[:fields].map{ |field| { id: field['id'], field_order: field['field_order'] } }
+
             category[:fields].each do |field|
               field['field_order'] = [field['field_order']]
+
               if (field['nested_field_id'] != nil)
                 parent_field = field_orders.find{ |parent_field| parent_field[:id] == field['nested_field_id'] }
                 field['field_order'].unshift(parent_field[:field_order])
@@ -280,7 +269,7 @@ module Concerns
           end
         end
 
-        templates_json.reduce({}){ |templates, template| templates.merge({ template['id'] => template }) }
+        array_to_id_map templates_json
       end
 
       ########################################################

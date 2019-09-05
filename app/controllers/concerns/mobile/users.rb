@@ -7,7 +7,9 @@ module Concerns
 
       def current_json
         # Get only the data that we need from the user
-        mobile_user_info = current_user.as_json(only: [:id, :full_name, :email, :mobile_fetch_months])['user']
+        mobile_user_info = current_user.as_json(only: [
+          :id, :full_name, :email, :mobile_fetch_months,
+        ])
 
         # Get which modules the user has access to
         all_mobile_modules = ['ASAP', 'Safety Assurance']
@@ -16,19 +18,16 @@ module Concerns
 
         # Get and parse the user's notices
         mobile_user_info[:notices] = current_user.notices.as_json(only: [
-          :id,
-          :content,
+          :id, :content,
         ]).map do |notice|
-          notice = notice.first[1] # Drops { object: {contents} ... } to { {contents} ... }
           content = notice['content']
-          extracted_uri = URI.extract(content, /http(s)?/)[0]
-          
-          if extracted_uri.present?
-            parsed_content = extracted_uri.chop.split('/').reverse
-            notice['owner_id'] = parsed_content[0]
-            notice['type'] = parsed_content[1]
+          href_match = /href\s*=\s*(?:'|")([^'"]*)(?:'|")/.match(content)
+
+          if href_match.present?
+            parsed_content = href_match[1].split('/').reverse
+            notice['owner_id'], notice['type'] = parsed_content
           end
-          
+
           notice['content'] = content.gsub(/<a.*/, '').strip
           notice
         end
