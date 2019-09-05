@@ -23,7 +23,18 @@ class Submission < ActiveRecord::Base
   after_create :make_report
   after_update :make_report
 
-  after_commit -> { create_transaction(context: 'User Submitted Report') if !self.description.include?('-- dual')}
+  #after_commit -> { create_transaction(context: 'User Submitted Report') if !self.description.include?('-- dual')}
+
+
+  def create_transaction(action: nil, context: nil)
+    Transaction.build_for(
+      self,
+      action,
+      self.anonymous? ? nil : (session[:simulated_id] || session[:user_id]),
+      context
+    )
+  end
+
 
 
   def self.get_meta_fields(*args)
