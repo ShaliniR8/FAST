@@ -10,25 +10,33 @@ module Concerns
       end
 
       def index_as_json
-        @records = Submission.where(user_id: current_user.id)
-          .includes(:template)
-          .can_be_accessed(current_user)
-
         fetch_months = current_user.mobile_fetch_months
-        @records = @records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
+
+        @complete_records, @incomplete_records = [true, false].map do |completed|
+          records = Submission.where({
+            user_id: current_user.id,
+            completed: completed,
+          }).includes(:template)
+
+          records = records.can_be_accessed(current_user) if completed
+
+          records = records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
+        end
 
         json = {}
 
         # Convert to id map for fast lookup
-        json[:submissions] = @records.as_json(
-          only: [:id, :completed, :description, :event_date],
-          include: { template: { only: :name }}
-        )
-        .map do |submission|
-          submission[:template_name] = submission[:template]['name']
-          submission.delete(:template)
-          submission
-        end
+        json[:submissions] = [@complete_records, @incomplete_records].map{ |records|
+          records.as_json(
+            only: [:id, :completed, :description, :event_date],
+            include: { template: { only: :name }}
+          )
+          .map do |submission|
+            submission[:template_name] = submission[:template]['name']
+            submission.delete(:template)
+            submission
+          end
+        }.flatten
         json[:submissions] = array_to_id_map json[:submissions]
 
         json[:templates] = submission_templates_as_json
@@ -42,7 +50,8 @@ module Concerns
 
         # Get ids of the 3 most recent completed submissions and 3 most recent in progress submissions
         recent_submissions = [true, false].map do |completed|
-          @records.where(completed: completed).last(3).as_json(only: :id).map{ |submission| submission['id'] }
+          records = completed ? @complete_records : @incomplete_records
+          records.last(3).as_json(only: :id).map{ |submission| submission['id'] }
         end
 
         json[:recent_submissions] = submissions_as_json(*recent_submissions.flatten)
