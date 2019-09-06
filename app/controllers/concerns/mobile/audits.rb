@@ -24,7 +24,7 @@ module Concerns
         recent_audits = @records.keep_if{ |audit| audit[:status] == 'Assigned' }
           .last(3).as_json(only: :id).map{ |audit| audit['id'] }
 
-        json[:recent_audits] = audits_as_json(*recent_audits)
+        json[:recent_audits] = audits_as_json(recent_audits)
 
         render :json => json
       end
@@ -33,7 +33,7 @@ module Concerns
         render :json => audits_as_json(params[:id])
       end
 
-      def audits_as_json(*ids)
+      def audits_as_json(ids)
         audits = Audit.where(id: ids).includes({
           checklists: { # Preload checklists to prevent N+1 queries
             checklist_header: :checklist_header_items,
@@ -78,7 +78,7 @@ module Concerns
           }
         ).map { |audit| format_audit_json(audit) }
 
-        ids.length == 1 ? json[0] : array_to_id_map(json)
+        ids.is_a?(Array) ? array_to_id_map(json) : json[0]
       end
 
       def format_audit_json(audit)

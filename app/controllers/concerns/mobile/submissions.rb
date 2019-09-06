@@ -55,7 +55,7 @@ module Concerns
           records.last(3).as_json(only: :id).map{ |submission| submission['id'] }
         end
 
-        json[:recent_submissions] = submissions_as_json(*recent_submissions.flatten)
+        json[:recent_submissions] = submissions_as_json(recent_submissions.flatten)
 
         # Get timezone data for timezone fields
         timezoneField = Field.where(data_type: 'timezone').first
@@ -71,7 +71,7 @@ module Concerns
         render :json => submissions_as_json(params[:id])
       end
 
-      def submissions_as_json(*ids)
+      def submissions_as_json(ids)
         submissions = Submission.where(id: ids).includes(:submission_fields, :attachments)
 
         json = submissions.as_json(
@@ -96,7 +96,7 @@ module Concerns
           }
         ).map { |submission| format_submission_json(submission) }
 
-        ids.length == 1 ? json[0] : array_to_id_map(json)
+        ids.is_a?(Array) ? array_to_id_map(json) : json[0]
       end
 
       def format_submission_json(submission)
