@@ -13,13 +13,8 @@ module Concerns
         fetch_months = current_user.mobile_fetch_months
 
         @complete_records, @incomplete_records = [true, false].map do |completed|
-          records = Submission.where({
-            user_id: current_user.id,
-            completed: completed,
-          }).includes(:template)
-
-          records = records.can_be_accessed(current_user) if completed
-
+          records = Submission.where(completed: completed).includes(:template)
+          records = completed ? records.can_be_accessed(current_user) : records.where(user_id: current_user.id)
           records = records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
           records
         end
