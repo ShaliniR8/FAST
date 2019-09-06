@@ -12,40 +12,40 @@ class BaseConfig
   }
 
   MODULES = {
-    "ASAP" => {
-      :display_name => "ASAP",
+    'ASAP' => {
+      :display_name => 'ASAP',
       :objects => {
-        "Submission" => "Submission",
-        "Record" => "Report",
-        "Report" => "Event",
-        "CorrectiveAction" => "Corrective Action",
+        'Submission' => 'Submission',
+        'Record' => 'Report',
+        'Report' => 'Event',
+        'CorrectiveAction' => 'Corrective Action',
       }
     },
 
-    "SMS IM" => {
-      :display_name => "SMS IM",
+    'SMS IM' => {
+      :display_name => 'SMS IM',
       :objects => {}
     },
 
-    "SMS" => {
-      :display_name => "Safety Assurance",
+    'SMS' => {
+      :display_name => 'Safety Assurance',
       :objects => {
-        "Audit" => "Audit",
-        "Inspection" => "Inspection",
-        "Evaluation" => "Evaluation",
-        "Investigation" => "Investigation",
-        "Finding" => "Finding",
-        "SmsAction" => "Corrective Action",
+        'Audit' => 'Audit',
+        'Inspection' => 'Inspection',
+        'Evaluation' => 'Evaluation',
+        'Investigation' => 'Investigation',
+        'Finding' => 'Finding',
+        'SmsAction' => 'Corrective Action',
       }
     },
 
-    "SRM" => {
-      :display_name => "Safety Risk Management",
+    'SRM' => {
+      :display_name => 'Safety Risk Management',
       :objects => {
-        "Sra" => "SRA",
-        "Hazard" => "Hazard",
-        "RiskControl" => "Risk Control",
-        "SafetyPlan" => "Safety Plan",
+        'Sra' => 'SRA',
+        'Hazard' => 'Hazard',
+        'RiskControl' => 'Risk Control',
+        'SafetyPlan' => 'Safety Plan',
       }
     }
   }
@@ -168,6 +168,11 @@ class BaseConfig
 
   def self.observation_phases
     Object.const_get(BaseConfig.airline[:code] + "_Config")::OBSERVATION_PHASES rescue []
+  end
+
+  def self.mobile_modules
+    mobile_mobile_access = Object.const_get("#{BaseConfig.airline[:code]}_Config")::MOBILE_MODULES rescue ['ASAP', 'SMS']
+    mobile_mobile_access.map{ |module_key| MODULES[module_key][:display_name] }
   end
 
 

@@ -12,9 +12,18 @@ module Concerns
         ])
 
         # Get which modules the user has access to
-        all_mobile_modules = ['ASAP', 'Safety Assurance']
-        mobile_user_info[:mobile_module_access] = current_user.accessible_modules
-          .select{ |module_name| all_mobile_modules.include? module_name }
+        mobile_user_info[:mobile_module_access] = current_user.accessible_modules.reduce({}) do |module_access, module_name|
+          submodules = []
+          case module_name
+          when 'ASAP'
+            submodules.push('Submissions') if current_user.has_access('submissions', 'view')
+          when 'Safety Assurance'
+            submodules.push('Audits') if current_user.has_access('audits', 'view')
+          end
+          module_access[module_name] = submodules if submodules.length > 0 &&
+            BaseConfig.mobile_modules.include?(module_name)
+          module_access
+        end
 
         # Get and parse the user's notices
         mobile_user_info[:notices] = current_user.notices.as_json(only: [

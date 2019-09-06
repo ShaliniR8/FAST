@@ -5,6 +5,8 @@ class NAMS_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[]
 
+  MOBILE_MODULES = ['ASAP']
+
   def self.airline_config
     {
       :version                                        => '1.0.3',

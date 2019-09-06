@@ -5,6 +5,7 @@ class BOE_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[]
 
+
   def self.airline_config
     {
       :version                                        => "1.0.3",
