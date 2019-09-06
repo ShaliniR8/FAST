@@ -176,7 +176,7 @@ class ReportsController < ApplicationController
     Transaction.build_for(
       @report,
       'Create',
-      'current_user',
+      current_user.id,
       content
     )
     redirect_to report_path(@report), flash: {success: "Event created."}
@@ -493,14 +493,16 @@ class ReportsController < ApplicationController
           "Your submission ##{submission.id} has been closed by analyst." + g_link(submission),
           true, "Submission ##{submission.id} Closed")
         Transaction.build_for(
-          submission.id,
-          'Close',
-          current_user.id
-        )
-        Transaction.build_for(
-          record.id,
+          submission,
           'Close',
           current_user.id,
+          'Report has been closed.'
+        )
+        Transaction.build_for(
+          record,
+          'Close',
+          current_user.id,
+          'Report has been closed.'
         )
       end
     end

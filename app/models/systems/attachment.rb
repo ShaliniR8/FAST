@@ -4,7 +4,6 @@ class Attachment < ActiveRecord::Base
   mount_uploader :name, AttachmentsUploader
 
   after_create :create_transaction
-  after_update :create_transaction
   before_destroy :delete_transaction
 
   def self.image_extensions
@@ -28,15 +27,14 @@ class Attachment < ActiveRecord::Base
   end
 
   def create_transaction
-    if (owner.respond_to?(:completed) && owner.completed) || (!owner.respond_to?(:completed))
-      Transaction.build_for(
-        self.owner,
-        'Add Attachment',
-        (owner.has_attribute?(:anonymous) && owner.anonymous) ? nil : (session[:simulated_id] || session[:user_id]),
-        self.document_filename
-      )
-    end
+    Transaction.build_for(
+      self.owner,
+      'Add Attachment',
+      session[:simulated_id] || session[:user_id],
+      self.document_filename
+    )
   end
+
 
   def delete_transaction
     Transaction.build_for(

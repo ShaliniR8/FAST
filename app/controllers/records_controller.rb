@@ -441,7 +441,8 @@ class RecordsController < ApplicationController
         Transaction.build_for(
           @owner.submission,
           params[:commit],
-          current_user.id
+          current_user.id,
+          'Report has been closed.'
         )
         end
     when 'Override Status'

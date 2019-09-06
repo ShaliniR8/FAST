@@ -342,7 +342,7 @@ class SubmissionsController < ApplicationController
         if params[:commit] == 'Add Notes'
           @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
         else
-          @record.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
+          @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         end
         if params[:create_copy] == '1'
           converted = @record.convert

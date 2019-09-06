@@ -12,9 +12,8 @@
       <div class="col-xs-12">
 
         <%
-          attachments = owner.attachments
-          if defined? children_attachments
-            attachments << children_attachments
+          if !defined?attachments
+            attachments = owner.attachments
           end
         %>
 
