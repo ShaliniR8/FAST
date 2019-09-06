@@ -1,5 +1,5 @@
 <%if BaseConfig.airline[:base_risk_matrix]%>
-  <%if BaseConfig.airline_code == 'Demo' && type == 'hazards'%>
+  <%if %w[Trial Demo].include?(BaseConfig.airline_code) && type == 'hazards'%>
     <!--if Demo and Hazards use BOE's matrix-->
     <%=render "shared/#{BaseConfig.airline[:code]}/baseline_form", :f => f%>
   <%else%>
@@ -10,8 +10,8 @@
   <%if defined?(airline_config::RISK_ARRAY) && airline_config::RISK_ARRAY[type.to_sym].present?%>
     <%risk_option = airline_config::RISK_ARRAY[type.to_sym][:form]%>
     <%if risk_option.present?%>
-      <%=render "shared/#{BaseConfig.airline[:code]}/#{risk_option}_form", 
-      :f => f, 
+      <%=render "shared/#{BaseConfig.airline[:code]}/#{risk_option}_form",
+      :f => f,
       :owner => @owner %>
     <%end%>
   <%else%>
