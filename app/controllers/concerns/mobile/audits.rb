@@ -20,8 +20,9 @@ module Concerns
         # Convert to id map for fast audit lookup
         json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :completion])
 
-        # Get ids of the 3 most recent audits
-        recent_audits = @records.last(3).as_json(only: :id).map{ |audit| audit['id'] }
+        # Get ids of the 3 most recent assigned audits
+        recent_audits = @records.keep_if{ |audit| audit[:status] == 'Assigned' }
+          .last(3).as_json(only: :id).map{ |audit| audit['id'] }
 
         json[:recent_audits] = audits_as_json(*recent_audits)
 
