@@ -47,7 +47,7 @@
                   <%if can_change%>
                     <td>
                       <%=link_to "Delete", "#",
-                        :class => "btn btn-danger delete_cause_btn",
+                        :class => "btn btn-danger delete_#{cause_type}_btn",
                         "data-cid" => c.id%>
                     </td>
                   <%end%>
@@ -84,9 +84,7 @@
     });
   });
 
-
-
-  $('.delete_cause_btn').on('click',function(){
+  $('.delete_<%=cause_type%>_btn').on('click', function(){
     var result = confirm("Are you sure?");
     if (result) {
       btn = $(this);
