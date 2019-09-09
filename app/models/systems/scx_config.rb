@@ -5,6 +5,8 @@ class SCX_Config
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  MOBILE_MODULES = ['ASAP']
+
   def self.airline_config
     {
       :version                                        => '1.1.0',

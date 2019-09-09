@@ -11,10 +11,23 @@ module Concerns
           :id, :full_name, :email, :mobile_fetch_months,
         ])
 
+        ##### Legacy, delete later
+        mobile_user_info[:mobile_module_access] = ['ASAP']
+        #####
+
         # Get which modules the user has access to
-        all_mobile_modules = ['ASAP', 'Safety Assurance']
-        mobile_user_info[:mobile_module_access] = current_user.accessible_modules
-          .select{ |module_name| all_mobile_modules.include? module_name }
+        mobile_user_info[:mobile_modules] = current_user.accessible_modules.reduce({}) do |module_access, module_name|
+          submodules = []
+          case module_name
+          when 'ASAP'
+            submodules.push('Submissions') if current_user.has_access('submissions', 'view', admin: true, strict: true)
+          when 'Safety Assurance'
+            submodules.push('Audits') if current_user.has_access('audits', 'view', admin: true, strict: true)
+          end
+          module_access[module_name] = submodules if submodules.length > 0 &&
+            BaseConfig.mobile_modules.include?(module_name)
+          module_access
+        end
 
         # Get and parse the user's notices
         mobile_user_info[:notices] = current_user.notices.as_json(only: [
@@ -31,6 +44,10 @@ module Concerns
           notice['content'] = content.gsub(/<a.*/, '').strip
           notice
         end
+
+        permissions = { :submissions => [], :audits => [] }
+        permissions[:submissions].push('new') if current_user.has_access('submissions', 'new', admin: true, strict: true)
+        mobile_user_info[:permissions] = permissions
 
         render :json => mobile_user_info
       end
