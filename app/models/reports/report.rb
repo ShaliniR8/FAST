@@ -68,6 +68,7 @@ class Report < ActiveRecord::Base
       {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',             required: false },
 
       {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting',         required: false},
 
@@ -83,6 +84,13 @@ class Report < ActiveRecord::Base
       "Under Review"    => { :score => 75,  :color => "warning"},
       "Closed"          => { :score => 100, :color => "success"},
     }
+  end
+
+
+  def get_minutes_agenda
+    agenda = "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" if agendas.length > 0
+    meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
+    "#{agenda || ''} #{meeting_minutes || ''}".html_safe
   end
 
 
