@@ -12,15 +12,16 @@ namespace :ultipro do
       Rails.logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
       assign_configs
+      fetch_file
 
       begin
-        data_dump = File.read(@filepath).sub(/^\<\?.*\?\>$/, '')
+        data_dump = File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
       rescue
-        Rails.logger.info "[ERROR] #{DateTime.now}: #{@filepath} could not be opened"
+        Rails.logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
         next #Abort
       end
 
-      if File.exist?(@filepath_prior) && compare_file(@filepath_prior, @filepath)
+      if File.exist?('lib/tasks/ultipro_data_prior.xml') && compare_file('lib/tasks/ultipro_data_prior.xml', 'lib/tasks/ultipro_data.xml')
         Rails.logger.info "[INFO] Historical Data was identical- no update necessary"
         next #abort- nothing to update
       end
@@ -49,7 +50,7 @@ namespace :ultipro do
               end
             end
         end
-        IO.copy_stream(@filepath, @filepath_prior) #Update Historical File
+        IO.copy_stream('lib/tasks/ultipro_data.xml', 'lib/tasks/ultipro_data_prior.xml') #Update Historical File
         Rails.logger.info '###################################'
         Rails.logger.info '### ULTIPRO MIGRATION COMPLETED ###'
         Rails.logger.info '###################################'
@@ -73,75 +74,11 @@ namespace :ultipro do
     end #END update_userbase
 
 
-    # Now obsolete method- was used for one-time importing of Ultipro data
-      # WARNING- THERE MAY BE CONFILCTS WITH THE generate_user function and this!
-    task :import_users, [:filepath] => [:environment] do |t, args|
-      begin
-        data_dump = File.read(@filepath)
-      rescue
-        puts "[ERROR] #{@filepath} could not be opened"
-        next #Abort
-      end
-
-      @log_data = []
-      @privilege_list = {}
-      Privilege.all.each{ |priv| @privilege_list[priv[:name]] = priv.id }
-
-      puts '### Generating Users ###'
-      Hash.from_xml(data_dump)['wbat_poc']['poc'].each do |u|
-
-        user = generate_user u
-
-        begin
-          user.save! if !@dry_run
-        rescue
-          @log_data << "[WARNING] User #{u['user_name']} data error- Skipped\n   #{u}"
-          print 'x' if !@expand_output
-          next
-        end
-
-        puts "User (#{u['employee_number']}): #{u['first_name']} #{u['last_name']}" if @expand_output
-        puts " Email: #{u['email_address']}" if @expand_output
-
-        begin
-          puts 'Privileges:' if @expand_output
-          privileges = u['access_privilege_list']['access_privilege']
-          privileges = [privileges] if privileges.class == Hash
-          privileges.each do |pr|
-            if user.level.nil?
-              user[:level] = map_account_level(pr['employee_group'])
-              user.save!
-            end
-            priv =  "#{pr['employee_group'].titleize}: #{pr['access_group']}"
-            generate_privilege priv unless @privilege_list.key? priv
-            user.roles.new({privileges_id: @privilege_list[priv]}).save! if !@dry_run
-            puts "  #{priv}" if @expand_output
-          end
-          print '.' if !@expand_output
-
-        rescue
-          if defined?(privileges)
-            @log_data << "[NOTICE] Privileges not read for user #{user.full_name}:\n   -#{privileges || 'No privileges found'}"
-          else
-            @log_data << "[INFO] No privileges found for user #{user.full_name}"
-          end
-          print '*' if !@expand_output
-        end
-      end
-
-      puts "\n### Task Notes ###"
-      @log_data.each do |event|
-        puts " #{event}"
-      end
-    end #END import_users
-
-
  ### Helper Methods
 
     def assign_configs
       configs = Object.const_get("#{YAML.load_file("#{::Rails.root}/config/airline_code.yml")}_Config")::ULTIPRO_DATA
-      @filepath = configs[:filepath]
-      @filepath_prior = configs[:filepath_prior]
+      @upload_path = configs[:upload_path]
       @expand_output =  configs[:expand_output]
       @dry_run = configs[:dry_run]
       @group_mapping = configs[:group_mapping]
@@ -217,6 +154,10 @@ namespace :ultipro do
       else
         'Staff'
       end
+    end
+
+    def fetch_file
+      `cp #{@upload_path} lib/tasks/ultipro_data.xml`
     end
 
 

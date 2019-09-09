@@ -334,9 +334,7 @@ class SCX_Config
   end
 
   ULTIPRO_DATA = {
-    filepath: '/home/jiaming/dylan/Ultipro_POC.xml',
-    #This is to compare the new file with the prior file
-    filepath_prior: '/home/jiaming/dylan/Ultipro_POC_prior.xml',
+    upload_path: '/var/sftp/scxsftpuser/Suncountry_POC.xml',
     expand_output: false, #Shows full account generation details
     dry_run: false, #Prevents the saving of data to the database
 
