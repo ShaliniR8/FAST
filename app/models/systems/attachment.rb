@@ -30,10 +30,11 @@ class Attachment < ActiveRecord::Base
     Transaction.build_for(
       self.owner,
       'Add Attachment',
-      (session[:simulated_id] || session[:user_id]),
+      session[:simulated_id] || session[:user_id],
       self.document_filename
     )
   end
+
 
   def delete_transaction
     Transaction.build_for(

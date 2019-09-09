@@ -207,8 +207,10 @@ class SubmissionsController < ApplicationController
     if @record.save
       notify_notifiers(@record, params[:commit])
       if params[:commit] == 'Submit'
+        @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         if params[:create_copy] == '1'
           converted = @record.convert
+          converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
         end
       end
@@ -322,8 +324,11 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
-    params[:submission][:completed] = params[:commit] != 'Save for Later'
-    params[:submission][:anonymous] = params[:anonymous] == '1'
+    if params[:commit] != 'Add Notes'
+      params[:submission][:completed] = params[:commit] != 'Save for Later'
+      params[:submission][:anonymous] = params[:anonymous] == '1'
+    end
+
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
@@ -334,8 +339,14 @@ class SubmissionsController < ApplicationController
           format.json { update_as_json(flash) }
         end
       else
+        if params[:commit] == 'Add Notes'
+          @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+        else
+          @record.create_transaction(action: 'Create', context: 'User Submitted Report')
+        end
         if params[:create_copy] == '1'
           converted = @record.convert
+          converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
         end
         respond_to do |format|

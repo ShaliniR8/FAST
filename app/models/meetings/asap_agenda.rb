@@ -1,7 +1,7 @@
 class AsapAgenda < Agenda
   belongs_to :meeting,foreign_key: "owner_id", class_name:"Meeting"
   belongs_to :event,foreign_key:"event_id",class_name: "Report"
-  belongs_to :user,foreign_key:"user_id",class_name:"User"
+
 
   def self.get_headers
     [

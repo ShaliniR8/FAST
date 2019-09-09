@@ -224,11 +224,14 @@
               record_edit_access &&
               @record.status == "Open"%>
               <%=link_to "Convert to #{@record.template.map_template.name}",
-                convert_record_path(@record,:copy=>false),
-                :class=>"btn btn-success pull-right mr5 mb5 "%>
+                convert_record_path(@record,:copy => false),
+                :class=>"btn btn-success pull-right mr5 mb5",
+                confirm: 'Are you sure? You will lose the original report.',
+                disable_with: 'Converting...'%>
               <%=link_to "Copy to #{@record.template.map_template.name}",
-                convert_record_path(@record,:copy=>true),
-                :class=>"btn btn-success pull-right mr5 mb5 "%>
+                convert_record_path(@record,:copy => true),
+                :class=>"btn btn-success pull-right mr5 mb5",
+                disable_with: 'Copying...'%>
             <%end%>
           </div>
 

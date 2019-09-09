@@ -12,11 +12,7 @@ module Transactionable
       Transaction.build_for(
         self,
         action,
-        (
-          (
-            (self.respond_to?(:anonymous) && self.anonymous?)
-          ) ? '' : ((session[:simulated_id] || session[:user_id]) rescue nil )
-        ),
+        session[:simulated_id] || session[:user_id],
         context || (defined?(session) ? '' : "Recurring #{self.class.name.titleize}")
       )
     end

@@ -35,6 +35,14 @@ include Transactionable
 
   after_create -> { create_transaction(context: 'Generated Report From User Submission.') if !self.description.include?('-- copy')}
 
+
+  def handle_anonymous_reports
+    if anonymous
+      transactions.update_all(users_id: nil)
+    end
+  end
+
+
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     [

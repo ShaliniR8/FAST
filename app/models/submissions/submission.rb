@@ -23,7 +23,28 @@ class Submission < ActiveRecord::Base
   after_create :make_report
   after_update :make_report
 
-  after_commit -> { create_transaction(context: 'User Submitted Report') if !self.description.include?('-- dual')}
+  def create_transaction(action: nil, context: nil)
+    Transaction.build_for(
+      self,
+      action,
+      session[:simulated_id] || session[:user_id],
+      context
+    )
+    handle_anonymous_reports
+  end
+
+
+  # if submission is completed, check whether it's submitted anonymously and update transactions if needed
+  def handle_anonymous_reports
+    if anonymous
+      transactions.each do |transaction|
+        if ['Add Attachment', 'Create', 'Add Notes'].include? transaction.action
+          transaction.users_id = nil
+          transaction.save
+        end
+      end
+    end
+  end
 
 
   def self.get_meta_fields(*args)
@@ -242,6 +263,7 @@ class Submission < ActiveRecord::Base
           :value => f.value)
         rf.save
       end
+      record.handle_anonymous_reports
     end
   end
 
@@ -378,11 +400,6 @@ class Submission < ActiveRecord::Base
       end
       converted.completed = self.completed
       converted.save
-      Transaction.build_for(
-        converted,
-        "Dual Report",
-        session[:user_id],
-        "Dual Report of ##{self.id}")
     end
     converted
   end

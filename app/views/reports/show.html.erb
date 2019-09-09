@@ -210,7 +210,7 @@
 
 
           <%=render "/forms/show_comment", :owner => @report%>
-          <%=render "/forms/attachments_show", :owner => @report, :children_attachments => @report.records.map(&:attachments).flatten%>
+          <%=render "/forms/attachments_show", :owner => @report, :attachments => @report.attachments + @report.records.map(&:attachments).flatten%>
           <%=render "/records/transactions", :owner => @report%>
 
         </div>
