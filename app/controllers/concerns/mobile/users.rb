@@ -11,8 +11,12 @@ module Concerns
           :id, :full_name, :email, :mobile_fetch_months,
         ])
 
+        ##### Legacy, delete later
+        mobile_user_info[:mobile_module_access] = ['ASAP']
+        #####
+
         # Get which modules the user has access to
-        mobile_user_info[:mobile_module_access] = current_user.accessible_modules.reduce({}) do |module_access, module_name|
+        mobile_user_info[:mobile_modules] = current_user.accessible_modules.reduce({}) do |module_access, module_name|
           submodules = []
           case module_name
           when 'ASAP'
