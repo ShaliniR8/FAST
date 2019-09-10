@@ -1,3 +1,10 @@
 <h2><b><%=topic_name%></b></h2>
+
 <hr>
-<%=render "documents/user_guides/#{href}", :href => ((defined?content) && content.present?) ? content : href%>
+
+<div style="overflow-y:scroll;height:600px;">
+  <%=render "documents/user_guides/#{href}",
+    :href => ((defined? content) && content.present?) ? content : href%>
+</div>
+
+

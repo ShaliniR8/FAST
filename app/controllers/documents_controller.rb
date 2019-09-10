@@ -52,7 +52,7 @@ class DocumentsController < ApplicationController
     render :partial => "documents/user_guides/template", :locals => {
       :topic_name => params[:topic_name],
       :href => params[:href],
-      :content => params[:content]
+      :content => params[:content].split(',')
     }
   end
 
