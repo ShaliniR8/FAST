@@ -11,9 +11,7 @@
             Risk Control #<%=@risk_control.get_id%>: <%=@risk_control.title%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.admin? ||
-                  current_user.has_access('risk_controls', 'admin') ||
-                  current_user.has_access("risk_controls", "destroy")%>
+            <%if current_user.has_access('risk_controls', 'destroy', admin: true)%>
               <%=link_to "Delete",
                 risk_control_path(@risk_control),
                 :method => "delete",
@@ -21,8 +19,7 @@
                 :class => "btn btn-danger pull-right mr5 mb5"%>
             <%end%>
 
-            <%if current_user.admin? ||
-                  current_user.has_access('risk_controls','admin')%>
+            <%if current_user.has_access('risk_controls', 'admin', admin: true)%>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',
@@ -30,10 +27,8 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <%if @risk_control.status != 'Completed' && (
-                    current_user.admin? ||
-                    current_user.has_access('risk_controls','admin') ||
-                    current_user.has_access("risk_controls", "edit"))%>
+            <%if @risk_control.status != 'Completed' &&
+                    current_user.has_access('risk_controls', 'edit', admin: true)%>
               <%=link_to "Edit",
                 edit_risk_control_path(@risk_control),
                 :class => "btn btn-warning pull-right mr5 mb5",
@@ -74,8 +69,7 @@
             <%when 'New', 'Open'%>
               <%if @risk_control.approver == current_user ||
                     @risk_control.created_by == current_user ||
-                    current_user.admin? ||
-                    current_user.has_access('risk_controls','admin') %>
+                    current_user.has_access('risk_controls','admin', admin: true) %>
                 <%=link_to  "Assign", '#',
                   :id => 'assign_btn',
                   :class=>"btn btn-warning pull-right mr5 mb5",

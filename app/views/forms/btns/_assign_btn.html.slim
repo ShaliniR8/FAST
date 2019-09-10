@@ -1,6 +1,6 @@
 - if owner.status == 'New' && \
   (owner.approver == current_user || \
-  current_user.admin? || \
+  current_user.global_admin? || \
   (!owner.respond_to?('created_by') || owner.created_by == current_user) || \
   current_user.has_access(permission,'admin')) && \
   (!owner.respond_to?('can_assign?') || owner.can_assign?(current_user))

@@ -25,9 +25,7 @@ class RecordsController < ApplicationController
   before_filter :check_user_privilege, only: [:query_all, :observation_phases_trend]
 
   def check_user_privilege
-    if current_user.level == "Admin"
-      true
-    elsif current_user.has_access('home','query_all')
+    if current_user.has_access('home','query_all', admin: true)
       true
     else
       flash[:no_access] = 'You do not have access to this function.'

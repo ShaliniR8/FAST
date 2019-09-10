@@ -38,7 +38,7 @@
                     :class=>"btn btn-danger pull-right mr5 mb5 "%>
                 <%end%>
 
-                <%if current_user.admin?%>
+                <%if current_user.global_admin?%>
                   <%=link_to 'Override Status', '#',
                     :class => 'btn btn-danger pull-right mr5 mb5',
                     :id => 'override_status_btn',
@@ -224,7 +224,7 @@
 
           <%
             meta_field_args = ['show']
-            meta_field_args.push('admin') if current_user.admin?
+            meta_field_args.push('admin') if current_user.global_admin?
           %>
           <%=render "forms/show_fields", :fields => Record.get_meta_fields(*meta_field_args), :record => @record%>
 

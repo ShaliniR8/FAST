@@ -4,8 +4,8 @@ class UsersController < ApplicationController
   include Concerns::Mobile # used for mobile actions
 
   def index
-    if (current_user.level != "Admin")
-      flash[:notice] = "Only Administrators can view all the user accounts"
+    unless current_user.global_admin?
+      flash[:notice] = 'Only Administrators can view all the user accounts'
       redirect_to root_url
       return
     end
@@ -39,27 +39,23 @@ class UsersController < ApplicationController
 
   def new
     @levels = User.get_levels
-    @action = "new"
-    if (current_user.level != "Admin")
-      flash[:notice] = "Only Administrators can create new accounts."
+    @action = 'new'
+    unless current_user.global_admin?
+      flash[:notice] = 'Only Global Administrators can create new accounts.'
       redirect_to root_url
       return
     end
     @user = User.new
     @user.airport = current_user.airport
-    if current_user.level != "Admin"
-      @authorized = false
-    else
-      @authorized = true
-    end
+    @authorized = current_user.global_admin?
   end
 
 
 
   def show
     @user = User.find(params[:id])
-    if !((current_user.id == @user.id or current_user.level == "Admin") and @user.airport == current_user.airport)
-      flash[:notice] = "Only Administrators can view another user's account."
+    if !((current_user.id == @user.id || current_user.global_admin?) and @user.airport == current_user.airport)
+      flash[:notice] = 'Only Administrators can view another user\'s account.'
       redirect_to root_url
       return
     end
@@ -104,8 +100,8 @@ class UsersController < ApplicationController
 
 
   def create
-    if (current_user.level != "Admin")
-      flash[:notice] = "Only Administrators can create new accounts."
+    unless current_user.global_admin?
+      flash[:notice] = 'Only Administrators can create new accounts.'
       redirect_to root_url
       return
     end
@@ -128,7 +124,7 @@ class UsersController < ApplicationController
       redirect_to user_path(@user)
     else
       @authorized = true
-      @action = "new"
+      @action = 'new'
       @levels = User.get_levels
       flash[:error] = @user.errors.full_messages
       render :action => 'new'
@@ -139,41 +135,28 @@ class UsersController < ApplicationController
 
   def edit
     @levels=User.get_levels
-    Rails.logger.debug ("In edit")
-      # if (current_user.level != "Admin")
-      #     flash[:notice] = "Only Administrators can edit users"
-      #     redirect_to root_url
-      #     return
-      # end
-    if current_user.level != "Admin"
-      @authorized = false
-    else
-      @authorized = true
-    end
-    @action = "edit"
+    @authorized = current_user.global_admin?
+    @action = 'edit'
     @users = User.find(:all, :conditions => {:airport => current_user.airport})
     match_id = params[:id]
     @user = User.find(params[:id])
-    #@user = User.find(:all, :conditions => {:full_name => @users[match_id.to_i-1].full_name})
   end
 
 
 
   def self_edit
     @authorized = true
-    @action = "self_edit"
-    Rails.logger.debug ("In self edit")
+    @action = 'self_edit'
     @user = User.find(params[:id])
   end
 
 
 
   def change_password
-    Rails.logger.debug ("In change password")
     @user = User.find(params[:id])
-    @title = @user.first_name + " " + @user.last_name
-    if !((current_user.id == @user.id) and @user.airport == current_user.airport)
-      flash[:notice] = "To change a user's password, access their account from the grid"
+    @title = "#{@user.first_name} #{@user.last_name}"
+    if !((current_user.id == @user.id) && @user.airport == current_user.airport)
+      flash[:notice] = 'To change a user\'s password, access their account from the grid'
       redirect_to root_url
       return
     end
@@ -189,27 +172,24 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:id])
-    Rails.logger.debug ("In update")
 
     # User entered wrong password, only works for the self edit page right now
     if !@user.matching_password?(params[:pw])
       if params[:page].present?
-        if params[:page] == "self_edit"
-          flash[:error] = "Incorrect Password."
+        if params[:page] == 'self_edit'
+          flash[:error] = 'Incorrect Password.'
           @authorized = true
-          @action = "self_edit"
+          @action = 'self_edit'
           @levels = User.get_levels
-          render :action => "self_edit"
-          #redirect_to self_edit_user_path(current_user)
+          render :action => 'self_edit'
           return
 
-        elsif params[:page] == "change_password"
-          #redirect_to change_password_user_path(current_user)
-          flash[:error] = "Incorrect Password/Confirmation."
+        elsif params[:page] == 'change_password'
+          flash[:error] = 'Incorrect Password/Confirmation.'
           @authorized = true
-          @action = "change_password"
+          @action = 'change_password'
           @levels = User.get_levels
-          render :action => "change_password"
+          render :action => 'change_password'
           return
         end
       end
@@ -281,7 +261,7 @@ class UsersController < ApplicationController
 
   def simulate
     @user = User.find(params[:id])
-    if current_user.admin?
+    if current_user.global_admin?
       session[:simulated_id] = @user.id
       define_session_permissions
     else

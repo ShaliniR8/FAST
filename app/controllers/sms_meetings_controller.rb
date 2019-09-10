@@ -159,7 +159,7 @@ class SmsMeetingsController < ApplicationController
 
   def index
     @records=Object.const_get(params[:type]).includes(:invitations, :host)
-    unless current_user.admin?
+    unless current_user.global_admin?
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end

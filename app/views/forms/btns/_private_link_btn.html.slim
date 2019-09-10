@@ -1,5 +1,5 @@
 - if BaseConfig.airline[:enable_shared_links] && \
-  (current_user.admin? || \
+  (current_user.global_admin? || \
   current_user.has_access(permission,'admin') || \
   current_user.has_access(permission,'edit'))
   = link_to 'Share',

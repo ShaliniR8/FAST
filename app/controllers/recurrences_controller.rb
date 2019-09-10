@@ -55,7 +55,7 @@ class RecurrencesController < ApplicationController
       child_access_validation(params[:form_type].downcase.pluralize,'admin')
       @table = Recurrence.where(form_type: Object.const_get(params[:form_type]))
     else
-      redirct_to errors_path unless current_user.admin?
+      redirct_to errors_path unless current_user.global_admin?
       @table = Recurrence
     end
     @headers = @table.get_meta_fields('index')

@@ -312,7 +312,7 @@
           <ul class="nav navbar-nav navbar-right">
 
             <!-- System Configurations -->
-            <%if current_user.level == "Admin"%>
+            <%if current_user.admin?%>
               <li class="dropdown">
                 <%=link_to "System Configuration<b class='caret'></b>".html_safe,
                   "#",
@@ -382,7 +382,7 @@
                 <li class="menu-link"><%=link_to "My Profile", user_path(current_user)%></li>
                 <li class="menu-link"><%=link_to "Change Password", change_password_user_path(current_user)%></li>
 
-                <%if current_user.level == "Admin" %>
+                <%if current_user.global_admin? %>
                   <li><%=link_to "Admin", "#", :class => "dropdown-menu-header"%></li>
                   <li class="menu-link"><%=link_to "All Accounts", users_path%></li>
                   <li class="menu-link"><%=link_to "New Account", new_user_path%></li>

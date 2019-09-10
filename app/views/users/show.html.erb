@@ -15,7 +15,7 @@
               Account Summary
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.level == "Admin"%>
+              <%if current_user.global_admin?%>
 
 
                 <%#=link_to "Access Level",
@@ -43,7 +43,7 @@
                   :class => "btn btn-danger"%>
             <%end%>
 
-            <%=link_to "Edit Profile", current_user.level == "Admin" ? edit_user_path(@user) : self_edit_user_path(@user), :id=>"edit-btn", :class=>"btn btn-warning", :disable_with => "Editing..."%>
+            <%=link_to "Edit Profile", current_user.global_admin? ? edit_user_path(@user) : self_edit_user_path(@user), :id=>"edit-btn", :class=>"btn btn-warning", :disable_with => "Editing..."%>
             </div>
           </div>
         </div>
