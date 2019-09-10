@@ -10,15 +10,21 @@
 
       <div class="panel-body">
 
-        <div class="col-xs-4" style="overflow-y:auto;height:100vh;">
+        <div class="col-xs-4">
           <h3><b>Table of Contents</b></h3>
-          <div class="sidenav">
+          <div class="sidenav" style="overflow-y:scroll;height:600px;">
             <ol>
               <%Document.get_user_guides.each do |x|%>
                 <li><a class="<%=x[:class]%>" href="<%=x[:href]%>"><%=x[:name]%></a></li>
                 <ol type="a">
                   <%x[:topics].each do |y|%>
-                    <li><a class="<%=y[:class]%>" href="<%=y[:href]%>" data-content="<%=y[:content]%>"><%=y[:name]%></a></li>
+                    <li>
+                      <a class="<%=y[:class]%>"
+                        href="<%=y[:href]%>"
+                        data-content="<%=y[:content]%>">
+                        <%=y[:name]%>
+                      </a>
+                    </li>
                   <%end%>
                 </ol>
               <%end%>
