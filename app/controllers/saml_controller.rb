@@ -41,6 +41,7 @@ class SamlController < ApplicationController
 
           redirect_to @url
         else
+          define_session_permissions
           redirect_to_target_or_default(root_url)
         end
       end

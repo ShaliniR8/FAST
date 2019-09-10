@@ -27,7 +27,7 @@ class ReportsController < ApplicationController
     report = Report.find(params[:id])
     if current_user.level == "Admin"
       true
-    elsif report.privileges.present?
+    elsif report.privileges.reject{|priv| priv.empty?}.present?
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
           true
