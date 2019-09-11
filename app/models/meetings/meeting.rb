@@ -79,7 +79,7 @@ class Meeting < ActiveRecord::Base
 
 
   def covert_time(time)
-    timezone = BaseConfig.airline[:time_zone]
+    timezone = CONFIG::GENERAL[:time_zone]
     (time.in_time_zone(timezone) - time.in_time_zone(timezone).utc_offset).utc
   end
 

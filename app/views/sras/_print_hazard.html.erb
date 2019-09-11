@@ -31,10 +31,10 @@ table{
 <b>Status: </b><%=hazard.status%></br>
 <%if hazard.description.present?%><b>Description of Hazard: </b></br><%=hazard.description.gsub(/\n/, '<br/>').html_safe%></br><%end%>
 
-  <%if BaseConfig.airline[:base_risk_matrix]%>
+  <%if CONFIG::GENERAL[:base_risk_matrix]%>
     <%= render "/shared/print_risk_matrix", :owner => hazard %>
   <%else%>
-    <%= render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix", :owner => hazard%>
+    <%= render "/shared/#{AIRLINE_CODE}/print_risk_matrix", :owner => hazard%>
   <%end%>
 
   <% root_cause_headers = RootCause.get_headers %>

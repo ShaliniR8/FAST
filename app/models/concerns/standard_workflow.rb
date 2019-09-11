@@ -37,7 +37,7 @@ module StandardWorkflow
   end
 
   def can_reopen?(user, form_conds: false, user_conds: false)
-    return false unless BaseConfig.airline[:allow_reopen_report]
+    return false unless CONFIG::GENERAL[:allow_reopen_report]
     form_confirmed = self.status == 'Completed' || form_conds
     user_confirmed = [self.created_by_id].include?(user.id)||
       has_admin_rights?(user) ||

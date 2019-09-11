@@ -20,14 +20,14 @@
         </div>
       <%end%>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_risk"%>
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_probability"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_mitigated_risk"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_mitigated_probability"%>
       </div>
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_severity"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_mitigated_severity"%>
       </div>
       <div class="col-xs-12">
-        <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
+        <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
       </div>
       <div class="col-xs-12">
         <%=f.submit "Submit",:class=>"btn btn-success pull-right mr5", disable_with: "Submitting..."%>

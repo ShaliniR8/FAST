@@ -26,10 +26,10 @@
               <%owner.transactions.preload(:user).reverse!.each do |t|%>
                 <tr>
                   <td>
-                    <%#=datetime_to_string(t.stamp.in_time_zone(BaseConfig.airline[:time_zone]))%>
-                    <%base_config = BaseConfig.airline[:time_zone]%>
+                    <%#=datetime_to_string(t.stamp.in_time_zone(CONFIG::GENERAL[:time_zone]))%>
+                    <%base_config = CONFIG::GENERAL[:time_zone]%>
                     <%if base_config.present?%>
-                      <%=datetime_to_string(t.stamp.in_time_zone(BaseConfig.airline[:time_zone] ))%>
+                      <%=datetime_to_string(t.stamp.in_time_zone(CONFIG::GENERAL[:time_zone] ))%>
                     <%else%>
                       <%=datetime_to_string(t.stamp.in_time_zone)%>
                     <%end%>

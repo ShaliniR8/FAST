@@ -29,7 +29,7 @@ table{
 <div class="category">
   <b>Submission ID: </b><%=@record.get_id%></br>
   <%if @record.get_event_date.present?%><b>Date/Time of Event: </b><%=@record.get_event_date%></br><%end%>
-  <%if BaseConfig.airline[:submission_description]%><%if !@record.description.blank?%><b>General Description: </b><%=@record.description%></br><%end%><%end%>
+  <%if CONFIG::SR::GENERAL[:submission_description]%><%if !@record.description.blank?%><b>General Description: </b><%=@record.description%></br><%end%><%end%>
 
   <%@template.categories.order(:category_order).each do |cat|%>
     <%if cat.id == 338%>

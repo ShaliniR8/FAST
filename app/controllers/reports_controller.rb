@@ -147,7 +147,7 @@ class ReportsController < ApplicationController
       base.report = @report
       @report.records.push(base)
     end
-    @fields = Report.get_meta_fields('form', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('form', CONFIG::SR::GENERAL[:event_summary] ? 'event_summary' : '')
     @report_fields = Record.get_meta_fields('index')
     @candidates = Record
       .find(:all)
@@ -197,7 +197,7 @@ class ReportsController < ApplicationController
       .sort_by!{|a| a.name}
     @action = "edit"
     @report = Report.find(params[:id])
-    @fields = Report.get_meta_fields('form', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('form', CONFIG::SR::GENERAL[:event_summary] ? 'event_summary' : '')
     load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
@@ -291,7 +291,7 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show', @report.status == "Closed" ? 'close' : '', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('show', @report.status == 'Closed' ? 'close' : '', CONFIG::SR::GENERAL[:event_summary] ? 'event_summary' : '')
   end
 
 
@@ -446,10 +446,10 @@ class ReportsController < ApplicationController
     @owner=Report.find(params[:id])
     load_options
     load_special_matrix_form('report', 'mitigate', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
         render :partial=>"shared/mitigate"
       else
-        render :partial=>"shared/#{BaseConfig.airline[:code]}/mitigate"
+        render :partial=>"shared/#{AIRLINE_CODE}/mitigate"
       end
   end
 
@@ -458,10 +458,10 @@ class ReportsController < ApplicationController
     @owner=Report.find(params[:id])
     load_options
     load_special_matrix_form('report', 'baseline', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial=>"shared/baseline"
     else
-      render :partial=>"shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial=>"shared/#{AIRLINE_CODE}/baseline"
     end
   end
 

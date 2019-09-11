@@ -9,7 +9,7 @@ class NotifyMailer < ActionMailer::Base
     @message = message
     define_attachments
     subject = "ProSafeT#{subject.nil? ? '' : ": #{subject}"}"
-    if BaseConfig.airline[:enable_mailer] && Rails.env.production?
+    if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
       mail(:to => user.email, :subject => subject).deliver
     end
     mail(:to => 'noc@prosafet.com', :subject => subject).deliver
@@ -24,7 +24,7 @@ class NotifyMailer < ActionMailer::Base
     link = "<a style='font-weight:bold;text-decoration:underline' href='#{private_links_url(:digest => private_link.digest)}'>View</a>"
     @message = "#{shared_by.full_name} has shared a link with you on ProSafeT. #{link}"
 
-    if BaseConfig.airline[:enable_mailer] && Rails.env.production?
+    if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
       mail(:to => @email, :subject => @subject).deliver
     end
     mail(:to => 'noc@prosafet.com', :subject => subject).deliver
@@ -38,7 +38,7 @@ class NotifyMailer < ActionMailer::Base
     @record_url = g_link(record)
     define_attachments
     subject = "ProSafeT: #{subject}"
-    if BaseConfig.airline[:enable_mailer] && Rails.env.production?
+    if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
       mail(:to => user.email, :subject => subject).deliver
     end
     mail(:to => 'noc@prosafet.com', :subject => subject).deliver
@@ -51,7 +51,7 @@ class NotifyMailer < ActionMailer::Base
     @submission_url = g_link(submission)
     define_attachments
     subject = "ProSafeT: Submission ##{submission.id} Received"
-    if BaseConfig.airline[:enable_mailer] && Rails.env.production?
+    if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
       mail(to: user.email, subject: subject).deliver
     end
     mail(to: 'noc@prosafet.com', subject: subject).deliver

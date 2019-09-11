@@ -20,7 +20,7 @@
     <a href="#" data-toggle="dropdown">Hazards<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
       <li><a href=<%=hazards_path%>>All Hazards</a></li>
-      <%if BaseConfig.airline[:has_root_causes]%>
+      <%if CONFIG::GENERAL[:has_root_causes]%>
         <li><a href=<%=root_cause_trend_hazards_path%>>Root Cause Trend</a></li>
       <%end%>
     </ul>

@@ -11,7 +11,7 @@
     <div class="panel-body" style="display:none">
       <div class="row">
         <div class="col-xs-12">
-          <%if can_change && show_btns && allow_mitigate && 
+          <%if can_change && show_btns && allow_mitigate &&
               !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
             <span data-toggle="modal" data-target=".bs-example-modal-lg">
               <%=link_to "Mitigate Risk","#",
@@ -20,7 +20,7 @@
                 "data-toggle" => "tooltip", "data-placement" => "top", :title=>"Assess Mitigated Risk"%>
             </span>
           <%end%>
-         <%if can_change && show_btns && allow_baseline && 
+         <%if can_change && show_btns && allow_baseline &&
             !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
             <span data-toggle="modal" data-target=".bs-example-modal-lg">
               <%=link_to "Baseline Risk","#",
@@ -50,12 +50,12 @@
         </div>
 
         <div class="col-xs-12 col-sm-12 col-md-12">
-          <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_risk_severity",         :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_severity",         :owner => owner%>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_risk_probability",      :owner => owner%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_risk_factor",           :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_probability",      :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_factor",           :owner => owner%>
         </div>
 
 

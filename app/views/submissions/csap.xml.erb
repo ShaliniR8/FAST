@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Airline<%=BaseConfig.airline[:code]%>_CSAP>
+<Airline<%=AIRLINE_CODE%>_CSAP>
   <evnet_id><%if @submission.record.present? && @submission.record.report.present?%><%=@submission.record.report.id%><%end%></event_id>
   <reporter_info>
     <name><%=@submission.created_by.full_name%></name>
@@ -42,4 +42,4 @@
     <description><%=@submission.get_narratives%></description>  <!-- our maximum is 16000 characters for both description and recommendations -->
     <recommendations></recommendations>  <!-- or some other narrative field. -->
   </event_info>
-</Airline<%=BaseConfig.airline[:code]%>_CSAP>
+</Airline<%=AIRLINE_CODE%>_CSAP>

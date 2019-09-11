@@ -20,13 +20,13 @@
       </div>
 
       <div class="col-xs-12 col-sm-12 col-md-12">
-        <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_severity"%>
+        <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_severity"%>
       </div>
 
       <div class="col-xs-12 col-sm-12 col-md-12">
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_probability"%>
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_risk_table"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_probability"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_risk_table"%>
       </div>
 
       <div class="col-xs-12">
@@ -134,8 +134,8 @@
 
   function set_risk(row_index, column_index){
     clear_risk();
-    risk_table_def = <%=NAMS_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=NAMS_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");

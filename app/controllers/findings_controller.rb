@@ -203,10 +203,10 @@ class FindingsController < SafetyAssuranceController
     @owner = Finding.find(params[:id]).becomes(Finding)
     load_options
     load_special_matrix_form("finding", 'mitigate', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/mitigate"
+      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
     end
   end
 
@@ -215,10 +215,10 @@ class FindingsController < SafetyAssuranceController
     @owner = Finding.find(params[:id]).becomes(Finding)
     load_options
     load_special_matrix_form("finding", 'baseline', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
 

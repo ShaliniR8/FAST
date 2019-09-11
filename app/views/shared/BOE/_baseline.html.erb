@@ -13,7 +13,7 @@
       <%=f.hidden_field :risk_factor, :value => "", :id => "risk_fact"%>
 
       <%=render "/shared/BOE/baseline_content", :f => f%>
-      
+
         <div class="col-xs-12">
           <%=f.submit "Save Baseline Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
         </div>
@@ -135,8 +135,8 @@
 
   function set_baseline(row_index,column_index){
     clear_baseline();
-    risk_table_def = <%=BOE_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=BOE_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.baseline_risk_td').each(function(){
       if($(this).data("row")==row_index && $(this).data("column")==column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");

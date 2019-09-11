@@ -1,4 +1,4 @@
-- if BaseConfig.airline[:has_verification] && owner.status == 'Completed'
+- if CONFIG::GENERAL[:has_verification] && owner.status == 'Completed'
   = link_to 'Schedule Verification',
     '#',
     class: 'btn btn-warning pull-right mr5',

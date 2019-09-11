@@ -39,8 +39,8 @@ $("#calendar-parent").html("<%= escape_javascript(render('calendar')) %>");
 <% end %>
 // console.log("start-date=", "<%=@start_date%>");
 <% Rails.logger.debug "before render, start_date=#{@start_date}" %>
-<% if BaseConfig.airline[:base_risk_matrix] %>
+<% if CONFIG::GENERAL[:base_risk_matrix] %>
     $("#risk-matrix-parent").html("<%= escape_javascript(render('risk_matrix'))%><%= escape_javascript(render('after_matrix')) %>")
 <% else %>
-    $("#risk-matrix-parent").html('<%= escape_javascript(render("shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"))%><%= escape_javascript(render("shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix")) %>')
+    $("#risk-matrix-parent").html('<%= escape_javascript(render("shared/#{AIRLINE_CODE}/dashboard_risk_matrix"))%><%= escape_javascript(render("shared/#{AIRLINE_CODE}/dashboard_after_matrix")) %>')
 <% end %>

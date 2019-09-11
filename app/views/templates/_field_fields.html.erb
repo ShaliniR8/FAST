@@ -41,7 +41,7 @@
       <%else%>
         <a class="btn btn-warning archive_btn">Archive</a>
       <%end%>
-      <%if BaseConfig.airline[:allow_template_nested_fields]%>
+      <%if CONFIG::SR::GENERAL[:template_nested_fields]%>
         <a class="btn btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
       <%end%>
 

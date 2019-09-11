@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
 
   def track_activity
     #if Trial or Demo and user is not prosafet_admin then track log
-    track_airline_log = BaseConfig.airline[:track_log]
+    track_airline_log = CONFIG::GENERAL[:track_log]
     if track_airline_log
       date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
       file_date = date_time.strftime("%Y%m%d")
@@ -65,7 +65,7 @@ class ApplicationController < ActionController::Base
 
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso] && !current_token.present?
+    elsif (Time.now - session[:last_active])/60 > 100 && !CONFIG::GENERAL[:enable_sso] && !current_token.present?
        redirect_to logout_path
        return false
     else

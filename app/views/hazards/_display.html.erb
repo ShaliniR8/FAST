@@ -3,7 +3,7 @@
 
 <%=render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => hazard%>
 
-<%if BaseConfig.airline[:base_risk_matrix]%>
+<%if CONFIG::GENERAL[:base_risk_matrix]%>
   <%=render "shared/bsk_risk_matrix_show",
     :owner => hazard,
     :type => "hazards",
@@ -12,7 +12,7 @@
     :frequency => frequency,
     :allow_mitigate => true %>
 <%else%>
-  <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
+  <%=render "shared/#{AIRLINE_CODE}/show_matrix",
     :owner => hazard,
     :allow_mitigate => true%>
 <%end%>

@@ -143,7 +143,7 @@ class MAC_Config
     }
   }
 
-  # Calculate the severity based on #{BaseConfig.airline[:code]}'s risk matrix
+  # Calculate the severity based on airline's risk matrix
   def self.calculate_severity(list)
     if list.present?
       list.delete("undefined") # remove "undefined" element from javascript
@@ -151,7 +151,7 @@ class MAC_Config
     end
   end
 
-  # Calculate the probability based on #{BaseConfig.airline[:code]}'s risk matrix
+  # Calculate the probability based on airline's risk matrix
   def self.calculate_probability(list)
     if list.present?
       list.delete("undefined") # remove "undefined" element from javascript

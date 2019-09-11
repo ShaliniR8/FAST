@@ -25,7 +25,7 @@ module Concerns
             submodules.push('Audits') if current_user.has_access('audits', 'show', admin: true, strict: true)
           end
           module_access[module_name] = submodules if submodules.length > 0 &&
-            BaseConfig.mobile_modules.include?(module_name)
+            CONFIG.mobile_modules.include?(module_name)
           module_access
         end
 

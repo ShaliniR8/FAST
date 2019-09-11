@@ -662,7 +662,7 @@ class HomeController < ApplicationController
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
     prepare_analytics
     prepare_calendar
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       prepare_risk_matrix
     else
       prepare_special_risk_matrix

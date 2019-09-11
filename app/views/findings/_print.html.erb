@@ -11,12 +11,12 @@
     :deidentified => deidentified
   %>
 
-  <%if BaseConfig.airline[:base_risk_matrix]%>
+  <%if CONFIG::GENERAL[:base_risk_matrix]%>
     <%=render "/shared/print_risk_matrix",
       :owner => owner
     %>
   <%else%>
-    <%=render "/shared/#{BaseConfig.airline[:code]}/print_risk_matrix",
+    <%=render "/shared/#{AIRLINE_CODE}/print_risk_matrix",
       :owner => owner %>
   <%end%>
 

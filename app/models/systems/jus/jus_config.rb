@@ -1,61 +1,46 @@
-class JUS_Config
+class JUSConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[]
 
-  def self.airline_config
-    {
-      :version                                        => "1.1.1",
 
-      :name                                           => 'USA Jet',
-      :code                                           => "JUS",
-      :base_risk_matrix                               => false,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
-      :enable_configurable_risk_matrices              => false,
-      :allow_set_alert                                => false,
-      :has_verification                               => false,
-      :has_mobile_app                                 => false,
-      :enable_mailer                                  => true,
+  GENERAL = DefaultConfig::GENERAL.merge({
+    # AIRLINE-SPECIFIC CONFIGS
+    version:                            '1.0.3',
+    name:                               'USA Jet',
+    time_zone:                          'Eastern Time (US & Canada)',
 
+    # SYSTEM CONFIGS
+
+    # SYSTEM-WIDE FORM CONFIGS
+    base_risk_matrix:                   false,
+
+  })
 
 
-      # Safety Reporting Module
-      :show_submitter_name                            => true,
-      :submission_description                         => true,
-      :submission_time_zone                           => true,
-      :enable_orm                                     => false,
-      :observation_phases_trend                       => false,
-      :allow_template_nested_fields                   => false,
-      :checklist_version                              => '2',
+  FAA_INFO = DefaultConfig::FAA_INFO.merge({
+    'CHDO'=>'ACE-FSDO-09',
+    'Region'=>'Central',
+    'ASAP MOU Holder Name'=>'Boeing',
+    'ASAP MOU Holder FAA Designator'=>'BASE'
+  })
 
-      # Safety Assurance Module
-      :allow_reopen_report                            => true,
-      :has_root_causes                                => true,
-      :enable_recurrence                              => true,
-      :enable_shared_links                            => false,
-
-
-      # SMS IM Module
-      :has_framework                                  => false,
-    }
-  end
 
   RISK_ARRAY = {
     :sms_actions => {
-      :form => "mitigate",
+      :form => 'mitigate',
       :baseline => true,
       :mitigate => false,
     },
     :findings => {
-      :form => "baseline",
+      :form => 'baseline',
       :baseline => true,
       :mitigate => true,
     },
     :hazards => {
-      :form => "baseline",
+      :form => 'baseline',
       :baseline => true,
       :mitigate => true,
     },
@@ -70,14 +55,6 @@ class JUS_Config
       :mitigate => true,
     }
    }
-
-  FAA_INFO = {
-    "CHDO"=>"ACE-FSDO-09",
-    "Region"=>"Central",
-    "ASAP MOU Holder Name"=>"Boeing",
-    "ASAP MOU Holder FAA Designator"=>"BASE"
-  }
-
 
 
   MATRIX_INFO = {
@@ -117,9 +94,9 @@ class JUS_Config
     },
 
     severity_table_dict: {
-      0 => "Critical = 5",
-      1 => "Serious = 3",
-      2 => "Minor = 1",
+      0 => 'Critical = 5',
+      1 => 'Serious = 3',
+      2 => 'Minor = 1',
     },
 
     probability_table: {
@@ -158,52 +135,22 @@ class JUS_Config
     },
 
     risk_definitions: {
-      red:        {rating: "HIGH",          description: "Not Acceptable - Mitigation Required"},
-      yellow:     {rating: "MODERATE",      description: "Acceptable with Mitigation Plan"},
-      limegreen:  {rating: "LOW",           description: "Acceptable with Monitoring"}
+      red:        {rating: 'HIGH',          description: 'Not Acceptable - Mitigation Required'},
+      yellow:     {rating: 'MODERATE',      description: 'Acceptable with Mitigation Plan'},
+      limegreen:  {rating: 'LOW',           description: 'Acceptable with Monitoring'}
     },
 
     risk_table_index: {
-      red:        "High",
-      yellow:     "Moderate",
-      limegreen:  "Low"
+      red:        'High',
+      yellow:     'Moderate',
+      limegreen:  'Low'
     },
 
     risk_table_dict: {
-      red:            "HIGH",
-      yellow:         "MODERATE",
-      limegreen:      "LOW"
+      red:            'HIGH',
+      yellow:         'MODERATE',
+      limegreen:      'LOW'
     }
   }
 
-  # Calculate the severity based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_severity(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
-
-  # Calculate the probability based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_probability(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
-
-  def self.print_severity(owner, severity_score)
-    MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
-  end
-
-  def self.print_probability(owner, probability_score)
-    MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
-  end
-
-  def self.print_risk(probability_score, severity_score)
-    if !probability_score.nil? && !severity_score.nil?
-      lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]
-    end
-  end
 end

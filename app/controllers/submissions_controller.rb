@@ -36,7 +36,7 @@ class SubmissionsController < ApplicationController
       format.html do
         @table = Object.const_get('Submission')
         index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-          args.push('admin') if current_user.admin? || BaseConfig.airline[:show_submitter_name]
+          args.push('admin') if current_user.admin? || CONFIG::SR::GENERAL[:show_submitter_name]
           args
         end
         @headers = @table.get_meta_fields(*index_meta_field_args)

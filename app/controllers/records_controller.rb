@@ -122,7 +122,7 @@ class RecordsController < ApplicationController
   def index
     @table = Object.const_get("Record")
     index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-      args.push('admin') if current_user.admin? || BaseConfig.airline[:show_submitter_name]
+      args.push('admin') if current_user.admin? || CONFIG::SR::GENERAL[:show_submitter_name]
       args
     end
     @headers = @table.get_meta_fields(*index_meta_field_args)
@@ -532,10 +532,10 @@ class RecordsController < ApplicationController
     @owner = Record.find(params[:id])
     load_special_matrix_form('record', 'mitigate', @owner)
     load_options
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/mitigate"
+      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
     end
   end
 
@@ -544,10 +544,10 @@ class RecordsController < ApplicationController
     @owner = Record.find(params[:id])
     load_options
     load_special_matrix_form('record', 'baseline', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
 

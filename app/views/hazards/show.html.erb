@@ -124,7 +124,7 @@
           :color_matrix => @color_matrix,
           :frequency => @frequency%>
 
-        <%if BaseConfig.airline[:has_root_causes]%>
+        <%if CONFIG::GENERAL[:has_root_causes]%>
           <%=render '/root_causes/root_causes',
             :owner => @hazard,
             :show_btns => true,

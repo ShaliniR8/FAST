@@ -1,83 +1,50 @@
-class NAMS_Config
+class NAMSConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[]
 
-  MOBILE_MODULES = ['ASAP']
+  MOBILE_MODULES = %w[ASAP]
 
-  def self.airline_config
-    {
-      :version                                        => '1.1.1',
-      :code                                           => 'NAMS',
-      :name                                           => 'Northern Air Cargo',
-      :base_risk_matrix                               => false,
-      :event_summary                                  => false,
-      :event_tabulation                               => false,
-      :enable_configurable_risk_matrices              => false,
-      :allow_set_alert                                => false,
-      :has_verification                               => false,
-      :has_mobile_app                                 => true,
-      :enable_mailer                                  => true,
-      :time_zone                                      => 'Alaska',
+  GENERAL = DefaultConfig::GENERAL.merge({
+    # AIRLINE-SPECIFIC CONFIGS
+    version:                            '1.0.3',
+    name:                               'Northern Air Cargo',
+    time_zone:                          'Alaska',
 
+    # SYSTEM CONFIGS
+    has_mobile_app:                     true,
 
-      # Safety Reporting Module
-      :show_submitter_name                            => true,
-      :submission_description                         => true,
-      :submission_time_zone                           => true,
-      :enable_orm                                     => false,
-      :observation_phases_trend                       => false,
-      :allow_template_nested_fields                   => false,
-      :checklist_version                              => '1',
+    # SYSTEM-WIDE FORM CONFIGS
+    allow_reopen_report:                false,
+    base_risk_matrix:                   false,
 
-      # Safety Assurance Module
-      :allow_reopen_report                            => false,
-      :has_root_causes                                => false,
-      :enable_recurrence                              => false,
-      :enable_shared_links                            => false,
+  })
 
 
-      # SMS IM Module
-      :has_framework                                  => false,
-    }
-  end
-
-  MOBILE_KEY = {
-    key_name: airline_config[:name],
-    portals: [
-      { label: 'General', subdomain: 'nams' },
-    ]
-  }
-
-
-  OBSERVATION_PHASES = ["Observation Phase", "Condition", "Threat", "Error", "Human Factor", "Comment"]
-
-
-
-  FAA_INFO = {
+  FAA_INFO = DefaultConfig::FAA_INFO.merge({
     "CHDO"=>"FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
     "Region"=>"Anchorage",
     "ASAP MOU Holder Name"=>"N/A",
     "ASAP MOU Holder FAA Designator"=>"N/A"
-  }
-
+  })
 
 
   MATRIX_INFO = {
     severity_table: {
       starting_space: true,
       column_header: ['I','II','III','IV'],
-      row_header: [ 'Accident or Incident',
-                    'Employee or Customer Injury',
-                    'Aircraft Operational Events',
-                    'Airworthiness',
-                    'Documented Systems, Policies, and Processes',
-                    'Audit Finding',
-                    'Security',
-                    'HSE / Other Regulatory or General Issue',
-                  ],
+      row_header: [
+        'Accident or Incident',
+        'Employee or Customer Injury',
+        'Aircraft Operational Events',
+        'Airworthiness',
+        'Documented Systems, Policies, and Processes',
+        'Audit Finding',
+        'Security',
+        'HSE / Other Regulatory or General Issue',
+      ],
 
       rows: [
         [
@@ -204,36 +171,5 @@ class NAMS_Config
       mediumseagreen:   {rating: "LOW",       cells: "B/IV, C/IV, D/II, D/III and D/IV",      description: ""}
     }
   }
-
-  # Calculate the severity based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_severity(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
-
-  # Calculate the probability based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_probability(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
-
-  def self.print_severity(owner, severity_score)
-    MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
-  end
-
-  def self.print_probability(owner, probability_score)
-    MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
-  end
-
-  def self.print_risk(probability_score, severity_score)
-    if !probability_score.nil? && !severity_score.nil?
-      lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_index][lookup_table[severity_score][probability_score].to_sym] rescue nil
-    end
-  end
 
 end

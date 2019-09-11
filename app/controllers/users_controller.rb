@@ -18,7 +18,7 @@ class UsersController < ApplicationController
     active_users = @records.where('disable = ? OR disable IS ?', false, nil)
     @statistics = [{ :label => 'Active Users', :value => active_users.count }]
 
-    if BaseConfig.airline[:has_mobile_app]
+    if CONFIG::GENERAL[:has_mobile_app]
       latest_version = latest_android_version
       android_users = active_users.where('android_version > ?', 0)
       latest_android_users = active_users.where({android_version: latest_version})

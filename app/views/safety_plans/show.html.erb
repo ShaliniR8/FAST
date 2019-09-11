@@ -64,7 +64,7 @@
           <%end%>
           <% if @safety_plan.status == "Completed" &&
             current_user.has_access('safety_plans', 'new', admin: true) %>
-            <%if BaseConfig.airline[:allow_reopen_report]%>
+            <%if CONFIG::GENERAL[:allow_reopen_report]%>
               <%=link_to "Reopen",
                 reopen_safety_plan_path(@safety_plan),
                 :class => "btn btn-warning pull-right mr5",

@@ -1,4 +1,4 @@
-- if BaseConfig.airline[:has_extension] && owner.status == 'Assigned'
+- if CONFIG::GENERAL[:has_extension] && owner.status == 'Assigned'
   = link_to 'Request Extension',
     '#',
     class: 'btn btn-warning pull-right mr5 mb5',

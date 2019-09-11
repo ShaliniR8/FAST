@@ -27,7 +27,7 @@
       <div class="panel-body">
 
         <div class="col-xs-12 pull-right mb10">
-          <%if BaseConfig.airline[:observation_phases_trend] && (@owner.target == "Submission" || @owner.target == "Record")%>
+          <%if CONFIG::SR::GENERAL[:observation_phases_trend] && (@owner.target == "Submission" || @owner.target == "Record")%>
             <%=form_tag observation_phases_trend_records_path, :method => :post do%>
               <%=hidden_field_tag :records, @records.map(&:id).join(",")%>
               <%=submit_tag "Observation Phases", class: "btn btn-primary pull-right", disable_with: "Redirecting..."%>

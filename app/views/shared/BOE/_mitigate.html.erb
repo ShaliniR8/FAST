@@ -22,13 +22,13 @@
       </div>
 
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_risk"%>
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_probability"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_mitigated_risk"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_mitigated_probability"%>
       </div>
 
       <div class="col-xs-12 col-sm-12 col-md-6">
-        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_severity"%>
-        <%=render "shared/#{BaseConfig.airline[:code]}/risk_rating"%>
+        <%=render "shared/#{AIRLINE_CODE}/form_mitigated_severity"%>
+        <%=render "shared/#{AIRLINE_CODE}/risk_rating"%>
       </div>
 
       <div class="col-xs-12">
@@ -144,8 +144,8 @@
 
   function set_mitigate(row_index,column_index){
     clear_mitigate();
-    risk_table_def = <%=BOE_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=BOE_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.mitigate_risk_td').each(function(){
       if($(this).data("row")==row_index && $(this).data("column")==column_index){
       $(this).html("<span class='glyphicon glyphicon-ok' style='color:black'></span>");

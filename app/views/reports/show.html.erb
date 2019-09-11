@@ -166,7 +166,7 @@
             # :like => @like,
             :can_change => can_change%>
 
-          <%if BaseConfig.airline[:has_root_causes]%>
+          <%if CONFIG::GENERAL[:has_root_causes]%>
             <%=render '/root_causes/root_causes',
               :owner => @report,
               :show_btns => true,

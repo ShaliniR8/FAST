@@ -59,7 +59,7 @@ class Hazard < ActiveRecord::Base
 
 
   def self.get_headers
-    if BaseConfig.airline[:has_root_causes]
+    if CONFIG::GENERAL[:has_root_causes]
       [
         { :field => :get_id                           ,:title => "ID"                                                               },
         { :field => :title                            ,:title => "Title"                                                            },

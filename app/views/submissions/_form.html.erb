@@ -122,7 +122,7 @@
                 value='<%=@action == "new" ? current_user.full_name : @record.created_by.full_name%>'>
             </div>
 
-            <%if BaseConfig.airline[:submission_description]%>
+            <%if CONFIG::SR::GENERAL[:submission_description]%>
               <div class="col-xs-12 col-sm-4 mb5">
                 <%=label_tag :description,
                   "Event Title",
@@ -139,7 +139,7 @@
               <%=f.text_field :event_date, {:class => 'field-datetime form-control required_field', :id => "event_date"}%>
             </div>
 
-            <%if BaseConfig.airline[:submission_time_zone]%>
+            <%if CONFIG::SR::GENERAL[:submission_time_zone]%>
               <div class="col-xs-12 col-sm-2 mb5">
                 <%=label_tag :event_time_zone, "Time Zone"%>
                 <div class="input-group">

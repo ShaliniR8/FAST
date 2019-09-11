@@ -46,7 +46,7 @@ include Messageable
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
-    submitter_visible = "admin#{BaseConfig.airline[:show_submitter_name] ? ',index,show' : ''}"
+    submitter_visible = "admin#{CONFIG::SR::GENERAL[:show_submitter_name] ? ',index,show' : ''}"
     [
       {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
@@ -144,7 +144,7 @@ include Messageable
 
 
   def self.get_headers
-    if BaseConfig.airline[:submission_description]
+    if CONFIG::SR::GENERAL[:submission_description]
       [
         {:field => :get_id,                     :title => "ID"                                                                      },
         {:field => :get_description,            :title => "Event Title"                                                                   },

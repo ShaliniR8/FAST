@@ -20,9 +20,9 @@
 
         <%can_change = owner.status != "Rejected" && owner.status != "Completed"%>
 
-        <%=render 'shared/choose_show_matrix', 
-          :owner => owner, 
-          :show_btn => show_btn, 
+        <%=render 'shared/choose_show_matrix',
+          :owner => owner,
+          :show_btn => show_btn,
           :type => 'hazards',
           :can_change => can_change
           # :like => like,
@@ -30,7 +30,7 @@
           # :frequency => frequency,
           %>
 
-        <%if BaseConfig.airline[:has_root_causes] && owner.root_causes.present?%>
+        <%if CONFIG::GENERAL[:has_root_causes] && owner.root_causes.present?%>
           <div class="col-xs-12">
             <div class="panel clickable panel-lightskyblue">
               <div class="panel-heading click-heading collapsed">

@@ -45,7 +45,7 @@ class FaaReportsController < ApplicationController
 
   def print
     @report = FaaReport.find(params[:id])
-    @identification = BaseConfig.faa_info
+    @identification = CONFIG::FAA_INFO
     asap_reports = Record
       .where("event_date >= ? and event_date <= ?",
         @report.get_start_date, @report.get_end_date)
@@ -134,7 +134,7 @@ class FaaReportsController < ApplicationController
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
-    @identification = BaseConfig.faa_info
+    @identification = CONFIG::FAA_INFO
   end
 
 
@@ -164,12 +164,12 @@ class FaaReportsController < ApplicationController
     doc.paragraphs.each do |p|
 
       # Identification
-      p.text = p.to_s.sub("$chdo$", BaseConfig.faa_info["CHDO"])
-      p.text = p.to_s.sub("$region$", BaseConfig.faa_info["Region"])
+      p.text = p.to_s.sub("$chdo$", CONFIG::FAA_INFO["CHDO"])
+      p.text = p.to_s.sub("$region$", CONFIG::FAA_INFO["Region"])
       p.text = p.to_s.sub("$fiscal_year$", @report.year.to_s)
       p.text = p.to_s.sub("$fiscal_quarter$", @report.get_fiscal_quarter )
-      p.text = p.to_s.sub("$holder_name$", BaseConfig.faa_info["ASAP MOU Holder Name"])
-      p.text = p.to_s.sub("$faa_designator$", BaseConfig.faa_info["ASAP MOU Holder FAA Designator"])
+      p.text = p.to_s.sub("$holder_name$", CONFIG::FAA_INFO["ASAP MOU Holder Name"])
+      p.text = p.to_s.sub("$faa_designator$", CONFIG::FAA_INFO["ASAP MOU Holder FAA Designator"])
       p.text = p.to_s.sub("$employee_group$", @report.employee_group)
 
       # ASAP ERC Contact Information & Present Quarter Statistics

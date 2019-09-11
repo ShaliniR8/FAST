@@ -17,7 +17,6 @@ class Sra < ActiveRecord::Base
 
 
   has_one :matrix_connection,         :foreign_key => "owner_id",   :class_name => "SraMatrixConnection", :dependent => :destroy
-
   belongs_to :created_by,             :foreign_key => "created_by_id",          :class_name => "User"
   belongs_to :approver,               :foreign_key => "approver_id",            :class_name => "User"
   belongs_to :reviewer,               :foreign_key => "reviewer_id",            :class_name => "User"
@@ -37,7 +36,7 @@ class Sra < ActiveRecord::Base
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    meta_fields = BaseConfig.get_sra_meta_fields
+    meta_fields = CONFIG::SRM.get_sra_meta_fields
     meta_fields.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

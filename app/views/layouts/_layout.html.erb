@@ -322,21 +322,21 @@
                   <li>
                     <%=link_to "Safety Reports Templates", templates_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:enable_orm] ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::SR::GENERAL[:enable_orm] ? 'block' : 'none'%>">
                     <%=link_to "ORM Templates", orm_templates_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:enable_configurable_risk_matrices] ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::GENERAL[:enable_configurable_risk_matrices] ? 'block' : 'none'%>">
                     <%=link_to "Risk Matrices", risk_matrix_groups_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:has_root_causes] ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::GENERAL[:has_root_causes] ? 'block' : 'none'%>">
                     <%=link_to "Root Causes Templates", cause_options_path%>
                   </li>
                   <li><%=link_to "Custom Options", custom_options_path%></li>
                   <li><%=link_to "Message Templates", canned_messages_path%></li>
-                  <li style="display:<%=BaseConfig.airline[:checklist_version] == '2' ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::SR::GENERAL[:checklist_version] == '2' ? 'block' : 'none'%>">
                     <%=link_to "Checklists", checklist_templates_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:checklist_version] == '3' ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::SR::GENERAL[:checklist_version] == '3' ? 'block' : 'none'%>">
                     <%=link_to "Checklist Templates", checklists_path%>
                   </li>
 
@@ -427,7 +427,7 @@
 
     <div class="module_label">
       <span class="pull-right">
-        <% prefix = "#{BaseConfig.airline[:name]}
+        <% prefix = "#{CONFIG::GENERAL[:name]}
           #{" <span style='color:red'>#{Rails.env.titleize}</span>" if !Rails.env.production?} | "%>
         <%=case session[:mode]
           when 'SMS'

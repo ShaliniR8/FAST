@@ -32,7 +32,7 @@ class SessionsController < ApplicationController
   def destroy
     respond_to do |format|
       format.html do
-        if BaseConfig.airline[:enable_sso]
+        if CONFIG::GENERAL[:enable_sso]
           redirect_to '/saml/logout'
         else
           session[:user_id] = nil
@@ -56,8 +56,8 @@ class SessionsController < ApplicationController
   # gets the key from app and returns the associated config file
   def mobile_initialize
     key = params[:key].downcase.gsub('o','0')
-    if BaseConfig::MOBILE_KEY_MAP.key? key
-      config_file = BaseConfig::MOBILE_KEY_MAP[key]
+    if CONFIG::MOBILE::KEYS.key? key
+      config_file = CONFIG::MOBILE::KEYS[key]
       config_file[:key] = key
       render :json => config_file.to_json, :status => 200
       return

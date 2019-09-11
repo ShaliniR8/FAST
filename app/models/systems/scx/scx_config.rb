@@ -1,56 +1,32 @@
-class WAA_Config
+class SCXConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
-  ENABLED_SYSTEMS = %w[]
+  ENABLED_SYSTEMS = %w[audit]
   #used for creating different environments in database.yml; example would be %w[training]
-  SYSTEM_ENVIRONMENTS = %w[]
+  SYSTEM_ENVIRONMENTS = %w[training]
 
-  def self.airline_config
-    {
-      :version                                        => "1.1.1",
+  MOBILE_MODULES = %w[ASAP]
 
-      :name                                           => 'World Atlantic Airlines',
-      :code                                           => "WAA",
-      :base_risk_matrix                               => true,
-      :event_summary                                  => false,
-      :event_tabulation                               => false,
-      :enable_configurable_risk_matrices              => false,
-      :allow_set_alert                                => false,
-      :has_verification                               => false,
-      :has_mobile_app                                 => false,
-      :enable_mailer                                  => true,
-      :time_zone                                      => 'Central Time (US & Canada)',
+  GENERAL = DefaultConfig::GENERAL.merge({
+    # AIRLINE-SPECIFIC CONFIGS
+    name:                               'Sun Country Airlines',
+    time_zone:                          'Central Time (US & Canada)',
 
+    # SYSTEM CONFIGS
+    enable_sso:                         true,
+    has_mobile_app:                     true,
 
-      # Safety Reporting Module
-      :show_submitter_name                            => true,
-      :submission_description                         => true,
-      :submission_time_zone                           => true,
-      :enable_orm                                     => false,
-      :observation_phases_trend                       => false,
-      :allow_template_nested_fields                   => false,
-      :checklist_version                              => '1',
-
-      # Safety Assurance Module
-      :allow_reopen_report                            => true,
-      :has_root_causes                                => false,
-      :enable_recurrence                              => false,
+    # SYSTEM-WIDE FORM CONFIGS
+    base_risk_matrix:                   false,
+  })
 
 
-      # SMS IM Module
-      :has_framework                                  => false,
-    }
-  end
-
-
-
-  FAA_INFO = { #CORRECT/REVISE
-    "CHDO" => "FAA Flight Standards District Office, 300W 36th Ave, Suite 101, Anchorage, AK, 99503",
-    "Region" => "Anchorage",
-    "ASAP MOU Holder Name" => "N/A",
-    "ASAP MOU Holder FAA Designator" => "N/A"
-  }
-
+  FAA_INFO = DefaultConfig::FAA_INFO.merge({ #CORRECT/REVISE
+    'CHDO'=>'Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450',
+    'Region'=>'Great Lakes',
+    'ASAP MOU Holder Name'=>'N/A',
+    'ASAP MOU Holder FAA Designator'=>'SCNA'
+  })
 
   MATRIX_INFO = {
     severity_table: {
@@ -243,38 +219,38 @@ class WAA_Config
     }
   }
 
-  #ALL FOLLOWING MAY NEED CORRECTION/REVISION
 
-  # Calculate the severity based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_severity(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
 
-  # Calculate the probability based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_probability(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
+  ULTIPRO_DATA = {
+    upload_path: '/var/sftp/scxsftpuser/Suncountry_POC.xml',
+    expand_output: false, #Shows full account generation details
+    dry_run: false, #Prevents the saving of data to the database
 
-  def self.print_severity(owner, severity_score)
-    MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
-  end
-
-  def self.print_probability(owner, probability_score)
-    MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
-  end
-
-  def self.print_risk(probability_score, severity_score)
-    Rails.logger.debug "Probability score: #{probability_score}, Severity score: #{severity_score}"
-    if !probability_score.nil? && !severity_score.nil?
-      lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]
-    end
-  end
+    #The following identifies what account type is associated with each employee-group
+    group_mapping: {
+      'dispatch'    => 'Analyst',
+      'fight-crew'  => 'Pilot',
+      'ground'      => 'Ground',
+      'maintenance' => 'Staff',
+      'other'       => 'Staff'
+    }, #Cabin
+    tracked_privileges: [
+      'Ground: Incident Submitter',
+      'Ground: General Submitter',
+      'Other: General Submitter',
+      'Flight Crew: ASAP Submitter',
+      'Flight Crew: Incident Submitter',
+      'Flight Crew: Fatigue Submitter',
+      'Dispatch: ASAP Submitter',
+      'Dispatch: Incident Submitter',
+      'Dispatch: Fatigue Submitter',
+      'Maintenance: ASAP Submitter',
+      'Maintenance: Incident Submitter',
+      'Maitnenance: Fatigue Submitter',
+      'Cabin: ASAP Submitter',
+      'Cabin: Incident Submitter',
+      'Cabin: Fatigue Submitter'
+    ],
+  }
 
 end
