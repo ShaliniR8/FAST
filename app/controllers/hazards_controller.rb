@@ -67,6 +67,7 @@ class HazardsController < ApplicationController
 
   def edit
     @hazard = Hazard.find(params[:id])
+    @owner = @hazard
     load_options
     @fields = Hazard.get_meta_fields('form')
     load_special_matrix_form("hazard", "baseline", @hazard)
