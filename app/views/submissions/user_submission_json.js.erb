@@ -1,1 +1,4 @@
-<%=raw(@submissions.to_json(:include=>{:submission_fields=>{:include=>:field}}))%>
+<%= raw(@submissions.as_json( :include => {
+  :submission_fields => { :include => :field }
+}).to_json)
+%>
