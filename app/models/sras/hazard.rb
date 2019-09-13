@@ -36,7 +36,9 @@ class Hazard < ActiveRecord::Base
       {field: "title",              title: "Hazard Title",          num_cols: 6,  type: "text",     visible: 'form,index,show', required: true},
       {field: 'get_source',         title: 'Source of Input',       num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: "description",        title: "Description",           num_cols: 12, type: "textarea", visible: 'form,show'},
-      {field: "get_root_causes",    title: "Root Causes",                         type: "text",     visible: 'index'},
+
+      {field: "get_root_causes_full",  title: "#{I18n.t("srm.hazard.root_cause.title")}",   type: "list",     visible: 'invisible'},
+      {field: "get_root_causes",        title: "#{I18n.t("srm.hazard.root_cause.title")}",   type: "list",     visible: 'index'},
 
       {field: 'likelihood',         title: 'Baseline Likelihood',   num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity',           title: 'Baseline Severity',     num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
@@ -104,10 +106,7 @@ class Hazard < ActiveRecord::Base
   end
 
 
-  def get_root_causes
-    root_cause_arr = root_causes.map{|x| "<li>#{x.cause_option.name}</li>"}.join("").html_safe
-    "<ul class='table_ul'>#{root_cause_arr}</ul>".html_safe
-  end
+
 
 
   def self.get_avg_complete
