@@ -257,6 +257,19 @@ class QueriesController < ApplicationController
               end
             end
           end
+
+        elsif field_type == 'list'
+          if value.present?
+            values = value.split('<br>')
+            values.each do |v|
+              if @data[v].present?
+                @data[v] += 1
+              else
+                @data[v] = 1
+              end
+            end
+          end
+
         elsif field_type == 'boolean_box' || field_type == 'boolean'
           value ? @data["Yes"] += 1 : @data["No"] += 1
         elsif field_type == 'employee'
@@ -320,7 +333,7 @@ class QueriesController < ApplicationController
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
 
-    @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible').keep_if{|x| x[:field]}
 
     @template_fields = []
     Template.preload(:categories, :fields).where(:id => @owner.templates).map(&:fields).flatten.uniq{|field| field.label}.each{|field|

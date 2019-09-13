@@ -44,7 +44,9 @@ class Report < ActiveRecord::Base
       {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show',     required: true  },
       {                                                                                   type: 'newline',  visible: 'show'                        },
       {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',               required: false },
-      {field: "get_root_causes",      title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index'},
+
+      {field: "get_root_causes_full",   title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
+      {field: "get_root_causes",        title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index'},
 
       {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_label_options },
       {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_venue_options },
