@@ -1,5 +1,5 @@
 swal({
-  title: "New Root Cause",
+  title: "New <%=I18n.t("#{@i18nbase}.root_cause.title")%> ",
   html: "<%= escape_javascript render('/root_causes/new_root_cause', first_id: first_id, second_id: second_id) %>",
   customClass: "custom-swal",
   showCancelButton: false,
@@ -42,7 +42,7 @@ function update_options(section, second_id){
     if(second_id != ""){
       additional_params = "&second_id=" + second_id
     }
-    $.get("<%=retract_categories_root_causes_path%>?category=" + $(section).val() + additional_params, function(data){
+    $.get("<%=retract_categories_root_causes_path%>?i18nbase=<%=@i18nbase%>&category=" + $(section).val() + additional_params, function(data){
       $("#<%=@categories.first.level%>").html(data);
     });
   }

@@ -1,5 +1,6 @@
 <div class="row">
   <div class="col-xs-12 form-inline form-group">
+    <%= hidden_field_tag('i18nbase', @i18nbase)%>
     <%=fields_for :root_causes do |f| %>
       <%=f.label :cause_option_id, "Select Option"%>
       <%if @has_option%>

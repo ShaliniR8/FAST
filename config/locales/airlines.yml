@@ -1,0 +1,14 @@
+# In the future, if locales become too large, separate into individual files named after AIRLINE_CODES (i.e. scx.yml)
+
+SCX:
+  core:
+    root_cause:
+      title: Root Cause
+  sr:
+    event:
+      root_cause:
+        title: Category
+  srm:
+    hazard:
+      root_cause:
+        title: Root Cause
