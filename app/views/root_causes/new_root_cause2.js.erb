@@ -42,7 +42,7 @@ function update_options(section, second_id){
     if(second_id != ""){
       additional_params = "&second_id=" + second_id
     }
-    $.get("<%=retract_categories_root_causes_path%>?category=" + $(section).val() + additional_params, function(data){
+    $.get("<%=retract_categories_root_causes_path%>?i18nbase=<%=@i18nbase%>&category=" + $(section).val() + additional_params, function(data){
       $("#<%=@categories.first.level%>").html(data);
     });
   }

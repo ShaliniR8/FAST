@@ -18,21 +18,22 @@ end
 class RootCausesController < ApplicationController
 
 
-  def new_root_cause(first_id=nil, second_id=nil)
+  def new_root_cause(first_id=nil, second_id=nil, i18nbase='core.root_cause')
     @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @i18nbase = params[:i18nbase]
+    @i18nbase = params[:i18nbase] || i18nbase
     @root = CauseOption.where(level: 0, name: "#{params[:owner_type].titleize}").first
     if @root.present?
       @categories = @root.children.keep_if{|x| !x.hidden?}
     end
     respond_to do |format|
-      format.js {render "/root_causes/new_root_cause2", layout: false, :locals => {:first_id => first_id, :second_id => second_id} }
+      format.js {render "/root_causes/new_root_cause2", layout: false, :locals => {:first_id => first_id, :second_id => second_id, i18nbase: i18nbase} }
     end
   end
 
 
   def retract_categories
     second_id = params[:second_id] if params[:second_id]
+    @i18nbase = params[:i18nbase]
     @cause_option = CauseOption.find(params[:category])
     @categories = @cause_option.children.keep_if{|x| !x.hidden?}.sort_by{|x| x.name}
     render_category = false
@@ -76,7 +77,7 @@ class RootCausesController < ApplicationController
     end
     first_id ||= nil
     second_id ||= nil
-    new_root_cause(first_id, second_id)
+    new_root_cause(first_id, second_id, params[:i18nbase])
   end
 
 
