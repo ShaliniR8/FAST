@@ -6,9 +6,6 @@ class SessionsController < ApplicationController
     respond_to do |format|
       format.html do
         @categories = Category.all
-        if BaseConfig.airline[:enable_sso] && !params[:direct]
-          redirect_to '/saml/init'
-        end
       end
       format.json do
         render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
