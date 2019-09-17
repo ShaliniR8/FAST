@@ -91,7 +91,6 @@ class BaseConfig
     'Trial Key'     => Trial_Config::MOBILE_KEY,    # 6158-BC31-0338-233B
     'Demo Key'      => Demo_Config::MOBILE_KEY,     # 353D-0FC5-E54E-9C2F
     'BSK Key'       => BSK_Config::MOBILE_KEY,      # F9A1-67E8-DC44-4D8C
-    'BSK Beta Key'  => BSK_Config::BETA_MOBILE_KEY, # A6DE-FAB4-86B5-4FDA
     'NAMS Key'      => NAMS_Config::MOBILE_KEY,     # F3E3-60E8-84C2-24CF
     'SCX Key'       => SCX_Config::MOBILE_KEY,      # 33F1-4A88-339C-E6FD
     'SCX Beta Key'  => SCX_Config::BETA_MOBILE_KEY, # 35E1-98A2-2C8F-A912

@@ -48,12 +48,6 @@ class BSK_Config
     key_name: airline_config[:name],
     portals: [
       { label: 'General', subdomain: 'bsk' },
-    ]
-  }
-
-  BETA_MOBILE_KEY = {
-    key_name: "#{airline_config[:name]} Training",
-    portals: [
       { label: 'Training', subdomain: 'bsk-training' },
     ]
   }
