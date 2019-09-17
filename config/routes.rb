@@ -13,6 +13,7 @@ PrdgSession::Application.routes.draw do |map|
   match '/saml/consume',          :to => 'saml#consume',                :as => :consume
   match '/saml/metadata',         :to => 'saml#metadata',               :as => :metadata
   match '/saml/init',             :to => 'saml#init',                   :as => :init
+  match '/sso',                   :to => 'saml#init',                   :as => :init
   match '/saml/logout',           :to => 'saml#logout',                 :as => :saml
   match '/mobile/initialize',     :to => 'sessions#mobile_initialize',  :as => :session
 

@@ -69,7 +69,6 @@ class SamlController < ApplicationController
 
     if settings.idp_slo_target_url.nil?
       Rails.logger.debug 'SLO IdP Endpoint not defined, executing normal logout'
-      destroy_session
       redirect_to new_session_path
     else
       logout_request = OneLogin::RubySaml::Logoutrequest.new()
@@ -80,6 +79,7 @@ class SamlController < ApplicationController
         settings.name_identifier_value = User.find(session[:user_id]).sso_id
       end
 
+      destroy_session
       relay_state = url_for controller: 'sessions', action: 'new'
       redirect_to(logout_request.create(settings, RelayState: relay_state))
     end
