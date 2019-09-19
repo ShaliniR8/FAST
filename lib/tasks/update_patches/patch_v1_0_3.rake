@@ -1,14 +1,28 @@
 namespace :v1_0_3 do
+  logger = Logger.new('log/patch.log', File::WRONLY | File::APPEND)
+  logger.datetime_format = "%Y-%m-%d %H:%M:%S"
+  logger.formatter = proc do |severity, datetime, progname, msg|
+   "[#{datetime}]: #{msg}\n"
+  end
 
   task :patch_all => :environment do
     desc 'Run all updates from v1.0.2 to v1.0.3'
-    Rake::Task["v1_0_3:risk_matrix_transform"].invoke()
-    Rake::Task["v1_0_3:add_access_controls"].invoke()
-    Rake::Task["v1_0_3:populate_custom_options"].invoke()
-    Rake::Task["v1_0_3:populate_created_by"].invoke()
+    logger.info '###########################'
+    logger.info '### VERSION 1.0.3 PATCH ###'
+    logger.info '###########################'
+    logger.info "Start Time: #{DateTime.now.strftime("%F %R")}"
+
+    Rake::Task['v1_0_3:risk_matrix_transform'].invoke()
+    Rake::Task['v1_0_3:add_access_controls'].invoke()
+    Rake::Task['v1_0_3:populate_custom_options'].invoke()
+    Rake::Task['v1_0_3:populate_created_by'].invoke()
+
+    logger.info "Finish Time: #{DateTime.now.strftime("%F %R")}"
   end
 
   task :add_access_controls => :environment do
+    desc 'Populates Access Controls with core rules'
+    logger.info 'Executing Access Control Additions Patch'
     rules = AccessControl.get_meta
     rules.each do |rule, data|
       data.each do |key, val|
@@ -23,6 +37,7 @@ namespace :v1_0_3 do
 
   task :add_common_privileges => :environment do
     desc 'Adds new, common privileges'
+    logger.info 'Executing Common Privilege Additions Patch'
     OBSERVATION_SUBMITTER_ID = 127
     OBSERVATION_ANALYST_ID = 128
     CONCERN_SUBMITTER_ID = 129
@@ -70,6 +85,7 @@ namespace :v1_0_3 do
 
   task :populate_created_by => :environment do
     desc 'Updates all transactions for polymorphism and populates created_by_id fields'
+    logger.info 'Executing Transaction Updates and populating created_by_id Fields'
     transaction_types = [
       "CorrectiveActionTransaction",
       "SraTransaction",
@@ -106,6 +122,7 @@ namespace :v1_0_3 do
 
   task :populate_custom_options => :environment do
     desc 'Redefines all custom_options fields'
+    logger.info 'Executing Population of Custom Options'
 
     CustomOption.where(:title => "Risk Control Type").destroy_all
     CustomOption.where(:title => "System Task Analysis").destroy_all
@@ -266,9 +283,10 @@ namespace :v1_0_3 do
 
   task :risk_matrix_transform => :environment do
     desc 'Reorganizes risk matrix order to proper form for each airline'
+    logger.info 'Executing Risk Matrix Transform Patch'
     case BaseConfig.airline_code
     when "BOE"
-      puts "BOE risk matrix transform"
+      logger.info "BOE risk matrix transform"
       matrix_dic = BOE_Config::MATRIX_INFO[:risk_table][:rows]
       risk_dic = BOE_Config::MATRIX_INFO[:risk_table_index]
       [
@@ -294,9 +312,9 @@ namespace :v1_0_3 do
         end
       end
     when "SCX"
-      puts "SCX risk matrix transform"
+      logger.info "SCX risk matrix transform"
     when "NAMS"
-      puts "NAMS risk matrix transform"
+      logger.info "NAMS risk matrix transform"
       matrix_dic = NAMS_Config::MATRIX_INFO[:risk_table][:rows]
       risk_dic = NAMS_Config::MATRIX_INFO[:risk_table_index]
       [
@@ -322,7 +340,7 @@ namespace :v1_0_3 do
         end
       end
     else
-      puts "No airline specified risk matrix transform."
+      logger.info "No airline specified risk matrix transform."
     end
   end
 

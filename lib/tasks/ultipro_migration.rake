@@ -1,15 +1,15 @@
 namespace :ultipro do
   require 'securerandom'
-  Rails.logger = Logger.new("log/ultipro_migration.log")
+  logger = Logger.new("log/ultipro_migration.log")
 
 
   ### Tasks
 
     task :update_userbase => [:environment] do |t, args|
-      Rails.logger.info '##############################'
-      Rails.logger.info '### UPDATING USER DATABASE ###'
-      Rails.logger.info '##############################'
-      Rails.logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
+      logger.info '##############################'
+      logger.info '### UPDATING USER DATABASE ###'
+      logger.info '##############################'
+      logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
       assign_configs
       fetch_file
@@ -17,16 +17,16 @@ namespace :ultipro do
       begin
         data_dump = File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
       rescue
-        Rails.logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
+        logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
         next #Abort
       end
 
       if File.exist?('lib/tasks/ultipro_data_prior.xml') && compare_file('lib/tasks/ultipro_data_prior.xml', 'lib/tasks/ultipro_data.xml')
-        Rails.logger.info "[INFO] Historical Data was identical- no update necessary"
+        logger.info "[INFO] Historical Data was identical- no update necessary"
         next #abort- nothing to update
       end
       begin
-        Rails.logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
+        logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
         @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
         @log_data = []
         User.transaction do
@@ -51,24 +51,24 @@ namespace :ultipro do
             end
         end
         IO.copy_stream('lib/tasks/ultipro_data.xml', 'lib/tasks/ultipro_data_prior.xml') #Update Historical File
-        Rails.logger.info '###################################'
-        Rails.logger.info '### ULTIPRO MIGRATION COMPLETED ###'
-        Rails.logger.info '###################################'
+        logger.info '###################################'
+        logger.info '### ULTIPRO MIGRATION COMPLETED ###'
+        logger.info '###################################'
       rescue
-        Rails.logger.info '################################'
-        Rails.logger.info '### ULTIPRO MIGRATION FAILED ###'
-        Rails.logger.info '################################'
-        Rails.logger.info "Failed on: #{@err_username}"
-        Rails.logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
-        Rails.logger.info "Final log entry: #{@log_entry}"
+        logger.info '################################'
+        logger.info '### ULTIPRO MIGRATION FAILED ###'
+        logger.info '################################'
+        logger.info "Failed on: #{@err_username}"
+        logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
+        logger.info "Final log entry: #{@log_entry}"
       end
-      Rails.logger.info "SERVER DATE+TIME OF CONCLUSION: #{DateTime.now.strftime("%F %R")}"
-      Rails.logger.info 'SUMMARY OF EVENTS:'
+      logger.info "SERVER DATE+TIME OF CONCLUSION: #{DateTime.now.strftime("%F %R")}"
+      logger.info 'SUMMARY OF EVENTS:'
       if @log_data.empty?
-        Rails.logger.info 'No Userbase Changes'
+        logger.info 'No Userbase Changes'
       else
         @log_data.each do |log|
-          Rails.logger.info log
+          logger.info log
         end
       end
     end #END update_userbase
