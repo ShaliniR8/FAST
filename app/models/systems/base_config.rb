@@ -178,10 +178,11 @@ class BaseConfig
   def self.getTimeFormat
     {
       :timepicker       => "H:i",
-      :datepicker       => "Y-m-d",
-      :datetimepicker   => "Y-m-d H:i",
-      :dateformat       => "%Y-%m-%d",
-      :datetimeformat   => "%Y-%m-%d %H:%M",
+      :datepicker       => "Y/m/d",
+      :datetimepicker   => "Y/m/d H:i",
+      :dateformat       => "%Y/%m/%d",
+      :datetimeformat   => "%Y/%m/%d %H:%M",
+      :datetimezformat  => "%Y/%m/%d %H:%M %Z",
     }
   end
 
