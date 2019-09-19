@@ -53,6 +53,7 @@ class SessionsController < ApplicationController
     end
   end
 
+  # gets the key from app and returns the associated config file
   def mobile_initialize
     key = params[:key].downcase.gsub('o','0')
     if BaseConfig::MOBILE_KEY_MAP.key? key
@@ -63,6 +64,12 @@ class SessionsController < ApplicationController
     else
       render :json => { error: 'Invalid Activation Key.' }.to_json, :status => 401
     end
+  end
+
+  # redirects to a deep link that the app will use to auto-fill the activation key and automatically attempt to activate
+  def mobile_activate
+    key = params[:key]
+    redirect_to "prosafet://activate?key=#{key}"
   end
 
 

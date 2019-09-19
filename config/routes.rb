@@ -16,6 +16,7 @@ PrdgSession::Application.routes.draw do |map|
   match '/sso',                   :to => 'saml#init',                   :as => :init
   match '/saml/logout',           :to => 'saml#logout',                 :as => :saml
   match '/mobile/initialize',     :to => 'sessions#mobile_initialize',  :as => :session
+  match '/mobile/activate',       :to => 'sessions#mobile_activate',    :as => :session
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
