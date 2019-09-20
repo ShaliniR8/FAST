@@ -52,6 +52,7 @@ module ControllerAuthentication
   def oauth_load
     if current_token != nil
       @current_user = current_token.user
+      session[:platform] = Transaction::PLATFORMS[:mobile]
       define_session_permissions
     else
       login_required

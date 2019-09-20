@@ -13,7 +13,10 @@ module Transactionable
         self,
         action,
         session[:simulated_id] || session[:user_id],
-        context || (defined?(session) ? '' : "Recurring #{self.class.name.titleize}")
+        context || (defined?(session) ? '' : "Recurring #{self.class.name.titleize}"),
+        nil,
+        nil,
+        session[:platform]
       )
     end
   end
