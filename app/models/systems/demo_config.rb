@@ -24,6 +24,7 @@ class Demo_Config
       :time_zone                                      => 'Eastern Time (US & Canada)',
 
       # Safety Reporting Module
+      :show_submitter_name                            => false,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => true,

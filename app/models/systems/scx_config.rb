@@ -26,6 +26,7 @@ class SCX_Config
       :enable_sso                                     => true,
 
       # Safety Reporting Module
+      :show_submitter_name                            => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => false,
