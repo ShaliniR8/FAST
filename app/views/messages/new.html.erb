@@ -1,9 +1,3 @@
-<script type="text/javascript" src="/javascripts/messages/recipients-control.js"></script>
-<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
-<script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
-
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
     <div class="panel panel-warning">
@@ -13,85 +7,12 @@
         </div>
       </div>
       <%=form_for @message, :html => {:multipart => true}, :class => "form-horizontal" do |f|%>
-        <%if @reply_to.present?%>
-          <%=hidden_field_tag :reply_to, @reply_to.id%>
-        <%end%>
         <div class="panel-body">
-
           <div class="col-xs-5">
-            <%=render "recipients"%>
+            <%=render 'recipients'%>
           </div>
-
           <div class="col-xs-7">
-
-            <%=f.hidden_field :link, :value => params[:link]%>
-            <%=f.hidden_field :link_type, :value => params[:link_type]%>
-            <%=f.hidden_field :link_id, :value => params[:link_id]%>
-
-            <div class="col-xs-12">
-              <%=f.label :subject, "Subject", :class => "control-label col-xs-2"%>
-              <div class="col-xs-10">
-                <%=f.text_field :subject,
-                  {:class => "form-control",
-                  :value => @reply_to.present? ? "Re: " + @reply_to.subject : ""}%>
-              </div>
-            </div>
-
-            <div class="col-xs-12 mt10">
-              <%=label_tag "template",
-                "Template",
-                :class => "control-label col-xs-2"%>
-              <div class="col-xs-6">
-                <%= select_tag "template",
-                  options_for_select(CannedMessage.all.collect{|p| [p["name"], p["id"]]}),
-                  {:include_blank => true,
-                  :class => "form-control template"}%>
-              </div>
-            </div>
-
-            <div class='col-xs-12 mt5'>
-              <%=label_tag "template", "Attached", :class => "control-label col-xs-2"%>
-              <div class="col-xs-6">
-                <b>
-                  <%if params[:link_type]%>
-                    <%=link_to "#{params[:link_type].titleize} ##{params[:link_id]}", "#{params[:link]}"%>
-                  <%else%>
-                    N/A
-                  <%end%>
-                </b>
-              </div>
-            </div>
-
-
-            <div class="col-xs-12 mt5">
-              <div class="col-xs-12 mt10">
-                <%=f.text_area :content,
-                  {:class => "form-control",
-                  :rows => "15",
-                  :id => "content"}%>
-              </div>
-            </div>
-
-            <div class="col-xs-12 mt5">
-              <div class="col-xs-11 row" id="attachments"></div>
-              <div class="col-xs-12">
-                <%= link_to_add_fields "Add an attachment", f, :attachments%>
-              </div>
-            </div>
-          </div>
-
-          <%=f.hidden_field :time, :value => Time.now.utc%>
-          <div class="row mt5">
-            <div class="col-sm-12 pull-right">
-              <%=f.submit "Send",
-                :class => "btn btn-success pull-right",
-                :disable_with => "Sending..."%>
-              <%=link_to "Cancel",
-                params[:link] || root_url,
-                :confirm => 'Are you sure?',
-                :disable_with => 'Redirecting...',
-                :class => "btn btn-warning pull-right mr5"%>
-            </div>
+            <%=render 'message_content_form', f: f%>
           </div>
         </div>
       <%end%>
@@ -101,13 +22,3 @@
 
 
 
-<script type="text/javascript">
-  $(document).ready(function(){
-    $(".template").on("change", function(){
-      var message_template_id = $(this).val();
-      $.get("<%=canned_messages_path%>/"+message_template_id, function(data){
-        $("#content").val(data.data.content);
-      });
-    });
-  });
-</script>

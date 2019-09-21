@@ -1,0 +1,16 @@
+<div class="panel-warning">
+  <div class="panel-heading">
+    <div class="panel-title">
+      <%=action_name.titleize%>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
+  </div>
+  <%=form_for @message, :html => {:multipart => true}, :class => "form-horizontal" do |f|%>
+    <div class="panel-body">
+      <%=hidden_field_tag :to_anonymous, @owner.anonymous ? @owner.anonymous : !BaseConfig.airline[:show_submitter_name]%>
+      <%=render 'message_content_form', f: f%>
+    </div>
+  <%end%>
+</div>

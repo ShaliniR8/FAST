@@ -40,8 +40,8 @@
       <b>Attached:</b>
     </div>
     <div class="col-xs-10">
-      <%if message.link.present?%>
-        <b><%=link_to "#{message.link_type.titleize} ##{message.link_id}", @report_link%></b>
+      <%if message.owner.present?%>
+        <b><%=link_to "#{message.owner_type} ##{message.owner_id}", message.owner, target: :_blank%></b>
       <%else%>
         N/A
       <%end%>
