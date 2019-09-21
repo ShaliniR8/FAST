@@ -48,9 +48,12 @@ class SCX_Config
   MOBILE_KEY = {
     key_name: airline_config[:name],
     portals: [
-      { label: 'ProSafeT',                    subdomain: 'scx', sso: true },
-      { label: 'ProSafeT (Shared Device)',    subdomain: 'scx', sso: true, shared: true },
-      { label: 'External User',               subdomain: 'scx', },
+      { label: 'ProSafeT',                            subdomain: 'scx', sso: true },
+      { label: 'ProSafeT (Shared Device)',            subdomain: 'scx', sso: true, shared: true },
+      { label: 'External User',                       subdomain: 'scx', },
+      { label: 'ProSafeT (Training)',                 subdomain: 'scx-training', sso: true },
+      { label: 'ProSafeT Shared Device (Training)',   subdomain: 'scx-training', sso: true, shared: true },
+      { label: 'External User (Training)',            subdomain: 'scx-training' },
     ]
   }
 
