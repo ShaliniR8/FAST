@@ -8,10 +8,17 @@
       </div>
       <%=form_for @message, :html => {:multipart => true}, :class => "form-horizontal" do |f|%>
         <div class="panel-body">
-          <div class="col-xs-5">
-            <%=render 'recipients'%>
-          </div>
-          <div class="col-xs-7">
+          <%remaining_column_size = 12%>
+          <%if !(@reply_to.present? && @reply_to.send_from.anonymous)%>
+            <%
+              recipient_column_size = 5
+              remaining_column_size -= recipient_column_size
+            %>
+            <div class="col-xs-<%=recipient_column_size%>">
+              <%=render 'recipients'%>
+            </div>
+          <%end%>
+          <div class="col-xs-<%=remaining_column_size%>">
             <%=render 'message_content_form', f: f%>
           </div>
         </div>
