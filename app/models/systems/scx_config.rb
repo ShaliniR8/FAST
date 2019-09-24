@@ -51,20 +51,20 @@ class SCX_Config
       { label: 'ProSafeT',                            subdomain: 'scx', sso: true },
       { label: 'ProSafeT (Shared Device)',            subdomain: 'scx', sso: true, shared: true },
       { label: 'External User',                       subdomain: 'scx', },
-      { label: 'ProSafeT (Training)',                 subdomain: 'scx-training', sso: true },
-      { label: 'ProSafeT Shared Device (Training)',   subdomain: 'scx-training', sso: true, shared: true },
-      { label: 'External User (Training)',            subdomain: 'scx-training' },
+      { label: 'Training ProSafeT',                   subdomain: 'scx-training', sso: true },
+      { label: 'Training ProSafeT (Shared Device)',   subdomain: 'scx-training', sso: true, shared: true },
+      { label: 'Training External User',              subdomain: 'scx-training' },
     ]
   }
 
-  BETA_MOBILE_KEY = {
-    key_name: "#{airline_config[:name]} Training",
-    portals: [
-      { label: 'ProSafeT (Training)',                 subdomain: 'scx-training', sso: true },
-      { label: 'ProSafeT Shared Device (Training)',   subdomain: 'scx-training', sso: true, shared: true },
-      { label: 'External User (Training)',            subdomain: 'scx-training' },
-    ]
-  }
+  # BETA_MOBILE_KEY = { #DELETE AFTER 09/2019
+  #   key_name: "#{airline_config[:name]} Training",
+  #   portals: [
+  #     { label: 'ProSafeT (Training)',                 subdomain: 'scx-training', sso: true },
+  #     { label: 'ProSafeT Shared Device (Training)',   subdomain: 'scx-training', sso: true, shared: true },
+  #     { label: 'External User (Training)',            subdomain: 'scx-training' },
+  #   ]
+  # }
 
   FAA_INFO = { #CORRECT/REVISE
     "CHDO"=>"Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450",
