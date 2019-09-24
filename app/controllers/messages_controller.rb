@@ -28,27 +28,35 @@ class MessagesController < ApplicationController
     @message.time = Time.now
     @message.save
     SendFrom.create(messages_id: @message.id, users_id: current_user.id, anonymous: (params[:from_anonymous] || false))
+    
+    if params[:reply_to].present?
+      @reply_to = Message.find(params[:reply_to])
+      if @reply_to.send_from.anonymous
+        params[:send_to] = { 0 => @reply_to.send_from.user.id }
+        params[:to_anonymous] = true
+      end
+      @message.response = @reply_to
+      @message.save
+      @send_to = SendTo.where('messages_id = ? and users_id = ?', @reply_to.id, current_user.id).first
+      if @send_to.present?
+        @send_to.status = 'Replied'
+      end
+    end
+
     if params[:send_to].present?
       params[:send_to].values.each do |v|
         SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
-        notify(User.find(v), 'You have a new internal message. ' + g_link(@message), true, 'New Internal Message')
+        notify(User.find(v), "You have a new internal message. #{g_link(@message)}", true, 'New Internal Message')
       end
     end
+
     if params[:cc_to].present?
       params[:cc_to].values.each do |v|
         CC.create(:messages_id => @message.id, :users_id => v)
-        notify(User.find(v), 'You have a new internal message. ' + g_link(@message), true, 'New Internal Message')
+        notify(User.find(v), "You have a new internal message. #{g_link(@message)}", true, 'New Internal Message')
       end
     end
-    if params[:reply_to].present?
-      @reply_to = Message.find(params[:reply_to])
-      @message.response = @reply_to
-      @message.save
-      @send_to = SendTo.where("messages_id = ? and users_id = ?", @reply_to.id, current_user.id).first
-      if @send_to.present?
-        @send_to.status = "Replied"
-      end
-    end
+    
     if @message.owner
       Transaction.build_for(
         @message.owner,
@@ -56,7 +64,7 @@ class MessagesController < ApplicationController
         (session[:simulated_id] || session[:user_id])
       )
     end
-    redirect_to @message.owner || message_path(@message), flash: {success: "Message sent."}
+    redirect_to @message.owner || message_path(@message), flash: { success: 'Message sent.' }
   end
 
 
