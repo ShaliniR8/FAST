@@ -8,6 +8,7 @@ include Commentable
 include Investigationable
 include Sraable
 include Transactionable
+include Messageable
 
 #Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
@@ -49,7 +50,7 @@ include Transactionable
       {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',          title: 'Type',                 num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_user_id',           title: 'Submitted By',         num_cols: 6,  type: 'user',     visible: 'index,show',      required: false},
+      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
       {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
@@ -63,6 +64,11 @@ include Transactionable
       {field: 'severity_after',       title: 'Mitigated Severity',    num_cols: 12, type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',        num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+
+  def get_submitter_name
+    anonymous ? 'Anonymous' : (BaseConfig.airline[:show_submitter_name] ? created_by.full_name : "#{created_by.disable ? 'Inactive' : 'Active'} User")
   end
 
 

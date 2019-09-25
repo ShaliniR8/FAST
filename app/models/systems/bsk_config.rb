@@ -25,6 +25,7 @@ class BSK_Config
 
 
       # Safety Reporting Module
+      :show_submitter_name                            => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => false,

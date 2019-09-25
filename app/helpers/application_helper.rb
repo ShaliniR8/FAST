@@ -402,10 +402,15 @@ module ApplicationHelper
   end
 
 
-
   def datetime_to_string(datetime)
     datetime.strftime(BaseConfig.getTimeFormat[:datetimeformat]) rescue ''
   end
+
+
+  def datetimez_to_string(datetime)
+    datetime.in_time_zone(BaseConfig.airline[:time_zone]).strftime(BaseConfig.getTimeFormat[:datetimezformat]) rescue ''
+  end
+
 
   def latest_android_version
     android_version_uri = URI('https://demo.prosafet.com/api/version.json')

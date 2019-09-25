@@ -21,9 +21,10 @@ class Demo_Config
       :has_mobile_app                                 => true,
       :enable_mailer                                  => false,
       :track_log                                      => true,
-      :time_zone                                      => 'Pacific Time (US & Canada)',
+      :time_zone                                      => 'Eastern Time (US & Canada)',
 
       # Safety Reporting Module
+      :show_submitter_name                            => false,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => true,

@@ -33,14 +33,6 @@
               <%if template_full_access || template_viewer_access || report_admin_access%>
 
                 <%if record_edit_access %>
-                  <%if @record.submission.present? && !@record.submission.anonymous?%>
-                    <%=link_to "Message Submitter",
-                      new_message_path(
-                        :send_to => @record.created_by.id,
-                        :link => record_path(@record)),
-                      :id=>"index-btn",
-                      :class=>"btn btn-warning mb5 "%>
-                  <%end%>
                   <%if !@record.viewer_access%>
                     <%=link_to "Enable Viewer Access",
                       enable_record_path(@record),
@@ -54,13 +46,8 @@
                   <%end%>
                 <%end%>
 
-                <%=link_to "Attach in Message",
-                  new_message_path(
-                    :link => record_path(@record),
-                    :link_type => "Report",
-                    :link_id => @record.id),
-                  :class => "btn btn-warning mb5",
-                  :disable_with => "Redirecting..."%>
+                <%=render '/forms/btns/attach_in_message_btn', owner: @record%>
+                <%=render '/forms/btns/message_submitter_btn', owner: @record%>
 
                 <%if @record.submission.present? && submission_show_access%>
                   <%=link_to "View Submission",
@@ -312,14 +299,11 @@
 </div>
 
 
-
 <style>
  .datepicker{
   z-index: 1200!important;
  }
 </style>
-
-
 
 
 <script>
@@ -331,6 +315,7 @@
         $(window).trigger('resize');
       });
     });
+
     $('#comment_btn').on('click',function(){
       $.get("<%=comment_record_path(@record)%>",function(data){
         $(".modal-content").html(data);

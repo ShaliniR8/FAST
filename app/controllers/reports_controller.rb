@@ -27,7 +27,7 @@ class ReportsController < ApplicationController
     report = Report.find(params[:id])
     if current_user.level == "Admin"
       true
-    elsif report.privileges.reject{|priv| priv.empty?}.present?
+    elsif (report.privileges.reject(&:blank?).present? rescue false)
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
           true
@@ -163,7 +163,6 @@ class ReportsController < ApplicationController
         record = Record.find(value);
         record.report = @report
         record.status = "Linked"
-        record.viewer_access = true
         Transaction.build_for(
           record,
           'Add to Event',

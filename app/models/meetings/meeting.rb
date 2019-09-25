@@ -1,5 +1,7 @@
 class Meeting < ActiveRecord::Base
 
+  include ModelHelpers
+
 #Concerns List
   include Attachmentable
   include Commentable
@@ -32,20 +34,18 @@ class Meeting < ActiveRecord::Base
   after_create -> { create_transaction('Create') }
 
 
-
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'id',               title: 'Meeting ID',        num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
-      {                                                                     type: 'newline',    visible: 'form,show'},
+      {field: 'id',               title: 'ID',                num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
       {field: 'status',           title: 'Status',            num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
-      {                                                                     type: 'newline',    visible: 'form,show'},
       {field: 'get_host',         title: 'Host',              num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
+      {field: 'title',            title: 'Title',             num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: get_custom_options('Meeting Titles')},
       {                                                                     type: 'newline',    visible: 'form,show'},
-      {field: 'review_start',     title: 'Review Start',      num_cols: 6,  type: 'datetime',   visible: 'index,form,show', required: true},
-      {field: 'review_end',       title: 'Review End',        num_cols: 6,  type: 'datetime',   visible: 'index,form,show', required: true},
-      {field: 'meeting_start',    title: 'Meeting Start',     num_cols: 6,  type: 'datetime',   visible: 'index,form,show', required: true},
-      {field: 'meeting_end',      title: 'Meeting End',       num_cols: 6,  type: 'datetime',   visible: 'index,form,show', required: true},
+      {field: 'review_start',     title: 'Review Start',      num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'review_end',       title: 'Review End',        num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'meeting_start',    title: 'Meeting Start',     num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'meeting_end',      title: 'Meeting End',       num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
       {field: 'notes',            title: 'Notes',             num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
       {field: 'final_comment',    title: 'Final Comment',     num_cols: 12, type: 'textarea',   visible: 'show',            required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
@@ -60,7 +60,6 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?
       Transaction.build_for(
@@ -72,11 +71,24 @@ class Meeting < ActiveRecord::Base
   end
 
 
+  def set_datetimez
+    self.review_start = covert_time(self.review_start)
+    self.review_end = covert_time(self.review_end)
+    self.meeting_start = covert_time(self.meeting_start)
+    self.meeting_end = covert_time(self.meeting_end)
+    self.save
+  end
+
+
+  def covert_time(time)
+    timezone = BaseConfig.airline[:time_zone]
+    (time.in_time_zone(timezone) - time.in_time_zone(timezone).utc_offset).utc
+  end
+
 
   def get_privileges
     self.privileges.present? ? self.privileges : []
   end
-
 
 
   def set_privileges
@@ -84,11 +96,9 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
   def get_type
     self.type
   end
-
 
 
   def has_user(user)
@@ -100,8 +110,6 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
-
   def invited?(user)
     result = false
     self.invitations.each do |f|
@@ -111,11 +119,9 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
   def init_status
     self.status = "Open"
   end
-
 
 
   def get_tooltip
@@ -123,12 +129,9 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
   def reports
     self.report_meetings.map{|x| x.report} rescue []
   end
-
-
 
 
   def in_review
@@ -136,17 +139,12 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
-
   def in_meeting
     self.status == "Open"
   end
 
 
-
-
   def self.get_timezones
-
     ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
      "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
      "JT","ALMST","WAST","CXT","MMT","ALMT","MAWT","IOT","MVT","TFT","AFT","MUT","RET",
@@ -156,8 +154,6 @@ class Meeting < ActiveRecord::Base
      "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
      "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
-
-
 
 
   def self.get_headers
@@ -188,12 +184,9 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
   def get_events_count
     reports.length
   end
-
-
 
 
   def get_id
@@ -205,18 +198,14 @@ class Meeting < ActiveRecord::Base
   end
 
 
-
-
   def get_time(field)
     self.send(field).strftime("%Y-%m-%d %H:%M:%S") rescue ''
   end
 
 
-
   def get_host
     self.host.user.full_name rescue ''
   end
-
 
 
   def self.getMessageOptions
@@ -228,7 +217,5 @@ class Meeting < ActiveRecord::Base
       "Rejected Invitees"=>"Rej"
     }
   end
-
-
 
 end

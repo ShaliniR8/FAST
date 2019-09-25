@@ -137,7 +137,9 @@ class MeetingsController < ApplicationController
       end
     end
     if @meeting.save
-      end_time = @meeting.review_end>@meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
+      @meeting.set_datetimez
+      @meeting.save
+      end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       send_notices(
         @meeting.invitations,
         "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
@@ -185,23 +187,24 @@ class MeetingsController < ApplicationController
 
 
   def index
-    @records = Meeting.includes(:invitations, :host).where('meetings.type is null')
+    @table = Object.const_get("Meeting")
+    @headers = Meeting.get_meta_fields('index')
+    @title = 'Meetings'
+    @action = 'meeting'
+    @records = @table.includes(:invitations, :host).where('meetings.type is null')
     unless current_user.has_access('meetings', 'admin', admin: true, strict: true )
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end
     @records.keep_if{|r| display_in_table(r)}
-    @headers = Meeting.get_headers
-    @title = 'Meetings'
-    @action = 'meeting'
   end
-
 
 
   def close
     @owner = Meeting.find(params[:id])
     render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
   end
+
 
   def override_status
     @owner = Meeting.find(params[:id]).becomes(Meeting)
@@ -285,6 +288,7 @@ class MeetingsController < ApplicationController
         transaction_content
       )
     end
+    @owner.set_datetimez
     @owner.save
     redirect_to meeting_path(@owner)
 

@@ -83,7 +83,9 @@ class ApplicationController < ActionController::Base
         redirect_to logout_path
         return false
       elsif !current_user.has_access(controller_name,action_name,admin:true)
-        unless (action_name == 'show' && current_user.has_access(controller_name,'viewer',strict:strict))
+        unless (action_name == 'show' &&
+          current_user.has_access(controller_name,'viewer',strict:strict) &&
+          (Object.const_get(controller_name.singularize.titleize).find(params[:id]).viewer_access rescue true))
           redirect_to errors_path
           return false
         end

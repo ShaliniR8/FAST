@@ -77,13 +77,14 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :messages do
     member do
-      get "reply"
-      get "foward"
-      get "inbox"
-      get "prev"
+      get 'reply'
+      get 'foward'
+      get 'inbox'
+      get 'prev'
     end
     collection do
-      get "sent"
+      get 'sent'
+      get 'message_submitter'
     end
   end
   resources :time do

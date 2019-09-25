@@ -1,0 +1,15 @@
+= link_to 'Message Submitter',
+  '#',
+  class: 'btn btn-warning mb5',
+  id: 'message_submitter_btn',
+  'data-toggle' => 'modal',
+  'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $('#message_submitter_btn').on('click', function(){
+    $.get('#{eval("message_submitter_messages_path(owner_id: owner.id, owner_type: owner.class.name)")}',
+      function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });
