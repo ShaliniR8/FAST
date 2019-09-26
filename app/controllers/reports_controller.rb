@@ -69,7 +69,7 @@ class ReportsController < ApplicationController
 
   def reopen
     @report = Report.find(params[:id])
-    new_status = @report.meeting.present? ? "Under Review" : "New"
+    new_status = @report.meetings.present? ? "Under Review" : "New"
     @report.reopen(new_status)
     redirect_to report_path(@report), flash: {danger: "Event ##{params[:id]} reopened."}
   end
@@ -237,7 +237,7 @@ class ReportsController < ApplicationController
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:report][:status]}"
     when 'Add Meeting Minutes'
-      redirect_path = meeting_path(@owner.meetings.first)
+      redirect_path = meeting_path(params[:meeting_id])
       Transaction.build_for(
         @owner.meetings.first,
         params[:commit],
