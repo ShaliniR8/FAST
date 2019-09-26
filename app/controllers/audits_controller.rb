@@ -178,7 +178,8 @@ class AuditsController < SafetyAssuranceController
         current_user.id,
         transaction_content,
         nil,
-        current_user
+        current_user,
+        session[:platform]
       )
     end
     @owner.save

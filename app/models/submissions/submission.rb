@@ -28,7 +28,10 @@ class Submission < ActiveRecord::Base
       self,
       action,
       session[:simulated_id] || session[:user_id],
-      context
+      context,
+      nil,
+      nil,
+      session[:platform]
     )
     handle_anonymous_reports
   end
