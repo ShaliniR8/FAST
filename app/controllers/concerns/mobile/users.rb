@@ -20,9 +20,9 @@ module Concerns
           submodules = []
           case module_name
           when 'ASAP'
-            submodules.push('Submissions') if current_user.has_access('submissions', 'view', admin: true, strict: true)
+            submodules.push('Submissions') if current_user.has_access('submissions', 'show', admin: true, strict: true)
           when 'Safety Assurance'
-            submodules.push('Audits') if current_user.has_access('audits', 'view', admin: true, strict: true)
+            submodules.push('Audits') if current_user.has_access('audits', 'show', admin: true, strict: true)
           end
           module_access[module_name] = submodules if submodules.length > 0 &&
             BaseConfig.mobile_modules.include?(module_name)
