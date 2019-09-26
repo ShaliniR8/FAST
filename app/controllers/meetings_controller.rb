@@ -114,11 +114,9 @@ class MeetingsController < ApplicationController
     end
     if !params[:reports].blank?
       @meeting.save
-      params[:reports].each_pair do |index, value|
-        report = Report.find(value)
-        mr = ReportMeeting.new
-        mr.report=report
-        mr.meeting=@meeting
+      params[:reports].each_pair do |index, report_id|
+        report = Report.find(report_id)
+        Connection.create(owner: @meeting, child: report)
         report.status = "Under Review"
         Transaction.build_for(
           report,
@@ -132,7 +130,6 @@ class MeetingsController < ApplicationController
           current_user.id,
           "Event ##{report.get_id}"
         )
-        mr.save
         report.save
       end
     end
@@ -161,7 +158,7 @@ class MeetingsController < ApplicationController
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
     @report_headers = Report.get_meta_fields('form')
-    @reports = Report.where("status = 'Meeting Ready'")
+    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
   end
 
 
@@ -217,11 +214,9 @@ class MeetingsController < ApplicationController
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
-      params[:reports].each_pair do |index, value|
-        report = Report.find(value)
-        mr = ReportMeeting.new
-        mr.report = report
-        mr.meeting = @owner
+      params[:reports].each_pair do |index, report_id|
+        report = Report.find(report_id)
+        Connection.create(owner: @owner, child: report)
         report.status = "Under Review"
         Transaction.build_for(
           report,
@@ -235,7 +230,6 @@ class MeetingsController < ApplicationController
           current_user.id,
           "Event ##{report.get_id}"
         )
-        mr.save
         report.save
       end
     end
@@ -306,7 +300,8 @@ class MeetingsController < ApplicationController
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
     @timezones=Meeting.get_timezones
     @report_headers=Report.get_headers
-    @reports= @meeting.reports + Report.where("status = 'Meeting Ready'")
+    @associated_reports = @meeting.reports.map(&:id)
+    @reports= Report.where(status: ['Meeting Ready', 'Under Review'])
   end
 
 

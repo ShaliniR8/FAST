@@ -73,13 +73,13 @@
                   :format => :pdf),
                 :class => 'btn btn-darkturquoise pull-right ml5 mb5'%>
 
-              <%if @report.meetings.present? &&
+              <%#if @report.active_meetings.present? &&
                 current_user.has_access('meetings', 'show', admin: true)%>
-                <%=link_to "View Meeting",
-                  meeting_path(@report.meetings.first),
+                <%#=link_to "View Meeting",
+                  meeting_path(@report.active_meetings.first),
                   :class => "btn btn-info pull-right mb5 ml5",
                   :disable_with => "Redirecting..."%>
-              <%end%>
+              <%#end%>
               <%=link_to "Send Message",
                 new_message_path(:link => report_path(@report),
                 :link_type => "Event",

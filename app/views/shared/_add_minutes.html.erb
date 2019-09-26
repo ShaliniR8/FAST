@@ -1,4 +1,5 @@
 <%=form_for @owner do |f|%>
+  <%=hidden_field_tag :meeting_id, @meeting.id %>
   <div class="panel-warning">
     <div class="panel-heading">
       <div class="panel-title">Add Meeting Minutes

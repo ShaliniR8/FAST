@@ -6,20 +6,18 @@ class Meeting < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Noticeable
+  include Reportable
   include Transactionable
 
 #Associations List
   has_many :invitations,        foreign_key: "meetings_id",    class_name: "Invitation",         :dependent => :destroy
-  has_many :report_meetings,    foreign_key: "meeting_id",     class_name: "ReportMeeting",      :dependent => :destroy
   has_many :agendas,            foreign_key: "owner_id",       class_name: "AsapAgenda",         :dependent=>:destroy
-  has_many :reports,            foreign_key:"owner_id",        class_name: "Reports"
 
   has_one :host, foreign_key: "meetings_id", class_name: "Host"
 
 
   accepts_nested_attributes_for :invitations
   accepts_nested_attributes_for :host
-  accepts_nested_attributes_for :report_meetings
   accepts_nested_attributes_for :agendas
   accepts_nested_attributes_for :reports
 
@@ -126,11 +124,6 @@ class Meeting < ActiveRecord::Base
 
   def get_tooltip
     "Review Period is " + self.get_time("review_start") + " to "+self.get_time("review_end")
-  end
-
-
-  def reports
-    self.report_meetings.map{|x| x.report} rescue []
   end
 
 
