@@ -9,7 +9,6 @@ class Report < ActiveRecord::Base
   include RootCausable
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
-  has_many :report_meetings,    foreign_key: 'report_id',   class_name: 'ReportMeeting',      dependent: :destroy
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
   has_many :agendas,            foreign_key: 'event_id',    class_name: 'AsapAgenda',         dependent: :destroy
   has_many :suggestions,        foreign_key: 'owner_id',    class_name: 'ReportSuggestion',   dependent: :destroy
@@ -18,8 +17,6 @@ class Report < ActiveRecord::Base
   has_many :detections,         foreign_key: 'owner_id',    class_name: 'ReportDetection',    dependent: :destroy
   has_many :reactions,          foreign_key: 'owner_id',    class_name: 'ReportReaction',     dependent: :destroy
 
-  belongs_to :meeting, foreign_key:"meeting_id", class_name:"Meeting"
-
   serialize :privileges
   serialize :severity_extra
   serialize :probability_extra
@@ -27,12 +24,25 @@ class Report < ActiveRecord::Base
   serialize :mitigated_probability
 
   before_create :set_priveleges
-  after_create :set_name
   before_create :set_extra
+  after_create :set_name
 
   extend AnalyticsFilters
 
+  ### NOTE: Add these lines to the inheritance tree when added, then remove these statements in this tagged area
+    has_many :child_connections, as: :child, class_name: 'Connection', dependent: :destroy
+    has_many :meetings, through: :child_connections, source: :owner, source_type: 'Meeting'
 
+    # def all_connections
+    #   owner_connections + child_connections
+    # end
+    before_destroy :delete_connections
+    # private
+      def delete_connections
+        self.connections.delete_all
+      end
+  ### END TAGGED AREA
+    has_many :active_meetings, through: :child_connections, source: :owner, source_type: 'Meeting', conditions: "connections.complete = 0 AND connections.archive = 0"
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
@@ -71,7 +81,7 @@ class Report < ActiveRecord::Base
       {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
-      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',             required: false },
+      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',             required: false }, #Gets overridden in view- see included_events.html.erb
 
       {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting',         required: false},
 
@@ -90,8 +100,8 @@ class Report < ActiveRecord::Base
   end
 
 
-  def get_minutes_agenda
-    agenda = "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" if agendas.length > 0
+  def get_minutes_agenda(meeting_id)
+    agenda = "<b>Agendas:</b><br>#{agendas.where(owner_id: meeting_id).map(&:get_content).join('<br>')}" if agendas.length > 0
     meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
     "#{agenda || ''} #{meeting_minutes || ''}".html_safe
   end
@@ -193,13 +203,6 @@ class Report < ActiveRecord::Base
     ["New","Under Investigation","Closed"]
   end
 
-  def meetings
-    if self.report_meetings.present?
-      self.report_meetings.map{|x| x.meeting}
-    else
-      []
-    end
-  end
 
   def has_emp
     self.corrective_actions.each do |c|

@@ -109,23 +109,24 @@ class ReportsController < ApplicationController
 
   def carryover
     report = Report.find(params[:id])
-    report.agendas.map(&:destroy)
-    report.report_meetings.each do |x|
-      Transaction.build_for(
-        x,
-        'Carry Over Event',
-        current_user.id,
-        "Event ##{report.get_id} Carried Over"
-      )
-      Transaction.build_for(
-        report,
-        'Carried Over',
-        current_user.id,
-        "Event Carried Over from Meeting ##{x.meeting_id}"
-      )
-      x.destroy
-    end
-    report.status = "Meeting Ready"
+    meeting = Meeting.find(params[:meeting_id])
+    report.agendas.where(owner_id: params[:meeting_id]).map(&:destroy) rescue
+      Rails.logger.warning "Report ##{report.id} Carryover failed to delete proper agendas
+        from Meeting ##{params[:meeting_id]}"
+    connection = Connection.get(meeting, report).update_attributes(archive: true)
+    Transaction.build_for(
+      meeting,
+      'Carry Over Event',
+      current_user.id,
+      "Event ##{report.get_id} Carried Over"
+    )
+    Transaction.build_for(
+      report,
+      'Carried Over',
+      current_user.id,
+      "Event Carried Over from Meeting ##{meeting.id}"
+    )
+    report.update_attributes(status: 'Meeting Ready') if report.active_meetings.empty?
     report.save
   end
 
@@ -245,6 +246,7 @@ class ReportsController < ApplicationController
       )
     when 'Close Event'
       close_records(@owner)
+      @owner.child_connections.where(owner_type: 'Meeting').update_all(complete: true)
       redirect_path = params[:redirect_path]
     when 'Add Attachment'
       transaction = false
@@ -383,9 +385,7 @@ class ReportsController < ApplicationController
     @report_headers = Report.get_meta_fields('index', 'meeting')
     @meeting = Meeting.find(params[:meeting])
     @report = Report.find(params[:id])
-    mr = ReportMeeting.new
-    mr.report = @report
-    mr.meeting = @meeting
+    Connection.create(owner: @meeting, child: @report)
     @report.status = "Under Review"
     Transaction.build_for(
       @report,
@@ -399,7 +399,7 @@ class ReportsController < ApplicationController
       current_user.id,
       "Event ##{@report.get_id}"
     )
-    if mr.save && @report.save
+    if @report.save
       render :partial=> "report"
     end
   end

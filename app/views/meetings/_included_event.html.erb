@@ -1,7 +1,11 @@
 <tr data-id="<%=event.id%>">
   <%@report_headers.each do |h|%>
     <td class="<%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
-      <%=render "forms/show_field", :record => event, :field_hash => h%>
+      <% if h[:field] == 'get_minutes_agenda' %>
+        <%= event.get_minutes_agenda(meeting.id) %>
+      <% else %>
+        <%=render "forms/show_field", :record => event, :field_hash => h%>
+      <% end %>
     </td>
   <%end%>
   <td>
@@ -29,7 +33,7 @@
           <!-- Carryover Event -->
           <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
             :class=>"btn btn-danger mb5",
-            :onclick=>"delete_report(#{event.id},this)"%>
+            :onclick=>"delete_report(#{event.id}, #{meeting.id},this)"%>
           <!-- Meeting Minutes -->
           <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
             :class => "btn btn-success minutes_btn mb5",
