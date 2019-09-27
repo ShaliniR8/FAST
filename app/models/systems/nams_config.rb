@@ -9,7 +9,7 @@ class NAMS_Config
 
   def self.airline_config
     {
-      :version                                        => '1.0.3',
+      :version                                        => '1.1.1',
       :code                                           => 'NAMS',
       :name                                           => 'Northern Air Cargo',
       :base_risk_matrix                               => false,

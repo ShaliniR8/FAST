@@ -7,7 +7,7 @@ class TMC_Config
 
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => "1.1.1",
 
       :name                                           => 'Travel Management Company',
       :code                                           => "TMC",

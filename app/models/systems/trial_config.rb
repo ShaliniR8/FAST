@@ -7,7 +7,7 @@ class Trial_Config
 
   def self.airline_config
     {
-      :version                                        => '1.1.0',
+      :version                                        => '1.1.1',
 
       :name                                           => 'ProSafeT Trial',
       :code                                           => 'BOE',
