@@ -7,6 +7,8 @@ class MakesMessagePolymorphic < ActiveRecord::Migration
     Message.update_all("owner_id = link_id")
     Message.where(owner_type: 'Report').update_all('owner_type = "Record"')
     Message.where(owner_type: 'Event').update_all('owner_type = "Report"')
+    Message.where(link_type: '').update_all('owner_type = NULL')
+    Message.where(link_type: '').update_all('owner_id = NULL')
 
     remove_column :messages, :link
     remove_column :messages, :link_type
