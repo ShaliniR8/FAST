@@ -64,12 +64,7 @@
                 :class => "btn btn-info pull-right mr5 mb5",
                 :disable_with => "Redirecting..."%>
             <%end%>
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => corrective_action_path(@correcitve_action),
-                :link_type => "CorrectiveAction",
-                :link_id => @corrective_action.id),
-                :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @corrective_action%>
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default mr5 expandall pull-right mb5"%>

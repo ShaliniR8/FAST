@@ -40,12 +40,7 @@
             <%=link_to "PDF",
               print_safety_plan_path(@safety_plan, format: :pdf),
               :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => safety_plan_path(@safety_plan),
-                :link_type => "SafetyPlan",
-                :link_id => @safety_plan.id),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @safety_plan%>
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>

@@ -268,17 +268,17 @@ class SCX_Config
   SAML_DATA = {
     # Always ask if they have a URL for their metadata
     # If they do, you can skip all tags under IdP Info and use the following- otherwise leave this string empty: ''
-      metadata_link: 'https://syextec0001.suncountry.com/FederationMetadata/2007-06/FederationMetadata.xml',
+      metadata_link: 'https://syextec0002.suncountry.com/FederationMetadata/2007-06/FederationMetadata.xml',
 
     ### IdP Info ###
 
       # Route to IdP; should be in metadata.xml under:
        # <EntityDescriptor ... entityID="|__this__|" />
-      idp_entity_id: 'https://SYEXTEC0001.suncountry.com/adfs/services/trust',
+      idp_entity_id: 'https://SYEXTEC0002.suncountry.com/adfs/services/trust',
 
       # Route to IdP's sign-in; should be in metadata.xml under:
        # <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="|__this__|" />
-      idp_sso_target_url: 'https://syextec0001.suncountry.com/adfs/ls/',
+      idp_sso_target_url: 'https://syextec0002.suncountry.com/adfs/ls/',
 
 
       # Specifies the route to the hash algorithm; standard format is sha1, s"http://www.w3.org/2000/09/xmldsig#sha1"
@@ -320,11 +320,11 @@ class SCX_Config
 
       # Location to send SAML request from ProSafeT, should be in the following format:
       # "|__IdP_domain__|/adfs/ls/idpinitiatedsignon"
-      access_point: 'https://syextec0001.suncountry.com/adfs/ls/idpinitiatedsignon',
+      access_point: 'https://syextec0002.suncountry.com/adfs/ls/idpinitiatedsignon',
 
       # Route to IdP's sign-out; should be in the following format:
       # '|__IdP_domain__|/adfs/ls/?wa=wsignout1.0'
-      idp_slo_target_url: 'https://syextec0001.suncountry.com/adfs/ls/?wa=wsignout1.0',
+      idp_slo_target_url: 'https://syextec0002.suncountry.com/adfs/ls/?wa=wsignout1.0',
   }
   #The following must also be defined for SSO: This interprets the IdP's response info and matches it to an account
   def self.digest_response(response)

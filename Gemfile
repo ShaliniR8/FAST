@@ -46,7 +46,6 @@ gem 'nokogiri'
 # and rake tasks are available in development mode:
 group :development, :test do
   gem 'byebug'
-  gem 'bullet'
 #   gem 'webrat'
 end
 
@@ -63,7 +62,6 @@ gem 'net-ssh'
 
 #Kaushik Mahorker OAuth
 gem 'oauth-plugin', '~> 0.5.1'
-gem 'sinatra', '~> 1.2', '>= 1.2.9'
 gem 'oauth2', '~> 1.4.0'
 gem 'oauth', '~> 0.4.7'
 

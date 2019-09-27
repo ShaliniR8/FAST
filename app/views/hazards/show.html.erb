@@ -59,12 +59,7 @@
               sra_path(@hazard.sra),
               :class => "btn btn-info pull-right mr5 mb5",
               :disable_with => "Redirecting..."%>
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => hazard_path(@hazard),
-                :link_type => "Hazard",
-                :link_id => @hazard.id),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @hazard%>
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default mr5 mb5 expandall pull-right ml5"%>

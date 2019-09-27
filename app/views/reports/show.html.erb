@@ -23,13 +23,13 @@
                   report_path(@report),
                   :method=>"delete",
                   :confirm=>'Are you sure?',
-                  :class=>"btn btn-danger pull-right ml5 mb5"%>
+                  :class=>"btn btn-danger pull-right mr5 mb5"%>
               <%end%>
 
 
               <%if current_user.has_access('reports', 'admin', admin: true, strict: true)%>
                 <%=link_to 'Override Status', '#',
-                  :class => 'btn btn-danger pull-right ml5 mb5',
+                  :class => 'btn btn-danger pull-right mr5 mb5',
                   :id => 'override_status_btn',
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
@@ -40,7 +40,7 @@
                 <%=link_to 'Edit',
                   edit_report_path(@report),
                   :id => "edit-btn",
-                  :class => "btn btn-warning pull-right ml5 mb5",
+                  :class => "btn btn-warning pull-right mr5 mb5",
                   :disable_with => "Editing..."%>
               <%end%>
 
@@ -48,7 +48,7 @@
                 current_user.has_access('Safety Assurance','module', admin: true, strict: true) %>
                 <%=link_to "View Investigation",
                   investigation_path(@report.investigation),
-                  :class=>"btn btn-info mb5",
+                  :class=>"btn btn-info mb5 pull-right mr5 ",
                   :disable_with => "Redirecting..."%>
               <%end%>
 
@@ -56,7 +56,7 @@
                 current_user.has_access('Safety Risk Management','module', admin: true, strict: true) %>
                 <%=link_to "View SRA(SRM)",
                   sra_path(@report.sra),
-                  :class=>"btn btn-info mb5",
+                  :class=>"btn btn-info mb5 pull-right mr5 ",
                   :disable_with => "Redirecting..."%>
               <%end%>
 
@@ -65,13 +65,13 @@
                   @report,
                   :deidentified => true,
                   :format => :pdf),
-                :class=>'btn btn-darkturquoise pull-right ml5 mb5'%>
+                :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
               <%=link_to "PDF",
                 print_report_path(
                   @report,
                   :deidentified => false,
                   :format => :pdf),
-                :class => 'btn btn-darkturquoise pull-right ml5 mb5'%>
+                :class => 'btn btn-darkturquoise pull-right mr5 mb5'%>
 
               <%#if @report.active_meetings.present? &&
                 current_user.has_access('meetings', 'show', admin: true)%>
@@ -80,14 +80,10 @@
                   :class => "btn btn-info pull-right mb5 ml5",
                   :disable_with => "Redirecting..."%>
               <%#end%>
-              <%=link_to "Send Message",
-                new_message_path(:link => report_path(@report),
-                :link_type => "Event",
-                :link_id => @report.id),
-                :class => "btn btn-warning pull-right mb5"%>
+              <%=render '/forms/btns/attach_in_message_btn', owner: @report%>
               <%=link_to "Expand All",
                 "#",
-                :class => "btn btn-default expandall pull-right ml5 mr5 mb5"%>
+                :class => "btn btn-default expandall pull-right mb5 mr5"%>
             </div>
           </div>
         </div>

@@ -59,12 +59,7 @@
               :class => "btn btn-info pull-right mr5 mb5",
               :disable_with => "Redirecting..."%>
 
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => risk_control_path(@risk_control),
-                :link_type => "RiskControl",
-                :link_id => @risk_control.id),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @risk_control%>
 
             <%=link_to "Expand All",
               "#",

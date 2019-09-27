@@ -28,54 +28,22 @@
             </div>
             <div class="top_buttons pull-right">
 
-              <a class="btn btn-default expandall mb5">Expand All</a>
-
               <%if template_full_access || template_viewer_access || report_admin_access%>
 
-                <%if record_edit_access %>
-                  <%if !@record.viewer_access%>
-                    <%=link_to "Enable Viewer Access",
-                      enable_record_path(@record),
-                      :class=>"btn btn-warning mb5",
-                      :disable_with => "Updating..."%>
-                  <%else%>
-                    <%=link_to "Disable Viewer Access",
-                      enable_record_path(@record),
-                      :class=>"btn btn-warning mb5",
-                      :disable_with => "Updating..."%>
-                  <%end%>
+                <%if record_delete_access%>
+                  <%=link_to 'Delete',
+                    record_path(@record),
+                    :method=>"delete",
+                    :confirm=>'Are you sure?',
+                    :class=>"btn btn-danger pull-right mr5 mb5 "%>
                 <%end%>
 
-                <%=render '/forms/btns/attach_in_message_btn', owner: @record%>
-                <%=render '/forms/btns/message_submitter_btn', owner: @record%>
-
-                <%if @record.submission.present? && submission_show_access%>
-                  <%=link_to "View Submission",
-                    submission_path(@record.submission),
-                    :class=>"btn btn-info mb5",
-                    :disable_with => "Redirecting..." %>
-                <%end%>
-
-                <%if @record.report.present? && report_show_access%>
-                  <%=link_to "View Event",
-                    report_path(@record.report),
-                    :id=>"report-btn",
-                    :class=>"btn btn-info mb5",
-                    :disable_with => "Redirecting..."%>
-                <%end%>
-
-                <%if @record.investigation.present? && sa_module_access%>
-                  <%=link_to "View Investigation",
-                    investigation_path(@record.investigation),
-                    :class=>"btn btn-info mb5",
-                    :disable_with => "Redirecting..."%>
-                <%end%>
-
-                <%if @record.sra.present? && sra_module_access%>
-                  <%=link_to "View SRA(SRM)",
-                    sra_path(@record.sra),
-                    :class=>"btn btn-info mb5",
-                    :disable_with => "Redirecting..."%>
+                <%if current_user.admin?%>
+                  <%=link_to 'Override Status', '#',
+                    :class => 'btn btn-danger pull-right mr5 mb5',
+                    :id => 'override_status_btn',
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg"%>
                 <%end%>
 
                 <%=link_to "PDF",
@@ -83,47 +51,79 @@
                     @record,
                     :deidentified => false,
                     :format => :pdf),
-                  :class=>'btn btn-darkturquoise mb5'%>
+                  :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
                 <%=link_to "De-ID PDF",
                   print_record_path(
                     @record,
                     :deidentified => true,
                     :format => :pdf),
-                  :class=>'btn btn-darkturquoise mb5'%>
+                  :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
 
                 <%if record_edit_access%>
                   <%if @record.status == "New"%>
                     <%=link_to  "Open Report",
                       open_record_path(@record),
-                      :class => "btn btn-warning mb5",
+                      :class => "btn btn-warning pull-right mr5 mb5",
                       :confirm => "Are you sure?",
                       :disable_with => "Opening..."%>
                   <%elsif @record.status != "Closed"%>
                     <%=link_to  "Edit",
                       edit_record_path(@record),
                       :id=>"edit-btn",
-                      :class=>"btn btn-warning mb5",
+                      :class=>"btn btn-warning pull-right mr5 mb5",
                       :disable_with => "Editing..."%>
                   <%end%>
                 <%end%>
 
-                <%if current_user.admin?%>
-                  <%=link_to 'Override Status', '#',
-                    :class => 'btn btn-danger mb5',
-                    :id => 'override_status_btn',
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
+                <%if @record.submission.present? && submission_show_access%>
+                  <%=link_to "View Submission",
+                    submission_path(@record.submission),
+                    :class=>"btn btn-info pull-right mr5 mb5",
+                    :disable_with => "Redirecting..." %>
                 <%end%>
 
-                <%if record_delete_access%>
-                  <%=link_to 'Delete',
-                    record_path(@record),
-                    :method=>"delete",
-                    :confirm=>'Are you sure?',
-                    :class=>"btn btn-danger mb5 "%>
+                <%if @record.report.present? && report_show_access%>
+                  <%=link_to "View Event",
+                    report_path(@record.report),
+                    :id=>"report-btn",
+                    :class=>"btn btn-info pull-right mr5 mb5",
+                    :disable_with => "Redirecting..."%>
                 <%end%>
 
+                <%if @record.investigation.present? && sa_module_access%>
+                  <%=link_to "View Investigation",
+                    investigation_path(@record.investigation),
+                    :class=>"btn btn-info pull-right mr5 mb5",
+                    :disable_with => "Redirecting..."%>
+                <%end%>
+
+                <%if @record.sra.present? && sra_module_access%>
+                  <%=link_to "View SRA(SRM)",
+                    sra_path(@record.sra),
+                    :class=>"btn btn-info pull-right mr5 mb5",
+                    :disable_with => "Redirecting..."%>
+                <%end%>
+
+                <%if record_edit_access %>
+                  <%if !@record.viewer_access%>
+                    <%=link_to "Enable Viewer Access",
+                      enable_record_path(@record),
+                      :class=>"btn btn-warning pull-right mr5 mb5",
+                      :disable_with => "Updating..."%>
+                  <%else%>
+                    <%=link_to "Disable Viewer Access",
+                      enable_record_path(@record),
+                      :class=>"btn btn-warning pull-right mr5 mb5",
+                      :disable_with => "Updating..."%>
+                  <%end%>
+                <%end%>
               <%end%>
+
+              <%=render '/forms/btns/attach_in_message_btn', owner: @record%>
+              <%=render '/forms/btns/message_submitter_btn', owner: @record%>
+
+              <a class="btn btn-default expandall pull-right mr5 mb5">Expand All</a>
+
             </div>
           </div>
         </div>
