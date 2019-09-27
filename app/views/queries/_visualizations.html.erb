@@ -1,0 +1,62 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<div class="panel panel-lightblue">
+  <div class="panel-heading">
+    <div class="panel-title">
+      <div class="top_text">
+        Visualizations
+      </div>
+      <div class="top_buttons pull-right">
+        <%=link_to "Add Visualization", "#",
+          :id => "add_btn",
+          :class => "btn btn-success pull-right mr5"%>
+      </div>
+    </div>
+  </div>
+  <div class="panel-body" id="visualizations">
+    <%if @owner.visualizations.present?%>
+      <%@owner.visualizations.each do |visualization|%>
+        <%=render "visualization",
+          :records => @records.map(&:id).join(","),
+          :field_name => visualization,
+          :field_id => visualization.parameterize%>
+      <%end%>
+    <%end%>
+  </div>
+</div>
+
+
+
+
+<style>
+  .visualization_box .panel-lightsteelblue .panel-heading .panel-title {
+    padding: 5px !important;
+    min-height: 0px !important;
+  }
+  .panel-lightsteelblue {
+    border: 1px solid lightsteelblue;
+  }
+
+</style>
+
+
+
+<script type="text/javascript">
+
+  $(function(){
+    $(".chart_btn").click();
+
+    $("#add_btn").on("click", function(e){
+      e.preventDefault();
+      $.ajax({
+        type: "GET",
+        url: "<%=add_visualization_query_path(@owner)%>",
+        data: {"records": "<%=@records.map(&:id).join(',')%>"},
+        success: function(response){$("#visualizations").prepend(response);},
+        error: function(response){console.log(response);}
+      });
+    });
+  });
+
+</script>

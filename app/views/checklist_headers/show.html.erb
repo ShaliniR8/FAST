@@ -68,7 +68,7 @@
               <div class="col-xs-12 well">
                 <ul>
                   <li>
-                    Publish - releases the checklist header so that it can be used. Published Headers can not be edited. 
+                    Publish - releases the checklist header so that it can be used. Published Headers can not be edited.
                   </li>
                   <li>
                     Disable - disables the checklist header so that it can not be used.
@@ -103,7 +103,7 @@
               <table class="table table-bordered table-striped">
                 <thead>
                   <%@record.checklist_header_items.order(:display_order).each do |item|%>
-                    <th><%=item.title%></th>
+                    <th width="<%=item.size%>%"><%=item.title%></th>
                   <%end%>
                 </thead>
                 <tbody>

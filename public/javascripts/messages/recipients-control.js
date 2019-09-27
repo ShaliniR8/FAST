@@ -22,27 +22,28 @@ $(document).ready(function(){
       "iDisplayLength": 5
     });
 
-	$('form').on('submit',function(){
-		var count = 0;
-		var form = $(this);
-		dt.rows().nodes().to$().each(function(){
-			if ($(this).find(".send_btn").hasClass('btn-danger')){
-				form.append('<input type="hidden" name=send_to['+count+ '] value='+$(this).attr("user")+'>');
-				count++;
-			}
-			if ($(this).find(".cc_btn").hasClass('btn-danger')){
-				form.append('<input type="hidden" name=cc_to['+count+ '] value='+$(this).attr("user")+'>');
-				count++;
-			}
-		});
-		if (count == 0){
-			event.preventDefault();
-			swal({
-				title: "Message has no recipient.",
-				type: "error",
-			});
-			return false;
-		}
-		return true;
-	});
-});
+  $('form').on('submit', function() {
+    var send_count = 0
+    var cc_count = 0
+    var form = $(this)
+    dt.rows().nodes().to$().each(function() {
+      if ($(this).find('.send_btn').hasClass('btn-danger')){
+        form.append(`<input type='hidden' name=send_to[${send_count++}] value=${$(this).attr('user')}>`)
+      }
+
+      if ($(this).find('.cc_btn').hasClass('btn-danger')){
+        form.append(`<input type='hidden' name=cc_to[${cc_count++}] value=${$(this).attr('user')}>`)
+      }
+    })
+
+    if (send_count + cc_count === 0) {
+      event.preventDefault()
+      swal({
+        title:  'Message has no recipient.',
+        type:   'error',
+      })
+      return false
+    }
+    return true
+  })
+})

@@ -74,6 +74,9 @@
           <%when "datetime"%>
             <%=datetime_to_string(field_value)%>
 
+          <%when 'datetimez'%>
+            <%=datetimez_to_string(field_value)%>
+
           <%when "user"%>
             <%=User.find(field_value).full_name rescue field_value.to_s%>
 
@@ -112,5 +115,5 @@
   }
   .form-group {
     margin-bottom: 3px;
-
+  }
 </style>

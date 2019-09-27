@@ -32,7 +32,7 @@
             :f => f%>
 
           <%=render '/forms/form_fields',
-            :fields => Report.get_meta_fields('form'),
+            :fields => @fields,
             :f => f,
             :record => @report%>
 

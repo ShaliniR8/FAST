@@ -54,9 +54,13 @@
               <tr record_id="<%=record.id%>">
                 <%@headers.each do |header|%>
                   <%if header[:param].present?%>
-                    <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>"><%=record.send(header[:field],header[:param])%></td>
+                    <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                      <%=record.send(header[:field],header[:param])%>
+                    </td>
                   <%else%>
-                    <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>"><%=record.send(header[:field])%></td>
+                    <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                      <%=render "forms/show_field", :field_hash => header, :record => record%>
+                    </td>
                   <%end%>
                 <%end%>
               </tr>

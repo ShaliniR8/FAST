@@ -4,12 +4,19 @@ PrdgSession::Application.routes.draw do |map|
   resources :oauth_clients
 
   #root :to => "oauth_clients#index"
-  match '/oauth/test_request',  :to => 'oauth#test_request',  :as => :test_request
-  match '/oauth/token',         :to => 'oauth#token',         :as => :token
-  match '/oauth/access_token',  :to => 'oauth#access_token',  :as => :access_token
-  match '/oauth/request_token', :to => 'oauth#request_token', :as => :request_token
-  match '/oauth/authorize',     :to => 'oauth#authorize',     :as => :authorize
-  match '/oauth',               :to => 'oauth#index',         :as => :oauth
+  match '/oauth/test_request',    :to => 'oauth#test_request',          :as => :test_request
+  match '/oauth/token',           :to => 'oauth#token',                 :as => :token
+  match '/oauth/access_token',    :to => 'oauth#access_token',          :as => :access_token
+  match '/oauth/request_token',   :to => 'oauth#request_token',         :as => :request_token
+  match '/oauth/authorize',       :to => 'oauth#authorize',             :as => :authorize
+  match '/oauth',                 :to => 'oauth#index',                 :as => :oauth
+  match '/saml/consume',          :to => 'saml#consume',                :as => :consume
+  match '/saml/metadata',         :to => 'saml#metadata',               :as => :metadata
+  match '/saml/init',             :to => 'saml#init',                   :as => :init
+  match '/sso',                   :to => 'saml#init',                   :as => :init
+  match '/saml/logout',           :to => 'saml#logout',                 :as => :saml
+  match '/mobile/initialize',     :to => 'sessions#mobile_initialize',  :as => :session
+  match '/mobile/activate',       :to => 'sessions#mobile_activate',    :as => :session
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
@@ -29,7 +36,8 @@ PrdgSession::Application.routes.draw do |map|
      get 'get_user_json'
   end
 
-
+  resources :signatures, only:[:show]
+  resources :errors
 
   # System Feature
   resources :automated_notifications do
@@ -39,6 +47,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :notifications
   resources :notices
+  resources :private_links
   resources :verifications do
     member do
       get 'address'
@@ -49,7 +58,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'address'
     end
   end
-  resources :errors do
+  resources :modes do
     collection do
       get 'switch'
     end
@@ -59,19 +68,23 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'download'
     end
+
     collection do
       get "revision_history"
+      get "user_guides"
+      get "load_content"
     end
   end
   resources :messages do
     member do
-      get "reply"
-      get "foward"
-      get "inbox"
-      get "prev"
+      get 'reply'
+      get 'foward'
+      get 'inbox'
+      get 'prev'
     end
     collection do
-      get "sent"
+      get 'sent'
+      get 'message_submitter'
     end
   end
   resources :time do
@@ -101,6 +114,18 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :recurrences
+  resources :queries do
+    member do
+      get "clone"
+      get "add_visualization"
+      get "remove_visualization"
+      get "generate_visualization"
+      get "generate_visualization_dynamic"
+    end
+    collection do
+      get 'load_conditions_block'
+    end
+  end
 
 
   # Configurations
@@ -121,7 +146,14 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :sections
-  resources :root_causes
+  resources :root_causes do
+    collection do
+      get 'new_root_cause'
+      get 'retract_categories'
+      post 'add'
+      get 'reload'
+    end
+  end
   resources :checklist_templates do
     member do
 
@@ -153,10 +185,6 @@ PrdgSession::Application.routes.draw do |map|
   resources :responsible_users
 
 
-
-
-
-
   # User and Access Control
   resources :users do
     member do
@@ -173,6 +201,8 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get "users_index"
+      get 'current_json'
+      put 'mobile_months'
       get 'get_json'   #Added by BP July 14 2017
       get 'submission_json'
       get "notices_json"    #added by BL OCT 10 2018
@@ -258,7 +288,7 @@ PrdgSession::Application.routes.draw do |map|
       get "detailed_search"
       get "custom_view"
       get "dynamic_categories"
-      get "observation_phases_trend"
+      post "observation_phases_trend"
       get "query"
       get "query_all"
       get "update_listing_table"
@@ -294,6 +324,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'show_narrative'
       get "reopen"
       get 'override_status'
+      get 'comment'
     end
   end
   resources :meetings do
@@ -325,6 +356,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'assign'
       get 'complete'
       get 'approve'
+      get 'comment'
     end
   end
   resources :query_statements do
@@ -369,8 +401,6 @@ PrdgSession::Application.routes.draw do |map|
 
 
 
-
-
   # Safety Assurance Module
   resources :audits do
     member do
@@ -378,7 +408,9 @@ PrdgSession::Application.routes.draw do |map|
       get 'download_checklist'
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_checklist'
       post 'upload_checklist'
       get 'update_checklist'
@@ -402,7 +434,9 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_finding'
       get 'new_checklist'
       post 'upload_checklist'
@@ -428,7 +462,9 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'new_task'
       get 'new_contact'
+      get 'new_cost'
       get 'new_requirement'
+      get 'new_signature'
       get 'new_finding'
       get 'new_checklist'
       post 'upload_checklist'
@@ -455,6 +491,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'mitigate'
       get 'baseline'
       get 'new_recommendation'
+      get 'new_signature'
       get 'new_contact'
       get 'new_finding'
       get 'new_action'
@@ -474,6 +511,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'download_checklist'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'retract_cause_attributes'
@@ -523,6 +561,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'baseline'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :finding_action, :controller => 'sms_actions'
@@ -537,6 +576,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -550,7 +590,6 @@ PrdgSession::Application.routes.draw do |map|
   # SRA Module
   resources :sras do
     member do
-      get 'enable'
       get 'mitigate'
       get 'baseline'
       get 'carryover'
@@ -566,6 +605,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'get_agenda'
       get 'override_status'
+      get 'comment'
+      get 'viewer_access'
     end
     collection do
       get 'advanced_search'
@@ -588,6 +629,7 @@ PrdgSession::Application.routes.draw do |map|
       get "new_root_cause"
       get "reload_root_causes"
       get 'override_status'
+      get 'comment'
     end
     collection do
       get 'advanced_search'
@@ -613,6 +655,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :safety_plans do
@@ -625,6 +668,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'reopen'
       get 'override_status'
+      get 'comment'
     end
   end
   resources :srm_meetings do

@@ -18,11 +18,17 @@ class Expectation < ActiveRecord::Base
   end
 
   def self.get_departments
-    custom_options = CustomOption.where(:title => 'Departments').first
-    if custom_options.present?
-      custom_options.options.split(';')
-    else
-      Inspection.get_departments
-    end
+    CustomOption.where(:title => 'Departments').first.options.split(';') rescue ['Please go to Custom Options to add options.']
   end
+
+
+  def transaction_log
+    Transaction.build_for(
+      self.owner_id,
+      'Add Requirement',
+      session[:user_id],
+      self.title
+    )
+  end
+
 end

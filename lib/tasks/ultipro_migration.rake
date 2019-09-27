@@ -1,0 +1,164 @@
+namespace :ultipro do
+  require 'securerandom'
+  logger = Logger.new("log/ultipro_migration.log")
+
+
+  ### Tasks
+
+    task :update_userbase => [:environment] do |t, args|
+      logger.info '##############################'
+      logger.info '### UPDATING USER DATABASE ###'
+      logger.info '##############################'
+      logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
+
+      assign_configs
+      fetch_file
+
+      begin
+        data_dump = File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
+      rescue
+        logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
+        next #Abort
+      end
+
+      if File.exist?('lib/tasks/ultipro_data_prior.xml') && compare_file('lib/tasks/ultipro_data_prior.xml', 'lib/tasks/ultipro_data.xml')
+        logger.info "[INFO] Historical Data was identical- no update necessary"
+        next #abort- nothing to update
+      end
+      begin
+        logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
+        @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
+        @log_data = []
+        User.transaction do
+          Hash.from_xml(data_dump)['wbat_poc']['poc']
+            .map{ |poc| [poc['user_name'], poc]}
+            .to_h
+            .each do |username, user_hash|
+              @err_username = username #Used for error logging
+              @err_user_hash = user_hash  #Used for error logging
+              @log_entry = ""
+              if @users.key?(username)
+                user = @users[username]
+              else
+                user = generate_user user_hash
+                next if user.nil?
+                @log_entry << " Account Created"
+              end
+              update_privileges user, user_hash
+              if !@log_entry.empty?
+                @log_data << ("  [User] #{user.username}:" << @log_entry)
+              end
+            end
+        end
+        IO.copy_stream('lib/tasks/ultipro_data.xml', 'lib/tasks/ultipro_data_prior.xml') #Update Historical File
+        logger.info '###################################'
+        logger.info '### ULTIPRO MIGRATION COMPLETED ###'
+        logger.info '###################################'
+      rescue
+        logger.info '################################'
+        logger.info '### ULTIPRO MIGRATION FAILED ###'
+        logger.info '################################'
+        logger.info "Failed on: #{@err_username}"
+        logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
+        logger.info "Final log entry: #{@log_entry}"
+      end
+      logger.info "SERVER DATE+TIME OF CONCLUSION: #{DateTime.now.strftime("%F %R")}"
+      logger.info 'SUMMARY OF EVENTS:'
+      if @log_data.empty?
+        logger.info 'No Userbase Changes'
+      else
+        @log_data.each do |log|
+          logger.info log
+        end
+      end
+    end #END update_userbase
+
+
+ ### Helper Methods
+
+    def assign_configs
+      configs = Object.const_get("#{YAML.load_file("#{::Rails.root}/config/airline_code.yml")}_Config")::ULTIPRO_DATA
+      @upload_path = configs[:upload_path]
+      @expand_output =  configs[:expand_output]
+      @dry_run = configs[:dry_run]
+      @group_mapping = configs[:group_mapping]
+      @tracked_privileges = configs[:tracked_privileges]
+    end
+
+    def generate_privilege title
+      priv = Privilege.new({
+        name: title,
+        description: '',
+        example: ''
+      })
+      if @dry_run || priv.save!
+        @privilege_list[title] = priv.id
+        @log_data << "[INFO] Generated New Privilege: #{title}"
+      end
+    end
+
+
+    def generate_user user_hash
+      begin
+        user = User.new({
+          username: user_hash['user_name'],
+          email: user_hash['email_address'],
+          full_name: "#{user_hash['first_name']} #{user_hash['last_name']}",
+          first_name: user_hash['first_name'],
+          last_name: user_hash['last_name'],
+          password: SecureRandom.urlsafe_base64(20),
+          employee_number: user_hash['employee_number'],
+          level: map_account_level(user_hash['employee_group'])
+        })
+        user[:sso_id] = user_hash['email_address']
+        user.save! if !@dry_run
+        return user
+      rescue
+        @log_entry << "   Account Creation Failed!\n    User: #{user_hash['user_name']}\n    Ultipro Data: #{user_hash}"
+        return nil
+      end
+    end
+
+
+    def update_privileges user, user_hash
+      user_privileges = user.privileges.map{|priv| priv[:name]}
+      @privilege_list ||= Privilege.all.map{ |priv| [priv[:name], priv.id] }.to_h
+      privileges = user_hash['access_privilege_list']['access_privilege'] rescue []
+      privileges = [privileges] if privileges.class == Hash
+      privileges = privileges.map{ |priv| "#{priv['employee_group'].titleize}: #{priv['access_group']}" }
+
+      privileges.each do |priv| #First check user has all privileges expected
+        if user.level.nil?
+          user[:level] = map_account_level(pr['employee_group'])
+          user.save!
+        end
+        generate_privilege priv unless @privilege_list.key?(priv) #Ensure privilege exists
+
+        unless user_privileges.include? priv
+          user.roles.new({privileges_id: @privilege_list[priv]}).save! if !@dry_run
+          @log_entry << "\n    Added- #{priv}"
+        end
+      end
+      user_privileges.each do |priv| #Next check if user has any privs that they shouldn't
+        if @tracked_privileges.include?(priv) && !privileges.include?(priv)
+          user.roles.where({privileges_id: @privilege_list[priv]}).destroy_all if !@dry_run
+          @log_entry << "\n    Removed- #{priv}"
+        end
+      end
+    end
+
+
+    def map_account_level employee_group
+      if @group_mapping.key? employee_group
+        @group_mapping[employee_group]
+      else
+        'Staff'
+      end
+    end
+
+    def fetch_file
+      `cp #{@upload_path} lib/tasks/ultipro_data.xml`
+    end
+
+
+end #END MODULE

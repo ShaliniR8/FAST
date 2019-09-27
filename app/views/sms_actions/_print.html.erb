@@ -24,11 +24,9 @@
 <%end%>
 
 <%if owner.costs.present?%>
-  <%owner.costs.each do |c|%>
-    <div class="category">
-      <%=render '/sras/print_cost',
-      :cost => c,
-      :deidentified => deidentified%>
-    </div>
-  <%end%>
+  <div class="category">
+    <%=render '/sras/print_cost',
+    :owner => owner,
+    :deidentified => deidentified%>
+  </div>
 <%end%>

@@ -16,15 +16,19 @@
           <font style="color:blue;font-weight:bold"><%=@cat.description%></font>
         </div>
 
-        <%@cat.fields.where(deleted: false, :nested_field_id => nil).order(:field_order).each do |field|%>
+        <%@cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order).each do |field|%>
 
           <%=render "/submissions/field", :field => field, :f => f%>
 
-          <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-            <div class="form-group nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
-              style="display:none;">
-              <%=f.fields_for :submission_fields do |nf|%>
-                <%=render "/submissions/field", :field => nested_field, :f => nf%>
+          <%if field.nested_fields.where(:deleted => false).present?%>
+            <div class="col-xs-12">
+              <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+                <div class="nested_field
+                  nested_field_<%=field.id%>
+                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                  style="display:none;">
+                  <%=render "/submissions/field", :field => nested_field, :f => f%>
+                </div>
               <%end%>
             </div>
           <%end%>
@@ -46,14 +50,23 @@
 
 
 <script>
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).val();
+    $(".nested_field_" + field_id).hide();
+    $(".nested_field_" + field_id + "_" + field_value).show();
+  }
+
+
   $(document).ready(function(){
 
+    $(".field_select").each(function(){
+      update_nested_fields($(this));
+    });
 
     $(".field_select").on("change", function(){
-      var field_id = $(this).attr("data-id");
-      var field_value = $(this).val();
-      $(".nested_field_" + field_id).hide();
-      $(".nested_field_" + field_id + "_" + field_value).show();
+      update_nested_fields($(this));
     });
 
 

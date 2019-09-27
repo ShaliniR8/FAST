@@ -22,49 +22,57 @@ end
 class SubmissionsController < ApplicationController
 
   before_filter :set_table_name, :oauth_load # Kaushik Mahorker KM
-
-
+  include Concerns::Mobile # used for [method]_as_json
 
   def set_table_name
     @table_name = "submissions"
   end
 
-
-
   def mitre_export_all
   end
 
-
-
   def index
-    @table = Object.const_get("Submission")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
+    respond_to do |format|
+      format.html do
+        @table = Object.const_get('Submission')
+        index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+          args.push('admin') if current_user.admin? || BaseConfig.airline[:show_submitter_name]
+          args
+        end
+        @headers = @table.get_meta_fields(*index_meta_field_args)
+        @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{
+          |x|
+          Rails.logger.info x[:field]
+          x[:field].present?
+        }
+        handle_search
 
-    @categories = Category.all
-    @fields = Field.all
-    @templates = Template.all
+        @categories = Category.all
+        @fields = Field.all
+        @templates = Template.all
 
-    records = @records
-      .where(:completed => 1)
-      .preload(:template, :created_by)
-      .can_be_accessed(current_user)
+        records = @records
+          .where(:completed => 1)
+          .preload(:template, :created_by)
+          .can_be_accessed(current_user)
 
-    @records = @records.to_a & records.to_a
-    records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
-    @records = @records.to_a & records.to_a
+        @records = @records.to_a & records.to_a
+        records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
+        @records = @records.to_a & records.to_a
 
-    if params[:template]
-      records = @records.select{|x| x.template.name == params[:template]}
-    end
-    @records = @records.to_a & records.to_a
+        if params[:template]
+          records = @records.select{|x| x.template.name == params[:template]}
+        end
+        @records = @records.to_a & records.to_a
 
-    # handle custom view
-    if params[:custom_view].present?
-      selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
-      @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
-      @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+        # handle custom view
+        if params[:custom_view].present?
+          selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
+          @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
+          @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+        end
+      end
+      format.json { index_as_json }
     end
   end
 
@@ -124,11 +132,12 @@ class SubmissionsController < ApplicationController
       @record.submission_fields.build
     else
       @templates = Template.find(:all)
-      @templates
-        .keep_if{|x|
-          (current_user.has_template_access(x.name).include? "full") ||
-          (current_user.has_template_access(x.name).include? "submitter")}
-      @templates.sort_by! {|x| x.name }
+      unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+        @templates.keep_if{|x|
+            (current_user.has_template_access(x.name).include? 'full') ||
+            (current_user.has_template_access(x.name).include? 'submitter')}
+        @templates.sort_by! {|x| x.name }
+      end
     end
   end
 
@@ -136,7 +145,7 @@ class SubmissionsController < ApplicationController
 
   def comment
     @owner = Submission.find(params[:id])
-    @comment = SubmissionNote.new
+    @comment = @owner.comments.new
     render :partial => "notes"
   end
 
@@ -172,8 +181,8 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
-    params[:submission][:anonymous] = params[:anonymous] == '1' ? true : false
+    params[:submission][:completed] = params[:commit] != 'Save for Later'
+    params[:submission][:anonymous] = params[:anonymous] == '1'
 
 
     if params[:submission][:attachments_attributes].present?
@@ -205,25 +214,31 @@ class SubmissionsController < ApplicationController
 
     if @record.save
       notify_notifiers(@record, params[:commit])
-      if params[:commit] == "Submit"
+      if params[:commit] == 'Submit'
+        @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         if params[:create_copy] == '1'
           converted = @record.convert
+          converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
         end
       end
 
       respond_to do |format|
-        if params[:commit] == "Submit"
-          format.html { redirect_to submission_path(@record), flash: {success: "Submission submitted."} }
+        flash = {}
+        if params[:commit] == 'Submit'
+          flash = { success: 'Submission submitted.' }
+          format.html { redirect_to submission_path(@record), flash: flash }
         else
-          format.html { redirect_to incomplete_submissions_path, flash: {success: "Submission created in progress."} }
+          flash = { success: 'Submission created in progress.' }
+          format.html { redirect_to incomplete_submissions_path, flash: flash }
         end
-        format.json
+        format.json { update_as_json(flash) }
       end
 
     else
       respond_to do |format|
-        format.html { redirect_to new_submission_path(:template => @record.template), flash: {danger: @record.errors.full_messages.first} }
+        flash = { danger: @record.errors.full_messages.first }
+        format.html { redirect_to new_submission_path(:template => @record.template), flash: flash }
         format.json
       end
     end
@@ -232,20 +247,27 @@ class SubmissionsController < ApplicationController
 
 
   def show
-    @record = Submission.preload(:submission_fields).find(params[:id])
-    if !@record.completed
-      if @record.user_id == current_user.id
-        redirect_to continue_submission_path(@record)
-      else
-        redirect_to root_url
+    respond_to do |format|
+      format.html do
+        @record = Submission.preload(:submission_fields).find(params[:id])
+        if !@record.completed
+          if @record.user_id == current_user.id
+            redirect_to continue_submission_path(@record)
+          else
+            redirect_to errors_path
+          end
+        end
+        @template = @record.template
+        access_level=current_user.has_template_access(@template.name)
+        unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+          if access_level == "" && @record.user_id != current_user.id
+              redirect_to errors_path
+          elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
+              redirect_to errors_path
+          end
+        end
       end
-    end
-    @template = @record.template
-    access_level=current_user.has_template_access(@template.name)
-    if access_level == "" && @record.user_id != current_user.id
-        redirect_to root_url
-    elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
-        redirect_to root_url
+      format.json { show_as_json }
     end
   end
 
@@ -310,29 +332,35 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
-    params[:submission][:completed] = params[:commit] == "Save for Later" ? false : true
+    if params[:commit] != 'Add Notes'
+      params[:submission][:completed] = params[:commit] != 'Save for Later'
+      params[:submission][:anonymous] = params[:anonymous] == '1'
+    end
+
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
       if params[:commit] == "Save for Later"
         respond_to do |format|
-          format.html {
-            redirect_to incomplete_submissions_path,
-              flash: {success: "Submission ##{@record.id} updated."}
-          }
-          format.json
+          flash = { success: "Submission ##{@record.id} updated." }
+          format.html { redirect_to incomplete_submissions_path, flash: flash }
+          format.json { update_as_json(flash) }
         end
       else
+        if params[:commit] == 'Add Notes'
+          @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+        else
+          @record.create_transaction(action: 'Create', context: 'User Submitted Report')
+        end
         if params[:create_copy] == '1'
           converted = @record.convert
+          converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
         end
         respond_to do |format|
-          format.html {
-            redirect_to submission_path(@record),
-              flash: {success: params[:submission][:comments_attributes].present? ? "Notes added" : "Submission submitted."}
-          }
-          format.json
+          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added' : 'Submission submitted.' }
+          format.html { redirect_to submission_path(@record), flash: flash }
+          format.json { update_as_json(flash) }
         end
       end
     end
@@ -510,42 +538,15 @@ class SubmissionsController < ApplicationController
 
 
   def airport_data
-    icao = "%"+params[:icao]+"%"
-    iata = "%"+params[:iata]+"%"
+    icao = "%"+params[:icao].upcase+"%"
+    iata = "%"+params[:iata].upcase+"%"
     arpt_name = "%"+params[:arpt_name]+"%"
     @field_id = params[:field_id]
     #@records = Airport.where("MATCH (icao) AGAINST (?) AND MATCH (faa_host_id) AGAINST (?) AND MATCH (name) AGAINST (?)", icao, iata, arpt_name)
-    @records = Airport.where("icao LIKE ? AND faa_host_id LIKE ? AND name LIKE ?", icao, iata, arpt_name)
+    @records = Airport.where("icao LIKE ? AND iata LIKE ? AND airport_name LIKE ?", icao, iata, arpt_name)
     @headers = Airport.get_header
     render :partial => "submissions/airports"
-    #render :partial => "records/record_table"
   end
-
-
-
-
-
-
-# ------------- BELOW ARE EVERYTHING ADDED FOR PROSAFET APP
-  #Added by BP Aug 8. render json for templates accessible to the current user
-  def template_json
-    @templates = Template.find(:all)
-    @templates.keep_if{|x| (current_user.has_template_access(x.name).include? "full")||(current_user.has_template_access(x.name).include? "submitter")}
-    stream = render_to_string(:template=>"submissions/template_json.js.erb" )
-    send_data(stream, :type => "json", :disposition => "inline")
-  end
-
-
-  def user_submission_json
-    @date = params[:date]
-    @submissions = Submission.find(:all, :conditions => [ "created_at > ? and user_id = ?",@date,current_user.id])
-    # @templates=Template.find(:all)
-    stream = render_to_string(:template => "submissions/user_submission_json.js.erb" )
-    response.headers['Content-Length'] = stream.bytesize.to_s
-    send_data(stream, :type => "json", :disposition => "inline")
-  end
-
-
 
   private
 
@@ -579,6 +580,4 @@ class SubmissionsController < ApplicationController
     else
     end
   end
-
-
 end

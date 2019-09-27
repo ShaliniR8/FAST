@@ -171,10 +171,11 @@ class HomeController < ApplicationController
       redirect_to root_url
       return
     end
-    num = current_user.accessible_modules
-    case num
+    accessible_modules = current_user.accessible_modules
+    case accessible_modules.length
     when 1
-      @size="col-xs-12"
+      single_landing_page = module_display_to_mode(accessible_modules.first)
+      redirect_to choose_module_home_index_path(:mode => single_landing_page)
     when 2
       @size="col-xs-12 col-sm-6"
     when 3
@@ -316,9 +317,10 @@ class HomeController < ApplicationController
 
       objects = ['Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation']
       objects.each do |x|
-        records = Object.const_get(x).where('status in (?) and (responsible_user_id = ? || approver_id = ?)',
-          ['Assigned', 'Pending Approval'], current_user_id, current_user_id)
-        records.each do |record|
+        records = Object.const_get(x).where(status: 'Assigned', responsible_user_id: current_user_id)
+        records << Object.const_get(x).where(status: 'Pending Approval', approver_id: current_user_id)
+        records.flatten.each do |record|
+          x = x == 'SmsAction' ? 'CorrectiveAction' : x
           if (record.get_completion_date.present? rescue false)
             @calendar_entries.push({
               :url => "#{records.table_name}/#{record.id}",
@@ -328,6 +330,20 @@ class HomeController < ApplicationController
               :title => "#{x.titleize} ##{record.id}: #{record.title} (#{record.status})"
             })
           end
+        end
+      end
+
+
+      Verification.where(:status => 'New').each do |x|
+        if x.validator == current_user
+          owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
+          @calendar_entries.push({
+            :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+            :start => x.verify_date,
+            :color => 'skyblue',
+            :textColor => "darkslategrey",
+            :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
+          })
         end
       end
 
@@ -367,9 +383,9 @@ class HomeController < ApplicationController
 
       objects = ['CorrectiveAction']
       objects.each do |x|
-        records = Object.const_get(x).where('status in (?) and (responsible_user_id = ? || approver_id = ?)',
-          ['Assigned', 'Pending Approval'], current_user_id, current_user_id)
-        records.each do |record|
+        records = Object.const_get(x).where(status: 'Assigned', responsible_user_id: current_user_id)
+        records << Object.const_get(x).where(status: 'Pending Approval', approver_id: current_user_id)
+        records.flatten.each do |record|
           if (record.due_date.present? rescue false)
             @calendar_entries.push({
               :url => "#{records.table_name}/#{record.id}",
@@ -385,10 +401,10 @@ class HomeController < ApplicationController
 
     elsif session[:mode] == "SRM"
 
-      sras = Sra.where("status in (?)", ['Assigned', 'Pending Review', 'Pending Approval'])
-      sras = sras.where("responsible_user_id = ? OR approver_id = ? OR reviewer_id = ?",
-        current_user_id, current_user_id, current_user_id)
-      sras.each do |a|
+      sras = Sra.where(status: 'Assigned', responsible_user_id: current_user_id)
+      sras << Sra.where(status: 'Pending Review', reviewer_id: current_user_id)
+      sras << Sra.where(status: 'Pending Approval', approver_id: current_user_id)
+      sras.flatten.each do |a|
         if a.scheduled_completion_date.present?
           @calendar_entries.push({
             :url => sra_path(a),
@@ -400,10 +416,9 @@ class HomeController < ApplicationController
         end
       end
 
-      risk_controls = RiskControl.where("status in (?)", ['Assigned', 'Pending Review', 'Pending Approval'])
-      risk_controls = risk_controls.where("responsible_user_id = ? OR approver_id = ?",
-        current_user_id, current_user_id)
-      risk_controls.each do |a|
+      risk_controls = RiskControl.where(status: 'Assigned', responsible_user_id: current_user_id)
+      risk_controls << RiskControl.where(status: 'Pending Approval', approver_id: current_user_id)
+      risk_controls.flatten.each do |a|
         if a.scheduled_completion_date.present?
           @calendar_entries.push({
             :url => risk_control_path(a),
@@ -663,38 +678,8 @@ class HomeController < ApplicationController
     #@submissions = Submission.where(:completed => 1).can_be_accessed(current_user).within_timerange(@start_date, @end_date).by_emp_groups(params[:emp_groups]).group_by{|x| x.template.name}
   end
 
-
-  def load_objects(module_name)
-    case module_name
-    when 'safety_assurance'
-      @types =
-        {
-          'Audit'.to_sym => 'Audit',
-          'Inspection'.to_sym => 'Inspection',
-          'Evaluation'.to_sym => 'Evaluation',
-          'Investigation'.to_sym => 'Investigation',
-          'Finding'.to_sym => 'Finding',
-          'Corrective Action'.to_sym => 'SmsAction',
-          'Recommendation'.to_sym => 'Recommendation',
-        }
-    else
-      @types =
-        {
-          'SRA'.to_sym => 'Sra',
-          'Hazard'.to_sym => 'Hazard',
-          'Risk Control'.to_sym => 'RiskControl',
-          'Safety Plan'.to_sym => 'SafetyPlan',
-        }
-    end
-  end
-
   def query_all
-    case session[:mode]
-    when 'SMS'
-      load_objects('safety_assurance')
-    else
-      load_objects('sra')
-    end
+    load_objects(session[:mode])
     @fields = []
     @types.each do |k, v|
       @fields << Object.const_get(v)
@@ -790,15 +775,18 @@ class HomeController < ApplicationController
         begin
           # get result from logic
           if expr['logic'] == "Equals To"
-            if field[:type] == 'boolean_box'
+            case field[:type]
+            when "boolean_box"
+              base.keep_if{|x| (x.send(field[:field]) ? 'Yes' : 'No').downcase == expr_val.downcase}
+            when "user"
               base.keep_if{|x|
-                (x.send(field[:field]) ? 'Yes' : 'No').downcase == expr_val.downcase}
+                (x.send(field[:field]).to_s.present?) &&
+                (expr_val.split(",").include? x.send(field[:field]).to_s)}
             else
               base.keep_if{|x|
                 (x.send(field[:field]).to_s.present?) &&
                 (x.send(field[:field]).to_s.downcase.include? expr_val.downcase)}
             end
-
           elsif expr['logic'] == "Not equal to"
             if field[:type] == 'boolean_box'
               base.keep_if{|x|
@@ -950,7 +938,9 @@ class HomeController < ApplicationController
   def advanced_search
     @table = Object.const_get(params[:table])
     @path = send("#{@table.table_name}_path")
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    meta_field_args = ['show']
+    meta_field_args.push('admin') if current_user.admin?
+    @terms = @table.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present?}
     render :partial => '/shared/advanced_search'
   end
 

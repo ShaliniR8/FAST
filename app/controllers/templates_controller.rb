@@ -20,10 +20,12 @@ end
 class TemplatesController < ApplicationController
   # before_filter :login_required
   before_filter :oauth_load # Kaushik Mahorker KM
+
   def index
     @title = "Safety Reports Templates"
-    @headers = Template.get_headers
+    @headers = Template.get_meta_fields('index')
     @table_name = "templates"
+    @table = Object.const_get("Template")
     @records = Template.find(:all)
   end
 
@@ -33,12 +35,6 @@ class TemplatesController < ApplicationController
     @action="new"
   end
 
-  def update
-    @template=Template.find(params[:id])
-    if @template.update_attributes(params[:template])
-      redirect_to template_path(@template), flash: {success: "Template ##{@template.id} updated."}
-    end
-  end
 
   def edit
     @all_templates=Template.find(:all)
@@ -50,9 +46,17 @@ class TemplatesController < ApplicationController
     @template=Template.new(params[:template])
     @template.created_by=current_user;
     if @template.save
+      AccessControl.get_template_opts.map { |disp, db_val|
+        AccessControl.new({
+          list_type: 1,
+          action: db_val,
+          entry: @template[:name],
+          viewer_access: 1
+        }).save
+      }
       redirect_to template_path(@template), flash: {success: "Template #{@template.id} created."}
     else
-
+      #TODO: Handle creation error
     end
   end
 
@@ -100,10 +104,13 @@ class TemplatesController < ApplicationController
 
   def update
     @template=Template.find(params[:id])
+    updated_name = params[:template][:name]
+    if @template[:name] != updated_name
+      AccessControl.where(entry: @template[:name]).update_all(entry: updated_name)
+    end
     if @template.update_attributes(params[:template])
       redirect_to template_path(@template), flash: {success: "Template ##{@template.id} updated."}
     end
   end
-
 
 end

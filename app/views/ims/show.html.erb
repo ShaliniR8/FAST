@@ -133,14 +133,14 @@
           <!-- Task -->
           <%=render "/ims/show_task",
             :owner=>@im,
-            :fields => ImTask.get_meta_fields('show')
+            :fields => SmsTask.get_meta_fields('show')
           %>
 
           <%=render "items"%>
           <!-- Contact -->
           <%=render "/ims/show_contact",
             :owner => @im,
-            :fields => ImContact.get_meta_fields('show')
+            :fields => Contact.get_meta_fields('show')
           %>
           <!-- Attachment -->
           <%=render "/forms/attachments_show", :owner => @im%>

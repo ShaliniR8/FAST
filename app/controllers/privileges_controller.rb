@@ -62,6 +62,7 @@ class PrivilegesController < ApplicationController
         a.destroy
       end
     end
+    privilege.update_user_modified_dates
     redirect_to privileges_path
   end
 end

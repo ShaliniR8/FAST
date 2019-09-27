@@ -62,11 +62,6 @@ class SrasController < ApplicationController
   def create
     sra = Sra.create(params[:sra])
     sra.status = 'New'
-    if sra.record_id.present?
-      @record = Record.find(sra.record_id)
-      @record.sra_id = sra.id
-      @record.save
-    end
     if params[:matrix_id].present?
       connection = SraMatrixConnection.create(
         :matrix_id => params[:matrix_id],
@@ -81,7 +76,10 @@ class SrasController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Sra.find(params[:id]).becomes(Sra)
+    sra_meeting = @owner.meeting
+    meeting_redirect = false
     case params[:commit]
     when 'Assign'
       notify(@owner.responsible_user,
@@ -138,18 +136,29 @@ class SrasController < ApplicationController
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
+    when 'Add Attachment'
+      transaction = false
+    when 'Add Meeting Minutes'
+      meeting_redirect = true
+      Transaction.build_for(
+        sra_meeting,
+        params[:commit],
+        current_user.id,
+        "SRA ##{@owner.get_id}"
+      )
     end
     @owner.update_attributes(params[:sra])
     @owner.status = update_status || @owner.status #unless otherwise specified, use default status update from views
-    SraTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        stamp:      Time.now,
-        content:    transaction_content || ''
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
       )
+    end
     @owner.save
-    redirect_to sra_path(@owner)
+    redirect_to meeting_redirect ? meeting_path(sra_meeting) : sra_path(@owner)
   end
 
 
@@ -219,7 +228,7 @@ class SrasController < ApplicationController
 
   def new_attachment
     @owner=Sra.find(params[:id])
-    @attachment=SraAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 
@@ -236,7 +245,7 @@ class SrasController < ApplicationController
   def approve
     @owner = Sra.find(params[:id]).becomes(Sra)
     pending_approval = @owner.status == 'Pending Approval'
-    status = params[:commit] == 'Approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
+    status = params[:commit].downcase == 'approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
     field = pending_approval ? :approver_comment : :reviewer_comment
     render :partial => '/forms/workflow_forms/process', locals: {status: status, field: field }
   end
@@ -257,35 +266,39 @@ class SrasController < ApplicationController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
+  def comment
+    @owner = Sra.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def get_agenda
-    @sra=Sra.find(params[:id])
-    @meeting=SrmMeeting.find(params[:meeting])
-    @headers=SrmAgenda.get_headers
-    @status=SrmAgenda.get_status
-    @tof={"Yes"=>true,"No"=>false}
-    @accept_deline={"Accepted"=>true,"Declined"=>false}
-    render :partial=>"agenda"
+    @sra = Sra.find(params[:id])
+    @meeting = SrmMeeting.find(params[:meeting])
+    @headers = SrmAgenda.get_headers
+    @status = SrmAgenda.get_status
+    @tof = {"Yes" => true,"No" => false}
+    @accept_deline = {"Accepted" => true,"Declined" => false}
+    render :partial => "agenda"
   end
 
 
 
   def carryover
     sra = Sra.find(params[:id])
-    MeetingTransaction.create(
-      :users_id => current_user.id,
-      :action => "Carry Over SRA",
-      :content=> "SRA ##{sra.get_id} Carried Over",
-      :owner_id => sra.meeting.id,
-      :stamp => Time.now)
-    SraTransaction.create(
-      :users_id => current_user.id,
-      :action => "Carried Over",
-      :content => "SRA Carried Over from Meeting ##{sra.meeting.get_id}",
-      :owner_id => sra.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      sra.meeting,
+      'Carry Over SRA',
+      current_user.id,
+      "SRA ##{sra.get_id} Carried Over"
+    )
+    Transaction.build_for(
+      sra,
+      'Carried Over',
+      current_user.id,
+      "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
+    )
     sra.meeting_id = nil
     sra.status = "New"
     sra.save
@@ -322,10 +335,14 @@ class SrasController < ApplicationController
 
 
 
-  def enable
-    @sra=Sra.find(params[:id])
+  def viewer_access
+    @sra = Sra.find(params[:id])
     @sra.viewer_access=!@sra.viewer_access
-    SraTransaction.create(:users_id=>current_user.id,:action=>"#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",:owner_id=>params[:id],:stamp=>Time.now)
+    Transaction.build_for(
+      @sra,
+      "#{(@sra.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
+      current_user.id
+    )
     @sra.save
     redirect_to sra_path(@sra)
   end
@@ -333,9 +350,9 @@ class SrasController < ApplicationController
 
 
   def new_minutes
-    @owner=Sra.find(params[:id])
+    @owner = Sra.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
-    render :partial=>"shared/add_minutes"
+    render :partial => "shared/add_minutes"
   end
 
 

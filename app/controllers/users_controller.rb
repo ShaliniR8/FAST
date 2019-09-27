@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   # before_filter :login_required
   before_filter :oauth_load # Kaushik Mahorker KM
-
+  include Concerns::Mobile # used for mobile actions
 
   def index
     if (current_user.level != "Admin")
@@ -10,7 +10,9 @@ class UsersController < ApplicationController
       return
     end
 
-    @headers = User.get_headers_table
+    @headers = User.get_meta_fields('index')
+    # @headers = User.get_headers_table
+
     @records = User.where({airport: current_user.airport})
 
     active_users = @records.where('disable = ? OR disable IS ?', false, nil)
@@ -27,7 +29,7 @@ class UsersController < ApplicationController
         { :label => 'Total Android Users', :value => android_users.count },
       ])
     end
-
+    @table = Object.const_get("User")
     @table_name = "users"
     @title = "Users"
     #@users.keep_if{|u| !u.disable}
@@ -94,6 +96,8 @@ class UsersController < ApplicationController
         a.destroy
       end
     end
+    user.privileges_last_updated = DateTime.now
+    user.save!
     redirect_to user_path(user), flash: {success: "Privileges updated."}
   end
 
@@ -279,6 +283,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     if current_user.admin?
       session[:simulated_id] = @user.id
+      define_session_permissions
     else
       flash[:error] = "Only Administrators may simulate Accounts"
     end
@@ -293,52 +298,6 @@ class UsersController < ApplicationController
     redirect_to user_path(@user)
   end
 
-
-
-  # --------- BELOW ARE EVERYTHING ADDED FOR PROSAFET APP
-   # following method added. BP Jul 14 2017
-  # Added if statement for OAuth compatibiltiy KM Jul 17 2017
-  def get_json
-    @date = params[:date]
-    if current_token != nil
-      @user = current_token.user
-    else
-      @user = current_user
-    end
-    @submissions = current_user.submissions.where("created_at > ?",@date)
-    stream = render_to_string(:template=>"users/get_json.js.erb" )
-    send_data(stream, :type=>"json", :disposition => "inline")
-  end
-
-  #added by BP Aug 8 2017. Used to get all submissions with detailed fields from current user
-  def submission_json
-    if current_token != nil
-      @user = current_token.user
-    else
-      @user = current_user
-    end
-    @submissions = Submission.find(:all, :conditions => [ "event_date > ?",'2017-8-11 12:00:00'])
-    stream = render_to_string(:template=>"users/submission_json.js.erb" )
-    send_data(stream, :type=>"json", :disposition => "inline")
-  end
-
-
-  def notices_json
-    if current_token != nil
-      @user = current_token.user
-    else
-      @user = current_user
-    end
-    @notices = @user.get_notices
-    stream = render_to_string(:template=>"users/notices_json.js.erb" )
-    send_data(stream, :type=>"json", :disposition => "inline")
-  end
-
-
-
-
-
-
   private
 
   def build_module_access
@@ -346,7 +305,5 @@ class UsersController < ApplicationController
       params[:"module_#{name}"].to_i == 1
     end.join(',')
   end
-
-
 
 end

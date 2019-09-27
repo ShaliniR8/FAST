@@ -171,13 +171,21 @@
         background-color: steelblue;
         color: white;
       }
+      .panel-lightsteelblue > .panel-heading {
+        background-color: lightsteelblue;
+        color: black;
+      }
+      .panel-lightblue > .panel-heading {
+        background-color: lightblue;
+        color: black;
+      }
       .panel-lightskyblue > .panel-heading {
         background-color: lightblue;
         color: darkslategrey;
       }
       .panel-tan > .panel-heading {
         background-color: tan;
-        color: white;
+        color: black;
       }
       .panel-rosybrown > .panel-heading {
         background-color: rosybrown;
@@ -248,6 +256,13 @@
       .menu-link a:hover {
         color: midnightblue!important;
       }
+
+      .custom-swal {
+        max-height: 70% !important;
+        font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+        font-size: 14px;
+      }
+
     </style>
 
   </head>
@@ -273,6 +288,7 @@
           </a>
         </div>
 
+        <%if current_user.id.present?%>
         <div class="collapse navbar-collapse" id="myNavbar">
 
           <!-- Module based menu -->
@@ -378,20 +394,21 @@
 
                 <li><a href="#" class="dropdown-menu-header">Modules</a></li>
 
-                <%if current_user.has_access('ASAP','module') %>
-                  <li class="menu-link"><%= link_to 'Safety Reporting', switch_errors_path(mode: 'ASAP') %></li>
+                <%if current_user.has_access('ASAP','module', admin: true) %>
+                  <li class="menu-link"><%= link_to 'Safety Reporting', switch_modes_path(mode: 'ASAP') %></li>
                 <%end%>
-                <% if current_user.has_access('SMS IM','module') %>
-                  <li class="menu-link"><%= link_to 'SMS IM', switch_errors_path(:mode=>"SMS IM") %></li>
+                <% if current_user.has_access('SMS IM','module', admin: true) %>
+                  <li class="menu-link"><%= link_to 'SMS IM', switch_modes_path(:mode=>"SMS IM") %></li>
                 <%end%>
-                <% if current_user.has_access('Safety Assurance','module') %>
-                  <li class="menu-link"><%= link_to 'Safety Assurance', switch_errors_path(:mode=>"SMS") %></li>
+                <% if current_user.has_access('Safety Assurance','module', admin: true) %>
+                  <li class="menu-link"><%= link_to 'Safety Assurance', switch_modes_path(:mode=>"SMS") %></li>
                 <%end%>
-                <% if current_user.has_access('Safety Risk Management','module') %>
-                  <li class="menu-link"><%= link_to 'SRA (SRM)', switch_errors_path(:mode=>"SRM") %></li>
+                <% if current_user.has_access('Safety Risk Management','module', admin: true) %>
+                  <li class="menu-link"><%= link_to 'SRA (SRM)', switch_modes_path(:mode=>"SRM") %></li>
                 <%end%>
 
                 <li><a href="#" class="dropdown-menu-header">Reference</a></li>
+                <li class="menu-link"><%=link_to "User Guides", user_guides_documents_path%></li>
                 <li class="menu-link"><%=link_to "Version History", revision_history_documents_path%></li>
                 <%if current_user.has_access("documents","index")%>
                   <li class="menu-link"><%=link_to "Documents", documents_path%></li>
@@ -404,20 +421,23 @@
 
           </ul>
         </div>
+        <%end%>
       </div>
     </nav>
 
     <div class="module_label">
       <span class="pull-right">
-        <%= case session[:mode]
-          when "SMS"
-            "Safety Assurance Module"
-          when "SMS IM"
-            "SMS IM Module"
-          when "ASAP"
-            "Safety Reporting Module"
-          when "SRM"
-            "SRA (SRM) Module"
+        <% prefix = "#{BaseConfig.airline[:name]}
+          #{" <span style='color:red'>#{Rails.env.titleize}</span>" if !Rails.env.production?} | "%>
+        <%=case session[:mode]
+          when 'SMS'
+            "#{prefix}Safety Assurance Module".html_safe
+          when 'SMS IM'
+            "#{prefix}SMS IM Module".html_safe
+          when 'ASAP'
+            "#{prefix}Safety Reporting Module".html_safe
+          when 'SRM'
+            "#{prefix}SRA (SRM) Module".html_safe
           end
         %>
       </span>

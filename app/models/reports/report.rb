@@ -1,21 +1,21 @@
 class Report < ActiveRecord::Base
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Investigationable
+  include Sraable
+  include Transactionable
+  include RootCausable
+
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
-  has_many :report_meetings,    foreign_key: 'report_id',   class_name: 'ReportMeeting',      dependent: :destroy
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
-  has_many :transactions,       foreign_key: 'owner_id',    class_name: 'ReportTransaction',  dependent: :destroy
-  has_many :attachments,        foreign_key: 'owner_id',    class_name: 'ReportAttachment',   dependent: :destroy
   has_many :agendas,            foreign_key: 'event_id',    class_name: 'AsapAgenda',         dependent: :destroy
   has_many :suggestions,        foreign_key: 'owner_id',    class_name: 'ReportSuggestion',   dependent: :destroy
   has_many :descriptions,       foreign_key: 'owner_id',    class_name: 'ReportDescription',  dependent: :destroy
   has_many :causes,             foreign_key: 'owner_id',    class_name: 'ReportCause',        dependent: :destroy
   has_many :detections,         foreign_key: 'owner_id',    class_name: 'ReportDetection',    dependent: :destroy
   has_many :reactions,          foreign_key: 'owner_id',    class_name: 'ReportReaction',     dependent: :destroy
-
-  belongs_to :meeting, foreign_key:"meeting_id", class_name:"Meeting"
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
 
   serialize :privileges
   serialize :severity_extra
@@ -24,29 +24,45 @@ class Report < ActiveRecord::Base
   serialize :mitigated_probability
 
   before_create :set_priveleges
-  after_create :set_name
   before_create :set_extra
+  after_create :set_name
 
   extend AnalyticsFilters
 
+  ### NOTE: Add these lines to the inheritance tree when added, then remove these statements in this tagged area
+    has_many :child_connections, as: :child, class_name: 'Connection', dependent: :destroy
+    has_many :meetings, through: :child_connections, source: :owner, source_type: 'Meeting'
 
+    # def all_connections
+    #   owner_connections + child_connections
+    # end
+    before_destroy :delete_connections
+    # private
+      def delete_connections
+        self.connections.delete_all
+      end
+  ### END TAGGED AREA
+    has_many :active_meetings, through: :child_connections, source: :owner, source_type: 'Meeting', conditions: "connections.complete = 0 AND connections.archive = 0"
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     [
-      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
-      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',      required: false },
-      {                                                                                   type: 'newline',  visible: 'form,show'                        },
-      {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show', required: true  },
-      {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show', required: true  },
-      {                                                                                   type: 'newline',  visible: 'form,show'                        },
-      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',           required: false },
+      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',          required: false },
+      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',          required: false },
+      {                                                                                   type: 'newline',  visible: 'show'                        },
+      {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: true  },
+      {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show',     required: true  },
+      {                                                                                   type: 'newline',  visible: 'show'                        },
+      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',               required: false },
 
-      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_label_options },
-      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'form,show',       required: false, options: get_venue_options },
-      {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'form,show',       required: false },
-      {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show', required: true  },
-      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'form,show',       required: false },
+      {field: "get_root_causes_full",   title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
+      {field: "get_root_causes",        title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index'},
+
+      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_label_options },
+      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_venue_options },
+      {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'event_summary',       required: false },
+      {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show',     required: true  },
+      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',                required: false },
 
       {field: 'eir',                  title: 'EIR Number',                num_cols: 6,    type: 'text',     visible: 'close',           required: false },
       {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
@@ -56,7 +72,7 @@ class Report < ActiveRecord::Base
       {field: 'company_disposition',  title: 'Company Disposition',       num_cols: 6,    type: 'select',   visible: 'close',           required: false, options: company_dis },
       {field: 'narrative',            title: 'Narrative',                 num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
       {field: 'regulation',           title: 'Regulation',                num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
-      {field: 'notes',                title: 'Notes',                     num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
+      {field: 'notes',                title: 'Closing Notes',             num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
 
       {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
@@ -65,6 +81,9 @@ class Report < ActiveRecord::Base
       {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',             required: false }, #Gets overridden in view- see included_events.html.erb
+
+      {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting',         required: false},
 
 
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
@@ -78,6 +97,29 @@ class Report < ActiveRecord::Base
       "Under Review"    => { :score => 75,  :color => "warning"},
       "Closed"          => { :score => 100, :color => "success"},
     }
+  end
+
+
+  def get_minutes_agenda(meeting_id)
+    agenda = "<b>Agendas:</b><br>#{agendas.where(owner_id: meeting_id).map(&:get_content).join('<br>')}" if agendas.length > 0
+    meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
+    "#{agenda || ''} #{meeting_minutes || ''}".html_safe
+  end
+
+
+  def is_asap
+    result = false
+    records.each do |x|
+      result = result || x.template.report_type == "asap"
+    end
+    return result
+  end
+
+
+  def additional_info
+    if attachments.length > 0 || records.map(&:attachments).flatten.length > 0
+      "<i class='fa fa-paperclip view_attachments'></i>".html_safe
+    end
   end
 
 
@@ -99,11 +141,11 @@ class Report < ActiveRecord::Base
   def reopen(new_status)
     self.status = new_status
     self.records.each{|x| x.reopen("Linked");}
-    ReportTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Reopen",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Reopen',
+      (session[:simulated_id] || session[:user_id])
+    )
     self.save
   end
 
@@ -161,13 +203,6 @@ class Report < ActiveRecord::Base
     ["New","Under Investigation","Closed"]
   end
 
-  def meetings
-    if self.report_meetings.present?
-      self.report_meetings.map{|x| x.meeting}
-    else
-      []
-    end
-  end
 
   def has_emp
     self.corrective_actions.each do |c|

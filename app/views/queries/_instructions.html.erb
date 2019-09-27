@@ -1,0 +1,55 @@
+<div class="col-xs-12">
+  <a class="btn"
+    data-toggle="collapse"
+    data-target="#view_instructions">
+    View Instructions &raquo;
+  </a>
+  <%=render "shared/alerts"%>
+  <div class="collapse well" id="view_instructions">
+    <ol>
+      <li>Select a Target you would like to run the query on.</li>
+      <li>Build the query.</li>
+      <ol type="I">
+        <li>Add conditions to the query.
+          <ul>
+            <li>If no conditions are added, all results will be included in the report.</li>
+          </ul>
+        <li>Add nested conditions to your query.</li>
+          <ul>
+            <li>Select the Nested Operator</li>
+              <ul type="disc">
+                <li>AND: The result will satisfy all nested conditions.</li>
+                <li>OR: The result will satisfy at least one nested condition.</li>
+              </ul>
+          </ul>
+        <li>Enter constraints.</li>
+          <ul>
+            <li>Field: The field that data will be compared from.</li>
+            <li>Condition Type: The method that will be used for comparison.</li>
+            <ul type="disc">
+              <li>Equals To: Search for fields that have an exact value.</li>
+              <li>Not Equal To: Search for fields that do not have an exact value.</li>
+              <li>Contains: Search for fields that contain a value and fields that have multiple options selected.</li>
+              <li>Does Not Contain: Search for fields that do not contain a value.</li>
+              <li>>= Search for fields greater than or equal to a number.</li>
+              <li>< Search for fields less than a number.</li>
+            </ul>
+            <li>Value: The value that data will be compared to.</li>
+            <ul type="disc">
+              <li>Date Range: Click two dates to select a date range. Click on the same date twice to select a single date.</li>
+              <li>Yes or No: Select the response to a field.</li>
+              <li>Text: Enter text to search from a field.</li>
+            </ul>
+          </ul>
+        </ol>
+      <li>Click on Save to run the query.</li>
+      <li><%=link_to "Click to see some examples.", user_guides_documents_path(topic_name: "Query Center", href: "query_center")%></li>
+    </ol>
+  </div>
+</div>
+
+<style>
+  #view_instructions li{
+    font-weight: normal !important;
+  }
+</style>

@@ -1,16 +1,24 @@
 class Record < ActiveRecord::Base
+  extend AnalyticsFilters
+  include RiskHandling
+
+#Concerns List
+include Attachmentable
+include Commentable
+include Investigationable
+include Sraable
+include Transactionable
+include Messageable
+
+#Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
-  has_one     :investigation,       :foreign_key => "record_id",        :class_name => "Investigation"
-  has_one     :sra,                 :foreign_key => "record_id",        :class_name => "Sra"
+  has_one     :investigation,       as: :owner
 
   belongs_to  :template,            :foreign_key => "templates_id",     :class_name => "Template"
   belongs_to  :created_by,          :foreign_key => "users_id",         :class_name => "User"
   belongs_to  :report,              :foreign_key => "reports_id",       :class_name => "Report"
 
   has_many    :record_fields,       :foreign_key => "records_id",       :class_name => "RecordField",           :dependent => :destroy
-  has_many    :attachments,         :foreign_key => "owner_id",         :class_name => "RecordAttachment",      :dependent => :destroy
-  has_many    :transactions,        :foreign_key => "owner_id",         :class_name => "RecordTransaction",     :dependent => :destroy
-  has_many    :comments,            :foreign_key => "owner_id",         :class_name => "RecordComment",         :dependent => :destroy
   has_many    :suggestions,         :foreign_key => "owner_id",         :class_name => "RecordSuggestion",      :dependent => :destroy
   has_many    :descriptions,        :foreign_key => "owner_id",         :class_name => "RecordDescription",     :dependent => :destroy
   has_many    :causes,              :foreign_key => "owner_id",         :class_name => "RecordCause",           :dependent => :destroy
@@ -18,40 +26,34 @@ class Record < ActiveRecord::Base
   has_many    :reactions,           :foreign_key => "owner_id",         :class_name => "RecordReaction",        :dependent => :destroy
   has_many    :corrective_actions,  :foreign_key => "records_id",       :class_name => "CorrectiveAction",      :dependent => :destroy
 
-  serialize :severity_extra
-  serialize :probability_extra
-  serialize :mitigated_severity
-  serialize :mitigated_probability
-
   accepts_nested_attributes_for :suggestions
   accepts_nested_attributes_for :descriptions
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :detections
   accepts_nested_attributes_for :suggestions
   accepts_nested_attributes_for :record_fields
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :descriptions
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
+
+  after_create -> { create_transaction(context: 'Generated Report From User Submission.') if !self.description.include?('-- copy')}
 
 
-  after_create -> { creation_transaction }
-
-
-  before_create :set_extra
-
-  extend AnalyticsFilters
-
+  def handle_anonymous_reports
+    if anonymous
+      transactions.update_all(users_id: nil)
+    end
+  end
 
 
   def self.get_meta_fields(*args)
-    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    submitter_visible = "admin#{BaseConfig.airline[:show_submitter_name] ? ',index,show' : ''}"
     [
       {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',          title: 'Type',                 num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_user_id',           title: 'Submitted By',         num_cols: 6,  type: 'user',     visible: 'index,show',      required: false},
+      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
-      {field: 'get_event_date',        title: 'Event Date/Time',      num_cols: 6,  type: 'text',     visible: 'form,index,show', required: false},
+      {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
       {field: 'final_comment',         title: 'Final Comment',        num_cols: 12, type: 'text',     visible: 'show',            required: false},
 
@@ -63,6 +65,11 @@ class Record < ActiveRecord::Base
       {field: 'severity_after',       title: 'Mitigated Severity',    num_cols: 12, type: 'text',     visible: 'adv',             required: false},
       {field: 'risk_factor_after',    title: 'Mitigated Risk',        num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+
+  def get_submitter_name
+    anonymous ? 'Anonymous' : created_by.full_name
   end
 
 
@@ -81,17 +88,15 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def reopen(new_status)
     self.status = new_status
-    RecordTransaction.create(
-      :users_id => session[:user_id],
-      :action => "Reopen",
-      :owner_id => self.id,
-      :stamp => Time.now)
+    Transaction.build_for(
+      self,
+      'Reopen',
+      (session[:simulated_id] || session[:user_id])
+    )
     self.save
   end
-
 
 
   # whether the current user can access this record
@@ -109,7 +114,6 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def getTimeZone()
     ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
      "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
@@ -120,7 +124,6 @@ class Record < ActiveRecord::Base
      "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
      "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
-
 
 
   def set_extra
@@ -137,43 +140,6 @@ class Record < ActiveRecord::Base
       self.mitigated_probability = []
     end
   end
-
-
-
-  def get_extra_severity
-    self.severity_extra.present? ?  self.severity_extra : []
-  end
-
-
-
-  def get_extra_probability
-    self.probability_extra.present? ?  self.probability_extra : []
-  end
-
-
-
-  def get_mitigated_probability
-    self.mitigated_probability.present? ?  self.mitigated_probability : []
-  end
-
-
-
-  def get_mitigated_severity
-    self.mitigated_severity.present? ?  self.mitigated_severity : []
-  end
-
-
-
-  def creation_transaction
-    RecordTransaction.create(
-      :users_id => self.anonymous? ? '' : session[:user_id],
-      :action => 'Create',
-      :owner_id => self.id,
-      :content => 'Generated report from user submission',
-      :stamp => Time.now
-    )
-  end
-
 
 
   def self.get_headers
@@ -204,119 +170,6 @@ class Record < ActiveRecord::Base
   end
 
 
-
-  def get_before_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_before_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].key(display_before_risk_factor)
-    end
-  end
-
-
-
-  def get_after_risk_color
-    if BaseConfig.airline[:base_risk_matrix]
-      BaseConfig::RISK_MATRIX[:risk_factor][display_after_risk_factor]
-    else
-      Object.const_get("#{BaseConfig.airline[:code]}_Config")::MATRIX_INFO[:risk_table_index].key(display_after_risk_factor)
-    end
-  end
-
-
-
-  def display_before_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity
-    else
-      get_risk_values[:severity_1].present? ? get_risk_values[:severity_1] : "N/A"
-    end
-  end
-
-
-
-  def display_before_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood
-    else
-      get_risk_values[:probability_1].present? ? get_risk_values[:probability_1] : "N/A"
-    end
-  end
-
-
-
-  def display_before_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor.present? ? risk_factor : "N/A"
-    else
-      get_risk_values[:risk_1].present? ? get_risk_values[:risk_1] : "N/A"
-    end
-  end
-
-
-
-  def display_after_severity
-    if BaseConfig.airline[:base_risk_matrix]
-      severity_after
-    else
-      get_risk_values[:severity_2].present? ? get_risk_values[:severity_2] : "N/A"
-    end
-  end
-
-
-
-  def display_after_likelihood
-    if BaseConfig.airline[:base_risk_matrix]
-      likelihood_after
-    else
-      get_risk_values[:probability_2].present? ? get_risk_values[:probability_2] : "N/A"
-    end
-  end
-
-
-
-  def display_after_risk_factor
-    if BaseConfig.airline[:base_risk_matrix]
-      risk_factor_after.present? ? risk_factor_after : "N/A"
-    else
-      get_risk_values[:risk_2].present? ? get_risk_values[:risk_2] : "N/A"
-    end
-  end
-
-
-
-  def get_risk_values
-    airport_config = Object.const_get("#{BaseConfig.airline[:code]}_Config")
-    matrix_config = airport_config::MATRIX_INFO
-    @severity_table = matrix_config[:severity_table]
-    @probability_table = matrix_config[:probability_table]
-    @risk_table = matrix_config[:risk_table]
-
-    @severity_score = airport_config.calculate_severity(severity_extra)
-    @sub_severity_score = airport_config.calculate_severity(mitigated_severity)
-    @probability_score = airport_config.calculate_severity(probability_extra)
-    @sub_probability_score = airport_config.calculate_severity(mitigated_probability)
-
-    @print_severity = airport_config.print_severity(self, @severity_score)
-    @print_probability = airport_config.print_probability(self, @probability_score)
-    @print_risk = airport_config.print_risk(@probability_score, @severity_score)
-
-    @print_sub_severity = airport_config.print_severity(self, @sub_severity_score)
-    @print_sub_probability = airport_config.print_probability(self, @sub_probability_score)
-    @print_sub_risk = airport_config.print_risk(@sub_probability_score, @sub_severity_score)
-
-    {
-      :severity_1       => @print_severity,
-      :severity_2       => @print_sub_severity,
-      :probability_1    => @print_probability,
-      :probability_2    => @print_sub_probability,
-      :risk_1           => @print_risk,
-      :risk_2           => @print_sub_risk,
-    }
-  end
-
-
-
   def get_viewer_access
     if self.viewer_access
       "Yes"
@@ -324,7 +177,6 @@ class Record < ActiveRecord::Base
       "No"
     end
   end
-
 
 
   def get_id
@@ -336,25 +188,9 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def get_event_date
     self.event_date.strftime("%Y-%m-%d %H:%M:%S")
   end
-
-
-
-
-  def create_transaction(action, content)
-    if !self.changes()['viewer_access'].present?
-      RecordTransaction.create(
-        :users_id => session[:user_id],
-        :action => action,
-        :owner_id => self.id,
-        :content => content,
-        :stamp => Time.now)
-    end
-  end
-
 
 
   def self.get_terms
@@ -375,12 +211,10 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def get_field(id)
     f = self.record_fields.find_by_fields_id(id)
     f.present? ? f.value : ""
   end
-
 
 
   def get_field_by_label(label)
@@ -391,7 +225,6 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def submit_name
     if self.anonymous?
       'Anonymous'
@@ -399,7 +232,6 @@ class Record < ActiveRecord::Base
       self.created_by.full_name
     end
   end
-
 
 
   def get_description
@@ -415,11 +247,9 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def get_template
     self.template.name
   end
-
 
 
   def submitted_date
@@ -427,17 +257,14 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def updated_date
     self.updated_at.strftime("%Y-%m-%d") rescue ''
   end
 
 
-
   def self.getStatus
     ["New", "In Progress", "Closed"]
   end
-
 
 
   def self.build(template)
@@ -447,17 +274,14 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def categories
     self.template.categories
   end
 
 
-
   def all_causes
     self.suggestions + self.descriptions + self.causes + self.detections + self.reactions
   end
-
 
 
   def time_diff(base)
@@ -469,37 +293,9 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def get_date
     self.event_date.strftime("%Y-%m-%d") rescue ''
   end
-
-
-
-  def self.get_likelihood
-    ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
-  end
-
-
-
-  def likelihood_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood).to_i
-    else
-      self.likelihood.to_i
-    end
-  end
-
-
-
-  def likelihood_after_index
-    if BaseConfig.airline[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood_after).to_i
-    else
-      self.likelihood_after.to_i
-    end
-  end
-
 
 
   def convert(copy=true)
@@ -510,7 +306,7 @@ class Record < ActiveRecord::Base
         converted = self.class.create({
           :status => self.status,
           :templates_id => temp_id,
-          :description => self.description,
+          :description => self.description + " -- copy report of ##{self.id}",
           :users_id => self.users_id,
           :event_date => self.event_date,
           :severity => self.severity,
@@ -519,7 +315,8 @@ class Record < ActiveRecord::Base
           :statement => (self.statement.present? ? self.statement : ""),
           :likelihood_after => self.likelihood_after,
           :severity_after => self.severity_after,
-          :risk_factor_after => self.risk_factor_after
+          :risk_factor_after => self.risk_factor_after,
+          :anonymous => self.submission.present? ? self.submission.anonymous : self.anonymous
         })
         self.record_fields.each do |f|
           if f.map_field.present?
@@ -546,12 +343,17 @@ class Record < ActiveRecord::Base
             end
           end
         end
+        Transaction.build_for(
+          converted,
+          "Copy",
+          session[:user_id],
+          "Copied Report From ##{self.id}")
       end
     else
       if self.template.map_template.present?
         temp_id = self.template.map_template_id
         new_temp = Template.find(temp_id)
-        self.update_attributes({:templates_id => temp_id})
+        self.update_attributes({:templates_id => temp_id, :description => (self.description + " -- converted from #{self.template.name}")})
         self.record_fields.each do |f|
           if f.map_field.present?
             f.update_attributes({:fields_id => f.field.map_id})
@@ -569,10 +371,14 @@ class Record < ActiveRecord::Base
             end
           end
         end
+        Transaction.build_for(
+          self,
+          "Convert",
+          session[:user_id],
+          "Report Converted From #{self.template.name}")
       end
     end
   end
-
 
 
   def self.get_avg_complete(current_user)
@@ -587,7 +393,6 @@ class Record < ActiveRecord::Base
       "N/A"
     end
   end
-
 
 
   def satisfy(conditions)
@@ -651,9 +456,6 @@ class Record < ActiveRecord::Base
   end
 
 
-
-
-
   def has_emp
     self.corrective_actions.each do |c|
       if c.employee
@@ -669,7 +471,6 @@ class Record < ActiveRecord::Base
     end
     false
   end
-
 
 
   def has_com
@@ -689,7 +490,6 @@ class Record < ActiveRecord::Base
   end
 
 
-
   def get_instructions
     case status
     when 'New'
@@ -707,7 +507,6 @@ class Record < ActiveRecord::Base
 
     end
   end
-
 
 
 end

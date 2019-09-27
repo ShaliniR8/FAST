@@ -2,6 +2,9 @@ log/*.log
 tmp
 public/uploads/**
 public/exports/**
+app/assets/**
+**/airline_code.yml
+**/database.yml
 
 mysqldumps/**
 mitre/**

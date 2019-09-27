@@ -4,22 +4,19 @@
 
 <%=render '/forms/show_fields', :fields => Finding.get_meta_fields('show'), :record => owner%>
 
-<%if BaseConfig.airline[:base_risk_matrix]%>
-  <%=render "shared/bsk_risk_matrix_show",
-    :owner => owner,
-    :type=>"findings",
-    :allow_mitigate => true,
-    :show_btns => show_btn%>
-<%else%>
-  <%=render "shared/#{BaseConfig.airline[:code]}/show_matrix",
-    :owner => owner,
-    :show_btns => show_btn%>
-<%end%>
-
-
 <%can_change = current_user.has_access(@type,"edit") &&
   owner.status != "Completed" &&
-  owner.status != "Pending Approval" && show_btn%>
+  owner.status != "Pending Approval"%>
+
+<%=render 'shared/choose_show_matrix', 
+  :owner => owner, 
+  :show_btn => show_btn, 
+  :type => 'findings',
+  :allow_mitigate => true,
+  :can_change => can_change%>
+
+
+
 <%=render '/causes/all',
   :owner => owner,
   :cause_type => 'description',
@@ -33,6 +30,4 @@
 <%=render '/sms_actions/show_all', :owner => owner, :show_btn => false%>
 <%=render '/recommendations/show_all', :owner => owner, :show_btn => false%>
 
-<div class="col-xs-12">
-  <%=render "/audits/show_comment", :owner => owner%>
-</div>
+<%=render "/forms/show_comment", :owner => owner%>

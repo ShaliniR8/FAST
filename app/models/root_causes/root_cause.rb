@@ -1,7 +1,7 @@
 class RootCause < ActiveRecord::Base
-
-  belongs_to  :cause_option,        :foreign_key => "cause_option_id",      :class_name => "CauseOption"
-  belongs_to  :user,                :foreign_key => "user_id",              :class_name => "User"
+  belongs_to :owner, polymorphic: true
+  belongs_to :cause_option,  foreign_key: "cause_option_id", class_name: "CauseOption"
+  belongs_to :user,          foreign_key: "user_id",         class_name: "User"
 
 
   def self.get_headers

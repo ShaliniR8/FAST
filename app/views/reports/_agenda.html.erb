@@ -17,7 +17,7 @@
               </tr>
             </thead>
             <tbody id="agendas">
-              <%@report.agendas.each do |a|%>
+              <%@report.agendas.where(owner_id: @meeting.id).each do |a|%>
                 <%if a.user_id==current_user.id%>
                   <%=f.fields_for :agendas,a do |x|%>
                     <tr>
@@ -48,6 +48,7 @@
           </table>
         </div>
         <div class="col-xs-12">
+          <%=hidden_field_tag :event_id, @report.id%>
           <%=f.submit "Save Agenda",:class=>"btn btn-success pull-right", :disable_with => "Saving..."%>
           <%=link_to_fields "Add",f,:agendas,"AsapAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5"%>
         </div>

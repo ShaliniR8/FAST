@@ -1,5 +1,6 @@
 class ViewerComment < ActiveRecord::Base
   belongs_to :viewer, foreign_key:"user_id",class_name:"User"
+  belongs_to :owner,  polymorphic: true
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)

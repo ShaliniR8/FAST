@@ -5,11 +5,9 @@ class Section < ActiveRecord::Base
   belongs_to :approver,   :foreign_key => "approver_id", :class_name => "User"
 
   has_many :section_fields, :foreign_key => "section_id", :class_name => "SectionField",  :dependent => :destroy
-  #has_many :notices,       :foreign_key => "owner_id",   :class_name => "AuditNotice",   :dependent => :destroy
 
 
   accepts_nested_attributes_for :section_fields
-
 
 
   after_create :post_creation

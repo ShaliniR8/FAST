@@ -1,0 +1,16 @@
+- if BaseConfig.airline[:allow_set_alert]
+  = link_to 'Set Alert',
+    '#',
+    class: 'btn btn-success pull-right mr5 mb5',
+    id: 'alert_btn',
+    'data-toggle' => 'modal',
+    'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $('#alert_btn').on('click', function(){
+    $.get('#{new_notice_path(owner_type: owner.class.name, owner_id: owner)}',
+      function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+    });
+  });

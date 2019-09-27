@@ -1,7 +1,9 @@
 <script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+
 <div class="col-xs-12">
-  <%=form_tag add_root_cause_hazards_path, method: :post, remote: true do %>
-    <%= hidden_field_tag :owner_id, @owner.id %>
+  <%=form_tag add_root_causes_path, method: :post, remote: true do %>
+    <%=hidden_field_tag :owner_type, @owner.class.name%>
+    <%=hidden_field_tag :owner_id, @owner.id%>
     <div class="panel-warning">
       <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
         <%=render "/root_causes/new_root_cause_categories", :second_id => second_id%>

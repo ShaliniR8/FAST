@@ -6,6 +6,17 @@ class Template < ActiveRecord::Base
   belongs_to  :created_by,foreign_key:"users_id",class_name: "User"
   accepts_nested_attributes_for :categories, reject_if: Proc.new{|category| category[:title].blank?}
 
+
+  def self.get_meta_fields(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    return [
+      { field: "name",               title: "Name",        num_cols: 12, type: "text", visible: 'index,show',   required: false},
+      { field: "num_of_categories",  title: "Categories",  num_cols: 10, type: "text", visible: 'index,show',   required: true    },
+      { field: "num_of_fields",      title: "Fields",      num_cols: 12, type: "text", visible: 'index,show',   required: false   },
+      { field: "num_of_records",     title: "Records",     num_cols: 10, type: "text", visible: 'index,show',   required: false},
+    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
   def self.get_headers
     [
       #{:field => "id",                               :title => "ID"},

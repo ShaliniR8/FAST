@@ -2,51 +2,74 @@ require 'open-uri'
 require 'fileutils'
 
 class Submission < ActiveRecord::Base
+  extend AnalyticsFilters
+  include Rails.application.routes.url_helpers
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Association List
   belongs_to :template,   foreign_key: "templates_id",  class_name: "Template"
   belongs_to :created_by, foreign_key: "user_id",       class_name: "User"
   belongs_to :record,     foreign_key: "records_id",    class_name: "Record"
 
   has_many :submission_fields,    foreign_key: "submissions_id",  class_name: "SubmissionField",        :dependent => :destroy
-  has_many :attachments,          foreign_key: "owner_id",        class_name: "SubmissionAttachment",   :dependent => :destroy
-  has_many :transactions,         foreign_key: "owner_id",        class_name: "SubmissionTransaction",  :dependent => :destroy
-  has_many :comments,             foreign_key: "owner_id",        class_name: "SubmissionNote",         :dependent => :destroy
-  has_many :notices,              foreign_key: "owner_id",        class_name: "SubmissionNotice",       :dependent => :destroy
+  has_many :notices,              foreign_key: "owner_id",       :dependent => :destroy
 
-  accepts_nested_attributes_for :comments
   accepts_nested_attributes_for :submission_fields
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
-
 
   after_create :make_report
-  after_create :create_transaction
   after_update :make_report
 
-  extend AnalyticsFilters
-  include Rails.application.routes.url_helpers
-
-
-
-  def self.get_meta_fields(*args)
-    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    [
-      {field: 'get_id',         title: 'ID',              num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_template',   title: 'Submission Type', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'get_user_id',    title: 'Submitted By',    num_cols: 6,  type: 'user', visible: 'index,show', required: false},
-      {field: 'get_event_date', title: 'Event Date/Time', num_cols: 6,  type: 'text', visible: 'index,show', required: false},
-      {field: 'description',    title: 'Event Title',     num_cols: 12, type: 'text', visible: 'index,show', required: false},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  def create_transaction(action: nil, context: nil)
+    Transaction.build_for(
+      self,
+      action,
+      session[:simulated_id] || session[:user_id],
+      context,
+      nil,
+      nil,
+      session[:platform]
+    )
+    handle_anonymous_reports
   end
 
 
+  # if submission is completed, check whether it's submitted anonymously and update transactions if needed
+  def handle_anonymous_reports
+    if anonymous
+      transactions.each do |transaction|
+        if ['Add Attachment', 'Create', 'Add Notes'].include? transaction.action
+          transaction.users_id = nil
+          transaction.save
+        end
+      end
+    end
+  end
+
+
+  def self.get_meta_fields(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'admin'] : args)
+    submitter_visible = "admin#{BaseConfig.airline[:show_submitter_name] ? ',index,show' : ''}"
+    [
+      {field: 'get_id',             title: 'ID',              num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'get_template',       title: 'Submission Type', num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'get_submitter_name', title: 'Submitted By',    num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
+      {field: 'event_date',         title: 'Event Date/Time', num_cols: 6,  type: 'datetime', visible: 'index,show',      required: false},
+      {field: 'description',        title: 'Event Title',     num_cols: 12, type: 'text',     visible: 'index,show',      required: false},
+    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
 
 
   def get_user_id
     anonymous ? 'Anonymous' : user_id
   end
 
-
+  def get_submitter_name
+    anonymous ? 'Anonymous' : created_by.full_name
+  end
 
 
   def getEventId
@@ -54,7 +77,6 @@ class Submission < ActiveRecord::Base
       self.record.report.id
     end
   end
-
 
 
   def getTimeZone()
@@ -67,7 +89,6 @@ class Submission < ActiveRecord::Base
      "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
      "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
   end
-
 
 
   def self.export_all
@@ -98,7 +119,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def self.get_headers
     if BaseConfig.airline[:submission_description]
       [
@@ -119,28 +139,14 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_id
     custom_id || id
   end
 
 
-
   def get_event_date
     event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
   end
-
-
-
-  def create_transaction
-    SubmissionTransaction.create(
-      :users_id => self.anonymous? ? '' : session[:user_id],
-      :content => "User Submitted Report.",
-      :action => "Create",
-      :owner_id => self.id,
-      :stamp => Time.now)
-  end
-
 
 
   def self.get_terms
@@ -155,12 +161,10 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_field(id)
     f = self.submission_fields.find_by_fields_id(id)
     f.present? ? f.value : ""
   end
-
 
 
   def get_field_by_label(label)
@@ -169,7 +173,6 @@ class Submission < ActiveRecord::Base
     f = self.submission_fields.where(:fields_id => fields_id)
     f.present? ? f.first.value : ""
   end
-
 
 
   def submit_name
@@ -185,17 +188,14 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_date
     event_date.strftime("%Y-%m-%d") rescue ''
   end
 
 
-
   def get_time
     event_date.strftime("%H:%M") rescue ''
   end
-
 
 
   def get_description
@@ -211,11 +211,9 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def get_template
     self.template.name
   end
-
 
 
   def submitted_date
@@ -223,11 +221,9 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def updated
     self.updated_at.strftime("%Y-%m-%d")
   end
-
 
 
   def self.build(template)
@@ -237,11 +233,9 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def categories
     self.template.categories
   end
-
 
 
   def time_diff(base)
@@ -249,11 +243,10 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   # Can we find a better way to mass assign values to it?
   def make_report
     if self.completed && self.records_id.blank?
-      record = Record.new(
+      record = Record.create(
         :templates_id       => self.templates_id,
         :description        => self.description,
         :event_date         => self.event_date,
@@ -262,12 +255,12 @@ class Submission < ActiveRecord::Base
         :anonymous          => self.anonymous,
         :event_time_zone    => self.event_time_zone
       )
-    self.attachments.each do |x|
-      temp = RecordAttachment.new(
-        :name => x.name,
-        :caption => x.caption)
-      record.attachments.push(temp)
-    end
+      self.attachments.each do |x|
+        temp = Attachment.new(
+          :name => x.name,
+          :caption => x.caption)
+        record.attachments.push(temp)
+      end
       record.save
       self.records_id = record.id
       self.save
@@ -278,14 +271,13 @@ class Submission < ActiveRecord::Base
           :value => f.value)
         rf.save
       end
+      record.handle_anonymous_reports
     end
   end
 
 
-
   def to_asap
   end
-
 
 
   def find_field(field_name)
@@ -302,7 +294,6 @@ class Submission < ActiveRecord::Base
       ""
     end
   end
-
 
 
   def get_narratives
@@ -322,7 +313,6 @@ class Submission < ActiveRecord::Base
       ''
     end
   end
-
 
 
   def satisfy(conditions)
@@ -378,7 +368,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-
   def convert
     if self.template.map_template.present?
       temp_id = self.template.map_template_id
@@ -386,7 +375,7 @@ class Submission < ActiveRecord::Base
       converted = self.class.create({
         :anonymous        => self.anonymous,
         :templates_id     => temp_id,
-        :description      => self.description + " -- dual report of ##{self.id}",
+        :description      => self.description + " -- dual report",
         :event_date       => self.event_date,
         :user_id          => self.user_id,
         :event_time_zone  => self.event_time_zone,
@@ -412,7 +401,7 @@ class Submission < ActiveRecord::Base
       #SubmissionField.import columns, values, validate: false
 
       self.attachments.each do |x|
-        temp = SubmissionAttachment.new(
+        temp = Attachment.new(
           :name => x.name,
           :caption => x.caption)
         converted.attachments.push(temp)
@@ -422,7 +411,6 @@ class Submission < ActiveRecord::Base
     end
     converted
   end
-
 
 
 end

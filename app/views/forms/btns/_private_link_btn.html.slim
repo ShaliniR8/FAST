@@ -1,0 +1,19 @@
+- if BaseConfig.airline[:enable_shared_links] && \
+  (current_user.admin? || \
+  current_user.has_access(permission,'admin') || \
+  current_user.has_access(permission,'edit'))
+  = link_to 'Share',
+    '#',
+    class: 'btn btn-lightblue pull-right mr5 mb5',
+    id: 'private_link_btn',
+    'data-toggle' => 'modal',
+    'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $('#private_link_btn').on('click',function(){
+    $(".modal-content").html("");
+    $.get('#{eval("new_private_link_path")}?link=#{eval("request.url")}',function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });

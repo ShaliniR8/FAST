@@ -7,8 +7,7 @@ namespace :wbat_upload do
     username = "dkhtb964"
     password = "AiPa7uuC"
     current = Time.now - 1.month
-    current = Time.now
-    airline = BaseConfig::AIRPORT_INFO[:symbol]
+    airline = BaseConfig.airline[:code]
     desc "Uploading Mitre Export"
     @log = Logger.new("log/mitre_#{Rails.env}.log")
     @log.level = Logger::INFO

@@ -84,23 +84,7 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-12 col-md-12 col-lg-12"%>
-            <div class="panel clickable panel-default">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Attachments</b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row" id="attachments">
-                  <%@im.attachments.each do |att|%>
-                    <%=render "/records/existing_attachments_field",:f=>f,:attachment=>att%>
-                  <%end%>
-                </div>
-                <div class="pull-right"><%= link_to_add_fields "Add an attachment", f, :attachments%></div>
-              </div>
-            </div>
-          </div>
+          <%= render 'forms/attachments_form', f: f, owner: @im %>
           <div class="mt10">
             <%= f.submit "Save", class:"btn btn-success pull-right", disable_with: "Saving..."%>
             <%if action_name == "new"%>

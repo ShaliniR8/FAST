@@ -25,10 +25,9 @@ class MeetingsController < ApplicationController
   before_filter :check_group,:only=>[:show]
 
 
-
   def check_group
-    report=Meeting.find(params[:id]).becomes(Meeting)
-    if report.privileges.present?
+    report = Meeting.find(params[:id]).becomes(Meeting)
+    if (report.privileges.reject(&:blank?).present? rescue false)
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
           return true
@@ -42,26 +41,24 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def reopen
     @meeting = Meeting.find(params[:id]).becomes(Meeting)
     @meeting.status = "Open"
     @meeting.save
-    MeetingTransaction.create(:users_id=>current_user.id, :action=>"Reopen", :owner_id => @meeting.id, :stamp=>Time.now)
+    Transaction.build_for(
+      @meeting.id,
+      'Reopen',
+      current_user.id
+    )
     redirect_to meeting_path(@meeting)
   end
 
 
-
-
   def new_attachment
     @owner = Meeting.find(params[:id]).becomes(Meeting)
-    @attachment = MeetingAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
-
-
 
 
   def destroy
@@ -79,12 +76,12 @@ class MeetingsController < ApplicationController
       "Cancellation of Meeting ##{@meeting.get_id}")
 
     @meeting.reports.each do |x|
-      ReportTransaction.create(
-        :users_id => current_user.id,
-        :action => "Meeting Ready",
-        :content => "Meeting Deleted",
-        :owner_id => x.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        x,
+        'Meeting Ready',
+        current_user.id,
+        'Meeting Deleted'
+      )
       x.status = "Meeting Ready"
       x.records.each do |y|
         y.status = "Linked"
@@ -96,23 +93,17 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def comment
     @owner=Meeting.find(params[:id]).becomes(Meeting)
-    @comment=MeetingComment.new
-    render :partial=>"audits/viewer_comment"
+    @comment=@owner.comments.new
+    render :partial=>"forms/viewer_comment"
   end
-
-
 
 
   def set_table_name
     #Rails.logger.debug "#{controller_name}  #{action_name} set table!"
     @table_name="meetings"
   end
-
-
 
 
   def create
@@ -123,29 +114,29 @@ class MeetingsController < ApplicationController
     end
     if !params[:reports].blank?
       @meeting.save
-      params[:reports].each_pair do |index, value|
-        report = Report.find(value)
-        mr = ReportMeeting.new
-        mr.report=report
-        mr.meeting=@meeting
+      params[:reports].each_pair do |index, report_id|
+        report = Report.find(report_id)
+        Connection.create(owner: @meeting, child: report)
         report.status = "Under Review"
-        ReportTransaction.create(
-          :users_id=>current_user.id,
-          :action=>"Under Review",
-          :content=>"Add to Meeting ##{@meeting.id}",
-          :owner_id=>report.id,:stamp=>Time.now)
-        MeetingTransaction.create(
-          :users_id=>current_user.id,
-          :action=>"Added Event ##{report.get_id}",
-          :content=>"Event ##{report.get_id}",
-          :owner_id => @meeting.id,
-          :stamp=>Time.now)
-        mr.save
+        Transaction.build_for(
+          report,
+          'Under Review',
+          current_user.id,
+          "Add to Meeting ##{@meeting.id}"
+        )
+        Transaction.build_for(
+          @meeting,
+          "Added Event ##{report.get_id}",
+          current_user.id,
+          "Event ##{report.get_id}"
+        )
         report.save
       end
     end
     if @meeting.save
-      end_time = @meeting.review_end>@meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
+      @meeting.set_datetimez
+      @meeting.save
+      end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       send_notices(
         @meeting.invitations,
         "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
@@ -158,8 +149,6 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def new
     @privileges = Privilege.find(:all)
     @meeting = Meeting.new
@@ -168,11 +157,9 @@ class MeetingsController < ApplicationController
     @headers = User.invite_headers
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
-    @report_headers = Report.get_headers
-    @reports = Report.where("status = 'Meeting Ready'")
+    @report_headers = Report.get_meta_fields('form')
+    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
   end
-
-
 
 
   def show
@@ -189,33 +176,32 @@ class MeetingsController < ApplicationController
     end
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
-    @report_headers = Report.get_meta_fields('index')
+    @report_headers = Report.get_meta_fields('index', 'meeting')
     @reports = @meeting.reports.sort_by{|x| x.id}
     @users = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user == current_user && x.status == "Pending"}.first
   end
 
 
-
-
   def index
-    @records = Meeting.includes(:invitations, :host).where('meetings.type is null')
-    unless current_user.admin?
+    @table = Object.const_get("Meeting")
+    @headers = Meeting.get_meta_fields('index')
+    @title = 'Meetings'
+    @action = 'meeting'
+    @records = @table.includes(:invitations, :host).where('meetings.type is null')
+    unless current_user.has_access('meetings', 'admin', admin: true, strict: true )
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end
     @records.keep_if{|r| display_in_table(r)}
-    @headers = Meeting.get_headers
-    @title = 'Meetings'
-    @action = 'meeting'
   end
-
 
 
   def close
     @owner = Meeting.find(params[:id])
     render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
   end
+
 
   def override_status
     @owner = Meeting.find(params[:id]).becomes(Meeting)
@@ -224,28 +210,26 @@ class MeetingsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
-      params[:reports].each_pair do |index, value|
-        report = Report.find(value)
-        mr = ReportMeeting.new
-        mr.report = report
-        mr.meeting = @owner
+      params[:reports].each_pair do |index, report_id|
+        report = Report.find(report_id)
+        Connection.create(owner: @owner, child: report)
         report.status = "Under Review"
-        ReportTransaction.create(
-          :users_id => current_user.id,
-          :action => "Under Review",
-          :content => "Add to Meeting ##{@owner.id}",
-          :owner_id => report.id,
-          :stamp => Time.now)
-        MeetingTransaction.create(
-          :users_id => current_user.id,
-          :action => "Added Event ##{report.get_id}",
-          :content => "Event ##{report.get_id}",
-          :owner_id => @owner.id,
-          :stamp => Time.now)
-        mr.save
+        Transaction.build_for(
+          report,
+          'Under Review',
+          current_user.id,
+          "Add to Meeting ##{@owner.id}"
+        )
+        Transaction.build_for(
+          @owner,
+          "Added Event ##{report.get_id}",
+          current_user.id,
+          "Event ##{report.get_id}"
+        )
         report.save
       end
     end
@@ -259,6 +243,10 @@ class MeetingsController < ApplicationController
         "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
         true,
         "Meeting ##{@owner.get_id} Closed")
+    when 'Add Attachment'
+      transaction = false
+    when 'Save Agenda'
+      transaction_content = "Event ##{params[:event_id]}"
     end
 
     if params[:invitations].present?
@@ -286,12 +274,15 @@ class MeetingsController < ApplicationController
     end
 
     @owner.update_attributes(params[:meeting])
-    MeetingTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
+    @owner.set_datetimez
     @owner.save
     redirect_to meeting_path(@owner)
 
@@ -309,7 +300,8 @@ class MeetingsController < ApplicationController
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
     @timezones=Meeting.get_timezones
     @report_headers=Report.get_headers
-    @reports= @meeting.reports + Report.where("status = 'Meeting Ready'")
+    @associated_reports = @meeting.reports.map(&:id)
+    @reports= Report.where(status: ['Meeting Ready', 'Under Review'])
   end
 
 

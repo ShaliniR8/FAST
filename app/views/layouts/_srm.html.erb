@@ -1,18 +1,21 @@
-<li class="dropdown">
-  <a href="#" data-toggle="dropdown">SRA (SRM)<b class="caret"></b></a>
-  <ul class="dropdown-menu dropdown-notification" role="menu">
-    <%if current_user.has_access("sras","index")%>
-      <li><a href=<%=sras_path%>>All</a></li>
-    <%end%>
-    <%if current_user.has_access("sras","new")%>
-      <li><a href=<%=new_sra_path%>>New</a></li>
-    <%end%>
-  </ul>
-</li>
+<% sra_new = current_user.has_access('sras', 'new', admin: true) %>
+<% sra_index = current_user.has_access('sras', 'index', admin: true) %>
+<% if sra_new || sra_index %>
+  <li class="dropdown">
+    <a href="#" data-toggle="dropdown">SRA (SRM)<b class="caret"></b></a>
+    <ul class="dropdown-menu dropdown-notification" role="menu">
+      <% if sra_index %>
+        <li><a href=<%=sras_path%>>All</a></li>
+      <%end%>
+      <% if sra_new %>
+        <li><a href=<%=new_sra_path%>>New</a></li>
+      <%end%>
+    </ul>
+  </li>
+<%end%>
 
 
-
-<%if current_user.has_access("hazards","index")%>
+<%if current_user.has_access('hazards', 'index', admin: true) %>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Hazards<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
@@ -26,40 +29,49 @@
 
 
 
-<%if current_user.has_access("hazards","index")%>
+<%if current_user.has_access('risk_controls', 'index', admin: true) %>
   <li><a href=<%=risk_controls_path%>>Risk Controls</a></li>
 <%end%>
-<li class="dropdown">
-  <a href="#" data-toggle="dropdown">Safety Plans<b class="caret"></b></a>
-  <ul class="dropdown-menu dropdown-notification" role="menu">
-    <%if current_user.has_access("safety_plans","index")%>
-      <li><a href=<%=safety_plans_path%>>All</a></li>
-    <%end%>
-    <%if current_user.has_access("safety_plans","new")%>
-      <li><a href=<%=new_safety_plan_path%>>New</a></li>
-    <%end%>
-  </ul>
-</li>
+
+<% safety_plans_index = current_user.has_access('safety_plans', 'index', admin: true) %>
+<% safety_plans_new = current_user.has_access('safety_plans', 'new', admin: true) %>
+<% if safety_plans_index || safety_plans_new %>
+  <li class="dropdown">
+    <a href="#" data-toggle="dropdown">Safety Plans<b class="caret"></b></a>
+    <ul class="dropdown-menu dropdown-notification" role="menu">
+      <% if safety_plans_index %>
+        <li><a href=<%=safety_plans_path%>>All</a></li>
+      <%end%>
+      <% if safety_plans_new %>
+        <li><a href=<%= new_safety_plan_path %>>New</a></li>
+      <%end%>
+    </ul>
+  </li>
+<%end%>
+
+<% srm_meetings_index = current_user.has_access('srm_meetings', 'index', admin: true) %>
+<% srm_meetings_new = current_user.has_access('srm_meetings', 'new', admin: true) %>
+<% if srm_meetings_index || srm_meetings_new %>
+  <li class="dropdown">
+    <a href="#" data-toggle="dropdown">Meetings<b class="caret"></b></a>
+    <ul class="dropdown-menu dropdown-notification" role="menu">
+      <% if srm_meetings_index %>
+        <li><a href=<%=srm_meetings_path%>>All</a></li>
+      <%end%>
+      <% if srm_meetings_new %>
+        <li><a href=<%=new_srm_meeting_path%>>New</a></li>
+      <%end%>
+    </ul>
+  </li>
+<%end%>
 
 
-<li class="dropdown">
-  <a href="#" data-toggle="dropdown">Meetings<b class="caret"></b></a>
-  <ul class="dropdown-menu dropdown-notification" role="menu">
-    <%if current_user.has_access("srm_meetings","index")%>
-      <li><a href=<%=srm_meetings_path%>>All</a></li>
-    <%end%>
-    <%if current_user.has_access("srms_meetings","new")%>
-      <li><a href=<%=new_srm_meeting_path%>>New</a></li>
-    <%end%>
-  </ul>
-</li>
-
-
-
-<% if current_user.level == 'Admin' || current_user.has_access('home','query_all') %>
-  <li>
-    <%=link_to "Query Center",
-      query_all_home_index_path
-      %>
+<%if current_user.level == 'Admin' || current_user.has_access('home','query_all') %>
+  <li class="dropdown">
+    <a href="#" data-toggle="dropdown">Query Center<b class="caret"></b></a>
+    <ul class="dropdown-menu dropdown-notification" role="menu">
+      <li><%=link_to "All", queries_path%></li>
+      <li><%=link_to "New", new_query_path%></li>
+    </ul>
   </li>
 <%end%>

@@ -24,9 +24,4 @@ class EvaluationRequirement < Expectation
     })
   end
 
-
-  def transaction_log
-    EvaluationTransaction.create(:users_id=>session[:user_id], :action=>"Add Requirement", :content=>self.title, :owner_id=>self.owner_id, :stamp=>Time.now)
-    #InspectionTransaction.create(:users_id=>current_user.id,:action=>"Open",:owner_id=>inspection.id,:stamp=>Time.now)
-  end
 end

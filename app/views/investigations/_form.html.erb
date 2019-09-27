@@ -18,27 +18,26 @@
         </div>
       </div>
       <div class="panel-body" id="form_body">
-        <%=form_for @investigation ,:html => {:multipart => true} do |f|%>
+        <%=form_for @owner ,:html => {:multipart => true} do |f|%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
           <%end%>
-          <%if params[:record].present?%>
-            <%=f.hidden_field :record_id, :value => params[:record]%>
+          <%if params[:owner_id].present? && params[:owner_type].present? %>
+            <%=f.hidden_field :owner_id,   :value => params[:owner_id] %>
+            <%=f.hidden_field :owner_type, :value => params[:owner_type] %>
           <%end%>
-          <%=render "/shared/privilege_form", :target => "investigation[privileges][]", :owner => @investigation, :f => f%>
-          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @investigation %>
-          <%if BaseConfig.airline[:base_risk_matrix]%>
-            <%=render "shared/matrix", :f => f, :owner => @investigation%>
-          <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/matrix", :f => f%>
-          <%end%>
-          <%=render '/forms/attachments_form', :f => f, :owner => @investigation%>
+          <%=render "/shared/privilege_form", :target => "investigation[privileges][]", :owner => @owner, :f => f%>
+          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
+
+          <%=render "shared/choose_form_matrix", :f => f, :type => 'investigations', :owner => @owner%>
+
+          <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
           <div class="mt10 mr10">
             <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
               :class => "btn btn-success pull-right",
               :disable_with => "Saving..."%>
             <%=link_to "Cancel",
-              action_name == "edit" ? investigation_path(@investigation): @cancel_path,
+              action_name == "edit" ? investigation_path(@owner): @cancel_path,
               :id => "cancel-btn",
               :class => "mr5 btn btn-warning pull-right",
               :confirm => 'Are you sure?'%>
@@ -68,7 +67,7 @@
 
 <script>
   $(document).ready(function(){
-    $("#<%=@investigation.severity%>-<%=Investigation.get_likelihood.index(@investigation.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
+    $("#<%=@owner.severity%>-<%=Investigation.get_likelihood.index(@owner.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
     $('#sev').on('change',function(){
       reset_risk();
     });

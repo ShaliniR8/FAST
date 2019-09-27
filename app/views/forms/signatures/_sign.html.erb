@@ -1,0 +1,88 @@
+<div id="signing_modal" class="col-xs-12 col-lg-12"%>
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">
+        Sign <%="#{@owner.class.name.titleize} #{@owner.id}: #{@owner.title}"%>
+        <button type="button"
+          class="close pull-right exit_signing"
+          data-dismiss="modal"
+          aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row modal-content">
+        <div class="col-xs-12" style="display:inline-block">
+          <canvas id="signature-pad" class="signature-pad" style="width: 100%; text-align:center; touch-action: none; border:1px solid #000000;"></canvas>
+          <%= form_for @owner, html: {multipart: true} do |x| %>
+            <%= x.fields_for :signatures, @signature do |f| %>
+              <div class='form-group col-xs-6 signature_signee_name'>
+                <b>Full Name:</b><br>
+                <%= f.text_field :signee_name, {class: 'form-control mb10'} %>
+              </div>
+              <div class='form-group col-xs-6 signature_date'>
+                <b>Date Signed:</b><br>
+                <%=f.text_field :created_at,
+                  class: 'form-control emp',
+                  readonly: true,
+                  value: Time.now.strftime("%b %e, %Y") %>
+              </div>
+                <%=f.hidden_field :path %>
+                <%=f.hidden_field :user_id, value: current_user.id%>
+                <%=f.hidden_field :created_at, value: Time.now%>
+              <%=x.submit "Sign",
+                class: "btn btn-success mr10 pull-right",
+                id: "submit_signature",
+                disable_with: "Saving..."%>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var canvas;
+  var signaturePad;
+
+  function resizeCanvas() {
+    var temp_signature_url = signaturePad.toDataURL();
+    var ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = 150;
+    canvas.getContext("2d").scale(ratio,ratio);
+    signaturePad.clear();
+    signaturePad.fromDataURL(temp_signature_url);
+    $(window).resize();
+  };
+
+  function createCanvas() {
+    canvas = document.querySelector('canvas');
+    signaturePad = new SignaturePad(canvas, {
+      backgroundColor: "rgb(245,245,245)"
+    });
+    $(window).resize();
+    resizeCanvas();
+  };
+
+  $(document).ready(function() {
+    createCanvas();
+
+    window.addEventListener('resize', resizeCanvas);
+    $('.bs-example-modal-lg').on('shown.bs.modal',function(){createCanvas();});
+
+    document.getElementById('submit_signature').addEventListener('click', function(){
+      var dataUrl = signaturePad.toDataURL();
+      var dataImg = document.createElement('img');
+      dataImg.src = dataUrl;
+      var drawnSignature = document.createElement('div');
+      drawnSignature.innerHTML = "<input type='hidden' name='<%=@owner.class.name.underscore%>[signatures_attributes][0][path]' id='path' value='" + dataImg.src + "'>"
+      document.getElementById('<%=@owner.class.name.underscore%>_signatures_attributes_0_path').value = dataUrl;
+    });
+
+  })
+</script>
+

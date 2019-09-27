@@ -7,6 +7,8 @@ class AccessControl < ActiveRecord::Base
 
 
   after_create :set_viewer_access
+  after_create :update_rules_config
+  after_destroy :update_rules_config
   validates :action, presence: true, allow_blank: false
   validates :entry, presence: true, allow_blank: false
 
@@ -96,6 +98,7 @@ class AccessControl < ActiveRecord::Base
         "show"                => generate_desc("Submission", "show"),
         "destroy"             => generate_desc("Submission", "destroy"),
         "index"               => generate_desc("Submission", "index"),
+        "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from access any previous submissions.",
       },
 
       "records"=>{
@@ -230,7 +233,6 @@ class AccessControl < ActiveRecord::Base
 
       'risk_controls'=>{
         "new"                 => generate_desc("Risk Control", "new"),
-        "new"                 => generate_desc("Risk Control", "new"),
         "show"                => generate_desc("Risk Control", "show"),
         "edit"                => generate_desc("Risk Control", "edit"),
         "destroy"             => generate_desc("Risk Control", "destroy"),
@@ -240,7 +242,6 @@ class AccessControl < ActiveRecord::Base
 
       'safety_plans'=>{
         "new"                 => generate_desc("Safety Plan", "new"),
-        "new"                 => generate_desc("Safety Plan", "new"),
         "show"                => generate_desc("Safety Plan", "show"),
         "edit"                => generate_desc("Safety Plan", "edit"),
         "destroy"             => generate_desc("Safety Plan", "destroy"),
@@ -249,7 +250,6 @@ class AccessControl < ActiveRecord::Base
       },
 
       'srm_meetings'=>{
-        "new"                 => generate_desc("SRM Meeting", "new"),
         "new"                 => generate_desc("SRM Meeting", "new"),
         "show"                => generate_desc("SRM Meeting", "show"),
         "edit"                => generate_desc("SRM Meeting", "edit"),
@@ -318,7 +318,9 @@ class AccessControl < ActiveRecord::Base
         "New"=>"new",
         "View"=>"show",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Shared"=>"shared",
+        "Admin"=>"admin"
       },
       "records"=>{
         "View Summary" => "summary",
@@ -329,13 +331,15 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Query"=>"query",
         "De-Identified" => "deid",
+        "Admin"=>"admin"
       },
       "reports"=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "trackings"=>{
         "New"=>"new",
@@ -349,14 +353,16 @@ class AccessControl < ActiveRecord::Base
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        "Listing"=>"index"
+        "Listing"=>"index",
+        "Admin"=>"admin"
       },
       "faa_reports"=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Listing"=>"index",
-        "Safety Enhancement"=>"enhance"
+        "Safety Enhancement"=>"enhance",
+        "Admin"=>"admin"
       },
       "corrective_actions"=>{
         "New"=>"new",
@@ -450,7 +456,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'risk_controls'=>{
         "New"=>"new",
@@ -467,7 +474,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'srm_meetings'=>{
         "New"=>"new",
@@ -475,7 +483,8 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
       },
       'ims'=>{
         "New"=>"new",
@@ -483,22 +492,26 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"},
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
+      },
       'packages'=>{
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"},
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
+      },
       'sms_meetings'=>{
-
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Viewer"=>"viewer"
+        "Viewer"=>"viewer",
+        "Admin"=>"admin"
        },
        'ASAP'=>{
         'Module'=>'module'
@@ -534,9 +547,11 @@ class AccessControl < ActiveRecord::Base
       'Submitter'           => 'submitter',
       'Safety Enhancement'  => 'enhance',
       'Summary'             => 'summary',
+      'Module'              => 'module',
       'Tabulation'          => 'tabulation',
       'Access'              => 'query_all',
       'Admin'               => 'admin',
+      'Shared'              => 'shared'
     }
   end
 
@@ -652,7 +667,15 @@ class AccessControl < ActiveRecord::Base
     end
   end
 
-
+  def update_rules_config
+    restricting_rules = Hash.new{ |h, k| h[k] = [] }
+    AccessControl.all.each do |acs|
+      restricting_rules[acs.entry] << acs.action
+    end
+    restricting_rules.update(restricting_rules) { |key, val| val.uniq }
+    Rails.application.config.restricting_rules = restricting_rules
+    Rails.logger.info "[INFO] Access Rules have been updated- restricting_rules application config updated"
+  end
 
   def self.get_headers
     [

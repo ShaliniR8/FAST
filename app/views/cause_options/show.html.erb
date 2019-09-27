@@ -8,22 +8,27 @@
   <div class="grid per90 center-block">
     <%=render "shared/alerts"%>
     <%=render "access_controls/new_modal"%>
-    <div class="panel panel-primary">
+    <div class="panel panel-steelblue">
       <div class="panel-heading" style="overflow-wrap: break-word; word-wrap: break-word; hyphen: auto">
         <div class="panel-title">
           <div class="top_text">
-            <b><%=@record.name%></b><span class="pull-right clickable"></span>
+            <span class="pull-right clickable"></span>
+            <b><%=@record.name%></b>
           </div>
           <div class="top_buttons pull-right">
             <%=link_to "Export to Excel", download_cause_option_path(@record) + ".xls", :method => :get, :class => "btn btn-info"%>
             <%=link_to "Edit", edit_cause_option_path(@record), :class => "btn btn-warning", :disable_with => "Editing..."%>
-            <%=link_to "Add Sub Category", "#", :class => "btn btn-success top_add_btn", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"%>
+            <%=link_to "Add Sub Category",
+              '#',
+              :class => "btn btn-success top_add_btn",
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
           </div>
         </div>
       </div>
 
       <div class="panel-body">
-        <div class="alert alert-warning" role="alert">
+        <div class="col-xs-12 alert alert-warning" role="alert">
           Please note that <b>editing</b> existing categories and options will affect the root causes that have been added to hazards. If there are changes made to the list of options or categories, it is suggested to <b>archive the old options first and then add new ones</b>. </br></br>
           Please note that <b>archiving</b> a category will also archive all of its nested sub-categories, use this with caution.
         </div>
@@ -54,9 +59,6 @@
     min-height: 8!important;
     max-height: 8!important;
   }
-  .just-padding {
-    padding: 5px;
-  }
   .list-group.list-group-root {
     font-weight: bold;
     padding: 0;
@@ -82,9 +84,9 @@
   .list-group-item .glyphicon {
     margin-right: 5px;
   }
-  .btn{
+/*  .btn{
     display: inline!important;
-  }
+  }*/
 </style>
 
 
@@ -98,7 +100,6 @@
       });
     });
   });
-
 </script>
 
 

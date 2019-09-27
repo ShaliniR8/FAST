@@ -47,7 +47,12 @@ class SmsMeetingsController < ApplicationController
       true,
       "Cancellation of Meeting ##{@meeting.get_id}")
     @meeting.packages.each do |x|
-      PackageTransaction.create(:users_id=>current_user.id, :action=>"Open", :content=>"Meeting Deleted", :owner_id=>x.id, :stamp=>Time.now)
+      Transaction.build_for(
+        x,
+        'Open',
+        current_user.id,
+        'Meeting Deleted'
+      )
       x.status = "Open"
       x.meeting_id = nil
       x.save
@@ -172,7 +177,11 @@ class SmsMeetingsController < ApplicationController
 
   def close
     meeting=Meeting.find(params[:id])
-    MeetingTransaction.create(:users_id=>current_user.id,:action=>"Close",:owner_id=>meeting.id,:stamp=>Time.now)
+    Transaction.build_for(
+      meeting,
+      'Close',
+      current_user.id
+    )
     meeting.status="Closed"
     meeting.closing_date = Time.now
     if meeting.save
@@ -238,7 +247,11 @@ class SmsMeetingsController < ApplicationController
     end
 
     if @meeting.previous_changes.present?
-      MeetingTransaction.create(:users_id=>current_user.id,:action=>"Edit",:owner_id=>params[:id],:stamp=>Time.now)
+      Transaction.build_for(
+        meeting,
+        'Edit',
+        current_user.id
+      )
     end
     redirect_to sms_meeting_path(@meeting), flash: {success: "Meeting updated."}
   end

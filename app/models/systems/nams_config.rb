@@ -1,11 +1,17 @@
 class NAMS_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
+
+  MOBILE_MODULES = ['ASAP']
 
   def self.airline_config
     {
-      :version                                        => "1.0.3",
-
-      :code                                           => "NAMS",
+      :version                                        => '1.1.1',
+      :code                                           => 'NAMS',
+      :name                                           => 'Northern Air Cargo',
       :base_risk_matrix                               => false,
       :event_summary                                  => false,
       :event_tabulation                               => false,
@@ -14,10 +20,11 @@ class NAMS_Config
       :has_verification                               => false,
       :has_mobile_app                                 => true,
       :enable_mailer                                  => true,
-
+      :time_zone                                      => 'Alaska',
 
 
       # Safety Reporting Module
+      :show_submitter_name                            => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => false,
@@ -29,12 +36,20 @@ class NAMS_Config
       :allow_reopen_report                            => false,
       :has_root_causes                                => false,
       :enable_recurrence                              => false,
+      :enable_shared_links                            => false,
 
 
       # SMS IM Module
       :has_framework                                  => false,
     }
   end
+
+  MOBILE_KEY = {
+    key_name: airline_config[:name],
+    portals: [
+      { label: 'General', subdomain: 'nams' },
+    ]
+  }
 
 
   OBSERVATION_PHASES = ["Observation Phase", "Condition", "Threat", "Error", "Human Factor", "Comment"]

@@ -38,6 +38,7 @@ class HazardsController < ApplicationController
 
   def show
     @hazard = Hazard.find(params[:id])
+    @i18nbase = 'srm.hazard'
     @root_cause_headers = HazardRootCause.get_headers
     load_options
     @fields = Hazard.get_meta_fields('show')
@@ -51,7 +52,7 @@ class HazardsController < ApplicationController
     @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     load_options
     @fields = Hazard.get_meta_fields('form')
-    form_special_matrix(@hazard, "hazard", "severity_extra", "probability_extra")
+    load_special_matrix_form("hazard", "baseline", @hazard)
   end
 
 
@@ -67,28 +68,33 @@ class HazardsController < ApplicationController
 
   def edit
     @hazard = Hazard.find(params[:id])
+    @owner = @hazard
     load_options
     @fields = Hazard.get_meta_fields('form')
-    form_special_matrix(@hazard, "hazard", "severity_extra", "probability_extra")
+    load_special_matrix_form("hazard", "baseline", @hazard)
   end
 
 
 
 
   def update
+    transaction = true
     @owner = Hazard.find(params[:id])
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
     @owner.update_attributes(params[:hazard])
-    HazardTransaction.create(
-        users_id:   current_user.id,
-        action:     params[:commit],
-        owner_id:   @owner.id,
-        stamp:      Time.now,
-        content:    transaction_content
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
       )
+    end
     redirect_to hazard_path(@owner)
   end
 
@@ -98,7 +104,11 @@ class HazardsController < ApplicationController
     hazard = Hazard.find(params[:id])
     hazard.status = params[:status]
     hazard.close_date = Time.now
-    HazardTransaction.create(:users_id => current_user.id, :action => params[:status], :owner_id => params[:id], :stamp => Time.now)
+    Transaction.build_for(
+      hazard,
+      params[:status],
+      current_user.id,
+    )
     hazard.save
     redirect_to hazard_path(hazard)
   end
@@ -139,98 +149,14 @@ class HazardsController < ApplicationController
   end
 
 
-
   def new_attachment
     @owner=Hazard.find(params[:id])
-    @attachment=HazardAttachment.new
+    @attachment=Attachment.new
     render :partial=>"shared/attachment_modal"
   end
 
 
-
-  def new_root_cause
-    @hazard = Hazard.find(params[:id])
-    @root = CauseOption.find(1)
-    @categories = @root.children.keep_if{|x| !x.hidden?}
-    render :partial => "/root_causes/new_root_cause"
-  end
-
-
-
-  def new_root_cause2(first_id=nil, second_id=nil)
-    @owner = Hazard.find(params[:owner_id])
-    @root = CauseOption.find(1)
-    @categories = @root.children.keep_if{|x| !x.hidden?}
-    respond_to do |format|
-      format.js {render "/root_causes/new_root_cause2", layout: false, :locals => {:first_id => first_id, :second_id => second_id} }
-    end
-  end
-
-
-
-  def add_root_cause
-    @owner = Hazard.find(params[:owner_id])
-    if params[:root_causes].present?
-      if params[:root_causes][:cause_option_id].present?
-        root_cause = HazardRootCause.create(
-          :owner_id => @owner.id,
-          :user_id  => current_user.id,
-          :cause_option_id => params[:root_causes][:cause_option_id],
-          :cause_option_value => params[:root_causes][:cause_option_value])
-        ancestors = root_cause.cause_option.ancestors
-        first_id = ancestors[1].id
-        second_id = ancestors[2].id
-      end
-    end
-    first_id ||= nil
-    second_id ||= nil
-    new_root_cause2(first_id, second_id)
-  end
-
-
-
-  def reload_root_causes
-    @hazard = Hazard.find(params[:id])
-    @root_cause_headers = HazardRootCause.get_headers
-    render :partial => "/root_causes/root_causes_table",
-      :locals => {
-        :headers => HazardRootCause.get_headers,
-        :owner => @hazard,
-        :show_btns => true}
-  end
-
-
-
-  def retract_root_cause_categories
-    second_id = params[:second_id] if params[:second_id]
-    @cause_option = CauseOption.find(params[:category])
-    @categories = @cause_option.children.keep_if{|x| !x.hidden?}.sort_by{|x| x.name}
-    render_category = false
-    @categories.each do |x|
-      if x.children.length > 0
-        render_category = true
-      end
-    end
-    if render_category
-      if params[:category_only]
-        ancestor_ids = params[:ancestor_ids].present? ? params[:ancestor_ids].split(",").map(&:to_i) : []
-        render :partial => "/root_causes/select_category_in_trending", :locals => {:ancestor_ids => ancestor_ids}
-      else
-        render :partial => "/root_causes/new_root_cause_categories", :locals => {:second_id => second_id}
-      end
-    else
-      if params[:category_only]
-        false
-      else
-        @has_option = @categories.length > 0
-        render :partial => "/root_causes/new_root_cause_value"
-      end
-    end
-  end
-
-
   # Following are functions related to trending the root causes.
-
   def root_cause_trend
     @records = Hazard.find(:all)
     if params[:start_date].present?
@@ -257,14 +183,14 @@ class HazardsController < ApplicationController
         .where(owner_id: @records.map(&:id))
         .keep_if{|x| x.cause_option.ancestors.map(&:id).include?(@root.id)}
         .group_by{|x| (x.cause_option.ancestors.map(&:id) & @root.children.map(&:id)).first}
-        .map {|x, xs| [CauseOption.find(x), xs.length] }
+        .map {|x, xs| [CauseOption.find(x), xs.map{|c| c.hazard}.uniq.length] }
         .to_h.sort_by{|k, v| v}.reverse!
     else
       @root_causes = HazardRootCause
         .includes(:cause_option)
         .where(owner_id: @records.map(&:id))
         .group_by(&:cause_option_id)
-        .map {|x, xs| [CauseOption.find(x), xs.length] }
+        .map {|x, xs| [CauseOption.find(x), xs.map{|c| c.hazard}.uniq.length] }
         .to_h.sort_by{|k, v| v}.reverse!
     end
   end
@@ -289,7 +215,7 @@ class HazardsController < ApplicationController
     puts "#{CauseOption.find(cause_option_id).children.map(&:id)}"
     @records = RootCause
       .where(:cause_option_id => CauseOption.find(cause_option_id).descendants.map(&:id))
-      .map{|x| x.hazard}.uniq{|x| x.id}
+      .map{|x| x.owner}.uniq{|x| x.id}
     if params[:start_date].present?
       @start_date = Date.parse(params[:start_date])
       @records.keep_if{|x| x.created_at >= @start_date}
@@ -315,13 +241,17 @@ class HazardsController < ApplicationController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
+  def comment
+    @owner = Hazard.find(params[:id])
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
+  end
 
 
   def mitigate
     @owner=Hazard.find(params[:id])
     load_options
-    mitigate_special_matrix("hazard", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form("hazard", "mitigate", @owner)
     if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/mitigate"
     else
@@ -334,7 +264,7 @@ class HazardsController < ApplicationController
   def baseline
     @owner=Hazard.find(params[:id])
     load_options
-    form_special_matrix(@owner, "hazard", "severity_extra", "probability_extra")
+    load_special_matrix_form("hazard", "baseline", @owner)
     if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
       render :partial=>"shared/baseline"
     else

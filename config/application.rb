@@ -29,8 +29,11 @@ module PrdgSession
    config.time_zone = 'Eastern Time (US & Canada)'
 
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-  # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-  # config.i18n.default_locale = :de
+  config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+  config.i18n.locale = :default
+  config.i18n.fallbacks = [:default, :en]
+  I18n.enforce_available_locales = false
+
 
   # JavaScript files you want as :defaults (application.js is always included).
   # config.action_view.javascript_expansions[:defaults] = %w(jquery rails)
@@ -44,7 +47,7 @@ module PrdgSession
   config.filter_parameters += [:password, :pw, :base64]
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.default_url_options = { :host => 'tmc.prosafet.com' }
+  config.action_mailer.default_url_options = { :host => 'bsk.prosafet.com' }
   config.action_mailer.smtp_settings = {
     address: 'smtp.1and1.com',
     port: 587,

@@ -85,6 +85,32 @@ module ApplicationHelper
     special_matrix
   end
 
+  def load_special_matrix_form(target_name, risk_type, target=nil)
+    @target = target
+    @target_name = target_name
+    case risk_type
+    when 'mitigate'
+      @severity_field = "mitigated_severity"
+      @probability_field = "mitigated_probability"
+    when 'baseline'
+      @severity_field = "severity_extra"
+      @probability_field = "probability_extra"
+    end
+    special_matrix
+  end
+
+  def choose_load_special_matrix_form(target, risk_type)
+    airline_config = Object.const_get("#{BaseConfig.airline_code}_Config")
+    if defined?(airline_config::RISK_ARRAY)
+      if (airline_config::RISK_ARRAY[risk_type.pluralize.to_sym][:form].present?)
+        form_type = airline_config::RISK_ARRAY[risk_type.pluralize.to_sym][:form]
+        load_special_matrix_form(risk_type, form_type, target)
+      end
+    else
+      load_special_matrix_form(risk_type, 'baseline', target)
+    end
+  end
+
   def load_special_matrix(target)
     @target = target
     special_matrix
@@ -92,6 +118,8 @@ module ApplicationHelper
 
   def print_special_matrix(target)
     load_special_matrix(target)
+
+    @notes = target.statement
 
     @severity_score = calculate_severity(target.severity_extra)
     @sub_severity_score = calculate_severity(target.mitigated_severity)
@@ -363,7 +391,10 @@ module ApplicationHelper
     return ''
   end
 
-
+  def load_objects(module_name)
+    @types = BaseConfig::MODULES[module_name][:objects].invert
+    @types
+  end
 
 
   def date_to_string(date)
@@ -371,14 +402,44 @@ module ApplicationHelper
   end
 
 
-
   def datetime_to_string(datetime)
     datetime.strftime(BaseConfig.getTimeFormat[:datetimeformat]) rescue ''
   end
+
+
+  def datetimez_to_string(datetime)
+    datetime.in_time_zone(BaseConfig.airline[:time_zone]).strftime(BaseConfig.getTimeFormat[:datetimezformat]) rescue ''
+  end
+
 
   def latest_android_version
     android_version_uri = URI('https://demo.prosafet.com/api/version.json')
     android_version_json = JSON.parse Net::HTTP.get(android_version_uri)
     android_version_json['version']
   end
+
+
+  def define_session_permissions
+    user = User.find(session[:simulated_id] || session[:user_id])
+    accesses = Hash.new{ |h, k| h[k] = [] }
+    user.privileges.includes(:access_controls).map{ |priv|
+      priv.access_controls.each do |acs|
+        accesses[acs.entry] << acs.action
+      end
+    }
+    accesses.update(accesses) { |key, val| val.uniq }
+    session[:permissions] = accesses.to_json
+  end
+
+  def module_display_to_mode module_display
+    mode, val = BaseConfig::MODULES.select{|k, hash| hash[:display_name] == module_display}.first
+    mode
+  end
+
+  # used in mobile concerns, assumes that each element of the array has an id
+  def array_to_id_map(*args)
+    array, key = args
+    array.reduce({}) { |id_map, element| id_map.merge({ element[key || 'id'] => element }) }
+  end
+
 end

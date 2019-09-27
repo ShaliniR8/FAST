@@ -88,6 +88,8 @@
                       <%=date_to_string(field_value)%>
                     <%when "datetime"%>
                       <%=datetime_to_string(field_value)%>
+                    <%when 'datetimez'%>
+                      <%=datetimez_to_string(field_value)%>
                     <%when "checkbox"%>
                       <%=field_value%>
                     <%when "user"%>

@@ -18,13 +18,14 @@
 module ControllerAuthentication
 
   def self.included(controller)
-    controller.send :helper_method, :current_user, :logged_in?, :redirect_to_target_or_default
+    controller.send :helper_method, :current_user, :logged_in?, :redirect_to_target_or_default, :redirect_back_or_default
   end
 
+
   def current_user
-    # Rails.logger.info("CURRENT USER_ID BEGIN")
-  #   Rails.logger.info(session[:user_id])
-  #   Rails.logger.info("CURRENT USER_ID END")
+    # Rails.logger.debug("CURRENT USER_ID BEGIN")
+    # Rails.logger.debug(session.inspect)
+    # Rails.logger.debug("CURRENT USER_ID END")
     begin
       if defined?(current_token) && current_token != nil
         user = current_token.user
@@ -32,24 +33,27 @@ module ControllerAuthentication
         @current_user = user
       elsif session[:simulated_id]
         @current_user ||= User.find(session[:simulated_id]) if session[:user_id]
-      else
+      elsif session[:user_id]
         @current_user ||= User.find(session[:user_id]) if session[:user_id]
+      elsif session[:digest]
+        @current_user = User.new(:username => session[:digest].name, :email => session[:digest].email)
       end
     rescue ActiveRecord::RecordNotFound => e
       @current_user = nil
     end
   end
 
+
+
   #Kaushik Mahorker OAuth
   #Checks to see if request was made using OAuth
   #if so it sets current_user to the matching user based on the access_token parameter
   #else use standard login method
   def oauth_load
-    Rails.logger.info("CURRENT TOKEN BEGIN")
-    Rails.logger.info(current_token.inspect)
-    Rails.logger.info("CURRENT TOKEN END")
     if current_token != nil
       @current_user = current_token.user
+      session[:platform] = Transaction::PLATFORMS[:mobile]
+      define_session_permissions
     else
       login_required
     end
@@ -72,7 +76,6 @@ module ControllerAuthentication
 
 
   def login_required
-    puts "Login required"
     unless logged_in?
       store_target_location
       redirect_to login_url, :alert => "You need to log in first to access this page."
@@ -96,6 +99,10 @@ module ControllerAuthentication
     end
   end
 
+  def redirect_back_or_default(default)
+    redirect_to(session[:return_to] || default)
+  end
+
 
 
   private
@@ -104,4 +111,9 @@ module ControllerAuthentication
   def store_target_location
     session[:return_to] = request.url
   end
+
+  def store_location
+    session[:return_to] = request.fullpath if request.get? and controller_name != "user_sessions" and controller_name != "sessions"
+  end
+
 end

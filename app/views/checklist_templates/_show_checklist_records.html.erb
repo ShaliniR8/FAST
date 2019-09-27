@@ -75,4 +75,12 @@
       $(window).trigger("resize");
     });
   });
+
+  $("#select_checklist_btn").on('click', function(){
+    $.get("<%=select_checklist_checklist_templates_path%>?owner_class=<%=@owner.class.name%>&owner_id=<%=@owner.id%>",
+      function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });
 </script>

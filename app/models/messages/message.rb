@@ -1,11 +1,17 @@
 class Message < ActiveRecord::Base
-  belongs_to :response, foreign_key: "response_id", class_name: "Message"
-  has_many :dialogs, foreign_key: "response_id", class_name: "Message"
-  has_one :send_from, foreign_key: "messages_id", class_name: "SendFrom"
-  has_many :send_to, foreign_key: "messages_id", class_name: "SendTo"
-  has_many :cc, foreign_key: "messages_id", class_name: "CC"
-  has_many :attachments, foreign_key: "owner_id",class_name: "MessageAttachment"
-  accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
+
+#Concerns List
+  include Attachmentable
+
+#Associations List
+  belongs_to :owner,  polymorphic: true
+  belongs_to :response,          foreign_key: "response_id",         class_name: "Message"
+  has_many :dialogs,             foreign_key: "response_id",         class_name: "Message"
+
+  has_one :send_from,            foreign_key: "messages_id",         class_name: "SendFrom"
+  has_many :send_to,             foreign_key: "messages_id",         class_name: "SendTo"
+  has_many :cc,                  foreign_key: "messages_id",         class_name: "CC"
+
 
   def getAll(att)
     if att == "send_from"
@@ -14,7 +20,6 @@ class Message < ActiveRecord::Base
       self.send(att).map{|x| x.getName}.join(", ")
     end
   end
-
 
 
   def getDialogs
@@ -31,7 +36,6 @@ class Message < ActiveRecord::Base
   end
 
 
-
   def getPrev
     result = [self]
     if self.response.present?
@@ -40,7 +44,6 @@ class Message < ActiveRecord::Base
       result.sort_by!{|x| x.id}
     end
   end
-
 
 
   def get_time

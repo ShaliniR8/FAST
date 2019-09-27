@@ -20,32 +20,29 @@
       </div>
       <div class="panel-body">
 
-        <%=form_for @corrective_action.becomes(SmsAction), :html => {:multipart => true} do |f|%>
+        <%=form_for @owner.becomes(SmsAction), :html => {:multipart => true} do |f|%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
           <%end%>
           <%if params[:owner_type].present?%>
-            <%=hidden_field_tag :owner_type, params[:owner_type]%>
-            <%=f.hidden_field :owner_id, :value => params[:owner_id]%>
+            <%=f.hidden_field :owner_type, value: params[:owner_type]%>
+            <%=f.hidden_field :owner_id, value: params[:owner_id]%>
           <%end%>
 
-          <%=render "shared/privilege_form",:target => "sms_action[privileges][]",:owner => @corrective_action,:f => f%>
-          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @corrective_action %>
+          <%=render "shared/privilege_form",:target => "sms_action[privileges][]",:owner => @owner,:f => f%>
+          
+          <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
 
-          <%if BaseConfig.airline[:base_risk_matrix]%>
-            <%=render "shared/matrix", :f => f, :owner => @corrective_action %>
-          <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/matrix", :f => f %>
-          <%end%>
+          <%=render "shared/choose_form_matrix", :f => f, :type => 'sms_actions'%>
 
-          <%=render '/forms/attachments_form', :f => f, :owner => @corrective_action%>
+          <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
 
           <div class="mt10 mr10">
             <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
               :class => "btn btn-success pull-right mt5 mr5",
               disable_with: "Saving..."%>
             <%=link_to "Cancel",
-              @owner.present? ? @owner : @corrective_action.becomes(SmsAction),
+              @parent.present? ? @parent : @owner.becomes(SmsAction),
               :class=>"btn btn-warning pull-right mr5 mt5",
               :confirm=>'Are you sure?'%>
             <%=link_to "Group Access",

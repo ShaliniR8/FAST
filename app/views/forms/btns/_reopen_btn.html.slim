@@ -1,0 +1,5 @@
+- if owner.status == 'Completed' && \
+  (!owner.respond_to?('can_reopen?') || owner.can_reopen?(current_user))
+  = link_to 'Reopen',
+    eval("reopen_#{owner_class}_path(owner)"),
+    class: 'btn btn-success pull-right mr5 mb5'

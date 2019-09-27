@@ -22,6 +22,7 @@
                   *If no privileges are selected, all privileges will be granted access in case no user can access it.
                 </span>
               </p>
+              <div style="display:none"><%=check_box_tag target, "", :class => "form-control"%></div>
               <%@privileges.each do |p|%>
                 <div class="form-group form-inline col-xs-4">
                   <%=check_box_tag target,
@@ -48,11 +49,11 @@
 <script>
   function checkall()
   {
-    $('.privilege').prop("checked",  "checked");
+    $('.privilege').attr("checked",  true);
   }
   function uncheckall()
   {
-    $('.privilege').prop("checked",false);
+    $('.privilege').attr("checked", false);
   }
 
   $(document).ready(function(){

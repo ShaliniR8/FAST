@@ -38,7 +38,7 @@ class UpdateIdColumnNamesAddCreatedByIdColumn < ActiveRecord::Migration
   end
 
   def self.down
-
+    
     #Safety Reporting Changes Revert
     rename_column :corrective_actions, :responsible_user_id, :users_id
     rename_column :corrective_actions, :approver_id, :final_approver_id
@@ -74,6 +74,5 @@ class UpdateIdColumnNamesAddCreatedByIdColumn < ActiveRecord::Migration
     remove_column :sms_actions, :created_by_id, :integer
     remove_column :findings, :created_by_id, :integer
     remove_column :recommendations, :created_by_id, :integer
-
   end
 end

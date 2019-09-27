@@ -1,0 +1,20 @@
+- if owner.status == 'New' && \
+  (owner.approver == current_user || \
+  current_user.admin? || \
+  (!owner.respond_to?('created_by') || owner.created_by == current_user) || \
+  current_user.has_access(permission,'admin')) && \
+  (!owner.respond_to?('can_assign?') || owner.can_assign?(current_user))
+    = link_to 'Assign',
+      '#',
+      class: 'btn btn-warning pull-right mr5 mb6',
+      id: 'assign_btn',
+      'data-toggle' => 'modal',
+      'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $('#assign_btn').on('click',function(){
+    $.get('#{eval("assign_#{owner_class}_path(owner)")}', function(data){
+      $('.modal-content').html(data);
+      $(window).trigger('resize');
+    });
+  });

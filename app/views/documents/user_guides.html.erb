@@ -1,0 +1,127 @@
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          User Guides
+        </div>
+      </div>
+
+      <div class="panel-body">
+
+        <div class="col-xs-4">
+          <h3><b>Table of Contents</b></h3>
+          <div class="sidenav" style="overflow-y:scroll;height:600px;">
+            <ol>
+              <%Document.get_user_guides.each do |x|%>
+                <li><a class="<%=x[:class]%>" href="<%=x[:href]%>"><%=x[:name]%></a></li>
+                <ol type="a">
+                  <%x[:topics].each do |y|%>
+                    <li>
+                      <a class="<%=y[:class]%>"
+                        href="<%=y[:href]%>"
+                        data-content="<%=y[:content]%>">
+                        <%=y[:name]%>
+                      </a>
+                    </li>
+                  <%end%>
+                </ol>
+              <%end%>
+            </ol>
+          </div>
+        </div>
+
+        <div class="col-xs-8">
+          <div class="main">
+            <div id="user_guide_content">
+              <%=render "documents/user_guides/template", :topic_name => @topic_name, :href => @href%>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .sidenav li {
+    font-weight: normal !important;
+  }
+  .sidenav a{
+    color: darkslategray;
+  }
+  .sidenav a:hover {
+    font-weight: bold;
+    color: darkslategray !important
+  }
+  .sidenav {
+    width: 100%;
+    z-index: 1;
+    top: 20px;
+    left: 10px;
+    background: #eee;
+    overflow-x: hidden;
+    padding: 8px 0;
+  }
+  .sidenav a {
+    padding: 3px 3px 3px 3px;
+    text-decoration: none;
+    display: block;
+  }
+  .sidenav .title{
+    font-size: 16px;
+  }
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  }
+  .embolden {
+    color: darkslategray !important;
+    font-weight: bold;
+  }
+  .position-right{
+    float: right;
+  }
+</style>
+
+
+<script>
+  $(function(){
+    $(".tv").append("<i class='glyphicon glyphicon-expand position-right'></i>");
+    $(".doc").append("<i class='glyphicon glyphicon-file position-right'></i>");
+
+    var addclass = 'embolden';
+    var $category = $('.sidenav a').click(function(e) {
+      $category.removeClass(addclass);
+      $(this).addClass(addclass);
+    });
+
+    $(document).on("click", ".sidenav a", function(e){
+      e.preventDefault();
+      var href = $(this).attr("href");
+      var name = $(this).text();
+      var content = $(this).data('content');
+      if (href != undefined){
+        $.get("<%=load_content_documents_path%>?" +
+          "topic_name=" + name +
+          "&href=" + href +
+          "&content=" + content, function(data){
+          $("#user_guide_content").html(data);
+        });
+      }else{
+        $("#user_guide_content").html("");
+      }
+    });
+
+  });
+
+</script>
+
+
+
+
+
+

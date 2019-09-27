@@ -8,42 +8,21 @@
         </span>
       </div>
     </div>
-    <div class="panel-body" style="display:none" >
+    <div class="panel-body" style="display:none">
       <div class="row" id="fields" style="word-wrap: break-word">
-        <%all_submission_fields = @record
-          .submission_fields
-          .map{|sf| [sf.fields_id, sf] }.to_h%>
+        <%all_submission_fields = @record.submission_fields.map{|sf| [sf.fields_id, sf]}.to_h%>
         <%@cat.fields.each do |field|%>
-          <%sub_field = all_submission_fields[field.id]%>
-
-          <%if sub_field.present? && sub_field.value.present?%>
-            <%size = "col-xs-" + field.display_size.to_s%>
-            <div class="<%=size%>">
-              <b><%=field.label.html_safe%>: </b>
-              <%value = sub_field.present? ? sub_field.value : ""%>
-
-              <%if (field.display_type == "checkbox" || field.display_type == "radio")%>
-                <%value.split(";").each do |x|%>
-                  <div class="col-xs-12">
-                    <span class="glyphicon glyphicon-check" aria-hidden="true"></span> <%=x%>
-                  </div>
+          <%if field.nested_field_id.nil?%>
+            <%sub_field = all_submission_fields[field.id]%>
+            <%=render "display_field", :field => field, :sub_field => sub_field%>
+            <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
+              <div class="col-xs-12">
+                <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
+                  <%sn_field = all_submission_fields[nest_field.id]%>
+                  <%=render "display_field", :field => nest_field, :sub_field => sn_field%>
                 <%end%>
-
-              <%elsif field.display_type == "textarea"%>
-                </br><%=value.gsub(/\n/, '<br/>').html_safe%>
-
-              <%elsif field.display_type == "employee"%>
-                <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                  <%=User.find(value).full_name%>
-                <%else%>
-                  <%=value%>
-                <%end%>
-
-              <%else%>
-                <%=value%>
-              <%end%>
-
-            </div>
+              </div>
+            <%end%>
           <%end%>
         <%end%>
       </div>

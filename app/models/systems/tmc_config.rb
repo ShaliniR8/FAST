@@ -1,9 +1,15 @@
 class TMC_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[training]
+
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => "1.1.1",
 
+      :name                                           => 'Travel Management Company',
       :code                                           => "TMC",
       :base_risk_matrix                               => true,
       :event_summary                                  => false,
@@ -17,6 +23,7 @@ class TMC_Config
 
 
       # Safety Reporting Module
+      :show_submitter_name                            => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => false,
@@ -28,6 +35,7 @@ class TMC_Config
       :allow_reopen_report                            => false,
       :has_root_causes                                => false,
       :enable_recurrence                              => false,
+      :enable_shared_links                            => false,
 
 
       # SMS IM Module

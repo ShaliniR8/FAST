@@ -16,7 +16,7 @@
       $(".cat_<%=@categories.first.level%> .cat_select option").each(function(){
         if($(this).val() == "<%=second_id%>") {
           $(this).prop("selected", true);
-          $.get("<%=retract_root_cause_categories_hazards_path%>?category=" + $(this).val(), function(data){
+          $.get("<%=retract_categories_root_causes_path%>?i18nbase=<%=@i18nbase%>&category=" + $(this).val(), function(data){
             $("#<%=@categories.first.level%>").html(data);
           });
           return true;
@@ -32,7 +32,7 @@
         }
       });
       if ($(this).val() != ""){
-        $.get("<%=retract_root_cause_categories_hazards_path%>?category=" + $(this).val(), function(data){
+        $.get("<%=retract_categories_root_causes_path%>?i18nbase=<%=@i18nbase%>&category=" + $(this).val(), function(data){
           $("#<%=@categories.first.level%>").html(data);
         });
       }

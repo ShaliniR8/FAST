@@ -63,8 +63,8 @@ class RecordsController < ApplicationController
 
   def comment
     @owner = Record.find(params[:id])
-    @comment = RecordComment.new
-    render :partial => "viewer_comment"
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
   end
 
 
@@ -72,10 +72,10 @@ class RecordsController < ApplicationController
   def enable
     record = Record.find(params[:id])
     record.viewer_access = !record.viewer_access
-    RecordTransaction.create(:users_id => current_user.id,
-      :action => "#{(record.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
-      :owner_id => params[:id],
-      :stamp => Time.now)
+    Transaction.build_for(
+      record,
+      "#{(record.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
+      current_user.id)
     record.save
     redirect_to record_path(record)
   end
@@ -95,23 +95,25 @@ class RecordsController < ApplicationController
   def open
     @record = Record.find(params[:id])
     @record.status = 'Open'
-    SubmissionTransaction.create(
-      :users_id => current_user.id,
-      :action => "Open",
-      :content => "Report has been opened.",
-      :owner_id => @record.submission.id,
-      :stamp => Time.now)
-    RecordTransaction.create(
-      :users_id => current_user.id,
-      :action => "Open",
-      :content => "Report Opened.",
-      :owner_id => @record.id,
-      :stamp => Time.now)
-    notify(
-      @record.submission.created_by,
-      "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
-      true,
-      "Submission ##{@record.submission.id} Opened by Analyst")
+    Transaction.build_for(
+      @record.submission,
+      'Open', current_user.id,
+      'Report has been opened.'
+    )
+    Transaction.build_for(
+      @record,
+      'Open',
+      current_user.id,
+      'Report Opened.'
+    )
+    begin #TODO - Review case for if submission is deleted then report is opened
+      notify(
+        @record.submission.created_by,
+        "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
+        true,
+        "Submission ##{@record.submission.id} Opened by Analyst")
+    rescue
+    end
     @record.save
     redirect_to @record,
       :flash => {:success => "Report Opened."}
@@ -121,8 +123,12 @@ class RecordsController < ApplicationController
 
   def index
     @table = Object.const_get("Record")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+      args.push('admin') if current_user.admin? || BaseConfig.airline[:show_submitter_name]
+      args
+    end
+    @headers = @table.get_meta_fields(*index_meta_field_args)
+    @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{|x| x[:field].present?}
     @title = 'Reports'
     handle_search
 
@@ -190,7 +196,7 @@ class RecordsController < ApplicationController
     load_options
     @action = "edit"
     @record = Record.find(params[:id])
-    form_special_matrix(@record, "record", "severity_extra", "probability_extra")
+    load_special_matrix_form("record", "baseline", @record)
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
     if !(access_level.include? "full")
@@ -199,18 +205,18 @@ class RecordsController < ApplicationController
     end
     if @record.status == "New"
       @record.status = "Open"
-      RecordTransaction.create(
-        :users_id => current_user.id,
-        :action => "Open",
-        :owner_id => params[:id],
-        :stamp => Time.now)
+      Transaction.build_for(
+        @record,
+        'Open',
+        current_user.id
+      )
       if @record.submission.present?
-        SubmissionTransaction.create(
-          :users_id => current_user.id,
-          :action => "Open",
-          :content => "Report has been opened.",
-          :owner_id => @record.submission.id,
-          :stamp => Time.now)
+        Transaction.build_for(
+          @record.submission,
+          'Open',
+          current_user.id,
+          'Report has been opened.'
+        )
         notify(
           @record.submission.created_by,
           "The Report for Submission ##{@record.submission.get_id} has been opened by analyst." +
@@ -358,11 +364,11 @@ class RecordsController < ApplicationController
     params[:record][:record_fields_attributes].each_value do |field|
       if field[:value].is_a?(Array)
         field[:value].delete("")
-        field[:value]=field[:value].join(";")
+        field[:value] = field[:value].join(";")
       end
     end
-    @record=Record.new(params[:record])
-    @record.status="New"
+    @record = Record.new(params[:record])
+    @record.status = "New"
     if @record.save
       redirect_to record_path(@record)
     end
@@ -418,6 +424,7 @@ class RecordsController < ApplicationController
 
 
   def update
+    transaction = true
     @owner = Record.find(params[:id])
 
     if params[:record][:record_fields_attributes].present?
@@ -435,23 +442,28 @@ class RecordsController < ApplicationController
         notify(@owner.submission.created_by,
           "Your submission ##{@owner.submission.id} has been closed by analyst." + g_link(@owner.submission),
           true, "Submission ##{@owner.submission.id} Closed")
-        SubmissionTransaction.create(
-          users_id: current_user.id,
-          action:   params[:commit],
-          owner_id: @owner.submission.id,
-          stamp:    Time.now)
+        Transaction.build_for(
+          @owner.submission,
+          params[:commit],
+          current_user.id,
+          'Report has been closed.'
+        )
         end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
+    when 'Add Attachment'
+      transaction = false
     end
 
     @owner.update_attributes(params[:record])
-    RecordTransaction.create(
-      users_id: current_user.id,
-      action:   params[:commit],
-      owner_id: @owner.id,
-      content:  transaction_content,
-      stamp:    Time.now)
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content
+      )
+    end
     @owner.save
     redirect_to record_path(@owner)
   end
@@ -501,7 +513,7 @@ class RecordsController < ApplicationController
 
   def new_attachment
     @owner = Record.find(params[:id])
-    @attachment = RecordAttachment.new
+    @attachment = Attachment.new
     render :partial => "shared/attachment_modal"
   end
 
@@ -518,7 +530,7 @@ class RecordsController < ApplicationController
 
   def mitigate
     @owner = Record.find(params[:id])
-    mitigate_special_matrix("record", "mitigated_severity", "mitigated_probability")
+    load_special_matrix_form('record', 'mitigate', @owner)
     load_options
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/mitigate"
@@ -531,7 +543,7 @@ class RecordsController < ApplicationController
   def baseline
     @owner = Record.find(params[:id])
     load_options
-    form_special_matrix(@owner, "record", "severity_extra", "probability_extra")
+    load_special_matrix_form('record', 'baseline', @owner)
     if BaseConfig.airline[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
@@ -549,7 +561,7 @@ class RecordsController < ApplicationController
 
 
   def observation_phases_trend
-    @records = Record.where(:templates_id => 25)
+    @records = Record.where(id: params[:records].split(","), :templates_id => 25)
     if params[:start_date].present?
       @start_date = Date.parse(params[:start_date])
       @records.keep_if{|x| x.event_date >= @start_date}
@@ -803,15 +815,14 @@ class RecordsController < ApplicationController
 
 
   def airport_data
-    icao = "%"+params[:icao]+"%"
-    iata = "%"+params[:iata]+"%"
+    icao = "%"+params[:icao].upcase+"%"
+    iata = "%"+params[:iata].upcase+"%"
     arpt_name = "%"+params[:arpt_name]+"%"
     @field_id = params[:field_id]
     #@records = Airport.where("MATCH (icao) AGAINST (?) AND MATCH (faa_host_id) AGAINST (?) AND MATCH (name) AGAINST (?)", icao, iata, arpt_name)
-    @records = Airport.where("icao LIKE ? AND faa_host_id LIKE ? AND name LIKE ?", icao, iata, arpt_name)
+    @records = Airport.where("icao LIKE ? AND iata LIKE ? AND airport_name LIKE ?", icao, iata, arpt_name)
     @headers = Airport.get_header
     render :partial => "submissions/airports"
-    #render :partial => "records/record_table"
   end
 
 
@@ -826,7 +837,6 @@ class RecordsController < ApplicationController
 
     result_id = []
     @result.each{ |r| result_id << r.id }
-
 
     # Create Hash to store value and occurance
     @data = Hash.new

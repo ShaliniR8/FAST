@@ -1,27 +1,24 @@
 class CorrectiveAction < ActiveRecord::Base
+  extend AnalyticsFilters
+
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Noticeable
+  include Transactionable
+
+#Associations List
   belongs_to  :report,                foreign_key: 'reports_id',          class_name: 'Report'
   belongs_to  :record,                foreign_key: 'records_id',          class_name: 'Record'
   belongs_to  :responsible_user,      foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to  :approver,              foreign_key: 'approver_id',         class_name: 'User'
   belongs_to  :created_by,            foreign_key: 'created_by_id',       class_name: 'User'
 
-  has_many :attachments,    foreign_key: 'owner_id',  class_name: 'CorrectiveActionAttachment',   dependent: :destroy
-  has_many :transactions,   foreign_key: 'owner_id',  class_name: 'CorrectiveActionTransaction',  dependent: :destroy
-  has_many :notices,        foreign_key: 'owner_id',  class_name: 'CorrectiveActionNotice',       dependent: :destroy
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank? && attachment[:_destroy].blank?)}
-
-  after_create -> { create_transaction('Create') }
-  # after_update -> { create_transaction('Edit') }
-
-  after_create :create_report_record_transaction
   serialize :privileges
   before_create :set_priveleges
+  after_create :create_report_record_transaction
+  after_create :create_transaction
 
-
-  extend AnalyticsFilters
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -43,10 +40,10 @@ class CorrectiveAction < ActiveRecord::Base
       { field: 'company',                 title: 'Company Corrective Action',      num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
       { field: 'employee',                title: 'Employee Corrective Action',     num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
       { field: 'bimmediate_action',       title: 'Immediate Action',               num_cols: 2,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'immediate_action',        title: 'Immediate Action',               num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
+      { field: 'immediate_action',        title: 'Immediate Action Detail',        num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
       {                                                                                          type: 'newline',  visible: 'form,show'},
       { field: 'bcomprehensive_action',   title: 'Comprehensive Action',           num_cols: 2,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'comprehensive_action',    title: 'Comprehensive Action',           num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
+      { field: 'comprehensive_action',    title: 'Comprehensive Action Detail',    num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
       {                                                                                          type: 'newline',  visible: 'form,show'},
       { field: 'action',                  title: 'Action',                         num_cols: 6,  type: 'datalist', visible: 'index,form,show', required: false, options: action_options},
       { field: 'description',             title: 'Description',                    num_cols: 12, type: 'textarea', visible: 'index,form,show', required: false},
@@ -65,10 +62,10 @@ class CorrectiveAction < ActiveRecord::Base
     }
   end
 
+
   def self.getStatusOptions
     ["New", "Open", "Assigned", "Rejected", "Completed"]
   end
-
 
 
   def self.getYesNoOptions
@@ -79,12 +76,9 @@ class CorrectiveAction < ActiveRecord::Base
   end
 
 
-
-
   def get_privileges
     self.privileges.present? ?  self.privileges : []
   end
-
 
 
   def set_priveleges
@@ -92,36 +86,24 @@ class CorrectiveAction < ActiveRecord::Base
   end
 
 
-
-  def create_transaction(action)
-    CorrectiveActionTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now)
-  end
-
-
-
   def create_report_record_transaction()
     if self.record.present?
-      RecordTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.record.get_id}",
-        :owner_id => self.record.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        self.record,
+        'Add Corrective Action',
+        session[:user_id],
+        "##{self.record.get_id}"
+      )
     end
     if self.report.present?
-      ReportTransaction.create(
-        :users_id => session[:user_id],
-        :action => "Add Corrective Action",
-        :content => "##{self.report.get_id}",
-        :owner_id => self.report.id,
-        :stamp => Time.now)
+      Transaction.build_for(
+        self.report,
+        'Add Corrective Action',
+        session[:user_id],
+        "##{self.report.get_id}",
+      )
     end
   end
-
 
 
   def self.departments
@@ -142,7 +124,6 @@ class CorrectiveAction < ActiveRecord::Base
   end
 
 
-
   def self.status_options
     [
       "New",
@@ -152,7 +133,6 @@ class CorrectiveAction < ActiveRecord::Base
       "Completed"
     ]
   end
-
 
 
   def self.action_options
@@ -180,6 +160,7 @@ class CorrectiveAction < ActiveRecord::Base
     ]
   end
 
+
   def get_description
     if self.description.blank?
       ""
@@ -189,6 +170,7 @@ class CorrectiveAction < ActiveRecord::Base
       self.description
     end
   end
+
 
   def get_response
     if self.response.blank?
@@ -200,6 +182,7 @@ class CorrectiveAction < ActiveRecord::Base
     end
   end
 
+
   def get_opened
     if self.opened_date.present?
       self.opened_date.strftime("%Y-%m-%d")
@@ -208,6 +191,7 @@ class CorrectiveAction < ActiveRecord::Base
     end
   end
 
+
   def get_association
     if self.employee
       "Employee"
@@ -215,6 +199,7 @@ class CorrectiveAction < ActiveRecord::Base
       "Company"
     end
   end
+
 
   def self.get_headers
     [
@@ -229,13 +214,16 @@ class CorrectiveAction < ActiveRecord::Base
     ]
   end
 
+
   def get_final_approver
     approver.full_name
   end
 
+
   def get_responsible_user
     employee_responsible.full_name
   end
+
 
   def get_id
     if self.custom_id.present?
@@ -244,6 +232,7 @@ class CorrectiveAction < ActiveRecord::Base
       self.id
     end
   end
+
 
   def self.get_search_terms
     {
@@ -256,6 +245,7 @@ class CorrectiveAction < ActiveRecord::Base
     }
   end
 
+
   def self.terms
     {
       :status=>{ :type =>"select",:options=>self.status_options},
@@ -266,6 +256,7 @@ class CorrectiveAction < ActiveRecord::Base
       :action=>{:type=>"datalist",:options=>self.action_options}
     }
   end
+
 
   def self.get_avg_complete
     candidates = self.where("status = ? and created_at is not ? and close_date is not ?",
@@ -279,4 +270,6 @@ class CorrectiveAction < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

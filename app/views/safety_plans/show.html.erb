@@ -11,7 +11,7 @@
             <%="Safety Plan ##{@safety_plan.get_id}: #{@safety_plan.title}"%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access("safety_plans","destroy")%>
+            <% if current_user.has_access('safety_plans', 'destroy', admin: true, strict: true) %>
               <%=link_to "Delete",
                 safety_plan_path(@safety_plan),
                 :method => "delete",
@@ -20,7 +20,7 @@
                 :disable_with => "Deleting..."%>
             <%end%>
 
-            <%if current_user.admin?%>
+            <% if current_user.has_access('safety_plans', 'admin', admin: true, strict: true) %>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',
@@ -30,7 +30,7 @@
 
 
             <%if @safety_plan.status != "Completed"%>
-              <%if current_user.has_access("safety_plans","edit")%>
+              <% if current_user.has_access('safety_plans', 'edit', admin: true) %>
                 <%=link_to "Edit",
                   edit_safety_plan_path(@safety_plan, :evaluate => false),
                   :class => "btn btn-warning pull-right mr5 mb5",
@@ -40,12 +40,7 @@
             <%=link_to "PDF",
               print_safety_plan_path(@safety_plan, format: :pdf),
               :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => safety_plan_path(@safety_plan),
-                :link_type => "SafetyPlan",
-                :link_id => @safety_plan.id),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @safety_plan%>
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>
@@ -67,8 +62,8 @@
               :class => "btn btn-warning pull-right mr5 mb5",
               :disable_with => "Evaluating..."%>
           <%end%>
-          <%if @safety_plan.status == "Completed" &&
-            current_user.has_access("safety_plans","new")%>
+          <% if @safety_plan.status == "Completed" &&
+            current_user.has_access('safety_plans', 'new', admin: true) %>
             <%if BaseConfig.airline[:allow_reopen_report]%>
               <%=link_to "Reopen",
                 reopen_safety_plan_path(@safety_plan),
@@ -77,9 +72,16 @@
                 :confirm => "Are you sure?"%>
             <%end%>
           <%end%>
+
+          <%=link_to "Add Comment", "#",
+            :class => "btn btn-success pull-right mr5 mb5",
+            :id => 'comment_btn',
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"%>
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @safety_plan%>
+        <%=render "/forms/show_comment", :owner => @safety_plan%>
         <%=render "/forms/attachments_show", :owner => @safety_plan%>
         <%=render "/records/transactions", :owner => @safety_plan%>
 
@@ -94,6 +96,12 @@
   $(document).ready(function(){
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_safety_plan_path(@safety_plan, :evaluate => false)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_safety_plan_path(@safety_plan)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

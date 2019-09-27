@@ -1,18 +1,16 @@
 class SafetyPlan < ActiveRecord::Base
+  extend AnalyticsFilters
+  include ModelHelpers
 
+#Concerns List
+  include Attachmentable
+  include Commentable
+  include Transactionable
+
+#Associations List
   belongs_to :created_by, foreign_key: "created_by_id", class_name: "User"
 
-  has_many :transactions, foreign_key: 'owner_id', class_name: 'SafetyPlanTransaction', dependent: :destroy
-  has_many :attachments,  foreign_key: 'owner_id', class_name: 'SafetyPlanAttachment',  dependent: :destroy
-
-  accepts_nested_attributes_for :attachments,
-    allow_destroy: true,
-    reject_if: Proc.new{|attachment| (attachment[:name].blank?&&attachment[:_destroy].blank?)}
-
-
-  after_create -> { create_transaction('Create') }
-
-  extend AnalyticsFilters
+  after_create :create_transaction
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -40,52 +38,18 @@ class SafetyPlan < ActiveRecord::Base
 
 
   def self.progress
-    {
-      "New"               => { :score => 25,  :color => "default"},
-      "Evaluated"         => { :score => 50,  :color => "warning"},
-      "Completed"         => { :score => 100, :color => "success"},
-    }
-  end
+  {
+    'New'               => { :score => 33,  :color => 'default'},
+    'Evaluated'         => { :score => 66,  :color => 'warning'},
+    'Completed'         => { :score => 100, :color => 'success'},
+  }
+end
 
-
-
-  def create_transaction(action)
-    SafetyPlanTransaction.create(
-      :users_id => session[:user_id],
-      :action => action,
-      :owner_id => self.id,
-      :stamp => Time.now)
-  end
-
-  def self.get_custom_options(title)
-    CustomOption
-      .where(:title => title)
-      .first
-      .options
-      .split(';') rescue ['Please go to Custom Options to add options.']
-  end
-
-  # def self.risk_factors
-  #   ['Green - ACCEPTABLE','Yellow - ACCEPTABLE WITH MITIGATION','Orange - UNACCEPTABLE']
-  # end
 
   def self.results
     ['Satisfactory','Unsatisfactory']
   end
 
-  def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
-  end
-
-
-
-  def both_factor
-    self.risk_factor_after + self.risk_factor_after
-  end
 
   def self.get_avg_complete
     candidates=self.where("status=? and date_completed is not ?","Completed",nil)
@@ -98,4 +62,6 @@ class SafetyPlan < ActiveRecord::Base
       "N/A"
     end
   end
+
+
 end

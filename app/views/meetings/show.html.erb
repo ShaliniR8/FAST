@@ -17,7 +17,7 @@
             Meeting #<%=@meeting.get_id%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access("meetings","destroy")%>
+            <%if current_user.has_access('meetings', 'destroy', admin: true)%>
               <%=link_to 'Delete',
                 meeting_path(@meeting),
                 :method => "delete",
@@ -33,7 +33,9 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <%if @meeting.has_user(current_user) && @meeting.status != "Closed"%>
+            <% if current_user.has_access('meetings', 'edit', admin: true) &&
+              @meeting.has_user(current_user) &&
+              @meeting.status != 'Closed' %>
               <%=link_to "Edit",
                 edit_meeting_path(@meeting),
                 :id => "edit-btn",
@@ -51,37 +53,36 @@
       </div>
 
       <div class="panel-body">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="pull-right mb10">
-              <%if current_user.has_access("meetings","edit") && @meeting.has_user(current_user)%>
-                <%if @meeting.status == "Open"%>
-                  <%=link_to 'Close Meeting', '#',
-                    :class => 'btn btn-danger pull-right mr5 mb5',
-                    :id => 'close',
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
-                  <%=link_to "Add Comment",
-                    "#",
-                    :class => "btn btn-success mb5 pull-right mr5",
-                    :id => 'comment_btn',
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
-                  <%=link_to "Add Events",
-                    "#",
-                    :class => "btn btn-success mb5 pull-right mr5",
-                    :id => "new_report_btn",
-                    "data-toggle" => "modal",
-                    "data-target" => ".bs-example-modal-lg"%>
-                <%elsif @meeting.status == "Closed"%>
-                  <%=link_to "Reopen Meeting",
-                    reopen_meeting_path(@meeting),
-                    :class=>"btn btn-success pull-right mr5 mb5",
-                    :confirm => "Are you sure?",
-                    :disable_with => "Reopening..."%>
-                <%end%>
+        <div class="col-xs-12 mb15">
+          <div class="pull-right mb10">
+            <% if current_user.has_access('meetings','edit', admin: true) &&
+              @meeting.has_user(current_user) %>
+              <%if @meeting.status == "Open"%>
+                <%=link_to 'Close Meeting', '#',
+                  :class => 'btn btn-danger pull-right mr5 mb5',
+                  :id => 'close',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+                <%=link_to "Add Comment",
+                  "#",
+                  :class => "btn btn-success mb5 pull-right mr5",
+                  :id => 'comment_btn',
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+                <%=link_to "Add Events",
+                  "#",
+                  :class => "btn btn-success mb5 pull-right mr5",
+                  :id => "new_report_btn",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%elsif @meeting.status == "Closed"%>
+                <%=link_to "Reopen Meeting",
+                  reopen_meeting_path(@meeting),
+                  :class=>"btn btn-success pull-right mr5 mb5",
+                  :confirm => "Are you sure?",
+                  :disable_with => "Reopening..."%>
               <%end%>
-            </div>
+            <%end%>
           </div>
         </div>
 
@@ -104,12 +105,12 @@
               </div>
             </div>
           </div>
-
-
           <%=render "all_reports"%>
+        </div>
 
-          <%=render "/audits/show_comment", :owner => @meeting%>
+        <%=render "/forms/show_comment", :owner => @meeting%>
 
+        <div class="col-xs-12">
           <div class="panel panel-lightskyblue">
             <div class="panel-heading click-heading collapsed">
               <div class="panel-title">
@@ -135,11 +136,10 @@
             </div>
           </div>
         </div>
-
         <%=render "/forms/attachments_show", :owner => @meeting%>
         <%=render "records/transactions", :owner => @meeting%>
-
       </div>
+
     </div>
   </div>
 </div>
@@ -148,10 +148,10 @@
 
 
 <script>
-  function delete_report(report_id,btn){
+  function delete_report(report_id, meeting_id,btn){
     var result = confirm("Are you sure?");
     if(result){
-      $.get("/reports/" + report_id + "/carryover", function(data){
+      $.get("/reports/" + report_id + "/carryover?meeting_id=" + meeting_id, function(data){
         $(btn).closest('tr').hide();
       });
     }

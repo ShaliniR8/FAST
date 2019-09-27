@@ -15,153 +15,38 @@
           <div class="top_text">
             SRA(SRM) #<%=@sra.get_id%>: <%=@sra.title%>
           </div>
-
           <div class="top_buttons pull-right">
+            <%= render '/forms/btns/render_btns',
+              btns: [
+                'delete',
+                'override_status',
+                'edit',
+                'deid_pdf',
+                'pdf',
+                'view_meeting',
+                'view_parent',
+                'viewer_access',
+                'attach_in_message',
+                'expand_all'
+              ],
+              owner: @owner %>
 
-            <%if current_user.admin? ||
-                  current_user.has_access('sras','admin') ||
-                  current_user.has_access('sras', 'destroy')%>
-              <%=link_to 'Delete',
-                sra_path(@sra),
-                :method => 'delete',
-                :confirm => 'Are you sure?',
-                :class => 'btn btn-danger pull-right mr5 mb5'%>
-            <%end%>
-
-
-            <%if current_user.admin?
-                  current_user.has_access('sras','admin')%>
-              <%=link_to 'Override Status', '#',
-                :class => 'btn btn-danger pull-right mr5 mb5',
-                :id => 'override_status_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-            <%if (["Assigned", "New"].include? @sra.status) && (
-                  current_user.admin? ||
-                  current_user.has_access('sras','admin') ||
-                  current_user.has_access("sras", "edit"))%>
-              <%=link_to "Edit",
-                edit_sra_path(@sra),
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Editing..."%>
-            <%end%>
-
-            <%=link_to "De-ID PDF",
-              print_sra_path(
-                @sra,
-                :deidentified => true,
-                :format => :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-            <%=link_to "PDF",
-              print_sra_path(
-                @sra,
-                :deidentified => false,
-                :format => :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%if @sra.meeting.present?%>
-              <%=link_to "View Meeting",
-                srm_meeting_path(@sra.meeting),
-                :class => "btn btn-info pull-right mr5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
-
-            <%if @sra.record.present? && current_user.has_access('ASAP','module')%>
-              <%=link_to "View Report",
-                record_path(@sra.record),
-                :class => "btn btn-info pull-right mr5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
-
-            <%if current_user.admin? ||
-                  current_user.has_access('sras','admin') ||
-                  current_user.has_access("sras", "edit")%>
-              <%if !@sra.viewer_access%>
-                <%=link_to "Enable Viewer Access",
-                  enable_sra_path(@sra),
-                  :class => "btn btn-warning pull-right mr5 mb5"%>
-              <%else%>
-                <%=link_to "Disable Viewer Access",
-                  enable_sra_path(@sra),
-                  :class => "btn btn-warning pull-right mr5 mb5"%>
-              <%end%>
-            <%end%>
-
-            <%=link_to "Send Message",
-              new_message_path(
-                :link_type => "Sra",
-                :link_id => @sra.id,
-                :link => sra_path(@sra)),
-              :class => "btn btn-warning pull-right mr5 mb5"%>
-
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>
           </div>
         </div>
       </div>
 
       <div class="panel-body">
         <div class="col-xs-12 mb20">
-
-          <%if @sra.status == 'New'%>
-            <%if @sra.approver == current_user ||
-                  current_user.admin? ||
-                  current_user.has_access('sras','admin')%>
-              <%=link_to 'Assign', '#',
-                id: 'assign_btn',
-                class: 'btn btn-warning pull-right mr5',
-                'data-toggle' => 'modal',
-                'data-target' => '.bs-example-modal-lg' %>
-            <%end%>
-          <%end%>
-
-          <%if @sra.can_approve? current_user %>
-            <%=link_to "Approve",
-              "#",
-              :class=>"btn btn-success pull-right mr5 approve_btn mb5",
-              :commit=>'Approve',
-              "data-toggle"=>"modal",
-              "data-target"=>".bs-example-modal-lg"%>
-            <%=link_to "Reject",
-              "#",
-              :class=>"btn btn-danger pull-right mr5 approve_btn mb5",
-              :commit=>'Reject',
-              "data-toggle"=>"modal",
-              "data-target"=>".bs-example-modal-lg"%>
-          <%end%>
-
-          <%if @sra.status != "Completed"%>
-            <%if @sra.can_complete? current_user %>
-              <%=link_to "Complete", "#",
-                :class=>"btn btn-warning pull-right mr5 mb5",
-                :commit=>'Complete',
-                :id=>'complete_btn',
-                "data-toggle"=>"modal",
-                "data-target"=>".bs-example-modal-lg" %>
-            <%end%>
-            <%=link_to "Add Hazard",
-              new_hazard_path(
-                :owner_id => @sra.id,
-                :owner_type => @sra.class.name),
-              :class => "btn btn-success pull-right mr5 mb5",
-              :disable_with => "Adding..."%>
-            <%#=link_to "Add Section",
-              "#",
-              :class => "btn btn-info pull-right mr5 mb5",
-              :id => "section_btn"%>
-
-          <%elsif @sra.status == "Completed"%>
-            <%if @sra.can_reopen? current_user %>
-              <%=link_to "Reopen",
-                reopen_sra_path(@sra),
-                :class => "btn btn-warning pull-right mr5",
-                :confirm => "Are you sure?",
-                :disable_with => "Reopening..."%>
-            <%end%>
-          <%end%>
+          <%= render '/forms/btns/render_btns',
+            btns: [
+              'assign',
+              'complete',
+              'approve_reject',
+              'hazard',
+              'reopen',
+              'comment'
+            ],
+            owner: @owner %>
 
         </div>
 
@@ -182,11 +67,11 @@
                 <div class="row">
                   <%@sra.hazards.each do |hazard|%>
                     <%=render "/sras/show_hazard",
-                      :hazard => hazard,
+                      :owner => hazard,
                       :like => @like,
                       :color_matrix => @color_matrix,
                       :frequency => @frequency,
-                      :show_btns => true%>
+                      :show_btn => false%>
                   <%end%>
                 </div>
               </div>
@@ -220,8 +105,9 @@
           <%#=render "/sections/display", :section => section%>
         <%end%>
 
-        <%=render '/forms/list_records', :records => Array(@sra.record), :title => 'Report'%>
+        <%=render '/forms/list_records', :records => Array(@sra.owner), :title => 'Report'%>
 
+        <%=render "/forms/show_comment", :owner => @sra%>
         <%=render "/forms/attachments_show", :owner => @sra%>
         <%=render "/records/transactions", :owner => @sra%>
 
@@ -254,24 +140,6 @@
         $(window).trigger('resize');
       });
     });
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_sra_path(@sra)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      $.get("<%=approve_sra_path(@sra)%>?commit="+$(this).attr('commit'),function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#complete_btn').on('click',function(){
-      $.get("<%=complete_sra_path(@sra)%>?commit="+$(this).attr('commit'),function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#mitigate_btn').on('click',function(){
       $.get("<%=mitigate_sra_path(@sra)%>",function(data){
         $(".modal-content").html(data);
@@ -284,14 +152,6 @@
         $(window).trigger('resize');
       });
     });
-
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_sra_path(@sra)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
 
   });
 </script>

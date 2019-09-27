@@ -19,9 +19,11 @@ gem 'pdfkit', '0.5.0'
 gem 'docx', '~> 0.2.07', :require => ["docx"]
 #gem 'hello_fax'
 
-#Engines 
+#Engines
 
 gem 'ruby_dig'
+
+gem 'slim'
 
 # Use unicorn as the web server
 # gem 'unicorn'
@@ -35,7 +37,7 @@ gem 'ruby_dig'
 
 # Bundle the extra gems:
 # gem 'bj'
-# gem 'nokogiri'
+gem 'nokogiri'
 # gem 'sqlite3-ruby', :require => 'sqlite3'
 # gem 'aws-s3', :require => 'aws/s3'
 
@@ -44,7 +46,6 @@ gem 'ruby_dig'
 # and rake tasks are available in development mode:
 group :development, :test do
   gem 'byebug'
-  gem 'bullet'
 #   gem 'webrat'
 end
 
@@ -61,6 +62,7 @@ gem 'net-ssh'
 
 #Kaushik Mahorker OAuth
 gem 'oauth-plugin', '~> 0.5.1'
-gem 'sinatra', '~> 1.2', '>= 1.2.9'
 gem 'oauth2', '~> 1.4.0'
 gem 'oauth', '~> 0.4.7'
+
+gem 'ruby-saml'

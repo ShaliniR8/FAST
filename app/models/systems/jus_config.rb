@@ -1,12 +1,17 @@
 class JUS_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
 
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => "1.1.1",
 
+      :name                                           => 'USA Jet',
       :code                                           => "JUS",
-      :base_risk_matrix                               => true,
+      :base_risk_matrix                               => false,
       :event_summary                                  => true,
       :event_tabulation                               => true,
       :enable_configurable_risk_matrices              => false,
@@ -18,6 +23,7 @@ class JUS_Config
 
 
       # Safety Reporting Module
+      :show_submitter_name                            => true,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => false,
@@ -29,6 +35,7 @@ class JUS_Config
       :allow_reopen_report                            => true,
       :has_root_causes                                => true,
       :enable_recurrence                              => true,
+      :enable_shared_links                            => false,
 
 
       # SMS IM Module
@@ -36,6 +43,33 @@ class JUS_Config
     }
   end
 
+  RISK_ARRAY = {
+    :sms_actions => {
+      :form => "mitigate",
+      :baseline => true,
+      :mitigate => false,
+    },
+    :findings => {
+      :form => "baseline",
+      :baseline => true,
+      :mitigate => true,
+    },
+    :hazards => {
+      :form => "baseline",
+      :baseline => true,
+      :mitigate => true,
+    },
+    :reports => {
+      :form => nil,
+      :baseline => true,
+      :mitigate => true,
+    },
+    :records => {
+      :form => nil,
+      :baseline => true,
+      :mitigate => true,
+    }
+   }
 
   FAA_INFO = {
     "CHDO"=>"ACE-FSDO-09",
@@ -129,6 +163,12 @@ class JUS_Config
       limegreen:  {rating: "LOW",           description: "Acceptable with Monitoring"}
     },
 
+    risk_table_index: {
+      red:        "High",
+      yellow:     "Moderate",
+      limegreen:  "Low"
+    },
+
     risk_table_dict: {
       red:            "HIGH",
       yellow:         "MODERATE",
@@ -163,7 +203,7 @@ class JUS_Config
   def self.print_risk(probability_score, severity_score)
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_dict][lookup_table[probability_score][severity_score].to_sym]
+      return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]
     end
   end
 end

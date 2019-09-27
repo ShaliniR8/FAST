@@ -1,32 +1,43 @@
 class Demo_Config
 
+  #used for linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[audit]
+  #used for creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[training]
+
   def self.airline_config
     {
-      :version                                        => "1.0.3",
+      :version                                        => '1.1.1',
 
-      :code                                           => "BOE",
+      :name                                           => 'ProSafeT Demo',
+      :code                                           => 'BOE',
       :base_risk_matrix                               => true,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
+      :event_summary                                  => false,
+      :event_tabulation                               => false,
       :enable_configurable_risk_matrices              => true,
       :allow_set_alert                                => true,
+      :has_extension                                  => true,
       :has_verification                               => true,
       :has_mobile_app                                 => true,
-      :enable_mailer                                  => true,
-
+      :enable_mailer                                  => false,
+      :track_log                                      => true,
+      :time_zone                                      => 'Eastern Time (US & Canada)',
 
       # Safety Reporting Module
+      :show_submitter_name                            => false,
       :submission_description                         => true,
       :submission_time_zone                           => true,
       :enable_orm                                     => true,
-      :observation_phases_trend                       => false,
+      :observation_phases_trend                       => true,
       :allow_template_nested_fields                   => true,
-      :checklist_version                              => '1',
+      :checklist_version                              => '3',
 
       # Safety Assurance Module
-      :allow_reopen_report                            => true,
+      :allow_reopen_report                            => false,
       :has_root_causes                                => true,
       :enable_recurrence                              => true,
+      :enable_shared_links                            => true,
+
 
 
       # SMS IM Module
@@ -34,7 +45,12 @@ class Demo_Config
     }
   end
 
-
+  MOBILE_KEY = {
+    key_name: airline_config[:name],
+    portals: [
+      { label: 'General', subdomain: 'demo' },
+    ]
+  }
 
   FAA_INFO = { #CORRECT/REVISE
     "CHDO"=>"ProSafeT",
@@ -188,6 +204,7 @@ class Demo_Config
     Rails.logger.debug "Probability score: #{probability_score}, Severity score: #{severity_score}"
     if !probability_score.nil? && !severity_score.nil?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
+      puts "==#{MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]}"
       return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym]
     end
   end

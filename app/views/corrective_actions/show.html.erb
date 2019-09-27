@@ -13,9 +13,7 @@
             <%="Corrective Action ##{@corrective_action.get_id}"%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.admin? ||
-                  current_user.has_access('corrective_actions', 'admin') ||
-                  current_user.has_access('corrective_actions','destroy') %>
+            <% if current_user.has_access('corrective_actions', 'destroy', admin: true, strict: true) %>
               <%=link_to "Delete",
                 corrective_action_path(@corrective_action),
                 :method => "delete",
@@ -23,7 +21,7 @@
                 :class => "pull-right btn btn-danger mb5"%>
             <%end%>
 
-            <%if current_user.admin?%>
+            <% if current_user.has_access('corrective_actions', 'admin', admin: true, strict: true) %>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',
@@ -31,7 +29,7 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <%if current_user.has_access("corrective_actions","edit") &&
+            <%if current_user.has_access('corrective_actions','edit', admin: true) &&
                 @corrective_action.status != "Completed"%>
               <%=link_to "Edit",
                 edit_corrective_action_path(@corrective_action),
@@ -66,12 +64,7 @@
                 :class => "btn btn-info pull-right mr5 mb5",
                 :disable_with => "Redirecting..."%>
             <%end%>
-            <%=link_to "Send Message",
-              new_message_path(
-                :link => corrective_action_path(@correcitve_action),
-                :link_type => "CorrectiveAction",
-                :link_id => @corrective_action.id),
-                :class => "btn btn-warning pull-right mr5 mb5"%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @corrective_action%>
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default mr5 expandall pull-right mb5"%>
@@ -83,10 +76,10 @@
 
         <div class="col-xs-12 mb15">
 
-            <%if @corrective_action.status == "New"%>
-              <%if current_user.admin? ||
+            <% if @corrective_action.status == "New" %>
+              <% if current_user.has_access('corrective_actions', 'admin', admin: true, strict: true) ||
                   @corrective_action.approver_id == current_user.id ||
-                  @corrective_action.created_by == current_user%>
+                  @corrective_action.created_by == current_user %>
                 <%=link_to 'Assign', '#',
                   :id => 'assign_btn',
                   :class => 'btn btn-warning pull-right mr5',
@@ -95,7 +88,8 @@
               <%end%>
 
             <%elsif @corrective_action.status == 'Assigned'%>
-              <%if current_user.admin? || @corrective_action.responsible_user_id == current_user.id%>
+              <% if current_user.has_access('corrective_actions', 'admin', admin: true, strict: true) ||
+                @corrective_action.responsible_user_id == current_user.id %>
                 <%=link_to "Complete", '#',
                   :class => "btn btn-warning pull-right complete_btn mr5 mb5",
                   :id => 'complete',
@@ -104,7 +98,8 @@
               <%end%>
 
             <%elsif @corrective_action.status == "Pending Approval"%>
-              <%if current_user.admin? || @corrective_action.approver_id == current_user.id%>
+              <% if current_user.has_access('corrective_actions', 'admin', admin: true, strict: true) ||
+                @corrective_action.approver_id == current_user.id %>
                 <%=link_to "Approve", "#",
                   :class => "btn btn-success pull-right mr5 approve_btn mb5",
                   :id => 'approve',
@@ -117,10 +112,17 @@
                   "data-target" => ".bs-example-modal-lg"%>
               <%end%>
             <%end%>
+            <%=link_to "Add Comment", "#",
+              :class => "btn btn-success pull-right mr5 mb5",
+              :id => 'comment_btn',
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
         </div>
 
 
         <%=render "/forms/show_fields", :fields => @fields, :record => @corrective_action%>
+
+        <%=render "/forms/show_comment", :owner => @corrective_action%>
         <%=render "/forms/attachments_show", :owner => @corrective_action%>
         <%=render "records/transactions", :owner => @corrective_action%>
 
@@ -137,6 +139,13 @@
 
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_corrective_action_path(@corrective_action)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_corrective_action_path(@corrective_action)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

@@ -1,0 +1,16 @@
+- if BaseConfig.airline[:has_extension] && owner.status == 'Assigned'
+  = link_to 'Request Extension',
+    '#',
+    class: 'btn btn-warning pull-right mr5 mb5',
+    id: 'extension_btn',
+    'data-toggle' => 'modal',
+    'data-target' => '.bs-example-modal-lg'
+
+javascript:
+  $("#extension_btn").on("click", function(){
+    $.get('#{new_extension_request_path(owner_type: owner.class.name, owner_id: owner, user_id: (owner.approver.id rescue nil))}',
+        function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });

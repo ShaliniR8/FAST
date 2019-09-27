@@ -18,7 +18,7 @@
           <%=f.select :category,@category_options,{:include_blank=>""},{:class=>"form-control required_field"}%>
         </div>
         <div class="col-sm-12" style="display:none" id="file_upload">
-          <%=f.fields_for :attachment,DocumentAttachment.new do |ff|%>
+          <%=f.fields_for :attachment,Attachment.new do |ff|%>
             <b>Select File to Upload:</b><br>
             <%=ff.file_field :name, class: "required_field_file"%>
             <b>Title:</b><br>

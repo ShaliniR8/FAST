@@ -1,0 +1,138 @@
+<div class="col-xs-6 visualization_box" id="visualization_<%=field_id%>">
+  <div class="panel panel-lightsteelblue">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <div class="top_text">
+          Visualization
+        </div>
+        <div class="top_buttons pull-right">
+          <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, "#",
+            :class => "remove_btn btn btn-danger pull-right",
+            "data-id" => "#{field_id}"%>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-xs-12">
+
+          <div class="form-group row col-xs-12">
+            <%=label_tag :select_field, "Data Field", class: "col-sm-3 col-form-label"%>
+            <div class="col-sm-7">
+              <%=text_field_tag :field_id, (field_name rescue nil),
+                {:list => "select_field",
+                  :class => "form-control ml5",
+                  :id => "field_select_all_#{field_id}"}%>
+              <datalist id="select_field">
+                <%@fields.each do |x|%>
+                  <option value="<%=x[:title]%>"></option>
+                <%end%>
+              </datalist>
+            </div>
+            <div class="col-sm-2">
+              <%=link_to "<span class=\"glyphicon glyphicon-refresh\"></span>".html_safe, "#",
+                :class => "btn btn-info chart_btn",
+                :id => "generate_charts_btn_#{field_id}",
+                "data-field-id" => field_id%>
+            </div>
+          </div>
+
+          <div class="col-xs-12 mt10">
+
+            <div id="loader_<%=field_id%>" style="display:none">
+              <div class="centered loader"></div>
+              <div class="loading-text">Loading</div>
+            </div>
+
+            <div id="chart_area_<%=field_id%>"></div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+  // Generate color interplation
+  function colorInterpolation(steps){
+    var colorArray = [];
+    if(steps == 1){
+      colorArray = ["red"]
+    }else{
+      var colorInterpolator = d3.interpolateRgb("red", "yellow");
+      colorArray = d3.range(0, (1 + 1 / steps), 1 / (steps - 1)).map(function(d) {
+        return colorInterpolator(d)
+      });
+    }
+    return colorArray;
+  }
+
+  $(window).resize(function() {
+    if(this.resizeTO) clearTimeout(this.resizeTO);
+    this.resizeTO = setTimeout(function() {
+      $(this).trigger('resizeEnd');
+    }, 100);
+  });
+
+
+  $(function(){
+
+    $("#generate_charts_btn_<%=field_id%>").on("click", function(e){
+      e.preventDefault();
+      var field_id = $(this).data("field-id");
+      $.ajax({
+        type: "GET",
+        url: "<%=generate_visualization_query_path(@owner)%>",
+        data: {
+          "field_id": field_id,
+          "field_name": $("#field_select_all_" + field_id).val(),
+          "records": "<%=records%>",
+        },
+        beforeSend: function(){$('#loader_' + field_id).show();$("#chart_area_" + field_id).css({'opacity':0.5});},
+        complete: function(){$('#loader_' + field_id).hide();$("#chart_area_" + field_id).css({'opacity':1});},
+        success: function(response){
+          $("#chart_area_" + field_id).html(response);
+          $("#generate_charts_btn_" + field_id).hide();
+          $("#field_select_all_" + field_id).prop("readonly", true);
+          $("#field_select_all_" + field_id).css({"font-weight": "bold", "color": "steelblue"});
+        },
+        error: function(response){
+          $("#chart_area_" + field_id).html(response);
+        },
+      });
+    });
+
+
+    $(document).delegate(".remove_btn", "click", function (e){
+      e.preventDefault();
+      var field_id = $(this).data("id");
+      var field_name = $("#field_select_all_" + field_id).val();
+      $(this).closest('.visualization_box').remove();
+      $.ajax({
+        type: "GET",
+        url: "<%=remove_visualization_query_path(@owner)%>",
+        data: {
+          "field_name": field_name,
+        },
+        beforeSend: function(){$('#loader_' + field_id).show();$("#chart_area_" + field_id).css({'opacity':0.5});},
+        complete: function(){$('#loader_' + field_id).hide();$("#chart_area_" + field_id).css({'opacity':1});},
+        success: function(response){},
+        error: function(response){console.log(response);}
+      });
+    });
+
+  });
+
+</script>
+
+
+
+
+
+
+
