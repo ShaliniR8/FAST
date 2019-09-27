@@ -23,4 +23,19 @@ class Transaction < ActiveRecord::Base
     end
   end
 
+
+  def get_user_name
+    if user.present?
+      if %w[Submission Record].include? owner.class.name
+        user == owner.created_by ? 'Submitter' : user.full_name
+      else
+        user.full_name
+      end
+    elsif alt_user.present?
+      "External - #{alt_user}"
+    else
+      'Anonymous'
+    end
+  end
+
 end

@@ -45,12 +45,13 @@ include Messageable
 
 
   def self.get_meta_fields(*args)
-    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    submitter_visible = "admin#{BaseConfig.airline[:show_submitter_name] ? ',index,show' : ''}"
     [
       {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',          title: 'Type',                 num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
       {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
@@ -68,7 +69,7 @@ include Messageable
 
 
   def get_submitter_name
-    anonymous ? 'Anonymous' : (BaseConfig.airline[:show_submitter_name] ? created_by.full_name : "#{created_by.disable ? 'Inactive' : 'Active'} User")
+    anonymous ? 'Anonymous' : created_by.full_name
   end
 
 

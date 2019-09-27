@@ -34,7 +34,7 @@
                       <%=datetime_to_string(t.stamp.in_time_zone)%>
                     <%end%>
                   </td>
-                  <td><%=t.user.present? ? t.user.full_name : (t.alt_user.present? ? "<b>External</b> #{t.alt_user}".html_safe : "Anonymous")%></td>
+                  <td><%=t.get_user_name%></td>
                   <td><%=t.action%></td>
                   <td><%=t.content.html_safe rescue ''%></td>
                 </tr>
