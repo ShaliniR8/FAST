@@ -28,7 +28,7 @@ class MessagesController < ApplicationController
     @message.time = Time.now
     @message.save
     SendFrom.create(messages_id: @message.id, users_id: current_user.id, anonymous: (params[:from_anonymous] || false))
-    
+
     if params[:reply_to].present?
       @reply_to = Message.find(params[:reply_to])
       if @reply_to.send_from.anonymous
@@ -56,14 +56,14 @@ class MessagesController < ApplicationController
         notify(User.find(v), "You have a new internal message. #{g_link(@message)}", true, 'New Internal Message')
       end
     end
-    
-    if @message.owner
-      Transaction.build_for(
-        @message.owner,
-        params[:commit],
-        (session[:simulated_id] || session[:user_id])
-      )
-    end
+
+    # if @message.owner
+    #   Transaction.build_for(
+    #     @message.owner,
+    #     params[:commit],
+    #     (session[:simulated_id] || session[:user_id])
+    #   )
+    # end
     redirect_to @message.owner || message_path(@message), flash: { success: 'Message sent.' }
   end
 
