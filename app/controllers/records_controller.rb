@@ -123,8 +123,12 @@ class RecordsController < ApplicationController
 
   def index
     @table = Object.const_get("Record")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+      args.push('admin') if current_user.admin? || BaseConfig.airline[:show_submitter_name]
+      args
+    end
+    @headers = @table.get_meta_fields(*index_meta_field_args)
+    @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{|x| x[:field].present?}
     @title = 'Reports'
     handle_search
 
