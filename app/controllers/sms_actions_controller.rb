@@ -19,7 +19,7 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 
 class SmsActionsController < SafetyAssuranceController
-
+  before_filter :login_required
   before_filter :load_options
   before_filter(only: [:show]) { check_group('sms_action') }
   before_filter :define_owner, only: [
