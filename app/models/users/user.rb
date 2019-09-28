@@ -104,8 +104,8 @@ class User < ActiveRecord::Base
       rescue
         return false #rescue for if session has expired
       end
-      return (admin && permissions.key?(con_name) && permissions[con_name].include?('admin')) ||
-        (permissions.key?(con_name) && permissions[con_name].include?(act_name))
+      return (admin && permissions.key?('admin') && permissions['admin'].include?(con_name)) ||
+        (permissions.key?(act_name) && permissions[act_name].include?(con_name))
     end
     strict ? !(AccessControl.get_meta.key?(con_name) && AccessControl.get_meta[con_name].invert[act_name].present?) : true
   end
