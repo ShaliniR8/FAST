@@ -424,10 +424,9 @@ module ApplicationHelper
     accesses = Hash.new{ |h, k| h[k] = [] }
     user.privileges.includes(:access_controls).map{ |priv|
       priv.access_controls.each do |acs|
-        accesses[acs.entry] << acs.action
+        accesses[acs.action] << acs.entry
       end
     }
-    accesses.update(accesses) { |key, val| val.uniq }
     session[:permissions] = accesses.to_json
   end
 
