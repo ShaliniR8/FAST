@@ -11,20 +11,20 @@ include Transactionable
 include Messageable
 
 #Associations List
-  has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
+  has_one     :submission,          foreign_key: 'records_id',   class_name: 'Submission'
   has_one     :investigation,       as: :owner
 
-  belongs_to  :template,            :foreign_key => "templates_id",     :class_name => "Template"
-  belongs_to  :created_by,          :foreign_key => "users_id",         :class_name => "User"
-  belongs_to  :report,              :foreign_key => "reports_id",       :class_name => "Report"
+  belongs_to  :template,            foreign_key: 'templates_id', class_name: 'Template'
+  belongs_to  :created_by,          foreign_key: 'users_id',     class_name: 'User'
+  belongs_to  :report,              foreign_key: 'reports_id',   class_name: 'Report'
 
-  has_many    :record_fields,       :foreign_key => "records_id",       :class_name => "RecordField",           :dependent => :destroy
-  has_many    :suggestions,         :foreign_key => "owner_id",         :class_name => "RecordSuggestion",      :dependent => :destroy
-  has_many    :descriptions,        :foreign_key => "owner_id",         :class_name => "RecordDescription",     :dependent => :destroy
-  has_many    :causes,              :foreign_key => "owner_id",         :class_name => "RecordCause",           :dependent => :destroy
-  has_many    :detections,          :foreign_key => "owner_id",         :class_name => "RecordDetection",       :dependent => :destroy
-  has_many    :reactions,           :foreign_key => "owner_id",         :class_name => "RecordReaction",        :dependent => :destroy
-  has_many    :corrective_actions,  :foreign_key => "records_id",       :class_name => "CorrectiveAction",      :dependent => :destroy
+  has_many    :record_fields,       foreign_key: 'records_id',   class_name: 'RecordField',        dependent: :destroy
+  has_many    :suggestions,         foreign_key: 'owner_id',     class_name: 'RecordSuggestion',   dependent: :destroy
+  has_many    :descriptions,        foreign_key: 'owner_id',     class_name: 'RecordDescription',  dependent: :destroy
+  has_many    :causes,              foreign_key: 'owner_id',     class_name: 'RecordCause',        dependent: :destroy
+  has_many    :detections,          foreign_key: 'owner_id',     class_name: 'RecordDetection',    dependent: :destroy
+  has_many    :reactions,           foreign_key: 'owner_id',     class_name: 'RecordReaction',     dependent: :destroy
+  has_many    :corrective_actions,  foreign_key: 'records_id',   class_name: 'CorrectiveAction',   dependent: :destroy
 
   accepts_nested_attributes_for :suggestions
   accepts_nested_attributes_for :descriptions
@@ -38,9 +38,7 @@ include Messageable
 
 
   def handle_anonymous_reports
-    if anonymous
-      transactions.update_all(users_id: nil)
-    end
+    transactions.update_all(users_id: nil) if anonymous
   end
 
 
@@ -48,14 +46,14 @@ include Messageable
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
     submitter_visible = "admin#{CONFIG::SR::GENERAL[:show_submitter_name] ? ',index,show' : ''}"
     [
-      {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_template',          title: 'Type',                 num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
-      {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
-      {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
-      {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
-      {field: 'final_comment',         title: 'Final Comment',        num_cols: 12, type: 'text',     visible: 'show',            required: false},
+      {field: 'get_id',               title: 'ID',                    num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'status',               title: 'Status',                num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'get_template',         title: 'Type',                  num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: 'get_submitter_name',   title: 'Submitted By',          num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
+      {field: 'viewer_access',        title: 'Viewer Access',         num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
+      {field: 'event_date',           title: 'Event Date/Time',       num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
+      {field: 'description',          title: 'Event Title',           num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
+      {field: 'final_comment',        title: 'Final Comment',         num_cols: 12, type: 'text',     visible: 'show',            required: false},
 
       {field: 'likelihood',           title: 'Baseline Likelihood',   num_cols: 12, type: 'text',     visible: 'adv',             required: false},
       {field: 'severity',             title: 'Baseline Severity',     num_cols: 12, type: 'text',     visible: 'adv',             required: false},
@@ -116,76 +114,37 @@ include Messageable
 
 
   def getTimeZone()
-    ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
-     "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
-     "JT","ALMST","WAST","CXT","MMT","ALMT","MAWT","IOT","MVT","TFT","AFT","MUT","RET",
-     "SCT","IRT","IT","EAT","BT","EETDST","HMT","BDST","CEST","CETDST","EET","FWT","IST",
-     "MEST","METDST","SST","BST","CET","DNT","FST","MET","MEWT","MEZ","NOR","SET","SWT",
-     "WETDST","GMT","UT","UTC","ZULU","WET","WAT","FNST","FNT","BRST","NDT","ADT","AWT",
-     "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
-     "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
-  end
-
-
-  def set_extra
-    if self.severity_extra.blank?
-      self.severity_extra = []
-    end
-    if self.severity_extra.blank?
-      self.probability_extra = []
-    end
-    if self.mitigated_severity.blank?
-      self.mitigated_severity = []
-    end
-    if self.mitigated_probability.blank?
-      self.mitigated_probability = []
-    end
+    ['Z','NZDT','IDLE','NZST','NZT','AESST','ACSST','CADT','SADT','AEST','CHST','EAST','GST',
+     'LIGT','SAST','CAST','AWSST','JST','KST','MHT','WDT','MT','AWST','CCT','WADT','WST',
+     'JT','ALMST','WAST','CXT','MMT','ALMT','MAWT','IOT','MVT','TFT','AFT','MUT','RET',
+     'SCT','IRT','IT','EAT','BT','EETDST','HMT','BDST','CEST','CETDST','EET','FWT','IST',
+     'MEST','METDST','SST','BST','CET','DNT','FST','MET','MEWT','MEZ','NOR','SET','SWT',
+     'WETDST','GMT','UT','UTC','ZULU','WET','WAT','FNST','FNT','BRST','NDT','ADT','AWT',
+     'BRT','NFT:NST','AST','ACST','EDT','ACT','CDT','EST','CST','MDT','MST','PDT','AKDT',
+     'PST','YDT','AKST','HDT','YST','MART','AHST','HST','CAT','NT','IDLW']
   end
 
 
   def self.get_headers
-    if CONFIG::SR::GENERAL[:submission_description]
-      [
-        {:field => :get_id,                     :title => "ID"                                                                      },
-        {:field => :get_description,            :title => "Event Title"                                                                   },
-        {:field => :get_template,               :title => "Type"                                                                    },
-        {:field => :submit_name,                :title => "Submitted By"                                                            },
-        {:field => :get_event_date,             :title => "Event Date"                                                              },
-        {:field => :status,                     :title => "Status"                                                                  },
-        {:field => :get_viewer_access,          :title => "Viewer Access"                                                           },
-        # {:field => :display_before_risk_factor, :title => "Baseline Risk",  :html_class => :get_before_risk_color },
-        # {:field => :display_after_risk_factor,  :title => "Mitigated Risk", :html_class => :get_after_risk_color  },
-      ]
-    else
-      [
-        {:field => :get_id,                     :title => "ID"                                                                      },
-        {:field => :get_template,               :title => "Type"                                                                    },
-        {:field => :submit_name,                :title => "Submitted By"                                                            },
-        {:field => :get_event_date,             :title => "Event Date"                                                              },
-        {:field => :status,                     :title => "Status"                                                                  },
-        {:field => :get_viewer_access,          :title => "Viewer Access"                                                           },
-        # {:field => :display_before_risk_factor, :title => "Baseline Risk",  :html_class => :get_before_risk_color },
-        # {:field => :display_after_risk_factor,  :title => "Mitigated Risk", :html_class => :get_after_risk_color  },
-      ]
-    end
+    [
+      {field: :get_id,              title: 'ID'              },
+     ({field: :get_description,     title: 'Event Title'     } if CONFIG::SR::GENERAL[:submission_description]),
+      {field: :get_template,        title: 'Type'            },
+      {field: :submit_name,         title: 'Submitted By'    },
+      {field: :get_event_date,      title: 'Event Date'      },
+      {field: :status,              title: 'Status'          },
+      {field: :get_viewer_access,   title: 'Viewer Access'   },
+    ]
   end
 
 
   def get_viewer_access
-    if self.viewer_access
-      "Yes"
-    else
-      "No"
-    end
+    self.viewer_access ? 'Yes' : 'No'
   end
 
 
   def get_id
-    if self.custom_id.present?
-      self.custom_id
-    else
-      self.id
-    end
+    self.custom_id.present? ? self.custom_id : self.id
   end
 
 
@@ -196,25 +155,24 @@ include Messageable
 
   def self.get_terms
     {
-      "Type"                      =>  "get_template",
-      "Status"                    =>  "status",
-      "Submitted By"              =>  "submit_name",
-      "Last Update"               =>  "updated_date",
-      "Submitted At"              =>  "submitted_date",
-      "Event Date/Time"           =>  "get_event_date",
-      "Title"                     =>  "description",
-      "Likelihood"                =>  "likelihood",
-      "Severity"                  =>  "severity",
-      "Likelihood (Mitigated)"    =>  "likelihood_after",
-      "Severity (Mitigated)"      =>  "severity_after",
-      "Risk Factor (Mitigated)"   =>  "risk_factor_after"
+      'Type'                      =>  'get_template',
+      'Status'                    =>  'status',
+      'Submitted By'              =>  'submit_name',
+      'Last Update'               =>  'updated_date',
+      'Submitted At'              =>  'submitted_date',
+      'Event Date/Time'           =>  'get_event_date',
+      'Title'                     =>  'description',
+      'Likelihood'                =>  'likelihood',
+      'Severity'                  =>  'severity',
+      'Likelihood (Mitigated)'    =>  'likelihood_after',
+      'Severity (Mitigated)'      =>  'severity_after',
+      'Risk Factor (Mitigated)'   =>  'risk_factor_after'
     }
   end
 
 
   def get_field(id)
-    f = self.record_fields.find_by_fields_id(id)
-    f.present? ? f.value : ""
+    self.record_fields.find_by_fields_id(id).present? ? f.value : ''
   end
 
 
@@ -222,7 +180,7 @@ include Messageable
     fields = Field.where(:label => label)
     fields_id = fields.collect{|x| x.id}
     f = self.record_fields.where(:fields_id => fields_id)
-    f.present? ? f.first.value : ""
+    f.present? ? f.first.value : ''
   end
 
 
@@ -240,7 +198,7 @@ include Messageable
       ""
     else
       if self.description.length > 50
-        self.description[0..50] + "..."
+        self.description[0..50] + '...'
       else
         self.description
       end

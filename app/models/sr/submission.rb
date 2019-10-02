@@ -11,12 +11,12 @@ class Submission < ActiveRecord::Base
   include Transactionable
 
 #Association List
-  belongs_to :template,   foreign_key: "templates_id",  class_name: "Template"
-  belongs_to :created_by, foreign_key: "user_id",       class_name: "User"
-  belongs_to :record,     foreign_key: "records_id",    class_name: "Record"
+  belongs_to :template,   foreign_key: 'templates_id',  class_name: 'Template'
+  belongs_to :created_by, foreign_key: 'user_id',       class_name: 'User'
+  belongs_to :record,     foreign_key: 'records_id',    class_name: 'Record'
 
-  has_many :submission_fields,    foreign_key: "submissions_id",  class_name: "SubmissionField",        :dependent => :destroy
-  has_many :notices,              foreign_key: "owner_id",       :dependent => :destroy
+  has_many :submission_fields,    foreign_key: 'submissions_id',  class_name: 'SubmissionField',  dependent: :destroy
+  has_many :notices,              foreign_key: 'owner_id',        dependent: :destroy
 
   accepts_nested_attributes_for :submission_fields
 
@@ -39,14 +39,7 @@ class Submission < ActiveRecord::Base
 
   # if submission is completed, check whether it's submitted anonymously and update transactions if needed
   def handle_anonymous_reports
-    if anonymous
-      transactions.each do |transaction|
-        if ['Add Attachment', 'Create', 'Add Notes'].include? transaction.action
-          transaction.users_id = nil
-          transaction.save
-        end
-      end
-    end
+    transactions.where(action: ['Add Attachment', 'Create', 'Add Notes']).update_all(users_id: nil) if anonymous
   end
 
 
@@ -80,62 +73,52 @@ class Submission < ActiveRecord::Base
 
 
   def getTimeZone()
-    ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
-     "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
-     "JT","ALMST","WAST","CXT","MMT","ALMT","MAWT","IOT","MVT","TFT","AFT","MUT","RET",
-     "SCT","IRT","IT","EAT","BT","EETDST","HMT","BDST","CEST","CETDST","EET","FWT","IST",
-     "MEST","METDST","SST","BST","CET","DNT","FST","MET","MEWT","MEZ","NOR","SET","SWT",
-     "WETDST","GMT","UT","UTC","ZULU","WET","WAT","FNST","FNT","BRST","NDT","ADT","AWT",
-     "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
-     "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
+    ['Z','NZDT','IDLE','NZST','NZT','AESST','ACSST','CADT','SADT','AEST','CHST','EAST','GST',
+     'LIGT','SAST','CAST','AWSST','JST','KST','MHT','WDT','MT','AWST','CCT','WADT','WST',
+     'JT','ALMST','WAST','CXT','MMT','ALMT','MAWT','IOT','MVT','TFT','AFT','MUT','RET',
+     'SCT','IRT','IT','EAT','BT','EETDST','HMT','BDST','CEST','CETDST','EET','FWT','IST',
+     'MEST','METDST','SST','BST','CET','DNT','FST','MET','MEWT','MEZ','NOR','SET','SWT',
+     'WETDST','GMT','UT','UTC','ZULU','WET','WAT','FNST','FNT','BRST','NDT','ADT','AWT',
+     'BRT','NFT:NST','AST','ACST','EDT','ACT','CDT','EST','CST','MDT','MST','PDT','AKDT',
+     'PST','YDT','AKST','HDT','YST','MART','AHST','HST','CAT','NT','IDLW']
   end
 
 
   def self.export_all
-    #purify_fields
     submissions = self.where(:completed => true)
-    submissions.keep_if{|x| x.template.report_type == "asap"}
+    submissions.keep_if{|x| x.template.report_type == 'asap'}
     submissions.each do |s|
       employee_group = s.template.emp_group
       if s.event_date.present?
         event_time = s.event_date
-        year = event_time.strftime("%Y")
-        month = event_time.strftime("%b").downcase
-        dirname = Rails.root.join("mitre", year, month, employee_group)
+        year = event_time.strftime('%Y')
+        month = event_time.strftime('%b').downcase
+        dirname = Rails.root.join('mitre', year, month, employee_group)
         temp_file = Rails.root.join('mitre', year, month, employee_group, "#{s.id}.xml")
       else
-        dirname = Rails.root.join("mitre", "no_date", employee_group)
-        temp_file = Rails.root.join('mitre', "no_date", employee_group, "#{s.id}.xml")
+        dirname = Rails.root.join('mitre', 'no_date', employee_group)
+        temp_file = Rails.root.join('mitre', 'no_date', employee_group, "#{s.id}.xml")
       end
       unless File.directory?(dirname)
         FileUtils.mkdir_p(dirname)
       end
       File.open(temp_file, 'w') do |file|
         file << ApplicationController.new.render_to_string(
-          :template => "submissions/export_component.xml.erb",
-          :locals => { :template => s.template, :submission => s})
+          template: 'submissions/export_component.xml.erb',
+          locals:   { template: s.template, submission: s})
       end
     end
   end
 
 
   def self.get_headers
-    if CONFIG::SR::GENERAL[:submission_description]
       [
-        {:field => "get_id",            :title => "ID"},
-        {:field => "get_description",   :title => "Title"},
-        {:field => "get_template",      :title => "Type"},
-        {:field => "submit_name",       :title => "Submitted By"},
-        {:field => "get_event_date",    :title => "Event Date"},
-      ]
-    else
-      [
-        {:field => "get_id",            :title => "ID"},
-        {:field => "get_template",      :title => "Type"},
-        {:field => "submit_name",       :title => "Submitted By"},
-        {:field => "get_event_date",    :title => "Event Date"},
-      ]
-    end
+        {field: 'get_id',            title: 'ID'},
+       ({field: 'get_description',   title: 'Title'} if CONFIG::SR::GENERAL[:submission_description]),
+        {field: 'get_template',      title: 'Type'},
+        {field: 'submit_name',       title: 'Submitted By'},
+        {field: 'get_event_date',    title: 'Event Date'},
+      ].compact
   end
 
 
@@ -151,40 +134,32 @@ class Submission < ActiveRecord::Base
 
   def self.get_terms
     {
-      "Type"              => "get_template",
-      "Submitted By"      => "submit_name",
-      "Last Update"       => "updated",
-      "Submitted At"      => "submitted_date",
-      "Event Date/Time"   => "get_event_date",
-      "Title"             => "description"
+      'Type'              => 'get_template',
+      'Submitted By'      => 'submit_name',
+      'Last Update'       => 'updated',
+      'Submitted At'      => 'submitted_date',
+      'Event Date/Time'   => 'get_event_date',
+      'Title'             => 'description'
     }
   end
 
 
   def get_field(id)
-    f = self.submission_fields.find_by_fields_id(id)
-    f.present? ? f.value : ""
+    submission_fields.find_by_fields_id(id).present? ? f.value : ''
   end
 
 
   def get_field_by_label(label)
-    fields = Field.where(:label => label)
-    fields_id = fields.collect{|x| x.id}
-    f = self.submission_fields.where(:fields_id => fields_id)
-    f.present? ? f.first.value : ""
+    submission_fields.where(fields_id: Field.where(label: label.map(&:id)))
+    fields_id = Field.where(label: label).map(&:id)
+    submission_fields.where(fields_id: fields_id).present? ? f.first.value : ''
   end
 
 
   def submit_name
-    if self.anonymous?
-      'Anonymous'
-    else
-      if self.created_by.present?
-        self.created_by.full_name
-      else
-        'Disabled'
-      end
-    end
+    return 'Anonymous' if self.anonymous?
+    return self.created_by.full_name if self.created_by.present?
+    return 'Disabled'
   end
 
 
@@ -199,76 +174,60 @@ class Submission < ActiveRecord::Base
 
 
   def get_description
-    if self.description.blank?
-      ""
-    else
-      if self.description.length > 50
-        self.description[0..50] + "..."
-      else
-        self.description
-      end
-    end
+    return '' if self.description.blank?
+    return self.description[0..50] + '...' if self.description.length > 50
+    return self.description
   end
 
 
   def get_template
-    self.template.name
+    template.name
   end
 
 
   def submitted_date
-    self.created_at.strftime("%Y-%m-%d")
+    created_at.strftime("%Y-%m-%d")
   end
 
 
   def updated
-    self.updated_at.strftime("%Y-%m-%d")
+    updated_at.strftime("%Y-%m-%d")
   end
 
 
   def self.build(template)
-    record = self.new()
-    record.templates_id = template.id
-    record
+    self.new(templates_id: template.id)
   end
 
 
   def categories
-    self.template.categories
+    template.categories
   end
 
 
   def time_diff(base)
-    diff = ((self.event_date - base.event_date) / (24 * 60 * 60)).abs
+    ((event_date - base.event_date) / (24 * 60 * 60)).abs
   end
 
 
-  # Can we find a better way to mass assign values to it?
   def make_report
-    if self.completed && self.records_id.blank?
+    if completed && records_id.blank?
       record = Record.create(
-        :templates_id       => self.templates_id,
-        :description        => self.description,
-        :event_date         => self.event_date,
-        :users_id           => self.user_id,
-        :status             => "New",
-        :anonymous          => self.anonymous,
-        :event_time_zone    => self.event_time_zone
+        templates_id:       templates_id,
+        description:        description,
+        event_date:         event_date,
+        users_id:           user_id,
+        status:             'New',
+        anonymous:          anonymous,
+        event_time_zone:    event_time_zone,
+        attachments:        [].tap{ |att| self.attachments.each{ |x| att.push(x.clone) } },
       )
-      self.attachments.each do |x|
-        temp = Attachment.new(
-          :name => x.name,
-          :caption => x.caption)
-        record.attachments.push(temp)
-      end
-      record.save
-      self.records_id = record.id
       self.save
-      self.submission_fields.each do |f|
+      submission_fields.each do |f|
         rf = RecordField.new(
-          :records_id => record.id,
-          :fields_id => f.fields_id,
-          :value => f.value)
+          records_id: record.id,
+          fields_id: f.fields_id,
+          value: f.value)
         rf.save
       end
       record.handle_anonymous_reports
@@ -276,109 +235,78 @@ class Submission < ActiveRecord::Base
   end
 
 
-  def to_asap
-  end
-
-
   def find_field(field_name)
-    possible_fields = self.template.fields.where('label = ?',field_name)
+    possible_fields = template.fields.where('label = ?',field_name)
     if possible_fields.present?
-      sub_field = self.submission_fields
+      sub_field = submission_fields
         .where('fields_id = ?', possible_fields.first.id)
-      if sub_field.present?
-        sub_field.first.value
-      else
-        ''
-      end
-    else
-      ""
+      return sub_field.first.value if sub_field.present?
     end
+    return ''
   end
 
 
-  def get_narratives
-    result = []
-    possible_fields = self.template.fields.where("label like '%narrative%'")
-    possible_fields.each do |f|
-      sub_field = self.submission_fields.where('fields_id = ?',f.id)
-      if sub_field.present?
-        result.push(sub_field.first.value)
-      else
-        ''
+  def get_narratives #Was used in older xml file exports for asap reports for mitre before refactoring
+    [].tap { |ret|
+      submission_fields.where(
+        fields_id: template.fields.where("label like '%narrative%'").map(&:id))
+      .each do |f|
+        ret.push(f.first.value)
       end
-    end
-    if result.present?
-      result.join("\n")
-    else
-      ''
-    end
+    }.join('\n')
   end
 
 
   def satisfy(conditions)
     conditions.each do |c|
       # get all candidate fields
-      fields = self.submission_fields.where('fields_id = ?', c.field_id)
-
-      # if submission_fields exists
-      if fields.present?
-        field = fields.first
+      field = submission_fields.where('fields_id = ?', c.field_id).first
+      # if submission_field exists
+      if field.present?
+        case field.field.display_type
 
         # fields that are checkboxes needs to be dissambled
-        if field.field.display_type == "checkbox"
-          if !(c.value - field.value.split(";")).empty?
-            return false
-          end
+        when 'checkbox'
+          return (c.value - field.value.split(';')).empty?
 
         # dropdown items needs to match exactly
-        elsif field.field.display_type == "dropdown"
-          if field.value == c.value
-            return true
-          else
-            return false
-          end
+        when 'dropdown'
+          return field.value == c.value
 
         # fields that are date/datetime needs to be searched based on start/end date
-        elsif field.field.data_type == "date" || field.field.data_type == "datetime"
-          if field.field.data_type == "date"
+        when %w[date datetime]
+          if field.field.data_type == 'date'
             field_val = field.value.present? ? Date.parse(field.value) : nil
-          elsif field.field.data_type == "datetime"
+          else #datetime
             field_val = field.value.present? ? DateTime.parse(field.value) : nil
           end
-
-          if field_val.present? && c.start_date.present? && c.end_date.present? && field_val.between?(c.start_date, c.end_date)
-            return true
-          else
-            return false
-          end
-
+          return field_val.present? &&
+            c.start_date.present? &&
+            c.end_date.present? &&
+            field_val.between?(c.start_date, c.end_date)
 
         # all other display types
         else
-          if (c.value.present?) && (!field.value.downcase.include? c.value.downcase)
-            return false
-          end
+          return false if (c.value.present?) && (!field.value.downcase.include? c.value.downcase)
         end
-
-      # if submission_fields does not exist
-      else
-        return true
       end
+      # otherwise submission_fields does not exist
+      return true
     end
   end
 
 
   def convert
-    if self.template.map_template.present?
-      temp_id = self.template.map_template_id
+    if template.map_template.present?
+      temp_id = template.map_template_id
       new_temp = Template.find(temp_id)
       converted = self.class.create({
-        :anonymous        => self.anonymous,
-        :templates_id     => temp_id,
-        :description      => self.description + " -- dual report",
-        :event_date       => self.event_date,
-        :user_id          => self.user_id,
-        :event_time_zone  => self.event_time_zone,
+        anonymous:        self.anonymous,
+        templates_id:     temp_id,
+        description:      self.description + ' -- dual report',
+        event_date:       self.event_date,
+        user_id:          self.user_id,
+        event_time_zone:  self.event_time_zone,
       })
 
       mapped_fields = self.submission_fields.map{|x| [x.field.map_id, x.value]}.to_h
@@ -391,19 +319,17 @@ class Submission < ActiveRecord::Base
       SubmissionField.transaction do
         values.each do |value|
           SubmissionField.create({
-            :value => value[0],
-            :fields_id => value[1],
-            :submissions_id => value[2]
+            value:          value[0],
+            fields_id:      value[1],
+            submissions_id: value[2]
           })
         end
       end
 
-      #SubmissionField.import columns, values, validate: false
-
       self.attachments.each do |x|
         temp = Attachment.new(
-          :name => x.name,
-          :caption => x.caption)
+          name:       x.name,
+          caption:    x.caption)
         converted.attachments.push(temp)
       end
       converted.completed = self.completed
@@ -411,6 +337,5 @@ class Submission < ActiveRecord::Base
     end
     converted
   end
-
 
 end

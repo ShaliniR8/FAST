@@ -30,7 +30,7 @@ module RiskHandling
     #Class Methods
 
     def self.get_likelihood
-      ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"]
+      ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent']
     end
 
   end
@@ -41,16 +41,16 @@ module RiskHandling
     if CONFIG::GENERAL[:base_risk_matrix]
       likelihood_after
     else
-      get_risk_values[:probability_2] rescue "N/A"
+      get_risk_values[:probability_2] rescue 'N/A'
     end
   end
 
 
   def display_after_risk_factor
     if CONFIG::GENERAL[:base_risk_matrix]
-      risk_factor_after rescue "N/A"
+      risk_factor_after rescue 'N/A'
     else
-      get_risk_values[:risk_2] rescue "N/A"
+      get_risk_values[:risk_2] rescue 'N/A'
     end
   end
 
@@ -59,7 +59,7 @@ module RiskHandling
     if CONFIG::GENERAL[:base_risk_matrix]
       severity_after
     else
-      get_risk_values[:severity_2] rescue "N/A"
+      get_risk_values[:severity_2] rescue 'N/A'
     end
   end
 
@@ -68,16 +68,16 @@ module RiskHandling
     if CONFIG::GENERAL[:base_risk_matrix]
       likelihood
     else
-      get_risk_values[:probability_1] rescue "N/A"
+      get_risk_values[:probability_1] rescue 'N/A'
     end
   end
 
 
   def display_before_risk_factor
     if CONFIG::GENERAL[:base_risk_matrix]
-      risk_factor rescue "N/A"
+      risk_factor rescue 'N/A'
     else
-      get_risk_values[:risk_1] rescue "N/A"
+      get_risk_values[:risk_1] rescue 'N/A'
     end
   end
 
@@ -86,7 +86,7 @@ module RiskHandling
     if CONFIG::GENERAL[:base_risk_matrix]
       severity
     else
-      get_risk_values[:severity_1] rescue "N/A"
+      get_risk_values[:severity_1] rescue 'N/A'
     end
   end
 
