@@ -1,4 +1,4 @@
-class ScxSafetyReportingConfig < DefaultSafetyReportingConfig
+class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     # General Module Features:
