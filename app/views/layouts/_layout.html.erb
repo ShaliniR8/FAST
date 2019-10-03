@@ -333,10 +333,10 @@
                   </li>
                   <li><%=link_to "Custom Options", custom_options_path%></li>
                   <li><%=link_to "Message Templates", canned_messages_path%></li>
-                  <li style="display:<%=CONFIG::SR::GENERAL[:checklist_version] == '2' ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::SA::GENERAL[:checklist_version] == '2' ? 'block' : 'none'%>">
                     <%=link_to "Checklists", checklist_templates_path%>
                   </li>
-                  <li style="display:<%=CONFIG::SR::GENERAL[:checklist_version] == '3' ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::SA::GENERAL[:checklist_version] == '3' ? 'block' : 'none'%>">
                     <%=link_to "Checklist Templates", checklists_path%>
                   </li>
 
