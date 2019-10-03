@@ -71,7 +71,7 @@ namespace :checklist_converter do
     logger.info "- Creating #{audit_ids_with_audit_items.length} new Checklists..."
     logger.info "- Creating #{number_of_new_checklist_rows} new ChecklistRows..."
     logger.info "- Creating #{number_of_new_checklist_rows * header_items.size} new ChecklistCells..."
-    audit_ids_with_audit_items.each do |owner_id|
+    audit_ids_with_audit_items.each_with_index do |owner_id, index|
       # create a Checklist for every Audit with AuditItems
       checklist_id = Checklist.create(
         title:                'Default',
@@ -81,22 +81,26 @@ namespace :checklist_converter do
         checklist_header_id:  header_id,
       )[:id]
 
-      AuditItem.where(owner_id: owner_id).each do |audit_item|
-        # create a ChecklistRow for each AuditItem
-        row_id = ChecklistRow.create(checklist_id: checklist_id)[:id]
-        
-        header_items.each do |key, header_item|
-          options = header_item[:options].present? ? header_item[:options] : nil
+      AuditItem.transaction do
+        AuditItem.where(owner_id: owner_id).each do |audit_item|
+          # create a ChecklistRow for each AuditItem
+          row_id = ChecklistRow.create(checklist_id: checklist_id)[:id]
+          
+          header_items.each do |key, header_item|
+            options = header_item[:options].present? ? header_item[:options] : nil
 
-          # create a ChecklistCell for each ChecklistHeaderItem
-          ChecklistCell.create(
-            checklist_row_id:         row_id,
-            checklist_header_item_id: header_item[:id],
-            options:                  options,
-            value:                    audit_item[key.to_sym],
-          )
+            # create a ChecklistCell for each ChecklistHeaderItem
+            ChecklistCell.create(
+              checklist_row_id:         row_id,
+              checklist_header_item_id: header_item[:id],
+              options:                  options,
+              value:                    audit_item[key.to_sym],
+            )
+          end
         end
       end
+
+      logger.info "...[#{index + 1}/#{audit_ids_with_audit_items.length}] Checklists Created"
     end
 
     logger.info '...v1 Audit Checklists successfully converted to v3'
