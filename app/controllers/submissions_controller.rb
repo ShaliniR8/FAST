@@ -28,9 +28,6 @@ class SubmissionsController < ApplicationController
     @table_name = "submissions"
   end
 
-  def mitre_export_all
-  end
-
   def index
     respond_to do |format|
       format.html do
@@ -120,8 +117,6 @@ class SubmissionsController < ApplicationController
   end
 
 
-
-
   def new
     @action = "new"
     @has_template = false
@@ -142,13 +137,11 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def comment
     @owner = Submission.find(params[:id])
     @comment = @owner.comments.new
     render :partial => "notes"
   end
-
 
 
   def search
@@ -164,13 +157,11 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def destroy
     @record=Submission.find(params[:id])
     @record.destroy
     redirect_to submissions_path, flash: {danger: "Submission ##{params[:id]} deleted."}
   end
-
 
 
   def create
@@ -246,7 +237,6 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def show
     respond_to do |format|
       format.html do
@@ -273,7 +263,6 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def incomplete
     @title = "Submissions In Progress"
     @action = "continue"
@@ -282,7 +271,6 @@ class SubmissionsController < ApplicationController
     @fields = Field.find(:all)
     @records = Submission.where("user_id=? AND completed is not true ",current_user.id)
   end
-
 
 
   def print
@@ -295,9 +283,6 @@ class SubmissionsController < ApplicationController
     filename = "Submission_##{@record.get_id}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
-
-
-
 
 
   def update
@@ -369,44 +354,12 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def export
     @submission = Submission.find(params[:id])
     @template = @submission.template
     stream = render_to_string(:template => "submissions/export.xml.erb" )
     send_data(stream, :type=>"text")
   end
-
-
-
-  def export_all
-    #purify_fields
-    submissions = Submission.find(:all)
-    submissions.keep_if{|x| x.template.report_type == "asap"}
-    submissions.each do |s|
-      if s.event_date.present?
-        event_time = s.event_date
-        year = event_time.strftime("%Y")
-        month = event_time.strftime("%b").downcase
-        employee_group = s.template.emp_group
-        dirname = Rails.root.join("mitre", year, month, employee_group)
-        temp_file = Rails.root.join('mitre', year, month, employee_group, "#{s.id}.xml")
-      else
-        dirname = Rails.root.join("mitre", "no_date", employee_group)
-        temp_file = Rails.root.join('mitre', "no_date", employee_group, "#{s.id}.xml")
-      end
-      unless File.directory?(dirname)
-        FileUtils.mkdir_p(dirname)
-      end
-      File.open(temp_file, 'w') do |file|
-        file << ApplicationController.new.render_to_string(
-            :template => "submissions/export_component.xml.erb",
-            :locals => { :template => s.template, :submission => s})
-      end
-    end
-    redirect_to root_url
-  end
-
 
 
   def get_json
@@ -417,13 +370,17 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def advanced_search
     @path = submissions_path
-    @terms = Submission.get_terms
+    @search_terms = {
+      'Type'              => 'get_template',
+      'Submitted By'      => 'submit_name',
+      'Last Update'       => 'updated',
+      'Submitted At'      => 'submitted_date',
+      'Event Date/Time'   => 'get_event_date',
+      'Title'             => 'description' }
     render :partial=>"shared/advanced_search"
   end
-
 
 
   def continue
@@ -431,7 +388,6 @@ class SubmissionsController < ApplicationController
     @record=Submission.find(params[:id])
     @template=@record.template
   end
-
 
 
   def detailed_search
@@ -443,7 +399,6 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   def custom_view
     @record_attributes = Submission.get_headers
     @templates=Template.find(:all)
@@ -451,7 +406,6 @@ class SubmissionsController < ApplicationController
     @templates.unshift Template.new(id:0, name:'All')
     render :partial=>"shared/custom_view"
   end
-
 
 
   def dynamic_categories
@@ -463,80 +417,12 @@ class SubmissionsController < ApplicationController
   end
 
 
-
   # Convert the selected fields into Submission.get_headers format
   def format_header(selected_fields)
     selected_fields.map { |field_id|
       {:field=>"get_field", :param=>field_id, :size=>"col-xs-1 col-sm-1 col-md-1 col-lg-1", :title=>Field.find(field_id).label}
     }
   end
-
-
-
-  def fsap_all
-    @submissions = Submission.find(:all)
-    @submissions.keep_if{|x| x.template.id == 31 || x.template.id == 7 || x.template.id == 5 || x.template.id == 22}
-    @submissions.each do |x|
-      @submission = x
-      file = Rails.root.join('nasa',"#{x.id}.xml")
-      file = File.open(file, "w")
-      file << render_to_string(:template=>"submissions/fsap.xml.erb" )
-    end
-    redirect_to submissions_path
-  end
-
-
-
-  def fsap
-    @submission = Submission.find(params[:id])
-    @template = @submission.template
-    stream = render_to_string(:template => "submissions/fsap.xml.erb" )
-    send_data(stream, :filename => "fsap_#{params[:id]}.xml", :type => "xml")
-  end
-
-
-
-  def msap
-    @submission = Submission.find(params[:id])
-    @template = @submission.template
-    stream = render_to_string(:template => "submissions/msap.xml.erb" )
-    send_data(stream, :filename => "msap_#{params[:id]}.xml", :type => "xml")
-  end
-
-
-
-  def csap
-    @submission = Submission.find(params[:id])
-    @template = @submission.template
-    stream = render_to_string(:template => "submissions/csap.xml.erb" )
-    send_data(stream, :filename => "csap_#{params[:id]}.xml",:type => "xml")
-  end
-
-
-
-  def dsap
-    @submission = Submission.find(params[:id])
-    @template = @submission.template
-    stream = render_to_string(:template => "submissions/dsap.xml.erb" )
-    send_data(stream, :filename => "dsap_#{params[:id]}.xml", :type => "xml")
-  end
-
-
-
-  def purify_fields
-    all_fields = Field.find(:all)
-    all_fields.each do |x|
-      if x.display_type == "checkbox"
-        x.submission_fields.each do |f|
-          if f.value.present?
-           f.value = f.value.split(";").select{|x| x.present?}.join(";")
-           f.save
-          end
-        end
-      end
-    end
-  end
-
 
 
   def airport_data
@@ -550,36 +436,37 @@ class SubmissionsController < ApplicationController
     render :partial => "submissions/airports"
   end
 
+
   private
 
-  def notify_notifiers(owner, commit)
+    def notify_notifiers(owner, commit)
 
-    mailer_privileges = AccessControl.where(
-      :action => 'notifier',
-      :entry => owner.template.name)
-      .map{|x| x.privileges.map(&:id)}.flatten
-    notifiers = User.preload(:privileges)
-      .where("disable is null or disable = 0")
-      .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
+      mailer_privileges = AccessControl.where(
+        :action => 'notifier',
+        :entry => owner.template.name)
+        .map{|x| x.privileges.map(&:id)}.flatten
+      notifiers = User.preload(:privileges)
+        .where("disable is null or disable = 0")
+        .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
 
-    case commit
-    when "Submit"
-      notifiers.each do |user|
-        notify(user, "A new #{owner.template.name} submission ##{owner.id} is submitted. " + g_link(owner),
-          true, "New #{owner.template.name} Submission")
+      case commit
+      when "Submit"
+        notifiers.each do |user|
+          notify(user, "A new #{owner.template.name} submission ##{owner.id} is submitted. " + g_link(owner),
+            true, "New #{owner.template.name} Submission")
+        end
+      when "Save for Later"
+        notify(
+          owner.created_by,
+          "You have a #{owner.template.name} Submission in progress." + g_link(owner),
+          false,
+          "#{owner.template.name} Submission In Progress")
+      when "Add Notes"
+        notifiers.each do |user|
+          notify(user, "Additional notes have been added to submission ##{owner.id}. " + g_link(owner),
+            true, "Additional Notes Added to Submission")
+        end
+      else
       end
-    when "Save for Later"
-      notify(
-        owner.created_by,
-        "You have a #{owner.template.name} Submission in progress." + g_link(owner),
-        false,
-        "#{owner.template.name} Submission In Progress")
-    when "Add Notes"
-      notifiers.each do |user|
-        notify(user, "Additional notes have been added to submission ##{owner.id}. " + g_link(owner),
-          true, "Additional Notes Added to Submission")
-      end
-    else
     end
-  end
 end

@@ -1,7 +1,7 @@
 require 'open-uri'
 require 'fileutils'
 
-class Submission < ActiveRecord::Base
+class Submission < Sr::SafetyReportingBase
   extend AnalyticsFilters
   include Rails.application.routes.url_helpers
 
@@ -56,49 +56,16 @@ class Submission < ActiveRecord::Base
   end
 
 
-  def get_user_id
-    anonymous ? 'Anonymous' : user_id
-  end
-
-  def get_submitter_name
-    anonymous ? 'Anonymous' : created_by.full_name
-  end
-
-
   def getEventId
-    if self.record.present? && self.record.report.present?
-      self.record.report.id
-    end
+    record.report.id rescue nil
   end
 
 
-  def getTimeZone()
-    ['Z','NZDT','IDLE','NZST','NZT','AESST','ACSST','CADT','SADT','AEST','CHST','EAST','GST',
-     'LIGT','SAST','CAST','AWSST','JST','KST','MHT','WDT','MT','AWST','CCT','WADT','WST',
-     'JT','ALMST','WAST','CXT','MMT','ALMT','MAWT','IOT','MVT','TFT','AFT','MUT','RET',
-     'SCT','IRT','IT','EAT','BT','EETDST','HMT','BDST','CEST','CETDST','EET','FWT','IST',
-     'MEST','METDST','SST','BST','CET','DNT','FST','MET','MEWT','MEZ','NOR','SET','SWT',
-     'WETDST','GMT','UT','UTC','ZULU','WET','WAT','FNST','FNT','BRST','NDT','ADT','AWT',
-     'BRT','NFT:NST','AST','ACST','EDT','ACT','CDT','EST','CST','MDT','MST','PDT','AKDT',
-     'PST','YDT','AKST','HDT','YST','MART','AHST','HST','CAT','NT','IDLW']
-  end
-
-
-  def self.export_all
-    submissions = self.where(:completed => true)
-    submissions.keep_if{|x| x.template.report_type == 'asap'}
-    submissions.each do |s|
-      employee_group = s.template.emp_group
-      if s.event_date.present?
-        event_time = s.event_date
-        year = event_time.strftime('%Y')
-        month = event_time.strftime('%b').downcase
-        dirname = Rails.root.join('mitre', year, month, employee_group)
-        temp_file = Rails.root.join('mitre', year, month, employee_group, "#{s.id}.xml")
-      else
-        dirname = Rails.root.join('mitre', 'no_date', employee_group)
-        temp_file = Rails.root.join('mitre', 'no_date', employee_group, "#{s.id}.xml")
-      end
+  def self.export_all #Used in Mitre Rake Task
+    self.includes(:template).where(completed: true, templates:{report_type: 'asap'}).each do |s|
+      path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
+      dirname = File.join([Rails.root] + path)
+      temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
       unless File.directory?(dirname)
         FileUtils.mkdir_p(dirname)
       end
@@ -122,66 +89,24 @@ class Submission < ActiveRecord::Base
   end
 
 
-  def get_id
-    custom_id || id
-  end
-
-
-  def get_event_date
-    event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
-  end
-
-
-  def self.get_terms
-    {
-      'Type'              => 'get_template',
-      'Submitted By'      => 'submit_name',
-      'Last Update'       => 'updated',
-      'Submitted At'      => 'submitted_date',
-      'Event Date/Time'   => 'get_event_date',
-      'Title'             => 'description'
-    }
-  end
-
-
   def get_field(id)
     submission_fields.find_by_fields_id(id).present? ? f.value : ''
   end
 
 
   def get_field_by_label(label)
-    submission_fields.where(fields_id: Field.where(label: label.map(&:id)))
-    fields_id = Field.where(label: label).map(&:id)
-    submission_fields.where(fields_id: fields_id).present? ? f.first.value : ''
+    submission_fields.includes(:field).where(fields:{label:label}).first.value rescue ''
   end
 
 
   def submit_name
     return 'Anonymous' if self.anonymous?
-    return self.created_by.full_name if self.created_by.present?
-    return 'Disabled'
-  end
-
-
-  def get_date
-    event_date.strftime("%Y-%m-%d") rescue ''
+    return (self.created_by.full_name rescue 'Disabled')
   end
 
 
   def get_time
     event_date.strftime("%H:%M") rescue ''
-  end
-
-
-  def get_description
-    return '' if self.description.blank?
-    return self.description[0..50] + '...' if self.description.length > 50
-    return self.description
-  end
-
-
-  def get_template
-    template.name
   end
 
 
@@ -200,11 +125,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-  def categories
-    template.categories
-  end
-
-
   def time_diff(base)
     ((event_date - base.event_date) / (24 * 60 * 60)).abs
   end
@@ -212,7 +132,7 @@ class Submission < ActiveRecord::Base
 
   def make_report
     if completed && records_id.blank?
-      record = Record.create(
+      self.record = Record.create(
         templates_id:       templates_id,
         description:        description,
         event_date:         event_date,
@@ -224,11 +144,10 @@ class Submission < ActiveRecord::Base
       )
       self.save
       submission_fields.each do |f|
-        rf = RecordField.new(
+        RecordField.create(
           records_id: record.id,
           fields_id: f.fields_id,
           value: f.value)
-        rf.save
       end
       record.handle_anonymous_reports
     end
@@ -246,17 +165,6 @@ class Submission < ActiveRecord::Base
   end
 
 
-  def get_narratives #Was used in older xml file exports for asap reports for mitre before refactoring
-    [].tap { |ret|
-      submission_fields.where(
-        fields_id: template.fields.where("label like '%narrative%'").map(&:id))
-      .each do |f|
-        ret.push(f.first.value)
-      end
-    }.join('\n')
-  end
-
-
   def satisfy(conditions)
     conditions.each do |c|
       # get all candidate fields
@@ -264,17 +172,14 @@ class Submission < ActiveRecord::Base
       # if submission_field exists
       if field.present?
         case field.field.display_type
-
-        # fields that are checkboxes needs to be dissambled
         when 'checkbox'
+          # fields that are checkboxes needs to be dissambled
           return (c.value - field.value.split(';')).empty?
-
-        # dropdown items needs to match exactly
         when 'dropdown'
+          # dropdown items needs to match exactly
           return field.value == c.value
-
-        # fields that are date/datetime needs to be searched based on start/end date
         when %w[date datetime]
+          # fields that are date/datetime needs to be searched based on start/end date
           if field.field.data_type == 'date'
             field_val = field.value.present? ? Date.parse(field.value) : nil
           else #datetime
@@ -284,9 +189,8 @@ class Submission < ActiveRecord::Base
             c.start_date.present? &&
             c.end_date.present? &&
             field_val.between?(c.start_date, c.end_date)
-
-        # all other display types
         else
+          # all other display types
           return false if (c.value.present?) && (!field.value.downcase.include? c.value.downcase)
         end
       end
