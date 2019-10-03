@@ -1,7 +1,7 @@
 namespace :recurring do
 
+  desc 'Generate upcoming forms from recurrent items'
   task :generate_recurrent_forms => :environment do
-    desc 'Generate upcoming forms from recurrent items'
 
     puts 'BEGIN Generating Recurrent Forms:'
     active_recurring = Recurrence.where('(end_date > ? OR end_date IS NULL) AND next_date < ?',

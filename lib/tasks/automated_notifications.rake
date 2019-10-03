@@ -1,7 +1,7 @@
 namespace :notifications do
 
+  desc "Send automated notifications/reminders."
   task :automated_notifications => :environment do
-    desc "Send automated notifications/reminders."
 
     all_rules = AutomatedNotification.all
 
@@ -26,8 +26,8 @@ namespace :notifications do
     end
   end
 
+  desc 'Send out user-designated email reminders'
   task :send_reminders => :environment do
-    desc 'Send out user-designated email reminders'
 
     Notice.where('create_email = TRUE AND
       (expire_date > ? OR expire_date IS NULL) AND
