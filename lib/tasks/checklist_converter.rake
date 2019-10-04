@@ -1,5 +1,5 @@
 namespace :checklist_converter do
-  logger = Logger.new('log/patch_test.log', File::WRONLY | File::APPEND)
+  logger = Logger.new('log/patch.log', File::WRONLY | File::APPEND)
   logger.datetime_format = "%Y-%m-%d %H:%M:%S"
   logger.formatter = proc do |severity, datetime, progname, msg|
    "[#{datetime}]: #{msg}\n"
@@ -10,7 +10,7 @@ namespace :checklist_converter do
     logger.info 'Converting v1 Audit Checklists to v3...'
 
     # Used for ChecklistHeader and Checklist
-    prosafet_admin_id = User.find_by_username('prosafet_admin')[:id]
+    prosafet_admin_id = User.find_by_username('prosafet_admin').id
 
     logger.info '- Creating 1 new ChecklistHeader...'
     header_id = ChecklistHeader.create(
@@ -18,7 +18,7 @@ namespace :checklist_converter do
       description:    'Default Checklist Header',
       status:         'Published',
       created_by_id:  prosafet_admin_id,
-    )[:id]
+    ).id
 
     # add comment to AuditItem.get_headers
     audit_item_headers = AuditItem.get_headers.concat([
@@ -54,7 +54,7 @@ namespace :checklist_converter do
         data_type:            data_type,
         options:              options,
         editable:             editable,
-      )[:id]
+      ).id
 
       # return a hash with keys of fields from audit_item_headers
       header_items_hash.merge({
@@ -63,15 +63,13 @@ namespace :checklist_converter do
     end
 
     # get the ids of Audits with AuditItems
-    audit_ids_with_audit_items = Audit.where(
-      id: AuditItem.select('distinct owner_id').map(&:owner_id)
-    ).map(&:id)
-    number_of_new_checklist_rows = AuditItem.where(owner_id: audit_ids_with_audit_items).length
+    audits = Audit.joins(:items).select('distinct audits.id').map(&:id)
+    audit_items = AuditItem.where(owner_id: audits)
 
-    logger.info "- Creating #{audit_ids_with_audit_items.length} new Checklists..."
-    logger.info "- Creating #{number_of_new_checklist_rows} new ChecklistRows..."
-    logger.info "- Creating #{number_of_new_checklist_rows * header_items.size} new ChecklistCells..."
-    audit_ids_with_audit_items.each_with_index do |owner_id, index|
+    logger.info "- Creating #{audits.length} total new Checklists..."
+    logger.info "- Creating #{audit_items.length} total new ChecklistRows..."
+    logger.info "- Creating #{audit_items.length * header_items.size} total new ChecklistCells..."
+    checklists = audits.each.with_index.reduce({}) do |checklists_hash, (owner_id, index)|
       # create a Checklist for every Audit with AuditItems
       checklist_id = Checklist.create(
         title:                'Default',
@@ -79,28 +77,28 @@ namespace :checklist_converter do
         owner_id:             owner_id,
         created_by_id:        prosafet_admin_id,
         checklist_header_id:  header_id,
-      )[:id]
+      ).id
 
-      AuditItem.transaction do
-        AuditItem.where(owner_id: owner_id).each do |audit_item|
-          # create a ChecklistRow for each AuditItem
-          row_id = ChecklistRow.create(checklist_id: checklist_id)[:id]
-          
-          header_items.each do |key, header_item|
-            options = header_item[:options].present? ? header_item[:options] : nil
+      checklists_hash.merge({ owner_id => checklist_id })
+    end
 
-            # create a ChecklistCell for each ChecklistHeaderItem
-            ChecklistCell.create(
-              checklist_row_id:         row_id,
-              checklist_header_item_id: header_item[:id],
-              options:                  options,
-              value:                    audit_item[key.to_sym],
-            )
-          end
+    AuditItem.transaction do
+      audit_items.each do |audit_item|
+        # create a ChecklistRow for each AuditItem
+        row_id = ChecklistRow.create(checklist_id: checklists[audit_item.owner_id]).id
+        
+        header_items.each do |key, header_item|
+          options = header_item[:options].present? ? header_item[:options] : nil
+
+          # create a ChecklistCell for each ChecklistHeaderItem
+          ChecklistCell.create(
+            checklist_row_id:         row_id,
+            checklist_header_item_id: header_item[:id],
+            options:                  options,
+            value:                    audit_item[key.to_sym],
+          )
         end
       end
-
-      logger.info "...[#{index + 1}/#{audit_ids_with_audit_items.length}] Checklists Created"
     end
 
     logger.info '...v1 Audit Checklists successfully converted to v3'
