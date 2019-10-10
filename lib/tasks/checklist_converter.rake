@@ -5,6 +5,47 @@ namespace :checklist_converter do
    "[#{datetime}]: #{msg}\n"
   end
 
+  desc 'Add FAA SAS XML ChecklistHeader'
+  task :add_faa_xml_header => :environment do
+    logger.info 'Adding FAA SAS XML ChecklistHeader...'
+
+    if ChecklistHeader.find_by_title('FAA SAS XML').present?
+      logger.info '...ChecklistHeader already exists'
+    else
+      prosafet_admin_id = User.find_by_username('prosafet_admin').id
+      source_db = 'prosafet_scx_training_db'
+      source_header_id = 1
+
+      source_header = ActiveRecord::Base.connection.select_all("
+        SELECT * FROM #{source_db}.checklist_headers
+          WHERE #{source_db}.checklist_headers.id = #{source_header_id};
+      ").first
+      header_id = ChecklistHeader.create(
+        title:          source_header['title'],
+        description:    source_header['description'],
+        status:         source_header['status'],
+        created_by_id:  prosafet_admin_id,
+      ).id
+
+      ActiveRecord::Base.connection.select_all("
+        SELECT * FROM #{source_db}.checklist_header_items
+          WHERE #{source_db}.checklist_header_items.checklist_header_id = #{source_header_id}
+      ").each do |source_header_item|
+        ChecklistHeaderItem.create(
+          display_order:        source_header_item['display_order'],
+          checklist_header_id:  header_id,
+          title:                source_header_item['title'],
+          data_type:            source_header_item['data_type'],
+          options:              source_header_item['options'],
+          editable:             source_header_item['editable'],
+          size:                 source_header_item['size'],
+        )
+      end
+
+      logger.info '...ChecklistHeader added'
+    end
+  end
+
   desc 'Converts v1 Audit Checklists to v3'
   task :audit_v1_to_v3 => :environment do
     logger.info 'Converting v1 Audit Checklists to v3...'
