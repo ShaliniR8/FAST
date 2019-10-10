@@ -227,6 +227,7 @@ class SubmissionsController < ApplicationController
         flash = {}
         if params[:commit] == 'Submit'
           flash = { success: 'Submission submitted.' }
+          NotifyMailer.send_submitter_confirmation(current_user, @record)
           format.html { redirect_to submission_path(@record), flash: flash }
         else
           flash = { success: 'Submission created in progress.' }
@@ -351,6 +352,7 @@ class SubmissionsController < ApplicationController
           @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
         else
           @record.create_transaction(action: 'Create', context: 'User Submitted Report')
+          NotifyMailer.send_submitter_confirmation(current_user, @record)
         end
         if params[:create_copy] == '1'
           converted = @record.convert

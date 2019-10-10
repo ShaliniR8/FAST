@@ -57,5 +57,18 @@ class NotifyMailer < ActionMailer::Base
     end
   end
 
+  def send_submitter_confirmation(user, submission)
+    @user = user
+    @submission_id = submission.id
+    @submission_description = submission.get_description
+    @submission_url = g_link(submission)
+    subject = "ProSafeT: Submission ##{submission.id} Received"
+    if BaseConfig.airline[:enable_mailer] && Rails.env.production?
+      mail(to: user.email, subject: subject).deliver
+    else
+      mail(to: 'noc@prodigiq.com', subject: subject).deliver
+    end
+  end
+
 
 end
