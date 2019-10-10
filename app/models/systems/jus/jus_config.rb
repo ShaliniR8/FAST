@@ -8,7 +8,6 @@ class JUSConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                            '1.0.3',
     name:                               'USA Jet',
     time_zone:                          'Eastern Time (US & Canada)',
 

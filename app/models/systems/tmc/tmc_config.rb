@@ -7,9 +7,8 @@ class TMCConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                            '1.0.3',
     name:                               'Travel Management Company',
-    # time_zone:                          '', #N/A
+    time_zone:                          'Eastern Time (US & Canada)',
 
     # SYSTEM CONFIGS
 

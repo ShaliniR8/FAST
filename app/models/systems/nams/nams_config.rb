@@ -9,7 +9,6 @@ class NAMSConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                            '1.0.3',
     name:                               'Northern Air Cargo',
     time_zone:                          'Alaska',
 

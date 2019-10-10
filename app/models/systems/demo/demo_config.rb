@@ -7,7 +7,6 @@ class DemoConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                      '1.0.3',
     name:                         'ProSafeT Demo',
     time_zone:                    'Pacific Time (US & Canada)',
 

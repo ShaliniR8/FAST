@@ -7,7 +7,6 @@ class TrialConfig
 
     GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                          '1.2.0 beta',
     name:                             'ProSafeT Trial',
     time_zone:                        'Pacific Time (US & Canada)',
 

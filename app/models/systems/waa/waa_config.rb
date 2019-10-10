@@ -7,7 +7,6 @@ class WAAConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                            '1.2.0',
     name:                               'World Atlantic Airlines',
     time_zone:                          'Central Time (US & Canada)',
 

@@ -10,7 +10,6 @@ class BSKConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    version:                      '1.0.3',
     name:                         'Miami Air International',
     time_zone:                    'Eastern Time (US & Canada)',
 
