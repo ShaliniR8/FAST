@@ -99,19 +99,8 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
-  def submit_name
-    return 'Anonymous' if self.anonymous?
-    return (self.created_by.full_name rescue 'Disabled')
-  end
-
-
   def get_time
     event_date.strftime("%H:%M") rescue ''
-  end
-
-
-  def submitted_date
-    created_at.strftime("%Y-%m-%d")
   end
 
 
@@ -122,11 +111,6 @@ class Submission < Sr::SafetyReportingBase
 
   def self.build(template)
     self.new(templates_id: template.id)
-  end
-
-
-  def time_diff(base)
-    ((event_date - base.event_date) / (24 * 60 * 60)).abs
   end
 
 

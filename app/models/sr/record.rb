@@ -1,4 +1,4 @@
-class Record < ActiveRecord::Base
+class Record < Sr::SafetyReportingBase
   extend AnalyticsFilters
   include RiskHandling
 
@@ -66,11 +66,6 @@ include Messageable
   end
 
 
-  def get_submitter_name
-    anonymous ? 'Anonymous' : created_by.full_name
-  end
-
-
   def self.progress
     {
       "New"       => { :score => 25,  :color => "default"},
@@ -78,11 +73,6 @@ include Messageable
       "Linked"    => { :score => 75,  :color => "warning"},
       "Closed"    => { :score => 100, :color => "success"},
     }
-  end
-
-
-  def get_user_id
-    anonymous ? 'Anonymous' : users_id
   end
 
 
@@ -143,16 +133,6 @@ include Messageable
   end
 
 
-  def get_id
-    self.custom_id.present? ? self.custom_id : self.id
-  end
-
-
-  def get_event_date
-    self.event_date.strftime("%Y-%m-%d %H:%M:%S")
-  end
-
-
   def self.get_terms
     {
       'Type'                      =>  'get_template',
@@ -184,38 +164,6 @@ include Messageable
   end
 
 
-  def submit_name
-    if self.anonymous?
-      'Anonymous'
-    else
-      self.created_by.full_name
-    end
-  end
-
-
-  def get_description
-    if self.description.blank?
-      ""
-    else
-      if self.description.length > 50
-        self.description[0..50] + '...'
-      else
-        self.description
-      end
-    end
-  end
-
-
-  def get_template
-    self.template.name
-  end
-
-
-  def submitted_date
-    self.created_at.strftime("%Y-%m-%d") rescue ''
-  end
-
-
   def updated_date
     self.updated_at.strftime("%Y-%m-%d") rescue ''
   end
@@ -233,27 +181,8 @@ include Messageable
   end
 
 
-  def categories
-    self.template.categories
-  end
-
-
   def all_causes
     self.suggestions + self.descriptions + self.causes + self.detections + self.reactions
-  end
-
-
-  def time_diff(base)
-    if self.event_date.blank?
-      100000.0
-    else
-      diff = ((self.event_date - base.event_date) / (24*60*60)).abs
-    end
-  end
-
-
-  def get_date
-    self.event_date.strftime("%Y-%m-%d") rescue ''
   end
 
 
