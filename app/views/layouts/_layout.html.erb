@@ -325,7 +325,7 @@
                   <li style="display:<%=CONFIG::SR::GENERAL[:enable_orm] ? 'block' : 'none'%>">
                     <%=link_to "ORM Templates", orm_templates_path%>
                   </li>
-                  <li style="display:<%=CONFIG::GENERAL[:enable_configurable_risk_matrices] ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::GENERAL[:configurable_risk_matrices] ? 'block' : 'none'%>">
                     <%=link_to "Risk Matrices", risk_matrix_groups_path%>
                   </li>
                   <li style="display:<%=CONFIG::GENERAL[:has_root_causes] ? 'block' : 'none'%>">
