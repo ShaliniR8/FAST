@@ -52,8 +52,8 @@
               'comment'
             ],
             owner: @owner %>
-
         </div>
+
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
         <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
@@ -66,10 +66,7 @@
 
         <%=render 'forms/signatures/show_signatures', owner: @owner %>
 
-
-        <%=render "/forms/show_comment", :owner => @owner%>
-        <%=render "/forms/attachments_show", :owner => @owner%>
-        <%=render "/records/transactions", :owner => @owner%>
+        <%=render '/panels/show_panels', owner: @owner%>
 
       </div>
     </div>

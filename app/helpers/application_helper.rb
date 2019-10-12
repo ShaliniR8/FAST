@@ -432,4 +432,33 @@ module ApplicationHelper
     array.reduce({}) { |id_map, element| id_map.merge({ element[key || 'id'] => element }) }
   end
 
+  #Call in show statements; pass array of any and all subpanels to include data display preparations
+  def prepare_panels(owner)
+    [].tap do |panels|
+      %i[comments attachments transaction_log].each do |panel|
+        case panel
+        when :attachments
+          panels << {
+            partial: '/forms/attachments_show',
+            owner: owner
+          }
+        when :comments
+          panels << {
+            partial: '/panels/comments',
+            comments: owner.comments.preload(:viewer)
+          }
+        when :risk_assessment
+          risk_matrix = owner.risk_analyses
+        when :transaction_log
+          panels << {
+            partial: '/panels/transaction_log',
+            transactions: owner.transactions.preload(:user)
+          }
+        else
+          Rails.logger.warning "Unknown Panel #{panel}; preparation available (skipped)"
+        end
+      end
+    end
+  end
+
 end
