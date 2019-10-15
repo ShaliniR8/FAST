@@ -29,7 +29,7 @@
   <%else%>
     <%locals[:checklist_header].checklist_header_items.order("display_order").each do |header_item|%>
       <%checklist_cell = ChecklistCell.new%>
-      <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
+      <%=f.fields_for :checklist_cells, checklist_cell, { class: 'changed' } do |cell_form|%>
         <%=render 'checklist_row_fields_td',
           :header_item => header_item,
           :checklist_cell => checklist_cell,
