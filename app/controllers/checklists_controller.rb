@@ -152,7 +152,7 @@ class ChecklistsController < ApplicationController
               checklist_header_item_id: checklist_header_items[index].id
             }
             if header_item.data_type.match /radio|dropdown/
-              cell_attributes[:options] = csv_cell_value
+              cell_attributes[:options] = csv_cell_value || checklist_header_items[index].options
             else
               cell_attributes[:value] = csv_cell_value
             end
