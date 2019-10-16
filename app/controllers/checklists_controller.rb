@@ -139,14 +139,25 @@ class ChecklistsController < ApplicationController
     checklist_header_items = owner.checklist_header.checklist_header_items
     begin
       Checklist.transaction do
-        CSV.foreach(upload, :headers => true) do |row|
-          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+        CSV.foreach(upload, headers: true) do |csv_row|
+          checklist_row = ChecklistRow.create({
+            checklist_id: owner.id,
+            created_by_id: current_user.id
+          })
+
           checklist_header_items.each_with_index do |header_item, index|
-            cell = row[index]
-            ChecklistCell.create({
-              :checklist_row_id => checklist_row.id,
-              :value => cell,
-              :checklist_header_item_id => checklist_header_items[index].id})
+            csv_cell_value = csv_row[index]
+            cell_attributes = {
+              checklist_row_id: checklist_row.id,
+              checklist_header_item_id: checklist_header_items[index].id
+            }
+            if header_item.data_type.match /radio|dropdown/
+              cell_attributes[:options] = csv_cell_value
+            else
+              cell_attributes[:value] = csv_cell_value
+            end
+
+            ChecklistCell.create(cell_attributes)
           end
         end
       end
