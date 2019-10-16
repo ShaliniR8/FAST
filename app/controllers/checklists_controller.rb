@@ -106,6 +106,32 @@ class ChecklistsController < ApplicationController
     @record = @table.find(params[:id])
   end
 
+  def add_template
+    owner = Object.const_get("#{params[:owner_type]}").find(params[:owner_id])
+    template = @table.find(params[:id])
+    new_checklist = template.clone
+
+    template.checklist_rows.each do |row|
+      new_row = row.clone
+
+      row.checklist_cells.each do |cell|
+        new_cell = cell.clone
+        new_cell.save
+        new_row.checklist_cells << new_cell
+      end
+
+      new_row.save
+      new_checklist.checklist_rows << new_row
+    end
+
+    new_checklist.save
+    owner.checklists << new_checklist
+
+    respond_to do |format|
+      format.js { render inline: 'location.reload()' }
+    end
+  end
+
 
   private
 
