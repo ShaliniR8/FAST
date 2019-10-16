@@ -9,5 +9,5 @@
     end
   end
 %>
-<%= CSV.generate_line titles %>
-<%= CSV.generate_line examples %>
+<%= CSV.generate_line titles.push('Header? (Y/N)') %>
+<%= CSV.generate_line examples.push('Y') %>
