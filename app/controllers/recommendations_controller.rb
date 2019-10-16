@@ -43,7 +43,7 @@ class RecommendationsController < SafetyAssuranceController
     @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
 
-    if !current_user.admin? && !current_user.has_access('recommendations','admin')
+    if !current_user.has_access('recommendations', 'admin', admin: true, strict: true)
       cars = Recommendation.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
       cars += Recommendation.where('approver_id = ?', current_user.id)

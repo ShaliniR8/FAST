@@ -25,7 +25,7 @@ class ReportsController < ApplicationController
 
   def check_group
     report = Report.find(params[:id])
-    if current_user.level == "Admin"
+    if current_user.global_admin?
       true
     elsif (report.privileges.reject(&:blank?).present? rescue false)
       current_user.privileges.each do |p|

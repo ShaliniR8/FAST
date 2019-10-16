@@ -10,10 +10,8 @@
     </div>
     <div class="panel-body" style="display:none">
 
-      <%if owner.status != 'Completed' && (
-        current_user.admin? ||
-        current_user.has_access(owner.class.table_name,'admin') ||
-        current_user.has_access(owner.class.table_name,'edit'))%>
+      <%if owner.status != 'Completed' &&
+        current_user.has_access(owner.class.table_name,'edit', admin: true)%>
 
         <%=link_to "Add New Checklist", '#',
             :class => 'btn btn-success pull-right mr5 mb10',
@@ -27,8 +25,7 @@
         <%owner.checklists.preload(:checklist_rows => :checklist_cells).each do |checklist|%>
 
           <%if owner.status != 'Completed' && (
-              current_user.admin? ||
-              current_user.has_access(owner.class.table_name,'admin') ||
+              current_user.has_access(owner.class.table_name,'admin', admin: true) ||
               owner.responsible_user_id == current_user.id)%>
             <%=link_to "Address", '#',
               :class => 'btn btn-success pull-right mr5 start_btn',
@@ -37,10 +34,8 @@
               'data-target' => '.bs-example-modal-lg'%>
           <%end%>
 
-          <%if owner.status != 'Completed' && (
-              current_user.admin? ||
-              current_user.has_access(owner.class.table_name,'admin') ||
-              current_user.has_access(owner.class.table_name,'edit'))%>
+          <%if owner.status != 'Completed' &&
+              current_user.has_access(owner.class.table_name,'edit', admin: true)%>
 
             <%=link_to "Update", '#',
               :class => 'btn btn-warning pull-right mr5 update_btn',

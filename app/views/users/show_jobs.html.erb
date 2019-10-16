@@ -8,7 +8,7 @@
 <div class="content">
 <div class="grid">
   <div class="white_grid">
-  <% if current_user.level == "Admin" or current_user.level == "Maintenance Supervisor" %>
+  <% if current_user.global_admin? %>
   <script type="text/javascript">
     //<![CDATA[
         jQuery(document).ready(function () {

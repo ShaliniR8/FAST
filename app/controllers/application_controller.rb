@@ -89,7 +89,7 @@ class ApplicationController < ActionController::Base
   end
 
   def strict_access_validation
-    access_validation(true) || current_user.admin?
+    access_validation(true) || current_user.global_admin?
   end
 
 
@@ -99,7 +99,7 @@ class ApplicationController < ActionController::Base
     end
 
     report = Object.const_get(form.titleize.gsub(/\s+/, '')).find(params[:id])
-    if current_user.level == "Admin" || current_user.has_access("#{form}s",'admin')
+    if current_user.has_access("#{form}s", 'admin', admin: true, strict: true)
       true
     else
       group_validation = false #to reduce calculation of whether user is part of the group if present
@@ -207,7 +207,7 @@ class ApplicationController < ActionController::Base
 
 
   def display_in_table(report)
-    if current_user.level == "Admin"
+    if current_user.global_admin?
       return true
     elsif report.privileges.reject{|priv| priv.empty?}.present?
       current_user.privileges.each do |p|

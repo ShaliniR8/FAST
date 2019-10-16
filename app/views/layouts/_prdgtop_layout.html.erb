@@ -91,11 +91,11 @@ function refreshPage()
               <ul class="dropdown-menu">
                 <li><a href ="/users/self_edit/<%= current_user.id %>">Profile</a></li>
                 <li><a href ="/users/change_password/<%= current_user.id %>">Change Password</a></li>
-                 <% if current_user.level == "Admin" %>
-                 <li class="divider"></li>
-                 <li class="dropdown-header"><u>Admin</u></li>
-                 <li><a href ="/users_index">Accounts</a></li>
-                 <li><a href ="/users/new">New Account</a></li>
+                 <% if current_user.global_admin?%>
+                   <li class="divider"></li>
+                   <li class="dropdown-header"><u>Admin</u></li>
+                   <li><a href ="/users_index">Accounts</a></li>
+                   <li><a href ="/users/new">New Account</a></li>
                  <%end%>
               </ul>
             </li>

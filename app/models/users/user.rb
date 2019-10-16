@@ -86,12 +86,12 @@ class User < ActiveRecord::Base
   # admin: if set to true, will return true if the user is a global admin, has the specific con_name's 'admin' action, or has the exact con_name act_name rule
   # strict: if set to true, will return true ONLY IF the user has the EXACT rule; will return false even if the rule isn't defined in the system
   def has_access(con_name, act_name, strict:false, admin:false)
-    return true if admin && self.admin?
+    return true if admin && self.global_admin?
     rules = Rails.application.config.restricting_rules
     if rules.key?(con_name) && rules[con_name].include?(act_name)
       begin
         permissions = JSON.parse(session[:permissions])
-        if !self.admin? && permissions.empty?
+        if !self.global_admin? && permissions.empty?
           accesses = Hash.new{ |h, k| h[k] = [] }
           self.privileges.includes(:access_controls).map{ |priv|
             priv.access_controls.each do |acs|
@@ -113,7 +113,7 @@ class User < ActiveRecord::Base
 
   def accessible_modules
     modules = AccessControl.where(action: 'module')
-    return modules.map{|rule| rule.entry} if self.admin?
+    return modules.map{|rule| rule.entry} if self.global_admin?
     (modules & get_all_access).map{|rule| rule.entry}
   end
 
@@ -302,10 +302,13 @@ class User < ActiveRecord::Base
     end
   end
 
-  def admin?
-    self.level == "Admin"
+  def global_admin?
+    self.level == 'Global Admin'
   end
 
+  def admin?
+    ['Global Admin', 'Admin'].include? self.level
+  end
 
   private
 
@@ -330,7 +333,7 @@ class User < ActiveRecord::Base
 
 
   def self.get_levels
-    ['Admin','Staff','Pilot','Ground','Analyst']
+    ['Global Admin', 'Admin', 'Staff', 'Pilot', 'Ground', 'Analyst']
   end
 
 

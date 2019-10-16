@@ -31,7 +31,7 @@ class RiskControlsController < ApplicationController
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     handle_search
 
-    if !current_user.admin? && !current_user.has_access('risk_controls','admin')
+    if !current_user.has_access('risk_controls', 'admin', admin: true, strict: true)
       rcs = RiskControl.includes(hazard: :sra)
       cars = rcs.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
