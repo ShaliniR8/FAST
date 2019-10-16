@@ -140,15 +140,16 @@ class ChecklistsController < ApplicationController
     has_header_col = checklist_header_items.length < CSV.read(upload, headers: true).headers.length
     begin
       Checklist.transaction do
-        CSV.foreach(upload) do |csv_row|
+        CSV.foreach(upload, headers: true) do |csv_row|
+          csv_row = csv_row.fields
           checklist_row_attributes = {
             checklist_id: owner.id,
             created_by_id: current_user.id
           }
 
           if has_header_col
-            is_header = csv_row.pop
-            checklist_row_attributes[:is_header] = is_header.upcase == 'Y'
+            is_header = csv_row.last
+            checklist_row_attributes[:is_header] = is_header && is_header.upcase == 'Y'
           end
 
           checklist_row = ChecklistRow.create(checklist_row_attributes)
@@ -169,6 +170,7 @@ class ChecklistsController < ApplicationController
         end
       end
     rescue Exception => e
+      Rails.logger.info e
     end
   end
 
