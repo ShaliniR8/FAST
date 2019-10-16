@@ -6,9 +6,11 @@ $(function() {
       hiddenHeaderInput.val(true)
       hiddenHeaderInput.change()
       $(this).closest('td').find('#is_header').val(true)
+      $(this).closest('tr').addClass('header-row')
       $(this).removeClass('btn-default').addClass('btn-success')
     } else {
       $(this).closest('td').find('#is_header').val(false)
+      $(this).closest('tr').removeClass('header-row')
       $(this).removeClass('btn-success').addClass('btn-default')
     }
   })

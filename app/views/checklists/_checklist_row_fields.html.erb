@@ -1,4 +1,6 @@
-<tr class="field_group to_delete">
+<% is_header = (defined? checklist_row) && checklist_row.is_header || false %>
+
+<tr class='field_group to_delete <%= is_header ? 'header-row' : '' %>'>
   <%if source == 'Existing'%>
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
@@ -42,7 +44,6 @@
   <%if action_name == 'edit' || action_name == 'retract_form_template'%>
     <td width="13%">
       <%=f.hidden_field :is_header, :id => 'is_header'%>
-      <%is_header = (defined? checklist_row) && checklist_row.is_header || false%>
       <%=link_to "<i class='glyphicon glyphicon-header'></i>".html_safe, '#',
         :class => "btn #{is_header ? 'btn-success' : 'btn-default'} header_toggle_btn"%>
       <%=f.hidden_field :_destroy, :id => "delete_row"%>
