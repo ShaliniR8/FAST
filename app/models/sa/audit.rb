@@ -1,4 +1,4 @@
-class Audit < ActiveRecord::Base
+class Audit < SafetyAssuranceBase
   extend AnalyticsFilters
   include GroupAccessHandling
   include ModelHelpers

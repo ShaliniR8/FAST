@@ -433,29 +433,66 @@ module ApplicationHelper
   end
 
   #Call in show statements; pass array of any and all subpanels to include data display preparations
-  def prepare_panels(owner)
+  def prepare_panels(owner, show_btns={})
+    btns = Hash.new(false).merge(owner.panel_btns)
     [].tap do |panels|
-      %i[comments attachments transaction_log].each do |panel|
+      CONFIG::OBJECT[owner.class.name][:panels].each do |panel|
         case panel
         when :attachments
           panels << {
-            partial: '/forms/attachments_show',
-            owner: owner
+            partial: '/panels/attachments',
+            attachments: owner.attachments,
+            show_btns: btns[:attachments]
           }
         when :comments
-          panels << {
-            partial: '/panels/comments',
-            comments: owner.comments.preload(:viewer)
-          }
+          if owner.comments.present?
+            panels << {
+              partial: '/panels/comments',
+              comments: owner.comments.preload(:viewer)
+            }
+          end
+        when :contacts
+          if owner.contacts.present?
+            panels << {
+              partial: '/panels/contacts',
+              contacts: owner.contacts,
+              fields: Contact.get_meta_fields('show')
+            }
+          end
+        when :costs
+          if owner.costs.present?
+            panels << {
+              partial: '/panels/costs',
+              costs: owner.costs
+            }
+          end
+        when :findings
+          if owner.findings.present?
+            panels << {
+              partial: '/panels/findings',
+              findings: owner.findings,
+              show_btns: btns[:findings]
+            }
+          end
         when :risk_assessment
           risk_matrix = owner.risk_analyses
+        when :signatures
+          if owner.signatures.present?
+            panels << {
+              partial: '/panels/signatures',
+              signatures: owner.signatures,
+              fields: Signature.get_meta_fields('show')
+            }
+          end
         when :transaction_log
-          panels << {
-            partial: '/panels/transaction_log',
-            transactions: owner.transactions.preload(:user)
-          }
+          if owner.transactions.present?
+            panels << {
+              partial: '/panels/transaction_log',
+              transactions: owner.transactions.preload(:user)
+            }
+          end
         else
-          Rails.logger.warning "Unknown Panel #{panel}; preparation available (skipped)"
+          Rails.logger.warn "Unknown Panel #{panel}; preparation available (skipped)"
         end
       end
     end

@@ -17,7 +17,7 @@ class DefaultConfig
   GENERAL = {
     # AIRLINE-SPECIFIC CONFIGS
       # Please Ensure these are filled out for each airline
-    version:        '1.1.0',                      # Helps to track most recent logged updates
+    version:        '1.2.0 beta',                 # Helps to track most recent logged updates
     name:           'Not Initialized',            # Airline Name- shown throughout site
     time_zone:      'Pacific Time (US & Canada)', # Used in varied locations
 
@@ -89,6 +89,7 @@ class DefaultConfig
     'SRM'     => SRM::HIERARCHY
   }
 
+  OBJECT = HIERARCHY.reduce({}){ |acc, (mod,data)| acc.merge(data[:objects]) }
 
   ###################################
   ### DEFAULT RISK MATRIX CONFIGS ###

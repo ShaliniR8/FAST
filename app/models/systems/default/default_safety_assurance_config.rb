@@ -12,13 +12,27 @@ class DefaultSafetyAssuranceConfig
   HIERARCHY = {
     display_name: 'Safety Assurance',
     objects: {
-      'Audit' => 'Audit',
-      'Inspection' => 'Inspection',
-      'Evaluation' => 'Evaluation',
-      'Investigation' => 'Investigation',
-      'Finding' => 'Finding',
-      'SmsAction' => 'Corrective Action',
-    }
+      'Audit' => {
+        title: 'Audit',
+        panels: %i[contacts findings costs signatures comments attachments transaction_log],
+      },
+      'Inspection' => {
+        title: 'Inspection',
+        panels: %i[contacts requirements findings costs signatures comments attachments transactions],
+      },
+      'Evaluation' => {
+        title: 'Evaluation',
+      },
+      'Investigation' => {
+        title: 'Investigation',
+      },
+      'Finding' => {
+        title: 'Finding',
+      },
+      'SmsAction' => {
+        title: 'Corrective Action',
+      },
+    },
   }
 
 end

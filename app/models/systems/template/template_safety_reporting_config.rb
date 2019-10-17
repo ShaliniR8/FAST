@@ -6,4 +6,6 @@ class TemplateSafetyReportingConfig < DefaultSafetyReportingConfig
     # Airline-Specific Features:
   })
 
+  HIERARCHY = DefaultSafetyReportingConfig::GENERAL.deep_merge({
+  })
 end
