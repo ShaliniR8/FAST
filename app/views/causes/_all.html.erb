@@ -1,5 +1,4 @@
-<%owner_class = owner.class.superclass.name == "ActiveRecord::Base" ? owner.class.name : owner.class.superclass.name%>
-<%headers = Object.const_get("#{owner_class}#{cause_type.titleize}").get_meta_fields('show')%>
+<%headers = owner.class.get_meta_fields('show')%>
 
 <div class="col-xs-12">
   <div class="panel panel-lightskyblue">

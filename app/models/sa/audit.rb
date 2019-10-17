@@ -1,4 +1,4 @@
-class Audit < SafetyAssuranceBase
+class Audit < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include GroupAccessHandling
   include ModelHelpers

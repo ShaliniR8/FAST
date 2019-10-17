@@ -14,17 +14,19 @@ class DefaultSafetyAssuranceConfig
     objects: {
       'Audit' => {
         title: 'Audit',
-        panels: %i[contacts findings costs signatures comments attachments transaction_log],
+        panels: %i[tasks contacts findings costs signatures comments attachments transaction_log],
       },
       'Inspection' => {
         title: 'Inspection',
-        panels: %i[contacts requirements findings costs signatures comments attachments transactions],
+        panels: %i[tasks contacts requirements findings costs signatures comments attachments transaction_log],
       },
       'Evaluation' => {
         title: 'Evaluation',
+        panels: %i[tasks contacts requirements findings costs signatures comments attachments transaction_log],
       },
       'Investigation' => {
         title: 'Investigation',
+        panels: %i[findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log],
       },
       'Finding' => {
         title: 'Finding',

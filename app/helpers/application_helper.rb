@@ -474,7 +474,19 @@ module ApplicationHelper
               show_btns: btns[:findings]
             }
           end
-        when :risk_assessment
+        when :recommendations #WIP
+          panels << {
+            partial: '/recommendations/show_all',
+            owner: owner,
+            show_btn: false
+          }
+        when :requirements #WIP
+          panels << {
+            partial: '/audits/show_requirements',
+            owner: owner,
+            type: owner.class.name.downcase
+          }
+        when :risk_assessment #WIP
           risk_matrix = owner.risk_analyses
         when :signatures
           if owner.signatures.present?
@@ -484,6 +496,18 @@ module ApplicationHelper
               fields: Signature.get_meta_fields('show')
             }
           end
+        when :sms_actions #WIP
+          panels << {
+            partial: '/sms_actions/show_all',
+            owner: owner,
+            show_btn: false
+          }
+        when :tasks #WIP
+          panels << {
+            partial: '/ims/show_task',
+            owner: owner,
+            fields: SmsTask.get_meta_fields('show')
+          }
         when :transaction_log
           if owner.transactions.present?
             panels << {

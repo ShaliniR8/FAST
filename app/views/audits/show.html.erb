@@ -1,11 +1,16 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2',
+    'utility/jquery.dataTables.min',
+    'utility/dataTables.bootstrap.min',
+    'utility/dataTables.buttons.min',
+    'utility/format-builder',
+    'utility/validate-form.js',
+    'utility/extra_fields'
+  )
+%>
+
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
-<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -58,9 +63,7 @@
         <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
         <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
 
-        <%=render "/ims/show_task", :owner => @owner, :fields => SmsTask.get_meta_fields('show')%>
-
-        <%=render '/panels/show_panels', owner: @owner, show_btns: @panel_btns%>
+        <%=render '/panels/show_panels', owner: @owner%>
 
       </div>
     </div>

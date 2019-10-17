@@ -1,4 +1,4 @@
-class Inspection < ActiveRecord::Base
+class Inspection < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include GroupAccessHandling
   include ModelHelpers

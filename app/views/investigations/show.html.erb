@@ -1,9 +1,13 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2',
+    'utility/jquery.dataTables.min',
+    'utility/dataTables.bootstrap.min',
+    'utility/dataTables.buttons.min',
+    'utility/format-builder'
+  )
+%>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -84,27 +88,8 @@
             :cause_type => 'cause',
             :can_change => can_change%>
 
-          <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
-          <%=render '/sms_actions/show_all', :owner => @owner, :show_btn => false%>
-          <%=render '/recommendations/show_all', :owner => @owner, :show_btn => false%>
+          <%=render '/panels/show_panels', owner: @owner%>
 
-          <%=render "/ims/show_contact",
-            :owner => @owner,
-            :fields => Contact.get_meta_fields('show')%>
-
-          <%=render "/ims/show_task",
-            :owner=>@owner,
-            :fields=> SmsTask.get_meta_fields('show')%>
-
-          <%=render "/forms/cost", :owner => @owner%>
-          <%=render 'forms/signatures/show_signatures', owner: @owner %>
-
-
-          <!-- <%#=render "/records/show_template_fields", :record => @owner.record%> -->
-
-          <%=render "/forms/show_comment", :owner => @owner%>
-          <%=render "/forms/attachments_show", :owner => @owner%>
-          <%=render "/records/transactions", :owner => @owner%>
         </div>
       </div>
     </div>

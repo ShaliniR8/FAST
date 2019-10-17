@@ -1,4 +1,4 @@
-class Investigation < ActiveRecord::Base
+class Investigation < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include GroupAccessHandling
   include ModelHelpers

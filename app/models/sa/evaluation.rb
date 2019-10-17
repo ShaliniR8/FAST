@@ -1,4 +1,4 @@
-class Evaluation < ActiveRecord::Base
+class Evaluation < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include GroupAccessHandling
   include ModelHelpers
