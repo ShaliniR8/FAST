@@ -12,11 +12,11 @@ module Transactionable
       Transaction.build_for(
         self,
         action,
-        session[:simulated_id] || session[:user_id],
+        defined?(session) ? (session[:simulated_id] || session[:user_id]) : nil,
         context || (defined?(session) ? '' : "Recurring #{self.class.name.titleize}"),
         nil,
         nil,
-        session[:platform]
+        defined?(session) ? session[:platform] : 'System'
       )
     end
   end
