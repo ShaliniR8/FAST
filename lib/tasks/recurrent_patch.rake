@@ -1,21 +1,23 @@
 namespace :recurring do
 
+  logger = Logger.new('log/patch.log', File::WRONLY | File::APPEND)
+  logger.datetime_format = "%Y-%m-%d %H:%M:%S"
+  logger.formatter = proc do |severity, datetime, progname, msg|
+   "[#{datetime}]: #{msg}\n"
+  end
+
   task :patch_current_audits => :environment do
     desc 'Patch existing in progress audits to use Recurrence'
 
-    puts 'BEGIN Patching Audits:'
+    logger.info 'BEGIN Patching Audits'
     num_created = 0
     num_skipped = 0
+
     audits_in_progress = Audit.where('status != ?', 'Completed')
-    puts "Processing #{audits_in_progress.count} active audits:"
+    logger.info "Processing #{audits_in_progress.count} active audits."
 
     # List of recurrence frequency labels
-    month_count_inverted = Hash.new
-    Recurrence.month_count.invert.each do |key, value|
-      key.each do |key_b, value_b|
-        month_count_inverted[value_b] = value
-      end
-    end
+    month_count_inverted = Recurrence.month_count.reduce({}){ |acc,(k,val)| (acc[val[:number]]=k); acc }
 
     # List of potential user defined audit types in db
     annual_audit_types = ['Annual']
@@ -33,72 +35,60 @@ namespace :recurring do
       'Bi-ennial'
     ]
 
-    if true
-      audits_in_progress.each do |audit|
-        audit_type = audit.audit_type
+    audits_in_progress.each do |audit|
+      audit_type = audit.audit_type
 
-        # Find audit frequency
-        if annual_audit_types.include?(audit_type)
-          month_count = 12.months
-          frequency = month_count_inverted[12]
-        elsif biennial_audit_types.include?(audit_type)
-          month_count = 24.months
-          frequency = month_count_inverted[24]
-        else
-          month_count = 0.months
-          frequency = 'None'
-        end
+      # Find audit frequency
+      if annual_audit_types.include?(audit_type)
+        month_count = 12.months
+        frequency = month_count_inverted[12]
+      elsif biennial_audit_types.include?(audit_type)
+        month_count = 24.months
+        frequency = month_count_inverted[24]
+      else
+        month_count = 0.months
+        frequency = 'None'
+      end
 
-        if ['Yearly','Biennial'].include?(frequency) && (audit.template != true)
-          puts "Generating template for audit ##{audit.id}..."
-          template = audit.clone
-          template.template = true
-          template.save!
+      if ['Yearly','Biennial'].include?(frequency) && !audit.template
+        template = audit.clone
+        template.update_attributes({template: true})
 
-          puts "Generating recurrence for audit ##{audit.id}..."
-          recurrence = Recurrence.new
-          recurrence.title = audit.title
-          recurrence.created_by_id = 1
-          recurrence.form_type = "Audit"
-          recurrence.template_id = template.id
-          recurrence.frequency = frequency
-          recurrence.newest_id = audit.id
-          recurrence.next_date = audit.completion + month_count
-          recurrence.save!
+        recurrence = Recurrence.create({
+          title:            audit.title,
+          created_by_id:    1,
+          form_type:        "Audit",
+          template_id:      template.id,
+          frequency:        frequency,
+          newest_id:        audit.id,
+          next_date:        audit.completion + month_count
+        })
 
-          # Link recurrence_id to the new template
-          template.recurrence_id = recurrence.id
-          template.save!
+        # Link recurrence_id to the new template
+        template.update_attributes({recurrence_id: recurrence.id})
 
-          num_created += 1
-        else
-          puts "Skipping audit ##{audit.id}; Audit is non-recurring."
-          num_skipped += 1
-        end
+        num_created += 1
+      else
+        num_skipped += 1
       end
     end
 
-    puts "Generated #{num_created} recurring audits."
-    puts "Skipped #{num_skipped} non-recurring audits."
+    logger.info "Generated #{num_created} recurring audits."
+    logger.info "Skipped #{num_skipped} non-recurring audits."
 
     all_audits = Audit.all
-    puts "Processing #{all_audits.count} audits:"
+    logger.info "Processing #{all_audits.count} audits."
 
     all_audits.group_by(&:title).each do |title, audits|
-      # puts "\'#{title}\' -> #{audits.map(&:class).join(', ')}"
       if audits.count > 1
-        group_recurrence_id = nil
-        audits.each do |audit|
-          group_recurrence_id = audit.recurrence_id if audit.template == true
-        end
-        audits.each do |audit|
-          audit.recurrence_id = group_recurrence_id
-          audit.save!
-        end
+        group_recurrence_id = audits.find{ |a| a.template }.recurrence_id rescue nil
+          #^Find the first that is the template from the array, then fetch its recurrence_id
+        Audit.where(id: audits.map(&:id)).update_all(recurrence_id: group_recurrence_id)
+          #^Fetch all that were in our group and update all of their recurrence_ids
       end
     end
 
-    puts "FINISH Patching Audits:"
+    logger.info 'FINISH Patching Audits.'
 
   end
 end

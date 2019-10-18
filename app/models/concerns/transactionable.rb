@@ -6,7 +6,7 @@ module Transactionable
 
   end
 
-  def create_transaction(action: 'Create', context: nil, user_id: nil)
+  def create_transaction(action: 'Create', context: nil)
     if !self.changes()['viewer_access'].present? &&
       ((!self.respond_to?(:completed)) || (self.respond_to?(:completed) && self.completed?))
       Transaction.build_for(
