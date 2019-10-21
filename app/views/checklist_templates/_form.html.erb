@@ -49,7 +49,11 @@
               <%end%>
             </tbody>
           </table>
-          <%=link_to_add_fields "Add Question", f, :checklist_questions%>
+          <%=link_to_add_fields 'Add Question',
+            f,
+            :checklist_questions,
+            partial: 'checklist_question_fields'
+          %>
           <%=submit_tag "Save Template",
             :class => "btn btn-success pull-right mt20",
             :disable_with => "Saving..."%>

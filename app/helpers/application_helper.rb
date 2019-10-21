@@ -338,11 +338,12 @@ module ApplicationHelper
     "    <a href='#{entry_url}'>#{message}</a>"
   end
 
-  def link_to_add_fields(name, f, association, locals={})
+  def link_to_add_fields(name, f, association, locals={}, partial: nil)
     target = association.to_s
     new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
+    partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields"
     fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(association.to_s.singularize.downcase + "_fields", :f => builder, :source => "New", :guest => @guest, :locals => locals)
+      render(partial, :f => builder, :source => 'New', :guest => @guest, :locals => locals)
     end
     link_to_function(name, "add_fields(this, \"#{association}\", \"#{escape_javascript(fields)}\", \"#{target}\")")
   end

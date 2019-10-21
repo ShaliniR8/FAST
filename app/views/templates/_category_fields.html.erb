@@ -76,7 +76,11 @@
             <%end%>
           </tbody>
         </table>
-        <%= link_to_add_fields "Add a Field", f, :fields%></br>
+        <%= link_to_add_fields 'Add a Field',
+          f,
+          :fields,
+          partial: 'field_fields'
+        %></br>
       </div>
     </div>
 
