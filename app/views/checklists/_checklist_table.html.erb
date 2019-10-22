@@ -1,23 +1,23 @@
-<table id="checklist_records_<%checklist.id%>" class="table table-bordered table-striped mt10">
+<table id="checklist_records_<%= checklist.id %>" class="table table-bordered table-striped mt10">
   <thead>
     <tr>
-      <%checklist.checklist_header.checklist_header_items.order("display_order").each do |header|%>
-        <th width="<%=header.size%>%"><%=header.title%></th>
-      <%end%>
+      <% checklist.checklist_header.checklist_header_items.each do |header|%>
+        <th width="<%= header.size %>%"><%= header.title %></th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
-    <%checklist.checklist_rows.order(:id).each do |checklist_row|%>
+    <% checklist.checklist_rows.each do |row| %>
       <tr class='<%= checklist_row.is_header ? 'header-row' : '' %>'>
-        <%checklist_row.checklist_cells.order{|x| x.checklist_header_item.display_order}.each do |checklist_cell|%>
+        <% row.checklist_cells.each do |cell| %>
           <td>
             <%=render 'checklist_headers/preview_field',
               :owner_type => checklist.owner_type,
-              :cell => checklist_cell,
-              :item => checklist_cell.checklist_header_item%>
+              :cell => cell,
+              :item => cell.checklist_header_item%>
           </td>
-        <%end%>
+        <% end %>
       </tr>
-    <%end%>
+    <% end %>
   </tbody>
 </table>

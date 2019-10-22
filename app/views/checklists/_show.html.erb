@@ -22,7 +22,12 @@
 
       <div class="col-xs-12">
 
-        <%owner.checklists.preload(:checklist_rows => :checklist_cells).each do |checklist|%>
+        <%
+          owner.checklists.includes(
+            checklist_rows: { checklist_cells: :checklist_header_item },
+            checklist_header: :checklist_header_items
+          ).each do |checklist|
+        %>
 
           <%if owner.status != 'Completed' && (
               current_user.has_access(owner.class.table_name,'admin', admin: true) ||
@@ -55,8 +60,8 @@
             :class => "btn btn-success pull-right mr5",
             :target => "_blank"%>
 
-          <h5><b>Checklist Title: </b><%=checklist.title%></h5>
-          <%=render "/checklists/checklist_table", :checklist => checklist%>
+          <h5><b>Checklist Title: </b><%= checklist.title %></h5>
+          <%= render '/checklists/checklist_table', checklist: checklist %>
 
         <%end%>
       </div>
