@@ -281,7 +281,7 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('show', @report.status == "Closed" ? 'close' : '', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
   end
 
 
