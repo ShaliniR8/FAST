@@ -79,7 +79,10 @@ class ChecklistsController < ApplicationController
 
 
   def start
-    @record = @table.find(params[:id])
+    @record = @table.includes(
+      checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
+      checklist_header: :checklist_header_items,
+    ).find(params[:id])
     render :partial => 'edit'
   end
 
