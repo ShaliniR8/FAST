@@ -1,4 +1,5 @@
 class Report < ActiveRecord::Base
+  include ModelHelpers
 
 #Concerns List
   include Attachmentable
@@ -58,8 +59,8 @@ class Report < ActiveRecord::Base
       {field: "get_root_causes_full",   title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
       {field: "get_root_causes",        title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index'},
 
-      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_label_options },
-      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false, options: get_venue_options },
+      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false,  options: get_custom_options('Event Types')},
+      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false,  options: get_custom_options('Event Venues')},
       {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'event_summary',       required: false },
       {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show',     required: true  },
       {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',                required: false },
@@ -68,8 +69,8 @@ class Report < ActiveRecord::Base
       {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
       {field: 'asap',                 title: 'Accepted Into ASAP',        num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
       {field: 'sole',                 title: 'Sole Source',               num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
-      {field: 'disposition',          title: 'Disposition',               num_cols: 6,    type: 'select',   visible: 'close',           required: false, options: dispositions  },
-      {field: 'company_disposition',  title: 'Company Disposition',       num_cols: 6,    type: 'select',   visible: 'close',           required: false, options: company_dis },
+      {field: 'disposition',          title: 'Disposition',               num_cols: 6,    type: 'datalist', visible: 'close',           required: false,      options: get_custom_options('Dispositions')},
+      {field: 'company_disposition',  title: 'Company Disposition',       num_cols: 6,    type: 'datalist', visible: 'close',           required: false,      options: get_custom_options('Company Dispositions')},
       {field: 'narrative',            title: 'Narrative',                 num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
       {field: 'regulation',           title: 'Regulation',                num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
       {field: 'notes',                title: 'Closing Notes',             num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
