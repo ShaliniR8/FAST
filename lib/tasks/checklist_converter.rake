@@ -98,9 +98,7 @@ namespace :checklist_converter do
       ).id
 
       # return a hash with keys of fields from audit_item_headers
-      header_items_hash.merge({
-        header_item[:field] => { id: header_item_id, options: options }
-      })
+      header_items_hash.tap{ |h| h[header_item[:field]] = { id: header_item_id, options: options } }
     end
 
     # get the ids of Audits with AuditItems
@@ -120,7 +118,7 @@ namespace :checklist_converter do
         checklist_header_id:  header_id,
       ).id
 
-      checklists_hash.merge({ owner_id => checklist_id })
+      checklists_hash.tap{ |h| h[owner_id] = checklist_id }
     end
 
     AuditItem.transaction do
