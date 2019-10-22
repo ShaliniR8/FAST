@@ -33,6 +33,7 @@ class SCX_Config
       :observation_phases_trend                       => false,
       :allow_template_nested_fields                   => false,
       :checklist_version                              => '3',
+      :report_root_cause_lock                         => true,
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
