@@ -108,6 +108,16 @@
   }
 }
 
+/*--- Checklist Styles ---*/
+tr.header-row {
+  background-color: #e8e8e8 !important;
+  color: #333333 !important;
+}
+
+tr.header-row td {
+  font-weight: bold !important;
+}
+
 /*-----------------------------------------
   Plugins Styling (Fixes)
 ----------------------------------------- */

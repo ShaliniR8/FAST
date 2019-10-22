@@ -1,7 +1,12 @@
-<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
-<script type="text/javascript" src="/javascripts/utility/checklist-control.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/nested_fields',
+    'utility/checklist-control',
+    'utility/dirty-form',
+  )
+%>
 
-<%=form_for @record do |f|%>
+<%=form_for @record, html: { class: 'dirty-submit' } do |f|%>
   <div class="col-xs-12">
     <div class="panel panel-warning">
 

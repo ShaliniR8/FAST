@@ -1,34 +1,54 @@
+<%
+  source ||= nil
+  is_new = source.blank?
+%>
+
 <td>
   <%if !header_item.editable && action_name == 'start' || (action_name == 'start' && checklist_cell.checklist_row.is_header rescue true)%>
     <%=checklist_cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%else%>
     <%case header_item.data_type%>
     <%when 'radio'%>
-      <%if action_name == "start"%>
+      <%if action_name == 'start'%>
         <div class="col-xs-12 ml5">
-          <%checklist_cell.options.split(";").each do |option|%>
+          <%checklist_cell.options.split(';').each do |option|%>
             <label class="radio radio-inline">
-              <%=f.radio_button :value, option%>
+              <%=f.radio_button :value, option, class: "#{is_new ? 'changed' : ''}"%>
               <%=option%>
             </label><br>
           <%end%>
         </div>
       <%else%>
-        <%=f.text_area :options, :value => (f.object.options || header_item.options), :class => "form-control", :rows => 4%>
+        <%= f.text_area :options,
+          value: (f.object.options || header_item.options),
+          class: "form-control #{is_new ? 'changed' : ''}",
+          rows: 4
+        %>
       <%end%>
 
     <%when 'dropdown'%>
-      <%if action_name == "start"%>
-        <%=f.select :value,
-          header_item.options.split(";"),
-          {:include_blank => ""},
-          {:class=>'form-control field_select'}%>
+      <%if action_name == 'start'%>
+        <%= f.select :value,
+          header_item.options.split(';'),
+          { include_blank: ''},
+          { class: "form-control field_select #{is_new ? 'changed' : ''}" }
+        %>
       <%else%>
-        <%=f.text_area :options, :value => (f.object.options || header_item.options), :class => "form-control", :rows => 4%>
+        <%= f.text_area :options,
+          value: (f.object.options || header_item.options),
+          class: "form-control #{is_new ? 'changed' : ''}",
+          rows: 4
+        %>
       <%end%>
     <%when 'text'%>
-      <%=f.text_area :value, :class => "form-control", :rows => 4%>
+      <%= f.text_area :value,
+        class: "form-control #{is_new ? 'changed' : ''}",
+        rows: 4
+      %>
     <%end%>
-    <%=f.hidden_field :checklist_header_item_id, :value => header_item.id%>
+    <%= f.hidden_field :checklist_header_item_id,
+      value: header_item.id,
+      class: "#{is_new ? 'changed' : ''}"
+    %>
   <%end%>
 </td>

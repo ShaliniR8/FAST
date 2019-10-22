@@ -179,6 +179,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       get 'retract_form_upload'
       get 'retract_form_template'
+      post 'add_template'
     end
   end
   resources :checklist_rows

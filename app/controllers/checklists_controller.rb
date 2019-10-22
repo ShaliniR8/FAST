@@ -106,25 +106,59 @@ class ChecklistsController < ApplicationController
     @record = @table.find(params[:id])
   end
 
+  def add_template
+    owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    template = @table.preload(checklist_rows: :checklist_cells).find(params[:id])
+
+    Checklist.transaction do
+      new_checklist = template.clone
+      owner.checklists << new_checklist
+
+      template.checklist_rows.each do |row|
+        new_row = row.clone
+        new_checklist.checklist_rows << new_row
+        row.checklist_cells.each{ |cell| new_row.checklist_cells << cell.clone }
+      end
+    end
+
+    respond_to do |format|
+      format.js { render inline: 'location.reload()' }
+    end
+  end
+
 
   private
 
   def upload_csv(upload, owner)
     checklist_header_items = owner.checklist_header.checklist_header_items
+    has_header_col = checklist_header_items.length < CSV.read(upload, headers: true).headers.length
     begin
       Checklist.transaction do
-        CSV.foreach(upload, :headers => true) do |row|
-          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+        CSV.foreach(upload, headers: true) do |csv_row|
+          csv_row = csv_row.fields
+          is_header = csv_row.last
+          checklist_row = ChecklistRow.create({
+            checklist_id: owner.id,
+            created_by_id: current_user.id,
+            is_header: has_header_col && is_header && is_header.upcase == 'Y'
+          })
+
           checklist_header_items.each_with_index do |header_item, index|
-            cell = row[index]
-            ChecklistCell.create({
-              :checklist_row_id => checklist_row.id,
-              :value => cell,
-              :checklist_header_item_id => checklist_header_items[index].id})
+            csv_cell_value = csv_row[index]
+            cell = ChecklistCell.new({
+              checklist_header_item_id: checklist_header_items[index].id
+            })
+            if header_item.data_type.match /radio|dropdown/
+              cell.options = csv_cell_value || checklist_header_items[index].options
+            else
+              cell.value = csv_cell_value
+            end
+            checklist_row.checklist_cells << cell
           end
         end
       end
     rescue Exception => e
+      Rails.logger.info e
     end
   end
 

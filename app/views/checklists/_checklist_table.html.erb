@@ -8,7 +8,7 @@
   </thead>
   <tbody>
     <%checklist.checklist_rows.order(:id).each do |checklist_row|%>
-      <tr>
+      <tr class='<%= checklist_row.is_header ? 'header-row' : '' %>'>
         <%checklist_row.checklist_cells.order{|x| x.checklist_header_item.display_order}.each do |checklist_cell|%>
           <td>
             <%=render 'checklist_headers/preview_field',
