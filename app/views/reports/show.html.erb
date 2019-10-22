@@ -89,6 +89,7 @@
         </div>
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
+            <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.root_cause_lock? %></b>
             <%if current_user.has_access('reports','edit', admin: true)%>
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
@@ -107,8 +108,8 @@
                   :class => "btn btn-success pull-right ml5 mb5",
                   :disable_with => "Adding..."%>
               <%end%>
-              <%if @report.status == "New"%>
-                <%=link_to "ERC Meeting Ready",
+              <%if @report.can_meeting_ready?(current_user)%>
+                <%=link_to 'ERC Meeting Ready',
                   meeting_ready_report_path(@report),
                   :class=>"btn btn-warning pull-right mb5 ml5",
                   :disable_with => "Preparing...",
@@ -116,7 +117,7 @@
                   "data-placement" => "top",
                   :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
               <%end%>
-              <%if @report.status != "Closed"%>
+              <%if @report.can_close?(current_user)%>
                 <%=link_to 'Close Event', '#',
                   :class => 'btn btn-danger close_event_btn pull-right ml5 mb5',
                   'data-toggle' => 'modal',

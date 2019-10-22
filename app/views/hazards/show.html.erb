@@ -6,10 +6,12 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
+
 <%=render "access_controls/new_modal"%>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
     <div class="panel panel-primary">
       <div class="panel-heading">
         <div class="panel-title">
@@ -69,7 +71,8 @@
 
       <div class="panel-body">
         <div class="col-xs-12 mb20">
-          <%if @hazard.status == "New"%>
+        <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before Completing/Rejecting" if @hazard.root_cause_lock? %></b>
+          <%if @hazard.can_complete?(current_user)%>
             <%=link_to "Reject",
               complete_hazard_path(@hazard, :status => "Rejected"),
               :class => "btn btn-danger pull-right mr5 mb5",

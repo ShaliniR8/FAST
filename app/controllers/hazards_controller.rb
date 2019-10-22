@@ -102,6 +102,10 @@ class HazardsController < ApplicationController
 
   def complete
     hazard = Hazard.find(params[:id])
+    unless hazard.can_complete?(current_user)
+      redirect_to hazard_path(hazard), flash: { error: "Unable to #{params[:status]} hazard." }
+      return
+    end
     hazard.status = params[:status]
     hazard.close_date = Time.now
     Transaction.build_for(

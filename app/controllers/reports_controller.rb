@@ -93,6 +93,10 @@ class ReportsController < ApplicationController
 
   def meeting_ready
     report = Report.find(params[:id])
+    unless report.can_meeting_ready?(current_user)
+      redirect_to report_path(report), flash: { error: 'Unable to make event meeting ready' }
+      return
+    end
     report.status = "Meeting Ready"
     Transaction.build_for(
       report,
@@ -245,6 +249,10 @@ class ReportsController < ApplicationController
         "Event ##{@owner.get_id}"
       )
     when 'Close Event'
+      unless @owner.can_close?(current_user)
+        redirect_to redirect_path || report_path(@owner), flash: { error: 'Unable to close event' }
+        return
+      end
       close_records(@owner)
       @owner.child_connections.where(owner_type: 'Meeting').update_all(complete: true)
       redirect_path = params[:redirect_path]

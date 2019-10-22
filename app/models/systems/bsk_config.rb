@@ -32,6 +32,7 @@ class BSK_Config
       :observation_phases_trend                       => true,
       :allow_template_nested_fields                   => true,
       :checklist_version                              => '1',
+      :hazard_root_cause_lock                         => true,
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,

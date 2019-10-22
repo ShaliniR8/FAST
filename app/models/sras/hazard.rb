@@ -106,8 +106,11 @@ class Hazard < ActiveRecord::Base
   end
 
 
-
-
+  def can_complete?(user, form_conds: false, user_conds: false)
+    form_confirmed = self.status == 'New' || form_conds
+    user_confirmed = true
+    form_confirmed && user_confirmed && !self.root_cause_lock?
+  end
 
   def self.get_avg_complete
     candidates=self.where("status=? and close_date is not ? and created_at is not ?","Completed",nil,nil)

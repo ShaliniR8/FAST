@@ -584,4 +584,16 @@ class Report < ActiveRecord::Base
       "N/A"
     end
   end
+
+  def can_meeting_ready?(user, form_conds: false, user_conds: false)
+    form_confirmed = self.status == 'New' || form_conds
+    user_confirmed = true
+    form_confirmed && user_confirmed && !self.root_cause_lock?
+  end
+
+  def can_close?(user, form_conds: false, user_conds: false)
+    form_confirmed = self.status != 'Closed' || form_conds
+    user_confirmed = true
+    form_confirmed && user_confirmed && !self.root_cause_lock?
+  end
 end
