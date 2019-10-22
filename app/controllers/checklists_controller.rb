@@ -107,25 +107,19 @@ class ChecklistsController < ApplicationController
   end
 
   def add_template
-    owner = Object.const_get("#{params[:owner_type]}").find(params[:owner_id])
-    template = @table.find(params[:id])
-    new_checklist = template.clone
+    owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    template = @table.preload(checklist_rows: :checklist_cells).find(params[:id])
 
-    template.checklist_rows.each do |row|
-      new_row = row.clone
+    Checklist.transaction do
+      new_checklist = template.clone
+      owner.checklists << new_checklist
 
-      row.checklist_cells.each do |cell|
-        new_cell = cell.clone
-        new_cell.save
-        new_row.checklist_cells << new_cell
+      template.checklist_rows.each do |row|
+        new_row = row.clone
+        new_checklist.checklist_rows << new_row
+        row.checklist_cells.each{ |cell| new_row.checklist_cells << cell.clone }
       end
-
-      new_row.save
-      new_checklist.checklist_rows << new_row
     end
-
-    new_checklist.save
-    owner.checklists << new_checklist
 
     respond_to do |format|
       format.js { render inline: 'location.reload()' }
@@ -142,30 +136,24 @@ class ChecklistsController < ApplicationController
       Checklist.transaction do
         CSV.foreach(upload, headers: true) do |csv_row|
           csv_row = csv_row.fields
-          checklist_row_attributes = {
+          is_header = csv_row.last
+          checklist_row = ChecklistRow.create({
             checklist_id: owner.id,
-            created_by_id: current_user.id
-          }
+            created_by_id: current_user.id,
+            is_header: has_header_col && is_header && is_header.upcase == 'Y'
+          })
 
-          if has_header_col
-            is_header = csv_row.last
-            checklist_row_attributes[:is_header] = is_header && is_header.upcase == 'Y'
-          end
-
-          checklist_row = ChecklistRow.create(checklist_row_attributes)
           checklist_header_items.each_with_index do |header_item, index|
             csv_cell_value = csv_row[index]
-            cell_attributes = {
-              checklist_row_id: checklist_row.id,
+            cell = ChecklistCell.new({
               checklist_header_item_id: checklist_header_items[index].id
-            }
+            })
             if header_item.data_type.match /radio|dropdown/
-              cell_attributes[:options] = csv_cell_value || checklist_header_items[index].options
+              cell.options = csv_cell_value || checklist_header_items[index].options
             else
-              cell_attributes[:value] = csv_cell_value
+              cell.value = csv_cell_value
             end
-
-            ChecklistCell.create(cell_attributes)
+            checklist_row.checklist_cells << cell
           end
         end
       end
