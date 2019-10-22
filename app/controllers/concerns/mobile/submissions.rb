@@ -39,9 +39,9 @@ module Concerns
 
         json[:meta_field_titles] = Submission.get_meta_fields('show').reduce({}) do |meta_field_titles, meta_field|
           field = meta_field[:field]
-          field = meta_field[:field].split('_').drop(1).join('_') if field.include? 'get'
-          field = 'submitted_by' if field == 'user_id'
-          meta_field_titles.merge({ field => meta_field[:title] })
+          field = field.split('_').drop(1).join('_') if field.include? 'get'
+          field = 'submitted_by' if field == 'submitter_name'
+          meta_field_titles.tap{ |titles| titles[field] = meta_field[:title] }
         end
 
         # Get ids of the 3 most recent completed submissions and 3 most recent in progress submissions
