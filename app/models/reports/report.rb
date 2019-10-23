@@ -48,16 +48,16 @@ class Report < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     [
-      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,show',          required: false },
-      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,show',          required: false },
-      {                                                                                   type: 'newline',  visible: 'show'                        },
+      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: false },
+      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: false },
+      {                                                                                   type: 'newline',  visible: 'show'                                 },
       {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: true  },
       {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show',     required: true  },
-      {                                                                                   type: 'newline',  visible: 'show'                        },
-      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index',               required: false },
+      {                                                                                   type: 'newline',  visible: 'show'                                 },
+      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index,form',          required: false },
 
-      {field: "get_root_causes_full",   title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
-      {field: "get_root_causes",        title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index'},
+      {field: "get_root_causes_full", title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
+      {field: "get_root_causes",      title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index,form'},
 
       {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false,  options: get_custom_options('Event Types')},
       {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false,  options: get_custom_options('Event Venues')},
@@ -77,14 +77,14 @@ class Report < ActiveRecord::Base
 
       {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index,form',      required: false,  html_class: 'get_before_risk_color'},
 
       {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
       {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
-      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',             required: false }, #Gets overridden in view- see included_events.html.erb
+      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index,form',      required: false,  html_class: 'get_after_risk_color'},
+      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',         required: false }, #Gets overridden in view- see included_events.html.erb
 
-      {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting',         required: false},
+      {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'form,meeting',    required: false},
 
 
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
