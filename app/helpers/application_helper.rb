@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include ShowFormHelper
+
   def getAlltemplates
     return Template.find(:all)
   end
@@ -423,7 +425,7 @@ module ApplicationHelper
   end
 
   def module_display_to_mode module_display
-    mode, val = CONFIG::HIERARCHY.select{|k, hash| hash[:display_name] == module_display}.first
+    mode, val = CONFIG::HIERARCHY.find{|k, hash| hash[:display_name] == module_display}
     mode
   end
 
@@ -431,96 +433,6 @@ module ApplicationHelper
   def array_to_id_map(*args)
     array, key = args
     array.reduce({}) { |id_map, element| id_map.merge({ element[key || 'id'] => element }) }
-  end
-
-  #Call in show statements; pass array of any and all subpanels to include data display preparations
-  def prepare_panels(owner, show_btns={})
-    btns = Hash.new(false).merge(owner.panel_btns)
-    [].tap do |panels|
-      CONFIG::OBJECT[owner.class.name][:panels].each do |panel|
-        case panel
-        when :attachments
-          panels << {
-            partial: '/panels/attachments',
-            attachments: owner.attachments,
-            show_btns: btns[:attachments]
-          }
-        when :comments
-          if owner.comments.present?
-            panels << {
-              partial: '/panels/comments',
-              comments: owner.comments.preload(:viewer)
-            }
-          end
-        when :contacts
-          if owner.contacts.present?
-            panels << {
-              partial: '/panels/contacts',
-              contacts: owner.contacts,
-              fields: Contact.get_meta_fields('show')
-            }
-          end
-        when :costs
-          if owner.costs.present?
-            panels << {
-              partial: '/panels/costs',
-              costs: owner.costs
-            }
-          end
-        when :findings
-          if owner.findings.present?
-            panels << {
-              partial: '/panels/findings',
-              findings: owner.findings,
-              show_btns: btns[:findings]
-            }
-          end
-        when :recommendations #WIP
-          panels << {
-            partial: '/recommendations/show_all',
-            owner: owner,
-            show_btn: false
-          }
-        when :requirements #WIP
-          panels << {
-            partial: '/audits/show_requirements',
-            owner: owner,
-            type: owner.class.name.downcase
-          }
-        when :risk_assessment #WIP
-          risk_matrix = owner.risk_analyses
-        when :signatures
-          if owner.signatures.present?
-            panels << {
-              partial: '/panels/signatures',
-              signatures: owner.signatures,
-              fields: Signature.get_meta_fields('show')
-            }
-          end
-        when :sms_actions #WIP
-          panels << {
-            partial: '/sms_actions/show_all',
-            owner: owner,
-            show_btn: false
-          }
-        when :tasks #WIP
-          panels << {
-            partial: '/ims/show_task',
-            owner: owner,
-            fields: SmsTask.get_meta_fields('show')
-          }
-        when :transaction_log
-          if owner.transactions.present?
-            panels << {
-              partial: '/panels/transaction_log',
-              transactions: owner.transactions.preload(:user)
-            }
-          end
-        else
-          Rails.logger.warn "Unknown Panel #{panel}; preparation available (skipped)"
-        end
-      end
-    end
   end
 
 end

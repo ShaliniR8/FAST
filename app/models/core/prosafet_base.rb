@@ -24,7 +24,7 @@ class ProsafetBase < ActiveRecord::Base
 
   # Returns the titleized version of the class + strips any namespacing
   def self.titleize
-    self.name.split('::').last
+    self.name.split('::').last.titleize
   end
 
   # Returns the result of the path helper for any class

@@ -6,6 +6,6 @@ class TemplateSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
     # Airline-Specific Features:
   })
 
-  HIERARCHY = DefaultSafetyAssuranceConfig::GENERAL.deep_merge({
+  HIERARCHY = DefaultSafetyAssuranceConfig::HIERARCHY.deep_merge({
   })
 end
