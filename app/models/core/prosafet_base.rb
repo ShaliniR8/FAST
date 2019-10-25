@@ -22,9 +22,17 @@ class ProsafetBase < ActiveRecord::Base
     end
   end
 
+  # Returns the AccessControl table name of the object (for user.has_access lookups)
+  def self.rule_name
+    self.name.demodulize.downcase
+  end
+  def rule_name
+    self.class.name.demodulize.downcase
+  end
+
   # Returns the titleized version of the class + strips any namespacing
   def self.titleize
-    self.name.split('::').last.titleize
+    self.name.demodulize.titleize
   end
 
   # Returns the result of the path helper for any class

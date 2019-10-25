@@ -92,6 +92,10 @@ class DefaultConfig
 
   OBJECT = HIERARCHY.reduce({}){ |acc, (mod,data)| acc.merge(data[:objects]) }
 
+  def self.check_action(user,action,object,**op)
+    OBJECT[object.class.name][:actions][:access].call(owner:object,user:user,**op)
+  end
+
 
   ###################################
   ### DEFAULT RISK MATRIX CONFIGS ###

@@ -1,7 +1,14 @@
  module ShowFormHelper
   #This contains all helpers used to render generalized show/form pages
 
-  def prepare_btns(owner)
+  #Called in form/render_buttons; pass the owner and form location to automatically find which
+    #buttons should be displayed
+  def prepare_btns(owner, env)
+    actions = CONFIG::OBJECT[owner.class.name][:actions].select{ |key, act|
+       act[:btn_loc].include?(env) &&
+       act[:access].call(owner: owner, user: current_user)
+    }.map {|key, act| key}
+    actions
   end
 
   #Called in panel/show_panels; pass the owner and it will initialize all locals for each panel

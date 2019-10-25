@@ -1,4 +1,4 @@
-class Recommendation < ActiveRecord::Base
+class Recommendation < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include ModelHelpers
   include StandardWorkflow

@@ -1,4 +1,4 @@
-class Finding < ActiveRecord::Base
+class Finding < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include GroupAccessHandling
   include ModelHelpers

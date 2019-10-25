@@ -19,38 +19,14 @@
             <%="Evaluation ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
-            <%= render '/forms/btns/render_btns',
-              btns: [
-                'delete',
-                'override_status',
-                'edit',
-                'sign',
-                'deid_pdf',
-                'pdf',
-                'viewer_access',
-                'attach_in_message',
-                'expand_all'
-              ],
-              owner: @owner %>
+            <%= render '/forms/render_buttons', owner: @owner, env: :top %>
           </div>
         </div>
       </div>
       <div class="panel-body">
         <div class="col-xs-12 mb15">
 
-          <%= render '/forms/btns/render_btns',
-            btns: [
-              'assign',
-              'complete',
-              'approve_reject',
-              'reopen',
-              'task',
-              'cost',
-              'contact',
-              'finding',
-              'comment'
-            ],
-            owner: @owner %>
+          <%= render '/forms/render_buttons', owner: @owner, env: :inline %>
 
         </div>
 

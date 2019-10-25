@@ -1,4 +1,4 @@
-class SmsAction < ActiveRecord::Base
+class SmsAction < Sa::SafetyAssuranceBase
   extend AnalyticsFilters
   include StandardWorkflow
   include GroupAccessHandling
