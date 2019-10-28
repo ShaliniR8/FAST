@@ -140,6 +140,7 @@ class Report < ActiveRecord::Base
 
   def reopen(new_status)
     self.status = new_status
+    self.close_date = nil
     self.records.each{|x| x.reopen("Linked");}
     Transaction.build_for(
       self,

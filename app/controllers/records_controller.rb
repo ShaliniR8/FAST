@@ -446,9 +446,11 @@ class RecordsController < ApplicationController
           current_user.id,
           'Report has been closed.'
         )
-        end
+      end
+      @owner.close_date = Time.now
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
+      params[:record][:close_date] = params[:record][:status] == 'Closed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

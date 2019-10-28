@@ -552,6 +552,7 @@ class ApplicationController < ActionController::Base
   def reopen_report(owner)
     owner_class = owner.class.name
     owner.status = "New"
+    owner.close_date = nil
     owner.save
     Transaction.build_for(
       owner,

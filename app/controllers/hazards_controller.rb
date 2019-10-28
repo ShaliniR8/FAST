@@ -83,6 +83,7 @@ class HazardsController < ApplicationController
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
+      params[:hazard][:close_date] = params[:hazard][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

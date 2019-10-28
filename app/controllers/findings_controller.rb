@@ -155,6 +155,7 @@ class FindingsController < SafetyAssuranceController
           true, 'Finding Pending Approval')
       else
         @owner.complete_date = Time.now
+        @owner.close_date = Time.now
       end
     when 'Reject'
       notify(@owner.responsible_user,
@@ -162,11 +163,13 @@ class FindingsController < SafetyAssuranceController
         true, 'Finding Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Finding ##{@owner.id} was Approved by the Final Approver" + g_link(@owner),
         true, 'Finding Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:finding][:status]}"
+      params[:finding][:close_date] = params[:finding][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

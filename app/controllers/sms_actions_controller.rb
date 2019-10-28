@@ -133,6 +133,7 @@ class SmsActionsController < SafetyAssuranceController
           true, 'Corrective Action Pending Approval')
       else
         @owner.complete_date = Time.now
+        @owner.close_date = Time.now
       end
     when 'Reject'
       notify(@owner.responsible_user,
@@ -140,11 +141,13 @@ class SmsActionsController < SafetyAssuranceController
         true, 'Corrective Action Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Corrective Action ##{@owner.id} has been Approved by the Final Approver." + g_link(@owner),
         true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
+      params[:sms_action][:close_date] = params[:sms_action][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

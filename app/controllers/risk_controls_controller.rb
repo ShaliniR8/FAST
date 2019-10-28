@@ -107,6 +107,7 @@ class RiskControlsController < ApplicationController
           true, 'Risk Control Pending Approval')
       else
         @owner.date_complete = Time.now
+        @owner.close_date = Time.now
       end
     when 'Reject'
       notify(@owner.responsible_user,
@@ -114,11 +115,13 @@ class RiskControlsController < ApplicationController
         true, 'Risk Control Rejected')
     when 'Approve'
       @owner.date_complete = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Risk Control ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Risk Control Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
+      params[:risk_control][:close_date] = params[:risk_control][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment', 'Add Cost'
       transaction = false
     end

@@ -138,6 +138,7 @@ class CorrectiveActionsController < ApplicationController
         true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:corrective_action][:status]}"
+      params[:corrective_action][:close_date] = params[:corrective_action][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

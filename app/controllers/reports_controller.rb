@@ -240,6 +240,7 @@ class ReportsController < ApplicationController
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:report][:status]}"
+      params[:report][:close_date] = params[:report][:status] == 'Closed' ? Time.now : nil
     when 'Add Meeting Minutes'
       redirect_path = meeting_path(params[:meeting_id])
       Transaction.build_for(
@@ -254,6 +255,7 @@ class ReportsController < ApplicationController
         return
       end
       close_records(@owner)
+      @owner.close_date = Time.now
       @owner.child_connections.where(owner_type: 'Meeting').update_all(complete: true)
       redirect_path = params[:redirect_path]
     when 'Add Attachment'
