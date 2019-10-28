@@ -1,51 +1,98 @@
 class RemovePocColumnsFromAllTables < ActiveRecord::Migration
+
+  TABLES = {
+    user_poc_id: {
+      table: %i[
+        agendas
+        corrective_actions
+        message_accesses
+        recommendations
+        sms_actions
+        transactions
+      ],
+      type: :integer
+    },
+    approver_poc_id: {
+      table: %i[
+        audits
+        evaluations
+        findings
+        inspections
+        investigations
+        sms_actions
+      ],
+      type: :integer
+    },
+    poc_id: {
+      table: %i[
+        participations
+        users
+      ],
+      type: :integer
+    },
+    auditor_poc_id: {
+      table: %i[
+        audits
+      ],
+      type: :integer
+    },
+    evaluator_poc_id: {
+      table: %i[
+        evaluations
+      ],
+      type: :integer
+    },
+    responsible_user_poc_id: {
+      table: %i[
+        findings
+      ],
+      type: :integer
+    },
+    lead_evaluator_poc_id: {
+      table: %i[
+        ims
+      ],
+      type: :integer
+    },
+    pre_reviewer_poc_id: {
+      table: %i[
+        ims
+      ],
+      type: :integer
+    },
+    investigator_poc_id: {
+      table: %i[
+        investigations
+      ],
+      type: :integer
+    },
+    poc_first_name: {
+      table: %i[
+        transactions
+      ],
+      type: :string
+    },
+    poc_last_name: {
+      table: %i[
+        transactions
+      ],
+      type: :string
+    },
+  }
+
   def self.up
-    remove_column :agendas,            :user_poc_id
-    remove_column :audits,             :auditor_poc_id
-    remove_column :audits,             :approver_poc_id
-    remove_column :corrective_actions, :user_poc_id
-    remove_column :evaluations,        :approver_poc_id
-    remove_column :evaluations,        :evaluator_poc_id
-    remove_column :findings,           :responsible_user_poc_id
-    remove_column :findings,           :approver_poc_id
-    remove_column :ims,                :lead_evaluator_poc_id
-    remove_column :ims,                :pre_reviewer_poc_id
-    remove_column :inspections,        :approver_poc_id
-    remove_column :investigations,     :approver_poc_id
-    remove_column :investigations,     :investigator_poc_id
-    remove_column :message_accesses,   :user_poc_id
-    remove_column :participations,     :poc_id
-    remove_column :recommendations,    :user_poc_id
-    remove_column :sms_actions,        :user_poc_id
-    remove_column :sms_actions,        :approver_poc_id
-    remove_column :transactions,       :user_poc_id
-    remove_column :transactions,       :poc_first_name
-    remove_column :transactions,       :poc_last_name
-    remove_column :users,              :poc_id
+    TABLES.each do |column_name, data|
+      data[:table].each do |table_name|
+        remove_column table_name, column_name
+      end
+    end
   end
 
   def self.down
-    add_column    :agendas,            :user_poc_id,             :integer
-    add_column    :audits,             :auditor_poc_id,          :integer
-    add_column    :audits,             :approver_poc_id,         :integer
-    add_column    :corrective_actions, :user_poc_id,             :integer
-    add_column    :evaluations,        :approver_poc_id,         :integer
-    add_column    :evaluations,        :evaluator_poc_id,        :integer
-    add_column    :findings,           :responsible_user_poc_id, :integer
-    add_column    :findings,           :approver_poc_id,         :integer
-    add_column    :ims,                :lead_evaluator_poc_id,   :integer
-    add_column    :ims,                :pre_reviewer_poc_id,     :integer
-    add_column    :inspections,        :approver_poc_id,         :integer
-    add_column    :investigations,     :approver_poc_id,         :integer
-    add_column    :investigations,     :investigator_poc_id,     :integer
-    add_column    :message_accesses,   :user_poc_id,             :integer
-    add_column    :participations,     :poc_id,                  :integer
-    add_column    :recommendations,    :user_poc_id,             :integer
-    add_column    :sms_actions,        :user_poc_id,             :integer
-    add_column    :sms_actions,        :approver_poc_id,         :integer
-    add_column    :transactions,       :user_poc_id,             :integer
-    add_column    :transactions,       :poc_first_name,          :string
-    add_column    :transactions,       :poc_last_name,           :string
-    add_column    :users,              :poc_id,                  :integer
+    TABLES.each do |column_name, data|
+      data[:table].each do |table_name|
+        add_column table_name, column_name, data[:type]
+      end
+    end
   end
 end
