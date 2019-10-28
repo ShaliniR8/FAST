@@ -157,7 +157,7 @@ class MeetingsController < ApplicationController
     @headers = User.invite_headers
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
-    @report_headers = Report.get_meta_fields('form')
+    @report_headers = Report.get_meta_fields('meeting_form')
     @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
   end
 

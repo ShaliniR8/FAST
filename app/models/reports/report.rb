@@ -48,45 +48,44 @@ class Report < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     [
-      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: false },
-      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: false },
-      {                                                                                   type: 'newline',  visible: 'show'                                 },
-      {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,show',     required: true  },
-      {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,show',     required: true  },
-      {                                                                                   type: 'newline',  visible: 'show'                                 },
-      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index,form',          required: false },
+      {field: 'id',                   title: 'ID',                        num_cols: 6,    type: 'text',     visible: 'index,meeting_form,show',     required: false },
+      {field: 'status',               title: 'Status',                    num_cols: 6,    type: 'text',     visible: 'index,meeting_form,show',     required: false },
+      {                                                                                   type: 'newline',  visible: 'show'                                         },
+      {field: 'name',                 title: 'Event Title',               num_cols: 6,    type: 'text',     visible: 'index,form,meeting_form,show',required: true  },
+      {field: 'event_date',           title: 'Event Date',                num_cols: 6,    type: 'date',     visible: 'index,form,meeting_form,show',required: true  },
+      {                                                                                   type: 'newline',  visible: 'show'                                         },
+      {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index,meeting_form',          required: false },
 
       {field: "get_root_causes_full", title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
-      {field: "get_root_causes",      title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index,form'},
+      {field: "get_root_causes",      title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index,meeting_form'},
 
-      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false,  options: get_custom_options('Event Types')},
-      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',       required: false,  options: get_custom_options('Event Venues')},
-      {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'event_summary',       required: false },
-      {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,show',     required: true  },
-      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',                required: false },
-
-      {field: 'eir',                  title: 'EIR Number',                num_cols: 6,    type: 'text',     visible: 'close',           required: false },
-      {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
-      {field: 'asap',                 title: 'Accepted Into ASAP',        num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
-      {field: 'sole',                 title: 'Sole Source',               num_cols: 6,    type: 'boolean',  visible: 'close',           required: true  },
-      {field: 'disposition',          title: 'Disposition',               num_cols: 6,    type: 'datalist', visible: 'close',           required: false,      options: get_custom_options('Dispositions')},
-      {field: 'company_disposition',  title: 'Company Disposition',       num_cols: 6,    type: 'datalist', visible: 'close',           required: false,      options: get_custom_options('Company Dispositions')},
-      {field: 'narrative',            title: 'Narrative',                 num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
-      {field: 'regulation',           title: 'Regulation',                num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
-      {field: 'notes',                title: 'Closing Notes',             num_cols: 12,   type: 'textarea', visible: 'close',           required: false },
-
-      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index,form',      required: false,  html_class: 'get_before_risk_color'},
-
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index,form',      required: false,  html_class: 'get_after_risk_color'},
-      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',         required: false }, #Gets overridden in view- see included_events.html.erb
-
-      {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'form,meeting',    required: false},
+      {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',               required: false,  options: get_custom_options('Event Types')},
+      {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',               required: false,  options: get_custom_options('Event Venues')},
+      {field: 'icao',                 title: 'ICAO',                      num_cols: 6,    type: 'text',     visible: 'event_summary',               required: false },
+      {field: 'narrative',            title: 'Event Description',         num_cols: 12,   type: 'textarea', visible: 'index,form,meeting_form,show',required: true  },
+      {field: 'minutes',              title: 'Meeting Minutes',           num_cols: 12,   type: 'textarea', visible: 'show',                        required: false },
 
 
+      {field: 'eir',                  title: 'EIR Number',                num_cols: 6,    type: 'text',     visible: 'close',                       required: false },
+      {field: 'scoreboard',           title: 'Exclude from Scoreboard',   num_cols: 6,    type: 'boolean',  visible: 'close',                       required: true  },
+      {field: 'asap',                 title: 'Accepted Into ASAP',        num_cols: 6,    type: 'boolean',  visible: 'close',                       required: true  },
+      {field: 'sole',                 title: 'Sole Source',               num_cols: 6,    type: 'boolean',  visible: 'close',                       required: true  },
+      {field: 'disposition',          title: 'Disposition',               num_cols: 6,    type: 'datalist', visible: 'close',                       required: false,  options: get_custom_options('Dispositions')},
+      {field: 'company_disposition',  title: 'Company Disposition',       num_cols: 6,    type: 'datalist', visible: 'close',                       required: false,  options: get_custom_options('Company Dispositions')},
+      {field: 'narrative',            title: 'Narrative',                 num_cols: 12,   type: 'textarea', visible: 'close',                       required: false },
+      {field: 'regulation',           title: 'Regulation',                num_cols: 12,   type: 'textarea', visible: 'close',                       required: false },
+      {field: 'notes',                title: 'Closing Notes',             num_cols: 12,   type: 'textarea', visible: 'close',                       required: false },
+
+      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index,meeting_form',          required: false,  html_class: 'get_before_risk_color'},
+
+      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index,meeting_form',          required: false,  html_class: 'get_after_risk_color'},
+      {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',                     required: false }, #Gets overridden in view- see included_events.html.erb
+
+      {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting_form,meeting',        required: false },
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
