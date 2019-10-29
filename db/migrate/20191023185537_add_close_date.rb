@@ -1,7 +1,7 @@
 class AddCloseDate < ActiveRecord::Migration
 
   ADD = {
-    :close_date => {
+    close_date: {
       table: %i[
         audits
         evaluations
@@ -19,7 +19,7 @@ class AddCloseDate < ActiveRecord::Migration
   }
 
   CHANGE = {
-    :close_date => {
+    close_date: {
       table: %i[
         corrective_actions
         hazards

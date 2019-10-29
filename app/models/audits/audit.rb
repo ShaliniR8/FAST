@@ -45,6 +45,7 @@ class Audit < ActiveRecord::Base
       {field: 'created_by_id',        title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
       {                                                                                   type: 'newline',      visible: 'show'},
       {field: 'completion',           title: 'Scheduled Completion Date',   num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
+      {field: 'close_date',           title: 'Actual Completion Date',      num_cols: 6,  type: 'date',         visible: 'index,show',      required: false},
       {field: 'responsible_user_id',  title: 'Responsible User',            num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',          title: 'Final Approver',              num_cols: 6,  type: 'user',         visible: 'form,show',       required: false},
       {field: 'department',           title: 'Auditing Department',         num_cols: 6,  type: 'select',       visible: 'index,form,show', required: false,    options: get_custom_options('Departments')},
@@ -61,6 +62,7 @@ class Audit < ActiveRecord::Base
       {field: 'instruction',          title: 'Audit Instructions',          num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'comment',              title: 'Auditor Comment',             num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'final_comment',        title: 'Final Comment',               num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
+      {field: 'included_findings',    title: 'Included Findings',           num_cols: 6,  type: 'text',         visible: 'index',           required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
@@ -115,6 +117,18 @@ class Audit < ActiveRecord::Base
 
   def get_completion_date
     self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
+  end
+
+
+  def included_findings
+    result = ""
+    Finding.where(owner_type: self.type).where(owner_id: self.id).each do |finding|
+      result += "
+        <a style='font-weight:bold' href='/findings/#{finding.id}'>
+          ##{finding.id}
+        </a><br>"
+    end
+    result.html_safe
   end
 
 
