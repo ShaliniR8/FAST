@@ -24,7 +24,7 @@ class RootCausesController < ApplicationController
     @root = CauseOption.where(level: 0, name: "#{params[:owner_type].titleize}").first ||
       CauseOption.where(level: 0, name: 'Hazard').first
     if @root.present?
-      @categories = @root.children.keep_if{|x| !x.hidden?}
+      @categories = @root.children.keep_if{|x| !x.hidden?}.sort_by(&:name)
     end
     respond_to do |format|
       format.js {render "/root_causes/new_root_cause2", layout: false, :locals => {:first_id => first_id, :second_id => second_id, i18nbase: i18nbase} }
@@ -87,9 +87,9 @@ class RootCausesController < ApplicationController
     @root_cause_headers = RootCause.get_headers
     render :partial => "/root_causes/root_causes_table",
       :locals => {
-        :headers => @root_cause_headers,
-        :owner => @owner,
-        :show_btns => true}
+        headers: @root_cause_headers,
+        owner: @owner,
+        show_btns: true}
   end
 
 
