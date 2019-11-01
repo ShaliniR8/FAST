@@ -226,7 +226,6 @@
             $('.emp_modal').modal('toggle');
           });
           $('.close').on('click',function(){
-            console.log("closed");
             $(item).parent().parent().find("#emp"+field_id).val("");
             $(item).parent().parent().find("#employee-select"+field_id).val("");
             $('#emp_div').hide();
