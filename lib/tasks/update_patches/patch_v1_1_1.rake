@@ -6,7 +6,7 @@ namespace :v1_1_1 do
   end
 
   task :patch_all => :environment do
-    desc 'Run all updates from v1.0.3 to v1.1.0'
+    desc 'Run all updates from v1.1.0 to v1.1.1'
     logger.info '###########################'
     logger.info '### VERSION 1.1.1 PATCH ###'
     logger.info '###########################'
