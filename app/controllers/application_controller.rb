@@ -209,7 +209,7 @@ class ApplicationController < ActionController::Base
   def display_in_table(report)
     if current_user.global_admin?
       return true
-    elsif report.privileges.reject{|priv| priv.empty?}.present?
+    elsif (report.privileges || []).reject{|priv| priv.empty?}.present?
       current_user.privileges.each do |p|
         if report.get_privileges.include? p.id.to_s
           return true

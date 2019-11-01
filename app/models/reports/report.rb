@@ -40,7 +40,7 @@ class Report < ActiveRecord::Base
     before_destroy :delete_connections
     # private
       def delete_connections
-        self.connections.delete_all
+        self.child_connections.delete_all
       end
   ### END TAGGED AREA
     has_many :active_meetings, through: :child_connections, source: :owner, source_type: 'Meeting', conditions: "connections.complete = 0 AND connections.archive = 0"
