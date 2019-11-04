@@ -11,7 +11,7 @@
     <%when 'radio'%>
       <%if action_name == 'start'%>
         <div class="col-xs-12 ml5">
-          <%checklist_cell.options.split(';').each do |option|%>
+          <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
             <label class="radio radio-inline">
               <%=f.radio_button :value, option, class: "#{is_new ? 'changed' : ''}"%>
               <%=option%>

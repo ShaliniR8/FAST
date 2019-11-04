@@ -33,6 +33,8 @@ class Investigation < ActiveRecord::Base
 
   after_create :create_transaction
 
+  scope :templates, -> {where(template: 1)}
+  scope :regulars, -> {where(template: 0)}
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)

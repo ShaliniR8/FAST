@@ -179,6 +179,29 @@
           <%=render '/causes/all', :owner => @report, :cause_type => 'reaction', :can_change => can_change%>
           <%=render '/causes/all', :owner => @report, :cause_type => 'suggestion', :can_change => can_change%>
 
+
+          <%if @report.meetings.present?%>
+            <div class="col-xs-12 col-md-12 col-lg-12"%>
+              <div class="panel panel-info">
+                <div class="panel-heading click-heading collapsed">
+                  <div class="panel-title">
+                    <b>Meetings</b>
+                    <span class="pull-right clickable">
+                      <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="panel-body" style="display:none">
+                  <div class="row">
+                    <%@no_footer = true%>
+                    <%=render "meetings"%>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <%end%>
+
+
           <%if @report.agendas.present?%>
             <%=render "agendas"%>
           <%end%>
