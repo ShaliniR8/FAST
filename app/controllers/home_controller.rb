@@ -534,7 +534,7 @@ class HomeController < ApplicationController
 
     elsif session[:mode] == "SMS"
       if current_user.has_access("audit","index")
-        audits = Audit.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
+        audits = Audit.regulars.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
         @audits = audits.group_by{|x| x.status}
         if (temp = audits.select{|x| x.overdue}).present?
           @audits["Overdue"] = temp
@@ -556,7 +556,7 @@ class HomeController < ApplicationController
         end
       end
       if current_user.has_access("inspections","index")
-        inspections = Inspection.within_timerange(@start_date, @end_date)
+        inspections = Inspection.regulars.within_timerange(@start_date, @end_date)
           .sort{|x,y| status_index(x) <=> status_index(y)}
         @inspections = inspections.group_by{|x| x.status}
         if (temp = inspections.select{|x| x.overdue}).present?
@@ -564,7 +564,7 @@ class HomeController < ApplicationController
         end
       end
       if current_user.has_access("evaluations","index")
-        evaluations=Evaluation.within_timerange(@start_date, @end_date)
+        evaluations=Evaluation.regulars.within_timerange(@start_date, @end_date)
           .sort{|x,y| status_index(x) <=> status_index(y)}
         @evaluations = evaluations.group_by{|x| x.status}
         if (temp = evaluations.select{|x| x.overdue}).present?
@@ -580,7 +580,7 @@ class HomeController < ApplicationController
         end
       end
       if current_user.has_access("investigations","index")
-        investigations = Investigation.within_timerange(@start_date, @end_date)
+        investigations = Investigation.regulars.within_timerange(@start_date, @end_date)
           .sort{|x,y| status_index(x) <=> status_index(y)}
         @investigations = investigations.group_by{|x| x.status}
         if (temp = investigations.select{|x| x.overdue}).present?
