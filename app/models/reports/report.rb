@@ -578,7 +578,7 @@ class Report < ActiveRecord::Base
     candidates = self.where("status=? and close_date is not ?","Closed",nil)
     if candidates.present?
       sum=0
-      candidates.map{|x| sum+=(x.close_date-x.created_at.to_date).to_i}
+      candidates.map{|x| sum+=(x.close_date.to_date - x.created_at.to_date).to_i}
       result= (sum.to_f/candidates.length.to_f).round(1)
       result
     else
