@@ -68,7 +68,6 @@
         <%if current_user.has_access("hazards","index")%><%=render "hazards"%><%end%>
         <%if current_user.has_access("risk_controls","index")%><%=render "risk_controls"%><%end%>
         <%if current_user.has_access("safety_plans","index")%><%=render "safety_plans"%><%end%>
-        <h1><%=BaseConfig.airline_code != 'Demo'%></h1>
         <%if current_user.has_access("hazards","index") && BaseConfig.airline_code != 'Demo'%>
           <div id="risk-matrix-parent">
             <%if BaseConfig.airline[:base_risk_matrix]%>

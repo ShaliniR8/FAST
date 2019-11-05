@@ -68,7 +68,7 @@ module ControllerAuthentication
 
 
   def admin_required
-    unless current_user.level == "Admin"
+    unless ['Admin', 'Global Admin'].include?(current_user.level)
       redirect_to errors_path
     end
   end

@@ -7,8 +7,8 @@
               Reference Data Center
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.has_access("documents","new")%>
-                <%=link_to "New",
+              <%if current_user.has_access('documents','new', admin: true)%>
+                <%=link_to 'New',
                   "#",
                   :class => "btn btn-success pull-right",
                   "data-toggle" => "modal",
