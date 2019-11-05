@@ -15,7 +15,7 @@ class SamlController < ApplicationController
     response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], settings: saml_settings)
     if response.is_valid?(collect_errors = true)
       user = saml_config.digest_response response
-      if user.nil?
+      if user.nil? || response.name_id.empty?
         render 'errors/sso_error'
         return
       else

@@ -44,6 +44,7 @@ class SafetyPlansController < ApplicationController
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:safety_plan][:status]}"
+      params[:safety_plan][:close_date] = params[:safety_plan][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
@@ -108,6 +109,7 @@ class SafetyPlansController < ApplicationController
     )
     safety_plan.status="Completed"
     safety_plan.date_completed = Time.now
+    safety_plan.close_date = Time.now
     if safety_plan.save
       redirect_to safety_plan_path(safety_plan)
     end

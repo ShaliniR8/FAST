@@ -98,6 +98,7 @@ class SrasController < ApplicationController
           true, 'SRA Pending Approval')
       else
         @owner.date_complete = Time.now
+        @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
@@ -129,6 +130,7 @@ class SrasController < ApplicationController
         transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.date_complete = Time.now
+        @owner.close_date = Time.now
         notify(@owner.responsible_user,
           "SRA ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
           true, 'SRA Approved')
@@ -136,6 +138,7 @@ class SrasController < ApplicationController
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"
+      params[:sra][:close_date] = params[:sra][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     when 'Add Meeting Minutes'

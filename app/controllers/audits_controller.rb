@@ -153,6 +153,7 @@ class AuditsController < SafetyAssuranceController
           true, 'Audit Pending Approval')
       else
         @owner.complete_date = Time.now
+        @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
@@ -161,11 +162,13 @@ class AuditsController < SafetyAssuranceController
         true, 'Audit Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Audit ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Audit Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
+      params[:audit][:close_date] = params[:audit][:status] == 'Completed' ? Time.now : nil
     when 'Add Cost', 'Add Contact', 'Add Attachment'
       transaction = false
     end

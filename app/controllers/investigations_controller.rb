@@ -92,6 +92,7 @@ class InvestigationsController < SafetyAssuranceController
           true, 'Investigation Pending Approval')
       else
         @owner.complete_date = Time.now
+        @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
@@ -100,11 +101,13 @@ class InvestigationsController < SafetyAssuranceController
         true, 'Investigation Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Investigation ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Investigation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:investigation][:status]}"
+      params[:investigation][:close_date] = params[:investigation][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

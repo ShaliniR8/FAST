@@ -103,6 +103,7 @@ class RecommendationsController < SafetyAssuranceController
           true, 'Recommendation Pending Approval')
       else
         @owner.complete_date = Time.now
+        @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
@@ -111,11 +112,13 @@ class RecommendationsController < SafetyAssuranceController
         true, 'Recommendation Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Recommendation ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Recommendation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
+      params[:recommendation][:close_date] = params[:recommendation][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

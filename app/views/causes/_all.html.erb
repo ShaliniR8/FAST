@@ -41,7 +41,7 @@
                 <tr>
                   <%headers.each do |h|%>
                     <td>
-                      <%=c.send(h[:field]).gsub(/\n/, '<br/>').html_safe%>
+                      <%=c.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue c.attr%>
                     </td>
                   <%end%>
                   <%if can_change%>

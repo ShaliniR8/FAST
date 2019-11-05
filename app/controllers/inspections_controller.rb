@@ -86,6 +86,7 @@ class InspectionsController < SafetyAssuranceController
           true, 'Inspection Pending Approval')
       else
         @owner.complete_date = Time.now
+        @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
@@ -94,11 +95,13 @@ class InspectionsController < SafetyAssuranceController
         true, 'Inspection Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
+      @owner.close_date = Time.now
       notify(@owner.responsible_user,
         "Inspection ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
         true, 'Inspection Approved')
     when 'Override Status'
       transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
+      params[:inspection][:close_date] = params[:inspection][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end

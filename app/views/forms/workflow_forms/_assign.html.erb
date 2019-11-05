@@ -24,7 +24,7 @@
           <%=f.hidden_field :status, :value => 'Assigned'%>
 
           <b style="color:red">*</b>
-          <%=label_tag :res, "Responsible User"%>
+          <%=label_tag :res, 'Responsible User'%>
           <div class="input-group">
             <%=text_field_tag :res,
               "",
@@ -102,7 +102,7 @@
       $('#users tbody tr' ).unbind();
       $('.close' ).unbind();
       $('#users').on('click', 'tbody tr', function(){
-        $('#emp_1').val($(this).find('td').eq(3).text());
+        $('#emp_1').val($(this).find('td').eq(1).text());
         $('#employee-select1').val($(this).find('td').eq(0).text());
         $('form').show();
         $('#emp_div').hide();
@@ -118,7 +118,7 @@
 
     $("form").on('submit',function(){
       $(this).find('.required_field').each(function(){
-        if ($(this).val()==""){
+        if ($(this).val() == ''){
           event.preventDefault();
         }
       });

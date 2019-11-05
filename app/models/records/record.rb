@@ -90,6 +90,7 @@ include Messageable
 
   def reopen(new_status)
     self.status = new_status
+    self.close_date = nil
     Transaction.build_for(
       self,
       'Reopen',

@@ -51,7 +51,7 @@
 
     <div class="panel-body">
       <div class="table-responsive">
-        <table id="records_table" class="table table-hover table-striped table-bordered">
+        <table id="records_table" class="table table-hover table-striped table-bordered index_table">
           <thead>
             <tr>
               <%@headers.each do |header|%>
@@ -81,24 +81,24 @@
 
                   <td class="<%=html_class%> percent" percentage="<%=field_progress%>">
                     <%case header[:type]%>
-                    <%when "boolean"%>
-                      <%boolean_options = {true => "Yes", false => "No"}%>
+                    <%when 'boolean'%>
+                      <%boolean_options = {true => 'Yes', false => 'No'}%>
                       <%=boolean_options[field_value]%>
-                    <%when "date"%>
+                    <%when 'date'%>
                       <%=date_to_string(field_value)%>
-                    <%when "datetime"%>
+                    <%when 'datetime'%>
                       <%=datetime_to_string(field_value)%>
                     <%when 'datetimez'%>
                       <%=datetimez_to_string(field_value)%>
-                    <%when "checkbox"%>
+                    <%when 'checkbox'%>
                       <%=field_value%>
-                    <%when "user"%>
-                      <%if field_value != nil && field_value != ""%>
+                    <%when 'user'%>
+                      <%if field_value != nil && field_value != ''%>
                         <%=User.find(field_value).full_name rescue field_value.to_s%>
                       <%end%>
-                    <%when "textarea"%>
+                    <%when 'textarea'%>
                       <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
-                    <%when "select"%>
+                    <%when 'select'%>
                       <%if field_display.present?%>
                         <%=field_display[field_value]%>
                       <%else%>
@@ -110,11 +110,11 @@
                   </td>
                 <%end%>
                 <td width="20%">
-                  <%=link_to "Open",
+                  <%=link_to 'Open',
                     "/#{@table.table_name}/#{record.id}",
                     :class => "btn btn-lightblue mr5 mb5",
                     :target => nil%>
-                  <%=link_to "Open in New Tab",
+                  <%=link_to 'Open in New Tab',
                     "/#{@table.table_name}/#{record.id}",
                     :class => "btn btn-lightblue mr5 mb5",
                     :target => :_blank%>
@@ -128,6 +128,17 @@
   </div>
 </div>
 
+
+<style>
+  .index_table > thead > tr > th,
+  .index_table > tbody > tr > th,
+  .index_table > tfoot > tr > th,
+  .index_table > thead > tr > td,
+  .index_table > tbody > tr > td,
+  .index_table > tfoot > tr > td {
+    padding: 5px !important;
+  }
+</style>
 
 
 
@@ -156,7 +167,7 @@
            "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
            "<'row'<'col-sm-12'B>>",
       buttons: ['copy', 'csv', 'excel', 'print'],
-      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "aLengthMenu": [[10, 15, 50, 100, -1], [10, 15, 50, 100, "All"]],
       "iDisplayLength": 10,
       "aaSorting": [[0, "desc"]],
       "columnDefs": [{ type: 'natural', targets: 0 }],
