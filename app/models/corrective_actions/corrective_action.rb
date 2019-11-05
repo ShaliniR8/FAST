@@ -29,6 +29,7 @@ class CorrectiveAction < ActiveRecord::Base
 
       { field: 'recommendation',          title: 'Is this only a recommendation',  num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
       { field: 'due_date',                title: 'Scheduled Completion Date',      num_cols: 6,  type: 'date',     visible: 'index,form,show', required: false},
+      {field: 'close_date',               title: 'Actual Completion Date',         num_cols: 6,  type: 'date',     visible: 'index,show',      required: false},
       { field: 'opened_date',             title: 'Date Opened',                    num_cols: 6,  type: 'date',     visible: 'show',            required: false},
       { field: 'assigned_date',           title: 'Date Assigned',                  num_cols: 6,  type: 'date',     visible: 'show',            required: false},
       { field: 'decision_date',           title: 'Date Completed/Rejected',        num_cols: 6,  type: 'date',     visible: 'show',            required: false},

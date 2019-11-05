@@ -49,6 +49,7 @@ class Investigation < ActiveRecord::Base
       {field: 'viewer_access',              title: 'Viewer Access',                 num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
       {                                                                                           type: 'newline',      visible: 'show'},
       {field: 'completion',                 title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
+      {field: 'close_date',                 title: 'Actual Completion Date',        num_cols: 6,  type: 'date',         visible: 'index,show',      required: false},
       {field: 'responsible_user_id',        title: 'Investigator',                  num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'form,show',       required: false},
       {field: 'event_occured',              title: 'Date/Time When Event Occurred', num_cols: 6,  type: 'datetime',     visible: 'form,show',       required: false},
