@@ -326,7 +326,7 @@ class MeetingsController < ApplicationController
   def get_reports
     @report_headers = Report.get_meta_fields('index')
     @meeting = Meeting.find(params[:id])
-    @reports = Report.find(:all).select{|x| x.status == "Meeting Ready"}
+    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
     render :partial => "reports"
   end
 

@@ -55,9 +55,7 @@
         </tr>
       </thead>
       <tbody>
-        <%@reports.each do |u|%>
-          <%=render '/meetings/included_event', :event => u, :meeting => @meeting%>
-        <%end%>
+        <%=render '/meetings/included_event', events: @reports, meeting: @meeting%>
       </tbody>
     </table>
   </div>
