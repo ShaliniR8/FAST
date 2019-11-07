@@ -12,7 +12,7 @@ namespace :v1_1_2 do
     logger.info '###########################'
     logger.info "Patch start - #{DateTime.now.strftime("%F %R")}"
 
-    Rake::Task['populate_close_date_from_transactions']
+    Rake::Task['populate_close_date_from_transactions'].invoke
   end
 
  end

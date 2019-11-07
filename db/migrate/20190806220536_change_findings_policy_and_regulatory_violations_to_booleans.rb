@@ -1,7 +1,7 @@
 class ChangeFindingsPolicyAndRegulatoryViolationsToBooleans < ActiveRecord::Migration
   def self.up
     %w[policy regulatory].each do |type|
-      execute "UPDATE findings SET #{type}_violation = IF((#{type}_violation = '1' OR #{type}_violation = 'Yes'), '1', NULL)"
+      execute "UPDATE findings SET #{type}_violation = IF((#{type}_violation = '1' OR #{type}_violation = 'Yes'), '1', '0')"
       change_column :findings, "#{type}_violation".to_sym, :boolean, default: false, null: false
     end
   end

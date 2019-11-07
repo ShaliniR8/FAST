@@ -12,8 +12,8 @@ namespace :v1_1_1 do
     logger.info '###########################'
     logger.info "Patch start - #{DateTime.now.strftime("%F %R")}"
 
-    Rake::Task['connection_converter:report_meetings']
-    Rake::Task['v1_1_1:promote_admins']
+    Rake::Task['connection_converter:report_meetings'].invoke()
+    Rake::Task['v1_1_1:promote_admins'].invoke()
   end
 
   task :promote_admins => :environment do
