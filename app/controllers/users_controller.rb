@@ -275,6 +275,7 @@ class UsersController < ApplicationController
   def stop_simulation
     @user = User.find(params[:id])
     session.delete(:simulated_id)
+    define_session_permissions
     redirect_to user_path(@user)
   end
 
