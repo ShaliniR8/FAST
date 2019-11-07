@@ -1,5 +1,5 @@
 class UserMailer < ActionMailer::Base
-  default :from => "engineering@prosafet.com"
+  default :from => "donotreply@prosafet.com"
 
   def password_reset(user)
     @user = user
