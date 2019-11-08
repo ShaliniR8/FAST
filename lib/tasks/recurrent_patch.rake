@@ -52,7 +52,7 @@ namespace :recurring do
 
       if ['Yearly','Biennial'].include?(frequency) && !audit.template
         template = audit.clone
-        template.update_attributes({template: true})
+        template.update_attributes({})
 
         recurrence = Recurrence.create({
           title:            audit.title,
@@ -61,11 +61,15 @@ namespace :recurring do
           template_id:      template.id,
           frequency:        frequency,
           newest_id:        audit.id,
-          next_date:        audit.completion + month_count
+          next_date:        audit.completion
         })
 
         # Link recurrence_id to the new template
-        template.update_attributes({recurrence_id: recurrence.id})
+        template.update_attributes({
+          template: true,
+          completion: audit.completion + month_count,
+          recurrence_id: recurrence.id
+        })
 
         num_created += 1
       else
@@ -88,6 +92,7 @@ namespace :recurring do
       end
     end
 
+    Audit.where(template: true).update_all(recurrence_id: nil)
     logger.info 'FINISH Patching Audits.'
 
   end
