@@ -1,11 +1,9 @@
 ruby:
   owner_class = owner.class.name.underscore
   permission = "#{owner_class}s"
-  btns = prepare_btns(owner, env)
 / All Renderable Buttons
 - btns.each do |btn|
   - case btn
-
   - when :approve_reject
     = link_to 'Approve',
       '#',
@@ -30,7 +28,7 @@ ruby:
 
   - when :attach_in_message
     = link_to 'Attach in Message',
-      eval("interpret_#{owner_class}_path(act: :attach_in_message)"),
+      eval("new_message_path(owner_id: owner.id, owner_class: owner.class)"),
       class: 'btn btn-warning pull-right mb5 mr5',
       disable_with: 'Redirecting...'
 
@@ -91,7 +89,9 @@ ruby:
 
   - when :finding
     = link_to 'Add Finding',
-      new_finding_path( owner_id: owner.id, owner_type: owner.class.name ),
+      new_finding_path(\
+        owner_id: owner.id,
+        owner_type: owner.class.name),
       class: 'btn btn-success pull-right mr5 mb5',
       disable_with: 'Adding...'
 
@@ -132,13 +132,15 @@ ruby:
 
   - when :recommendation
     = link_to 'Add Recommendation',
-      new_recommendation_path(owner_id: owner.id, owner_type: owner.class.name),
+      new_recommendation_path(\
+        owner_id: owner.id,
+        owner_type: owner.class.name),
       class: 'btn btn-success pull-right mr5 mb5',
       disable_with: 'Adding...'
 
   - when :reopen
     = link_to 'Reopen',
-      eval("interpret_#{owner_class}_path(owner, act: :reopen)"),
+      eval("reopen_#{owner_class}_path(owner)"),
       class: 'btn btn-success pull-right mr5 mb5'
 
   - when :request_extension
@@ -228,8 +230,6 @@ ruby:
       eval("viewer_access_#{owner_class}_path(owner)"),
       class: 'btn btn-warning pull-right mr5 mb5'
 
-    / TODO: add - else statement to handle unique cases/custom buttons for airlines
-
 / Javascript functions
 - btns.uniq.each do |btn|
   - case btn
@@ -238,7 +238,7 @@ ruby:
     javascript:
       $('.approve_btn').on('click',function(){
         var commit=$(this).attr('id');
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :approve_reject)")}&commit='+commit,function(data){
+        $.get('#{eval("approve_#{owner_class}_path(owner)")}?commit='+commit,function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -247,7 +247,7 @@ ruby:
   - when :assign
     javascript:
       $('#assign_btn').on('click',function(){
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :assign)")}', function(data){
+        $.get('#{eval("assign_#{owner_class}_path(owner)")}', function(data){
           $('.modal-content').html(data);
           $(window).trigger('resize');
         });
@@ -256,7 +256,7 @@ ruby:
   - when :comment
     javascript:
       $('#comment_btn').on('click',function(){
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :comment)")}',function(data){
+        $.get('#{eval("comment_#{owner_class}_path(owner)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -266,8 +266,7 @@ ruby:
     javascript:
       $('.complete_btn').on('click',function(){
         var commit=$(this).attr('id');
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :complete)")}&commit='+commit,
-            function(data){
+        $.get('#{eval("complete_#{owner_class}_path(owner)")}?commit='+commit, function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -276,7 +275,7 @@ ruby:
   - when :contact
     javascript:
       $('#contact_btn').on('click',function(){
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :contact)")}',function(data){
+        $.get('#{eval("new_contact_#{owner_class}_path(owner)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -285,7 +284,7 @@ ruby:
   - when :cost
     javascript:
       $('#cost_btn').on('click',function(){
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :cost)")}',function(data){
+        $.get('#{eval("new_cost_#{owner_class}_path(owner)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -314,7 +313,7 @@ ruby:
     javascript:
       $('#private_link_btn').on('click',function(){
         $(".modal-content").html("");
-        $.get('#{new_private_link_path}?link=#{eval("request.url")}',function(data){
+        $.get('#{eval("new_private_link_path")}?link=#{eval("request.url")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -355,7 +354,7 @@ ruby:
     javascript:
       $('#sign_btn').on('click',function(){
         $(".modal-content").html("");
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :sign)")}',function(data){
+        $.get('#{eval("new_signature_#{owner_class}_path(owner)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });
@@ -364,7 +363,7 @@ ruby:
   - when :task
     javascript:
       $('#task_btn').on('click',function(){
-        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :task)")}',function(data){
+        $.get('#{eval("new_task_#{owner_class}_path(owner)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });

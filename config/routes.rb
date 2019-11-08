@@ -405,27 +405,17 @@ PrdgSession::Application.routes.draw do |map|
   # Safety Assurance Module
   resources :audits do
     member do
-      get 'reoccur'
       get 'download_checklist'
-      get 'new_task'
-      get 'new_contact'
-      get 'new_cost'
       get 'new_requirement'
-      get 'new_signature'
       get 'new_checklist'
       post 'upload_checklist'
       get 'update_checklist'
-      get 'assign'
-      get 'complete'
-      get 'approve'
       get 'viewer_access'
-      get 'comment'
       get 'print'
-      get 'print_deidentified'
       get 'new_attachment'
-      get 'reopen'
       get 'update_checklist_records'
       get 'override_status'
+      get 'interpret'
     end
     collection do
       get "advanced_search"

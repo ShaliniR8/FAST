@@ -21,18 +21,110 @@ class SafetyAssuranceController < ApplicationController
   ####    SHARED FORMS     ####
   #############################
 
+  # Handles permissions and ability to execute button actions
+  def interpret
+    begin
+      unless CONFIG.check_action(current_user, params[:act].to_sym, @owner)
+        redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+          flash: {danger: "Unable to #{params[:commit] || params[:act]} #{@owner.class.titleize}."}
+        return false
+      end
+    rescue
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unknown process #{params[:act]}- action aborted."}
+        return false
+    end
+
+    case params[:act].to_sym
+
+    when :approve_reject
+      status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
+      render partial: '/forms/workflow_forms/process', locals: {status: status}
+
+    when :assign
+      render partial: '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
+
+    when :attach_in_message
+      redirect_to new_message_path(owner_id: @owner.id, owner_class: @owner.class)
+
+    when :comment
+      @comment = @owner.comments.new
+      render partial: '/forms/viewer_comment'
+
+    when :complete
+      status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
+      render partial: '/forms/workflow_forms/process', locals: {status: status}
+
+    when :contact
+      @contact = Contact.new
+      render :partial => 'forms/contact_form'
+
+    when :cost
+      @cost = @owner.costs.new
+      render :partial => 'forms/new_cost'
+
+    # :delete handled safely by link_to in render_buttons
+
+    # :edit handled safely by link_to in render_buttons
+
+    #TODO- properly make the print functionality class ambiguous (applies for pdf and deid_pdf)
+    # when :print
+    #   # Add to filter_before for defining @owner and class
+    #   @deidentified = params[:deidentified]
+    #   html = render_to_string(:template=>"/audits/print.html.erb")
+    #   pdf = PDFKit.new(html)
+    #   pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    #   pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    #   filename = "Audit_#{@audit.get_id}" + (@deidentified ? '(de-identified)' : '')
+    #   send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+
+    # :finding redirect handled in render_buttons
+
+    # :hazard redirect handled in render_buttons
+
+    when :reopen
+      @owner.update_attribute(:status, 'New')
+      Transaction.build_for(@owner, 'Reopen', current_user.id)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {success: " #{@owner.class.titleize} Reopened."}
+
+    when :sign
+      @signature = Signature.new
+      render partial: 'forms/signatures/sign'
+
+    when :task
+      load_options
+      @task = @owner.tasks.new
+      render :partial => 'forms/task'
+
+      #message submitter, override status, private link, reopen
+
+    else
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: 'Unknown process- action aborted.'}
+    end
+  end
+
+
+
+  #############################
+  ##### Deprecated Routes #####
+  #############################
+
   def approve
-    if !@owner.can_approve? current_user
-      redirect_to errors_path
+    unless CONFIG.check_action(current_user, :approve_reject, @owner)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unable to approve #{@owner.class.titleize}."}
       return false
     end
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
+    status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
     render :partial => '/forms/workflow_forms/process', locals: {status: status}
   end
 
   def assign
-    if !@owner.can_assign?(current_user)
-      redirect_to errors_path
+    unless CONFIG.check_action(current_user, :assign, @owner)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unable to assign #{@owner.class.titleize}."}
       return false
     end
     render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
@@ -40,7 +132,7 @@ class SafetyAssuranceController < ApplicationController
 
   def comment
     @comment = @owner.comments.new
-    render :partial => "forms/viewer_comment"
+    render :partial => 'forms/viewer_comment'
   end
 
   def complete
@@ -52,14 +144,14 @@ class SafetyAssuranceController < ApplicationController
     render :partial => '/forms/workflow_forms/process', locals: {status: status}
   end
 
-  def destroy
+  def destroy #KEEP
     @owner.destroy
     redirect_to eval("#{@class.name.underscore}s_path"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
   end
 
-  def new_attachment
+  def new_attachment #KEEP
     @attachment = Attachment.new
-    render :partial => "shared/attachment_modal"
+    render :partial => 'shared/attachment_modal'
   end
 
   def new_contact
@@ -99,9 +191,9 @@ class SafetyAssuranceController < ApplicationController
   def viewer_access
     @owner.viewer_access = !@owner.viewer_access
     if @owner.viewer_access
-      content = "Viewer Access Enabled"
+      content = 'Viewer Access Enabled'
     else
-      content = "Viewer Access Disabled"
+      content = 'Viewer Access Disabled'
     end
     Transaction.build_for(
       @owner,

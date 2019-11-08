@@ -34,6 +34,7 @@ class AuditsController < SafetyAssuranceController
     :new_signature,
     :new_task,
     :override_status,
+    :interpret,
     :reopen,
     :show,
     :update,
