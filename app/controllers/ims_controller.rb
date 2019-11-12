@@ -25,8 +25,7 @@ class ImsController < ApplicationController
 
   def index
     @ims = true
-    @table = Object.const_get(params[:type])
-    @title = @table.display_name
+    @table = Im
     if params[:status].present?
       if params[:status] == "Overdue"
         @records = @table.within_timerange(params[:start_date], params[:end_date]).select{|x| x.overdue}
@@ -46,7 +45,9 @@ class ImsController < ApplicationController
   def advanced_search
     @im = true
     @path = ims_path
-    @terms = Im.get_terms
+    meta_field_args = ['show']
+    meta_field_args.push('admin') if current_user.admin?
+    @terms = Im.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present?}
     render :partial => "shared/advanced_search"
   end
 
