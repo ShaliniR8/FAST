@@ -20,19 +20,13 @@ class FindingsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('finding') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
+    :interpret,
     :new_attachment,
-    :new_contact,
     :override_status,
-    :reopen,
     :show,
     :update,
-    :update_checklist
   ]
 
   def define_owner
@@ -66,18 +60,6 @@ class FindingsController < SafetyAssuranceController
   end
 
 
-  def new_recommendation
-    @namespace = 'finding'
-    @predefined_actions = SmsAction.get_actions
-    @departments = SmsAction.departments
-    load_options
-    @finding = Finding.find(params[:id])
-    @recommendation = Recommendation.new
-    @fields = Recommendation.get_meta_fields('form')
-    render :partial => "new_recommendation"
-  end
-
-
   def index
     @table = Object.const_get("Finding")
     @headers = @table.get_meta_fields('index')
@@ -91,26 +73,6 @@ class FindingsController < SafetyAssuranceController
       cars += Finding.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
-  end
-
-
-  def open
-    f = Finding.find(params[:id])
-    Transaction.build_for(
-      f,
-      'Open',
-      current_user.id
-    )
-    notify(
-      f.responsible_user,
-      "Finding ##{f.get_id} has been scheduled for you." +
-        g_link(finding),
-      true,
-      "Finding ##{f.get_id} Assigned"
-    )
-    f.status = "Open"
-    f.save
-    redirect_to finding_path (f)
   end
 
 

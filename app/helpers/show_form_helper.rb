@@ -91,11 +91,11 @@
           if owner.transactions.present?
             panels << {
               partial: '/panels/transaction_log',
-              transactions: owner.transactions.preload(:user)
+              transactions: owner.transactions.preload(:user, :owner) #owner is for get_user_name
             }
           end
         else
-          Rails.logger.warn "Unknown Panel #{panel}; preparation available (skipped)"
+          Rails.logger.warn "Unknown Panel #{panel}; preparation unavailable (skipped)"
         end
       end
     end

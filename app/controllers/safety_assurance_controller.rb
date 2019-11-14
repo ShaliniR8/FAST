@@ -37,11 +37,11 @@ class SafetyAssuranceController < ApplicationController
 
     case params[:act].to_sym
 
-    when :approve_reject
+    when :approve_reject # was approve route
       status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
       render partial: '/forms/workflow_forms/process', locals: {status: status}
 
-    when :assign
+    when :assign # was assign route
       render partial: '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
 
     when :attach_in_message
@@ -51,7 +51,7 @@ class SafetyAssuranceController < ApplicationController
       @comment = @owner.comments.new
       render partial: '/forms/viewer_comment'
 
-    when :complete
+    when :complete # was complete route
       status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
       render partial: '/forms/workflow_forms/process', locals: {status: status}
 
@@ -107,43 +107,6 @@ class SafetyAssuranceController < ApplicationController
 
 
 
-  #############################
-  ##### Deprecated Routes #####
-  #############################
-
-  def approve
-    unless CONFIG.check_action(current_user, :approve_reject, @owner)
-      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
-        flash: {danger: "Unable to approve #{@owner.class.titleize}."}
-      return false
-    end
-    status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def assign
-    unless CONFIG.check_action(current_user, :assign, @owner)
-      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
-        flash: {danger: "Unable to assign #{@owner.class.titleize}."}
-      return false
-    end
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def comment
-    @comment = @owner.comments.new
-    render :partial => 'forms/viewer_comment'
-  end
-
-  def complete
-    if !@owner.can_complete?(current_user)
-      redirect_to errors_path
-      return false
-    end
-    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
   def destroy #KEEP
     @owner.destroy
     redirect_to eval("#{@class.name.underscore}s_path"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
@@ -154,38 +117,12 @@ class SafetyAssuranceController < ApplicationController
     render :partial => 'shared/attachment_modal'
   end
 
-  def new_contact
-    @contact = Contact.new
-    render :partial => 'forms/contact_form'
-  end
-
-  def new_cost
-    @cost = @owner.costs.new
-    render :partial => 'forms/new_cost'
-  end
-
-  def new_signature
-    @signature = Signature.new
-    render partial: 'forms/signatures/sign'
-  end
-
-  def new_task
-    load_options
-    @task = @owner.tasks.new
-    render :partial => 'forms/task'
-  end
-
   def override_status
     if !current_user.has_access(@owner.class.name.downcase.underscore, 'admin', admin: true, strict: true)
       redirect_to errors_path
       return false
     end
     render :partial => '/forms/workflow_forms/override_status'
-  end
-
-  def reopen
-    redirect_to errors_path if !@owner.can_reopen? current_user
-    reopen_report(@owner)
   end
 
   def viewer_access
@@ -203,5 +140,69 @@ class SafetyAssuranceController < ApplicationController
     @owner.save
     redirect_to eval("#{@class.name.underscore}_path(@owner)")
   end
+
+  #############################
+  ##### Deprecated Routes #####
+  #############################
+
+  def approve # DEPRECATED
+    unless CONFIG.check_action(current_user, :approve_reject, @owner)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unable to approve #{@owner.class.titleize}."}
+      return false
+    end
+    status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
+    render :partial => '/forms/workflow_forms/process', locals: {status: status}
+  end
+
+  def assign # DEPRECATED
+    unless CONFIG.check_action(current_user, :assign, @owner)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unable to assign #{@owner.class.titleize}."}
+      return false
+    end
+    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
+  end
+
+  def comment # DEPRECATED
+    @comment = @owner.comments.new
+    render :partial => 'forms/viewer_comment'
+  end
+
+  def complete # DEPRECATED
+    if !@owner.can_complete?(current_user)
+      redirect_to errors_path
+      return false
+    end
+    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
+    render :partial => '/forms/workflow_forms/process', locals: {status: status}
+  end
+
+  def new_contact # DEPRECATED
+    @contact = Contact.new
+    render :partial => 'forms/contact_form'
+  end
+
+  def new_cost # DEPRECATED
+    @cost = @owner.costs.new
+    render :partial => 'forms/new_cost'
+  end
+
+  def new_signature # DEPRECATED
+    @signature = Signature.new
+    render partial: 'forms/signatures/sign'
+  end
+
+  def new_task # DEPRECATED
+    load_options
+    @task = @owner.tasks.new
+    render :partial => 'forms/task'
+  end
+
+  def reopen # DEPRECATED
+    redirect_to errors_path if !@owner.can_reopen? current_user
+    reopen_report(@owner)
+  end
+
 
 end

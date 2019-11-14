@@ -23,16 +23,11 @@ class SmsActionsController < SafetyAssuranceController
   before_filter :load_options
   before_filter(only: [:show]) { check_group('sms_action') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
+    :interpret,
     :new_attachment,
-    :new_cost,
     :override_status,
-    :reopen,
     :show,
     :update
   ]

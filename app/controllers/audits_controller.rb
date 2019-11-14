@@ -22,20 +22,11 @@ class AuditsController < SafetyAssuranceController
   before_filter :oauth_load
   before_filter(only: [:show]) { check_group('audit') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
-    :new_attachment,
-    :new_contact,
-    :new_cost,
-    :new_signature,
-    :new_task,
-    :override_status,
     :interpret,
-    :reopen,
+    :new_attachment,
+    :override_status,
     :show,
     :update,
     :update_checklist_records,

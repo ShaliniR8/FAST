@@ -19,15 +19,11 @@ class RecommendationsController < SafetyAssuranceController
 
   before_filter(only: [:show]) { check_group('recommendation') }
   before_filter :define_owner, only:[
-    :approve,
-    :assign,
-    :comment,
-    :complete,
-    :edit,
     :destroy,
+    :edit,
+    :interpret,
     :new_attachment,
     :override_status,
-    :reopen,
     :show,
     :update
   ]

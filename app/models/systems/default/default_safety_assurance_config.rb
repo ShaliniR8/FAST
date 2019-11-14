@@ -102,7 +102,14 @@ class DefaultSafetyAssuranceConfig
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete approve_reject reopen comment]
-        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          assign: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
+              (owner.immediate_action || (%w[Completed].include? owner.owner.status rescue true))
+            },
+          },
+        }),
         panels: %i[comment attachments transaction_log]
       }
     },

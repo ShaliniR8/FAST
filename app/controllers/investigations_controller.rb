@@ -19,38 +19,19 @@ class InvestigationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('investigation') }
   before_filter :define_owner, only:[
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
-    :new_attachment,
-    :new_contact,
-    :new_cost,
-    :new_signature,
-    :new_task,
+    :interpret,
     :override_status,
-    :reopen,
+    :new_attachment,
     :show,
     :update,
     :viewer_access
-
   ]
 
   def define_owner
     @class = Object.const_get('Investigation')
     @owner = Investigation.find(params[:id])
-  end
-
-  def new_recommendation
-    @predefined_actions = SmsAction.get_actions
-    @departments = SmsAction.departments
-    load_options
-    @finding = Investigation.find(params[:id])
-    @recommendation = Recommendation.new
-    @fields = Recommendation.get_meta_fields('form')
-    render :partial => "findings/new_recommendation"
   end
 
 

@@ -26,7 +26,7 @@ class Transaction < ActiveRecord::Base
 
   def get_user_name
     if user.present?
-      if %w[Submission Record].include? owner.class.name
+      if %w[Submission Record].include? owner_type
         user == owner.created_by ? 'Submitter' : user.full_name
       else
         user.full_name

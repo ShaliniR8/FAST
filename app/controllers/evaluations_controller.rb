@@ -19,19 +19,11 @@ class EvaluationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('evaluation') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
+    :interpret,
     :new_attachment,
-    :new_contact,
-    :new_cost,
-    :new_signature,
-    :new_task,
     :override_status,
-    :reopen,
     :show,
     :update,
     :upload_checklist,
