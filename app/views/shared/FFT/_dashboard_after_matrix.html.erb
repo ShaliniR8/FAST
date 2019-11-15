@@ -25,20 +25,22 @@
       <!-- <div class="panel-body" style="height:300px"> -->
       <div class="panel-body">
       <table id="after_matrix" class="table table-bordered table-hover">
-        <thead>
-          <tr>
-            <%if @risk_table[:starting_space]%>
-              <th bgcolor="white"></th>
-            <%end%>
-            <%@risk_table[:column_header].each do |header|%>
-              <th bgcolor="white"><%=header%></th>
-            <%end%>
-          </tr>
-        </thead>
+        <tr>
+          <th bgcolor="#BDB76B" style="color:white"><h4>PROBABILITY</h4></th>
+          <th colspan="5" bgcolor="#BDB76B" style="color:white"><h4>SEVERITY</h4></th>
+        </tr>
+        <tr>
+          <%if @risk_table[:starting_space]%>
+            <th bgcolor="white" width="15%"></th>
+          <%end%>
+          <%@risk_table[:column_header].each do |header|%>
+            <th bgcolor="white" width="15%"><%=header.html_safe%></th>
+          <%end%>
+        </tr>
         <tbody>
           <%@risk_table[:row_header].each_with_index do |row_header,row_index|%>
             <tr>
-              <td><b><%=row_header%></b></td>
+              <th style="text-align:left" bgcolor="white"><%=row_header.html_safe%></th>
               <%@risk_table[:column_header].each_with_index do |column_header,column_index|%>
 
                 <%if session[:mode]=="SMS"%>
@@ -60,27 +62,28 @@
     <div align="right" class="mr10"><a href="#" id="after_export"><u>Download Table</u></a></div>
     </div>
 </div>
+
+
+
 <script>
-
   $('#after_export').on('click', function() {
-      html2canvas($('#after_matrix'), {
-          onrendered: function(canvas) {
+    html2canvas($('#after_matrix'), {
+      onrendered: function(canvas) {
+        var saveAs = function(uri, filename) {
+          var link = document.createElement('a');
+          if (typeof link.download === 'string') {
+              document.body.appendChild(link); // Firefox requires the link to be in the body
+              link.download = filename;
+              link.href = uri;
+              link.click();
+              document.body.removeChild(link); // remove the link when done
+          } else {
+              location.replace(uri);
+          }
+        };
 
-              var saveAs = function(uri, filename) {
-                  var link = document.createElement('a');
-                  if (typeof link.download === 'string') {
-                      document.body.appendChild(link); // Firefox requires the link to be in the body
-                      link.download = filename;
-                      link.href = uri;
-                      link.click();
-                      document.body.removeChild(link); // remove the link when done
-                  } else {
-                      location.replace(uri);
-                  }
-              };
-
-              var img = canvas.toDataURL("image/png"),
-                  uri = img.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+        var img = canvas.toDataURL("image/png"),
+          uri = img.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
 
         if ($("#after_switch").hasClass('show_finding')){
           saveAs(uri, 'Substitute Risk Analysis-Findings.png');
@@ -97,6 +100,7 @@
         }else{
           saveAs(uri, '<%=@after_title%>.png');
         }
+      }
     });
   });
 
