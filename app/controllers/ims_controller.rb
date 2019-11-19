@@ -19,6 +19,8 @@ end
 
 class ImsController < ApplicationController
 
+  before_filter :login_required
+
   require 'csv'
 
   def index
