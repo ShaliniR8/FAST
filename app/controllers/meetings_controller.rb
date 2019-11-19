@@ -139,7 +139,7 @@ class MeetingsController < ApplicationController
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       send_notices(
         @meeting.invitations,
-        "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
+        "You are invited to Meeting ##{@meeting.get_id}: #{@meeting.title}.  " + g_link(@meeting),
         true,
         "New Meeting Invitation")
       redirect_to meeting_path(@meeting), flash: {success: "Meeting created."}
@@ -240,9 +240,9 @@ class MeetingsController < ApplicationController
     when 'Close'
       send_notices(
         @owner.invitations,
-        "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
+        "Meeting ##{@owner.get_id}: #{@owner.title} has been Closed." + g_link(@owner),
         true,
-        "Meeting ##{@owner.get_id} Closed")
+        "Meeting ##{@owner.get_id}: #{@owner.title} Closed")
     when 'Add Attachment'
       transaction = false
     when 'Save Agenda'
@@ -258,7 +258,7 @@ class MeetingsController < ApplicationController
           new_inv.meeting = @owner
           new_inv.save
           send_notice(new_inv,
-            "You are invited to Meeting ##{@owner.get_id}.  " + g_link(@owner),
+            "You are invited to Meeting ##{@owner.get_id}: #{@owner.title}.  " + g_link(@owner),
             true, "New Meeting Invitation")
         end
       end
@@ -267,7 +267,7 @@ class MeetingsController < ApplicationController
       params[:cancellation].each_pair do |index, val|
         inv = @owner.invitations.where("users_id = ?", val)
         if inv.present?
-          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}.", true, "Removed from Meeting")
+          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}: #{@owner.title}.", true, "Removed from Meeting")
           inv.first.destroy
         end
       end
