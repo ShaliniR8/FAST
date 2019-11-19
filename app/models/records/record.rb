@@ -51,7 +51,7 @@ include Messageable
       {field: 'get_id',                title: 'ID',                   num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'status',                title: 'Status',               num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',          title: 'Type',                 num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
+      {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false, censor_deid: true},
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
       {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
