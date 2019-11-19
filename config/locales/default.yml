@@ -4,11 +4,14 @@ default:
       title: Root Cause
   sr:
     title: Safety Reporting
+    corrective_action:
+      title: Corrective Action
     event:
       root_cause:
         title: Root Cause
-    corrective_action:
-      title: Corrective Action
+    report:
+      root_cause:
+        title: Category
   im:
     title: Implementation Management
   sa:

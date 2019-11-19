@@ -391,6 +391,7 @@ class RecordsController < ApplicationController
 
   def show
     load_options
+    @i18nbase = 'sr.report'
     @record = Record.find(params[:id])
     @corrective_actions = @record.corrective_actions
     if @record.report.present?

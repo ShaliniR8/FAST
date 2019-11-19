@@ -5,9 +5,9 @@ class Report < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Investigationable
+  include RootCausable
   include Sraable
   include Transactionable
-  include RootCausable
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
