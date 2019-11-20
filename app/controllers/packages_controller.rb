@@ -8,9 +8,11 @@ class PackagesController < ApplicationController
 
   def advanced_search
     @im = true
-    @path=packages_path
-    @terms=Package.get_terms
-    render :partial=>"shared/advanced_search"
+    @path = packages_path
+    meta_field_args = ['show']
+    meta_field_args.push('admin') if current_user.admin?
+    @terms = Package.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present?}
+    render :partial => "shared/advanced_search"
   end
 
 
@@ -79,8 +81,7 @@ class PackagesController < ApplicationController
 
   def index
     @ims = true
-    @table=Object.const_get(params[:type])
-    @title=@table.display_name
+    @table=Package
     if params[:status].present?
       @records=@table.within_timerange(params[:start_date], params[:end_date]).where("status=?",params[:status])
     else
