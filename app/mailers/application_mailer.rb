@@ -1,9 +1,14 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'engineering@prosafet.com'
+  default from: 'donotreply@prosafet.com'
 
   protected
   def to_email(email)
     BaseConfig.airline[:enable_mailer] && Rails.env.production? ?
-      email : 'noc@prodigiq.com'
+      {to: email, bcc: 'noc@prosafet.com'} : {to: 'noc@prosafet.com'}
   end
+
+  def define_attachments
+    attachments.inline["logo.png"] = File.read("#{Rails.root}/public/ProSafeT_logo_final.png")
+  end
+
 end

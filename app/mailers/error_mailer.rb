@@ -6,6 +6,6 @@ class ErrorMailer < ApplicationMailer
     @app_info = app_info
     subject = "#{BaseConfig.airline[:code]} Mobile Debug Report sent from #{user.full_name}"
     attachments['debug_report.json'] = { mime_type: 'application/json', content: json_dump }
-    mail(to: to_email('engineering@prosafet.com'), subject: subject).deliver
+    mail(**to_email('engineering@prosafet.com'), subject: subject).deliver
   end
 end
