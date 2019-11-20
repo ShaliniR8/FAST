@@ -121,10 +121,10 @@
         $('tbody tr' ).unbind();
         $('.close' ).unbind();
         $('tbody tr').on('click',function(){
-          $('#emp_1').val($(this).find('td').eq(3).text());
+          $('#emp_1').val($(this).find('td').eq(1).text());
           $('#employee-select1').val($(this).find('td').eq(0).text());
-          $('#emp_div').hide();
           $('.bs-example-modal-lg').modal('toggle');
+          $('#emp_div').hide();
         });
         $('.close').on('click',function(){
           $('#emp_1').val("");
@@ -140,7 +140,7 @@
         $('.close' ).unbind();
 
         $('tbody tr').on('click',function(){
-          $('#emp_2').val($(this).find('td').eq(3).text());
+          $('#emp_2').val($(this).find('td').eq(1).text());
           $('#employee-select2').val($(this).find('td').eq(0).text());
           $('.bs-example-modal-lg').modal('toggle');
           $('#emp_div').hide();
