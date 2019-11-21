@@ -1,7 +1,8 @@
 ruby:
+  op ||= {} # In case no options were passed
   owner_class = owner.class.name.underscore
   permission = "#{owner_class}s"
-  btns = prepare_btns(owner, env)
+  btns = prepare_btns(owner, env, **op)
 / All Renderable Buttons
 - btns.each do |btn|
   - case btn

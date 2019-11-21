@@ -249,14 +249,14 @@ class SubmissionsController < ApplicationController
           end
         end
         @template = @record.template
-        access_level=current_user.has_template_access(@template.name)
-        unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
-          if access_level == "" && @record.user_id != current_user.id
-              redirect_to errors_path
-          elsif (!access_level.include? "full" ) && @record.created_by != current_user && (!access_level.include? "viewer")
-              redirect_to errors_path
-          end
-        end
+
+        @template_access = @record.user_id == current_user.id ||
+          current_user.has_access('submissions', 'admin', admin: true, strict: true) ||
+          current_user.has_access(@template.name, 'full', admin: true) ||
+          current_user.has_access(@template.name, 'viewer', admin: true)
+
+        redirect_to errors_path unless @template_access
+
       end
       format.json { show_as_json }
     end

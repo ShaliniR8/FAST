@@ -3,10 +3,10 @@
 
   #Called in form/render_buttons; pass the owner and form location to automatically find which
     #buttons should be displayed
-  def prepare_btns(owner, env)
+  def prepare_btns(owner, env, **op)
     actions = CONFIG::OBJECT[owner.class.name][:actions].select{ |key, act|
        act[:btn_loc].include?(env) &&
-       act[:access].call(owner: owner, user: current_user)
+       act[:access].call(owner: owner, user: current_user, **op)
     }.map {|key, act| key}
     actions
   end
