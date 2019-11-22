@@ -38,41 +38,7 @@ class Investigation < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
-    [
-      {field: 'id',                         title: 'ID',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'title',                      title: 'Title',                         num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
-      {field: 'get_source',                 title: 'Source of Input',               num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',              title: 'Created By',                    num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-      {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'viewer_access',              title: 'Viewer Access',                 num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
-      {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'completion',                 title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
-      {field: 'close_date',                 title: 'Actual Completion Date',        num_cols: 6,  type: 'date',         visible: 'index,show',      required: false},
-      {field: 'responsible_user_id',        title: 'Investigator',                  num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'form,show',       required: false},
-      {field: 'event_occured',              title: 'Date/Time When Event Occurred', num_cols: 6,  type: 'datetime',     visible: 'form,show',       required: false},
-      {field: 'local_event_occured',        title: 'Local Time When Event Occurred',num_cols: 6,  type: 'datetime',     visible: 'form,show',       required: false},
-      {field: 'inv_type',                   title: 'Investigation Type',            num_cols: 6,  type: 'datalist',     visible: 'index,form,show', required: false,    options: get_custom_options('Investigation Types')},
-      {field: 'source',                     title: 'Source',                        num_cols: 6,  type: 'select',       visible: 'form,show',       required: false,    options: get_custom_options('Sources')},
-      {field: 'ntsb',                       title: 'NTSB Reportable',               num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'safety_hazard',              title: 'Safety Hazard',                 num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'containment',                title: 'Containment',                   num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'notes',                      title: 'Notes',                         num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'description',                title: 'Description of Event',          num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'investigator_comment',       title: 'Investigator Comment',          num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'final_comment',              title: 'Final Comment',                 num_cols: 12, type: 'text',         visible: 'show',            required: false},
-
-      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
-
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
-
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG::OBJECT['Investigation'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

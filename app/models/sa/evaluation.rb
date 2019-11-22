@@ -36,35 +36,7 @@ class Evaluation < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    [
-      {field: 'id',                       title: 'ID',                          num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'title',                    title: 'Title',                       num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
-      {                                                                                       type: 'newline',      visible: 'show'},
-      {field: 'status',                   title: 'Status',                      num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-
-      {                                                                                       type: 'newline',      visible: 'show'},
-      {field: 'viewer_access',            title: 'Viewer Access',               num_cols: 6,  type: 'boolean_box',  visible: 'show',            required: false},
-      {                                                                                       type: 'newline',      visible: 'show'},
-      {field: 'completion',               title: 'Scheduled Completion Date',   num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
-      {field: 'close_date',               title: 'Actual Completion Date',      num_cols: 6,  type: 'date',         visible: 'index,show',      required: false},
-      {field: 'responsible_user_id',      title: 'Lead Evaluator',              num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      {field: 'approver_id',              title: 'Final Approver',              num_cols: 6,  type: 'user',         visible: 'form,show',       required: false},
-      {field: 'department',               title: 'Evaluation Department',       num_cols: 6,  type: 'select',       visible: 'index,form,show', required: false,      options: get_custom_options('Departments')},
-      {field: 'evaluation_department',    title: 'Department being Evaluated',  num_cols: 6,  type: 'select',       visible: 'form,show',       required: false,      options: get_custom_options('Departments')},
-      {field: 'evaluation_type',          title: 'Type',                        num_cols: 6,  type: 'datalist',     visible: 'index,form,show', required: false,      options: get_custom_options('Evaluation Types')},
-      {field: 'location',                 title: 'Location',                    num_cols: 6,  type: 'text',         visible: 'form,show',       required: false},
-      {field: 'station_code',             title: 'Station Code',                num_cols: 6,  type: 'datalist',     visible: 'form,show',       required: false,      options: get_custom_options('Station Codes')},
-      {field: 'vendor',                   title: 'Vendor',                      num_cols: 6,  type: 'text',         visible: 'form,show',       required: false},
-      {field: 'process',                  title: 'Process',                     num_cols: 6,  type: 'text',         visible: 'form,show',       required: false},
-      {field: 'supplier',                 title: 'Internal/External/Supplier',  num_cols: 6,  type: 'select',       visible: 'form,show',       required: false,      options: get_custom_options('Suppliers')},
-      {field: 'planned',                  title: 'Planned',                     num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'objective',                title: 'Objective and Scope',         num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'reference',                title: 'References and Requirements', num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'instruction',              title: 'Evaluation Instructions',     num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'evaluator_comment',        title: 'Evaluator Comment',           num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'final_comment',            title: 'Final Comment',               num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG::OBJECT['Evaluation'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

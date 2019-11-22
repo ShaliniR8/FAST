@@ -214,6 +214,126 @@ class DefaultDictionary
   }
 
   META_DATA = {
-
+    id: {
+      field: 'id', title: 'ID',
+      num_cols: 6, type: 'text', visible: 'index,show',
+      required: false
+    },
+    title: {
+      field: 'title', title: 'Title',
+      num_cols: 6, type: 'text', visible: 'index,form,show',
+      required: true
+    },
+    status: {
+      field: 'status', title: 'Status',
+      num_cols: 6,  type: 'text', visible: 'index,show',
+      required: false
+    },
+    created_by: {
+      field: 'created_by_id', title: 'Created By',
+      num_cols: 6,  type: 'user', visible: 'show',
+      required: false
+    },
+    viewer_access: {
+      field: 'viewer_access', title: 'Viewer Access',
+      num_cols: 6,  type: 'boolean_box', visible: 'show',
+      required: false
+    },
+    completion: {
+      field: 'completion', title: 'Scheduled Completion Date',
+      num_cols: 6,  type: 'date', visible: 'index,form,show',
+      required: true
+    },
+    close_date: {
+      field: 'close_date', title: 'Actual Completion Date',
+      num_cols: 6,  type: 'date', visible: 'index,show',
+      required: false
+    },
+    responsible_user: {
+      field: 'responsible_user_id', title: 'Responsible User',
+      num_cols: 6,  type: 'user', visible: 'index,form,show',
+      required: false
+    },
+    approver: {
+      field: 'approver_id', title: 'Final Approver',
+      num_cols: 6,  type: 'user', visible: 'form,show',
+      required: false
+    },
+    location: {
+      field: 'location', title: 'Location',
+      num_cols: 6,  type: 'text', visible: 'form,show',
+      required: false
+    },
+    vendor: {
+      field: 'vendor', title: 'Vendor',
+      num_cols: 6,  type: 'text', visible: 'form,show',
+      required: false
+    },
+    process: {
+      field: 'process', title: 'Process',
+      num_cols: 6,  type: 'text', visible: 'form,show',
+      required: false
+    },
+    planned: {
+      field: 'planned', title: 'Planned',
+      num_cols: 6,  type: 'boolean_box', visible: 'form,show',
+      required: false
+    },
+    objective: {
+      field: 'objective', title: 'Objective and Scope',
+      num_cols: 12, type: 'textarea', visible: 'form,show',
+      required: false
+    },
+    reference: {
+      field: 'reference', title: 'References and Requirements',
+      num_cols: 12, type: 'textarea', visible: 'form,show',
+      required: false
+    },
+    instruction: {
+      field: 'instruction', title: 'Instructions',
+      num_cols: 12, type: 'textarea', visible: 'form,show',
+      required: false
+    },
+    comment: {
+      field: 'comment', title: 'Comment',
+      num_cols: 12, type: 'textarea', visible: 'form,show',
+      required: false
+    },
+    likelihood: {
+      field: 'likelihood', title: 'Baseline Likelihood',
+      num_cols: 12, type: 'text', visible: 'adv',
+      required: false
+    },
+    severity: {
+      field: 'severity', title: 'Baseline Severity',
+      num_cols: 12, type: 'text', visible: 'adv',
+      required: false
+    },
+    risk_factor: {
+      field: 'risk_factor', title: 'Baseline Risk',
+      num_cols: 12, type: 'text', visible: 'index',
+      required: false,  html_class: 'get_before_risk_color'
+    },
+    likelihood_after: {
+      field: 'likelihood_after', title: 'Mitigated Likelihood',
+      num_cols: 12, type: 'text', visible: 'adv',
+      required: false
+    },
+    severity_after: {
+      field: 'severity_after', title: 'Mitigated Severity',
+      num_cols: 12, type: 'text', visible: 'adv',
+      required: false
+    },
+    risk_factor_after: {
+      field: 'risk_factor_after', title: 'Mitigated Risk',
+      num_cols: 12, type: 'text', visible: 'index',
+      required: false,  html_class: 'get_after_risk_color'
+    },
+    final_comment: {
+      field: 'final_comment', title: 'Final Comment',
+      num_cols: 12, type: 'textarea', visible: 'show',
+      required: false
+    },
   }
+
 end

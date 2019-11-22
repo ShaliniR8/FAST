@@ -27,40 +27,7 @@ class SmsAction < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
-    [
-      {field: 'id',                             title: 'ID',                                num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'title',                          title: 'Title',                             num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
-      {field: 'get_status',                     title: 'Status',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'get_source',                     title: 'Source of Input',                   num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'created_by_id',                  title: 'Created By',                        num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-
-      {                                                                                                   type: 'newline',      visible: 'show'},
-      {field: 'schedule_completion_date',       title: 'Scheduled Completion Date',         num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
-      {field: 'close_date',                     title: 'Actual Completion Date',            num_cols: 6,  type: 'date',         visible: 'index,show',      required: false},
-      {field: 'responsible_user_id',            title: 'Responsible User',                  num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      {field: 'approver_id',                    title: 'Final Approver',                    num_cols: 6,  type: 'user',         visible: 'index,form,show',       required: true},
-      {field: 'responsible_department',         title: 'Responsible Department',            num_cols: 6,  type: 'select',       visible: 'form,show', required: false, options: get_custom_options('Departments')},
-      {                                                                                                   type: 'newline',      visible: 'form'},
-      {field: 'emp',                            title: 'Employee Corrective Action',        num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'dep',                            title: 'Company Corrective Action',         num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {                                                                                                   type: 'newline',      visible: 'form'},
-      {field: 'immediate_action',               title: 'Immediate Action',                  num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'immediate_action_comment',       title: 'Immediate Action Comment',          num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'comprehensive_action',           title: 'Comprehensive Action',              num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'comprehensive_action_comment',   title: 'Comprehensive Action Comment',      num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'action_taken',                   title: 'Action Taken',                      num_cols: 12, type: 'datalist',     visible: 'form,show',       required: false, options: get_custom_options('Actions Taken')},
-      {field: 'description',                    title: 'Description of Corrective Action',  num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'sms_actions_comment',            title: 'Corrective Action Comment',         num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'final_comment',                  title: 'Final Comment',                     num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
-
-      {field: 'likelihood',                     title: 'Baseline Likelihood',               num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity',                       title: 'Baseline Severity',                 num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor',                    title: 'Baseline Risk',                     num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
-
-      {field: 'likelihood_after',               title: 'Mitigated Likelihood',              num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity_after',                 title: 'Mitigated Severity',                num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor_after',              title: 'Mitigated Risk',                    num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG::OBJECT['SmsAction'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

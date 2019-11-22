@@ -30,50 +30,7 @@ class Finding < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
-    [
-      {field: 'id',                         title: 'ID',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'title',                      title: 'Title',                         num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
-      {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'status',                     title: 'Status',                        num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {field: 'get_source',                 title: 'Source of Input',               num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      {                                                                                           type: 'newline',      visible: 'show'},
-      {field: 'created_by_id',              title: 'Created By',                    num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-
-      {field: 'responsible_user_id',        title: 'Responsible User',              num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      {field: 'completion_date',            title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
-      {field: 'reference',                  title: 'Reference or Requirement',      num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'regulatory_violation',       title: 'Regulatory Violation',          num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'policy_violation',           title: 'Policy Violation',              num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'safety',                     title: 'Safety Hazard',                 num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'repeat',                     title: 'Repeat Finding',                num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'authority',                  title: 'Authority',                     num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'controls',                   title: 'Controls',                      num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       rqeuired: false},
-      {field: 'interfaces',                 title: 'Interfaces',                    num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'policy',                     title: 'Policy',                        num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'procedures',                 title: 'Procedure',                     num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'process_measures',           title: 'Process Measures',              num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'responsibility',             title: 'Responsibility',                num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {                                                                                           type: 'newline',      visible: 'form'},
-      {field: 'classification',             title: 'Classification',                num_cols: 6,  type: 'select',       visible: 'form,show',       required: false,  options: get_custom_options('Classifications')},
-      {field: 'department',                 title: 'Department',                    num_cols: 6,  type: 'select',       visible: 'form,show',       required: false,  options: get_custom_options('Departments')},
-      {field: 'immediate_action',           title: 'Immediate Action Required',     num_cols: 12, type: 'boolean_box',  visible: 'form,show',       required: false},
-      {field: 'action_taken',               title: 'Immediate Action Taken',        num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'description',                title: 'Description of Finding',        num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'analysis_result',            title: 'Analysis Results',              num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'findings_comment',           title: 'Finding Comment',               num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      {field: 'other',                      title: 'Other',                         num_cols: 6,  type: 'text',         visible: 'form,show',       required: false},
-      {field: 'final_comment',              title: 'Final Comment',                 num_cols: 12, type: 'text',         visible: 'show',            required: false},
-
-      {field: 'likelihood',                 title: 'Baseline Likelihood',           num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity',                   title: 'Baseline Severity',             num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor',                title: 'Baseline Risk',                 num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
-
-      {field: 'likelihood_after',           title: 'Mitigated Likelihood',          num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity_after',             title: 'Mitigated Severity',            num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor_after',          title: 'Mitigated Risk',                num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
-
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG::OBJECT['Finding'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

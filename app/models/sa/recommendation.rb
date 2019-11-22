@@ -24,29 +24,7 @@ class Recommendation < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    [
-      { field: 'id',                            title: 'ID',                                num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      { field: 'status',                        title: 'Status',                            num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      { field: 'title',                         title: 'Title',                             num_cols: 6,  type: 'text',         visible: 'index,form,show', required: true},
-      { field: 'get_source',                    title: 'Source of Input',                   num_cols: 6,  type: 'text',         visible: 'index,show',      required: false},
-      { field: 'created_by_id',                 title: 'Created By',                        num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-
-      {                                                                                                   type: 'newline',      visible: 'show'},
-      { field: 'response_date',                 title: 'Scheduled Response Date',           num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
-      { field: 'close_date',                    title: 'Actual Response Date',              num_cols: 6,  type: 'date',         visible: 'index,show',      required: false},
-      {                                                                                                   type: 'newline',      visible: 'show'},
-      { field: 'responsible_user_id',           title: 'Responsible User',                  num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
-      { field: 'approver_id',                   title: 'Final Approver',                    num_cols: 6,  type: 'user',         visible: 'form,show',       required: false},
-      {                                                                                                   type: 'newline',      visible: 'form,show'},
-      { field: 'department',                    title: 'Responsible Department',            num_cols: 6,  type: 'select',       visible: 'index,form,show', required: false,  options: get_custom_options('Departments')},
-      {                                                                                                   type: 'newline',      visible: 'form,show'},
-      { field: 'immediate_action',              title: 'Immediate Action Required',         num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
-      {                                                                                                   type: 'newline',      visible: 'form'},
-      { field: 'recommended_action',            title: 'Action',                            num_cols: 6,  type: 'datalist',     visible: 'index,form,show', required: false,  options: get_custom_options('Actions Taken')},
-      { field: 'description',                   title: 'Description of Recommendation',     num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      { field: 'recommendations_comment',       title: 'Recommendation Comment',            num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
-      { field: 'final_comment',                 title: 'Final Comment',                     num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG::OBJECT['Recommendation'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 
