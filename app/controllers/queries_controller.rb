@@ -370,15 +370,22 @@ class QueriesController < ApplicationController
 
   # Set session[:mode] to match the mode of the target query
   def adjust_session_to_target(target)
-    load_controller_list
-    if @sms_list.map {|s| s.gsub('_','')}.include?target.downcase.pluralize
-      session[:mode]='SMS'
-    elsif @sms_im_list.map {|s| s.gsub('_','')}.include?target.downcase.pluralize
-      session[:mode]='SMS IM'
-    elsif @asap_list.map {|s| s.gsub('_','')}.include?target.downcase.pluralize
-      session[:mode]='ASAP'
-    elsif @srm_list.map {|s| s.gsub('_','')}.include?target.downcase.pluralize
-      session[:mode]='SRM'
+
+    # Set a list of potential query targets
+    @sms_list = ['Audit','Inspection','Evaluation','Investigation','Finding','SmsAction']
+    @sms_im_list = ['Im'] # unused
+    @asap_list = ['Submission','Report','Record','CorrectiveAction']
+    @srm_list = ['Sra','Hazard','RiskControl','SafetyPlan']
+
+    case target
+    when *@sms_list
+      session[:mode] = 'SMS'
+    when *@sms_im_list
+      session[:mode] = 'SMS IM'
+    when *@asap_list
+      session[:mode] = 'ASAP'
+    when *@srm_list
+      session[:mode] = 'SRM'
     end
   end
 
