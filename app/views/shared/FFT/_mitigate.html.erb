@@ -2,7 +2,7 @@
 
   <div class="panel-heading">
     <div class="panel-title">
-      <b>Mitigated Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+      <b>Residual Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
     </div>
   </div>
 
@@ -14,7 +14,7 @@
       <%=f.hidden_field :risk_factor_after, :value => "", :id => "risk_fact"%>
 
       <%=render "shared/instructions", :instruction =>
-        "Select <b>Mitigated Probability</b> and <b>Mitigated Severity</b> from the table to assess risk."%>
+        "Select <b>Residual Probability</b> and <b>Residual Severity</b> from the table to assess risk."%>
 
       <div class="form-group col-xs-12">
         <%=f.label :statement, "Notes"%>
@@ -32,7 +32,7 @@
       </div>
 
       <div class="col-xs-12">
-        <%=f.submit "Save Mitigated Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
+        <%=f.submit "Save Residual Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
       </div>
     <%end%>
   </div>

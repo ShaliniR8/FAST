@@ -2,7 +2,7 @@
 
   <div class="panel-heading">
     <div class="panel-title">
-      <b>Baseline Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+      <b>Initial Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
     </div>
   </div>
 
@@ -15,7 +15,7 @@
       <%=render "/shared/FFT/baseline_content", :f => f%>
 
         <div class="col-xs-12">
-          <%=f.submit "Save Baseline Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
+          <%=f.submit "Save Initial Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
         </div>
       </div>
     <%end%>

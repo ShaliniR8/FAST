@@ -76,13 +76,14 @@ class Report < ActiveRecord::Base
       {field: 'regulation',           title: 'Regulation',                num_cols: 12,   type: 'textarea', visible: 'close',                       required: false },
       {field: 'notes',                title: 'Closing Notes',             num_cols: 12,   type: 'textarea', visible: 'close',                       required: false },
 
-      {field: 'likelihood',           title: 'Baseline Likelihood',       num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
-      {field: 'severity',             title: 'Baseline Severity',         num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
-      {field: 'risk_factor',          title: 'Baseline Risk',             num_cols: 12,   type: 'text',     visible: 'index,meeting_form',          required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',           title: "#{I18n.t("sr.risk.baseline.title")} Likelihood",   num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'severity',             title: "#{I18n.t("sr.risk.baseline.title")} Severity",     num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'risk_factor',          title: "#{I18n.t("sr.risk.baseline.title")} Risk",         num_cols: 12,   type: 'text',     visible: 'index,meeting_form',          required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',      num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
-      {field: 'severity_after',       title: 'Mitigated Severity',        num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',            num_cols: 12,   type: 'text',     visible: 'index,meeting_form',          required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',     title: "#{I18n.t("sr.risk.mitigated.title")} Likelihood",  num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'severity_after',       title: "#{I18n.t("sr.risk.mitigated.title")} Severity",    num_cols: 12,   type: 'text',     visible: 'adv',                         required: false },
+      {field: 'risk_factor_after',    title: "#{I18n.t("sr.risk.mitigated.title")} Risk",        num_cols: 12,   type: 'text',     visible: 'index,meeting_form',          required: false,  html_class: 'get_after_risk_color'},
+
       {field: 'get_minutes_agenda',   title: 'Meeting Minutes & Agendas', num_cols: 12,   type: 'text',     visible: 'meeting',                     required: false }, #Gets overridden in view- see included_events.html.erb
 
       {field: 'additional_info',      title: 'Has Attachments',           num_cols: 12,   type: 'text',     visible: 'meeting_form,meeting',        required: false },

@@ -117,17 +117,17 @@
           uri = img.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
 
         if ($("#matrix_switch").hasClass('show_finding')){
-          saveAs(uri, 'Baseline Risk Analysis-Findings.png');
+          saveAs(uri, 'Initial Risk Analysis-Findings.png');
         }else if($("#matrix_switch").hasClass('show_inv')){
-          saveAs(uri, 'Baseline Risk Analysis-Investigations.png');
+          saveAs(uri, 'Initial Risk Analysis-Investigations.png');
         }else if($("#matrix_switch").hasClass('show_record')){
-          saveAs(uri, 'Baseline Risk Analysis-Reports.png');
+          saveAs(uri, 'Initial Risk Analysis-Reports.png');
         }else if($("#matrix_switch").hasClass('show_report')){
-          saveAs(uri, 'Baseline Risk Analysis-Events.png');
+          saveAs(uri, 'Initial Risk Analysis-Events.png');
         }else if($("#matrix_switch").hasClass('show_sra')){
-          saveAs(uri, 'Baseline Risk Analysis-SRAs.png');
+          saveAs(uri, 'Initial Risk Analysis-SRAs.png');
         }else if($("#matrix_switch").hasClass('show_hazard')){
-          saveAs(uri, 'Baseline Risk Analysis-Hazards.png');
+          saveAs(uri, 'Initial Risk Analysis-Hazards.png');
         } else {
           saveAs(uri, '<%=@matrix_title%>.png');
         }
@@ -141,7 +141,7 @@
     if ($(this).hasClass('show_finding'))
     {
       $(this).removeClass("show_finding").addClass("show_inv").text("Findings");
-      $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Investigations</b>");
+      $(this).closest('.panel-title').find('.top_text').html("<b>Initial Risk Analysis: Investigations</b>");
       $('.finding_cell').hide();
       $('.inv_cell').show();
     }
@@ -149,7 +149,7 @@
     else if($(this).hasClass("show_inv"))
     {
       $(this).removeClass("show_inv").addClass("show_finding").text("Investigations");
-      $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Findings</b>");
+      $(this).closest('.panel-title').find('.top_text').html("<b>Initial Risk Analysis: Findings</b>");
       $('.inv_cell').hide();
       $('.finding_cell').show();
 
@@ -157,28 +157,28 @@
     else if($(this).hasClass("show_record"))
     {
       $(this).removeClass("show_record").addClass("show_report").text("Reports");
-      $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Events</b>");
+      $(this).closest('.panel-title').find('.top_text').html("<b>Initial Risk Analysis: Events</b>");
       $('.record_cell').hide();
       $('.report_cell').show();
     }
     else if($(this).hasClass("show_report"))
     {
       $(this).removeClass("show_report").addClass("show_record").text("Events");
-      $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Reports</b>");
+      $(this).closest('.panel-title').find('.top_text').html("<b>Initial Risk Analysis: Reports</b>");
       $('.report_cell').hide();
       $('.record_cell').show();
     }
     else if($(this).hasClass("show_sra"))
     {
       $(this).removeClass("show_sra").addClass("show_hazard").text("SRAs");
-      $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Hazards</b>");
+      $(this).closest('.panel-title').find('.top_text').html("<b>Initial Risk Analysis: Hazards</b>");
       $('.sra_cell').hide();
       $('.hazard_cell').show();
     }
     else if($(this).hasClass("show_hazard"))
     {
       $(this).removeClass("show_hazard").addClass("show_sra").text("Hazards");
-      $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: SRAs</b>");
+      $(this).closest('.panel-title').find('.top_text').html("<b>Initial Risk Analysis: SRAs</b>");
       $('.hazard_cell').hide();
       $('.sra_cell').show();
     }
