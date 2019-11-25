@@ -61,10 +61,7 @@ namespace :checklist_converter do
       created_by_id:  prosafet_admin_id,
     ).id
 
-    # add comment to AuditItem.get_headers
-    audit_item_headers = AuditItem.get_headers.concat([
-      { :field => 'comment', :title => 'Comment' }
-    ])
+    audit_item_headers = AuditItem.get_meta_fields
 
     logger.info "- Creating #{audit_item_headers.length} ChecklistHeaderItems..."
     header_items = audit_item_headers.each.with_index.reduce({}) do |header_items_hash, (header_item, index)|
