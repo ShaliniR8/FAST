@@ -92,6 +92,8 @@
                       <%end%>
                     <%when "textarea"%>
                       <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
+                    <%when "list"%>
+                      <%=field_value.gsub('<br>',', <br>')%>
                     <%when "select"%>
                       <%if field_display.present?%>
                         <%=field_display[field_value]%>
@@ -167,7 +169,13 @@
          "<'row'<'col-sm-12'tr>>" +
          "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
          "<'row'<'col-sm-12'B>>",
-    buttons: ['copy', 'csv', 'excel', 'print'],
+    buttons: ['copy', 'csv', 'excel',
+    {
+      extend: 'print',
+      exportOptions: {
+        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+      }
+    }],
     "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
     "iDisplayLength": 10,
     "aaSorting": [[0, "desc"]],
