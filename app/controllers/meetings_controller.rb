@@ -259,7 +259,7 @@ class MeetingsController < ApplicationController
           new_inv.save
           send_notice(new_inv,
             "You are invited to Meeting ##{@owner.get_id}: #{@owner.title}.  " + g_link(@owner),
-            true, "New Meeting Invitation")
+            true, "New Meeting Invitation: #{@owner.title}")
         end
       end
     end
@@ -267,7 +267,9 @@ class MeetingsController < ApplicationController
       params[:cancellation].each_pair do |index, val|
         inv = @owner.invitations.where("users_id = ?", val)
         if inv.present?
-          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}: #{@owner.title}.", true, "Removed from Meeting")
+          send_notice(inv.first,
+            "You are no longer invited to Meeting ##{@owner.id}: #{@owner.title}.",
+            true, "Removed from Meeting: #{@owner.title}")
           inv.first.destroy
         end
       end
