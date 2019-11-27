@@ -328,11 +328,7 @@ class MeetingsController < ApplicationController
   def get_reports
     @report_headers = Report.get_meta_fields('index')
     @meeting = Meeting.find(params[:id])
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
-    meeting_connections = Connection.get_added(@meeting)
-    @reports.keep_if do |report|
-      !meeting_connections.find{|connection| connection.child_id == report.id && connection.child_type == report.class.name}
-    end
+    @reports = Report.where(status: ['Meeting Ready', 'Under Review']).where('id NOT IN (?)', @meeting.reports.map(&:id))
     render :partial => "reports"
   end
 
