@@ -6,7 +6,7 @@ class InvitationsController < ApplicationController
     @invitation.save
     user=@invitation.user
     host=@invitation.meeting.host.user
-    message="#{user.full_name} has #{@invitation.status.downcase} the invitation to meeting ##{@invitation.meeting.get_id}. "+ generate_link_to("Click to view",@invitation.meeting)
+    message="#{user.full_name} has #{@invitation.status.downcase} the invitation to Meeting ##{@invitation.meeting.get_id}: #{@invitation.meeting.title}. "+ generate_link_to("Click to view",@invitation.meeting)
     notify(host, message, "Meeting", true)
     respond_to do |format|
       format.html { redirect_to @invitation, notice: 'Done.' }
