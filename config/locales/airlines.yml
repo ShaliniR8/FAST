@@ -8,6 +8,9 @@ SCX:
     event:
       root_cause:
         title: Category
+    report:
+      root_cause:
+        title: Category
   srm:
     hazard:
       root_cause:

@@ -3,12 +3,13 @@ class Record < ActiveRecord::Base
   include RiskHandling
 
 #Concerns List
-include Attachmentable
-include Commentable
-include Investigationable
-include Sraable
-include Transactionable
-include Messageable
+  include Attachmentable
+  include Commentable
+  include Investigationable
+  include Messageable
+  include RootCausable
+  include Sraable
+  include Transactionable
 
 #Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
