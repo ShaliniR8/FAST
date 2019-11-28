@@ -11,11 +11,15 @@ default:
         title: Root Cause
     report:
       root_cause:
-        title: Category
+        title: Root Cause
   im:
     title: Implementation Management
   sa:
     title: Safety Assurance
+    finding:
+      title: Finding
+      root_cause:
+          title: Root Cause
   srm:
     title: Safety Reporting
     hazard:

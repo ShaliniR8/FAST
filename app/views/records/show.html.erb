@@ -265,7 +265,7 @@
             :can_change => can_change%>
 
 
-          <%if BaseConfig.airline[:has_root_causes] && BaseConfig.airline[:record_root_causes]%>
+          <% if BaseConfig.airline[:has_root_causes] %>
             <%=render '/root_causes/root_causes',
               :owner => @record,
               :show_btns => true,

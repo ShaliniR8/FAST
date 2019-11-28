@@ -57,7 +57,7 @@ class Report < ActiveRecord::Base
       {field: 'included_reports',     title: 'Included Reports',          num_cols: 6,    type: 'text',     visible: 'index,meeting_form',          required: false },
 
       {field: "get_root_causes_full", title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'invisible'},
-      {field: "get_root_causes",      title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: 'index,meeting_form'},
+      {field: "get_root_causes",      title: "#{I18n.t("sr.event.root_cause.title")}",    type: "list",     visible: BaseConfig.airline[:has_root_causes] ? 'index,meeting_form' : ''},
 
       {field: 'event_label',          title: 'Event Type',                num_cols: 6,    type: 'select',   visible: 'event_summary',               required: false,  options: get_custom_options('Event Types')},
       {field: 'venue',                title: 'Venue',                     num_cols: 6,    type: 'select',   visible: 'event_summary',               required: false,  options: get_custom_options('Event Venues')},

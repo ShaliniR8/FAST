@@ -10,6 +10,7 @@ class Finding < ActiveRecord::Base
   include Commentable
   include Noticeable
   include Recommendationable
+  include RootCausable
   include SmsActionable
   include Transactionable
 
@@ -42,6 +43,9 @@ class Finding < ActiveRecord::Base
       {field: 'responsible_user_id',        title: 'Responsible User',              num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'completion_date',            title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
+      {field: "get_root_causes_full",       title: "#{I18n.t("sa.finding.root_cause.title")}",    type: "list",         visible: 'invisible'},
+      {field: "get_root_causes",            title: "#{I18n.t("sa.finding.root_cause.title")}",    type: "list",         visible: BaseConfig.airline[:has_root_causes] ? 'index' : ''},
+
       {field: 'reference',                  title: 'Reference or Requirement',      num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'regulatory_violation',       title: 'Regulatory Violation',          num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
       {field: 'policy_violation',           title: 'Policy Violation',              num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
