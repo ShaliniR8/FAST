@@ -55,6 +55,10 @@ class Record < ActiveRecord::Base
       {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
       {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
+
+      {field: "get_root_causes_full",  title: "#{I18n.t("sr.record.root_cause.title")}", type: "list", visible: 'invisible'},
+      {field: "get_root_causes",       title: "#{I18n.t("sr.record.root_cause.title")}", type: "list", visible: BaseConfig.airline[:has_root_causes] ? 'index' : '' },
+
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
       {field: 'final_comment',         title: 'Final Comment',        num_cols: 12, type: 'text',     visible: 'show',            required: false},
 
