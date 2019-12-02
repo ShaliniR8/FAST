@@ -57,13 +57,14 @@ class MessagesController < ApplicationController
       end
     end
 
-    # if @message.owner
-    #   Transaction.build_for(
-    #     @message.owner,
-    #     params[:commit],
-    #     (session[:simulated_id] || session[:user_id])
-    #   )
-    # end
+    if @message.owner
+      Transaction.build_for(
+        @message.owner,
+        params[:commit],
+        (session[:simulated_id] || session[:user_id]),
+        g_link(@message)
+      )
+    end
     redirect_to @message.owner || message_path(@message), flash: { success: 'Message sent.' }
   end
 
