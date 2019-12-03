@@ -34,7 +34,7 @@ class FFT_Config
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,
-      :has_root_causes                                => false,
+      :has_root_causes                                => true,
       :enable_recurrence                              => true,
       :enable_shared_links                            => false,
 
