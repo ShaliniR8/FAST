@@ -97,7 +97,7 @@ class MessagesController < ApplicationController
     if current_user.has_access_to(@message)
       need_reply=@message.send_to.map{|x| x.user}.include? current_user
     else
-      redirect_to root_url
+      redirect_to root_url, flash: { notice: 'You do not have permission to view that message.' }
     end
   end
 
