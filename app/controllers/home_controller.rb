@@ -63,8 +63,8 @@ class HomeController < ApplicationController
             @inv_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] + 1
         end
       end
-      @matrix_title = "Baseline Risk Analysis: Findings"
-      @after_title = "Substitute Risk Analysis: Findings"
+      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Findings"
+      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Findings"
 
       # SmsActions
       @car_after_matrix = Array.new(5){Array.new(5, 0)}
@@ -113,8 +113,8 @@ class HomeController < ApplicationController
           end
         #end
       end
-      @matrix_title = "Baseline Risk Analysis: Reports"
-      @after_title = "Substitute Risk Analysis: Reports"
+      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Reports"
+      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Reports"
 
     # Safety Risk Management
     else
@@ -144,8 +144,8 @@ class HomeController < ApplicationController
             @sra_matrix[sra.severity.to_i][sra.likelihood_index] + 1
         end
       end
-      @matrix_title = "Baseline Risk Analysis: Hazards"
-      @after_title = "Substitute Risk Analysis: Hazards"
+      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Hazards"
+      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Hazards"
       end
     end
   end
@@ -237,8 +237,8 @@ class HomeController < ApplicationController
         end
       end
 
-      @matrix_title="Baseline Risk Analysis: Findings"
-      @after_title="Substitute Risk Analysis: Findings"
+      @matrix_title="#{I18n.t("core.risk.baseline.title")} Risk Analysis: Findings"
+      @after_title="#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Findings"
 
 
     # Safety Reporting Module
@@ -272,8 +272,8 @@ class HomeController < ApplicationController
             @report_matrix[report.severity.to_i][report.likelihood_index] + 1
         end
       end
-      @matrix_title = "Baseline Risk Analysis: Reports"
-      @after_title = "Substitute Risk Analysis: Reports"
+      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Reports"
+      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Reports"
 
 
     # Safety Risk Management Module
@@ -303,8 +303,8 @@ class HomeController < ApplicationController
       #     @sra_matrix[sra.severity.to_i][sra.likelihood_index]=@sra_matrix[sra.severity.to_i][sra.likelihood_index]+1
       #   end
       # end
-      @matrix_title = "Baseline Risk Analysis: Hazards"
-      @after_title = "Substitute Risk Analysis: Hazards"
+      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Hazards"
+      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Hazards"
 
     end
   end

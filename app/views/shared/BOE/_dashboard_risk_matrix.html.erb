@@ -99,10 +99,10 @@
           saveAs(uri, 'Baseline Risk Analysis-SRAs.png');
         }else if($("#matrix_switch").hasClass('show_hazard')){
           saveAs(uri, 'Baseline Risk Analysis-Hazards.png');
+        }else{
+          saveAs(uri, '<%=@matrix_title%>.png');
         }
-              //saveAs(uri, '<%=@matrix_title%>.png');
-          }
-      });
+    });
   });
 
 

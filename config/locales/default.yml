@@ -2,6 +2,11 @@ default:
   core:
     root_cause:
       title: Root Cause
+    risk:
+      baseline:
+        title: Baseline
+      mitigated:
+        title: Substitute
   sr:
     title: Safety Reporting
     corrective_action:
@@ -12,6 +17,13 @@ default:
     report:
       root_cause:
         title: Root Cause
+    corrective_action:
+      title: Corrective Action
+    risk:
+      baseline:
+        title: Baseline
+      mitigated:
+        title: Mitigated
   im:
     title: Implementation Management
   sa:
@@ -20,9 +32,19 @@ default:
       title: Finding
       root_cause:
           title: Root Cause
+    risk:
+      baseline:
+        title: Baseline
+      mitigated:
+        title: Mitigated
   srm:
     title: Safety Reporting
     hazard:
       root_cause:
         title: Root Cause
+    risk:
+      baseline:
+        title: Baseline
+      mitigated:
+        title: Mitigated
 

@@ -8,7 +8,7 @@ class BOE_Config
 
   def self.airline_config
     {
-      :version                                        => "1.1.1",
+      :version                                        => "1.1.3",
 
       :name                                           => 'Boeing Executive Flight Operations',
       :code                                           => "BOE",
