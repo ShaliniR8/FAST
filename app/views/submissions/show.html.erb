@@ -71,12 +71,9 @@
             <%end%>
           </div>
 
-
-          <%
-            meta_field_args = ['show']
-            meta_field_args.push('admin') if current_user.admin?
-          %>
-          <%=render "forms/show_fields", :fields => Submission.get_meta_fields(*meta_field_args), :record => @record%>
+          <%= render "forms/show_fields",
+            fields: Submission.get_meta_fields(*@meta_field_args),
+            record: @record %>
 
 
           <%if @record.comments.present?%>

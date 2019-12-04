@@ -4,12 +4,8 @@
 
 <div class="content">
 
-  <%
-    meta_field_args = ['show']
-    meta_field_args.push('admin') if current_user.admin?
-  %>
   <%=render "forms/print_fields",
-    :fields => Submission.get_meta_fields(*meta_field_args),
+    :fields => Submission.get_meta_fields(*@meta_field_args),
     :owner => owner,
     :deidentified => deidentified%>
 
