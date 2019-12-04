@@ -43,7 +43,7 @@ class MessagesController < ApplicationController
       end
     end
 
-    if params[:send_to].present?
+    if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
       params[:send_to].values.each do |v|
         SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
         notify(User.find(v), "You have a new internal message. #{g_link(@message)}", true, 'New Internal Message')
@@ -57,13 +57,14 @@ class MessagesController < ApplicationController
       end
     end
 
-    # if @message.owner
-    #   Transaction.build_for(
-    #     @message.owner,
-    #     params[:commit],
-    #     (session[:simulated_id] || session[:user_id])
-    #   )
-    # end
+    if @message.owner
+      Transaction.build_for(
+        @message.owner,
+        params[:commit],
+        (session[:simulated_id] || session[:user_id]),
+        g_link(@message)
+      )
+    end
     redirect_to @message.owner || message_path(@message), flash: { success: 'Message sent.' }
   end
 
@@ -96,7 +97,7 @@ class MessagesController < ApplicationController
     if current_user.has_access_to(@message)
       need_reply=@message.send_to.map{|x| x.user}.include? current_user
     else
-      redirect_to root_url
+      redirect_to root_url, flash: { notice: 'You do not have permission to view that message.' }
     end
   end
 
