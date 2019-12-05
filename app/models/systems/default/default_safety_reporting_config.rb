@@ -28,11 +28,63 @@ class DefaultSafetyReportingConfig
   HIERARCHY = {
     display_name: 'ASAP',
     objects: {
-      'Submission' => 'Submission',
-      'Record' => 'Report',
-      'Report' => 'Event',
-      'CorrectiveAction' => 'Corrective Action',
+
+      'Submission' => {
+        title: 'Submission',
+        actions: [
+          #TOP
+          *%i[delete pdf deid_pdf view_report attach_in_message message_submitter expand_all],
+          #INLINE
+          *%i[comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          delete: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:delete][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          pdf: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:pdf][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          deid_pdf: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:deid_pdf][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          view_report: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:view_report][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          comment: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:comment][:access].call(owner:owner,user:user,**op) &&
+                (owner.user_id == user.id || user.has_access('submissions','admin',admin:true,strict:true))
+            },
+          },
+        }),
+        panels: %i[]
+      },
+
+
+      'Record' => {
+        title: 'Report',
+      },
+
+      'Report' => {
+        title: 'Event',
+      },
+      'CorrectiveAction' => {
+        title: 'Corrective Action',
+      },
     }
   }
+
+
 
 end

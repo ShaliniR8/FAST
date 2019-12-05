@@ -18,44 +18,15 @@
             </div>
             <div class="top_buttons pull-right">
 
-              <%if (current_user.has_template_access(@record.template.name).split(';') & %w[full viewer]).any? || current_user.has_access('submissions', 'admin', admin: true, strict: true)%>
+              <%= render '/forms/render_buttons',
+                owner: @record,
+                env: :top,
+                op: { template_access: @template_access }
+              %>
 
-                <%if current_user.has_access('submissions', 'destroy', admin: true, strict: true)%>
-                  <%=link_to 'Delete',
-                    submission_path(@record),
-                    :method => "delete",
-                    :confirm => 'Are you sure?',
-                    :class => "btn btn-danger pull-right mr5 mb5"%>
-                <%end%>
-
-                <%=link_to "PDF",
-                  print_submission_path(
-                    @record,
-                    :deidentified => false,
-                    :format => :pdf),
-                  :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
-                <%=link_to "De-ID PDF",
-                  print_submission_path(
-                    @record,
-                    :deidentified => true,
-                    :format => :pdf),
-                  :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
-
-                <%if @record.record.present?%>
-                  <%=link_to "View Report",
-                    record_path(@record.record),
-                    :class => "btn btn-info pull-right mr5 mb5",
-                    :disable_with => "Redirecting..."%>
-                <%end%>
-              <%end%>
-
-              <%=render '/forms/btns/attach_in_message_btn', owner: @record%>
-              <%=render '/forms/btns/message_submitter_btn', owner: @record%>
-              <a class="btn btn-default expandall pull-right mr5 mb5">Expand All</a>
             </div>
           </div>
         </div>
-
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
             <%if current_user.id == @record.created_by.id ||

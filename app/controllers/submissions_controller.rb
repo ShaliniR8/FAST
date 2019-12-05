@@ -22,11 +22,25 @@ end
 class SubmissionsController < ApplicationController
 
   before_filter :set_table_name, :oauth_load # Kaushik Mahorker KM
+  before_filter :define_owner
   include Concerns::Mobile # used for [method]_as_json
 
   def set_table_name
     @table_name = "submissions"
   end
+
+
+  def define_owner
+    @class = Object.const_get('Submission')
+    begin
+      @owner = Submission.find(params[:id]) if params.key?(:id)
+    rescue
+      redirect_to eval("#{@class.name.pluralize.underscore}_path"),
+      flash: {danger: "Could not find #{@class.name} with ID #{params[:id]}"}
+      return false
+    end
+  end
+
 
   def index
     respond_to do |format|

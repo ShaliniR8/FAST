@@ -241,6 +241,7 @@ PrdgSession::Application.routes.draw do |map|
   # Safety Reporting Module
   resources :submissions do
     member do
+      get 'interpret'
       get 'print'
       get 'export'
       get 'continue'
