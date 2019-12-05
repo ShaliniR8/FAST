@@ -63,6 +63,16 @@
     }
   <% end %>
 
+  <% @departments.each do |department| %>
+    <% next if department.nil? %>
+    .<%= department%> {
+      color: <%= group_to_color(department) %>;
+    }
+    .<%= department %>.active {
+      /*background-color: <%= group_to_color(department) %>;*/
+    }
+  <% end %>
+
 </style>
 
 <div class="panel floating b2 l2 box-shadow">
@@ -141,6 +151,23 @@
                       <%= label_tag emp_group, class: "btn btn-warning no-border analytics-filter" do %>
                         <%#= hidden_field_tag "emp_groups[]", "" %>
                         <%= check_box_tag "emp_groups[]", emp_group, false %> <%= emp_group.titleize %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <% if session[:mode] == "SRM" %>
+            <div class="row mt10">
+              <div class="col-sm-12">
+                <div class="input-group">
+                  <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
+                    <% @departments.each do |department| %>
+                      <% next if department.nil? %>
+                      <%= label_tag department, class: "btn btn-warning no-border analytics-filter" do %>
+                        <%#= hidden_field_tag "emp_groups[]", "" %>
+                        <%= check_box_tag "departments[]", department, false %> <%= department.titleize %>
                       <% end %>
                     <% end %>
                   </div>

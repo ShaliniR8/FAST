@@ -52,6 +52,32 @@ module AnalyticsFilters
     end
   end
 
+  def by_departments(departments)
+    unless departments
+      return scoped
+    else
+      query = ""
+      departments.each do |department|
+        query << " OR " unless department == departments.first
+        query << "department = \'#{department}\'"
+      end
+      return where("#{query}")
+    end
+  end
+
+  def sra_by_departments(departments)
+    unless departments
+      return scoped
+    else
+      query = ""
+      departments.each do |department|
+        query << " OR " unless department == departments.first
+        query << "departments LIKE \'%#{department}%\'"
+      end
+      return where("#{query}")
+    end
+  end
+
   def filter_array_by_timerange(array, start_date, end_date)
     if start_date && end_date
       begin

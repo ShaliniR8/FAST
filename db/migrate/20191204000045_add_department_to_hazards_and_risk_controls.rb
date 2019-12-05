@@ -6,7 +6,7 @@ class AddDepartmentToHazardsAndRiskControls < ActiveRecord::Migration
         hazards
         risk_controls
       ],
-      type: :text
+      type: :string
     }
   }
 
