@@ -23,7 +23,7 @@
           </tr>
         </thead>
         <tbody>
-          <%owner.reports.each do |report|%>
+          <%owner.reports.order(:id).each do |report|%>
             <tr>
               <%Report.get_meta_fields('index').each do |h|%>
                 <td class="<%=h[:html_class].present? ? report.send(h[:html_class]) : ''%>">
