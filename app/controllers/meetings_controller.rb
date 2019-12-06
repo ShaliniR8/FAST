@@ -374,9 +374,7 @@ class MeetingsController < ApplicationController
     message = Message.create(
       :subject => params[:subject],
       :content => params[:message],
-      :link => meeting_path(@meeting),
-      :link_type => 'Meeting',
-      :link_id => @meeting.id,
+      owner: @meeting,
       :time => Time.now)
     sent_from = SendFrom.create(
       :messages_id => message.id,

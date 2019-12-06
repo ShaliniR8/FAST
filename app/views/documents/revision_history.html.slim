@@ -15,9 +15,9 @@ css:
             - @versions.each do |version|
               .span4.collapse-group
                 h3
-                  b #{version[:title]}
+                  b = version[:title]
                   - if version[:tag]
-                    span.badge.badge-warning #{version[:tag]}
+                    span.badge.badge-warning.ml10 #{version[:tag]}
                   .pull-right style="font-size:14px" #{version[:date]}
                   - unless version[:tag] == 'New'
                     a.btn data-toggle="collapse" data-target="##{version[:toggle]}view" View Details &raquo;
