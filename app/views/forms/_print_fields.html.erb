@@ -1,4 +1,5 @@
 <%fields.each do |field|%>
+  <% next if field[:censor_deid] && @deidentified %>
   <%if field[:type] == 'newline'%>
     </br>
   <%elsif field[:type] == 'panel_start'%>
