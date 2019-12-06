@@ -1,7 +1,7 @@
 class AddDepartmentToHazardsAndRiskControls < ActiveRecord::Migration
 
   TABLES = {
-    department: {
+    departments: {
       table: %i[
         hazards
         risk_controls

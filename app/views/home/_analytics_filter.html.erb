@@ -63,7 +63,7 @@
     }
   <% end %>
 
-  <% @departments.each do |department| %>
+  <% @departments_list.each do |department| %>
     <% next if department.nil? %>
     .<%= department%> {
       color: <%= group_to_color(department) %>;
@@ -163,10 +163,10 @@
               <div class="col-sm-12">
                 <div class="input-group">
                   <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
-                    <% @departments.each do |department| %>
+                    <% @departments_list.each do |department| %>
                       <% next if department.nil? %>
                       <%= label_tag department, class: "btn btn-warning no-border analytics-filter" do %>
-                        <%#= hidden_field_tag "emp_groups[]", "" %>
+                        <%#= hidden_field_tag "departments[]", "" %>
                         <%= check_box_tag "departments[]", department, false %> <%= department.titleize %>
                       <% end %>
                     <% end %>

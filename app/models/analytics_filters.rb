@@ -56,12 +56,7 @@ module AnalyticsFilters
     unless departments
       return scoped
     else
-      query = ""
-      departments.each do |department|
-        query << " OR " unless department == departments.first
-        query << "department = \'#{department}\'"
-      end
-      return where("#{query}")
+      return where("#{departments.map{|x| "departments = '#{x}'"}.join(' OR ')}")
     end
   end
 
@@ -69,12 +64,8 @@ module AnalyticsFilters
     unless departments
       return scoped
     else
-      query = ""
-      departments.each do |department|
-        query << " OR " unless department == departments.first
-        query << "departments LIKE \'%#{department}%\'"
-      end
-      return where("#{query}")
+      sras = Sra.all.keep_if{|sra| sra.departments.any?{|x| departments.include?(x)}}
+      return where("id IN (#{sras.map{|sra| "#{sra.id}"}.join(',')})")
     end
   end
 

@@ -29,9 +29,10 @@
       var selection = chart.getSelection();
       var dateParams = params && params.startDate && params.endDate ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       var empGroupParams = params && params.employeeGroups ? "&" + $.param({emp_groups: params.employeeGroups}) : "";
+      var departmentsParams = params && params.departments ? "&" + $.param({departments: params.departments}) : "";
       var row = selection[0].row + 1;
       var status = data[row][0];
-      message = root_url + status + dateParams + empGroupParams;
+      message = root_url + status + dateParams + empGroupParams + departmentsParams;
       window.location=message;
     });
   }

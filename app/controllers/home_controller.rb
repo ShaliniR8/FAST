@@ -504,7 +504,7 @@ class HomeController < ApplicationController
     }
 
     @employee_groups = Template.select("distinct emp_group").map(&:emp_group)
-    @departments = Sra.get_custom_options('Departments')
+    @departments_list = Sra.get_custom_options('Departments')
 
     if session[:mode] == "ASAP"
       if current_user.has_access('submissions','index')
@@ -662,6 +662,7 @@ class HomeController < ApplicationController
       @start_date = @end_date = nil
     end
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
+    @departments = params[:departments] ? params[:departments] : nil
     prepare_analytics
     prepare_calendar
     if BaseConfig.airline[:base_risk_matrix]
