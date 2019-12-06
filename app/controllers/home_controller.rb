@@ -133,7 +133,7 @@ class HomeController < ApplicationController
       end
       @sra_matrix = Array.new(5){Array.new(5,0)}
       @sra_after_matrix = Array.new(5){Array.new(5,0)}
-      Sra.within_timerange(@start_date, @end_date).sra_by_departments(params[:departments]).each do |sra|
+      Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
         if sra.severity_after.present? && sra.likelihood_after_index.present?
           @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] =
             @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] + 1
@@ -293,7 +293,7 @@ class HomeController < ApplicationController
       end
       @sra_matrix = Array.new(5){Array.new(5,0)}
       @sra_after_matrix = Array.new(5){Array.new(5,0)}
-      # Sra.within_timerange(@start_date, @end_date).sra_by_departments(params[:departments]).each do |sra|
+      # Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
       #   if sra.severity_after.present? && sra.likelihood_after_index.present?
       #     @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index]=@sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index]+1
       #   end
@@ -589,7 +589,7 @@ class HomeController < ApplicationController
 
     elsif session[:mode] == "SRM"
       sras = Sra.within_timerange(@start_date, @end_date)
-        .sra_by_departments(params[:departments])
+        .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
       @sras = sras.group_by{|x| x.status}
       if (temp = sras.select{|x| x.overdue}).present?

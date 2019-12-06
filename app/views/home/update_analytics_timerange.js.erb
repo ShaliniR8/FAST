@@ -4,9 +4,9 @@
 var params = {
     startDate: "<%= @start_date %>",
     endDate: "<%= @end_date %>",
-    <% if @emp_groups && @emp_groups.length > 0 %>employeeGroups: ['<%= @emp_groups.join("','") %>'] <% end %>
-    <% if @departments && @departments.length > 0 %>departments: ['<%= @departments.join("','") %>'] <% end %>
-    <% if @feeder_operators && @feeder_operators.length > 0 %>feederOperators: ['<%= @feeder_operators.join("','") %>'] <% end %>
+    <% if @emp_groups.present? %>employeeGroups: ['<%= @emp_groups.join("','") %>'] <% end %>
+    <% if @departments.present? %>departments: ['<%= @departments.join("','") %>'] <% end %>
+    <% if @feeder_operators.present? %>feederOperators: ['<%= @feeder_operators.join("','") %>'] <% end %>
 }
 
 $("#calendar-parent").html("<%= escape_javascript(render('calendar')) %>");
