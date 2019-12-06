@@ -1,0 +1,31 @@
+css:
+  ol > li{
+    font-weight: normal
+  }
+
+.item.active.mt50 style="height:auto"
+  .grid.per90.center-block
+    .panel.panel-steelblue
+      .panel-heading
+        .panel-title
+          b Version History
+      .panel-body
+        .col-xs-12
+          .row.col-xs-12
+            - @versions.each do |version|
+              .span4.collapse-group
+                h3
+                  b #{version[:title]}
+                  - if version[:tag]
+                    span.badge.badge-warning #{version[:tag]}
+                  .pull-right style="font-size:14px" #{version[:date]}
+                  - unless version[:tag] == 'New'
+                    a.btn data-toggle="collapse" data-target="##{version[:toggle]}view" View Details &raquo;
+                .collapse id="#{version[:toggle]}view" class="#{'in' if(version[:tag] == 'New')}"
+                  .col-xs-12
+                    - version[:sections].each do |title, lines|
+                      .col-xs-6
+                        h5: b #{title}
+                        ol
+                          - lines.each do |line|
+                            li #{line}

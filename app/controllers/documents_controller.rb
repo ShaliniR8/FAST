@@ -41,6 +41,8 @@ class DocumentsController < ApplicationController
   end
 
   def revision_history
+    @versions = VersionDictionary::VERSIONS
+    render 'revision_history'
   end
 
   def user_guides
