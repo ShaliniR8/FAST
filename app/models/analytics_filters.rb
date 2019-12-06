@@ -52,6 +52,16 @@ module AnalyticsFilters
     end
   end
 
+  def by_departments(departments)
+    return scoped unless departments
+    if self.name == 'Sra'
+      sras = Sra.all.keep_if{|sra| sra.departments.any?{|x| departments.include?(x)}}
+      return find(sras.map(&:id))
+    end
+    return where(departments: departments)
+  end
+
+
   def filter_array_by_timerange(array, start_date, end_date)
     if start_date && end_date
       begin

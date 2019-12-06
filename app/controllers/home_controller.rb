@@ -119,10 +119,9 @@ class HomeController < ApplicationController
     # Safety Risk Management
     else
 
-      if false
       @hazard_matrix = Array.new(5){Array.new(5,0)}
       @hazard_after_matrix = Array.new(5){Array.new(5,0)}
-      Hazard.within_timerange(@start_date, @end_date).each do |hazard|
+      Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |hazard|
         if hazard.severity_after.present? && hazard.likelihood_after_index.present?
           @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] =
             @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] + 1
@@ -134,7 +133,7 @@ class HomeController < ApplicationController
       end
       @sra_matrix = Array.new(5){Array.new(5,0)}
       @sra_after_matrix = Array.new(5){Array.new(5,0)}
-      Sra.within_timerange(@start_date, @end_date).each do |sra|
+      Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
         if sra.severity_after.present? && sra.likelihood_after_index.present?
           @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] =
             @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] + 1
@@ -146,7 +145,6 @@ class HomeController < ApplicationController
       end
       @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Hazards"
       @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Hazards"
-      end
     end
   end
 
@@ -283,7 +281,7 @@ class HomeController < ApplicationController
 
       @hazard_matrix = Array.new(5){Array.new(5,0)}
       @hazard_after_matrix = Array.new(5){Array.new(5,0)}
-      Hazard.within_timerange(@start_date, @end_date).each do |hazard|
+      Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |hazard|
         if hazard.severity_after.present? && hazard.likelihood_after_index.present?
           @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] =
             @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] + 1
@@ -295,7 +293,7 @@ class HomeController < ApplicationController
       end
       @sra_matrix = Array.new(5){Array.new(5,0)}
       @sra_after_matrix = Array.new(5){Array.new(5,0)}
-      # Sra.within_timerange(@start_date, @end_date).each do |sra|
+      # Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
       #   if sra.severity_after.present? && sra.likelihood_after_index.present?
       #     @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index]=@sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index]+1
       #   end
@@ -506,6 +504,7 @@ class HomeController < ApplicationController
     }
 
     @employee_groups = Template.select("distinct emp_group").map(&:emp_group)
+    @departments_list = Sra.get_custom_options('Departments')
 
     if session[:mode] == "ASAP"
       if current_user.has_access('submissions','index')
@@ -590,15 +589,18 @@ class HomeController < ApplicationController
 
     elsif session[:mode] == "SRM"
       sras = Sra.within_timerange(@start_date, @end_date)
+        .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
       @sras = sras.group_by{|x| x.status}
       if (temp = sras.select{|x| x.overdue}).present?
         @sras["Overdue"]=temp
       end
       hazards = Hazard.within_timerange(@start_date, @end_date)
+        .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
       @hazards = hazards.group_by{|x| x.status}
       risk_controls = RiskControl.within_timerange(@start_date, @end_date)
+        .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
       @risk_controls = risk_controls.group_by{|x| x.status}
       if (temp=risk_controls.select{|x| x.overdue}).present?
@@ -660,6 +662,7 @@ class HomeController < ApplicationController
       @start_date = @end_date = nil
     end
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
+    @departments = params[:departments] ? params[:departments] : nil
     prepare_analytics
     prepare_calendar
     if BaseConfig.airline[:base_risk_matrix]

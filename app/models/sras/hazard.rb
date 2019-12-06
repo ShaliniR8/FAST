@@ -35,6 +35,7 @@ class Hazard < ActiveRecord::Base
 
       {field: "title",              title: "Hazard Title",          num_cols: 6,  type: "text",     visible: 'form,index,show', required: true},
       {field: 'get_source',         title: 'Source of Input',       num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: "departments",        title: "Affected Department",   num_cols: 6,  type: "select",   visible: 'form,index,show', required: false,    options: get_custom_options('Departments')},
       {field: "description",        title: "Description",           num_cols: 12, type: "textarea", visible: 'form,show'},
 
       {field: "get_root_causes_full",  title: "#{I18n.t("srm.hazard.root_cause.title")}",   type: "list",     visible: 'invisible'},
