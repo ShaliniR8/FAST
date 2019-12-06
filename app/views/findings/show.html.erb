@@ -53,12 +53,6 @@
           </div>
 
           <%=render '/findings/show', :owner => @owner, :show_btn => true%>
-          <% if BaseConfig.airline[:has_root_causes] %>
-            <%= render '/root_causes/root_causes',
-              owner: @owner,
-              show_btns: true,
-              headers: RootCause.get_headers %>
-          <% end %>
           <%=render "/forms/attachments_show", :owner => @owner%>
           <%=render "/records/transactions", :owner => @owner%>
 
