@@ -1,6 +1,7 @@
 <%load_special_matrix(owner)%>
 <%like = Finding.get_likelihood%>
 <%frequency = (0..4).to_a.reverse%>
+<% @i18nbase ||= 'sa.finding' %>
 
 <%=render '/forms/show_fields', :fields => Finding.get_meta_fields('show'), :record => owner%>
 
