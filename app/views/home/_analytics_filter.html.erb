@@ -161,7 +161,7 @@
                 <div class="input-group">
                   <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
                     <% @departments_list.compact.each do |department| %>
-                      <%= label_tag department, class: "btn btn-warning no-border analytics-filter" do %>
+                      <%= label_tag department, class: "btn btn-warning no-border analytics-filter col-xs-3" do %>
                         <%#= hidden_field_tag "departments[]", "" %>
                         <%= check_box_tag "departments[]", department, false %> <%= department.titleize %>
                       <% end %>

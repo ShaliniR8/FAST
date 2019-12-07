@@ -55,7 +55,9 @@ module AnalyticsFilters
   def by_departments(departments)
     return scoped unless departments
     if self.name == 'Sra'
-      sras = Sra.all.keep_if{|sra| sra.departments.any?{|x| departments.include?(x)}}
+      sras = Sra.all.keep_if{|sra| sra.departments.present? &&
+        sra.departments.any?{|x| departments.include?(x)}
+      }
       return find(sras.map(&:id))
     end
     return where(departments: departments)
