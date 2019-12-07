@@ -1,8 +1,36 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.1.2',
+      title: 'Version 1.1.3',
       tag: 'New',
+      toggle: 'v1_1_3',
+      date: '12/6/2019',
+      sections: {
+        'What\'s New' => [
+          'Added tooltips to Meeting.',
+          'Added Root Causes to Reports.',
+          'Added Root Causes to Findings.',
+          'Added title to Automated Notifications for Meetings',
+          'Added Department to Hazards and Risk Controls.',
+          'Added Department to SRA(SRM) Dashboard filter.',
+          'Added confirmation email for new submissions.',
+          'Messaging the Submitter from Submissions now adds a transaction in the log.',
+        ],
+        'Optimizations & Fixes' => [
+          'Revised version tracking and version history UI.',
+          'Revised signature in all email notifications.',
+          'Replaced engineering@prosafet.com with donotreply@prosafet.com for sender in all email notifications.',
+          'Fixed issue with Under Review Events not being visible in "Add Event" meeting button.',
+          'Fixed issue with ORM Template Modal not being dismissed.',
+          'Fixed issues with Query Center breaking on module change.',
+          'Fixed Admins from seeing submitted by, rather than only Global Admins.',
+          'Fixed CC-only internal messages from breaking when no To was supplied.',
+          'Events ordered by ID in Meeting PDFs.',
+        ]
+      }
+    },
+    {
+      title: 'Version 1.1.2',
       toggle: 'v1_1_2',
       date: '11/4/2019',
       sections: {
