@@ -19,7 +19,7 @@
 
 <% if BaseConfig.airline[:has_root_causes] %>
   <%= render '/root_causes/root_causes',
-    owner: @owner,
+    owner: owner,
     show_btns: true,
     headers: RootCause.get_headers %>
 <% end %>
