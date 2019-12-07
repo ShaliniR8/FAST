@@ -1,5 +1,7 @@
 class CannedMessagesController < ApplicationController
 
+  before_filter :login_required
+
   def index
     @table = Object.const_get("CannedMessage")
     @records = @table.all

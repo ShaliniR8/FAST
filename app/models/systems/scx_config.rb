@@ -9,7 +9,7 @@ class SCX_Config
 
   def self.airline_config
     {
-      :version                                        => '1.1.1',
+      :version                                        => '1.1.3',
 
       :name                                           => 'Sun Country Airlines',
       :code                                           => 'SCX',
@@ -34,6 +34,7 @@ class SCX_Config
       :allow_template_nested_fields                   => false,
       :checklist_version                              => '3',
       :report_root_cause_lock                         => true,
+      :record_root_causes                             => true,
 
       # Safety Assurance Module
       :allow_reopen_report                            => true,

@@ -139,7 +139,7 @@ class MeetingsController < ApplicationController
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       send_notices(
         @meeting.invitations,
-        "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
+        "You are invited to Meeting ##{@meeting.get_id}: #{@meeting.title}.  " + g_link(@meeting),
         true,
         "New Meeting Invitation")
       redirect_to meeting_path(@meeting), flash: {success: "Meeting created."}
@@ -240,9 +240,9 @@ class MeetingsController < ApplicationController
     when 'Close'
       send_notices(
         @owner.invitations,
-        "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
+        "Meeting ##{@owner.get_id}: #{@owner.title} has been Closed." + g_link(@owner),
         true,
-        "Meeting ##{@owner.get_id} Closed")
+        "Meeting ##{@owner.get_id}: #{@owner.title} Closed")
     when 'Add Attachment'
       transaction = false
     when 'Save Agenda'
@@ -258,8 +258,8 @@ class MeetingsController < ApplicationController
           new_inv.meeting = @owner
           new_inv.save
           send_notice(new_inv,
-            "You are invited to Meeting ##{@owner.get_id}.  " + g_link(@owner),
-            true, "New Meeting Invitation")
+            "You are invited to Meeting ##{@owner.get_id}: #{@owner.title}.  " + g_link(@owner),
+            true, "New Meeting Invitation: #{@owner.title}")
         end
       end
     end
@@ -267,7 +267,9 @@ class MeetingsController < ApplicationController
       params[:cancellation].each_pair do |index, val|
         inv = @owner.invitations.where("users_id = ?", val)
         if inv.present?
-          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}.", true, "Removed from Meeting")
+          send_notice(inv.first,
+            "You are no longer invited to Meeting ##{@owner.id}: #{@owner.title}.",
+            true, "Removed from Meeting: #{@owner.title}")
           inv.first.destroy
         end
       end
@@ -327,6 +329,7 @@ class MeetingsController < ApplicationController
     @report_headers = Report.get_meta_fields('index')
     @meeting = Meeting.find(params[:id])
     @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = @reports.where('id NOT IN (?)', @meeting.reports.map(&:id)) if @meeting.reports.present?
     render :partial => "reports"
   end
 
@@ -372,9 +375,7 @@ class MeetingsController < ApplicationController
     message = Message.create(
       :subject => params[:subject],
       :content => params[:message],
-      :link => meeting_path(@meeting),
-      :link_type => 'Meeting',
-      :link_id => @meeting.id,
+      owner: @meeting,
       :time => Time.now)
     sent_from = SendFrom.create(
       :messages_id => message.id,
@@ -384,7 +385,7 @@ class MeetingsController < ApplicationController
         :messages_id => message.id,
         :users_id => user.id)
       notify(User.find(user),
-        "You have a new internal message sent from Meeting. " + g_link(message),
+        "You have a new internal message sent from Meeting ##{@meeting.id}: #{@meeting.title}. #{g_link(message)}",
         true, 'New Internal Meeting Message')
     end
     redirect_to meeting_path(@meeting)

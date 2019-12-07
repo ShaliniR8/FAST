@@ -328,6 +328,7 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
+    adjust_session_to_target(@owner.target) if BaseConfig::MODULES[session[:mode]][:objects].exclude?(@owner.target)
     @title = BaseConfig::MODULES[session[:mode]][:objects][@owner.target].pluralize
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
@@ -365,6 +366,28 @@ class QueriesController < ApplicationController
 
 
   private
+
+
+  # Set session[:mode] to match the mode of the target query
+  def adjust_session_to_target(target)
+
+    # Set a list of potential query targets
+    @sms_list = ['Audit','Inspection','Evaluation','Investigation','Finding','SmsAction']
+    @sms_im_list = ['Im'] # unused
+    @asap_list = ['Submission','Report','Record','CorrectiveAction']
+    @srm_list = ['Sra','Hazard','RiskControl','SafetyPlan']
+
+    case target
+    when *@sms_list
+      session[:mode] = 'SMS'
+    when *@sms_im_list
+      session[:mode] = 'SMS IM'
+    when *@asap_list
+      session[:mode] = 'ASAP'
+    when *@srm_list
+      session[:mode] = 'SRM'
+    end
+  end
 
 
   def load_options

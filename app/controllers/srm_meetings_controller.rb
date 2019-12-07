@@ -297,7 +297,7 @@ class SrmMeetingsController < ApplicationController
         :messages_id => message.id,
         :users_id => user.id)
       notify(User.find(user),
-        "You have a new internal message sent from Meeting. " + g_link(message),
+        "You have a new internal message sent from Meeting ##{@meeting.id}. #{g_link(message)}",
         true, 'New Internal Meeting Message')
     end
     redirect_to srm_meeting_path(@meeting)

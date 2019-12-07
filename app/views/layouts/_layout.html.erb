@@ -352,17 +352,17 @@
               <%unread_message = current_user.num_unread%>
               <a href="#" data-toggle="dropdown">
                 Messages
-                <span class="badge badge-red">
-                  <%=unread_message%>
-                </span>
+                <% if unread_message > 0 %>
+                  <span class="badge badge-red"> <%=unread_message%> </span>
+                <% end %>
                 <b class="caret"></b>
               </a>
               <ul class="dropdown-menu dropdown-notification" role="menu">
                 <li>
                   <a href=<%=messages_path%>>Inbox
-                    <span class="badge badge-red">
-                      <%=unread_message%>
-                    </span>
+                    <% if unread_message > 0 %>
+                      <span class="badge badge-red"> <%=unread_message%> </span>
+                    <% end %>
                   </a>
                 </li>
                 <li>

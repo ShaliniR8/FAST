@@ -1,0 +1,201 @@
+<div class="panel panel-warning">
+
+  <div class="panel-heading">
+    <div class="panel-title">
+      <b>Residual Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+    </div>
+  </div>
+
+  <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto;">
+    <%=form_for @owner do |f|%>
+
+      <%=f.hidden_field :severity_after,    :value => "", :id => "sev"%>
+      <%=f.hidden_field :likelihood_after,  :value => "", :id => "like"%>
+      <%=f.hidden_field :risk_factor_after, :value => "", :id => "risk_fact"%>
+
+      <%=render "shared/instructions", :instruction =>
+        "Select <b>Residual Probability</b> and <b>Residual Severity</b> from the table to assess risk."%>
+
+      <div class="form-group col-xs-12">
+        <%=f.label :statement, "Notes"%>
+        <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_risk"%>
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_probability"%>
+        <%=render "shared/#{BaseConfig.airline[:code]}/risk_rating"%>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        <%=render "shared/#{BaseConfig.airline[:code]}/form_mitigated_severity"%>
+      </div>
+
+      <div class="col-xs-12">
+        <%=f.submit "Save Residual Risk",:class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
+      </div>
+    <%end%>
+  </div>
+</div>
+
+
+<style>
+  .table-cursor td:hover {
+    opacity: 0.8;
+    cursor: pointer;
+    background-color: #F0F8FF;
+  }
+  .table-centered th{
+    font-size: 16px;
+  }
+  .table-fixed { table-layout: fixed; }
+</style>
+
+
+<script>
+  function load_mitigate_data(){
+    <%if @owner.get_mitigated_severity.present? && @owner.get_mitigated_probability.present?%>
+      $('.mitigate_severity_td').each(function(){
+        <%(0..@severity_table[:column_header].size-1).each do |i|%>
+          if ($(this).data('column')==<%=i%>){
+            if($(this).data('row')==<%=@owner.get_mitigated_severity[i]%>){
+              $(this).data("status","checked");
+              $(this).css('background','#FCAFCB');
+            }
+          }
+        <%end%>
+      });
+      $('.mitigate_probability_td').each(function(){
+        <%(0..@probability_table[:row_header].size-1).each do |i|%>
+          if ($(this).data('row')==<%=i%>){
+            if($(this).data('column')==<%=@owner.get_mitigated_probability[i]%>){
+              $(this).data("status","checked");
+              $(this).css('background','#FCAFCB');
+            }
+          }
+        <%end%>
+      });
+      calculate_mitigate();
+    <%end%>
+  }
+
+  function initiliaze_mitigate(){
+    $('.mitigate_severity_td').on('click',function(){
+      if ($(this).data("status")==="checked"){
+        $(this).data("status","");
+        $(this).css('background','none');
+      }else{
+        $(this).data("status","checked");
+        $(this).css('background','#FCAFCB');
+        row_id=$(this).data("row");
+        column_id=$(this).data("column");
+        $('.mitigate_severity_td').each(function(){
+          if ($(this).data("row")!=row_id &&  $(this).data("column")==column_id){
+            $(this).data("status","");
+            $(this).css('background','none');
+          }
+        });
+      }
+      calculate_mitigate();
+    });
+    $('.mitigate_probability_td').on('click',function(){
+      if ($(this).data("status")==="checked"){
+        $(this).data("status","");
+        $(this).css('background','none');
+      }else{
+        $(this).data("status","checked");
+        $(this).css('background','#FCAFCB');
+        row_id=$(this).data("row");
+        column_id=$(this).data("column");
+        $('.mitigate_probability_td').each(function(){
+          if ($(this).data("row")==row_id &&  $(this).data("column")!=column_id){
+            $(this).data("status","");
+            $(this).css('background','none');
+          }
+        });
+      }
+      calculate_mitigate();
+    });
+  }
+
+  function calculate_mitigate(){
+    severities = []
+    probabilities = []
+    severity_checked = 0
+    probability_checked = 0
+    $('.mitigate_severity_td').each(function(){
+      if ($(this).data("status")==="checked"){
+        severities.push($(this).data("row"));
+        severity_checked++;
+      }
+    });
+    $('.mitigate_probability_td').each(function(){
+      if ($(this).data("status")==="checked"){
+        probabilities.push($(this).data("column"));
+        probability_checked++;
+      }
+    });
+    if (probability_checked>0 && severity_checked>0){
+      set_mitigate(Math.max.apply(null,severities),Math.max.apply(null,probabilities));
+    }else{
+      clear_mitigate();
+    }
+  }
+
+  function set_mitigate(row_index,column_index){
+    clear_mitigate();
+    risk_table_def = <%=FFT_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=FFT_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    $('.mitigate_risk_td').each(function(){
+      if($(this).data("row")==row_index && $(this).data("column")==column_index){
+      $(this).html("<span class='glyphicon glyphicon-ok' style='color:black'></span>");
+        $('#sev').val(row_index);
+        $('#like').val(column_index);
+        $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
+      }
+    });
+  }
+
+  function clear_mitigate(){
+    $('.mitigate_risk_td').each(function(){
+        $(this).text("");
+    });
+  }
+
+  function mitigate(row_index,column_index){
+    clear_mitigate();
+    $('.mitigate_risk_td').each(function(){
+      if($(this).data("row") == row_index && $(this).data("column")==column_index){
+        $(this).html("<span class='glyphicon glyphicon-ok style='color:black'></span>");
+        $('#sev').val(row_index);
+        $('#like').val(column_index);
+      }
+    });
+  }
+
+  $(document).ready(function(){
+    load_mitigate_data();
+    initiliaze_mitigate();
+    $('form').on('submit',function(){
+      var severity_result=[undefined,undefined,undefined,undefined,undefined];
+      var probability_result=[undefined];
+      $('.mitigate_severity_td').each(function(){
+        if ($(this).data('status')==="checked"){
+          severity_result[$(this).data("column")]=$(this).data("row");
+        }
+      });
+      $('.mitigate_probability_td').each(function(){
+        if ($(this).data('status')==="checked"){
+          probability_result[$(this).data("row")]=$(this).data("column");
+        }
+      });
+      for (i=0;i<severity_result.length;i++){
+        $('form').append("<input name='<%=@target_name%>[<%=@severity_field%>][]' value="+severity_result[i]+" hidden></input>");
+      }
+      for (i=0;i<probability_result.length;i++){
+        $('form').append("<input name='<%=@target_name%>[<%=@probability_field%>][]' value="+probability_result[i]+" hidden></input>");
+      }
+      return true;
+    });
+  });
+</script>

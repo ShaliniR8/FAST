@@ -42,17 +42,16 @@ module PrdgSession
   config.encoding = "utf-8"
   Rack::Utils.key_space_limit = 262144
 
-
   # Configure sensitive parameters which will be filtered from the log file.
-  config.filter_parameters += [:password, :pw, :base64]
+  config.filter_parameters += %i[password pw base64 json_dump]
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.default_url_options = { :host => 'bsk.prosafet.com' }
   config.action_mailer.smtp_settings = {
     address: 'smtp.1and1.com',
     port: 587,
-    user_name: 'engineering@prosafet.com',
-    password: '5Koko2000!',
+    user_name: 'donotreply@prosafet.com',
+    password: 'pookies224',
     authentication: 'plain',
   }
   config.action_mailer.raise_delivery_errors = true

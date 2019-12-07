@@ -94,10 +94,10 @@
           saveAs(uri, 'Substitute Risk Analysis-SRAs.png');
         }else if($("#after_switch").hasClass('show_hazard')){
           saveAs(uri, 'Substitute Risk Analysis-Hazards.png');
+        }else{
+          saveAs(uri, '<%=@after_title%>.png');
         }
-              //saveAs(uri, '<%=@after_title%>.png');
-          }
-      });
+    });
   });
 
 

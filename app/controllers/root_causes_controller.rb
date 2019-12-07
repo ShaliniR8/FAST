@@ -22,7 +22,7 @@ class RootCausesController < ApplicationController
     @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     @i18nbase = params[:i18nbase] || i18nbase
     @root = CauseOption.where(level: 0, name: "#{params[:owner_type].titleize}").first ||
-      CauseOption.where(level: 0, name: 'Hazard').first
+      CauseOption.where(level: 0, name: 'Default').first
     if @root.present?
       @categories = @root.children.keep_if{|x| !x.hidden?}.sort_by(&:name)
     end

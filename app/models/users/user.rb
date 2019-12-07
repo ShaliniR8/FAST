@@ -66,6 +66,14 @@ class User < ActiveRecord::Base
       .uniq
   end
 
+  def get_all_templates_hash
+    rules = privileges.preload(:access_controls).map(&:access_controls).flatten
+    {
+      :full => rules.select{|rule| rule[:action] == 'full'}.map{|x| x[:entry]}.uniq,
+      :viewer => rules.select{|rule| rule[:action] == 'viewer'}.map{|x| x[:entry]}.uniq
+    }
+  end
+
 
   def get_all_submitter_templates
     result = privileges.map(&:access_controls).flatten.select{|x| x[:action] == "full" || x[:action] == "submitter"}.map{|x| x[:entry]}.uniq

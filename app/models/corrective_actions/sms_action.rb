@@ -53,13 +53,13 @@ class SmsAction < ActiveRecord::Base
       {field: 'sms_actions_comment',            title: 'Corrective Action Comment',         num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'final_comment',                  title: 'Final Comment',                     num_cols: 12, type: 'textarea',     visible: 'show',            required: false},
 
-      {field: 'likelihood',                     title: 'Baseline Likelihood',               num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity',                       title: 'Baseline Severity',                 num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor',                    title: 'Baseline Risk',                     num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',                     title: "#{I18n.t("sa.risk.baseline.title")} Likelihood",      num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity',                       title: "#{I18n.t("sa.risk.baseline.title")} Severity",        num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor',                    title: "#{I18n.t("sa.risk.baseline.title")} Risk",            num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',               title: 'Mitigated Likelihood',              num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity_after',                 title: 'Mitigated Severity',                num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor_after',              title: 'Mitigated Risk',                    num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',               title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood",     num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity_after',                 title: "#{I18n.t("sa.risk.mitigated.title")} Severity",       num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor_after',              title: "#{I18n.t("sa.risk.mitigated.title")} Risk",           num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

@@ -1,0 +1,30 @@
+<div class="col-xs-12 mb10">
+  <hr/>
+  <h4 style="color:#DC7633"><b>PROBABILITY EXERCISE</b></h4>
+  <font size="1">
+  <table class="table table-bordered table-left table-cursor">
+    <tr>
+      <th bgcolor="#DC7633" colspan="5" bgcolor="grey" style="color:white"><h4>PROBABILITY</h4></th>
+    </tr>
+    <tr>
+      <%@probability_table[:column_header].each do |header|%>
+        <th bgcolor="#FEF5E7" width="15%"><h5><%=header.html_safe%></h5></th>
+      <%end%>
+    </tr>
+    <tr>
+      <%@probability_table[:row_header].each_with_index do |row_header,row_index|%>
+        <tr>
+          <%@probability_table[:column_header].each_with_index do |column_header,column_index|%>
+            <td class="baseline_probability_td"
+              data-row="<%=row_index%>"
+              data-status=""
+              data-column="<%=column_index%>">
+              <%=@probability_table[:rows][row_index][column_index].html_safe%>
+            </td>
+          <%end%>
+        </tr>
+      <%end%>
+    </tr>
+  </table>
+  </font>
+</div>

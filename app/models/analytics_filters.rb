@@ -2,16 +2,21 @@ module AnalyticsFilters
 
 
   def can_be_accessed(current_user)
-    templates = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: true, strict: true) ?
-      Template.all.map(&:id) : Template.where(:name => current_user.get_all_templates).map(&:id)
-    shared_user = current_user.has_access(self.name.downcase.pluralize, 'shared', admin: false, strict: true)
+    is_admin = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: true, strict: true)
+    full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:full])
+
     if self.to_s == "Submission"
-      preload(:template).where("submissions.templates_id IN (?) #{shared_user ? '' : " OR submissions.user_id = #{current_user.id}"}", templates)
+      shared_user = current_user.has_access(self.name.downcase.pluralize, 'shared', admin: false, strict: true)
+      preload(:template)
+        .where("submissions.templates_id IN (?) #{shared_user ? '' : " OR submissions.user_id = #{current_user.id}"}",
+          full_access_templates)
     else
-      preload(:template).where("records.templates_id IN (?) #{shared_user ? '' : " OR submissions.user_id = #{current_user.id}"}", templates)
+      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer])
+      preload(:template)
+        .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
+          full_access_templates, viewer_access_templates)
     end
   end
-
 
 
   def within_timerange(start_date, end_date)
@@ -46,6 +51,18 @@ module AnalyticsFilters
       return includes(:template).where("templates.emp_group in (?)", groups)
     end
   end
+
+  def by_departments(departments)
+    return scoped unless departments
+    if self.name == 'Sra'
+      sras = Sra.all.keep_if{|sra| sra.departments.present? &&
+        sra.departments.any?{|x| departments.include?(x)}
+      }
+      return find(sras.map(&:id))
+    end
+    return where(departments: departments)
+  end
+
 
   def filter_array_by_timerange(array, start_date, end_date)
     if start_date && end_date
