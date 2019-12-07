@@ -10,6 +10,7 @@ class Finding < ActiveRecord::Base
   include Commentable
   include Noticeable
   include Recommendationable
+  include RootCausable
   include SmsActionable
   include Transactionable
 
@@ -42,6 +43,9 @@ class Finding < ActiveRecord::Base
       {field: 'responsible_user_id',        title: 'Responsible User',              num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'approver_id',                title: 'Final Approver',                num_cols: 6,  type: 'user',         visible: 'index,form,show', required: false},
       {field: 'completion_date',            title: 'Scheduled Completion Date',     num_cols: 6,  type: 'date',         visible: 'index,form,show', required: true},
+      {field: "get_root_causes_full",       title: "#{I18n.t("sa.finding.root_cause.title")}",    type: "list",         visible: 'invisible'},
+      {field: "get_root_causes",            title: "#{I18n.t("sa.finding.root_cause.title")}",    type: "list",         visible: BaseConfig.airline[:has_root_causes] ? 'index' : ''},
+
       {field: 'reference',                  title: 'Reference or Requirement',      num_cols: 12, type: 'textarea',     visible: 'form,show',       required: false},
       {field: 'regulatory_violation',       title: 'Regulatory Violation',          num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
       {field: 'policy_violation',           title: 'Policy Violation',              num_cols: 6,  type: 'boolean_box',  visible: 'form,show',       required: false},
@@ -65,13 +69,13 @@ class Finding < ActiveRecord::Base
       {field: 'other',                      title: 'Other',                         num_cols: 6,  type: 'text',         visible: 'form,show',       required: false},
       {field: 'final_comment',              title: 'Final Comment',                 num_cols: 12, type: 'text',         visible: 'show',            required: false},
 
-      {field: 'likelihood',                 title: 'Baseline Likelihood',           num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity',                   title: 'Baseline Severity',             num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor',                title: 'Baseline Risk',                 num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',                 title: "#{I18n.t("sa.risk.baseline.title")} Likelihood",           num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity',                   title: "#{I18n.t("sa.risk.baseline.title")} Severity",             num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor',                title: "#{I18n.t("sa.risk.baseline.title")} Risk",                 num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',           title: 'Mitigated Likelihood',          num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'severity_after',             title: 'Mitigated Severity',            num_cols: 12, type: 'text',         visible: 'adv',             required: false},
-      {field: 'risk_factor_after',          title: 'Mitigated Risk',                num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',           title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood",          num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'severity_after',             title: "#{I18n.t("sa.risk.mitigated.title")} Severity",            num_cols: 12, type: 'text',         visible: 'adv',             required: false},
+      {field: 'risk_factor_after',          title: "#{I18n.t("sa.risk.mitigated.title")} Risk",                num_cols: 12, type: 'text',         visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
 
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end

@@ -19,7 +19,7 @@ end
 
 class CauseOptionsController < ApplicationController
 
-
+  before_filter :login_required
 
   def index
     @table = Object.const_get("CauseOption")

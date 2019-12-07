@@ -8,7 +8,37 @@ SCX:
     event:
       root_cause:
         title: Category
+    report:
+      root_cause:
+        title: Category
   srm:
     hazard:
       root_cause:
         title: Root Cause
+
+
+FFT:
+  core:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual
+  sr:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual
+  srm:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual
+  sa:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual

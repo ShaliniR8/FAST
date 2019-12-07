@@ -20,6 +20,7 @@ class HazardsController < ApplicationController
        @records = @records.select{|x| x.status == params[:status]}
       @title += " : #{params[:status]}"
     end
+    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
     @headers = @table.get_meta_fields('index')
     @table_name = "hazards"
     if !current_user.has_access('sras', 'admin', admin: true, strict: true)

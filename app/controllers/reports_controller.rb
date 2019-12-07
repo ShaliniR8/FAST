@@ -17,6 +17,8 @@ end
 
 
 class ReportsController < ApplicationController
+
+  before_filter :login_required
   before_filter :set_table_name
   before_filter :check_group, :only => [:show]
 

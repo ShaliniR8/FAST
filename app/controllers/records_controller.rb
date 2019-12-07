@@ -122,7 +122,7 @@ class RecordsController < ApplicationController
   def index
     @table = Object.const_get("Record")
     index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-      args.push('admin') if current_user.admin? || BaseConfig.airline[:show_submitter_name]
+      args << 'admin' if current_user.global_admin?
       args
     end
     @headers = @table.get_meta_fields(*index_meta_field_args)
@@ -391,6 +391,7 @@ class RecordsController < ApplicationController
 
   def show
     load_options
+    @i18nbase = 'sr.report'
     @record = Record.find(params[:id])
     @corrective_actions = @record.corrective_actions
     if @record.report.present?
@@ -406,6 +407,8 @@ class RecordsController < ApplicationController
   def print
     @deidentified = params[:deidentified]
     @record = Record.find(params[:id])
+    @meta_field_args = ['show']
+    @meta_field_args << 'admin' if current_user.global_admin?
     html = render_to_string(:template => "/records/print.html.erb")
     pdf = PDFKit.new(html)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")

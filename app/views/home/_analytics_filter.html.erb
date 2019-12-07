@@ -53,13 +53,21 @@
     cursor: pointer !important;
   }
 
-  <% @employee_groups.each do |emp_group| %>
-    <% next if emp_group.nil? %>
+  <% @employee_groups.compact.each do |emp_group| %>
     .<%= emp_group%> {
       color: <%= group_to_color(emp_group) %>;
     }
     .<%= emp_group %>.active {
       /*background-color: <%= group_to_color(emp_group) %>;*/
+    }
+  <% end %>
+
+  <% @departments_list.compact.each do |department| %>
+    .<%= department%> {
+      color: <%= group_to_color(department) %>;
+    }
+    .<%= department %>.active {
+      /*background-color: <%= group_to_color(department) %>;*/
     }
   <% end %>
 
@@ -136,11 +144,26 @@
               <div class="col-sm-12">
                 <div class="input-group">
                   <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
-                    <% @employee_groups.each do |emp_group| %>
-                      <% next if emp_group.nil? %>
+                    <% @employee_groups.compact.each do |emp_group| %>
                       <%= label_tag emp_group, class: "btn btn-warning no-border analytics-filter" do %>
                         <%#= hidden_field_tag "emp_groups[]", "" %>
                         <%= check_box_tag "emp_groups[]", emp_group, false %> <%= emp_group.titleize %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <% if session[:mode] == "SRM" %>
+            <div class="row mt10">
+              <div class="col-sm-12">
+                <div class="input-group">
+                  <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
+                    <% @departments_list.compact.each do |department| %>
+                      <%= label_tag department, class: "btn btn-warning no-border analytics-filter col-xs-3" do %>
+                        <%#= hidden_field_tag "departments[]", "" %>
+                        <%= check_box_tag "departments[]", department, false %> <%= department.titleize %>
                       <% end %>
                     <% end %>
                   </div>

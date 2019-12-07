@@ -1,4 +1,7 @@
 class PrivilegesController < ApplicationController
+
+  before_filter :login_required
+
   def index
     @privileges=Privilege.find(:all)
     @headers=Privilege.get_headers

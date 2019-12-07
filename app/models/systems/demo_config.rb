@@ -7,7 +7,7 @@ class Demo_Config
 
   def self.airline_config
     {
-      :version                                        => '1.1.1',
+      :version                                        => '1.1.3',
 
       :name                                           => 'ProSafeT Demo',
       :code                                           => 'BOE',

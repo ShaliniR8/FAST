@@ -9,7 +9,7 @@ class BSK_Config
 
   def self.airline_config
     {
-      :version                                        => "1.1.1",
+      :version                                        => "1.1.3",
 
       :name                                           => 'Miami Air International',
       :code                                           => "BSK",

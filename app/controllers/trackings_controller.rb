@@ -1,5 +1,8 @@
 class TrackingsController < ApplicationController
+
+  before_filter :login_required
   before_filter :set_table_name
+
   def set_table_name
     @table_name="trackings"
   end

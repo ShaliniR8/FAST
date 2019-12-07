@@ -3,12 +3,13 @@ class Record < ActiveRecord::Base
   include RiskHandling
 
 #Concerns List
-include Attachmentable
-include Commentable
-include Investigationable
-include Sraable
-include Transactionable
-include Messageable
+  include Attachmentable
+  include Commentable
+  include Investigationable
+  include Messageable
+  include RootCausable
+  include Sraable
+  include Transactionable
 
 #Associations List
   has_one     :submission,          :foreign_key => "records_id",       :class_name => "Submission"
@@ -54,16 +55,20 @@ include Messageable
       {field: 'get_submitter_name',    title: 'Submitted By',         num_cols: 6,  type: 'text',     visible: submitter_visible, required: false, censor_deid: true},
       {field: 'viewer_access',         title: 'Viewer Access',        num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
       {field: 'event_date',            title: 'Event Date/Time',      num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
+
+      {field: "get_root_causes_full",  title: "#{I18n.t("sr.report.root_cause.title")}", type: "list", visible: 'invisible'},
+      {field: "get_root_causes",       title: "#{I18n.t("sr.report.root_cause.title")}", type: "list", visible: BaseConfig.airline[:has_root_causes] ? 'index' : '' },
+
       {field: 'description',           title: 'Event Title',          num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
       {field: 'final_comment',         title: 'Final Comment',        num_cols: 12, type: 'text',     visible: 'show',            required: false},
 
-      {field: 'likelihood',           title: 'Baseline Likelihood',   num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: 'Baseline Severity',     num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: 'Baseline Risk',         num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',           title: "#{I18n.t("sr.risk.baseline.title")} Likelihood",   num_cols: 12, type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity',             title: "#{I18n.t("sr.risk.baseline.title")} Severity",     num_cols: 12, type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor',          title: "#{I18n.t("sr.risk.baseline.title")} Risk",         num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',     title: 'Mitigated Likelihood',  num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: 'Mitigated Severity',    num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: 'Mitigated Risk',        num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',     title: "#{I18n.t("sr.risk.mitigated.title")} Likelihood",  num_cols: 12, type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity_after',       title: "#{I18n.t("sr.risk.mitigated.title")} Severity",    num_cols: 12, type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor_after',    title: "#{I18n.t("sr.risk.mitigated.title")} Risk",        num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

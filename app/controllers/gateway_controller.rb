@@ -24,7 +24,8 @@ class GatewayController < ApplicationController
     #   return
     # end
 
-    # automatically redirect to audit module
+    # automatically redirect to audit
+    flash.keep
     redirect_to "/home"
     return
 

@@ -98,6 +98,8 @@
                       <%end%>
                     <%when 'textarea'%>
                       <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
+                    <%when "list"%>
+                      <%=field_value.gsub('<br>',', <br>')%>
                     <%when 'select'%>
                       <%if field_display.present?%>
                         <%=field_display[field_value]%>
