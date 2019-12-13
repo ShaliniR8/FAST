@@ -107,8 +107,8 @@ class DefaultConfig
     hierarchy.reduce({}){ |acc, (mod,data)| acc.merge(data[:objects]) }
   end
 
-  def self.check_action(user,action,object,**op)
-    OBJECT[object.class.name][:actions][action][:access].call(owner:object,user:user,**op)
+  def self.check_action(user,action,obj,**op)
+    self.object[obj.class.name][:actions][action][:access].call(owner:obj,user:user,**op)
   end
 
 
