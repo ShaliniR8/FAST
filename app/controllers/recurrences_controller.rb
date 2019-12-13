@@ -1,5 +1,6 @@
 class RecurrencesController < ApplicationController
 
+  before_filter :login_required
   before_filter :recurrence_enabled
 
   def recurrence_enabled

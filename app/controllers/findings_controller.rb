@@ -32,6 +32,7 @@ class FindingsController < SafetyAssuranceController
   def define_owner
     @class = Object.const_get('Finding')
     @owner = @class.find(params[:id])
+    @i18nbase = 'sa.finding'
   end
 
 

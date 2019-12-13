@@ -11,6 +11,7 @@ class GatewayController < ApplicationController
     session[:id] = nil
     session[:newid] = nil
 
+    flash.keep
     redirect_to "/home"
     return
 

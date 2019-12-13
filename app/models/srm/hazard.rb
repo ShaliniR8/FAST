@@ -31,22 +31,23 @@ class Hazard < ActiveRecord::Base
     return [
       {field: "get_id",             title: "Hazard ID",             num_cols: 6,  type: "text",     visible: 'index,show',      required: false},
       {field: "status",             title: "Status",                num_cols: 4,  type: "text",     visible: 'index,show',      required: false},
-      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
+      {field: 'created_by_id',      title: 'Created By',            num_cols: 6,  type: 'user',     visible: 'show',            required: false},
 
       {field: "title",              title: "Hazard Title",          num_cols: 6,  type: "text",     visible: 'form,index,show', required: true},
       {field: 'get_source',         title: 'Source of Input',       num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
+      {field: "departments",        title: "Affected Department",   num_cols: 6,  type: "select",   visible: 'form,index,show', required: false,    options: get_custom_options('Departments')},
       {field: "description",        title: "Description",           num_cols: 12, type: "textarea", visible: 'form,show'},
 
       {field: "get_root_causes_full",  title: "#{I18n.t("srm.hazard.root_cause.title")}",   type: "list",     visible: 'invisible'},
-      {field: "get_root_causes",        title: "#{I18n.t("srm.hazard.root_cause.title")}",   type: "list",     visible: 'index'},
+      {field: "get_root_causes",       title: "#{I18n.t("srm.hazard.root_cause.title")}",   type: "list",     visible: 'index'},
 
-      {field: 'likelihood',         title: 'Baseline Likelihood',   num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',           title: 'Baseline Severity',     num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',        title: 'Baseline Risk',         num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
+      {field: 'likelihood',         title: "#{I18n.t("srm.risk.baseline.title")} Likelihood",   num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity',           title: "#{I18n.t("srm.risk.baseline.title")} Severity",     num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor',        title: "#{I18n.t("srm.risk.baseline.title")} Risk",         num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
 
-      {field: 'likelihood_after',   title: 'Mitigated Likelihood',  num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',     title: 'Mitigated Severity',    num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',  title: 'Mitigated Risk',        num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
+      {field: 'likelihood_after',   title: "#{I18n.t("srm.risk.mitigated.title")} Likelihood",  num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'severity_after',     title: "#{I18n.t("srm.risk.mitigated.title")} Severity",    num_cols: 12,   type: 'text',     visible: 'adv',             required: false},
+      {field: 'risk_factor_after',  title: "#{I18n.t("srm.risk.mitigated.title")} Risk",        num_cols: 12,   type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

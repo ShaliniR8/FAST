@@ -49,7 +49,7 @@ class Submission < Sr::SafetyReportingBase
     [
       {field: 'get_id',             title: 'ID',              num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',       title: 'Submission Type', num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_submitter_name', title: 'Submitted By',    num_cols: 6,  type: 'text',     visible: submitter_visible, required: false},
+      {field: 'get_submitter_name', title: 'Submitted By',    num_cols: 6,  type: 'text',     visible: submitter_visible, required: false, censor_deid: true},
       {field: 'event_date',         title: 'Event Date/Time', num_cols: 6,  type: 'datetime', visible: 'index,show',      required: false},
       {field: 'description',        title: 'Event Title',     num_cols: 12, type: 'text',     visible: 'index,show',      required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}

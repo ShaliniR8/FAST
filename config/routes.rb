@@ -37,7 +37,12 @@ PrdgSession::Application.routes.draw do |map|
   end
 
   resources :signatures, only:[:show]
-  resources :errors
+
+  resources :errors do
+    collection do
+      post 'debug_report'
+    end
+  end
 
   # System Feature
   resources :automated_notifications do

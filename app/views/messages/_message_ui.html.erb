@@ -15,7 +15,7 @@
       </div>
       <div class="panel-body">
 
-        <div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height: 400px">
+        <div class="col-xs-4" style="overflow-x:hidden;overflow-y:auto;height:70vh">
           <div class="table-responsive">
             <table id="users" class="table table-hover table-bordered">
               <thead style="display:none"><tr><th></th></tr><thead>
@@ -31,7 +31,7 @@
                     <%end%>
                     <td style="font-weight:<%=@status ? 'bold' : 'normal'%>">
                       <div class="pull-right"><%=m.get_time%></div>
-                      <%=action_name == 'sent' ? m.getAll('send_to') : m.getAll('send_from')%><br>
+                      <%=action_name == 'sent' ? ((send_to_list = m.getAll('send_to')).empty? ? 'No Recipients' : send_to_list) : m.getAll('send_from')%><br>
                       <%=m.subject%></br>
                     </td>
                   </tr>

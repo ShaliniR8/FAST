@@ -17,6 +17,7 @@ end
 
 class RecommendationsController < SafetyAssuranceController
 
+  before_filter :login_required
   before_filter(only: [:show]) { check_group('recommendation') }
   before_filter :define_owner, only:[
     :destroy,

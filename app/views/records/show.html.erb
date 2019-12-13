@@ -264,6 +264,14 @@
             :frequency => @frequency,
             :can_change => can_change%>
 
+
+          <% if CONFIG::GENERAL[:has_root_causes] %>
+            <%=render '/root_causes/root_causes',
+              :owner => @record,
+              :show_btns => true,
+              :headers => RootCause.get_headers%>
+          <%end%>
+
           <%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => can_change%>
           <%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => can_change%>
           <%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => can_change%>

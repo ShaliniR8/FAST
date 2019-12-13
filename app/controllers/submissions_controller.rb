@@ -47,7 +47,7 @@ class SubmissionsController < ApplicationController
       format.html do
         @table = Object.const_get('Submission')
         index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-          args.push('admin') if current_user.admin? || CONFIG::SR::GENERAL[:show_submitter_name]
+          args << 'admin' if current_user.global_admin? || CONFIG::SR::GENERAL[:show_submitter_name]
           args
         end
         @headers = @table.get_meta_fields(*index_meta_field_args)
@@ -254,6 +254,8 @@ class SubmissionsController < ApplicationController
   def show
     respond_to do |format|
       format.html do
+        @meta_field_args = ['show']
+        @meta_field_args << 'admin' if current_user.global_admin?
         @record = Submission.preload(:submission_fields).find(params[:id])
         if !@record.completed
           if @record.user_id == current_user.id
@@ -290,6 +292,8 @@ class SubmissionsController < ApplicationController
   def print
     @deidentified = params[:deidentified]
     @record = Submission.find(params[:id])
+    @meta_field_args = ['show']
+    @meta_field_args << 'admin' if current_user.global_admin?
     html = render_to_string(:template => "/submissions/print.html.erb")
     pdf = PDFKit.new(html)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")

@@ -10,6 +10,7 @@ class Finding < Sa::SafetyAssuranceBase
   include Commentable
   include Noticeable
   include Recommendationable
+  include RootCausable
   include SmsActionable
   include Transactionable
 

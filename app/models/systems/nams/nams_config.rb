@@ -7,6 +7,7 @@ class NAMSConfig < DefaultConfig
 
   MOBILE_MODULES = %w[ASAP]
 
+
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                               'Northern Air Cargo',

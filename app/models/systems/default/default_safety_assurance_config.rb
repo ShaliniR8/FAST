@@ -271,12 +271,12 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
-          likelihood: { default: true },
-          severity: { default: true },
-          risk_factor: { default: true },
-          likelihood_after: { default: true },
-          severity_after: { default: true },
-          risk_factor_after: { default: true },
+          likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
+          severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
+          likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -304,6 +304,15 @@ class DefaultSafetyAssuranceConfig
           responsible_user: { default: true },
           approver: { default: true, visible: 'index,form,show' },
           completion: { field: 'completion_date', default: true },
+
+          root_causes: {
+            field: "get_root_causes_full", title: "#{I18n.t("sa.finding.root_cause.title")}",
+            type: "list", visible: 'invisible'
+          },
+          root_causes_full: {
+            field: "get_root_causes", title: "#{I18n.t("sa.finding.root_cause.title")}",
+            type: "list", visible: DefaultConfig::GENERAL[:has_root_causes] ? 'index' : ''
+          },
           reference: { default: true, title: 'Reference or Requirement' },
           regulatory_violation: {
             field: 'regulatory_violation', title: 'Regulatory Violation',
@@ -401,12 +410,12 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true, type: 'text' },
-          likelihood: { default: true },
-          severity: { default: true },
-          risk_factor: { default: true },
-          likelihood_after: { default: true },
-          severity_after: { default: true },
-          risk_factor_after: { default: true },
+          likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
+          severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
+          likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -493,12 +502,12 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
-          likelihood: { default: true },
-          severity: { default: true },
-          risk_factor: { default: true },
-          likelihood_after: { default: true },
-          severity_after: { default: true },
-          risk_factor_after: { default: true }
+          likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
+          severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
+          likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

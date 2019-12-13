@@ -1,0 +1,16 @@
+html
+  body
+    strong ="Message from #{@user.full_name} (User ##{@user.id}):"
+    br
+    br
+    =@message
+    br
+    br
+    hr
+    strong ="#{AIRLINE_CODE} - #{CONFIG::GENERAL[:name]}"
+    br
+    strong =@device_info
+    br
+    strong =@app_info
+    hr
+    em Debug Report Attached.

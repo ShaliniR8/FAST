@@ -17,6 +17,8 @@ end
 
 class FaaReportsController < ApplicationController
 
+  before_filter :login_required
+
   respond_to :docx
 
   def index

@@ -43,9 +43,8 @@ module PrdgSession
   config.encoding = "utf-8"
   Rack::Utils.key_space_limit = 262144
 
-
   # Configure sensitive parameters which will be filtered from the log file.
-  config.filter_parameters += [:password, :pw, :base64]
+  config.filter_parameters += %i[password pw base64 json_dump]
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.default_url_options = { :host => 'bsk.prosafet.com' }
