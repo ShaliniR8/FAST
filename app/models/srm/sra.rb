@@ -36,7 +36,7 @@ class Sra < ActiveRecord::Base
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    meta_fields = CONFIG::SRM.get_sra_meta_fields
+    meta_fields = CONFIG.srm.get_sra_meta_fields
     meta_fields.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

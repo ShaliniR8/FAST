@@ -83,10 +83,10 @@
 
       <!-- SMS IM -->
       <%elsif session[:mode]=="SMS IM"%>
-        <%if CONFIG::IM::GENERAL[:has_framework]%><%=render "frameworks"%><%end%> <!-- hide just for demo purpose, will release to Miami Air -->
+        <%if CONFIG.im::GENERAL[:has_framework]%><%=render "frameworks"%><%end%> <!-- hide just for demo purpose, will release to Miami Air -->
         <%=render "vps"%>
         <%=render "jobaids"%>
-        <%if CONFIG::IM::GENERAL[:has_framework]%><%=render "fp"%><%end%><!-- hide just for demo purpose, will release to Miami Air -->
+        <%if CONFIG.im::GENERAL[:has_framework]%><%=render "fp"%><%end%><!-- hide just for demo purpose, will release to Miami Air -->
         <%=render "vpp"%>
         <%=render "jap"%>
       <%end%>

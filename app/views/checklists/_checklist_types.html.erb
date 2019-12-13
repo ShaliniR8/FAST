@@ -1,5 +1,5 @@
 <%=
-  case CONFIG::SA::GENERAL[:checklist_version]
+  case CONFIG.sa::GENERAL[:checklist_version]
   when "1"
     render "/audits/items", :owner => owner, :type => owner.class.name.downcase
   when "2"

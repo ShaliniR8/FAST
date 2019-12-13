@@ -64,33 +64,48 @@ class DefaultConfig
     'ASAP MOU Holder FAA Designator' => 'Holder FAA Designator Not Initialized'
   }
 
-  # To access Safety Reporting Configs use the constant defined below (use CONFIG::SR in code)
-  SR = Object.const_get("#{AIRLINE_CODE}SafetyReportingConfig") rescue DefaultSafetyReportingConfig
+  # To access Safety Reporting Configs use the constant defined below (use CONFIG.sr in code)
+  def self.sr
+    Object.const_get("#{AIRLINE_CODE}SafetyReportingConfig") rescue DefaultSafetyReportingConfig
+  end
 
-  # To access Implementation Management Configs use the constant defined below (use CONFIG::IM in code)
-  IM = Object.const_get("#{AIRLINE_CODE}ImplementationManagementConfig") rescue DefaultImplementationManagementConfig
+  # To access Implementation Management Configs use the constant defined below (use CONFIG.im in code)
+  def self.im
+    Object.const_get("#{AIRLINE_CODE}ImplementationManagementConfig") rescue DefaultImplementationManagementConfig
+  end
 
-  # To access Safety Assurance Configs use the constant defined below (use CONFIG::SA in code)
-  SA = Object.const_get("#{AIRLINE_CODE}SafetyAssuranceConfig") rescue DefaultSafetyAssuranceConfig
+  # To access Safety Assurance Configs use the constant defined below (use CONFIG.sa in code)
+  def self.sa
+    Object.const_get("#{AIRLINE_CODE}SafetyAssuranceConfig") rescue DefaultSafetyAssuranceConfig
+  end
 
-  # To access Safety Risk Management Configs use the constant defined below (use CONFIG::SRM in code)
-  SRM = Object.const_get("#{AIRLINE_CODE}SafetyRiskManagementConfig") rescue DefaultSafetyRiskManagementConfig
+  # To access Safety Risk Management Configs use the constant defined below (use CONFIG.srm in code)
+  def self.srm
+    Object.const_get("#{AIRLINE_CODE}SafetyRiskManagementConfig") rescue DefaultSafetyRiskManagementConfig
+  end
 
-  # To access Mobile Configs use the constant defined below (use CONFIG::MOBILE)
-  MOBILE = Object.const_get("#{AIRLINE_CODE}MobileConfig") rescue DefaultMobileConfig
+  # To access Mobile Configs use the constant defined below (use CONFIG.mobile)
+  def self.mobile
+    Object.const_get("#{AIRLINE_CODE}MobileConfig") rescue DefaultMobileConfig
+  end
 
-  # To access SSO Configs use the constant defined below (use CONFIG::SSO)
-  SSO = Object.const_get("#{AIRLINE_CODE}SsoConfig") rescue DefaultSsoConfig
+  # To access SSO Configs use the constant defined below (use CONFIG.sso)
+  def self.sso
+    Object.const_get("#{AIRLINE_CODE}SsoConfig") rescue DefaultSsoConfig
+  end
 
-  HIERARCHY =
-  {
-    'ASAP'    => SR::HIERARCHY,
-    'SMS IM'  => IM::HIERARCHY,
-    'SMS'     => SA::HIERARCHY,
-    'SRM'     => SRM::HIERARCHY
-  }
+  def self.hierarchy
+    {
+      'ASAP'    => self.sr::HIERARCHY,
+      'SMS IM'  => self.im::HIERARCHY,
+      'SMS'     => self.sa::HIERARCHY,
+      'SRM'     => self.srm::HIERARCHY
+    }
+  end
 
-  OBJECT = HIERARCHY.reduce({}){ |acc, (mod,data)| acc.merge(data[:objects]) }
+  def self.object
+    hierarchy.reduce({}){ |acc, (mod,data)| acc.merge(data[:objects]) }
+  end
 
   def self.check_action(user,action,object,**op)
     OBJECT[object.class.name][:actions][action][:access].call(owner:object,user:user,**op)

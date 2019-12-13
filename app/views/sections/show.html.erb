@@ -48,8 +48,8 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb10" style="word-wrap: break-word">
               <b>Submission ID: </b><%=@record.get_id%></br>
               <%if !@record.anonymous?%><b>Submitted By: </b><%=@record.created_by.full_name%></br><%end%>
-              <b>Date/Time of Event: </b><%=@record.get_event_date%>  <%if CONFIG::SR::GENERAL[:submission_time_zone]%><%=@record.event_time_zone%><%end%></br>
-              <%if CONFIG::SR::GENERAL[:submission_description]%><b>Title: </b><%=@record.description%></br><%end%>
+              <b>Date/Time of Event: </b><%=@record.get_event_date%>  <%if CONFIG.sr::GENERAL[:submission_time_zone]%><%=@record.event_time_zone%><%end%></br>
+              <%if CONFIG.sr::GENERAL[:submission_description]%><b>Title: </b><%=@record.description%></br><%end%>
             </div>
 
             <%if @record.comments.present?%>

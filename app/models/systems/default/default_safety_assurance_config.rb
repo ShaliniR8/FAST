@@ -1,5 +1,6 @@
 class DefaultSafetyAssuranceConfig
   include ConfigTools
+
   # DO NOT COPY THIS CONFIG AS A TEMPLATE FOR NEW AIRLINES
     # Please look at other airline config definitions and mimic them
     # All configs inherit from their Default counterparts, then overload the default values when needed
@@ -311,7 +312,7 @@ class DefaultSafetyAssuranceConfig
           },
           root_causes_full: {
             field: "get_root_causes", title: "#{I18n.t("sa.finding.root_cause.title")}",
-            type: "list", visible: DefaultConfig::GENERAL[:has_root_causes] ? 'index' : ''
+            type: "list", visible: CONFIG::GENERAL[:has_root_causes] ? 'index' : ''
           },
           reference: { default: true, title: 'Reference or Requirement' },
           regulatory_violation: {

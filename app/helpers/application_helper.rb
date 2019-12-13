@@ -386,7 +386,7 @@ module ApplicationHelper
   end
 
   def load_objects(module_name)
-    @types = CONFIG::HIERARCHY[module_name][:objects].invert
+    @types = CONFIG.hierarchy[module_name][:objects].invert
     @types
   end
 
@@ -425,7 +425,7 @@ module ApplicationHelper
   end
 
   def module_display_to_mode module_display
-    mode, val = CONFIG::HIERARCHY.find{|k, hash| hash[:display_name] == module_display}
+    mode, val = CONFIG.hierarchy.find{|k, hash| hash[:display_name] == module_display}
     mode
   end
 

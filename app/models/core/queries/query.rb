@@ -20,7 +20,7 @@ class Query < ActiveRecord::Base
   end
 
   def get_target
-    CONFIG::HIERARCHY.values.map{|x| x[:objects]}.compact.inject(:merge)[target]
+    CONFIG.hierarchy.values.map{|x| x[:objects]}.compact.inject(:merge)[target]
   end
 
   def get_templates

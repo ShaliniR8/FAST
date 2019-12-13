@@ -366,7 +366,7 @@ class Report < ActiveRecord::Base
   end
 
   def self.getFormHeaders
-    if CONFIG::SR::GENERAL[:submission_description]
+    if CONFIG.sr::GENERAL[:submission_description]
         [
           {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
           {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},

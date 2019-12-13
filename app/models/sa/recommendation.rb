@@ -24,7 +24,7 @@ class Recommendation < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    CONFIG::OBJECT['Recommendation'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['Recommendation'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

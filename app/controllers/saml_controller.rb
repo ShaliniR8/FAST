@@ -3,7 +3,7 @@ class SamlController < ApplicationController
   helper_method :saml_config
 
   def saml_config
-    CONFIG::SSO
+    CONFIG.sso
   end
 
   def init

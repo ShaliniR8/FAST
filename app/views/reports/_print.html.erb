@@ -5,7 +5,7 @@
 <div class="content">
 
   <%=render "forms/print_fields",
-    :fields => Report.get_meta_fields('show', CONFIG::SR::GENERAL[:event_summary] ? 'event_summary' : ''),
+    :fields => Report.get_meta_fields('show', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : ''),
     :owner => owner,
     :deidentified => deidentified%>
 

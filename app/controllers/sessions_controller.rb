@@ -56,8 +56,8 @@ class SessionsController < ApplicationController
   # gets the key from app and returns the associated config file
   def mobile_initialize
     key = params[:key].downcase.gsub('o','0')
-    if CONFIG::MOBILE::KEYS.key? key
-      config_file = CONFIG::MOBILE::KEYS[key]
+    if CONFIG.mobile::KEYS.key? key
+      config_file = CONFIG.mobile::KEYS[key]
       config_file[:key] = key
       render :json => config_file.to_json, :status => 200
       return

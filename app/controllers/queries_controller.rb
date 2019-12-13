@@ -328,8 +328,8 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
-    adjust_session_to_target(@owner.target) if CONFIG::HIERARCHY[session[:mode]][:objects].exclude?(@owner.target)
-    @title = CONFIG::HIERARCHY[session[:mode]][:objects][@owner.target].pluralize
+    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
+    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target].pluralize
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
@@ -395,7 +395,7 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
-    @types = CONFIG::HIERARCHY[session[:mode]][:objects].invert
+    @types = CONFIG.hierarchy[session[:mode]][:objects].invert
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
   end
 

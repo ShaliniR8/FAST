@@ -27,7 +27,7 @@ class SmsAction < Sa::SafetyAssuranceBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
-    CONFIG::OBJECT['SmsAction'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['SmsAction'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

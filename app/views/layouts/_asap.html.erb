@@ -23,7 +23,7 @@
         <li><a href=<%=new_submission_path%>>New</a></li>
       <%end%>
 
-      <%if CONFIG::SR::GENERAL[:enable_orm]%>
+      <%if CONFIG.sr::GENERAL[:enable_orm]%>
         <div class="dropdown-divider"></div>
         <li><a href=<%=orm_submissions_path%>>All ORMs</a></li>
         <li><a href=<%=new_orm_submission_path%>>New ORM</a></li>
@@ -52,9 +52,9 @@
 <%
   report_index = current_user.has_access('reports', 'index', admin: true)
   report_summary = current_user.has_access('events', 'summary', admin: true) &&
-    CONFIG::SR::GENERAL[:event_summary]
+    CONFIG.sr::GENERAL[:event_summary]
   report_tabulation = current_user.has_access('events', 'tabulation', admin: true) &&
-    CONFIG::SR::GENERAL[:event_tabulation]
+    CONFIG.sr::GENERAL[:event_tabulation]
 %>
 <% if report_index || report_summary || report_tabulation %>
   <li class="dropdown">

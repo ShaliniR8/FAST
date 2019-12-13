@@ -45,7 +45,7 @@ class Submission < Sr::SafetyReportingBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'admin'] : args)
-    submitter_visible = "admin#{CONFIG::SR::GENERAL[:show_submitter_name] ? ',index,show' : ''}"
+    submitter_visible = "admin#{CONFIG.sr::GENERAL[:show_submitter_name] ? ',index,show' : ''}"
     [
       {field: 'get_id',             title: 'ID',              num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
       {field: 'get_template',       title: 'Submission Type', num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
@@ -81,7 +81,7 @@ class Submission < Sr::SafetyReportingBase
   def self.get_headers
       [
         {field: 'get_id',            title: 'ID'},
-       ({field: 'get_description',   title: 'Title'} if CONFIG::SR::GENERAL[:submission_description]),
+       ({field: 'get_description',   title: 'Title'} if CONFIG.sr::GENERAL[:submission_description]),
         {field: 'get_template',      title: 'Type'},
         {field: 'submit_name',       title: 'Submitted By'},
         {field: 'get_event_date',    title: 'Event Date'},
