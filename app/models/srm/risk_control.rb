@@ -1,4 +1,4 @@
-class RiskControl < ActiveRecord::Base
+class RiskControl < Srm::SafetyRiskManagementBase
   extend AnalyticsFilters
   include ModelHelpers
   include StandardWorkflow
@@ -7,6 +7,7 @@ class RiskControl < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Costable
+  include Occurrenceable
   include Transactionable
 
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"
@@ -24,21 +25,7 @@ class RiskControl < ActiveRecord::Base
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    return [
-      {field: 'id',                           title: 'ID',                                          num_cols: 6,  type: 'text',     visible: 'index,show',      required: false,      editable: false},
-      {field: 'status',                       title: 'Status',                                      num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'created_by_id',                title: 'Created By',                                  num_cols: 6,  type: 'user',     visible: 'show',            required: false},
-      {field: 'title',                        title: 'Title',                                       num_cols: 6,  type: 'text',     visible: 'index,form,show', required: true},
-      {field: "departments",                  title: "Affected Department",                         num_cols: 6,  type: "select",   visible: 'form,index,show', required: false, options: get_custom_options('Departments')},
-      {field: 'scheduled_completion_date',    title: 'Scheduled Completion Date',                   num_cols: 6,  type: 'date',     visible: 'index,form,show', required: false},
-      {field: 'follow_up_date',               title: 'Date for Follow-Up/Monitor Plan',             num_cols: 6,  type: 'date',     visible: 'form,show',       required: false},
-      {field: 'responsible_user_id',          title: 'Responsible User',                            num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
-      {field: 'approver_id',                  title: 'Final Approver',                              num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
-      {field: 'control_type',                 title: 'Type',                                        num_cols: 6,  type: 'datalist', visible: 'form,show',       required: false, options: get_custom_options('Risk Control Types')},
-      {field: 'description',                  title: 'Description of Risk Control/Mitigation Plan', num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
-      {field: 'notes',                        title: 'Notes',                                       num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
-      {field: 'final_comment',                title: 'Final Comment',                               num_cols: 12, type: 'textarea', visible: 'show'},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['RiskControl'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
   def owner

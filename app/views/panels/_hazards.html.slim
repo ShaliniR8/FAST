@@ -1,0 +1,13 @@
+.col-xs-12.mt10
+  .panel.clickable.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b Hazards
+        span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+    .panel-body style='display:none'
+      .row
+        - hazards.each do |hazard|
+          = render '/hazards/show_limited',
+            owner: hazard,
+            show_btn: show_btns
+

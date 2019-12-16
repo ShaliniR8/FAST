@@ -13,7 +13,7 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            SRA(SRM) #<%=@sra.get_id%>: <%=@sra.title%>
+            <%="SRA(SRM) ##{@sra.get_id}: #{@sra.title}"%>
           </div>
           <div class="top_buttons pull-right">
             <%= render '/forms/btns/render_btns',
@@ -51,63 +51,7 @@
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @sra%>
-
-        <%if @sra.hazards.present?%>
-          <div class="col-xs-12 mt10">
-            <div class="panel clickable panel-info">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Hazards</b>
-                  <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row">
-                  <%@sra.hazards.each do |hazard|%>
-                    <%=render "/sras/show_hazard",
-                      :owner => hazard,
-                      :like => @like,
-                      :color_matrix => @color_matrix,
-                      :frequency => @frequency,
-                      :show_btn => false%>
-                  <%end%>
-                </div>
-              </div>
-            </div>
-          </div>
-        <%end%>
-
-        <%if @sra.srm_agendas.present?%>
-          <div class="col-xs-12">
-            <div class="panel clickable panel-info">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Agendas</b>
-                  <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row">
-                  <%=render "agendas",:sra=>@sra%>
-                </div>
-              </div>
-            </div>
-          </div>
-        <%end%>
-
-        <%@sra.sections.each do |section|%>
-          <%#=render "/sections/display", :section => section%>
-        <%end%>
-
-        <%=render '/forms/list_records', :records => Array(@sra.owner), :title => 'Report'%>
-
-        <%=render "/forms/show_comment", :owner => @sra%>
-        <%=render "/forms/attachments_show", :owner => @sra%>
-        <%=render "/records/transactions", :owner => @sra%>
+        <%=render '/panels/show_panels', owner: @owner%>
 
       </div>
     </div>

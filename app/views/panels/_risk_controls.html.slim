@@ -1,0 +1,13 @@
+.col-xs-12
+  .panel.clickable.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b Risk Controls
+        span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+    .panel-body style='display:none'
+      .row style='overflow-wrap: break-word; word-wrap: break-word; hyphens:auto'
+        - risk_controls.each do |risk_control|
+          = render '/risk_controls/show_limited',
+            owner: risk_control,
+            show_btn: show_btns
+
