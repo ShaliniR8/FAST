@@ -18,9 +18,8 @@
     <%if @owner.visualizations.present?%>
       <%@owner.visualizations.each do |visualization|%>
         <%=render "visualization",
-          :records => @records.map(&:id).join(","),
-          :field_name => visualization,
-          :field_id => visualization.parameterize%>
+          records: @records.map(&:id).join(","),
+          visualization: visualization%>
       <%end%>
     <%end%>
   </div>
@@ -37,14 +36,13 @@
   .panel-lightsteelblue {
     border: 1px solid lightsteelblue;
   }
-
 </style>
 
 
 
 <script type="text/javascript">
-
   $(function(){
+
     $(".chart_btn").click();
 
     $("#add_btn").on("click", function(e){
@@ -58,5 +56,6 @@
       });
     });
   });
-
 </script>
+
+

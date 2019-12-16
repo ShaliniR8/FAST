@@ -1,4 +1,4 @@
-<div class="col-xs-6 visualization_box" id="visualization_<%=field_id%>">
+<div class="col-xs-12 visualization_box" id="visualization_<%=visualization.id%>">
   <div class="panel panel-lightsteelblue">
     <div class="panel-heading">
       <div class="panel-title">
@@ -8,7 +8,7 @@
         <div class="top_buttons pull-right">
           <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, "#",
             :class => "remove_btn btn btn-danger pull-right",
-            "data-id" => "#{field_id}"%>
+            "data-visualization-id" => "#{visualization.id}"%>
         </div>
       </div>
     </div>
@@ -16,36 +16,52 @@
       <div class="row">
         <div class="col-xs-12">
 
-          <div class="form-group row col-xs-12">
-            <%=label_tag :select_field, "Data Field", class: "col-sm-3 col-form-label"%>
-            <div class="col-sm-7">
-              <%=text_field_tag :field_id, (field_name rescue nil),
-                {:list => "select_field",
-                  :class => "form-control ml5",
-                  :id => "field_select_all_#{field_id}"}%>
+          <div class="form-group row col-xs-10">
+            <%=label_tag :x_axis, 'X-axis', class: "col-sm-4 col-form-label"%>
+            <div class="col-sm-8">
+              <%=text_field_tag :x_axis, visualization.x_axis,
+                {list: "select_field", class: "form-control ml5", id: "x_axis_#{visualization.id}"}%>
               <datalist id="select_field">
                 <%@fields.each do |x|%>
-                  <option value="<%=x[:title]%>"></option>
+                  <option value="<%=x[:title]%>" data-field-type="<%=x[:type]%>"></option>
                 <%end%>
               </datalist>
             </div>
-            <div class="col-sm-2">
-              <%=link_to "<span class=\"glyphicon glyphicon-refresh\"></span>".html_safe, "#",
-                :class => "btn btn-info chart_btn",
-                :id => "generate_charts_btn_#{field_id}",
-                "data-field-id" => field_id%>
+          </div>
+
+          <div class="form-group row col-xs-10">
+            <%=label_tag :series, 'Series (Optional)', class: "col-sm-4 col-form-label"%>
+            <div class="col-sm-8">
+              <%=text_field_tag :series, visualization.series,
+                {list: "select_field", class: "form-control ml5", id: "series_#{visualization.id}"}%>
             </div>
           </div>
 
-          <div class="col-xs-12 mt10">
+          <div class="form-group row col-xs-10">
+            <%=label_tag :default_chart, 'Default Chart Type (Optional)', class: "col-sm-4 col-form-label"%>
+            <div class="col-sm-8">
+              <%=select_tag :default_chart,
+                options_for_select(@chart_types.collect{|chart| [chart[:chart_name], chart[:val]]}, visualization.default_chart),
+                class: "form-control ml5",
+                id: "default_chart_#{visualization.id}"%>
+            </div>
+          </div>
 
-            <div id="loader_<%=field_id%>" style="display:none">
+          <div class="col-sm-2 pull-right">
+            <%=link_to "<span class=\"glyphicon glyphicon-refresh\"></span>".html_safe, "#",
+              class: "btn btn-success chart_btn",
+              id: "generate_charts_btn_#{visualization.id}",
+              'data-toggle' => "tooltip",
+              'title' => "Generate/Refresh Charts",
+              "data-visualization-id" => visualization.id%>
+          </div>
+
+          <div class="col-xs-12 mt10">
+            <div id="loader_<%=visualization.id%>" style="display:none">
               <div class="centered loader"></div>
               <div class="loading-text">Loading</div>
             </div>
-
-            <div id="chart_area_<%=field_id%>"></div>
-
+            <div class='chart_area' id="chart_area_<%=visualization.id%>"></div>
           </div>
 
         </div>
@@ -53,7 +69,6 @@
     </div>
   </div>
 </div>
-
 
 
 
@@ -82,57 +97,52 @@
 
   $(function(){
 
-    $("#generate_charts_btn_<%=field_id%>").on("click", function(e){
+
+    $("#generate_charts_btn_<%=visualization.id%>").on("click", function(e){
       e.preventDefault();
-      var field_id = $(this).data("field-id");
+      var visualization_id = $(this).data("visualization-id");
+
       $.ajax({
         type: "GET",
         url: "<%=generate_visualization_query_path(@owner)%>",
         data: {
-          "field_id": field_id,
-          "field_name": $("#field_select_all_" + field_id).val(),
+          "visualization_id": visualization_id,
+          "x_axis": $("#x_axis_" + visualization_id).val(),
+          "series": $('#series_' + visualization_id).val(),
+          "default_chart": $('#default_chart_' + visualization_id).val(),
           "records": "<%=records%>",
         },
-        beforeSend: function(){$('#loader_' + field_id).show();$("#chart_area_" + field_id).css({'opacity':0.5});},
-        complete: function(){$('#loader_' + field_id).hide();$("#chart_area_" + field_id).css({'opacity':1});},
-        success: function(response){
-          $("#chart_area_" + field_id).html(response);
-          $("#generate_charts_btn_" + field_id).hide();
-          $("#field_select_all_" + field_id).prop("readonly", true);
-          $("#field_select_all_" + field_id).css({"font-weight": "bold", "color": "steelblue"});
-        },
-        error: function(response){
-          $("#chart_area_" + field_id).html(response);
+        beforeSend: function(){
+          $('#loader_' + visualization_id).show();
+          $("#chart_area_" + visualization_id).css({'opacity':0.5});
+        }, complete: function(){
+          $('#loader_' + visualization_id).hide();
+          $("#chart_area_" + visualization_id).css({'opacity':1});
+        }, success: function(response){
+          $("#chart_area_" + visualization_id).html(response);
+        }, error: function(response){
+          $("#chart_area_" + visualization_id).html(response);
         },
       });
     });
 
-
-    $(document).delegate(".remove_btn", "click", function (e){
+    $('.remove_btn').unbind().on('click', function(e){
       e.preventDefault();
-      var field_id = $(this).data("id");
-      var field_name = $("#field_select_all_" + field_id).val();
+      var visualization_id = $(this).data("visualization-id");
       $(this).closest('.visualization_box').remove();
       $.ajax({
         type: "GET",
-        url: "<%=remove_visualization_query_path(@owner)%>",
+        url: "<%=remove_visualization_query_path%>",
         data: {
-          "field_name": field_name,
+          "visualization_id": visualization_id,
         },
-        beforeSend: function(){$('#loader_' + field_id).show();$("#chart_area_" + field_id).css({'opacity':0.5});},
-        complete: function(){$('#loader_' + field_id).hide();$("#chart_area_" + field_id).css({'opacity':1});},
+        beforeSend: function(){$('#loader_' + visualization_id).show();$("#chart_area_" + visualization_id).css({'opacity':0.5});},
+        complete: function(){$('#loader_' + visualization_id).hide();$("#chart_area_" + visualization_id).css({'opacity':1});},
         success: function(response){},
-        error: function(response){console.log(response);}
+        error: function(response){console.log('error deleting' + visualization_id + '!');}
       });
     });
 
   });
 
 </script>
-
-
-
-
-
-
-
