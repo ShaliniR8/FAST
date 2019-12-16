@@ -1,84 +1,113 @@
-<%@field_name = @field[:title].parameterize.underscore%>
-<%@label = @field[:title]%>
-
 <div class="row">
   <ul class="nav nav-tabs">
-    <li class="active">
-      <a class="nav-item nav-link active"
-        id="nav-grid-tab-<%=@field_name%>"
-        data-toggle="tab"
-        href="#nav-grid-<%=@field_name%>"
-        role="tab"
-        aria-controls="nav-grid-<%=@field_name%>"
-        aria-selected="true">
-        Grid View
-      </a>
-    </li>
-    <li>
-      <a class="nav-item nav-link"
-        id="nav-chart-tab-<%=@field_name%>"
-        data-toggle="tab"
-        href="#nav-piechart-<%=@field_name%>"
-        role="tab"
-        aria-controls="nav-chart-<%=@field_name%>"
-        aria-selected="false">
-        Pie Chart
-      </a>
-    </li>
-    <li>
-      <a class="nav-item nav-link"
-        id="nav-chart-tab-<%=@field_name%>"
-        data-toggle="tab"
-        href="#nav-barchart-<%=@field_name%>"
-        role="tab"
-        aria-controls="nav-chart-<%=@field_name%>"
-        aria-selected="false">
-        Bar Chart
-      </a>
-    </li>
+    <%@chart_types.each do |chart|%>
+      <li class="<%=@visualization.default_chart == chart[:val] ? 'active' : ''%>">
+        <a class="nav-item nav-link <%=@visualization.default_chart == chart[:val] ? 'active' : ''%>"
+          id="nav-tab-<%=@visualization.id%>"
+          data-toggle="tab"
+          href="#nav-<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"
+          role="tab"
+          aria-controls="nav-<%=@visualization.id%>"
+          aria-selected="true">
+          <%=chart[:chart_name]%>
+        </a>
+      </li>
+    <%end%>
   </ul>
 
   <div class="tab-content">
-    <div class="tab-pane in show active"
-      id="nav-grid-<%=@field_name%>"
-      role="tabpanel"
-      aria-labelledby="nav-grid-tab-<%=@field_name%>">
-      <%= render "/queries/charts/grid_view"%>
-    </div>
-    <div class="tab-pane"
-      id="nav-piechart-<%=@field_name%>"
-      role="tabpanel"
-      aria-labelledby="nav-piechart-tab-<%=@field_name%>">
-      <%= render "/queries/charts/piechart_view"%>
-    </div>
-    <div class="tab-pane"
-      id="nav-barchart-<%=@field_name%>"
-      role="tabpanel"
-      aria-labelledby="nav-barchart-tab-<%=@field_name%>">
-      <%= render "/queries/charts/barchart_view"%>
-    </div>
+    <%@chart_types.each do |chart|%>
+      <div class="tab-pane <%=@visualization.default_chart == chart[:val] ? 'in show active' : ''%>"
+        id="nav-<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"
+        role="tabpanel"
+        aria-labelledby="nav-<%=chart[:chart_name].parameterize%>-tab-<%=@visualization.id%>">
+        <div id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>" style="width:'100%'"></div>
+        <div class="mr5" id="<%=chart[:chart_name].parameterize%>_download" align="right"></div>
+        <%case chart[:val]%>
+        <%when 1%>
+          <div class="col-xs-12 col-sm-12 mt20">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered" width="100%">
+                <thead>
+                  <tr>
+                    <%@data[0].each do |header|%>
+                      <th><%=header%></th>
+                    <%end%>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%@data[1..-1].each do |row|%>
+                    <tr>
+                      <%row.each do |value|%>
+                        <td><%=value%></td>
+                      <%end%>
+                    </tr>
+                  <%end%>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <%when 2%>
+          <script type="text/javascript">
+            google.charts.load("current", {packages:["corechart"]});
+            google.charts.setOnLoadCallback(drawPieChart);
+            function drawPieChart(){
+              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var options = <%=raw chart[:options].to_json %>;
+              var pieChart = new google.visualization.PieChart(document.getElementById('<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+              pieChart.draw(data, options);
+            }
+          </script>
+        <%when 3%>
+          <script>
+            google.charts.load("current", {'packages': ["bar"]});
+            google.charts.setOnLoadCallback(drawBarChart);
+            function drawBarChart(){
+              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var options = <%=raw chart[:options].to_json %>;
+              var barChart = new google.charts.Bar(document.getElementById('<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+              barChart.draw(data, options);
+            }
+          </script>
+        <%when 4%>
+          <script>
+            google.charts.load("current", {'packages': ["line"]});
+            google.charts.setOnLoadCallback(drawLineChart);
+            function drawLineChart(){
+              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var options = <%=raw chart[:options].to_json%>;
+              var lineChart = new google.charts.Line(document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+              lineChart.draw(data, options);
+            }
+          </script>
+        <%when 5%>
+          <script>
+            google.charts.load("current", {'packages': ['corechart']});
+            google.charts.setOnLoadCallback(drawStackedChart);
+            function drawStackedChart(){
+              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var options = <%=raw chart[:options].to_json%>;
+              var stackedChart = new google.visualization.ColumnChart(document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+              stackedChart.draw(data, options);
+            }
+          </script>
+        <%else%>
+        <%end%>
+      </div>
+    <%end%>
   </div>
 </div>
 
-
-
-
 <style>
-.tab-content>.tab-pane {
-  height: 1px;
-  overflow: hidden;
-  display: block;
- visibility: hidden;
-}
-.tab-content>.active {
-  height: auto;
-  overflow: auto;
-  visibility: visible;
-}
-
+  .tab-content>.tab-pane {
+    height: 1px;
+    overflow: hidden;
+    display: block;
+   visibility: hidden;
+  }
+  .tab-content>.active {
+    height: auto;
+    overflow: auto;
+    visibility: visible;
+  }
 </style>
-
-
-
-
-
