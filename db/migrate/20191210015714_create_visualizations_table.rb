@@ -4,9 +4,7 @@ class CreateVisualizationsTable < ActiveRecord::Migration
       t.timestamps
       t.integer :owner_id
       t.string :x_axis
-      t.integer :x_axis_unit
       t.string :series
-      t.integer :series_unit
       t.integer :default_chart, :default => 1
     end
   end
