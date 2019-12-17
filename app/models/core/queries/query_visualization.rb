@@ -41,12 +41,4 @@ class QueryVisualization < ActiveRecord::Base
   end
 
 
-  def self.chart_units
-    {
-      'Year' => 1,
-      'Month' => 2,
-      'Month/Year' => 3
-    }
-  end
-
 end
