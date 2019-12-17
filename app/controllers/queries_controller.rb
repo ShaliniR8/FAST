@@ -30,6 +30,7 @@ class QueriesController < ApplicationController
   def show
     @query_fields = @table.get_meta_fields('show')
     @owner = @table.find(params[:id])
+    @chart_types = QueryVisualization.chart_types
     apply_query
   end
 
@@ -99,9 +100,9 @@ class QueriesController < ApplicationController
   # add visualization box to query
   def add_visualization
     @owner = Query.find(params[:id])
+    @chart_types = QueryVisualization.chart_types
     @object_type = Object.const_get(@owner.target)
     @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
-
     templates = Template.preload(:categories, :fields).where(:id => @owner.templates)
     templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @fields << {
@@ -110,35 +111,101 @@ class QueriesController < ApplicationController
         type: field.data_type,
       }
     }
-
-    @owner.visualizations ||= []
-    @owner.visualizations << Time.now.strftime("%Y%m%d%H%M%S")
-    @owner.save
-    render :partial => "visualization", :locals => {
+    visualization = @owner.visualizations.create
+    render :partial => 'visualization', :locals => {
       records: params[:records],
-      field_id: @owner.visualizations.last.parameterize,
-      field_name: ""}
+      visualization: visualization}
   end
+
 
   # remove visualization box to query
   def remove_visualization
-    @owner = Query.find(params[:id])
-    @owner.visualizations.delete(params["field_name"])
-    @owner.save
+    QueryVisualization.find(params[:visualization_id]).destroy
     render :json => true
   end
 
 
-  # generate visualization charts
+
+
+
   def generate_visualization
+    @visualization = QueryVisualization.find(params[:visualization_id]).tap do |vis|
+      vis.x_axis = params[:x_axis]
+      vis.series = params[:series]
+      vis.default_chart = params[:default_chart]
+      vis.save
+    end
+    @owner = Query.find(params[:id])
+    @object_type = Object.const_get(@owner.target)
+    @records = @object_type.where(id: params[:records].split(','))
 
-    begin
+    # find x_axis field name
+    @x_axis_field = @object_type
+      .get_meta_fields('show', 'index', 'invisible')
+      .keep_if{|f| f[:title] == params[:x_axis]}.first
 
+    if params[:series].present? # if series present, build data from both values
+      # find series field name
+      @series_field = @object_type
+        .get_meta_fields('show', 'index', 'invisible')
+        .keep_if{|f| f[:title] == params[:series]}.first
+      # build array of hashes that stores values for x_axis and series
+      arr = @records.inject([]) do |arr, record|
+        arr << {
+          x_axis: get_val(record, @x_axis_field),
+          series: get_val(record, @series_field)}
+        arr
+      end
+      # create a hash to store the occurences of each element
+      data_hash = Hash.new
+      arr.each do |record|
+        x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
+        series = record[:series].blank? ? 'N/A' : record[:series]
+        if data_hash[x_axis] && data_hash[x_axis][series]
+          data_hash[x_axis][series] += 1
+        elsif data_hash[x_axis]
+          data_hash[x_axis][series] = 1
+        else
+          data_hash[x_axis] = Hash.new
+          data_hash[x_axis][series] = 1
+        end
+      end
+      # get first row and first column values
+      series = data_hash.values.map(&:keys).flatten.uniq
+      x_axis = data_hash.keys
+      # creates final data array: 2-D array
+      row1 = [params[:x_axis]] << series.sort
+      @data = [row1.flatten]
+      x_axis.sort.each do |x|
+        @data << series.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
+      end
+    else # series not present, use default charts
+      @data = [[@x_axis_field[:title], 'Count']]
+      @records.map{|record| get_val(record, @x_axis_field)}
+        .compact
+        .reject(&:blank?)
+        .inject(Hash.new(0)){|h, e| h[e] += 1; h}
+        .sort_by{|k,v| k}
+        .each{|pair| @data << pair}
+      @data.flatten
+    end
+
+
+    @chart_types = QueryVisualization.chart_types
+
+    render :partial => "/queries/charts/chart_view"
+  end
+
+
+
+  # generate visualization charts
+  def generate_visualization_old
+    # begin
       # determines if empty value should be take into account
       show_empty_value = false
 
       @owner = Query.find(params[:id])
-      @label = params[:field_name]
+      @label = params[:x_axis]
       @object_type = Object.const_get(@owner.target)
       @table_name = @object_type.table_name
       @headers = @object_type.get_meta_fields('index')
@@ -146,22 +213,20 @@ class QueriesController < ApplicationController
       records = params[:records].split(",") || []
       @result = @object_type.where(:id => records)
 
-
       @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:title] == @label}
 
       @template_fields = []
-      Template.preload(:categories, :fields).where(:id => @owner.templates).map(&:fields).flatten.select{|x| x.label == @label}.each{|field|
-        @template_fields << field
-      }
+      Template.preload(:categories, :fields)
+        .where(:id => @owner.templates)
+        .map(&:fields)
+        .flatten
+        .select{|x| x.label == @label}
+        .each{|field|
+          @template_fields << field
+        }
       @fields = @target_fields + @template_fields
 
       dynamic_field = (@target_fields.map{|x| x[:title]}.include? @label) == false
-
-      visualization_index = @owner.visualizations.index(params["field_id"].titleize) ||
-        @owner.visualizations.index(params["field_name"])
-
-      @owner.visualizations[visualization_index] = @label
-      @owner.save
 
       if dynamic_field
         @field = @fields.first
@@ -317,9 +382,9 @@ class QueriesController < ApplicationController
       else
         render :partial => "/queries/charts/chart_view"
       end
-    rescue => e
-      render :partial => "/queries/charts/invalid_input"
-    end
+    # rescue => e
+    #   render :partial => "/queries/charts/invalid_input"
+    # end
   end
 
 
@@ -395,7 +460,11 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
+<<<<<<< HEAD
     @types = CONFIG.hierarchy[session[:mode]][:objects].invert
+=======
+    @types = CONFIG::HIERARCHY[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
+>>>>>>> 0eeeddd... Updates Query Controller to generate 2D array for charts
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
   end
 
@@ -428,8 +497,6 @@ class QueriesController < ApplicationController
     end
     results
   end
-
-
 
 
   # applies basic condition block
@@ -468,7 +535,6 @@ class QueriesController < ApplicationController
     end
     return results || []
   end
-
 
 
   def emit_helper(search_value, records, field, xor, logic_type, from_template)
@@ -548,7 +614,6 @@ class QueriesController < ApplicationController
     else
       return []
     end
-
   end
 
 
@@ -608,10 +673,6 @@ class QueriesController < ApplicationController
   end
 
 
-
-
-
-
   # builds query conditions
   def create_query_condition(condition_hash, query_id, query_condition_id)
     if condition_hash['operator'].present?
@@ -631,6 +692,22 @@ class QueriesController < ApplicationController
         :value => condition_hash["value"],
         :query_id => query_id,
         :query_condition_id => query_condition_id})
+    end
+  end
+
+
+  # gets the formatted values of record's field
+  def get_val(record, field)
+    case field[:type]
+    when 'user', 'employee'
+      User.find_by_id(record.send(field[:field])).full_name rescue 'N/A'
+    when 'datetime', 'date'
+      record.send(field[:field]).strftime("%Y-%m") rescue 'N/A'
+    when 'boolean_box', 'boolean'
+      (record.send(field[:field]) ? 'Yes' : 'No') rescue 'No'
+    # when 'checkbox'
+    else
+      record.send(field[:field])
     end
   end
 
