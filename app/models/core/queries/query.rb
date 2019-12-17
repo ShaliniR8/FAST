@@ -5,6 +5,7 @@ class Query < ActiveRecord::Base
   belongs_to :created_by, foreign_key: :created_by_id, class_name: "User"
 
   serialize :templates, Array
+  serialize :old_vis, Array
 
   accepts_nested_attributes_for :query_conditions
 
