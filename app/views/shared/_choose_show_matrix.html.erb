@@ -1,7 +1,7 @@
 <%if CONFIG::GENERAL[:base_risk_matrix]%>
   <%if %w[Trial Demo].include?(AIRLINE_CODE) && type == 'hazards'%>
     <!--if Demo and Hazards use BOE's matrix-->
-    <%=render "shared/#{AIRLINE_CODE}/show_matrix",
+    <%=render "shared/BOE/show_matrix",
       :owner => owner,
       :show_btns => show_btn,
       :allow_baseline => defined?(allow_baseline) ? allow_baseline : true,
