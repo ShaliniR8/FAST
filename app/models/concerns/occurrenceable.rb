@@ -1,4 +1,4 @@
-module Costable
+module Occurrenceable
   extend ActiveSupport::Concern
 
   included do

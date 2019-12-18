@@ -1,11 +1,25 @@
+css:
+  input.large[type='checkbox'] {
+      -webkit-appearance:none;
+      width:30px;
+      height:30px;
+      background:white;
+      border-radius:5px;
+      border:2px solid #555;
+  }
+  input.large[type='checkbox']:checked {
+      background: #777;
+  }
+
 javascript:
   swal({
     title: 'Add Occurrence',
-    html: '#{escape_javascript render("/occurrences/form", owner: owner)}',
+    html: "#{escape_javascript render('/occurrences/form', owner: owner)}",
     customClass: 'custom-swal',
     showCancelButton: false,
     showConfirmButton: false,
     allowOutsideClick: true,
+    width: '800px'
     // onOpen: function(){
 
     //   $('.cat_select').on('change',function(){
@@ -14,9 +28,162 @@ javascript:
     // }
   }).catch(swal.noop)
 
-ruby:
-/ = javascript_include_tag '/javascripts/utility/extra_fields.js'
+  $(document).ready(function(){
+    var tree = #{@tree.to_json.html_safe}
+    console.log("DOC READY!")
+    var content = document.getElementById("content")
+    interpretNode(content, tree, true)
+  })
 
-/ /Generates first panel for occurrences
-/ - options.each do |opt|
-/   = render 'form', owner: opt
+  $('.section-field').change(function(){
+    console.log($(this))
+    console.log($(this).closest('.content'))
+    $(this).closest('.content').find('.section-field option').each(function(){
+      console.log('hide' + '#content-' + this.value)
+      $('#content-' + this.value).hide()
+    })
+    $(this).closest('.content').find('.content .selection-field').prop('selectedIndex', 0)
+    console.log('show' + '#content-' + this.value)
+    var revealed = $('#content-' + this.value)
+    revealed.show()
+    // Catch case of section node that has no children section nodes and show all children instead
+    if(revealed.children('.section-field').length == 0){
+      revealed.children('.content').show()
+    }
+  })
+
+  $('.checkboxes-elem').change(function(){
+    var target = $(this).closest('.content').find("input[type='hidden']")
+  })
+
+  function interpretNode(content, node, root=false){
+    console.log(node)
+    var field = document.createElement('div')
+    $(field).addClass('form-group')
+    var id = node.id
+    var body = document.createElement('div')
+    body.setAttribute('id', 'content-' + id)
+    $(body).addClass(' content col-xs-12')
+    content.appendChild(body)
+    label = document.createElement('label')
+    label.innerHTML = node.title
+    body.appendChild(label)
+    body.appendChild(document.createElement('br'))
+    switch(node.type) {
+      case 'section':
+        console.log("section")
+        // if node.nodes doesn't contain any sections, skip selection step and render children
+        var hasChildSection = false
+        node.nodes.forEach(function(child){ if(child.type === 'section'){ hasChildSection = true } })
+        if(hasChildSection){
+          field = generateSelectionField(node.options)
+          $(field).addClass('input-field section-field mb5')
+        }
+        break;
+      case 'selection':
+        console.log("selection")
+        field = generateSelectionField(node.options)
+        $(field).addClass('input-field selection-field mb5')
+        break;
+      case 'boolean_box':
+        console.log("boolean box")
+        var field = document.createElement('input')
+        field.setAttribute('type', 'checkbox')
+        field.innerHTML = node.title
+        field.value = true
+        $(field).addClass('input-field boolean-field large mb5')
+        break;
+      case 'checkbox':
+        console.log("checkboxes")
+        field = generateCheckboxes(node)
+        $(field).addClass('input-field checkbox-field mb5')
+        break;
+      case 'text':
+        console.log("text")
+        field = document.createElement('input')
+        $(field).addClass('input-field text-field mb5')
+        break;
+      default:
+        console.log("default")
+        break;
+    };
+    if((node.type != 'section' && node.type != 'checkboxes') || hasChildSection){
+      field.setAttribute('id', 'occurrences_'+node.id+'_value') //Used to define rails param organization
+      field.setAttribute('name', 'occurrences['+node.id+'][value]') //^this as well
+      body.appendChild(field)
+    }
+    if(!root){
+      body.style.display = 'none'
+    }
+    if(node.type == 'section'){ node.nodes.forEach(option => interpretNode(body, option)) }
+  };
+
+  function generateSelectionField(options){
+    field = document.createElement('select')
+    var fragment = document.createDocumentFragment()
+    var initial = document.createElement('option')
+    initial.style.display = 'none'
+    fragment.appendChild(initial)
+    options.forEach(function(option, index) {
+      var opt = document.createElement('option')
+      if(Array.isArray(option)){
+        opt.innerHTML = option[0] // What is displayed
+        opt.value = option[1] //ID of what's selected
+      }
+      else{
+        opt.innerHTML = option
+        opt.value = option
+      }
+      fragment.appendChild(opt)
+    })
+    field.appendChild(fragment)
+    $(field).addClass('selection-field')
+    return field
+  }
+
+  function generateCheckboxes(node){
+    manyOptions = node.options.length > 6
+    field = document.createElement('fieldset')
+    var hidden = document.createElement('input')
+    hidden.setAttribute('type', 'hidden')
+    hidden.setAttribute('id', 'occurrences_'+node.id+'_value') //Used to define rails param organization
+    hidden.setAttribute('name', 'occurrences['+node.id+'][value]') //^this as well
+    field.appendChild(hidden)
+    // Add hidden field input to field element
+    var fragment = document.createDocumentFragment()
+    var container = document.createElement('div')
+    node.options.forEach(function(option, index){
+      if(!manyOptions){ //Use same||get new based on count
+        container = document.createElement('div')
+        $(container).addClass('col-xs-' + (manyOptions ? '' : '4'))
+      }
+      var label = document.createElement('label')
+      label.innerHTML = Array.isArray(option) ? option[0] : option
+      var opt = document.createElement('input')
+      $(opt).addClass('checkboxes-elem') // For onchange listener (checkboxes-elem)
+      opt.setAttribute('type', 'checkbox')
+      opt.innerHTML = Array.isArray(option) ? option[0] : option
+      opt.value = Array.isArray(option) ? option[1] : option
+      container.appendChild(label)
+            if(!manyOptions){//place checkbox below
+      container.appendChild(document.createElement('br'))
+      $(opt).addClass('large')
+      container.appendChild(opt)
+      }
+      else{
+      container.appendChild(opt)
+      container.appendChild(document.createElement('br'))
+      }
+      fragment.appendChild(container)
+    })
+    field.appendChild(fragment)
+    $(field).addClass('input-field checkboxes-field')
+    return field
+  }
+
+  function disableHiddenForSubmit(){
+    // This is used on submit to disable fields so they don't get passed to be added
+    $('form').find('.section-field').prop('disabled', true)
+    $('form').find('.input-field:hidden').prop('disabled', true)
+  }
+

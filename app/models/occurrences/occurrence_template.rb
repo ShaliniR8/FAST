@@ -29,4 +29,23 @@ class OccurrenceTemplate < ActiveRecord::Base
     self[:format]
   end
 
+  #Returns a hash of the node and all of its child nodes
+  def form_tree(library=OccurrenceTemplate.all)
+    {}.tap do |base|
+      base[:id] = self.id
+      base[:title] = self.title
+      base[:type] = self.format
+      case self.format.to_sym
+      when :section
+        nodes = library.select{|node| node.parent_id == self.id }
+        base[:options] = nodes.map{ |child| [child.title, child.id] }
+        base[:nodes] = nodes.reduce([]) { |acc, child| acc << child.form_tree(library); acc }
+      when :selection, :checkbox
+        base[:options] = self.options.lines
+      else #Boolean box or text; neither needs special options
+      end
+
+    end
+  end
+
 end
