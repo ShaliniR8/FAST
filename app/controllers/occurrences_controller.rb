@@ -1,9 +1,5 @@
 class OccurrencesController < ApplicationController
 
-  def create
-    #TODO: check if fields are empty- if blank, don't create a new element
-  end
-
   def new
     @templates = OccurrenceTemplate.all
     parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
@@ -15,14 +11,23 @@ class OccurrencesController < ApplicationController
     }
   end
 
+  def destroy
+    occurrence = Occurrence.find(params[:id])
+    if current_user.has_access(class_to_table(@owner.class), 'edit', admin: true)
+      if occurrence.destroy
+        render json: {}, status: 200
+      else
+        render json: {}, status: 500
+      end
+    else
+      flash[:danger] = "You do not have permission to alter this #{occurrence.owner_type.titleize}"
+    end
+  end
+
+
   def add
-    #Despite us calling to post to here, Rails posts all to update from here.
+    #Despite us calling POST to here, Rails posts all to update from here.
   end
-
-  def show
-    #TODO: render partial
-  end
-
   def update
     Occurrence.transaction do
       params[:occurrences].each do |template_id, occurrence|

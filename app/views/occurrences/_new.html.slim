@@ -20,30 +20,19 @@ javascript:
     showConfirmButton: false,
     allowOutsideClick: true,
     width: '800px'
-    // onOpen: function(){
-
-    //   $('.cat_select').on('change',function(){
-    //     update_options($(this), []);
-    //   });
-    // }
   }).catch(swal.noop)
 
   $(document).ready(function(){
     var tree = #{@tree.to_json.html_safe}
-    console.log("DOC READY!")
     var content = document.getElementById("content")
     interpretNode(content, tree, true)
   })
 
   $('.section-field').change(function(){
-    console.log($(this))
-    console.log($(this).closest('.content'))
     $(this).closest('.content').find('.section-field option').each(function(){
-      console.log('hide' + '#content-' + this.value)
       $('#content-' + this.value).hide()
     })
     $(this).closest('.content').find('.content .selection-field').prop('selectedIndex', 0)
-    console.log('show' + '#content-' + this.value)
     var revealed = $('#content-' + this.value)
     revealed.show()
     // Catch case of section node that has no children section nodes and show all children instead
@@ -54,10 +43,18 @@ javascript:
 
   $('.checkboxes-elem').change(function(){
     var target = $(this).closest('.content').find("input[type='hidden']")
+    var value = ''
+    $(this).closest('.content').find('input[type="checkbox"]').each(function(){
+      if(this.checked){ value += this.value }
+    })
+    target.prop('value', value)
+  })
+
+  $('.boolean-field').change(function(){
+    this.setAttribute('value', this.checked ? 1 : 0)
   })
 
   function interpretNode(content, node, root=false){
-    console.log(node)
     var field = document.createElement('div')
     $(field).addClass('form-group')
     var id = node.id
@@ -71,7 +68,6 @@ javascript:
     body.appendChild(document.createElement('br'))
     switch(node.type) {
       case 'section':
-        console.log("section")
         // if node.nodes doesn't contain any sections, skip selection step and render children
         var hasChildSection = false
         node.nodes.forEach(function(child){ if(child.type === 'section'){ hasChildSection = true } })
@@ -81,30 +77,25 @@ javascript:
         }
         break;
       case 'selection':
-        console.log("selection")
         field = generateSelectionField(node.options)
         $(field).addClass('input-field selection-field mb5')
         break;
       case 'boolean_box':
-        console.log("boolean box")
         var field = document.createElement('input')
         field.setAttribute('type', 'checkbox')
         field.innerHTML = node.title
-        field.value = true
+        field.value = 0
         $(field).addClass('input-field boolean-field large mb5')
         break;
       case 'checkbox':
-        console.log("checkboxes")
         field = generateCheckboxes(node)
         $(field).addClass('input-field checkbox-field mb5')
         break;
       case 'text':
-        console.log("text")
         field = document.createElement('input')
         $(field).addClass('input-field text-field mb5')
         break;
       default:
-        console.log("default")
         break;
     };
     if((node.type != 'section' && node.type != 'checkboxes') || hasChildSection){
@@ -165,14 +156,14 @@ javascript:
       opt.innerHTML = Array.isArray(option) ? option[0] : option
       opt.value = Array.isArray(option) ? option[1] : option
       container.appendChild(label)
-            if(!manyOptions){//place checkbox below
-      container.appendChild(document.createElement('br'))
-      $(opt).addClass('large')
-      container.appendChild(opt)
+      if(!manyOptions){//place checkbox below
+        container.appendChild(document.createElement('br'))
+        $(opt).addClass('large')
+        container.appendChild(opt)
       }
       else{
-      container.appendChild(opt)
-      container.appendChild(document.createElement('br'))
+        container.appendChild(opt)
+        container.appendChild(document.createElement('br'))
       }
       fragment.appendChild(container)
     })
@@ -183,6 +174,8 @@ javascript:
 
   function disableHiddenForSubmit(){
     // This is used on submit to disable fields so they don't get passed to be added
+    $('.boolean-field').prop('checked', true)
+    $('.boolean-field[value="0"]').css('background', 'white')
     $('form').find('.section-field').prop('disabled', true)
     $('form').find('.input-field:hidden').prop('disabled', true)
   }
