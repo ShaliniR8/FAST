@@ -90,7 +90,7 @@
             </div>
           <%end%>
 
-          <%if @template.map_template.present?%>
+          <%if @template.map_template.present? && BaseConfig.airline[:enable_dual_report]%>
             <div class="col-xs-12" style="margin-top:10px; margin-bottom:10px">
               <div class="col-xs-1">
                 <%=select_tag :create_copy,
