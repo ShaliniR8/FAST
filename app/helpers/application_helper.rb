@@ -435,4 +435,14 @@ module ApplicationHelper
     array.reduce({}) { |id_map, element| id_map.merge({ element[key || 'id'] => element }) }
   end
 
+
+  def class_to_table(obj_class)
+    case obj_class.name
+    when 'CorrectiveAction'
+      'corrective_actions'
+    # TODO more classes need to be handled
+    else
+      obj_class.name.downcase.pluralize
+    end
+  end
 end
