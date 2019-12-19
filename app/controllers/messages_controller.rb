@@ -1,6 +1,7 @@
 class MessagesController < ApplicationController
-  before_filter :login_required
+  before_filter :oauth_load
 
+  include Concerns::Mobile
 
   def new
     @message = Message.new
@@ -117,10 +118,20 @@ class MessagesController < ApplicationController
 
 
   def index
-    @title = "Inbox"
-    @messages = current_user.inbox_messages.select{|x| x.visible}.map{|x| x.message} +
-      current_user.cc_messages.select{|x| x.visible}.map{|x| x.message}
+    @title = 'Inbox'
+    @messages = [current_user.inbox_messages, current_user.cc_messages].map{ |message_accesses|
+      message_accesses.includes(message: [
+        send_from: :user,
+        send_to: :user,
+        cc: :user
+      ]).select(&:visible).map(&:message)
+    }.flatten
     @messages.uniq!
+
+    respond_to do |format|
+      format.html
+      format.json { index_as_json }
+    end
   end
 
 
@@ -137,16 +148,11 @@ class MessagesController < ApplicationController
     render :partial =>"dialogs"
   end
 
-
-  def foward
-  end
-
-
-  def mark_as_read(user,message)
-    messages=MessageAccess.where("users_id=? AND messages_id=?",user.id,message.id)
+  def mark_as_read(user_id, message_id)
+    messages = MessageAccess.where(users_id: user_id, messages_id: message_id)
     messages.each do |m|
-      if m.type!="SendFrom"
-        m.status="Read"
+      if m.type != 'SendFrom'
+        m.status = 'Read'
         m.save
       end
     end
@@ -157,7 +163,7 @@ class MessagesController < ApplicationController
     @title = params[:source]
     @message = Message.find(params[:id])
     @report_link = get_message_link(@message.owner_type, @message.owner_id)
-    mark_as_read(current_user, @message)
+    mark_as_read(current_user.id, @message.id)
     render :partial => 'inbox'
   end
 
