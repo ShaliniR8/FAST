@@ -306,13 +306,9 @@ class DefaultSafetyAssuranceConfig
           approver: { default: true, visible: 'index,form,show' },
           completion: { field: 'completion_date', default: true },
 
-          root_causes: {
-            field: "get_root_causes_full", title: "#{I18n.t("sa.finding.root_cause.title")}",
-            type: "list", visible: 'invisible'
-          },
-          root_causes_full: {
-            field: "get_root_causes", title: "#{I18n.t("sa.finding.root_cause.title")}",
-            type: "list", visible: CONFIG::GENERAL[:has_root_causes] ? 'index' : ''
+          root_causes_full: { default: true, title: "#{I18n.t("sa.finding.root_cause.title")}" },
+          root_causes: { default: true, title: "#{I18n.t("sa.finding.root_cause.title")}",
+            visible: CONFIG::GENERAL[:has_root_causes] ? 'index' : ''
           },
           reference: { default: true, title: 'Reference or Requirement' },
           regulatory_violation: {

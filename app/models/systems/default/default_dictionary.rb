@@ -5,7 +5,7 @@ class DefaultDictionary
     # Module Config files
 
   # Default actions- used to dry out model action definitions in the HIERARCHY
-    # To override, use the following:
+    # To override within the configs, use the following:
       # DICTIONARY:ACTIONS[|__action__|))].tap{|act| act[:access] = proc { ... } },
   ACTION = {
     # { btn: btn_loc:[], access: proc { |owner:,user:,**op| } },
@@ -332,6 +332,34 @@ class DefaultDictionary
     final_comment: {
       field: 'final_comment', title: 'Final Comment',
       num_cols: 12, type: 'textarea', visible: 'show',
+      required: false
+    },
+    template: {
+      field: 'get_template', title: 'Template Type',
+      num_cols: 6, type: 'text', visible: 'index,show',
+      required: false
+    },
+    submitter: {
+      field: 'get_submitter_name', title: 'Submitted By',
+      num_cols: 6, type: 'text', visible: 'admin', #should include show+form w/ sr::CONFIG[:show_submitter_name]
+      required: false, censor_deid: true
+    },
+    event_date: {
+      field: 'event_date', title: 'Event Date/Time',
+      num_cols: 6, type: 'datetime', visible: 'index,show',
+      required: false
+    },
+    root_causes_full: {
+      field: 'get_root_causes_full', title: 'Full Root Causes',
+      type: 'list', visible: 'invisible'
+    },
+    root_causes: {
+      field: 'get_root_causes', title: 'Root Causes',
+      type: 'list', visible: '' #should include index w/ CONFIG[:has_root_causes]
+    },
+    description: {
+      field: 'description', title: 'Event Title',
+      num_cols: 12, type: 'text', visible: 'index,show',
       required: false
     },
   }

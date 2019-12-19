@@ -22,35 +22,7 @@ class CorrectiveAction < ActiveRecord::Base
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    return [
-      { field: 'id',                      title: 'ID',                             num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      { field: 'status',                  title: 'Status',                         num_cols: 6,  type: 'select',   visible: 'index,show',      required: false, options: getStatusOptions},
-      {field: 'created_by_id',           title: 'Created By',                  num_cols: 6,  type: 'user',         visible: 'show',            required: false},
-
-      { field: 'recommendation',          title: 'Is this only a recommendation',  num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'due_date',                title: 'Scheduled Completion Date',      num_cols: 6,  type: 'date',     visible: 'index,form,show', required: false},
-      {field: 'close_date',               title: 'Actual Completion Date',         num_cols: 6,  type: 'date',     visible: 'index,show',      required: false},
-      { field: 'opened_date',             title: 'Date Opened',                    num_cols: 6,  type: 'date',     visible: 'show',            required: false},
-      { field: 'assigned_date',           title: 'Date Assigned',                  num_cols: 6,  type: 'date',     visible: 'show',            required: false},
-      { field: 'decision_date',           title: 'Date Completed/Rejected',        num_cols: 6,  type: 'date',     visible: 'show',            required: false},
-      { field: 'department',              title: 'Department',                     num_cols: 6,  type: 'select',   visible: 'form,show',       required: false, options: departments},
-      {                                                                                          type: 'newline',  visible: 'form,show'},
-      { field: 'responsible_user_id',     title: 'Responsible User',               num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
-      { field: 'approver_id',             title: 'Final Approver',                 num_cols: 6,  type: 'user',     visible: 'index,form,show', required: false},
-      {                                                                                          type: 'newline',  visible: 'form,show'},
-      { field: 'company',                 title: 'Company Corrective Action',      num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'employee',                title: 'Employee Corrective Action',     num_cols: 6,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'bimmediate_action',       title: 'Immediate Action',               num_cols: 2,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'immediate_action',        title: 'Immediate Action Detail',        num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
-      {                                                                                          type: 'newline',  visible: 'form,show'},
-      { field: 'bcomprehensive_action',   title: 'Comprehensive Action',           num_cols: 2,  type: 'boolean',  visible: 'form,show',       required: false},
-      { field: 'comprehensive_action',    title: 'Comprehensive Action Detail',    num_cols: 10, type: 'text',     visible: 'form,show',       required: false},
-      {                                                                                          type: 'newline',  visible: 'form,show'},
-      { field: 'action',                  title: 'Action',                         num_cols: 6,  type: 'datalist', visible: 'index,form,show', required: false, options: action_options},
-      { field: 'description',             title: 'Description',                    num_cols: 12, type: 'textarea', visible: 'index,form,show', required: false},
-      { field: 'response',                title: 'Response',                       num_cols: 12, type: 'textarea', visible: 'form,show',       required: false},
-      { field: 'final_comment',           title: 'Final Comment',                  num_cols: 12, type: 'textarea', visible: 'show',            requried: false},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['CorrectiveAction'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
 

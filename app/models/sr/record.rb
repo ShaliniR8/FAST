@@ -45,29 +45,7 @@ class Record < Sr::SafetyReportingBase
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
-    submitter_visible = "admin#{CONFIG.sr::GENERAL[:show_submitter_name] ? ',index,show' : ''}"
-    [
-      {field: 'get_id',                title: 'ID',                    num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'status',                title: 'Status',                num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_template',          title: 'Type',                  num_cols: 6,  type: 'text',     visible: 'index,show',      required: false},
-      {field: 'get_submitter_name',    title: 'Submitted By',          num_cols: 6,  type: 'text',     visible: submitter_visible, required: false, censor_deid: true},
-      {field: 'viewer_access',         title: 'Viewer Access',         num_cols: 6,  type: 'boolean',  visible: 'index,show',      required: false},
-      {field: 'event_date',            title: 'Event Date/Time',       num_cols: 6,  type: 'datetime', visible: 'form,index,show', required: false},
-
-      {field: "get_root_causes_full",  title: "#{I18n.t("sr.report.root_cause.title")}", type: "list", visible: 'invisible'},
-      {field: "get_root_causes",       title: "#{I18n.t("sr.report.root_cause.title")}", type: "list", visible: CONFIG::GENERAL[:has_root_causes] ? 'index' : '' },
-
-      {field: 'description',           title: 'Event Title',           num_cols: 12, type: 'text',     visible: 'form,index,show', required: false},
-      {field: 'final_comment',         title: 'Final Comment',         num_cols: 12, type: 'text',     visible: 'show',            required: false},
-
-      {field: 'likelihood',           title: "#{I18n.t("sr.risk.baseline.title")} Likelihood",   num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity',             title: "#{I18n.t("sr.risk.baseline.title")} Severity",     num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor',          title: "#{I18n.t("sr.risk.baseline.title")} Risk",         num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_before_risk_color'},
-
-      {field: 'likelihood_after',     title: "#{I18n.t("sr.risk.mitigated.title")} Likelihood",  num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'severity_after',       title: "#{I18n.t("sr.risk.mitigated.title")} Severity",    num_cols: 12, type: 'text',     visible: 'adv',             required: false},
-      {field: 'risk_factor_after',    title: "#{I18n.t("sr.risk.mitigated.title")} Risk",        num_cols: 12, type: 'text',     visible: 'index',           required: false,  html_class: 'get_after_risk_color'},
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['Record'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
 
