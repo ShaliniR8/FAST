@@ -1,5 +1,6 @@
 class CorrectiveAction < ProsafetBase
   extend AnalyticsFilters
+  include ModelHelpers
 
 #Concerns List
   include Attachmentable

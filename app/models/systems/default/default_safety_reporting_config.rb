@@ -265,7 +265,7 @@ class DefaultSafetyReportingConfig
           department: {
             field: 'department', title: 'Department',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: CorrectiveAction.departments
+            required: false, options: Report.get_custom_options('Departments')
           },
           responsible_user: { default: true, on_newline: true }, # for form and show
           approver: { default: true },
