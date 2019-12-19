@@ -394,7 +394,7 @@ class QueriesController < ApplicationController
       return
     end
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
-    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target].pluralize
+    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
@@ -460,11 +460,7 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
-<<<<<<< HEAD
-    @types = CONFIG.hierarchy[session[:mode]][:objects].invert
-=======
-    @types = CONFIG::HIERARCHY[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
->>>>>>> 0eeeddd... Updates Query Controller to generate 2D array for charts
+    @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
   end
 
