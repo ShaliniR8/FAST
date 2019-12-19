@@ -293,14 +293,14 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show', @report.status == 'Closed' ? 'close' : '', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('show', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
   end
 
 
   def close
     @fields = Report.get_meta_fields('close')
     @owner = Report.find(params[:id])
-    if @owner.is_asap
+    if @owner.has_open_asap
       render :partial => 'reports/close'
     else
       params[:commit] = "close_event"
@@ -498,6 +498,9 @@ class ReportsController < ApplicationController
     owner.records.each do |record|
       if record.status != 'Closed'
         record.close_date = Time.now
+        if record.is_asap && record.status != 'Closed'
+          record.update_attributes(params[:report])
+        end
         record.status = 'Closed'
         record.save
         submission = record.submission

@@ -76,6 +76,13 @@ class Report < Sr::SafetyReportingBase
     return result
   end
 
+  def has_open_asap
+    result = false
+    records.each do |record|
+      result = result || (record.template.report_type == "asap" && record.status != "Closed")
+    end
+    return result
+  end
 
   def additional_info
     if attachments.length > 0 || records.map(&:attachments).flatten.length > 0
