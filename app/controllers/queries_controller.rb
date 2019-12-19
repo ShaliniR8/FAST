@@ -414,7 +414,7 @@ class QueriesController < ApplicationController
     @fields = @target_fields + @template_fields
 
     if @title == "Submissions"
-      records = @object_type.preload(:submission_fields).where(:templates_id => @owner.templates)
+      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
     elsif @title == "Reports"
       records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
     else
