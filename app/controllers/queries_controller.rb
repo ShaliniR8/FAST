@@ -20,12 +20,15 @@ class QueriesController < ApplicationController
   before_filter :set_table
   before_filter :load_options, :only => [:edit, :new, :index]
 
+
   def set_table() @table = Object.const_get("Query") end
+
 
   def index
     @headers = @table.get_meta_fields('index')
     @records = @table.where(:target => @types.values)
   end
+
 
   def show
     @query_fields = @table.get_meta_fields('show')
@@ -34,13 +37,16 @@ class QueriesController < ApplicationController
     apply_query
   end
 
+
   def new
     @owner = Query.new
   end
 
+
   def edit
     @owner = @table.find(params[:id])
   end
+
 
   def create
     params[:query][:templates] = params[:query][:templates].split(",")
@@ -48,6 +54,7 @@ class QueriesController < ApplicationController
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
+
 
   def update
     @owner = Query.find(params[:id])
@@ -58,17 +65,20 @@ class QueriesController < ApplicationController
     redirect_to query_path(@owner)
   end
 
+
   def clone
     @owner = Query.find(params[:id])
     @query = @owner.make_copy
     redirect_to edit_query_path(@query)
   end
 
+
   def destroy
     @owner = Query.find(params[:id])
     @owner.destroy
     redirect_to queries_path, flash: {danger: "Query deleted."}
   end
+
 
   # on target select, load conditions block - primarily used to show only relevant fields
   def load_conditions_block
@@ -94,7 +104,6 @@ class QueriesController < ApplicationController
     @fields = @fields.sort_by{|field| field[:title]}
     render :partial => "building_query"
   end
-
 
 
   # add visualization box to query
@@ -125,9 +134,7 @@ class QueriesController < ApplicationController
   end
 
 
-
-
-
+  # generate indivisual visualization blocks
   def generate_visualization
     @visualization = QueryVisualization.find(params[:visualization_id]).tap do |vis|
       vis.x_axis = params[:x_axis]
@@ -138,10 +145,8 @@ class QueriesController < ApplicationController
     @owner = Query.find(params[:id])
     @object_type = Object.const_get(@owner.target)
     @records = @object_type.where(id: params[:records].split(','))
-
     # find x_axis field name
     @x_axis_field = get_field(@owner, @object_type, params[:x_axis])
-
     if params[:series].present? # if series present, build data from both values
       title = "#{params[:x_axis]} By #{params[:series]}"
       # find series field name
@@ -187,197 +192,6 @@ class QueriesController < ApplicationController
   end
 
 
-
-  # generate visualization charts
-  def generate_visualization_old
-    # begin
-      # determines if empty value should be take into account
-      show_empty_value = false
-
-      @owner = Query.find(params[:id])
-      @label = params[:x_axis]
-      @object_type = Object.const_get(@owner.target)
-      @table_name = @object_type.table_name
-      @headers = @object_type.get_meta_fields('index')
-
-      records = params[:records].split(",") || []
-      @result = @object_type.where(:id => records)
-
-      @target_fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:title] == @label}
-
-      @template_fields = []
-      Template.preload(:categories, :fields)
-        .where(:id => @owner.templates)
-        .map(&:fields)
-        .flatten
-        .select{|x| x.label == @label}
-        .each{|field|
-          @template_fields << field
-        }
-      @fields = @target_fields + @template_fields
-
-      dynamic_field = (@target_fields.map{|x| x[:title]}.include? @label) == false
-
-      if dynamic_field
-        @field = @fields.first
-
-        if @field.data_type == "datetime" || @field.data_type == "date"
-          field_type = @field.data_type
-        elsif @field.display_type == "checkbox"
-          field_type = @field.display_type
-        elsif @field.display_type == "employee"
-          field_type = @field.display_type
-        else
-          field_type = 'text'
-        end
-
-        @field = {
-          :title => @field.label,
-          :field => @field.label,
-          :type => field_type,
-          :options => @field.getOptions
-        }
-
-      else
-        @field = @object_type.get_meta_fields('show', 'index')
-          .select{|header| (header[:title] == @label && header[:field].present?)}.first
-        field_type = @field[:type]
-      end
-
-      result_id = []
-      @result.each{ |r| result_id << r.id }
-
-      # Create Hash to store value and occurance
-      @data = Hash.new
-
-      # Create Hash for each checkbox options
-      if field_type == "checkbox"
-        if dynamic_field
-          @fields.each do |f|
-            hash = Hash.new
-            hash = Hash[f.getOptions.collect { |item| [item, 0] } ]
-            @data = @data.merge(hash)
-          end
-        else
-          temp_hash = Hash.new
-          temp_hash = Hash[@field[:options].collect{|item| [item.gsub("'",""), 0]}]
-          @data = @data.merge(temp_hash)
-        end
-
-      elsif field_type == "boolean_box" || field_type == "boolean"
-        @data["Yes"] = 0
-        @data["No"] = 0
-
-      elsif field_type == "employee"
-        if @owner.target == "Submission"
-          submission_fields = SubmissionField.where(fields_id: @fields.collect{|x| x.id}, submissions_id: result_id)
-          uniq_employees = User.where("full_name in (?) OR id in (?)",
-            submission_fields.map(&:value), submission_fields.map(&:value))
-          @data = Hash[uniq_employees.collect{|employee| [employee.full_name, 0]}]
-        elsif @owner.target == "Record"
-          record_fields = RecordField.where(fields_id: @fields.collect{|x| x.id}, records_id: result_id)
-          uniq_employees = User.where("full_name in (?) OR id in (?)",
-            record_fields.map(&:value), record_fields.map(&:value))
-          @data = Hash[uniq_employees.collect{|employee| [employee.full_name, 0]}]
-        end
-      # Create key value pair for unique values
-      else
-        if dynamic_field
-          if @owner.target == "Submission"
-            @data = Hash[SubmissionField.where(:fields_id => @fields.collect{|x| x.id}, :submissions_id => result_id)
-              .select(:value).map(&:value).uniq.collect{|item| [item, 0]}]
-          elsif @owner.target == "Record"
-            @data = Hash[RecordField.where(:fields_id => @fields.collect{|x| x.id}, :records_id => result_id)
-              .select(:value).map(&:value).uniq.collect{|item| [item, 0]}]
-          end
-        else
-          @data = Hash[
-            @result.map{|x| x.send(@field[:field])}
-              .compact.uniq.collect{|item| [(item.gsub("\r\n", " ").gsub("'", "") rescue item), 0]}
-          ]
-        end
-      end
-      @data["*No Input"] = 0 if show_empty_value
-
-      # Iterate through result to update Hash
-      @result.each do |r|
-        value = dynamic_field ? r.get_field_by_label(@label) : r.send(@field[:field])
-        value = value.present? ? value : (show_empty_value ? "*No Input" : nil)
-        if field_type == 'checkbox'
-          if value.present?
-            value = dynamic_field ? value.split(";") : value
-            value.each do |v|
-              if @data[v].present?
-                @data[v] += 1
-              end
-            end
-          end
-
-        elsif field_type == 'list'
-          if value.present?
-            values = value.split('<br>')
-            values.each do |v|
-              if @data[v].present?
-                @data[v] += 1
-              else
-                @data[v] = 1
-              end
-            end
-          end
-
-        elsif field_type == 'boolean_box' || field_type == 'boolean'
-          value ? @data["Yes"] += 1 : @data["No"] += 1
-        elsif field_type == 'employee'
-          if value.present?
-            value = User.where('full_name = ? OR id = ?', value, value).first.full_name
-          else
-            value = show_empty_value ? '*No Input' : nil
-          end
-          @data[value] += 1 if @data[value].present?
-        else
-          if value.present?
-            value = value.gsub("\r\n", " ") if field_type == 'textarea'
-            if @data[value].present?
-              @data[value] += 1
-            end
-          end
-        end
-      end
-
-      @data = @data.sort_by{|k, v| v}
-      @data = @data.reject{|k, v| v < 1}
-      if @data.present?
-        @data.reverse!
-      end
-
-      if field_type == "datetime" || field_type == "date"
-        @daily_data = Hash.new(0)
-        @monthly_data = Hash.new(0)
-        @yearly_data = Hash.new(0)
-        @data.each do |x|
-          daily = x[0].to_datetime.beginning_of_day
-          monthly = x[0].to_datetime.beginning_of_month
-          yearly = x[0].to_datetime.beginning_of_year
-          @daily_data[daily] += x[1]
-          @monthly_data[monthly] += x[1]
-          @yearly_data[yearly] += x[1]
-        end
-        @daily_data = @daily_data.sort_by{|k,v| k}
-        @monthly_data = @monthly_data.sort_by{|k,v| k}
-        @yearly_data = @yearly_data.sort_by{|k,v| k}
-        render :partial => "/queries/charts/datetime_chart_view"
-      elsif field_type == "user"
-        @data = @data.map{|k, v| [(User.find(k).full_name rescue (show_empty_value ? "*No Input" : nil)), v]}
-        render :partial => "/queries/charts/chart_view"
-      else
-        render :partial => "/queries/charts/chart_view"
-      end
-    # rescue => e
-    #   render :partial => "/queries/charts/invalid_input"
-    # end
-  end
-
-
   def apply_query
     if !session[:mode].present?
       redirect_to choose_module_home_index_path
@@ -388,11 +202,14 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
-
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible').keep_if{|x| x[:field]}
-
     @template_fields = []
-    Template.preload(:categories, :fields).where(:id => @owner.templates).map(&:fields).flatten.uniq{|field| field.label}.each{|field|
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
       @template_fields << {
         title: field.label,
         field: field.label,
@@ -400,7 +217,6 @@ class QueriesController < ApplicationController
         field_type: field.display_type,
       }
     }
-
     @fields = @target_fields + @template_fields
 
     if @title == "Submissions"
