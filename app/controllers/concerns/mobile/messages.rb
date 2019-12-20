@@ -15,13 +15,19 @@ module Concerns
           include: {
             send_from: message_access_options,
             send_to: message_access_options,
-            cc: message_access_options
+            cc: message_access_options,
+            owner: { only: :id }
           }
         )
 
         unread = 0
 
         messages_json.each do |message|
+          if message[:owner].blank?
+            message.delete('owner_id')
+            message.delete('owner_type')
+            message.delete(:owner)
+          end
           message.delete_if do |key, value|
             key.instance_of?(String) && key.include?('owner') && value.blank?
           end

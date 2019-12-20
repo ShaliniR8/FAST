@@ -121,6 +121,7 @@ class MessagesController < ApplicationController
     @title = 'Inbox'
     @messages = [current_user.inbox_messages, current_user.cc_messages].map{ |message_accesses|
       message_accesses.includes(message: [
+        :owner,
         send_from: :user,
         send_to: :user,
         cc: :user
