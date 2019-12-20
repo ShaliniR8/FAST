@@ -140,22 +140,13 @@ class QueriesController < ApplicationController
     @records = @object_type.where(id: params[:records].split(','))
 
     # find x_axis field name
-    @x_axis_field = @object_type
-      .get_meta_fields('show', 'index', 'invisible')
-      .keep_if{|f| f[:title] == params[:x_axis]}.first
+    @x_axis_field = get_field(@owner, @object_type, params[:x_axis])
 
     if params[:series].present? # if series present, build data from both values
       # find series field name
-      @series_field = @object_type
-        .get_meta_fields('show', 'index', 'invisible')
-        .keep_if{|f| f[:title] == params[:series]}.first
-      # build array of hashes that stores values for x_axis and series
-      arr = @records.inject([]) do |arr, record|
-        arr << {
-          x_axis: get_val(record, @x_axis_field),
-          series: get_val(record, @series_field)}
-        arr
-      end
+      @series_field = get_field(@owner, @object_type, params[:series])
+      # build array of hash to stores values for x_axis and series
+      arr = create_hash_array(@records, @x_axis_field, @series_field)
       # create a hash to store the occurences of each element
       data_hash = Hash.new
       arr.each do |record|
@@ -179,20 +170,18 @@ class QueriesController < ApplicationController
       x_axis.sort.each do |x|
         @data << series.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
       end
-    else # series not present, use default charts
+    else # when series not present, use default charts
       @data = [[@x_axis_field[:title], 'Count']]
+      byebug
       @records.map{|record| get_val(record, @x_axis_field)}
-        .compact
+        .compact.flatten
         .reject(&:blank?)
         .inject(Hash.new(0)){|h, e| h[e] += 1; h}
         .sort_by{|k,v| k}
         .each{|pair| @data << pair}
       @data.flatten
     end
-
-
     @chart_types = QueryVisualization.chart_types
-
     render :partial => "/queries/charts/chart_view"
   end
 
@@ -692,20 +681,79 @@ class QueriesController < ApplicationController
   end
 
 
-  # gets the formatted values of record's field
+  # returns the field that matches field_label
+  def get_field(query, object_type, field_label)
+    # if top level field
+    field = object_type.get_meta_fields('show', 'index', 'invisible')
+      .keep_if{|f| f[:title] == field_label}.first
+    # else check template fields
+    field = Template.preload(:categories, :fields)
+      .where(id: query.templates)
+      .map(&:fields)
+      .flatten
+      .select{|x| x.label == field_label}
+      .first if field.nil?
+    field
+  end
+
+
+  # returns the formatted values of record's field
   def get_val(record, field)
-    case field[:type]
-    when 'user', 'employee'
-      User.find_by_id(record.send(field[:field])).full_name rescue 'N/A'
-    when 'datetime', 'date'
-      record.send(field[:field]).strftime("%Y-%m") rescue 'N/A'
-    when 'boolean_box', 'boolean'
-      (record.send(field[:field]) ? 'Yes' : 'No') rescue 'No'
-    # when 'checkbox'
+    if field.is_a?(Field)
+      field_type = field.display_type
+      if record.class == Submission
+        value = SubmissionField.where(fields_id: field.id, submissions_id: record.id).first.value rescue nil
+      elsif record.class == Record
+        value = RecordField.where(fields_id: field.id, records_id: record.id).frist.value rescue nil
+      else
+        value = 'Something Went Wrong'
+      end
     else
-      record.send(field[:field])
+      field_type = field[:type]
+      value = record.send(field[:field])
+    end
+    format_val(value, field_type)
+  end
+
+
+  # helper for get_val: formats value based on field type
+  def format_val(value, field_type)
+    case field_type
+    when 'user', 'employee'
+      User.find_by_id(value).full_name rescue 'N/A'
+    when 'datetime', 'date'
+      value.strftime("%Y-%m") rescue 'N/A'
+    when 'boolean_box', 'boolean'
+      (value ? 'Yes' : 'No') rescue 'No'
+    when 'checkbox'
+      value.split(';')
+    else
+      value
     end
   end
 
+
+  # returns an array that stores x_axis and series value pairs
+  def create_hash_array(records, x_axis_field, series_field)
+    arr = records.inject([]) do |res, record|
+      x_val = get_val(record, x_axis_field)
+      y_val = get_val(record, series_field)
+      if x_val.is_a?(Array) && y_val.is_a?(Array)
+        x_val.each do |x|
+          y_val.each do |y|
+            res << {x_axis: x, series: y}
+          end
+        end
+      elsif x_val.is_a?(Array)
+        x_val.each{|x| res << {x_axis: x, series: y_val}}
+      elsif y_val.is_a?(Array)
+        y_val.each{|y| res << {x_axis: x_val, series: y}}
+      else
+        res << {x_axis: x_val, series: y_val}
+      end
+      res
+    end
+    arr
+  end
 
 end
