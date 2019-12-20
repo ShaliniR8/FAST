@@ -97,7 +97,6 @@
 
   $(function(){
 
-
     $("#generate_charts_btn_<%=visualization.id%>").on("click", function(e){
       e.preventDefault();
       var visualization_id = $(this).data("visualization-id");
@@ -127,20 +126,29 @@
     });
 
     $('.remove_btn').unbind().on('click', function(e){
+
       e.preventDefault();
-      var visualization_id = $(this).data("visualization-id");
-      $(this).closest('.visualization_box').remove();
-      $.ajax({
-        type: "GET",
-        url: "<%=remove_visualization_query_path%>",
-        data: {
-          "visualization_id": visualization_id,
-        },
-        beforeSend: function(){$('#loader_' + visualization_id).show();$("#chart_area_" + visualization_id).css({'opacity':0.5});},
-        complete: function(){$('#loader_' + visualization_id).hide();$("#chart_area_" + visualization_id).css({'opacity':1});},
-        success: function(response){},
-        error: function(response){console.log('error deleting' + visualization_id + '!');}
-      });
+      if (confirm('Are you sure?')) {
+        var visualization_id = $(this).data("visualization-id");
+        $(this).closest('.visualization_box').remove();
+        $.ajax({
+          type: "GET",
+          url: "<%=remove_visualization_query_path%>",
+          data: {
+            "visualization_id": visualization_id,
+          },
+          beforeSend: function(){
+            $('#loader_' + visualization_id).show();
+            $("#chart_area_" + visualization_id).css({'opacity':0.5});
+          }, complete: function(){
+            $('#loader_' + visualization_id).hide();
+            $("#chart_area_" + visualization_id).css({'opacity':1});},
+          success: function(response){},
+          error: function(response){
+            console.log('error deleting' + visualization_id + '!');
+          }
+        });
+      }
     });
 
   });
