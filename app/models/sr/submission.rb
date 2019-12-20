@@ -101,6 +101,11 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def title
+    description
+  end
+
+
   def self.build(template)
     self.new(templates_id: template.id)
   end

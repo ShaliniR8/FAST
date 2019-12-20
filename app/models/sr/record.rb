@@ -157,6 +157,11 @@ class Record < Sr::SafetyReportingBase
   end
 
 
+  def title
+    description
+  end
+
+
   def self.build(template)
     record = self.new()
     record.templates_id = template.id

@@ -46,6 +46,10 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+  def title
+    name
+  end
+
 
   def self.progress
     {
