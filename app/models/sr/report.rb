@@ -62,6 +62,10 @@ class Report < Sr::SafetyReportingBase
     name
   end
 
+  def title
+    name
+  end
+
 
   def self.progress
     {

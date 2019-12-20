@@ -85,6 +85,7 @@ javascript:
       $.get(`#{canned_messages_path}/${message_template_id}`, function(data) {
         $('#content').val(data.data.content)
       })
+<<<<<<< HEAD
     });
 
     recipients_table = $('#recipients').DataTable();
@@ -159,3 +160,7 @@ javascript:
     document.getElementById("cc_list").innerHTML = cc_user_ids.sort().join(', ');
   }
 
+=======
+    })
+  })
+>>>>>>> 9e1cbda... Adds owner title to subject when creating a new message with an owner
