@@ -17,12 +17,14 @@
 
   <div class="tab-content">
     <%@chart_types.each do |chart|%>
+      <%options = chart[:options].merge(@options)%>
       <div class="tab-pane <%=@visualization.default_chart == chart[:val] ? 'in show active' : ''%>"
         id="nav-<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"
         role="tabpanel"
         aria-labelledby="nav-<%=chart[:chart_name].parameterize%>-tab-<%=@visualization.id%>">
-        <div id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>" style="width:'100%'"></div>
-        <div class="mr5" id="<%=chart[:chart_name].parameterize%>_download" align="right"></div>
+        <div class='mt10' id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"></div>
+        <div class="mr5" id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download" align="right"></div>
+
         <%case chart[:val]%>
         <%when 1%>
           <div class="col-xs-12 col-sm-12 mt20">
@@ -53,8 +55,13 @@
             google.charts.setOnLoadCallback(drawPieChart);
             function drawPieChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
-              var options = <%=raw chart[:options].to_json %>;
-              var pieChart = new google.visualization.PieChart(document.getElementById('<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+              var options = <%=raw options.to_json%>;
+              var pieChart = new google.visualization.PieChart(document.getElementById(
+                '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+              google.visualization.events.addListener(pieChart, 'ready', function () {
+                document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
+                  '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
+              });
               pieChart.draw(data, options);
             }
           </script>
@@ -64,8 +71,13 @@
             google.charts.setOnLoadCallback(drawBarChart);
             function drawBarChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
-              var options = <%=raw chart[:options].to_json %>;
-              var barChart = new google.charts.Bar(document.getElementById('<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+              var options = <%=raw options.to_json%>;
+              var barChart = new google.visualization.ComboChart(document.getElementById(
+                '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+              google.visualization.events.addListener(barChart, 'ready', function () {
+                document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
+                  '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
+              });
               barChart.draw(data, options);
             }
           </script>
@@ -75,8 +87,13 @@
             google.charts.setOnLoadCallback(drawLineChart);
             function drawLineChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
-              var options = <%=raw chart[:options].to_json%>;
-              var lineChart = new google.charts.Line(document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+              var options = <%=raw options.to_json%>;
+              var lineChart = new google.visualization.ComboChart(document.getElementById(
+                "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+              google.visualization.events.addListener(lineChart, 'ready', function () {
+                document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
+                  '<a href="' + lineChart.getImageURI() + '"download><u>Download Chart</u></a>';
+              });
               lineChart.draw(data, options);
             }
           </script>
@@ -86,8 +103,13 @@
             google.charts.setOnLoadCallback(drawStackedChart);
             function drawStackedChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
-              var options = <%=raw chart[:options].to_json%>;
-              var stackedChart = new google.visualization.ColumnChart(document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+              var options = <%=raw options.to_json%>;
+              var stackedChart = new google.visualization.ColumnChart(document.getElementById(
+                "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+              google.visualization.events.addListener(stackedChart, 'ready', function () {
+                document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
+                  '<a href="' + stackedChart.getImageURI() + '"download><u>Download Chart</u></a>';
+              });
               stackedChart.draw(data, options);
             }
           </script>
@@ -97,6 +119,7 @@
     <%end%>
   </div>
 </div>
+
 
 <style>
   .tab-content>.tab-pane {
