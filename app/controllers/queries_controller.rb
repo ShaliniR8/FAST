@@ -143,6 +143,7 @@ class QueriesController < ApplicationController
     @x_axis_field = get_field(@owner, @object_type, params[:x_axis])
 
     if params[:series].present? # if series present, build data from both values
+      title = "#{params[:x_axis]} By #{params[:series]}"
       # find series field name
       @series_field = get_field(@owner, @object_type, params[:series])
       # build array of hash to stores values for x_axis and series
@@ -171,8 +172,7 @@ class QueriesController < ApplicationController
         @data << series.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
       end
     else # when series not present, use default charts
-      @data = [[@x_axis_field[:title], 'Count']]
-      byebug
+      @data = [[params[:x_axis], 'Count']]
       @records.map{|record| get_val(record, @x_axis_field)}
         .compact.flatten
         .reject(&:blank?)
@@ -181,6 +181,7 @@ class QueriesController < ApplicationController
         .each{|pair| @data << pair}
       @data.flatten
     end
+    @options = { title: title || params[:x_axis] }
     @chart_types = QueryVisualization.chart_types
     render :partial => "/queries/charts/chart_view"
   end
