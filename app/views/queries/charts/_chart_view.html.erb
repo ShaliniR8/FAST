@@ -29,7 +29,7 @@
         <%when 1%>
           <div class="col-xs-12 col-sm-12 mt20">
             <div class="table-responsive">
-              <table class="table table-striped table-bordered" width="100%">
+              <table id="grid-table-<%=@visualization.id%>" class="table table-striped table-bordered" width="100%">
                 <thead>
                   <tr>
                     <%@data[0].each do |header|%>
@@ -49,6 +49,9 @@
               </table>
             </div>
           </div>
+          <script type="text/javascript">
+            $("#grid-table-<%=@visualization.id%>").DataTable();
+          </script>
         <%when 2%>
           <script type="text/javascript">
             google.charts.load("current", {packages:["corechart"]});
