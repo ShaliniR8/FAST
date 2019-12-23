@@ -519,9 +519,9 @@ class QueriesController < ApplicationController
     if field.is_a?(Field)
       field_type = field.display_type
       if record.class == Submission
-        value = SubmissionField.where(fields_id: field.id, submissions_id: record.id).first.value rescue nil
+        value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
       elsif record.class == Record
-        value = RecordField.where(fields_id: field.id, records_id: record.id).frist.value rescue nil
+        value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
       else
         value = 'Something Went Wrong'
       end
