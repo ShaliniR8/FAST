@@ -29,8 +29,15 @@ class OccurrenceTemplate < ActiveRecord::Base
     self[:format]
   end
 
-  #Returns a hash of the node and all of its child nodes
-  def form_tree(library=OccurrenceTemplate.all)
+  def archive_tree
+    self.transaction do
+      self.children.each{ |child| child.archive_tree }
+      self.update_attribute(:archived, true)
+    end
+  end
+
+  #Returns a hash of the node and all of its non-archived child nodes
+  def form_tree(library=OccurrenceTemplate.where(archived: false))
     {}.tap do |base|
       base[:id] = self.id
       base[:title] = self.title

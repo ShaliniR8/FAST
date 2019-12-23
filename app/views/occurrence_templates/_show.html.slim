@@ -47,9 +47,10 @@ css:
             class: 'ml5 btn edit_btn btn-warning',
             'data-toggle' => 'modal',
             'data-target' => '.bs-example-modal-lg'
-          = link_to '[Archive]',
-            '#',
+          = link_to 'Archive',
+            archive_occurrence_template_path(owner),
             class: 'ml5 btn btn-danger',
+            method: :post,
             confirm: 'Are you sure?'
         .list-group.collapse id="list_#{owner.id}"
           - owner.children.each do |x|

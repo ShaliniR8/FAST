@@ -15,10 +15,15 @@
               b Occurrence Hierarchies
             .top_buttons.pull-right
               /btns here
+              = link_to 'New Occurrence Category',
+                new_root_occurrence_templates_path,
+                method: :post,
+                class: 'btn btn-success pull-right'
+
         .panel-body
           .alert.alert-warning role="alert"
-            Please note that <b>editing</b> existing categories and options will affect the root causes that have been added to hazards. If there are changes made to the list of options or categories, it is suggested to <b>archive the old options first and then add new ones</b>. </br></br>
-            Please note that <b>archiving</b> a category will also archive all of its nested sub-categories, use this with caution.
+            | Please note that <b>editing</b> existing Occurrences and options will affect existing occurrences that have been added to forms. If there are changes made to the list of options or occurrences, it is suggested to <b>archive the old options first and then add new ones</b>. </br></br>
+            | Please note that <b>archiving</b> an occurrence will also archive all of its nested occurrences, use this with caution.
           - @records.each do |parent|
             = render 'show', owner: parent
 

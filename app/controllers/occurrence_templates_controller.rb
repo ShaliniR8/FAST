@@ -1,13 +1,24 @@
 class OccurrenceTemplatesController < ApplicationController
+  before_filter :check_admin
+
+  def check_admin
+    unless current_user.admin?
+      redirect_to gateway_index_path, flash: { danger: 'You do not have access to this action.' }
+      return false
+    end
+  end
 
   def create
-    @owner = OccurrenceTemplate.new(params[:occurrence_template])
-    @owner.save
+    @owner = OccurrenceTemplate.create(params[:occurrence_template])
     redirect_to occurrence_templates_path
   end
 
   def edit
     @owner = OccurrenceTemplate.find(params[:id])
+    if @owner.id == 1 && @owner.title == 'Default'
+      redirect_to occurrence_templates_path,
+        flash: { danger: 'You cannot alter the Default Occurrence Template' }
+    end
     if @owner.children.blank?
       @formats = OccurrenceTemplate.get_formats.map{ |key, val| [val,key] }
     else
@@ -19,7 +30,7 @@ class OccurrenceTemplatesController < ApplicationController
   def index
     @table = Object.const_get('OccurrenceTemplate')
     @formats = OccurrenceTemplate.get_formats
-    @records = @table.where(parent_id: nil)
+    @records = @table.where(parent_id: nil, archived: false)
     @fields = @table.get_meta_fields('index')
   end
 
@@ -41,6 +52,22 @@ class OccurrenceTemplatesController < ApplicationController
 
   def show
     redirect_to occurrence_templates_path
+  end
+
+  def new_root
+    @owner = OccurrenceTemplate.create(format: 'section', title: 'New Occurrence Root')
+    redirect_to occurrence_templates_path
+  end
+
+  def archive
+    node = OccurrenceTemplate.find(params[:id])
+    if node.id == 1 && node.title == 'Default'
+      redirect_to occurrence_templates_path,
+        flash: { danger: 'You cannot archive the Default Occurrence Template' }
+    else
+      node.archive_tree
+      redirect_to occurrence_templates_path
+    end
   end
 
 

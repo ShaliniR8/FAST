@@ -2,11 +2,12 @@ class OccurrencesController < ApplicationController
 
   def new
     @templates = OccurrenceTemplate.all
-    parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    root = OccurrenceTemplate.preload(:children).find(1) #TODO: Filter based on parent
+    owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    root = OccurrenceTemplate.preload(:children).find_by_title(owner.class.name.titleize)
+    root ||= OccurrenceTemplate.preload(:children).find(1) # This has to be the default node
     @tree = root.form_tree(@templates)
     render partial: 'new', locals: {
-      owner: parent,
+      owner: owner,
       root: root
     }
   end
