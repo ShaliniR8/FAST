@@ -15,19 +15,24 @@ css:
 
 - if owner.format != 'section'
   .col-xs-12 style="margin-top: 15px"
-    .col-xs-4
+    .col-xs-3
       p <b>Title:</b> #{owner.title}
     .col-xs-2
       p <b>Format:</b> #{@formats[owner.format.to_sym]}
-    - if ['checkbox','selection'].include? owner.format
-      .col-xs-5
+    .col-xs-4
+      - if ['checkbox','selection'].include? owner.format
         p <b>Options:</b> #{owner.options}
-    .col-xs-1.pull-right aid="#{owner.id}" id="#{owner.id}"
+    .col-xs-2.pull-right aid="#{owner.id}" id="#{owner.id}"
       = link_to 'Edit',
         '#',
         class: 'ml5 btn edit_btn btn-warning',
         'data-toggle' => 'modal',
         'data-target' => '.bs-example-modal-lg'
+      = link_to 'Archive',
+        archive_occurrence_template_path(owner),
+        class: 'ml5 btn btn-danger',
+        method: :post,
+        confirm: 'Are you sure?'
 - else
   .col-xs-12 style="margin: 10px"
     .list-group.well style="padding: 0; overflow: hidden;"
@@ -53,7 +58,7 @@ css:
             method: :post,
             confirm: 'Are you sure?'
         .list-group.collapse id="list_#{owner.id}"
-          - owner.children.each do |x|
+          - owner.children.where(archived: false).each do |x|
             = render 'show', owner: x
 
 

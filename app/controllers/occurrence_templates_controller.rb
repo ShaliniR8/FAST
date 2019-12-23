@@ -37,7 +37,6 @@ class OccurrenceTemplatesController < ApplicationController
   def new
     @owner = OccurrenceTemplate.new
     @formats = OccurrenceTemplate.get_formats.map{ |key, val| [val,key] }
-    Rails.logger.debug @formats
     render :partial => 'form', locals: {parent_id: params[:parent_id]}
   end
 
