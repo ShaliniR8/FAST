@@ -13,7 +13,7 @@ namespace :recurring do
       puts "Generating #{type.name} for Recurrence ##{recurrence.id}"
       template = type.find(recurrence.template_id)
       next_form = template.clone
-      next_form.completion = template.completion + month_count
+      next_form.completion = template.completion
       next_form.recurrence_id = recurrence.id
       next_form.template = false;
       if next_form.save!
