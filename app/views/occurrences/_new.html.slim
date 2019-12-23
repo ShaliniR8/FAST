@@ -26,11 +26,13 @@ javascript:
     var tree = #{@tree.to_json.html_safe}
     var content = document.getElementById("content")
     interpretNode(content, tree, true)
+    $('#add-occurrences-btn').hide()
   })
 
   $('.section-field').change(function(){
     $(this).closest('.content').find('.section-field option').each(function(){
       $('#content-' + this.value).hide()
+      $('#add-occurrences-btn').hide()
     })
     $(this).closest('.content').find('.content .selection-field').prop('selectedIndex', 0)
     var revealed = $('#content-' + this.value)
@@ -38,6 +40,7 @@ javascript:
     // Catch case of section node that has no children section nodes and show all children instead
     if(revealed.children('.section-field').length == 0){
       revealed.children('.content').show()
+      $('#add-occurrences-btn').show()
     }
   })
 
