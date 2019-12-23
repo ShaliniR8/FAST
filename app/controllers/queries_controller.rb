@@ -90,7 +90,7 @@ class QueriesController < ApplicationController
     @templates = Template.where(:id => params[:templates])
 
     @target_display_name = params[:target_display_name]
-    @fields = Object.const_get(@target).get_meta_fields('show', 'index').keep_if{|x| x[:field]}
+    @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
 
     if @templates.length > 0
       @templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
@@ -111,7 +111,7 @@ class QueriesController < ApplicationController
     @owner = Query.find(params[:id])
     @chart_types = QueryVisualization.chart_types
     @object_type = Object.const_get(@owner.target)
-    @fields = @object_type.get_meta_fields('show', 'index').keep_if{|x| x[:field]}
+    @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     templates = Template.preload(:categories, :fields).where(:id => @owner.templates)
     templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @fields << {
@@ -202,7 +202,7 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
-    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible').keep_if{|x| x[:field]}
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
     Template.preload(:categories, :fields)
       .where(id:  @owner.templates)
@@ -501,7 +501,7 @@ class QueriesController < ApplicationController
   # returns the field that matches field_label
   def get_field(query, object_type, field_label)
     # if top level field
-    field = object_type.get_meta_fields('show', 'index', 'invisible')
+    field = object_type.get_meta_fields('show', 'index', 'invisible', 'query')
       .keep_if{|f| f[:title] == field_label}.first
     # else check template fields
     field = Template.preload(:categories, :fields)
@@ -544,6 +544,8 @@ class QueriesController < ApplicationController
       (value ? 'Yes' : 'No') rescue 'No'
     when 'checkbox'
       value.split(';')
+    when 'list'
+      value.split('<br>')
     else
       value
     end

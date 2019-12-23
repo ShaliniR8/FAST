@@ -131,7 +131,7 @@ class DefaultSafetyReportingConfig
             num_cols: 6, type: 'text', visible: 'index,meeting_form',
             required: false, on_newline: true
           },
-          root_causes_full: { default: true, title: "#{I18n.t("sr.event.root_cause.title")}" },
+          root_causes_full: { default: true, title: "Full #{I18n.t("sr.event.root_cause.title")}" },
           root_causes: { default: true, title: "#{I18n.t("sr.event.root_cause.title")}",
             visible: CONFIG::GENERAL[:has_root_causes] ? 'index,meeting_form' : ''
           },
@@ -223,6 +223,11 @@ class DefaultSafetyReportingConfig
           additional_info: {
             field: 'additional_info', title: 'Has Attachments',
             num_cols: 12, type: 'text', visible: 'meeting_form,meeting',
+            required: false
+          },
+          included_reports_types: {
+            field: 'included_reports_types', title: 'Included Reports Types',
+            num_cols: 12, type: 'checkbox', visible: 'query',
             required: false
           },
         }.reduce({}) { |acc,(key,data)|
