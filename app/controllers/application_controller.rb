@@ -265,11 +265,10 @@ class ApplicationController < ActionController::Base
       #message submitter, override status, private link, reopen
 
     when :request_extension
-      byebug
       @extension_request = @owner.extension_requests.new
       @extension_request.requester = current_user
       @extension_request.approver = @owner.approver
-      byebug
+      @extension_request.request_date = Time.now
       render :partial => 'extension_requests/new'
 
     else

@@ -13,7 +13,7 @@
   <div class="panel-steelblue">
     <div class="panel-heading">
       <div class="panel-title">
-        Request Extension
+        <%=action_name == 'edit' ? 'Edit' : 'New'%> Request Extension
         <button type="button"
           class="close pull-right"
           data-dismiss="modal"
@@ -37,14 +37,14 @@
           <%=f.hidden_field :approver_id%>
           <%=f.hidden_field :owner_id%>
           <%=f.hidden_field :owner_type%>
-          <%=f.hidden_field :request_date, :value => Time.now%>
+          <%=f.hidden_field :request_date%>
 
           <%=render "forms/form_fields",
             :fields => @fields,
             :record => @extension_request,
             :f => f%>
 
-          <%=f.submit "Save",
+          <%=f.submit "#{action_name == 'edit' ? 'Update' : 'Create'}",
             :class => "btn btn-success pull-right mt10 mb20 mr20",
             :disable_with => "Saving..."%>
         </div>

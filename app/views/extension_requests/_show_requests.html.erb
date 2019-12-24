@@ -1,7 +1,7 @@
 <%if records.length > 0%>
 
   <div class="col-xs-12">
-    <div class="panel panel-info">
+    <div class="panel panel-steelblue">
       <div class="panel-heading click-heading collapsed">
         <div class="panel-title">
           <b><%=title%></b>
@@ -67,15 +67,15 @@
                     </td>
                   <%end%>
                   <td>
-                    <%if record.status == "New"%>
+                    <%if record.status != 'Completed'%>
                       <%=link_to "Edit",
-                        "#",
+                        '#',
                         :route => edit_extension_request_path(record),
                         :class => "btn btn-warning mr5 mb5 edit_extension_request_btn",
                         "data-toggle"=>"modal",
                         "data-target"=>".bs-example-modal-lg"%>
                       <%=link_to "Address",
-                        "#",
+                        '#',
                         :route => address_extension_request_path(record),
                         :class => "btn btn-success mr5 mb5 address_extension_request_btn",
                         "data-toggle"=>"modal",
