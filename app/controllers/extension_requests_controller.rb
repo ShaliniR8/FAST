@@ -21,23 +21,10 @@ class ExtensionRequestsController < ApplicationController
   before_filter :login_required
 
 
-  def new
-    @table = "#{params[:owner_type]}"
-    @owner_id = params[:owner_id]
-    @user_id = params[:user_id]
-    @extension_request = Object.const_get("#{@table}ExtensionRequest").new.becomes(ExtensionRequest)
-    render :partial => '/extension_requests/new'
-  end
-
-
-
   def create
-    @table = params[:owner_type]
-    @extension_request = Object.const_get("#{@table}ExtensionRequest").new(params[:extension_request])
-    @extension_request.status = "New"
-    @extension_request.save
+    @extension_request = ExtensionRequest.create(params[:extension_request])
     send_notification('New', @extension_request)
-    redirect_to "/#{Object.const_get(@table).table_name}/#{params[:extension_request][:owner_id]}"
+    redirect_to @extension_request.owner
   end
 
 

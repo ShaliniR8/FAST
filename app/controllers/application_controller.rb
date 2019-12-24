@@ -264,6 +264,14 @@ class ApplicationController < ActionController::Base
 
       #message submitter, override status, private link, reopen
 
+    when :request_extension
+      byebug
+      @extension_request = @owner.extension_requests.new
+      @extension_request.requester = current_user
+      @extension_request.approver = @owner.approver
+      byebug
+      render :partial => 'extension_requests/new'
+
     else
       redirect_to eval("#{@class.name.underscore}_path(@owner)"),
         flash: {danger: 'Unknown process- action aborted.'}

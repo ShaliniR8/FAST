@@ -33,11 +33,11 @@
             </div>
           </div>
 
-          <%=f.hidden_field :requester_id, :value => current_user.id%>
-          <%=f.hidden_field :approver_id, :value => @user_id%>
-          <%=f.hidden_field :owner_id, :value => @owner_id%>
+          <%=f.hidden_field :requester_id%>
+          <%=f.hidden_field :approver_id%>
+          <%=f.hidden_field :owner_id%>
+          <%=f.hidden_field :owner_type%>
           <%=f.hidden_field :request_date, :value => Time.now%>
-          <%=hidden_field_tag :owner_type, @table%>
 
           <%=render "forms/form_fields",
             :fields => @fields,

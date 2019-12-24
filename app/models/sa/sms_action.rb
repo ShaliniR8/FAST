@@ -12,6 +12,7 @@ class SmsAction < Sa::SafetyAssuranceBase
   include Noticeable
   include Occurrenceable
   include Transactionable
+  include ExtensionRequestable
 
 #Associations List
   belongs_to  :approver,                foreign_key: "approver_id",               class_name: "User"
@@ -20,7 +21,6 @@ class SmsAction < Sa::SafetyAssuranceBase
   belongs_to  :owner,                   polymorphic: true
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
   has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
-  has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
 
   after_create :create_transaction
   after_create -> { create_owner_transaction(action:'Add Corrective Action') }
