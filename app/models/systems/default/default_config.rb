@@ -37,8 +37,8 @@ class DefaultConfig
 
     # TO BE REMOVED:
     allow_set_alert:                    false,   # Allows forms to use alerts (notifications to users/self)
-    has_extension:                      false,   # Allows forms to request extensions
-    has_verification:                   false,   # Allows forms to be verified (additional step)
+    has_extension:                      true,   # Allows forms to request extensions
+    has_verification:                   true,   # Allows forms to be verified (additional step)
   }
 
   def self.getTimeFormat

@@ -20,7 +20,7 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           due_date: {default: true, on_newline: true },
           close_date: { default: true },
@@ -75,7 +75,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts findings costs signatures comments attachments transaction_log
+        panels: %i[occurrences tasks contacts findings costs signatures comments extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -84,7 +84,7 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           viewer_access: { default: true, on_newline: true },
           due_date: { default: true, on_newline: true },
@@ -138,7 +138,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -147,7 +147,7 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           viewer_access: { default: true, on_newline: true },
           due_date: { default: true, on_newline: true },
@@ -205,7 +205,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -219,7 +219,7 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6, type: 'text', visible: 'index,show',
             required: false
           },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           viewer_access: { default: true, on_newline: true },
           due_date: { default: true, on_newline: true },
@@ -290,7 +290,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log
+        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -299,7 +299,7 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, field: 'get_status', on_newline: true },
           get_source: {
             field: 'get_source', title: 'Source of Input',
             num_cols: 6, type: 'text', visible: 'index,show',
@@ -433,7 +433,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences attachments transaction_log
+        panels: %i[occurrences extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -527,7 +527,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments attachments transaction_log
+        panels: %i[occurrences comments extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
@@ -536,7 +536,7 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true },
+          status: { default: true, field: 'get_status' },
           get_source: {
             field: 'get_source', title: 'Source of Input',
             num_cols: 6, type: 'text', visible: 'index,show',
@@ -593,7 +593,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comment attachments transaction_log
+        panels: %i[occurrences comment extension_requests attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       }
     },

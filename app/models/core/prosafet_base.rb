@@ -57,4 +57,18 @@ class ProsafetBase < ActiveRecord::Base
     self.name.gsub(/\:\:/, '/').pluralize.downcase
   end
 
+
+  # Get full status including verification and extension
+  def get_status
+    verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0 rescue false
+    extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
+    if verification_needed
+      "#{status}, Verification Required"
+    elsif extension_requested
+      "#{status}, Extension Requested"
+    else
+      status
+    end
+  end
+
 end

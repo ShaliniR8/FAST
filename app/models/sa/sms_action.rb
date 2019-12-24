@@ -48,17 +48,17 @@ class SmsAction < Sa::SafetyAssuranceBase
   end
 
 
-  def get_status
-    verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0
-    extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
-    if verification_needed
-      "Completed, Verification Required"
-    elsif extension_requested
-      "#{status}, Extension Requested"
-    else
-      status
-    end
-  end
+  # def get_status
+  #   verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0
+  #   extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
+  #   if verification_needed
+  #     "Completed, Verification Required"
+  #   elsif extension_requested
+  #     "#{status}, Extension Requested"
+  #   else
+  #     status
+  #   end
+  # end
 
 
   def approver_name

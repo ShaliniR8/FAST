@@ -18,7 +18,7 @@
 
 <%=render "/forms/cost", :owner => owner%>
 
-<%=render "/extension_requests/show_requests",
+<%#=render "/extension_requests/show_requests",
   :fields => ExtensionRequest.get_meta_fields('index'),
   :records => owner.extension_requests,
   :title => "Extension Requests"%>
