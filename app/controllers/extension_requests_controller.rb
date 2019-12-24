@@ -23,28 +23,26 @@ class ExtensionRequestsController < ApplicationController
 
   def create
     @extension_request = ExtensionRequest.create(params[:extension_request])
-    send_notification('New', @extension_request)
+    send_notification(params[:commit], @extension_request)
     redirect_to @extension_request.owner
   end
-
 
 
   def edit
     @extension_request = ExtensionRequest
       .find(params[:id])
       .becomes(ExtensionRequest)
-    render :partial => '/extension_requests/edit'
+    render :partial => '/extension_requests/new'
   end
-
 
 
   def update
     @extension_request = ExtensionRequest.find(params[:id])
     @extension_request.update_attributes(params[:extension_request])
-    send_notification('Address', @extension_request)
+    @extension_request.owner.update_attribute(:due_date, params[:due_date]) if params[:due_date].present?
+    send_notification(params[:commit], @extension_request)
     redirect_to @extension_request.owner
   end
-
 
 
   def address
@@ -53,18 +51,11 @@ class ExtensionRequestsController < ApplicationController
   end
 
 
-
-  def send_notification(status, ext_req)
-    case status
-    when 'New'
-      notify(ext_req.requester,
-        "A new Extension Request has been submitted." + g_link(ext_req.owner),
-        true, 'Extension Request submitted')
-    else
-      notify(ext_req.approver,
-        "Your Extension Request has been addressed." + g_link(ext_req.owner),
-        true, 'Extension Request addressed')
-    end
+  def send_notification(commit, ext_req)
+    commit = 'Addresse' if commit == 'Address'
+    notify(ext_req.requester,
+      "Extension Request has been #{commit}d." + g_link(ext_req.owner),
+      true, "Extension Request #{commit}")
   end
 
 end
