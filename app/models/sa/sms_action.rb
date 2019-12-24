@@ -10,6 +10,7 @@ class SmsAction < Sa::SafetyAssuranceBase
   include Commentable
   include Costable
   include Noticeable
+  include Occurrenceable
   include Transactionable
 
 #Associations List

@@ -12,6 +12,7 @@ class Investigation < Sa::SafetyAssuranceBase
   include Costable
   include Findingable
   include Noticeable
+  include Occurrenceable
   include Recommendationable
   include Signatureable
   include SmsActionable

@@ -75,7 +75,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[tasks contacts findings costs signatures comments attachments transaction_log],
+        panels: %i[occurrences tasks contacts findings costs signatures comments attachments transaction_log],
       },
 
       'Inspection' => {
@@ -137,7 +137,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[tasks contacts requirements findings costs signatures comments attachments transaction_log],
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log],
       },
 
       'Evaluation' => {
@@ -203,7 +203,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[tasks contacts requirements findings costs signatures comments attachments transaction_log],
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log],
       },
 
       'Investigation' => {
@@ -287,7 +287,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log],
+        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log],
       },
 
       'Finding' => {
@@ -429,7 +429,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[attachments transaction_log],
+        panels: %i[occurrences attachments transaction_log],
       },
 
       'SmsAction' => {
@@ -522,7 +522,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[comments attachments transaction_log]
+        panels: %i[occurrences comments attachments transaction_log]
       },
 
       'Recommendation' => {
@@ -587,7 +587,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[comment attachments transaction_log]
+        panels: %i[occurrences comment attachments transaction_log]
       }
     },
   }

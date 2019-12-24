@@ -11,6 +11,7 @@ class Audit < Sa::SafetyAssuranceBase
   include Costable
   include Findingable
   include Noticeable
+  include Occurrenceable
   include Signatureable
   include SmsTaskable
   include Transactionable

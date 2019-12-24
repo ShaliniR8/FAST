@@ -8,6 +8,7 @@ class Recommendation < Sa::SafetyAssuranceBase
   include Attachmentable
   include Commentable
   include Noticeable
+  include Occurrenceable
   include Transactionable
 
 #Associations List

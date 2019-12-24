@@ -9,6 +9,7 @@ class Finding < Sa::SafetyAssuranceBase
   include Attachmentable
   include Commentable
   include Noticeable
+  include Occurrenceable
   include Recommendationable
   include RootCausable
   include SmsActionable

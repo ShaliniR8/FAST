@@ -10,6 +10,7 @@ class Evaluation < Sa::SafetyAssuranceBase
   include Contactable
   include Costable
   include Findingable
+  include Occurrenceable
   include Noticeable
   include Signatureable
   include SmsTaskable

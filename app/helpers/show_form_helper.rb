@@ -53,6 +53,11 @@
               show_btns: btns[:findings]
             }
           end
+        when :occurrences
+          panels << {
+            partial: '/occurrences/occurrences_panel',
+            owner: owner
+          }
         when :recommendations #WIP
           panels << {
             partial: '/recommendations/show_all',
