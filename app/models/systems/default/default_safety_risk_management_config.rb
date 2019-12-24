@@ -282,8 +282,65 @@ class DefaultSafetyRiskManagementConfig
       'SafetyPlan' => {
         title: 'Safety Plan',
         fields: {
-          id: { default: true },
+          id: { default: true,
+            required: true
+          },
           status: { default: true },
+          title: { default: true,
+            num_cols: 12
+          },
+          risk_factor: {
+            field: 'risk_factor', title: 'Baseline Risk',
+            num_cols: 12, type: 'select', visible: 'index,form,show',
+            required: false, on_newline: true, options: SafetyPlan.get_custom_options('Risk Factors')
+          },
+          concern: {
+            field: 'concern', title: 'Concern',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          objective: {
+            field: 'objective', title: 'Objective',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          background: {
+            field: 'background', title: 'Background',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          evaluation_panel_start: {
+            title: "Evaluation",
+            num_cols: 12, type: 'panel_start', visible: 'show,eval'
+          },
+          time_period: {
+            field: 'time_period', title: 'Time Period (Days)',
+            num_cols: 6, type: 'text', visible: 'show,eval',
+            required: false
+          },
+          date_started: {
+            field: 'date_started', title: 'Date Started',
+            num_cols: 6, type: 'date', visible: 'show,eval',
+            required: false
+          },
+          date_completed: {
+            field: 'date_completed', title: 'Date Completed',
+            num_cols: 6, type: 'date', visible: 'show,eval',
+            required: false
+          },
+          result: {
+            field: 'result', title: 'Result',
+            num_cols: 6, type: 'select', visible: 'show,eval',
+            required: false,  options: SafetyPlan.get_custom_options('Results')
+          },
+          risk_factor_after: {
+            field: 'risk_factor_after', title: 'Mitigated Risk',
+            num_cols: 6,  type: 'select', visible: 'index,eval,show',
+            required: false,  options: SafetyPlan.get_custom_options('Risk Factors')
+          },
+          evaluation_panel_end: {
+            type: 'panel_end', visible: 'show,eval'
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -293,7 +350,7 @@ class DefaultSafetyRiskManagementConfig
           #INLINE
           *%i[],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[evaluation occurrences attachments transaction_log
+        panels: %i[occurrences comments attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Meeting' => {

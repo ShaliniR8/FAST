@@ -20,7 +20,12 @@ class SrasController < ApplicationController
 
   before_filter :login_required
   before_filter :load_options
+  before_filter :define_owner, only: [:show, :interpret]
 
+  def define_owner
+    @class = Object.const_get('Sra')
+    @owner = Sra.find(params[:id])
+  end
 
   def index
     @title = "SRAs"

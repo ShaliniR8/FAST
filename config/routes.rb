@@ -543,6 +543,7 @@ PrdgSession::Application.routes.draw do |map|
   # SRA Module
   resources :sras do
     member do
+      get 'interpret'
       get 'mitigate'
       get 'baseline'
       get 'carryover'
