@@ -49,6 +49,9 @@ module Concerns
         permissions[:submissions].push('new') if current_user.has_access('submissions', 'new', admin: true, strict: true)
         mobile_user_info[:permissions] = permissions
 
+        # change when configs are updated to v1.2
+        mobile_user_info[:enable_dual_report] = BaseConfig.airline[:enable_dual_report]
+
         render :json => mobile_user_info
       end
 
