@@ -238,7 +238,7 @@ class DefaultSafetyReportingConfig
             num_cols: 6,  type: 'boolean', visible: 'form,show',
             required: false
           },
-          completion: { default: true, field: 'due_date' },
+          due_date: { default: true, field: 'due_date' },
           close_date: { default: true },
           opened_date: {
             field: 'opened_date', title: 'Date Opened',

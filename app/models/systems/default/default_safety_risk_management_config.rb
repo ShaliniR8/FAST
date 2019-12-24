@@ -10,6 +10,7 @@ class DefaultSafetyRiskManagementConfig
     # Airline-Specific Features:
   }
 
+
   HIERARCHY = {
     display_name: 'Safety Risk Management',
     objects: {

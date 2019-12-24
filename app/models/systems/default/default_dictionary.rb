@@ -425,8 +425,8 @@ class DefaultDictionary
       num_cols: 6,  type: 'boolean_box', visible: 'show',
       required: false
     },
-    completion: {
-      field: 'completion', title: 'Scheduled Completion Date',
+    due_date: {
+      field: 'due_date', title: 'Scheduled Completion Date',
       num_cols: 6,  type: 'date', visible: 'index,form,show',
       required: true
     },
