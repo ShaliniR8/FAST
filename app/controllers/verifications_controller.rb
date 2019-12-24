@@ -21,23 +21,9 @@ class VerificationsController < ApplicationController
   before_filter :login_required
 
 
-
-  def new
-    @table = "#{params[:owner_type]}"
-    @owner_id = params[:owner_id]
-    @user_id = params[:user_id]
-    @verification = Object.const_get(@table).new.becomes(Verification)
-    render :partial => '/verifications/new'
-  end
-
-
-
   def create
-    @table = params[:owner_type]
-    @verification = Object.const_get("#{@table}Verification").new(params[:verification])
-    @verification.status = "New"
-    @verification.save
-    redirect_to "/#{Object.const_get(@table).table_name}/#{params[:verification][:owner_id]}"
+    @verification = Verification.create(params[:verification])
+    redirect_to @verification.owner
   end
 
 

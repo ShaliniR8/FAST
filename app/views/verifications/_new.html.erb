@@ -32,9 +32,9 @@
               1. Enter the Verification Date using the calendar.</br>
               2. Enter what needs to be verified and the reason why in the Verification Detail box.</br>
             </div>
-            <%=f.hidden_field :users_id, :value => @user_id%>
-            <%=f.hidden_field :owner_id, :value => @owner_id%>
-            <%=hidden_field_tag :owner_type, @table%>
+            <%=f.hidden_field :owner_type%>
+            <%=f.hidden_field :owner_id%>
+            <%=f.hidden_field :users_id%>
           </div>
 
           <%=render "forms/form_fields",

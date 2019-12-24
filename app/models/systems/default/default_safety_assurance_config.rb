@@ -518,7 +518,7 @@ class DefaultSafetyAssuranceConfig
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
             #TODO: Complete Notices<=Notifications Update and add set_alert after view_parent
           #INLINE
-          *%i[assign complete request_extension schedule_validation cost approve_reject reopen comment],
+          *%i[assign complete request_extension schedule_verification cost approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -527,7 +527,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments extension_requests attachments transaction_log
+        panels: %i[occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 

@@ -164,8 +164,8 @@ class DefaultDictionary
         !['Completed', 'Rejected'].include?(owner.status) && !owner.root_cause_lock?
       },
     },
-    schedule_validation:{
-      btn: :schedule_validation,
+    schedule_verification:{
+      btn: :schedule_verification,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
         CONFIG::GENERAL[:has_verification] && owner.status == 'Completed'

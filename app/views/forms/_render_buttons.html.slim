@@ -183,7 +183,7 @@ ruby:
       class: 'btn btn-success pull-right mr5 mb5',
       disable_with: 'Adding...'
 
-  - when :schedule_validation
+  - when :schedule_verification
     = link_to 'Schedule Verification',
       '#',
       class: 'btn btn-warning pull-right mr5',
@@ -192,11 +192,11 @@ ruby:
       'data-target' => '.bs-example-modal-lg'
 
   - when :send_message
-  = link_to 'Send Message',
-    new_message_path(link:eval("#{owner_class}_path(owner)"),
-      link_type: owner.class.name,
-      link_id: owner.id),
-      class: 'btn btn-warning pull-right mr5 mb5'
+    = link_to 'Send Message',
+      new_message_path(link:eval("#{owner_class}_path(owner)"),
+        link_type: owner.class.name,
+        link_id: owner.id),
+        class: 'btn btn-warning pull-right mr5 mb5'
 
   - when :set_alert
     = link_to 'Set Alert',
@@ -375,12 +375,11 @@ ruby:
         });
       });
 
-  - when :schedule_validation
+  - when :schedule_verification
     javascript:
       $("#verification_btn").on("click", function(){
         $(".modal-content").html("");
-        $.get('#{new_verification_path(owner_type: owner.class.name, owner_id: owner, user_id: (owner.approver.id rescue nil))}',
-            function(data){
+        $.get('#{eval("interpret_#{owner_class}_path(owner, act: :schedule_verification)")}', function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
         });

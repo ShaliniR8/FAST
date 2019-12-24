@@ -1,5 +1,6 @@
 class Verification < ActiveRecord::Base
 
+  belongs_to :owner, polymorphic: true
   belongs_to :validator, foreign_key: 'users_id', class_name: 'User'
 
   def self.get_meta_fields(*args)
@@ -12,7 +13,6 @@ class Verification < ActiveRecord::Base
       {field: 'address_comment',  title: 'Comment',             num_cols: 12, type: 'textarea', visible: 'index,show,address',  required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
-
 
 
   def self.get_result_options

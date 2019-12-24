@@ -271,6 +271,11 @@ class ApplicationController < ActionController::Base
       @extension_request.request_date = Time.now
       render :partial => 'extension_requests/new'
 
+    when :schedule_verification
+      @verification = @owner.verifications.new
+      @verification.validator = @owner.approver
+      render :partial => 'verifications/new'
+
     else
       redirect_to eval("#{@class.name.underscore}_path(@owner)"),
         flash: {danger: 'Unknown process- action aborted.'}
