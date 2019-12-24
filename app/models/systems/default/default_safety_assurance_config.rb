@@ -75,7 +75,8 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts findings costs signatures comments attachments transaction_log],
+        panels: %i[occurrences tasks contacts findings costs signatures comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Inspection' => {
@@ -137,7 +138,8 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log],
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Evaluation' => {
@@ -203,7 +205,8 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log],
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Investigation' => {
@@ -287,7 +290,8 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log],
+        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Finding' => {
@@ -429,7 +433,8 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences attachments transaction_log],
+        panels: %i[occurrences attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'SmsAction' => {
@@ -522,7 +527,8 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments attachments transaction_log]
+        panels: %i[occurrences comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
       'Recommendation' => {
@@ -587,7 +593,8 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comment attachments transaction_log]
+        panels: %i[occurrences comment attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       }
     },
   }

@@ -213,6 +213,99 @@ class DefaultDictionary
     },
   }
 
+  PANEL = {
+    ## Format for Panel Elements:
+    # panel_title: {
+    #   partial: string of where the view file is
+    #   visible: proc to determine if the panel will be visible- has user and object accessible
+    #   show_btns: Conditional to determine if panel buttons should be shown
+    #   data: proc to generate a hash of local parameters for the panel- will be splatted into render
+    # },
+    attachments: {
+      partial: '/panels/attachments',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
+    },
+    comments: {
+      partial: '/panels/comments',
+      visible: proc { |owner:,user:,**op| owner.comments.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { comments: owner.comments.preload(:viewer) } },
+    },
+    contacts: {
+      partial: '/panels/contacts',
+      visible: proc { |owner:,user:,**op| owner.contacts.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| {
+        fields: Contact.get_meta_fields('show'),
+        contacts: owner.contacts
+      }},
+    },
+    costs: {
+      partial: '/panels/costs',
+      visible: proc { |owner:,user:,**op| owner.costs.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { costs: owner.costs } },
+    },
+    findings: {
+      partial: '/panels/findings',
+      visible: proc { |owner:,user:,**op| owner.findings.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { findings: owner.findings } },
+    },
+    occurrences: {
+      partial: '/occurrences/occurrences_panel',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    recommendations: { # WIP
+      partial: '/recommendations/show_all',
+      visible: proc { |owner:,user:,**op| owner.recommendations.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    requirements: { # WIP
+      partial: '/audits/show_requirements',
+      visible: proc { |owner:,user:,**op| owner.requirements.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { owner: owner, type: owner.class.name.downcase } },
+    },
+    signatures: {
+      partial: '/panels/signatures',
+      visible: proc { |owner:,user:,**op| owner.signatures.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        signatures: owner.signatures,
+        fields: Signature.get_meta_fields('show')
+      }},
+    },
+    sms_actions: { # WIP
+      partial: '/sms_acitons/show_all',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    tasks: { # WIP
+      partial: '/ims/show_task',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        fields: SmsTask.get_meta_fields('show')
+      }},
+    },
+    transaction_log: {
+      partial: '/panels/transaction_log',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        transactions: owner.transactions.preload(:user, :owner) #owner is for get_user_name
+      }},
+    },
+  }
+
   META_DATA = {
     id: {
       field: 'id', title: 'ID',
