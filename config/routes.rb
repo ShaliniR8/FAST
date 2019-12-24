@@ -159,6 +159,19 @@ PrdgSession::Application.routes.draw do |map|
       get 'reload'
     end
   end
+  resources :occurrence_templates do
+    collection do
+      post 'new_root'
+    end
+    member do
+      post 'archive'
+    end
+  end
+  resources :occurrences do
+    collection do
+      post 'add'
+    end
+  end
   resources :checklist_templates do
     member do
 

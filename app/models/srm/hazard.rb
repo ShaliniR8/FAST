@@ -7,6 +7,7 @@ class Hazard < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Commentable
+  include Occurrenceable
   include Transactionable
   include RootCausable
 

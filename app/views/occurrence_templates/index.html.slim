@@ -1,0 +1,29 @@
+= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css"
+= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js"
+= javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"
+= javascript_include_tag "/javascripts/utility/format-builder.js"
+
+.item.active.mt50 style="height:auto;"
+  .grid.per90.center-block
+    = render "shared/alerts"
+    = render "access_controls/new_modal"
+    .col-xs-12
+      .panel.panel-primary
+        .panel-heading
+          .panel-title
+            .top_text
+              b Occurrence Hierarchies
+            .top_buttons.pull-right
+              /btns here
+              = link_to 'New Occurrence Category',
+                new_root_occurrence_templates_path,
+                method: :post,
+                class: 'btn btn-success pull-right'
+
+        .panel-body
+          .alert.alert-warning role="alert"
+            | Please note that <b>editing</b> existing Occurrences and options will affect existing occurrences that have been added to forms. If there are changes made to the list of options or occurrences, it is suggested to <b>archive the old options first and then add new ones</b>. </br></br>
+            | Please note that <b>archiving</b> an occurrence will also archive all of its nested occurrences, use this with caution.
+          - @records.each do |parent|
+            = render 'show', owner: parent
+
