@@ -1,4 +1,4 @@
-class Sra < ActiveRecord::Base
+class Sra < Srm::SafetyRiskManagementBase
   extend AnalyticsFilters
   include StandardWorkflow
   include ModelHelpers
@@ -8,6 +8,7 @@ class Sra < ActiveRecord::Base
   include Attachmentable
   include Commentable
   include Noticeable
+  include Occurrenceable
   include Transactionable
 
 #Association List
@@ -36,8 +37,7 @@ class Sra < ActiveRecord::Base
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    meta_fields = CONFIG.srm.get_sra_meta_fields
-    meta_fields.select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['Sra'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
   def self.progress

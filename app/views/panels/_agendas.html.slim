@@ -1,0 +1,26 @@
+.col-xs-12
+  .panel.clickable.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b Agendas
+        span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+    .panel-body style='display:none'
+      .row
+        .col-xs-12 style='max-height:400px;overflow-y:auto'
+          table.table.table-striped.table-bordered
+            thead
+              tr
+                - @agenda_headers.each do |h|
+                  th #{h[:title]}
+                th Comment
+            tbody id='agendas'
+              - sra.srm_agendas.each do |a|
+                tr
+                  td = a.title
+                  td = a.status
+                  td = a.get_user
+                  td = a.get_created
+                  td = a.get_updated
+                  td = a.discussion ? 'Yes' : 'No'
+                  td = a.accepted ? 'Accepted' : 'Declined'
+                  td = a.comment.gsub(/\n/, '<br/>').html_safe

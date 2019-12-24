@@ -129,16 +129,7 @@
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @risk_control%>
 
-        <%=render '/causes/all',
-          :owner => @risk_control,
-          :cause_type => 'description',
-          :can_change => (@risk_control.status == "Open" || @risk_control.status == "New") &&
-              current_user.has_access("risk_controls", "edit")%>
-
-        <%=render "/forms/cost", :owner => @risk_control%>
-        <%=render "/forms/show_comment", :owner => @risk_control%>
-        <%=render "/forms/attachments_show", :owner => @risk_control%>
-        <%=render "/records/transactions", :owner => @risk_control%>
+        <%=render '/panels/show_panels', owner: @risk_control%>
       </div>
     </div>
   </div>

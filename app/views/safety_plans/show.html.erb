@@ -81,9 +81,7 @@
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @safety_plan%>
-        <%=render "/forms/show_comment", :owner => @safety_plan%>
-        <%=render "/forms/attachments_show", :owner => @safety_plan%>
-        <%=render "/records/transactions", :owner => @safety_plan%>
+        <%=render '/panels/show_panels', owner: @safety_plan%>
 
       </div>
     </div>

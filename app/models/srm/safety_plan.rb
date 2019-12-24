@@ -1,10 +1,11 @@
-class SafetyPlan < ActiveRecord::Base
+class SafetyPlan < Srm::SafetyRiskManagementBase
   extend AnalyticsFilters
   include ModelHelpers
 
 #Concerns List
   include Attachmentable
   include Commentable
+  include Occurrenceable
   include Transactionable
 
 #Associations List
@@ -14,26 +15,7 @@ class SafetyPlan < ActiveRecord::Base
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
-    [
-      {field: 'id',                             title: 'ID',                                num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
-      {field: 'status',                         title: 'Status',                            num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
-      {field: 'title',                          title: 'Title',                             num_cols: 12, type: 'text',       visible: 'index,form,show', required: true},
-      {                                                                                                   type: 'newline',    visible: 'show'},
-
-      {field: 'risk_factor',                    title: 'Baseline Risk',                     num_cols: 12, type: 'select',     visible: 'index,form,show', required: false,  options: get_custom_options('Risk Factors')},
-      {field: 'concern',                        title: 'Concern',                           num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
-      {field: 'objective',                      title: 'Objective',                         num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
-      {field: 'background',                     title: 'Background',                        num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
-
-      #The following are for if the safety plan was evaluated
-      {                                         title: "Evaluation",                        num_cols: 12, type: 'panel_start',visible: 'show,eval'},
-      {field: 'time_period',                    title: 'Time Period (Days)',                num_cols: 6,  type: 'text',       visible: 'show,eval',       required: false},
-      {field: 'date_started',                   title: 'Date Started',                      num_cols: 6,  type: 'date',       visible: 'show,eval',       required: false},
-      {field: 'date_completed',                 title: 'Date Completed',                    num_cols: 6,  type: 'date',       visible: 'show,eval',       required: false},
-      {field: 'result',                         title: 'Result',                            num_cols: 6,  type: 'select',     visible: 'show,eval',       required: false,  options: get_custom_options('Results')},
-      {field: 'risk_factor_after',              title: 'Mitigated Risk',                    num_cols: 6,  type: 'select',     visible: 'index,eval,show', required: false,  options: get_custom_options('Risk Factors')},
-      {                                                                                                   type: 'panel_end',  visible: 'show,eval'}
-    ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+    CONFIG.object['SafetyPlan'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 

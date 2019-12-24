@@ -18,6 +18,7 @@
           <div class="top_text">
             Hazard #<%=@hazard.get_id%>: <%=@hazard.title%>
           </div>
+
           <div class="top_buttons pull-right">
             <% if current_user.has_access('hazards', 'destroy', admin: true, strict: true) %>
               <%=link_to "Delete",
@@ -34,7 +35,6 @@
                 "data-toggle" => "modal",
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
-
 
             <% if @hazard.status == "New" &&
               current_user.has_access('hazards', 'edit', admin: true) %>
@@ -112,56 +112,7 @@
           :fields => Hazard.get_meta_fields('show'),
           :record => @hazard%>
 
-        <%can_change = @hazard.status != "Completed" && current_user.has_access("hazards", "edit")%>
-
-        <%=render 'shared/choose_show_matrix',
-          :owner => @hazard,
-          :show_btn => true,
-          :type => 'hazards',
-          :allow_mitigate => true,
-          :can_change => can_change,
-          :like => @like,
-          :color_matrix => @color_matrix,
-          :frequency => @frequency%>
-
-        <%if CONFIG::GENERAL[:has_root_causes]%>
-          <%=render '/root_causes/root_causes',
-            :owner => @hazard,
-            :show_btns => true,
-            :headers => RootCause.get_headers%>
-          <%=render '/occurrences/occurrences_panel', owner: @hazard %>
-        <%end%>
-
-        <%=render '/causes/all',
-          :owner => @hazard,
-          :cause_type => 'description',
-          :can_change => @hazard.status == "New" && current_user.has_access('hazards', 'edit', admin: true)%>
-
-        <%if @hazard.risk_controls.present?%>
-          <div class="col-xs-12">
-            <div class="panel clickable panel-info">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Risk Controls</b>
-                  <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
-                  <%@hazard.risk_controls.each do |risk_control|%>
-                    <%=render "show_risk_control", :risk_control => risk_control%>
-                  <%end%>
-                </div>
-              </div>
-            </div>
-          </div>
-        <%end%>
-
-        <%=render "/forms/show_comment", :owner => @hazard%>
-        <%=render "/forms/attachments_show", :owner => @hazard%>
-        <%=render "/records/transactions", :owner => @hazard%>
+        <%=render '/panels/show_panels', owner: @hazard%>
 
       </div>
     </div>

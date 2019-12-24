@@ -10,59 +10,367 @@ class DefaultSafetyRiskManagementConfig
     # Airline-Specific Features:
   }
 
-  def self.get_sra_meta_fields
-    [
-      { field: "get_id",                    title: "ID",                                       num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
-      { field: "status",                    title: "Status",                                   num_cols: 6,   type: "text",        visible: 'index,show',        required: false},
-      { field: 'get_source',                title: 'Source of Input',                           num_cols: 6,   type: 'text',         visible: 'index,show',      required: false},
-      {                                                                                                       type: "newline",     visible: 'form,show'},
-      { field: "title",                     title: "SRA Title",                                num_cols: 6,   type: "text",        visible: 'index,form,show',   required: false},
-      { field: "type_of_change",            title: "Type of Change",                           num_cols: 6,   type: "datalist",    visible: 'index,form,show',   required: false, options: Sra.get_custom_options('SRA Type of Change')},
-      { field: "system_task",               title: "System/Task",                              num_cols: 6,   type: "datalist",    visible: 'index,form,show',   required: false, options: Sra.get_custom_options('Systems/Tasks')},
-      { field: "responsible_user_id",       title: "Responsible User",                         num_cols: 6,   type: "user",        visible: 'index,form,show',  required: false},
-      { field: "reviewer_id",               title: "Quality Reviewer",                         num_cols: 6,   type: "user",        visible: 'form,show',         required: false},
-      { field: "approver_id",               title: "Final Approver",                           num_cols: 6,   type: "user",        visible: 'form,show',         required: false},
-      { field: "scheduled_completion_date", title: "Scheduled Completion Date",                num_cols: 6,   type: "date",        visible: 'index,form,show',   required: false},
-      { field: "current_description",       title: "Describe the Current System",              num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
-      { field: "plan_description",          title: "Describe Proposed Plan",                   num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
-      {                                     title: "Affected Department",                      num_cols: 12,  type: "panel_start", visible: 'form,show'},
-      { field: "departments",               title: "Affected Departments",                     num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: Sra.get_custom_options('Departments')},
-      { field: "other_department",          title: "Other Affected Departments",               num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
-      { field: "departments_comment",       title: "Affected Departments Comments",            num_cols: 12,  type: "textarea",    visible: 'form,show',        required: false},
-      {                                                                                        num_cols: 12,  type: "panel_end",   visible: 'form,show'},
-
-      {                                     title: "Affected Programs",                        num_cols: 12,  type: "panel_start", visible: 'form,show'},
-      { field: "programs",                  title: "Affected Programs",                        num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: Sra.get_custom_options('Programs')},
-      { field: "other_program",             title: "Other Affected Programs",                  num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
-      { field: "programs_comment",          title: "Affected Programs Comments",               num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
-      {                                                                                        num_cols: 12,  type: "panel_end",   visible: 'form,show'},
-
-      {                                     title: "Affected Manuals",                         num_cols: 12,  type: "panel_start", visible: 'form,show'},
-      { field: "manuals",                   title: "Affected Manuals",                         num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: Sra.get_custom_options('Manuals')},
-      { field: "other_manual",              title: "Other Affected Manuals",                   num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
-      { field: "manuals_comment",           title: "Affected Manuals Comments",                num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
-      {                                                                                        num_cols: 12,  type: "panel_end",   visible: 'form,show'},
-
-      {                                     title: "Affected Regulatory Compliances",           num_cols: 12,  type: "panel_start", visible: 'form,show',},
-      { field: "compliances",               title: "Affected Regulatory Compliances",           num_cols: 12,  type: "checkbox",    visible: 'form,show',         required: false, options: Sra.get_custom_options("Regulatory Compliances")},
-      { field: "other_compliance",          title: "Other Affected Regulatory Compliances",     num_cols: 6,   type: "text",        visible: 'form,show',         required: false},
-      { field: "compliances_comment",       title: "Affected Regulatory Compliances Comments",  num_cols: 12,  type: "textarea",    visible: 'form,show',         required: false},
-      {                                                                                       num_cols: 12,  type: "panel_end",   visible: 'form,show'},
-
-      { field: "closing_comment",           title: "Responsible User's Closing Comments",      num_cols: 12,  type: "text",        visible: 'show'},
-      { field: "reviewer_comment",          title: "Quality Reviewer's Closing Comments",      num_cols: 12,  type: "text",        visible: 'show'},
-      { field: "approver_comment",          title: "Final Approver's Closing Comments",        num_cols: 12,  type: "text",        visible: 'show'},
-    ]
-  end
-
   HIERARCHY = {
     display_name: 'Safety Risk Management',
     objects: {
-      'Sra' => 'SRA',
-      'Hazard' => 'Hazard',
-      'RiskControl' => 'Risk Control',
-      'SafetyPlan' => 'Safety Plan'
-    }
+
+      'Sra' => {
+        title: 'SRA',
+        fields: {
+          id: { default: true, field: 'get_id' },
+          status: { default: true },
+          source: {
+            field: 'get_source', title: 'Source of Input',
+            num_cols: 6, type: 'text', visible: 'index,show',
+            required: false
+          },
+          title: { default: true, title: 'SRA Title', on_newline: true },
+          type_of_change: {
+            field: 'type_of_change', title: 'Type of Change',
+            num_cols: 6, type: 'datalist', visible: 'index,form,show',
+            required: false, options: Sra.get_custom_options('SRA Type of Change')
+          },
+          system_task: {
+            field: 'system_task', title: 'System/Task',
+            num_cols: 6, type: 'datalist', visible: 'index,form,show',
+            required: false, options: Sra.get_custom_options('Systems/Tasks')
+          },
+          responsible_user: { default: true },
+          reviewer: {
+            field: 'reviewer_id', title: 'Quality Reviewer',
+            num_cols: 6, type: 'user', visible: 'form,show',
+            required: false
+          },
+          approver: { default: true },
+          completion: { default: true,
+            field: "scheduled_completion_date",
+            required: false
+          },
+          close_date: { default: true },
+          description: {
+            field: 'current_description', title: 'Describe the Current System',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          plan_description: {
+            field: 'plan_description', title: 'Describe Proposed Plan',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          closing_comment: {
+            field: 'closing_comment', title: "Responsible User's Closing Comments",
+            num_cols: 12, type: 'text', visible: 'show',
+            required: false
+          },
+          reviewer_comment: {
+            field: 'reviewer_comment', title: "Quality Reviewer's Closing Comments",
+            num_cols: 12, type: 'text', visible: 'show',
+            required: false
+          },
+          approver_comment: {
+            field: 'approver_comment', title: "Final Approver's Closing Comments",
+            num_cols: 12, type: 'text', visible: 'show',
+            required: false
+          },
+          departments_panel_start: {
+            title: 'Affected Department',
+            num_cols: 12, type: 'panel_start', visible: 'form,show'
+          },
+          departments: {
+            field: 'departments', title: 'Affected Departments',
+            num_cols: 12, type: 'checkbox', visible: 'form,show',
+            required: false, options: Sra.get_custom_options('Departments')
+          },
+          other_department: {
+            field: 'other_department', title: 'Other Affected Departments',
+            num_cols: 6, type: 'text', visible: 'form,show',
+            required: false
+          },
+          departments_comment: {
+            field: 'departments_comment', title: 'Affected Departments Comments',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          departments_panel_end: {
+            num_cols: 12, type: 'panel_end', visible: 'form,show'
+          },
+          programs_panel_start: {
+            title: 'Affected Programs',
+            num_cols: 12, type: 'panel_start', visible: 'form,show'
+          },
+          programs: {
+            field: 'programs', title: 'Affected Programs',
+            num_cols: 12, type: 'checkbox', visible: 'form,show',
+            required: false, options: Sra.get_custom_options('Programs')
+          },
+          other_program: {
+            field: 'other_program', title: 'Other Affected Programs',
+            num_cols: 6, type: 'text', visible: 'form,show',
+            required: false
+          },
+          programs_comment: {
+            field: 'programs_comment', title: 'Affected Programs Comments',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          programs_panel_end: {
+            num_cols: 12, type: 'panel_end', visible: 'form,show'
+          },
+          manuals_panel_start: {
+            title: 'Affected Manuals',
+            num_cols: 12, type: 'panel_start', visible: 'form,show'
+          },
+          manuals: {
+            field: 'manuals', title: 'Affected Manuals',
+            num_cols: 12, type: 'checkbox', visible: 'form,show',
+            required: false, options: Sra.get_custom_options('Manuals')
+          },
+          other_manual: {
+            field: 'other_manual', title: 'Other Affected Manuals',
+            num_cols: 6, type: 'text', visible: 'form,show',
+            required: false
+          },
+          manuals_comment: {
+            field: 'manuals_comment', title: 'Affected Manuals Comments',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          manuals_panel_end: {
+            num_cols: 12, type: 'panel_end', visible: 'form,show'
+          },
+          regulatory_compliances_panel_start: {
+            title: 'Affected Regulatory Compliances',
+            num_cols: 12, type: 'panel_start', visible: 'form,show'
+          },
+          compliances: {
+            field: 'compliances', title: 'Affected Regulatory Compliances',
+            num_cols: 12, type: 'checkbox', visible: 'form,show',
+            required: false, options: Sra.get_custom_options('Regulatory Compliances')
+          },
+          other_compliance: {
+            field: 'other_compliance', title: 'Other Affected Regulatory Compliances',
+            num_cols: 6, type: 'text', visible: 'form,show',
+            required: false
+          },
+          compliances_comment: {
+            field: 'compliances_comment', title: 'Affected Regulatory Compliances Comments',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          regulatory_compliances_panel_end: {
+            num_cols: 12, type: 'panel_end', visible: 'form,show'
+          },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        actions: [
+          #TOP
+          *%i[delete override_status edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
+          #INLINE
+          *%i[assign complete approve_reject hazard reopen comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        panels: %i[hazards agendas records occurrences comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+      'Hazard' => {
+        title: 'Hazard',
+        fields: {
+          id: { default: true,
+            field: 'get_id', title: 'Hazard ID'
+          },
+          status: { default: true },
+          created_by: { default: true },
+          title: { default: true,
+            title: 'Hazard Title',
+            required: false, on_newline: true
+          },
+          source: {
+            field: 'get_source', title: 'Source of Input',
+            num_cols: 6, type: 'text', visible: 'index,show',
+            required: false
+          },
+          departments: {
+            field: 'departments', title: 'Affected Department',
+            num_cols: 6, type: "select", visible: 'form,index,show',
+            required: false, options: Hazard.get_custom_options('Departments')
+          },
+          description: {
+            field: 'description', title: 'Description',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          root_causes_full: {
+            field: 'get_root_causes_full', title: "#{I18n.t("srm.hazard.root_cause.title")}",
+            type: 'list', visible: 'invisible'
+          },
+          root_causes: {
+            field: 'get_root_causes', title: "#{I18n.t("srm.hazard.root_cause.title")}",
+            type: 'list', visible: 'index'
+          },
+          likelihood: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Likelihood" },
+          severity: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk" },
+          likelihood_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Risk" },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        actions: [
+          #TOP
+          *%i[delete override_status edit deid_pdf pdf view_sra expand_all],
+          #INLINE
+          *%i[reject complete risk_control reopen comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        panels: %i[risk_assessment root_causes occurrences descriptions risk_controls comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+      'RiskControl' => {
+        title: 'Risk Control',
+        fields: {
+          id: { default: true },
+          status: { default: true },
+          created_by: { default: true },
+          title: { default: true },
+          departments: {
+            field: 'departments', title: 'Affected Department',
+            num_cols: 6, type: 'select', visible: 'form,index,show',
+            required: false, options: RiskControl.get_custom_options('Departments')
+          },
+
+          completion: { default: true,
+            field: "scheduled_completion_date",
+            required: false
+          },
+          follow_up_date: {
+            field: 'follow_up_date', title: 'Date for Follow-Up/Monitor Plan',
+            num_cols: 6, type: 'date', visible: 'form,show', required: false
+          },
+          responsible_user: { default: true },
+          approver: { default: true,
+            field: 'approver_id',
+            visible: 'index,form,show'
+          },
+          control_type: {
+            field: 'control_type', title: 'Type',
+            num_cols: 6, type: 'datalist', visible: 'form,show',
+            required: false, options: RiskControl.get_custom_options('Risk Control Types')
+          },
+          description: {
+            field: 'description', title: 'Description of Risk Control/Mitigation Plan',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          notes: {
+            field: 'notes', title: 'Notes',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          final_comment: { default: true },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        actions: [
+          #TOP
+          *%i[delete override_status edit deid_pdf pdf view_hazard attach_in_message expand_all],
+          #INLINE
+          *%i[assign complete add_cost approve_reject reopen comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        panels: %i[descriptions costs occurrences comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+      'SafetyPlan' => {
+        title: 'Safety Plan',
+        fields: {
+          id: { default: true,
+            required: true
+          },
+          status: { default: true },
+          title: { default: true,
+            num_cols: 12
+          },
+          risk_factor: {
+            field: 'risk_factor', title: 'Baseline Risk',
+            num_cols: 12, type: 'select', visible: 'index,form,show',
+            required: false, on_newline: true, options: SafetyPlan.get_custom_options('Risk Factors')
+          },
+          concern: {
+            field: 'concern', title: 'Concern',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          objective: {
+            field: 'objective', title: 'Objective',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          background: {
+            field: 'background', title: 'Background',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          evaluation_panel_start: {
+            title: "Evaluation",
+            num_cols: 12, type: 'panel_start', visible: 'show,eval'
+          },
+          time_period: {
+            field: 'time_period', title: 'Time Period (Days)',
+            num_cols: 6, type: 'text', visible: 'show,eval',
+            required: false
+          },
+          date_started: {
+            field: 'date_started', title: 'Date Started',
+            num_cols: 6, type: 'date', visible: 'show,eval',
+            required: false
+          },
+          date_completed: {
+            field: 'date_completed', title: 'Date Completed',
+            num_cols: 6, type: 'date', visible: 'show,eval',
+            required: false
+          },
+          result: {
+            field: 'result', title: 'Result',
+            num_cols: 6, type: 'select', visible: 'show,eval',
+            required: false,  options: SafetyPlan.get_custom_options('Results')
+          },
+          risk_factor_after: {
+            field: 'risk_factor_after', title: 'Mitigated Risk',
+            num_cols: 6,  type: 'select', visible: 'index,eval,show',
+            required: false,  options: SafetyPlan.get_custom_options('Risk Factors')
+          },
+          evaluation_panel_end: {
+            type: 'panel_end', visible: 'show,eval'
+          },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        actions: [
+          #TOP
+          *%i[],
+          #INLINE
+          *%i[],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        panels: %i[occurrences comments attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+      'Meeting' => {
+        title: 'Meeting',
+        fields: {
+          id: { default: true },
+          status: { default: true },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        actions: [
+          #TOP
+          *%i[],
+          #INLINE
+          *%i[],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        panels: %i[included_sras participants attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      }
+    },
   }
 
 end

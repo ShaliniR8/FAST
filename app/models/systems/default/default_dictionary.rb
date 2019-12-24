@@ -221,6 +221,12 @@ class DefaultDictionary
     #   show_btns: Conditional to determine if panel buttons should be shown
     #   data: proc to generate a hash of local parameters for the panel- will be splatted into render
     # },
+    agendas: {
+      partial: '/panels/agendas',
+      visible: proc { |owner:,user:,**op| owner.srm_agendas.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { sra: owner } },
+    },
     attachments: {
       partial: '/panels/attachments',
       visible: proc { |owner:,user:,**op| true },
@@ -248,11 +254,30 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| { costs: owner.costs } },
     },
+    descriptions: {
+      partial: '/causes/all',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        cause_type: 'description',
+        can_change: owner.status == 'New' && priv_check.call(owner,user,'edit',true)
+      }},
+    },
     findings: {
       partial: '/panels/findings',
       visible: proc { |owner:,user:,**op| owner.findings.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { findings: owner.findings } },
+    },
+    hazards: {
+      partial: '/panels/hazards',
+      visible: proc { |owner:,user:,**op| owner.hazards.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        hazards: owner.hazards
+      }},
     },
     occurrences: {
       partial: '/occurrences/occurrences_panel',
@@ -266,11 +291,50 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner } },
     },
+    records: { # WIP
+      partial: '/panels/records',
+      visible: proc { |owner:,user:,**op| owner.owner.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        records: Array(owner.owner),
+        title: 'Report'
+      }},
+    },
     requirements: { # WIP
       partial: '/audits/show_requirements',
       visible: proc { |owner:,user:,**op| owner.requirements.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner, type: owner.class.name.downcase } },
+    },
+    risk_assessment: { # WIP (only works for Hazards)
+      partial: 'shared/choose_show_matrix',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| true },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        type: 'hazards',
+        allow_mitigate: true,
+        show_btn: true,
+        can_change: owner.status != 'Completed' && priv_check.call(owner,user,'hazards','edit')
+      }},
+    },
+    risk_controls: { # WIP
+      partial: '/panels/risk_controls',
+      visible: proc { |owner:,user:,**op| owner.risk_controls.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        risk_controls: owner.risk_controls
+      }},
+    },
+    root_causes: { # WIP
+      partial: '/root_causes/root_causes',
+      visible: proc { |owner:,user:,**op| CONFIG::GENERAL[:has_root_causes] },
+      show_btns: proc { |owner:,user:,**op| ['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        headers: RootCause.get_headers
+      }},
     },
     signatures: {
       partial: '/panels/signatures',
@@ -282,7 +346,7 @@ class DefaultDictionary
       }},
     },
     sms_actions: { # WIP
-      partial: '/sms_acitons/show_all',
+      partial: '/sms_actions/show_all',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner } },
