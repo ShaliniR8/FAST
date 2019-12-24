@@ -10,10 +10,10 @@
 
 <%@fields = Verification.get_meta_fields('form')%>
 <%=form_for @verification do |f|%>
-  <div class="panel-steelblue">
+  <div class="panel-info">
     <div class="panel-heading">
       <div class="panel-title">
-        New Verification
+        <%="#{action_name == 'edit' ? 'Update' : 'Create'}"%> Verification
         <button type="button"
           class="close pull-right"
           data-dismiss="modal"
@@ -42,7 +42,7 @@
             :record => @verification,
             :f => f%>
 
-          <%=f.submit "Save",
+          <%=f.submit "#{action_name == 'edit' ? 'Update' : 'Create'}",
             :class => "btn btn-success pull-right mt10 mb20 mr20",
             :disable_with => "Saving..."%>
         </div>

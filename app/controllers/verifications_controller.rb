@@ -29,10 +29,8 @@ class VerificationsController < ApplicationController
 
 
   def edit
-    @verification = Verification
-      .find(params[:id])
-      .becomes(Verification)
-    render :partial => '/verifications/edit'
+    @verification = Verification.find(params[:id])
+    render :partial => '/verifications/new'
   end
 
 
@@ -46,7 +44,7 @@ class VerificationsController < ApplicationController
 
 
   def address
-    @verification = Verification.find(params[:id]).becomes(Verification)
+    @verification = Verification.find(params[:id])
     render :partial => '/verifications/address'
   end
 

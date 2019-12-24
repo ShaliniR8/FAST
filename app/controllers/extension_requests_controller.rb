@@ -29,9 +29,7 @@ class ExtensionRequestsController < ApplicationController
 
 
   def edit
-    @extension_request = ExtensionRequest
-      .find(params[:id])
-      .becomes(ExtensionRequest)
+    @extension_request = ExtensionRequest.find(params[:id])
     render :partial => '/extension_requests/new'
   end
 
