@@ -404,10 +404,10 @@ class HomeController < ApplicationController
       sras << Sra.where(status: 'Pending Review', reviewer_id: current_user_id)
       sras << Sra.where(status: 'Pending Approval', approver_id: current_user_id)
       sras.flatten.each do |a|
-        if a.scheduled_completion_date.present?
+        if a.due_date.present?
           @calendar_entries.push({
             :url => sra_path(a),
-            :start => a.get_completion_date,
+            :start => a.get_due_date,
             :color => (a.overdue ? "lightcoral" : "skyblue"),
             :textColor => "darkslategrey",
             :title=>"SRA ##{a.id}: "+ a.title + " (#{a.status})"
@@ -418,10 +418,10 @@ class HomeController < ApplicationController
       risk_controls = RiskControl.where(status: 'Assigned', responsible_user_id: current_user_id)
       risk_controls << RiskControl.where(status: 'Pending Approval', approver_id: current_user_id)
       risk_controls.flatten.each do |a|
-        if a.scheduled_completion_date.present?
+        if a.due_date.present?
           @calendar_entries.push({
             :url => risk_control_path(a),
-            :start => a.get_completion_date,
+            :start => a.get_due_date,
             :color => (a.overdue ? "lightcoral" : "skyblue"),
             :textColor => "darkslategrey",
             :title => "Risk Control ##{a.id}: " + a.title + " (#{a.status})"
