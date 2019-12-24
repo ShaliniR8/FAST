@@ -293,7 +293,7 @@ class DefaultDictionary
     },
     records: { # WIP
       partial: '/panels/records',
-      visible: proc { |owner:,user:,**op| true },
+      visible: proc { |owner:,user:,**op| owner.owner.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| {
         records: Array(owner.owner),
@@ -346,7 +346,7 @@ class DefaultDictionary
       }},
     },
     sms_actions: { # WIP
-      partial: '/sms_acitons/show_all',
+      partial: '/sms_actions/show_all',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner } },
