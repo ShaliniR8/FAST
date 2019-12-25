@@ -20,12 +20,11 @@ class VerificationsController < ApplicationController
 
   before_filter :login_required
 
-
   def create
     @verification = Verification.create(params[:verification])
+    send_notification(params[:commit], @verification)
     redirect_to @verification.owner
   end
-
 
 
   def edit
@@ -37,10 +36,9 @@ class VerificationsController < ApplicationController
   def update
     @verification = Verification.find(params[:id])
     @verification.update_attributes(params[:verification])
-    Rails.logger.debug "#{@verification.owner.class}"
+    send_notification(params[:commit], @verification)
     redirect_to @verification.owner
   end
-
 
 
   def address
@@ -48,5 +46,12 @@ class VerificationsController < ApplicationController
     render :partial => '/verifications/address'
   end
 
+
+  def send_notification(commit, verification)
+    commit = 'Addresse' if commit == 'Address'
+    notify(verification.validator,
+      "Verification for #{verification.owner.class.name.titleize} ##{verification.owner.id} has been #{commit}d." + g_link(verification.owner),
+      true, "Verification #{commit}d")
+  end
 
 end
