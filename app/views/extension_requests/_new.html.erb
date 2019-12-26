@@ -10,7 +10,7 @@
 
 <%@fields = ExtensionRequest.get_meta_fields('form')%>
 <%=form_for @extension_request do |f|%>
-  <div class="panel-steelblue">
+  <div class="panel-info">
     <div class="panel-heading">
       <div class="panel-title">
         <%=action_name == 'edit' ? 'Edit' : 'New'%> Extension Request
