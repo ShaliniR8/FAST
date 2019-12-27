@@ -8,7 +8,6 @@
   <div class="panel-heading">
     <div class="panel-title">
       To
-      <a class="btn btn-transparent pull-right clear_btn mb5">Clear</a>
     </div>
   </div>
   <div class="panel-body">
@@ -21,34 +20,20 @@
                 <%=header[:title]%>
               </th>
             <%end%>
-            <th>Actions</th>
+            <th>Add</th>
           </tr>
         </thead>
         <tbody>
-          <%@users.each do |user|%>
+          <%@users.each_with_index do |user, index|%>
             <tr user="<%=user.id%>">
               <%@headers.each do |header|%>
                 <td><%=user.send(header[:field])%></td>
               <%end%>
-              <td>
-                <%if @reply_to.present?%>
-                  <%if @reply_to.send_from.user.id==user.id%>
-                    <a class="btn btn-danger send_btn disabled">TO</a>
-                  <%else%>
-                    <%if @send_to==user.id%>
-                      <a class="btn btn-danger send_btn disabled">TO</a>
-                    <%else%>
-                      <a class="btn btn-transparent send_btn id_<%=user.id%>">TO</a>
-                      <a class="btn btn-transparent cc_btn">CC</a>
-                    <%end%>
-                  <%end%>
+              <td align="center">
+                <%if @distribution_list_users.include?(user.id)%>
+                  <a class="btn btn-danger enabled send_btn">Added</a>
                 <%else%>
-                  <%if @send_to==user.id%>
-                    <a class="btn btn-danger send_btn disabled">TO</a>
-                  <%else%>
-                    <a class="btn btn-transparent send_btn id_<%=user.id%>">TO</a>
-                    <a class="btn btn-transparent cc_btn">CC</a>
-                  <%end%>
+                  <a class="btn btn-transparent send_btn">Add</a>
                 <%end%>
               </td>
             </tr>
@@ -58,3 +43,17 @@
     </div>
   </div>
 </div>
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#recipients").on('click','.send_btn',function() {
+      $(this).toggleClass('enabled');
+      if ($(this).hasClass('enabled')) {
+        $(this).text('Added');
+      } else {
+        $(this).text('Add');
+      }
+    });
+  });
+</script>
