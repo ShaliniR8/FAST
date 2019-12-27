@@ -17,7 +17,7 @@
   <div class="col-xs-10">
     <%=f.text_field :subject,
       {:class => "form-control",
-      :value => @reply_to.present? ? "Re: " + @reply_to.subject : ""}%>
+      :value => "Re: #{@owner.class.name} ##{@owner.id}: #{@owner.description}" }%>
   </div>
 </div>
 
