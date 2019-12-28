@@ -131,33 +131,22 @@ class AuditsController < SafetyAssuranceController
 
   def update
     transaction = true
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Audit ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Audit Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Audit ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Audit Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Audit ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Audit Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Audit ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Audit Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
       params[:audit][:close_date] = params[:audit][:status] == 'Completed' ? Time.now : nil

@@ -66,30 +66,18 @@ class EvaluationsController < SafetyAssuranceController
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Evaluation ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Evaluation Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Evaluation ##{@owner.id} needs your Approval" + g_link(@owner),
-          true, 'Evaluation Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Evaluation ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Evaluation Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Evaluation ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Evaluation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:evaluation][:status]}"
       params[:evaluation][:close_date] = params[:evaluation][:status] == 'Completed' ? Time.now : nil

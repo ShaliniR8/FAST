@@ -657,23 +657,55 @@ class ApplicationController < ActionController::Base
   end
 
 
+  def send_notification(owner, commit)
+    object_name = owner.is_a?(SmsAction) ? 'Corrective Action' : owner.class.name.titleize
+    case commit
+    when 'Reassign'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user_id,
+          content: "#{object_name} ##{owner.get_id} has been Reassigned to you."},
+        mailer: true,
+        subject: "#{object_name} Reassigned")
+    when 'Assign'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user.id,
+          content: "#{object_name} ##{owner.id} has been assigned to you."},
+        mailer: true,
+        subject: "#{object_name} Assigned")
+    when 'Complete'
+      notify(owner,
+        notice: {
+          users_id: owner.approver.id,
+          content: "#{object_name} ##{owner.id} needs your Approval."},
+        mailer: true,
+        subject: "#{object_name} Pending Approval") if owner.approver.present?
+    when 'Reject'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user.id,
+          content: "#{object_name} ##{owner.id} was Rejected by the Final Approver."},
+        mailer: true,
+        subject: "#{object_name} Rejected") if owner.approver.present?
+    when 'Approve'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user.id,
+          content: "#{object_name} ##{owner.id} was Approved by the Final Approver."},
+        mailer: true,
+        subject: "#{object_name} Approved") if owner.approver.present?
+    end
+  end
 
 
-  def notify(user, message, mailer=false, subject=nil)
-    if user.present?
-      content = {
-        :user => user,
-        :content => message,
-        :start_date => DateTime.now.beginning_of_day
-      }
-      begin
-        notice = @owner.notices.create(content)
-      rescue
-        Rails.logger.warn 'WARNING: notify failed, @owner not defined- defaulting to unidentified Notice'
-        notice = Notice.create(content)
-      end
-      if mailer
-        NotifyMailer.notify(user, message, subject)
+  # sample arg => notice: {users_id: 1, content: 'Audit is assigned'}, mailer: true, subject: 'Audit Assigned'
+  def notify(record, arg)
+    if arg[:notice][:users_id].present? && record.present?
+      notice = record.notices.create(arg[:notice])
+      byebug if notice.owner_type.nil?
+      if arg[:mailer]
+        NotifyMailer.notify(notice, arg[:subject])
       end
     end
   end

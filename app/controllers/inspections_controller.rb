@@ -64,33 +64,22 @@ class InspectionsController < SafetyAssuranceController
 
   def update
     transaction = true
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Inspection ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Inspection Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Inspection ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Inspection Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Inspection ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Inspection Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Inspection ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Inspection Approved')
     when 'Override Status'
       transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
       params[:inspection][:close_date] = params[:inspection][:status] == 'Completed' ? Time.now : nil

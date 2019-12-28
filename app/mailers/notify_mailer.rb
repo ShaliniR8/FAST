@@ -1,12 +1,18 @@
 class NotifyMailer < ApplicationMailer
   include ApplicationHelper
 
-  def notify(user, message, subject)
-    @user = user
-    @message = message
+  default :from => "donotreply@prosafet.com"
+
+
+  def notify(notice, subject)
     define_attachments
-    subject = "ProSafeT#{subject.nil? ? '' : ": #{subject}"}"
-    mail(**to_email(user.email), subject: subject).deliver
+    @user = notice.user
+    @notice = notice
+    @link = g_link(notice.owner)
+    if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
+      mail(to: notice.user, subject: subject).deliver
+    end
+    mail(to: 'noc@prosafet.com', subject: subject).deliver
   end
 
 

@@ -120,5 +120,4 @@ class SafetyAssuranceController < ApplicationController
     reopen_report(@owner)
   end
 
-
 end

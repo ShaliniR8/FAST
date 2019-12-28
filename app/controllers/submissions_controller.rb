@@ -470,8 +470,24 @@ class SubmissionsController < ApplicationController
       case commit
       when "Submit"
         notifiers.each do |user|
-          notify(user, "A new #{owner.template.name} submission ##{owner.id} is submitted. " + g_link(owner),
-            true, "New #{owner.template.name} Submission")
+          notify(
+            owner,
+            notice: {
+              users_id: user.id,
+              content: "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",
+            },
+            mailer: true,
+            subject: "New #{owner.template.name} Submission"
+          )
+
+
+
+          # notify(
+          #   user,
+          #   "A new #{owner.template.name} submission ##{owner.id}: #{owner.description} is submitted.",
+          #   owner,
+          #   true,
+          #   "New #{owner.template.name} Submission")
         end
       when "Save for Later"
         notify(

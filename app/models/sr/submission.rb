@@ -16,7 +16,6 @@ class Submission < Sr::SafetyReportingBase
   belongs_to :record,     foreign_key: 'records_id',    class_name: 'Record'
 
   has_many :submission_fields,    foreign_key: 'submissions_id',  class_name: 'SubmissionField',  dependent: :destroy
-  has_many :notices,              foreign_key: 'owner_id',        dependent: :destroy
 
   accepts_nested_attributes_for :submission_fields
 
