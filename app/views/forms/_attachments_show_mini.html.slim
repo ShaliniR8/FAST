@@ -1,0 +1,60 @@
+ruby:
+  attachments ||= owner.attachments
+
+css:
+  .attachment-item {
+    border: 1px solid silver;
+    border-radius: 3px;
+    padding: 10px;
+    background-color: #e8e8e8;
+  }
+  .tooltip-inner {
+    max-width: 100% !important;
+  }
+  .attachment-thumbnail {
+    background-color: white;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid silver;
+  }
+
+.col-xs-12 style='max-width: 200px;'
+  - attachments.each.with_index do |attachment, index|
+    div id="preview_attachment_#{attachment.id}" style='display: none;'
+      .panel-lightskyblue
+        .panel-heading
+          .panel-title
+            = attachment.document_filename
+            button.close.pull-right type='button' data-dismiss='modal' aria-label='Close'
+              span.glyphicon.glyphicon-remove
+        .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
+          .col-xs-12 align='center'
+            = render 'forms/attachments_preview', attachment: attachment
+    .row.attachment-item align='center' class=(index > 0 && 'mt10')
+      .attachment-thumbnail
+        = render 'forms/attachments_preview', attachment: attachment
+      p
+        strong = attachment.caption
+      = link_to '<i class="glyphicon glyphicon-eye-open"></i>'.html_safe, '#',
+        class: 'btn btn-info show_preview_btn_mini pull-left',
+        hover: 'tooltip',
+        title: 'Preview',
+        'data-toggle' => 'modal',
+        'data-id' => attachment.id,
+        'data-target' => '.bs-example-modal-lg'
+      = link_to '<i class="glyphicon glyphicon-cloud-download"></i>'.html_safe, attachment.name.url,
+        class: 'btn btn-success pull-right',
+        hover: 'tooltip',
+        title: 'Download'
+
+javascript:
+  $(function() {
+    $('[hover="tooltip"]').tooltip({ placement: 'bottom', trigger: 'hover' })
+
+    $('.show_preview_btn_mini').click(function() {
+      var attachment_id = $(this).data('id')
+      console.log(attachment_id)
+      $('.modal-content').html($(`#preview_attachment_${attachment_id}`).html())
+      $(window).trigger('resize')
+    })
+  })

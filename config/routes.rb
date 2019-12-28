@@ -217,7 +217,11 @@ PrdgSession::Application.routes.draw do |map|
       post 'add_template'
     end
   end
-  resources :checklist_rows
+  resources :checklist_rows do
+    member do
+      get 'new_attachment'
+    end
+  end
   resources :responsible_users
 
 

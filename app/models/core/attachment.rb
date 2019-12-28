@@ -7,19 +7,19 @@ class Attachment < ActiveRecord::Base
   before_destroy :delete_transaction
 
   def self.image_extensions
-    ["png","jpg","jpeg"]
+    ['png', 'jpg', 'jpeg']
   end
 
   def self.audio_extensions
-    ["mp3"]
+    ['mp3']
   end
 
   def self.video_extensions
-    ["mp4", "mov"]
+    ['mp4', 'mov']
   end
 
   def self.pdf_extensions
-    ["pdf"]
+    ['pdf']
   end
 
   def document_filename
