@@ -8,7 +8,7 @@
   <div class="panel-heading">
     <div class="panel-title">
       To
-      <a class="btn btn-transparent pull-right clear_btn mb5">Clear</a>
+      <a class="btn btn-info pull-right clear_btn mb10" style="color:white">Clear</a>
     </div>
   </div>
   <div class="panel-body">
@@ -26,7 +26,7 @@
         </thead>
         <tbody>
           <%@users.each do |user|%>
-            <tr user="<%=user.id%>">
+            <tr user="<%=user.id%>" name="<%=user.full_name%>">
               <%@headers.each do |header|%>
                 <td><%=user.send(header[:field])%></td>
               <%end%>

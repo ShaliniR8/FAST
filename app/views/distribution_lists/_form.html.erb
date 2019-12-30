@@ -22,6 +22,10 @@
             <%= f.text_field :title, :class => "form-control ml5" %>
           </div>
           <div class="form-group col-xs-12">
+            <%= f.label :to_list, "TO" %>
+            <p class="ml5" style="overflow-y:auto;" id="to_list"></p>
+          </div>
+          <div class="form-group col-xs-12">
             <%= f.label :description, "Description" %>
             <%= f.text_area :description, :class => "form-control ml5", :rows => "5" %>
           </div>
@@ -36,3 +40,48 @@
     </div>
   </div>
 <%end%>
+
+<script type="text/javascript">
+  $(function() {
+    recipients_table = $('#recipients').DataTable();
+
+    $(document).ready(function() {
+      renderRecipients(recipients_table);
+
+      $("#recipients").on('click','.send_btn',function() {
+        $(this).toggleClass('enabled');
+        if ($(this).hasClass('enabled')) {
+          $(this).text('Added');
+        } else {
+          $(this).text('Add');
+        }
+        renderRecipients(recipients_table);
+      });
+
+      var allPages = recipients_table.cells().nodes();
+      $(".clear_btn").on('click',function() {
+        $(allPages).find('.send_btn').each(function(data) {
+          if ($(this).hasClass('btn-danger')) {
+            $(this).removeClass('btn-danger').addClass('btn-transparent');
+            $(this).removeClass('enabled').text('Add');
+          }
+        });
+        renderRecipients(recipients_table);
+      });
+    });
+  });
+
+  function renderRecipients(recipients_table) {
+    var to_user_ids = [];
+    var cc_user_ids = [];
+    recipients_table.rows().nodes().to$().each(function() {
+      if ($(this).find('.send_btn').hasClass('btn-danger')) {
+        to_user_ids.push($(this).attr('name'));
+      }
+      if ($(this).find('.cc_btn').hasClass('btn-danger')) {
+        cc_user_ids.push($(this).attr('name'));
+      }
+    })
+    document.getElementById("to_list").innerHTML = to_user_ids.sort().join(', ');
+  }
+</script>

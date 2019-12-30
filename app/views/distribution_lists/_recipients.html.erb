@@ -8,6 +8,7 @@
   <div class="panel-heading">
     <div class="panel-title">
       To
+      <a class="btn btn-info pull-right clear_btn mb10" style="color:white">Clear</a>
     </div>
   </div>
   <div class="panel-body">
@@ -25,7 +26,7 @@
         </thead>
         <tbody>
           <%@users.each_with_index do |user, index|%>
-            <tr user="<%=user.id%>">
+            <tr user="<%=user.id%>" name="<%=user.full_name%>">
               <%@headers.each do |header|%>
                 <td><%=user.send(header[:field])%></td>
               <%end%>
@@ -43,17 +44,3 @@
     </div>
   </div>
 </div>
-
-
-<script type="text/javascript">
-  $(document).ready(function() {
-    $("#recipients").on('click','.send_btn',function() {
-      $(this).toggleClass('enabled');
-      if ($(this).hasClass('enabled')) {
-        $(this).text('Added');
-      } else {
-        $(this).text('Add');
-      }
-    });
-  });
-</script>
