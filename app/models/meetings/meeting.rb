@@ -1,11 +1,10 @@
-class Meeting < ActiveRecord::Base
+class Meeting < ProsafetBase
 
   include ModelHelpers
 
 #Concerns List
   include Attachmentable
   include Commentable
-  include Noticeable
   include Reportable
   include Transactionable
 

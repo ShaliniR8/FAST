@@ -14,4 +14,20 @@ class Notice < ActiveRecord::Base
   end
 
 
+  def self.get_status
+    {
+      1 => 'Unread',
+      2 => 'Read'
+    }
+  end
+
+
+  def self.get_category
+    {
+      1 => 'Notice',
+      2 => 'Broadcast'
+    }
+  end
+
+
 end

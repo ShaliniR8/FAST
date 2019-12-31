@@ -65,7 +65,6 @@ class MessagesController < ApplicationController
           subject: 'New Internal Message')
       end
     end
-
     if @message.owner
       Transaction.build_for(
         @message.owner,
