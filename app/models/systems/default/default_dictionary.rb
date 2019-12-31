@@ -328,9 +328,11 @@ class DefaultDictionary
       }},
     },
     root_causes: { # WIP
-      partial: '/root_causes/root_causes',
+      partial: '/panels/root_causes',
       visible: proc { |owner:,user:,**op| CONFIG::GENERAL[:has_root_causes] },
-      show_btns: proc { |owner:,user:,**op| ['Pending Approval', 'Completed'].include? owner.status },
+      show_btns: proc { |owner:,user:,**op|
+        ['New', 'Assigned'].include? owner.status
+      },
       data: proc { |owner:,user:,**op| {
         owner: owner,
         headers: RootCause.get_headers

@@ -7,14 +7,13 @@
     .panel-body style='display:none'
       .row
         .col-xs-12
-          - if !%w[Rejected Completed].include?(owner.status) &&\
-              current_user.has_access(owner.class.table_name, 'edit', admin: true)
+          - if show_btns
             = link_to "Add #{I18n.t("#{@i18nbase}.root_cause.title")}",
               '#',
               :class => 'btn btn-success pull-right mr5',
               :id => 'add_root_cause_btn'
 
-          . id='root_causes_table'
+          #root_causes_table
             = render '/root_causes/root_causes_table',
               :show_btns => show_btns,
               :owner => owner,

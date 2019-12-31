@@ -16,11 +16,6 @@
             tbody id='agendas'
               - sra.srm_agendas.each do |a|
                 tr
-                  td = a.title
-                  td = a.status
-                  td = a.get_user
-                  td = a.get_created
-                  td = a.get_updated
-                  td = a.discussion ? 'Yes' : 'No'
-                  td = a.accepted ? 'Accepted' : 'Declined'
+                  - @agenda_headers.each do |h|
+                    td = a.send(h[:field])
                   td = a.comment.gsub(/\n/, '<br/>').html_safe
