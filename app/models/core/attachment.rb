@@ -45,4 +45,8 @@ class Attachment < ActiveRecord::Base
     )
   end
 
+  def url
+    self.name.url
+  end
+
 end

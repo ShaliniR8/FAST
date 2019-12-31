@@ -91,7 +91,7 @@ module Concerns
             },
             attachments: {
               only: [:id, :caption],
-              methods: :document_filename
+              methods: :url
             }
           }
         ).map { |submission| format_submission_json(submission) }
@@ -108,6 +108,11 @@ module Concerns
         json[:submission_fields] = array_to_id_map json[:submission_fields], 'fields_id'
 
         # Attachments id map
+        json[:attachments].each do |attachment|
+          attachment[:uri] = "#{request.protocol}#{request.host_with_port}#{attachment[:url]}"
+          attachment.delete(:url)
+        end
+
         json[:attachments] = array_to_id_map json[:attachments]
 
         json

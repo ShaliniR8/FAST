@@ -1,17 +1,20 @@
+ruby:
+  url = attachment.url
+
 - case attachment.name.file.extension
 - when *Attachment.image_extensions
-  a href=attachment.name.url target='_blank'
-    = image_tag attachment.name.url,
+  a href=url target='_blank'
+    = image_tag url,
       class: 'img-responsive',
       style: 'width: 100%; height: auto;'
 - when *Attachment.audio_extensions
   audio controls=true
-    source src=attachment.name.url type='audio/mpeg'
+    source src=url type='audio/mpeg'
 - when *Attachment.video_extensions
   video style='width: 100%; height: auto;' controls=true autostart=false
-    source src=attachment.name.url type='video/mp4'
+    source src=url type='video/mp4'
 - when *Attachment.pdf_extensions
-  object style='width: 100%; height: 600px;' data=attachment.name.url type='application/pdf'
-    a href=attachment.name.url = "#{attachment.document_filename}.pdf"
+  object style='width: 100%; height: 600px;' data=url type='application/pdf'
+    a href=url = "#{attachment.document_filename}.pdf"
 - else
   font style='color: red; font-weight: bold;' No Preview Available
