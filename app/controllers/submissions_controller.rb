@@ -470,35 +470,23 @@ class SubmissionsController < ApplicationController
       case commit
       when "Submit"
         notifiers.each do |user|
-          notify(
-            owner,
-            notice: {
-              users_id: user.id,
-              content: "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",
-            },
-            mailer: true,
-            subject: "New #{owner.template.name} Submission"
+          notify(owner, notice: {
+            users_id: user.id,
+            content: "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
+            mailer: true, subject: "New #{owner.template.name} Submission"
           )
-
-
-
-          # notify(
-          #   user,
-          #   "A new #{owner.template.name} submission ##{owner.id}: #{owner.description} is submitted.",
-          #   owner,
-          #   true,
-          #   "New #{owner.template.name} Submission")
         end
       when "Save for Later"
-        notify(
-          owner.created_by,
-          "You have a #{owner.template.name} Submission in progress." + g_link(owner),
-          false,
-          "#{owner.template.name} Submission In Progress")
+        notify(owner, notiice: {
+          users_id: owner.created_by.id,
+          content: "You have a #{owner.template.name} Submission in progress."},
+          mailer: false)
       when "Add Notes"
         notifiers.each do |user|
-          notify(user, "Additional notes have been added to submission ##{owner.id}. " + g_link(owner),
-            true, "Additional Notes Added to Submission")
+          notify(owner, notice: {
+            users_id: user.id,
+            content: "Additional notes have been added to submission ##{owner.id}."},
+            mailer: true, subject: 'Additonal Notes Added to Submission')
         end
       else
       end

@@ -28,11 +28,13 @@ class SrmMeetingsController < ApplicationController
     else
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
     end
-    send_notices(
-      @meeting.invitations,
-      "Meeting ##{@meeting.get_id} has been cancelled.",
-      true,
-      "Cancellation of Meeting ##{@meeting.get_id}")
+
+    @meeting.invitations.each do |inv|
+      notify(@meeting, notice: {
+        users_id: inv.users_id,
+        content: "Meeting ##{@meeting.id} has been canceled."},
+        mailer: true, subject: "Meeting Canceled")
+    end
 
     #change the status of all linked SRAs
     @meeting.sras.each do |x|
@@ -79,11 +81,12 @@ class SrmMeetingsController < ApplicationController
     end
     if @meeting.save
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
-      send_notices(
-        @meeting.invitations,
-        "You are invited to Meeting ##{@meeting.get_id}.  " + g_link(@meeting),
-        true,
-        "New Meeting Invitation")
+      @meeting.invitations.each do |inv|
+        notify(@meeting, notice: {
+          users_id: inv.users_id,
+          content: "You are invited to Meeting ##{@meeting.id}."},
+          mailer: true, subject: "New Meeting Invitation")
+      end
       redirect_to srm_meeting_path(@meeting), flash: {success: "Meeting created."}
     else
       redirect_to new_srm_meeting_path(:type=>params[:type])
@@ -165,11 +168,12 @@ class SrmMeetingsController < ApplicationController
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:srm_meeting][:status]}"
     when 'Close'
-      send_notices(
-        @owner.invitations,
-        "Meeting ##{@owner.get_id} has been Closed." + g_link(@owner),
-        true,
-        "Meeting ##{@owner.get_id} Closed")
+      @owner.invitations.each do |inv|
+        notify(@owner, notice: {
+          users_id: inv.users_id,
+          content: "Meeting ##{@owner.id} has been closed."},
+          mailer: true, subject: "Meeting Closed")
+      end
       status = 'Closed'
     when 'Save Agenda'
       transaction_content = "SRA ##{params[:sra_id]}"
@@ -183,18 +187,22 @@ class SrmMeetingsController < ApplicationController
           new_inv.users_id = val
           new_inv.meeting = @owner
           new_inv.save
-          send_notice(new_inv,
-            "You are invited to Meeting ##{@owner.get_id}.  " + g_link(@owner),
-            true, "New Meeting Invitation")
+          notify(@owner, notice: {
+            users_id: new_inv.users_id,
+            content: "You are invited to Meeting ##{@owner.get_id}."},
+            mailer: true, subject: "New Meeting Invitation")
         end
       end
     end
     if params[:cancellation].present?
       params[:cancellation].each_pair do |index,val|
-        inv = @owner.invitations.where("users_id=?",val)
+        inv = @owner.invitations.where("users_id = ?", val).first
         if inv.present?
-          send_notice(inv.first, "You are no longer invited to Meeting ##{@owner.id}.", true, "Removed from Meeting")
-          inv.first.destroy
+          notify(@owner, notice: {
+            users_id: inv.users_id,
+            content: "You are no longer invited to Meeting ##{@owner.id}."},
+            mailer: true, subject: 'Removed from Meeting')
+          inv.destroy
         end
       end
     end
@@ -222,18 +230,6 @@ class SrmMeetingsController < ApplicationController
     @timezones = Meeting.get_timezones
     @sra_headers = Sra.get_meta_fields('index')
     @sras = @meeting.sras + Sra.where('meeting_id is ?', nil)
-  end
-
-
-  def send_notices(participations, message, mailer, subject)
-    participations.each do |p|
-      send_notice(p, message, true, subject)
-    end
-  end
-
-
-  def send_notice(p, message, mailer, subject=nil)
-    notify(p.user, message, mailer, subject)
   end
 
 
