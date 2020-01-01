@@ -557,9 +557,9 @@ class RecordsController < ApplicationController
     @fields = Record.get_meta_fields('close')
     @owner = Record.find(params[:id])
     if @owner.is_asap
-      render :partial => 'records/close'
+      render partial: 'records/close'
     else
-      render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
+      render partial: '/forms/workflow_forms/process', locals: {status: 'Closed'}
     end
   end
 

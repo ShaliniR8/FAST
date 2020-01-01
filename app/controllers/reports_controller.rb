@@ -436,13 +436,12 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def change_privilege
     @privileges = Privileges.find(:all)
     @target = Report.find(params[:id])
     render :partial => "shared/privilege"
   end
+
 
   def mitigate
     @owner=Report.find(params[:id])
@@ -468,18 +467,19 @@ class ReportsController < ApplicationController
   end
 
 
-
   def new_minutes
     @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
     render :partial => "shared/add_minutes"
   end
 
+
   def show_narrative
     @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
     render :partial => "show_narrative"
   end
+
 
   def airport_data
     icao = "%"+params[:icao]+"%"
@@ -498,9 +498,7 @@ class ReportsController < ApplicationController
     owner.records.each do |record|
       if record.status != 'Closed'
         record.close_date = Time.now
-        if record.is_asap && record.status != 'Closed'
-          record.update_attributes(params[:report])
-        end
+        record.update_attributes(params[:report]) if record.is_asap
         record.status = 'Closed'
         record.save
         submission = record.submission
