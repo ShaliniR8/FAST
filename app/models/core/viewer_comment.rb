@@ -16,7 +16,7 @@ class ViewerComment < ActiveRecord::Base
     self.content.gsub(/\n/, '<br/>').html_safe
   end
 
-  def get_subnmission_time
+  def get_submission_time
     self.created_at.strftime("%Y-%m-%d")
   end
 
