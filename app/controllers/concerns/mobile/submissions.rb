@@ -92,7 +92,8 @@ module Concerns
             attachments: {
               only: [:id, :caption],
               methods: :url
-            }
+            },
+            comments: { only: [:id, :content, :created_at] }
           }
         ).map { |submission| format_submission_json(submission) }
 
