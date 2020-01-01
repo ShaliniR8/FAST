@@ -7,9 +7,8 @@ class Notice < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'begin_date',   title: 'Notify Date',        num_cols: 6,  type: 'date',       visible: 'index,form,show', required: true },
-      {field: 'create_email', title: 'Send Emails',        num_cols: 2,  type: 'booleanbox', visible: 'index,form,show', required: true },
-      {field: 'content',      title: 'Notice Message',     num_cols: 12, type: 'text',       visible: 'index,form,show', required: true },
+      {field: 'content',      title: 'Message',     num_cols: 12, type: 'text',       visible: 'index,form,show', required: true },
+      {field: 'begin_date',   title: 'Date',        num_cols: 6,  type: 'date',       visible: 'index,form,show', required: true },
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

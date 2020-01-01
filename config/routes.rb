@@ -51,7 +51,14 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :notifications
-  resources :notices
+  resources :notices do
+    member do
+      get 'read_message'
+    end
+    collection do
+      post 'mark_all_as_read'
+    end
+  end
   resources :private_links
   resources :verifications do
     member do
