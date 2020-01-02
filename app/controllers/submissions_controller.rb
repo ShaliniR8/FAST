@@ -203,6 +203,11 @@ class SubmissionsController < ApplicationController
       end
     end
 
+    # edge case for the mobile app
+    # if the user submits a new submission in offline mode,
+    # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
+    params[:commit] = 'Submit' if params[:commit] != 'Save for Later'
+
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
 
@@ -377,6 +382,11 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
+    # edge case for the mobile app
+    # if the user submits an existing in progress submission in offline mode,
+    # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
+    params[:commit] = 'Submit' if !@record.completed? && params[:commit] != 'Save for Later'
+
     if params[:commit] != 'Add Notes'
       params[:submission][:completed] = params[:commit] != 'Save for Later'
       params[:submission][:anonymous] = params[:anonymous] == '1'
@@ -404,7 +414,7 @@ class SubmissionsController < ApplicationController
           notify_notifiers(converted, params[:commit])
         end
         respond_to do |format|
-          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added' : 'Submission submitted.' }
+          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
           format.html { redirect_to submission_path(@record), flash: flash }
           format.json { update_as_json(flash) }
         end
