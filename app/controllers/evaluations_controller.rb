@@ -63,6 +63,7 @@ class EvaluationsController < SafetyAssuranceController
 
   def update
     transaction = true
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
