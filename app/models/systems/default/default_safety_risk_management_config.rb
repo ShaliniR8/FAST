@@ -43,7 +43,7 @@ class DefaultSafetyRiskManagementConfig
           },
           approver: { default: true },
           completion: { default: true,
-            field: "scheduled_completion_date",
+            field: 'scheduled_completion_date',
             required: false
           },
           close_date: { default: true },
@@ -191,7 +191,7 @@ class DefaultSafetyRiskManagementConfig
           },
           departments: {
             field: 'departments', title: 'Affected Department',
-            num_cols: 6, type: "select", visible: 'form,index,show',
+            num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: Hazard.get_custom_options('Departments')
           },
           description: {
@@ -263,7 +263,7 @@ class DefaultSafetyRiskManagementConfig
           },
 
           completion: { default: true,
-            field: "scheduled_completion_date",
+            field: 'scheduled_completion_date',
             required: false
           },
           follow_up_date: {
@@ -355,7 +355,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           evaluation_panel_start: {
-            title: "Evaluation",
+            title: 'Evaluation',
             num_cols: 12, type: 'panel_start', visible: 'show,eval'
           },
           time_period: {
@@ -399,7 +399,7 @@ class DefaultSafetyRiskManagementConfig
             btn: :complete_safety_plan,
             btn_loc: [:inline],
             access: proc { |owner:,user:,**op|
-              owner.status == "Evaluated"
+              owner.status == 'Evaluated'
             },
           },
           edit: {
