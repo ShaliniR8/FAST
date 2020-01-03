@@ -1,9 +1,14 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2',
+    'utility/jquery.dataTables.min',
+    'utility/dataTables.bootstrap.min',
+    'utility/dataTables.buttons.min',
+    'utility/format-builder'
+  )
+%>
+
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -15,9 +20,11 @@
           <div class="top_text">
             <%="SRA(SRM) ##{@sra.get_id}: #{@sra.title}"%>
           </div>
+
           <div class="top_buttons pull-right">
             <%= render '/forms/render_buttons', owner: @owner, env: :top %>
           </div>
+
         </div>
       </div>
 
@@ -26,8 +33,8 @@
           <%= render '/forms/render_buttons', owner: @owner, env: :inline %>
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @sra%>
-        <%=render '/panels/show_panels', owner: @owner%>
+        <%= render '/forms/show_fields', :fields => @fields, :record => @sra%>
+        <%= render '/panels/show_panels', owner: @owner%>
 
       </div>
     </div>

@@ -77,6 +77,11 @@ class DefaultDictionary
       btn_loc: [:top],
       access: proc { |owner:,user:,**op| priv_check.call(owner,user,'edit',true,true) },
     },
+    evaluate: {
+      btn: :evaluate,
+      btn_loc: [:inline],
+      access: proc { |owner:,user:,**op| owner.status != "Completed" },
+    },
     expand_all: {
       btn: :expand_all,
       btn_loc: [:top],
@@ -92,7 +97,7 @@ class DefaultDictionary
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
         owner.status != 'Completed' &&
-        user.has_access('hazard', 'new', admin:true, strict:true)
+        priv_check.call(owner,user,'new',true,true)
       },
     },
     message_submitter: {
@@ -128,6 +133,11 @@ class DefaultDictionary
         form_confirmed && user_confirmed
       },
     },
+    reject: {
+      btn: :reject,
+      btn_loc: [:inline],
+      access: proc { |owner:,user:,**op| owner.can_complete?(user) },
+    },
     reopen: {
       btn: :reopen,
       btn_loc: [:inline],
@@ -145,6 +155,13 @@ class DefaultDictionary
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
         CONFIG::GENERAL[:has_extension] && owner.status == 'Assigned'
+      },
+    },
+    risk_control: {
+      btn: :risk_control,
+      btn_loc: [:inline],
+      access: proc { |owner:,user:,**op|
+        !['Completed', 'Rejected'].include?(owner.status) && !owner.root_cause_lock?
       },
     },
     schedule_validation:{
@@ -190,6 +207,11 @@ class DefaultDictionary
       btn_loc: [:top],
       access: proc { |owner:,user:,**op| owner.report.present? },
     },
+    view_hazard: {
+      btn: :view_hazard,
+      btn_loc: [:top],
+      access: proc { |owner:,user:,**op| owner.hazard.present? },
+    },
     view_meeting: {
       btn: :view_meeting,
       btn_loc: [:top],
@@ -199,6 +221,11 @@ class DefaultDictionary
       btn: :view_parent,
       btn_loc: [:top],
       access: proc { |owner:,user:,**op| owner.owner.present? },
+    },
+    view_sra: {
+      btn: :view_sra,
+      btn_loc: [:top],
+      access: proc { |owner:,user:,**op| owner.sra.present? },
     },
     view_report: {
       btn: :view_report,

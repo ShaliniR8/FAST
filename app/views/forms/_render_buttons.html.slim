@@ -51,6 +51,20 @@ ruby:
       'data-toggle' => 'modal',
       'data-target' => '.bs-example-modal-lg'
 
+  - when :complete_hazard
+    = link_to "Complete",
+      complete_hazard_path(owner, status: "Completed"),
+      class: "btn btn-warning pull-right mr5 mb5",
+      disable_with: "Completing...",
+      confirm: "Are you sure?"
+
+  - when :complete_safety_plan
+    = link_to "Complete",
+      complete_safety_plan_path(owner),
+      class: "btn btn-warning pull-right mr5 mb5",
+      disable_with: "Completing...",
+      confirm: "Are you sure?"
+
   - when :contact
     = link_to 'Add Contact',
       '#',
@@ -84,6 +98,12 @@ ruby:
       eval("edit_#{owner_class}_path(owner)"),
       class: 'btn btn-warning pull-right mr5 mb5',
       disable_with: 'Editing...'
+
+  - when :evaluate
+    = link_to "Evaluate",
+      edit_safety_plan_path(owner, :evaluate => true),
+      :class => "btn btn-warning pull-right mr5 mb5",
+      :disable_with => "Evaluating..."
 
   - when :expand_all
     = link_to 'Expand All',
@@ -137,6 +157,13 @@ ruby:
       class: 'btn btn-success pull-right mr5 mb5',
       disable_with: 'Adding...'
 
+  - when :reject
+    = link_to "Reject",
+      complete_hazard_path(owner, status: "Rejected"),
+      class: "btn btn-danger pull-right mr5 mb5",
+      disable_with: "Rejecting...",
+      confirm: "Are you sure?"
+
   - when :reopen
     = link_to 'Reopen',
       eval("interpret_#{owner_class}_path(owner, act: :reopen)"),
@@ -149,6 +176,12 @@ ruby:
       id: 'extension_btn',
       'data-toggle' => 'modal',
       'data-target' => '.bs-example-modal-lg'
+
+  - when :risk_control
+    = link_to 'Add Risk Control',
+      new_risk_control_path(owner_id: owner.id, owner_type: owner.class.name),
+      class: 'btn btn-success pull-right mr5 mb5',
+      disable_with: 'Adding...'
 
   - when :schedule_validation
     = link_to 'Schedule Verification',
@@ -204,6 +237,12 @@ ruby:
       class: 'btn btn-info pull-right mr5 mb5',
       disable_with: 'Redirecting...'
 
+  - when :view_hazard
+    = link_to "View Hazard",
+      hazard_path(owner.hazard),
+      :class => "btn btn-info pull-right mr5 mb5",
+      :disable_with => "Redirecting..."
+
   - when :view_meeting
     - meeting_class = owner.meeting.class.name
     = link_to "View Meeting",
@@ -221,6 +260,12 @@ ruby:
   - when :view_report
     = link_to 'View Report',
       record_path(owner.record),
+      class: 'btn btn-info pull-right mr5 mb5',
+      disable_with: 'Redirecting...'
+
+  - when :view_sra
+    = link_to 'View SRA(SRM)',
+      sra_path(owner.sra),
       class: 'btn btn-info pull-right mr5 mb5',
       disable_with: 'Redirecting...'
 

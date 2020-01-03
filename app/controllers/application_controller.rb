@@ -213,7 +213,12 @@ class ApplicationController < ActionController::Base
 
     when :complete # was complete route
       status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
-      render partial: '/forms/workflow_forms/process', locals: {status: status}
+      case @class.name
+      when 'Sra'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :closing_comment}
+      else
+        render partial: '/forms/workflow_forms/process', locals: {status: status}
+      end
 
     when :contact
       @contact = Contact.new
