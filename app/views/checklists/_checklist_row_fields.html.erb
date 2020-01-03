@@ -12,6 +12,13 @@
           :f => cell_form%>
       <%end%>
     <%end%>
+    <%unless action_name == 'edit' || action_name == 'retract_form_template'%>
+      <td>
+        <%unless is_header%>
+          <%= render 'forms/attachments_show_mini', owner: checklist_row, edit: true, f: f %>
+        <%end%>
+      </td>
+    <%end%>
 
 
   <%elsif source == 'Template'%>

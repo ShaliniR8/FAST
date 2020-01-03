@@ -1,0 +1,22 @@
+ruby:
+  new_id = "attachment_#{Time.now.to_i}"
+
+css:
+  .hidden-file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
+
+.to-delete.attachment-item.mb10 align='center'
+  = f.file_field :name, id: new_id,
+    class: 'hidden-file-input'
+  label.mt10.btn.btn-info for=new_id Upload File
+  = f.text_field :caption,
+    placeholder: 'Caption',
+    class: 'form-control mt10'
+  = link_to 'Delete', '#',
+    class: 'btn btn-danger attachment-delete mt10'

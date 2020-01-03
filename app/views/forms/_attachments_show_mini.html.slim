@@ -1,5 +1,6 @@
 ruby:
   attachments ||= owner.attachments
+  edit ||= false
 
 css:
   .attachment-item {
@@ -18,8 +19,31 @@ css:
     border: 1px solid silver;
   }
 
-.col-xs-12 style='max-width: 200px;'
+.col-xs-12 style='max-width: 200px;' id="#{owner.id}_attachments"
   - attachments.each.with_index do |attachment, index|
+    .row.attachment-item align='center' class=((edit || index < attachments.length - 1) && 'mb10')
+      .attachment-thumbnail
+        = render 'forms/attachments_preview', attachment: attachment
+      p
+        strong = attachment.caption
+      - if edit
+        = link_to 'Delete', '#',
+          class: 'btn btn-danger attachment-destroy'
+        = f.fields_for :attachments, attachment do |attachment_field|
+          = attachment_field.hidden_field :_destroy, value: 0
+          = attachment_field.hidden_field :id, value: attachment.id
+      - else
+        = link_to '<i class="glyphicon glyphicon-eye-open"></i>'.html_safe, '#',
+          class: 'btn btn-info show_preview_btn_mini pull-left',
+          hover: 'tooltip',
+          title: 'Preview',
+          'data-toggle' => 'modal',
+          'data-id' => attachment.id,
+          'data-target' => '.bs-example-modal-lg'
+        = link_to '<i class="glyphicon glyphicon-cloud-download"></i>'.html_safe, attachment.name.url,
+          class: 'btn btn-success pull-right',
+          hover: 'tooltip',
+          title: 'Download'
     div id="preview_attachment_#{attachment.id}" style='display: none;'
       .panel-lightskyblue
         .panel-heading
@@ -30,22 +54,12 @@ css:
         .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
           .col-xs-12 align='center'
             = render 'forms/attachments_preview', attachment: attachment
-    .row.attachment-item align='center' class=(index > 0 && 'mt10')
-      .attachment-thumbnail
-        = render 'forms/attachments_preview', attachment: attachment
-      p
-        strong = attachment.caption
-      = link_to '<i class="glyphicon glyphicon-eye-open"></i>'.html_safe, '#',
-        class: 'btn btn-info show_preview_btn_mini pull-left',
-        hover: 'tooltip',
-        title: 'Preview',
-        'data-toggle' => 'modal',
-        'data-id' => attachment.id,
-        'data-target' => '.bs-example-modal-lg'
-      = link_to '<i class="glyphicon glyphicon-cloud-download"></i>'.html_safe, attachment.name.url,
-        class: 'btn btn-success pull-right',
-        hover: 'tooltip',
-        title: 'Download'
+  - if edit
+    .row
+      div id="#{owner.id}_add_attachments"
+      = link_to_add_fields 'Add', f, :attachments, nil,
+        { class: 'btn btn-success center-block add_attachment_mini' },
+        "#{owner.id}_add_attachments"
 
 javascript:
   $(function() {
@@ -56,5 +70,23 @@ javascript:
       console.log(attachment_id)
       $('.modal-content').html($(`#preview_attachment_${attachment_id}`).html())
       $(window).trigger('resize')
+    })
+
+    $("##{owner.id}_attachments").on('change', '.hidden-file-input', function(event) {
+      var fileName = event.target.value ? event.target.value.split('\\').pop() : ''
+      if (fileName) {
+        $(this).next('label').html(fileName)
+      }
+    })
+
+    $("##{owner.id}_attachments .attachment-destroy").click(function() {
+      $(this).parent('.attachment-item').hide()
+      var hiddenInput = $(this).next('input[type=hidden]')
+      hiddenInput.val(1)
+      hiddenInput.trigger('change')
+    })
+
+    $("##{owner.id}_attachments").on('click', '.to-delete .attachment-delete', function() {
+      $(this).parent('.to-delete').remove()
     })
   })

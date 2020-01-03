@@ -6,7 +6,7 @@
   )
 %>
 
-<%=form_for @record, html: { class: 'dirty-submit' } do |f|%>
+<%=form_for @record, html: { class: 'dirty-submit', multipart: true } do |f|%>
   <div class="col-xs-12">
     <div class="panel panel-warning">
 
@@ -60,7 +60,11 @@
                 <%@record.checklist_header.checklist_header_items.each do |item|%>
                   <th width="<%=item.size%>%"><%=item.title%></th>
                 <%end%>
-                <%if action_name == 'edit'%><th>Actions</th><%end%>
+                <%if action_name == 'edit'%>
+                  <th>Actions</th>
+                <%else%>
+                  <th>Attachments</th>
+                <%end%>
               </tr>
             </thead>
             <tbody id="checklist_rows">
