@@ -43,8 +43,8 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           approver: { default: true },
-          completion: { default: true,
-            field: 'scheduled_completion_date',
+          due_date: { default: true,
+            field: 'due_date',
             required: false
           },
           close_date: { default: true },
@@ -164,6 +164,7 @@ class DefaultSafetyRiskManagementConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
+
         actions: [
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
@@ -262,9 +263,8 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: RiskControl.get_custom_options('Departments')
           },
-
-          completion: { default: true,
-            field: 'scheduled_completion_date',
+          due_date: { default: true,
+            field: 'due_date',
             required: false
           },
           follow_up_date: {
