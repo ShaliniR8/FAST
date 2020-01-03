@@ -572,6 +572,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :hazards do
     member do
+      get 'interpret'
       get 'mitigate'
       get 'baseline'
       get 'new_risk_control'
@@ -600,6 +601,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'advanced_search'
     end
     member do
+      get 'interpret'
       get "new_cost"
       get 'assign'
       get 'complete'
@@ -617,6 +619,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'advanced_search'
     end
     member do
+      get 'interpret'
       get "new_attachment"
       get "print"
       get 'complete'
@@ -627,6 +630,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :srm_meetings do
     member do
+      get 'interpret'
       get "message"
       post "send_message"
       get "close"

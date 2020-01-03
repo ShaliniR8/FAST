@@ -1,7 +1,12 @@
 class HazardsController < ApplicationController
 
   before_filter :set_table_name,:login_required
+  before_filter :define_owner, only: [:interpret]
 
+  def define_owner
+    @class = Object.const_get('Hazard')
+    @owner = Hazard.find(params[:id])
+  end
 
 
   def set_table_name

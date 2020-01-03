@@ -24,10 +24,10 @@ class ProsafetBase < ActiveRecord::Base
 
   # Returns the AccessControl table name of the object (for user.has_access lookups)
   def self.rule_name
-    self.name.demodulize.downcase
+    self.name.demodulize.underscore.pluralize
   end
   def rule_name
-    self.class.name.demodulize.downcase
+    self.class.name.demodulize.underscore.pluralize
   end
 
   # Returns the titleized version of the class + strips any namespacing

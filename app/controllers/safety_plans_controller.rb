@@ -1,5 +1,11 @@
 class SafetyPlansController < ApplicationController
   before_filter :login_required
+  before_filter :define_owner, only: [:interpret]
+
+  def define_owner
+    @class = Object.const_get('SafetyPlan')
+    @owner = SafetyPlan.find(params[:id])
+  end
 
 
   def index

@@ -1,5 +1,8 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2'
+  )
+%>
 
 <%=render "access_controls/new_modal"%>
 <div class="item active mt50" style="height:auto;">
@@ -10,126 +13,22 @@
           <div class="top_text">
             Risk Control #<%=@risk_control.get_id%>: <%=@risk_control.title%>
           </div>
+
           <div class="top_buttons pull-right">
-            <%if current_user.has_access('risk_controls', 'destroy', admin: true)%>
-              <%=link_to "Delete",
-                risk_control_path(@risk_control),
-                :method => "delete",
-                :confirm => 'Are you sure?',
-                :class => "btn btn-danger pull-right mr5 mb5"%>
-            <%end%>
-
-            <%if current_user.has_access('risk_controls', 'admin', admin: true)%>
-              <%=link_to 'Override Status', '#',
-                :class => 'btn btn-danger pull-right mr5 mb5',
-                :id => 'override_status_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-            <%if @risk_control.status != 'Completed' &&
-                    current_user.has_access('risk_controls', 'edit', admin: true)%>
-              <%=link_to "Edit",
-                edit_risk_control_path(@risk_control),
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Editing..."%>
-            <%end%>
-
-            <%=link_to "De-ID PDF",
-              print_risk_control_path(
-                @risk_control,
-                :deidentified => true,
-                :format => :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%=link_to "PDF",
-              print_risk_control_path(
-                @risk_control,
-                :deidentified => false,
-                :format => :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%=link_to "View Hazard",
-              hazard_path(@risk_control.hazard),
-              :class => "btn btn-info pull-right mr5 mb5",
-              :disable_with => "Redirecting..."%>
-
-            <%=render '/forms/btns/attach_in_message_btn', owner: @risk_control%>
-
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>
+            <%= render '/forms/render_buttons', owner: @risk_control, env: :top %>
           </div>
+
         </div>
       </div>
 
       <div class="panel-body">
         <div class="col-xs-12 mb20">
-          <%case @risk_control.status%>
-            <%when 'New', 'Open'%>
-              <%if @risk_control.approver == current_user ||
-                    @risk_control.created_by == current_user ||
-                    current_user.has_access('risk_controls','admin', admin: true) %>
-                <%=link_to  "Assign", '#',
-                  :id => 'assign_btn',
-                  :class=>"btn btn-warning pull-right mr5 mb5",
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-              <%end%>
-
-            <%when 'Assigned'%>
-              <%if @risk_control.can_complete? current_user %>
-                <%=link_to  "Complete", '#',
-                  :class=>"btn btn-warning pull-right complete_btn mr5 mb5",
-                  :id => 'complete',
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-              <%end%>
-          <%end%>
-
-          <%if ['Assigned', 'New', 'Open'].include? @risk_control.status%>
-            <%=link_to "Add Cost",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5",
-              :id => "cost_btn",
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-
-          <%elsif @risk_control.can_approve? current_user %>
-            <%=link_to  "Approve",
-              "#",
-              :class => "btn btn-success pull-right mr5 mb5 approve_btn",
-              :id => 'approve',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"
-              %>
-            <%=link_to "Reject",
-              "#",
-              :class => "btn btn-danger pull-right mr5 mb5 approve_btn",
-              :id => 'reject',
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"
-              %>
-
-          <%elsif @risk_control.status == "Completed"%>
-            <%if @risk_control.can_reopen? current_user %>
-              <%=link_to "Reopen",
-                reopen_risk_control_path(@risk_control),
-                :class => "btn btn-success pull-right mr5",
-                :disable_with => "Reopening...",
-                :confirm => "Are you sure?"%>
-            <%end%>
-          <%end%>
-          <%=link_to "Add Comment", "#",
-            :class => "btn btn-success pull-right mr5 mb5",
-            :id => 'comment_btn',
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg"%>
+          <%= render '/forms/render_buttons', owner: @risk_control, env: :inline %>
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @risk_control%>
+        <%= render '/forms/show_fields', :fields => @fields, :record => @risk_control%>
+        <%= render '/panels/show_panels', owner: @risk_control%>
 
-        <%=render '/panels/show_panels', owner: @risk_control%>
       </div>
     </div>
   </div>
@@ -139,52 +38,11 @@
 
 <script>
   $(document).ready(function(){
-    $("#cost_btn").on('click',function(){
-      $.get("<%=new_cost_risk_control_path(@risk_control)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_risk_control_path(@risk_control)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_risk_control_path(@risk_control)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
-    $('#assign_btn').on('click',function(){
-      $.get("<%=assign_risk_control_path(@risk_control)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.complete_btn').on('click',function(){
-      var commit = $(this).attr('id');
-      $.get("<%=complete_risk_control_path(@risk_control)%>?commit=" + commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('.approve_btn').on('click',function(){
-      var commit = $(this).attr('id');
-      $.get("<%=approve_risk_control_path(@risk_control)%>?commit="+ commit, function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_risk_control_path(@risk_control)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
-
   });
 </script>

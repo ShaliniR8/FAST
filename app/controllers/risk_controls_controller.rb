@@ -22,7 +22,12 @@ end
 class RiskControlsController < ApplicationController
 
   before_filter :login_required
+  before_filter :define_owner, only: [:interpret]
 
+  def define_owner
+    @class = Object.const_get('RiskControl')
+    @owner = RiskControl.find(params[:id])
+  end
 
 
   def index

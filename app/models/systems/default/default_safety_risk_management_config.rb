@@ -43,7 +43,7 @@ class DefaultSafetyRiskManagementConfig
           },
           approver: { default: true },
           completion: { default: true,
-            field: "scheduled_completion_date",
+            field: 'scheduled_completion_date',
             required: false
           },
           close_date: { default: true },
@@ -191,7 +191,7 @@ class DefaultSafetyRiskManagementConfig
           },
           departments: {
             field: 'departments', title: 'Affected Department',
-            num_cols: 6, type: "select", visible: 'form,index,show',
+            num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: Hazard.get_custom_options('Departments')
           },
           description: {
@@ -218,10 +218,34 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_sra expand_all],
+          *%i[delete override_status edit deid_pdf pdf view_sra attach_in_message expand_all],
           #INLINE
-          *%i[reject complete risk_control reopen comment],
-        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+          *%i[reject complete_hazard risk_control reopen comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          complete_hazard: {
+            btn: :complete_hazard,
+            btn_loc: [:inline],
+            access: proc { |owner:,user:,**op|
+              owner.can_complete?(user)
+            },
+          },
+          edit: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:edit][:access].call(owner:owner,user:user,**op) &&
+              owner.status == 'New'
+            },
+          },
+          reopen: {
+            access: proc { |owner:,user:,**op|
+              next false unless CONFIG::GENERAL[:allow_reopen_report]
+              form_confirmed = ['Completed', 'Rejected'].include? owner.status || op[:form_conds]
+              user_confirmed = [owner.created_by_id].include?(user.id) ||
+                priv_check.call(owner,user,'admin',true,true) ||
+                op[:user_conds]
+              form_confirmed && user_confirmed
+            },
+          },
+        }),
         panels: %i[risk_assessment root_causes occurrences descriptions risk_controls comments attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
@@ -239,7 +263,7 @@ class DefaultSafetyRiskManagementConfig
           },
 
           completion: { default: true,
-            field: "scheduled_completion_date",
+            field: 'scheduled_completion_date',
             required: false
           },
           follow_up_date: {
@@ -274,8 +298,29 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_hazard attach_in_message expand_all],
           #INLINE
-          *%i[assign complete add_cost approve_reject reopen comment],
-        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+          *%i[assign complete cost approve_reject reopen comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          assign: {
+            access: proc { |owner:,user:,**op|
+              form_confirmed = ['New', 'Open'].include? owner.status || op[:form_conds]
+              user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
+                priv_check.call(owner,user,'admin',true,true) ||
+                op[:user_conds]
+              form_confirmed && user_confirmed
+            },
+          },
+          complete: {
+            access: proc { |owner:,user:,**op|
+              owner.can_complete?(user)
+            },
+          },
+          edit: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:edit][:access].call(owner:owner,user:user,**op) &&
+              owner.status != 'Completed'
+            },
+          },
+        }),
         panels: %i[descriptions costs occurrences comments attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
@@ -310,7 +355,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           evaluation_panel_start: {
-            title: "Evaluation",
+            title: 'Evaluation',
             num_cols: 12, type: 'panel_start', visible: 'show,eval'
           },
           time_period: {
@@ -346,10 +391,24 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[],
+          *%i[delete override_status edit pdf attach_in_message expand_all],
           #INLINE
-          *%i[],
-        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+          *%i[complete_safety_plan evaluate reopen comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          complete_safety_plan: {
+            btn: :complete_safety_plan,
+            btn_loc: [:inline],
+            access: proc { |owner:,user:,**op|
+              owner.status == 'Evaluated'
+            },
+          },
+          edit: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:edit][:access].call(owner:owner,user:user,**op) &&
+              owner.status != "Completed"
+            },
+          },
+        }),
         panels: %i[occurrences comments attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },

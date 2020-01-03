@@ -1,0 +1,16 @@
+<div class="col-xs-12">
+  <hr>
+  <h4><b>RISK RATING KEY</b></h4>
+  <table class="table table-bordered table-fixed table-centered">
+    <tr>
+      <%CONFIG::MATRIX_INFO[:risk_definitions].each do |k, v| %>
+        <td bgcolor="<%=v[:color].present? ? v[:color] : k%>" width="33%">
+          <h4><b><%=v[:rating]%></b></h4>
+          <hr>
+          <b>- <%=v[:description]%> -</b>
+        </td>
+      <%end%>
+    </tr>
+  </table>
+</div>
+
