@@ -30,11 +30,11 @@ $(document).ready(function(){
     var form = $(this)
     recipients_table.rows().nodes().to$().each(function() {
       if ($(this).find('.send_btn').hasClass('btn-danger')){
-        form.append(`<input type='hidden' name=send_to[${send_count++}] value=${$(this).attr('user')}>`)
+        form.append("<input type='hidden' name=send_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
       }
 
       if ($(this).find('.cc_btn').hasClass('btn-danger')){
-        form.append(`<input type='hidden' name=cc_to[${cc_count++}] value=${$(this).attr('user')}>`)
+        form.append("<input type='hidden' name=cc_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
       }
     })
 
