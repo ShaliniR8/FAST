@@ -7,6 +7,7 @@ class Im < ActiveRecord::Base
   include Noticeable
   include SmsTaskable
   include Transactionable
+  include Noticeable
 
 #Associations List
   belongs_to :evaluator,      foreign_key:"lead_evaluator",   class_name:"User"

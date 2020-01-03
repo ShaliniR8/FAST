@@ -4,6 +4,7 @@ class Package < ActiveRecord::Base
 #Concern List
   include Attachmentable
   include Transactionable
+  include Noticeable
 
 #Associations List
   has_many :sms_agendas,    foreign_key:"event_id",   class_name:"SmsAgenda",            :dependent=>:destroy

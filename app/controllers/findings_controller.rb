@@ -105,31 +105,20 @@ class FindingsController < SafetyAssuranceController
 
   def update
     transaction = true
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Finding ##{@owner.id} has been Assigned to you." + g_link(@owner),
-        true, 'Finding Assigned')
     when 'Complete'
       if @owner.approver
-        notify(@owner.approver,
-          "Finding ##{@owner.id} needs your Approval" + g_link(@owner),
-          true, 'Finding Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Finding ##{@owner.id} was Rejected by the Final Approver" + g_link(@owner),
-        true, 'Finding Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Finding ##{@owner.id} was Approved by the Final Approver" + g_link(@owner),
-        true, 'Finding Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:finding][:status]}"
       params[:finding][:close_date] = params[:finding][:status] == 'Completed' ? Time.now : nil

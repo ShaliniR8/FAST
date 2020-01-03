@@ -1,0 +1,50 @@
+.item.active.mt50
+  .grid.per90.center-block
+    .col-xs-12
+      .panel.panel-steelblue
+        .panel-heading
+          .panel-title
+            .top_text News
+            .top_buttons.pull-right
+              = link_to 'Mark all as Read', '#', class: 'btn btn-default mark_all_as_read'
+        .panel-body
+          table class='table table-hover table-bordered'
+            thead
+              th Content
+              th Time
+            tbody
+              - @records.each do |notice|
+                tr data-notice-id="#{notice.id}" class='#{notice.status == 1 ? "unread" : ""}' data-link="#{read_message_notice_path(notice)}"
+                  td = notice.content
+                  td = "#{time_ago_in_words(notice.created_at).scan(/\w+/).join(' ')} ago"
+
+css:
+  .unread {
+    background-color: cornsilk;
+    font-weight: bold;
+  }
+
+
+javascript:
+  $(function() {
+
+    $('tr[data-link]').on('click', function() {
+      window.open($(this).data('link'), '_blank');
+      $(this).removeClass('unread');
+    });
+
+    $('.mark_all_as_read').on('click', function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "#{mark_all_as_read_notices_path}",
+        dataType: 'json',
+        data: {notices: #{{@records.map(&:id)}}},
+        success: function(response) {$('.unread').removeClass('unread');},
+        error: function(response) {console.log('Error: ' + response)}
+      });
+    });
+
+  });
+
+

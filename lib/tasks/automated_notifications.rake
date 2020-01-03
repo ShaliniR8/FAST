@@ -20,8 +20,10 @@ namespace :notifications do
       puts "Alert ##{rule.id} count: #{records.length}"
       records.each do |record|
         user = User.find(record.send(audience_field)) rescue nil
-        NotifyMailer.automated_reminder(user, subject, content, record) if user.present?
-        #Notice.create({:user => user, :content => g_link(record)})
+        if user.present?
+          NotifyMailer.automated_reminder(user, subject, content, record)
+          record.notices.create({users_id: user.id, content: content})
+        end
       end
     end
   end

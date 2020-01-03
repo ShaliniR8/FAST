@@ -2,6 +2,7 @@ class Message < ActiveRecord::Base
 
 #Concerns List
   include Attachmentable
+  include Noticeable
 
 #Associations List
   belongs_to :owner,  polymorphic: true

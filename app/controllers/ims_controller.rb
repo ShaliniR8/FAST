@@ -64,25 +64,10 @@ class ImsController < ApplicationController
     im.date_open = Time.now.to_date
     im.save
     if im.evaluator.present?
-      if im.type == "VpIm"
-        notify(
-          im.evaluator,
-          "VP/Part 5 IM ##{im.get_id} is scheduled for you. " + g_link(im),
-          true,
-          "VP/Part 5 IM ##{im.get_id} Assigned")
-      elsif im.type == "JobAid"
-        notify(
-          im.evaluator,
-          "Job Aid ##{im.get_id} is scheduled for you." + g_link(im),
-          true,
-          "Job Aid ##{im.get_id} Assigned")
-      elsif im.type == "FrameworkIm"
-        notify(
-          im.evaluator,
-          "Framework IM ##{im.get_id} is scheduled for you." + g_link(im),
-          true,
-          "Framework IM ##{im.get_id} Assigned")
-      end
+      notify(im,
+        notice: {users_id: im.evaluator.id, content: "IM Plan ##{im.get_id} is Assigned to you."},
+        mailer: true,
+        subject: 'IM Plan Assigned')
     end
     redirect_to im_path(im)
   end
@@ -139,22 +124,24 @@ class ImsController < ApplicationController
           )
           im.date_complete=Time.now.to_date
           im.save
-          notify(
-            im.evaluator,
-            "IM ##{im.get_id} has been approved by preliminary reviewer." + g_link(im),
-            true,
-            "IM ##{im.get_id} Approved")
+          notify(im,
+            notice: {
+              users_id: im.evaluator.id,
+              content: "IM Plan ##{im.get_id} has been approved by the preliminary reviewer"},
+            mailer: true,
+            subject: 'IM Plan Approved')
         elsif old_status == "Pending Review" && new_status == "Open"
           Transaction.build_for(
             im,
             'Rejected',
             current_user.id
           )
-          notify(
-            im.evaluator,
-            "IM ##{im.get_id} has been rejected by preliminary reviewer." + g_link(im),
-            true,
-            "IM ##{im.get_id} Rejected")
+          notify(im,
+            notice: {
+              users_id: im.evaluator.id,
+              content: "IM Plan ##{im.get_id} has been rejected by the preliminary reviewer"},
+            mailer: true,
+            subject: 'IM Plan Rejected')
         end
       end
       redirect_to im_path(im), flash: {success: alert}
@@ -279,11 +266,12 @@ class ImsController < ApplicationController
         'Pending Review',
         current_user.id
       )
-      notify(
-        im.reviewer,
-        "IM Plan ##{im.get_id} needs your review." + g_link(im),
-        true,
-        "IM Plan ##{im.get_id} Pending Review")
+      notify(im,
+        notice: {
+          users_id: im.evaluator.id,
+          content: "IM Plan ##{im.get_id} needs your review"},
+        mailer: true,
+        subject: 'IM Plan Pending Review')
       im.status="Pending Review"
       im.save
     else

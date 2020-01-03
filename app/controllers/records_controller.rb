@@ -105,16 +105,14 @@ class RecordsController < ApplicationController
       'Report Opened.'
     )
     begin #TODO - Review case for if submission is deleted then report is opened
-      notify(
-        @record.submission.created_by,
-        "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
-        true,
-        "Submission ##{@record.submission.id} Opened by Analyst")
+      notify(@record.submission, notice: {
+        users_id: @record.created_by.id,
+        content: "Your submission ##{@record.submission.id} has been opened by analyst."},
+        mailer: true, subject: "Submission ##{@record.submission.id} Opened by Analyst")
     rescue
     end
     @record.save
-    redirect_to @record,
-      :flash => {:success => "Report Opened."}
+    redirect_to @record, flash: {success: "Report Opened."}
   end
 
 
@@ -215,12 +213,10 @@ class RecordsController < ApplicationController
           current_user.id,
           'Report has been opened.'
         )
-        notify(
-          @record.submission.created_by,
-          "The Report for Submission ##{@record.submission.get_id} has been opened by analyst." +
-            g_link(@record.submission),
-          true,
-          "Report for Submission ##{@record.submission.get_id} Opened by Analyst")
+        notify(@record.submission, notice: {
+          users_id: @record.created_by.id,
+          content: "Your submission ##{@record.submission.id} has been opened by analyst."},
+          mailer: true, subject: "Submission ##{@record.submission.id} Opened by Analyst")
       end
     end
     @record.save
@@ -440,9 +436,10 @@ class RecordsController < ApplicationController
     case params[:commit]
     when 'Close'
       if @owner.submission.present?
-        notify(@owner.submission.created_by,
-          "Your submission ##{@owner.submission.id} has been closed by analyst." + g_link(@owner.submission),
-          true, "Submission ##{@owner.submission.id} Closed")
+        notify(@owner.submission, notice: {
+          users_id: @owner.created_by.id,
+          content: "Your submission ##{@owner.submission.id} has been closed by analyst."},
+          mailer: true, subject: "Submission ##{@owner.submission.id} Closed by Analyst")
         Transaction.build_for(
           @owner.submission,
           params[:commit],

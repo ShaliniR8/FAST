@@ -501,9 +501,10 @@ class ReportsController < ApplicationController
         record.status = 'Closed'
         record.save
         submission = record.submission
-        notify(record.submission.created_by,
-          "Your submission ##{submission.id} has been closed by analyst." + g_link(submission),
-          true, "Submission ##{submission.id} Closed")
+        notify(record.submission, notice: {
+          users_id: record.created_by.id,
+          content: "Your submission ##{record.submission.id} has been closed by analyst."},
+          mailer: true, subject: "Submission ##{record.submission.id} Closed by Analyst")
         Transaction.build_for(
           submission,
           'Close',

@@ -112,34 +112,20 @@ class SmsActionsController < SafetyAssuranceController
 
   def update
     transaction = true
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Reassign'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{car.get_id} has been reassigned to you." + g_link(car),
-        true, 'Corrective Action Reassigned')
     when 'Assign'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Corrective Action Assigned')
     when 'Complete'
       if @owner.approver
-        notify(@owner.approver,
-          "Corrective Action ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Corrective Action Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Rejected by the Final Approver." + g_link(@owner),
-        true, 'Corrective Action Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Approved by the Final Approver." + g_link(@owner),
-        true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
       params[:sms_action][:close_date] = params[:sms_action][:status] == 'Completed' ? Time.now : nil

@@ -10,6 +10,7 @@ class HomeController < ApplicationController
       return
     end
     @action = "home"
+    @notices = current_user.notices.where(status: 1).reverse
     prepare_analytics
     prepare_calendar
     prepare_special_risk_matrix

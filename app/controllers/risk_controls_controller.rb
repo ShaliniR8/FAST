@@ -103,28 +103,32 @@ class RiskControlsController < ApplicationController
     case params[:commit]
     when 'Assign'
       @owner.date_open = Time.now
-      notify(@owner.responsible_user,
-        "Risk Control ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Risk Control Assigned')
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Risk Control ##{@owner.id} has been assigned to you."},
+        mailer: true, subject: 'Risk Control Assigned')
     when 'Complete'
       if @owner.approver
-        notify(@owner.approver,
-          "Risk Control ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Risk Control Pending Approval')
+        notify(@owner, notice: {
+          users_id: @owner.approver.id,
+          content: "Risk Control ##{@owner.id} needs your Approval."},
+          mailer: true, subject: 'Risk Control Pending Approval')
       else
         @owner.date_complete = Time.now
         @owner.close_date = Time.now
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Risk Control ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Risk Control Rejected')
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Risk Control ##{@owner.id} was Rejected by the Final Approver."},
+        mailer: true, subject: 'Risk Control Reject')
     when 'Approve'
       @owner.date_complete = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Risk Control ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Risk Control Approved')
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Risk Control ##{@owner.id} was Approved by the Final Approver."},
+        mailer: true, subject: 'Risk Control Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
       params[:risk_control][:close_date] = params[:risk_control][:status] == 'Completed' ? Time.now : nil

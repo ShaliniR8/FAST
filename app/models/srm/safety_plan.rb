@@ -7,6 +7,7 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
   include Commentable
   include Occurrenceable
   include Transactionable
+  include Noticeable
 
 #Associations List
   belongs_to :created_by, foreign_key: "created_by_id", class_name: "User"
