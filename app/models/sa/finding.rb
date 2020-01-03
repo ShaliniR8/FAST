@@ -14,7 +14,6 @@ class Finding < Sa::SafetyAssuranceBase
   include RootCausable
   include SmsActionable
   include Transactionable
-  include ExtensionRequestable
 
 #Associations List
   belongs_to  :responsible_user,          foreign_key: "responsible_user_id",     class_name: "User"

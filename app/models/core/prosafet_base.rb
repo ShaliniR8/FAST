@@ -10,6 +10,8 @@ class ProsafetBase < ActiveRecord::Base
 
   include Noticeable
   include Messageable
+  include ExtensionRequestable
+  include Verifiable
 
   self.abstract_class = true
   include Rails.application.routes.url_helpers #For path method

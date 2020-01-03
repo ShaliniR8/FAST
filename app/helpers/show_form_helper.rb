@@ -13,7 +13,7 @@
 
   #Called in panel/show_panels; pass the owner and it will initialize all locals for each panel
   def prepare_panels(owner, **op)
-    CONFIG.object[owner.class.name][:panels].values.select{ |data|
+    blair = CONFIG.object[owner.class.name][:panels].values.select{ |data|
       data[:visible].call(owner: owner, user: current_user, **op)
     }.map { |data|
       {

@@ -49,9 +49,11 @@ class VerificationsController < ApplicationController
 
   def send_notification(commit, verification)
     commit = 'Addresse' if commit == 'Address'
-    notify(verification.validator,
-      "Verification for #{verification.owner.class.name.titleize} ##{verification.owner.id} has been #{commit}d." + g_link(verification.owner),
-      true, "Verification #{commit}d")
+    notify(verification.owner, notice: {
+      users_id: verification.validator.id,
+      content: "Verification for #{verification.owner.class.name.titleize} ##{verification.owner.id} has been #{commit}d."},
+      mailer: true,
+      subject: "Verification #{commit}d")
   end
 
 end

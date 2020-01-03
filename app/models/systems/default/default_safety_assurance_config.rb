@@ -73,9 +73,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
           #INLINE
-          *%i[assign complete request_extension approve_reject reopen contact task cost finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts findings costs signatures comments extension_requests attachments transaction_log
+        panels: %i[occurrences tasks contacts findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -136,9 +136,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension approve_reject reopen task cost contact finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests attachments transaction_log
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -203,9 +203,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension approve_reject reopen task cost contact finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests attachments transaction_log
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -288,9 +288,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension approve_reject reopen recommendation contact task cost sms_action finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments extension_requests attachments transaction_log
+        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -424,7 +424,7 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension recommendation sms_action approve_reject reopen comment],
+          *%i[assign complete request_extension schedule_verification recommendation sms_action approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -433,7 +433,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences extension_requests attachments transaction_log
+        panels: %i[occurrences extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -543,8 +543,8 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           created_by: { default: true },
-          response_date: {
-            field: 'response_date', title: 'Scheduled Response Date',
+          due_date: {
+            field: 'due_date', title: 'Scheduled Response Date',
             num_cols: 6, type: 'date', visible: 'index,form,show',
             required: true, on_newline: true
           },
@@ -584,7 +584,7 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension approve_reject reopen comment]
+          *%i[assign complete request_extension schedule_verification approve_reject reopen comment]
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -593,7 +593,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comment extension_requests attachments transaction_log
+        panels: %i[occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       }
     },

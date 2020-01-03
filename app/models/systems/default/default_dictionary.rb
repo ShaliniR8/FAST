@@ -397,6 +397,22 @@ class DefaultDictionary
         transactions: owner.transactions.preload(:user, :owner) #owner is for get_user_name
       }},
     },
+    extension_requests: {
+      partial: '/extension_requests/show_requests',
+      visible: proc { |owner:, user:, **op| owner.extension_requests.present?},
+      show_btns: proc { |owner:, user:, **op| true},
+      data: proc { |owner:, user:, **op| {
+        records: owner.extension_requests
+      }},
+    },
+    verifications: {
+      partial: '/verifications/show_verifications',
+      visible: proc { |owner:, user:, **op| owner.verifications.present?},
+      show_btns: proc { |owner:, user:, **op| true},
+      data: proc { |owner:, user:, **op| {
+        records: owner.verifications
+      }},
+    }
   }
 
   META_DATA = {
