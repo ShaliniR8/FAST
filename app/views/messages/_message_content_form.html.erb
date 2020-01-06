@@ -22,6 +22,35 @@
 </div>
 
 <div class="col-xs-12 mt10">
+  <%=label_tag "to_list",
+    "TO",
+    :class => "control-label col-xs-2"%>
+  <div class="col-xs-10">
+    <p class="to_list" style="overflow-y:auto;" id="to_list"></p>
+  </div>
+</div>
+
+<div class="col-xs-12 mt10">
+  <%=label_tag "cc_list",
+    "CC",
+    :class => "control-label col-xs-2"%>
+  <div class="col-xs-10">
+    <p class="cc_list" style="overflow-y:auto;" id="cc_list"></p>
+  </div>
+</div>
+
+<div class="col-xs-12 mt10">
+  <%=label_tag "distribution_list",
+    "Distribution List",
+    :class => "control-label col-xs-2"%>
+  <div class="col-xs-6">
+    <%= select_tag "distribution_list",
+      options_for_select(DistributionList.all.collect{|p| [p["title"], p["id"]]}),
+      {:include_blank => true, :class => "form-control distribution_list"}%>
+  </div>
+</div>
+
+<div class="col-xs-12 mt10">
   <%=label_tag "template",
     "Template",
     :class => "control-label col-xs-2"%>
@@ -32,7 +61,6 @@
       :class => "form-control template"}%>
   </div>
 </div>
-
 
 <div class='col-xs-12 mt5'>
   <%=label_tag "template", "Attached", :class => "control-label col-xs-2"%>
@@ -92,15 +120,83 @@
 
 
 <script type="text/javascript">
-  $(function(){
-    $(".template").on("change", function(){
+  $(function() {
+
+    $('.template').on('change', function() {
       var message_template_id = $(this).val();
-      $.get("<%=canned_messages_path%>/"+message_template_id, function(data){
-        $("#content").val(data.data.content);
+      $.get('<%=canned_messages_path%>/'+message_template_id, function(data) {
+        $('#content').val(data.data.content);
+      });
+    });
+
+    recipients_table = $('#recipients').DataTable();
+
+    $('.distribution_list').on('change', function() {
+      var distribution_list_id = $(this).val();
+      if (distribution_list_id !== '') {
+        $.get('<%=distribution_lists_path%>/'+distribution_list_id, function(data) {
+          var dist_users = data.data.user_ids;
+          var allPages = recipients_table.cells().nodes();
+          for(var i = 0; i < dist_users.length; i++) {
+            var send_btn = $(allPages).find('.id_' + dist_users[i]);
+            if (!send_btn.hasClass('selected')) {
+              $(send_btn).click();
+              $(send_btn).addClass('selected');
+            }
+          }
+          renderRecipients(recipients_table);
+        });
+      }
+    });
+
+    $(document).ready(function() {
+      renderRecipients(recipients_table);
+
+      $("#recipients").on('click','.send_btn',function() {
+        $(this).toggleClass('selected');
+        renderRecipients(recipients_table);
+      });
+
+      $("#recipients").on('click','.cc_btn',function() {
+        $(this).toggleClass('selected');
+        renderRecipients(recipients_table);
+      });
+
+      var allPages = recipients_table.cells().nodes();
+      $(".clear_btn").on('click',function() {
+        $(allPages).find('.send_btn').each(function(data) {
+          if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+          }
+          if ($(this).hasClass('btn-danger') && !$(this).hasClass('disabled')) {
+            $(this).removeClass('btn-danger').addClass('btn-transparent');
+          }
+        });
+        $(allPages).find('.cc_btn').each(function(data) {
+          if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+          }
+          if ($(this).hasClass('btn-danger')) {
+            $(this).removeClass('btn-danger').addClass('btn-transparent');
+          }
+        });
+        renderRecipients(recipients_table);
       });
     });
   });
+
+  function renderRecipients(recipients_table) {
+    var to_user_ids = [];
+    var cc_user_ids = [];
+    recipients_table.rows().nodes().to$().each(function() {
+      if ($(this).find('.send_btn').hasClass('btn-danger')) {
+        to_user_ids.push($(this).attr('name'));
+      }
+      if ($(this).find('.cc_btn').hasClass('btn-danger')) {
+        cc_user_ids.push($(this).attr('name'));
+      }
+    })
+    document.getElementById("to_list").innerHTML = to_user_ids.sort().join(', ');
+    document.getElementById("cc_list").innerHTML = cc_user_ids.sort().join(', ');
+  }
 </script>
-
-
-

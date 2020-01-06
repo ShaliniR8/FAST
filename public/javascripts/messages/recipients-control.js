@@ -18,21 +18,23 @@ $(document).ready(function(){
 		}
 	});
 
-    var dt = $('#recipients').DataTable({
-      "iDisplayLength": 5
-    });
+
+  var recipients_table = $('#recipients').DataTable({
+    "iDisplayLength": 5
+  });
+
 
   $('form').on('submit', function() {
     var send_count = 0
     var cc_count = 0
     var form = $(this)
-    dt.rows().nodes().to$().each(function() {
+    recipients_table.rows().nodes().to$().each(function() {
       if ($(this).find('.send_btn').hasClass('btn-danger')){
-        form.append(`<input type='hidden' name=send_to[${send_count++}] value=${$(this).attr('user')}>`)
+        form.append("<input type='hidden' name=send_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
       }
 
       if ($(this).find('.cc_btn').hasClass('btn-danger')){
-        form.append(`<input type='hidden' name=cc_to[${cc_count++}] value=${$(this).attr('user')}>`)
+        form.append("<input type='hidden' name=cc_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
       }
     })
 
@@ -47,3 +49,6 @@ $(document).ready(function(){
     return true
   })
 })
+
+
+

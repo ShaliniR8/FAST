@@ -142,6 +142,7 @@ PrdgSession::Application.routes.draw do |map|
 
   # Configurations
   resources :canned_messages
+  resources :distribution_lists
   resources :custom_options
   resources :cause_options do
     member do
