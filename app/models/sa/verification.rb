@@ -1,6 +1,13 @@
 class Verification < ActiveRecord::Base
 
+  belongs_to :owner, polymorphic: true
   belongs_to :validator, foreign_key: 'users_id', class_name: 'User'
+
+  after_commit lambda {
+    transaction_log('Create') if transaction_include_action?(:create)
+    transaction_log('Update') if transaction_include_action?(:update)
+  }
+
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -14,10 +21,17 @@ class Verification < ActiveRecord::Base
   end
 
 
-
   def self.get_result_options
     ["New", "Approved", "Rejected"]
   end
 
+
+  def transaction_log(action)
+    Transaction.build_for(
+      self.owner,
+      "#{action.titleize} Verification",
+      session[:user_id],
+      self.detail)
+  end
 
 end

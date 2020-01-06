@@ -19,8 +19,6 @@ class SmsAction < Sa::SafetyAssuranceBase
   belongs_to  :created_by,              foreign_key: 'created_by_id',             class_name: 'User'
   belongs_to  :owner,                   polymorphic: true
   has_many    :descriptions,            foreign_key: 'owner_id',                  class_name: 'SmsActionDescription',     :dependent => :destroy
-  has_many    :verifications,           foreign_key: "owner_id",                  class_name: "SmsActionVerification",    :dependent => :destroy
-  has_many    :extension_requests,      foreign_key: "owner_id",                  class_name: "SmsActionExtensionRequest",:dependent => :destroy
 
   after_create :create_transaction
   after_create -> { create_owner_transaction(action:'Add Corrective Action') }
@@ -44,19 +42,6 @@ class SmsAction < Sa::SafetyAssuranceBase
       </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
-    end
-  end
-
-
-  def get_status
-    verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0
-    extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
-    if verification_needed
-      "Completed, Verification Required"
-    elsif extension_requested
-      "#{status}, Extension Requested"
-    else
-      status
     end
   end
 

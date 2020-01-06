@@ -77,8 +77,8 @@ end
   end
 
 
-  def get_completion_date
-    self.scheduled_completion_date.present? ? self.scheduled_completion_date.strftime("%Y-%m-%d") : ""
+  def get_due_date
+    self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
 
 

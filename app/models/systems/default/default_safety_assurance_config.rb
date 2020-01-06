@@ -20,9 +20,9 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
-          completion: {default: true, on_newline: true },
+          due_date: {default: true, on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true },
           approver: { default: true },
@@ -73,9 +73,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
           #INLINE
-          *%i[assign complete approve_reject reopen contact task cost finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts findings costs signatures comments attachments transaction_log
+        panels: %i[occurrences tasks contacts findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -84,10 +84,10 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           viewer_access: { default: true, on_newline: true },
-          completion: { default: true, on_newline: true },
+          due_date: { default: true, on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true, title: 'Lead Inspector' },
           approver: { default: true },
@@ -136,9 +136,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete approve_reject reopen task cost contact finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -147,10 +147,10 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           viewer_access: { default: true, on_newline: true },
-          completion: { default: true, on_newline: true },
+          due_date: { default: true, on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true, title: 'Lead Evaluator' },
           approver: { default: true },
@@ -203,9 +203,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete approve_reject reopen task cost contact finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments attachments transaction_log
+        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -219,10 +219,10 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6, type: 'text', visible: 'index,show',
             required: false
           },
-          status: { default: true, on_newline: true },
+          status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           viewer_access: { default: true, on_newline: true },
-          completion: { default: true, on_newline: true },
+          due_date: { default: true, on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true, title: 'Investigator' },
           approver: { default: true },
@@ -288,9 +288,9 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete approve_reject reopen recommendation contact task cost sms_action finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments attachments transaction_log
+        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -299,7 +299,7 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true, on_newline: true },
+          status: { default: true, field: 'get_status', on_newline: true },
           get_source: {
             field: 'get_source', title: 'Source of Input',
             num_cols: 6, type: 'text', visible: 'index,show',
@@ -308,7 +308,7 @@ class DefaultSafetyAssuranceConfig
           created_by: { default: true, on_newline: true },
           responsible_user: { default: true },
           approver: { default: true, visible: 'index,form,show' },
-          completion: { field: 'completion_date', default: true },
+          due_date: { field: 'due_date', default: true },
 
           root_causes_full: { default: true, title: "#{I18n.t("sa.finding.root_cause.title")}" },
           root_causes: { default: true, title: "#{I18n.t("sa.finding.root_cause.title")}",
@@ -424,7 +424,7 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete recommendation sms_action approve_reject reopen comment],
+          *%i[assign complete request_extension schedule_verification recommendation sms_action approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -433,7 +433,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences attachments transaction_log
+        panels: %i[occurrences extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -449,7 +449,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           created_by: { default: true },
-          completion: { default: true, field: 'schedule_completion_date', on_newline: true },
+          due_date: { default: true, field: 'due_date', on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true },
           approver: { default: true, visible: 'index,form,show', required: true },
@@ -518,7 +518,7 @@ class DefaultSafetyAssuranceConfig
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
             #TODO: Complete Notices<=Notifications Update and add set_alert after view_parent
           #INLINE
-          *%i[assign complete request_extension schedule_validation cost approve_reject reopen comment],
+          *%i[assign complete request_extension schedule_verification cost approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -527,7 +527,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments attachments transaction_log
+        panels: %i[occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
@@ -536,15 +536,15 @@ class DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
-          status: { default: true },
+          status: { default: true, field: 'get_status' },
           get_source: {
             field: 'get_source', title: 'Source of Input',
             num_cols: 6, type: 'text', visible: 'index,show',
             required: false
           },
           created_by: { default: true },
-          response_date: {
-            field: 'response_date', title: 'Scheduled Response Date',
+          due_date: {
+            field: 'due_date', title: 'Scheduled Response Date',
             num_cols: 6, type: 'date', visible: 'index,form,show',
             required: true, on_newline: true
           },
@@ -584,7 +584,7 @@ class DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete approve_reject reopen comment]
+          *%i[assign complete request_extension schedule_verification approve_reject reopen comment]
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -593,7 +593,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comment attachments transaction_log
+        panels: %i[occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       }
     },

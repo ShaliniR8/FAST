@@ -164,8 +164,8 @@ class DefaultDictionary
         !['Completed', 'Rejected'].include?(owner.status) && !owner.root_cause_lock?
       },
     },
-    schedule_validation:{
-      btn: :schedule_validation,
+    schedule_verification:{
+      btn: :schedule_verification,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
         CONFIG::GENERAL[:has_verification] && owner.status == 'Completed'
@@ -397,6 +397,22 @@ class DefaultDictionary
         transactions: owner.transactions.preload(:user, :owner) #owner is for get_user_name
       }},
     },
+    extension_requests: {
+      partial: '/extension_requests/show_requests',
+      visible: proc { |owner:, user:, **op| owner.extension_requests.present?},
+      show_btns: proc { |owner:, user:, **op| true},
+      data: proc { |owner:, user:, **op| {
+        records: owner.extension_requests
+      }},
+    },
+    verifications: {
+      partial: '/verifications/show_verifications',
+      visible: proc { |owner:, user:, **op| owner.verifications.present?},
+      show_btns: proc { |owner:, user:, **op| true},
+      data: proc { |owner:, user:, **op| {
+        records: owner.verifications
+      }},
+    }
   }
 
   META_DATA = {
@@ -425,8 +441,8 @@ class DefaultDictionary
       num_cols: 6,  type: 'boolean_box', visible: 'show',
       required: false
     },
-    completion: {
-      field: 'completion', title: 'Scheduled Completion Date',
+    due_date: {
+      field: 'due_date', title: 'Scheduled Completion Date',
       num_cols: 6,  type: 'date', visible: 'index,form,show',
       required: true
     },

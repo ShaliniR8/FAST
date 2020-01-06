@@ -1,97 +1,93 @@
-<%if records.length > 0%>
-
-  <div class="col-xs-12">
-    <div class="panel panel-info">
-      <div class="panel-heading click-heading collapsed">
-        <div class="panel-title">
-          <b><%=title%></b>
-          <span class="pull-right clickable">
-            <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-          </span>
-        </div>
+<div class="col-xs-12">
+  <div class="panel panel-info">
+    <div class="panel-heading click-heading collapsed">
+      <div class="panel-title">
+        <b>Extension Requests</b>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
       </div>
+    </div>
 
-      <div class="panel-body" style="display:none">
-        <div class="table-responsive">
-          <table id="records_table"
-            class="table table-striped table-bordered"
-            width="100%">
-            <thead>
-              <tr>
-                <%fields.each do |field|%>
-                  <th><%=field[:title]%></th>
-                <%end%>
-                <th width="20%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%records.each do |record|%>
-                <tr record_id="<%=record.id%>">
-                  <%fields.each do |field|%>
-                    <%field_name = field[:field]%>
-                    <%field_value = record.send(field_name)%>
-                    <%field_display = field[:display]%>
-                    <%field_progress = field[:progress].present? ? record.send(field[:progress]) : '0%'%>
-                    <%html_class = field[:html_class].present? ? record.send(field[:html_class]) : ''%>
-                    <td class="<%=html_class%> percent" percentage="<%=field_progress%>">
-                      <%case field[:type]%>
-                      <%when "boolean"%>
-                        <%boolean_options = {true => "Yes", false => "No"}%>
-                        <%=boolean_options[field_value]%>
-                      <%when "date"%>
-                        <%=date_to_string(field_value)%>
-                      <%when "datetime"%>
-                        <%=datetime_to_string(field_value)%>
-                      <%when "checkbox"%>
-                        <%=field_value%>
-                      <%when "user"%>
-                        <%if field_value != nil && field_value != ""%>
-                          <%user = User.find(field_value)%>
-                          <%if user.present?%>
-                            <%=User.find(field_value).full_name%>
-                          <%end%>
-                        <%else%>
-                          <%=""%>
+    <div class="panel-body" style="display:none">
+      <div class="table-responsive">
+        <table id="records_table"
+          class="table table-striped table-bordered"
+          width="100%">
+          <thead>
+            <tr>
+              <%ExtensionRequest.get_meta_fields('index').each do |field|%>
+                <th><%=field[:title]%></th>
+              <%end%>
+              <th width="20%">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%records.each do |record|%>
+              <tr record_id="<%=record.id%>">
+                <%ExtensionRequest.get_meta_fields('index').each do |field|%>
+                  <%field_name = field[:field]%>
+                  <%field_value = record.send(field_name)%>
+                  <%field_display = field[:display]%>
+                  <%field_progress = field[:progress].present? ? record.send(field[:progress]) : '0%'%>
+                  <%html_class = field[:html_class].present? ? record.send(field[:html_class]) : ''%>
+                  <td class="<%=html_class%> percent" percentage="<%=field_progress%>">
+                    <%case field[:type]%>
+                    <%when "boolean"%>
+                      <%boolean_options = {true => "Yes", false => "No"}%>
+                      <%=boolean_options[field_value]%>
+                    <%when "date"%>
+                      <%=date_to_string(field_value)%>
+                    <%when "datetime"%>
+                      <%=datetime_to_string(field_value)%>
+                    <%when "checkbox"%>
+                      <%=field_value%>
+                    <%when "user"%>
+                      <%if field_value != nil && field_value != ""%>
+                        <%user = User.find(field_value)%>
+                        <%if user.present?%>
+                          <%=User.find(field_value).full_name%>
                         <%end%>
-                      <%when "textarea"%>
-                        <%=field_value.gsub(/\n/, '<br/>').html_safe rescue ''%>
-                      <%when "select"%>
-                        <%if field_display.present?%>
-                          <%=field_display[field_value]%>
-                        <%else%>
-                          <%=field_value%>
-                        <%end%>
+                      <%else%>
+                        <%=""%>
+                      <%end%>
+                    <%when "textarea"%>
+                      <%=field_value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+                    <%when "select"%>
+                      <%if field_display.present?%>
+                        <%=field_display[field_value]%>
                       <%else%>
                         <%=field_value%>
                       <%end%>
-                    </td>
-                  <%end%>
-                  <td>
-                    <%if record.status == "New"%>
-                      <%=link_to "Edit",
-                        "#",
-                        :route => edit_extension_request_path(record),
-                        :class => "btn btn-warning mr5 mb5 edit_extension_request_btn",
-                        "data-toggle"=>"modal",
-                        "data-target"=>".bs-example-modal-lg"%>
-                      <%=link_to "Address",
-                        "#",
-                        :route => address_extension_request_path(record),
-                        :class => "btn btn-success mr5 mb5 address_extension_request_btn",
-                        "data-toggle"=>"modal",
-                        "data-target"=>".bs-example-modal-lg"%>
+                    <%else%>
+                      <%=field_value%>
                     <%end%>
                   </td>
-                </tr>
-              <%end%>
-            </tbody>
-          </table>
-        </div>
+                <%end%>
+                <td>
+                  <%if record.status != 'Completed'%>
+                    <%=link_to "Edit",
+                      '#',
+                      :route => edit_extension_request_path(record),
+                      :class => "btn btn-warning mr5 mb5 edit_extension_request_btn",
+                      "data-toggle"=>"modal",
+                      "data-target"=>".bs-example-modal-lg"%>
+                    <%=link_to "Address",
+                      '#',
+                      :route => address_extension_request_path(record),
+                      :class => "btn btn-success mr5 mb5 address_extension_request_btn",
+                      "data-toggle"=>"modal",
+                      "data-target"=>".bs-example-modal-lg"%>
+                  <%end%>
+                </td>
+              </tr>
+            <%end%>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-
-<%end%>
+</div>
 
 
 <style>

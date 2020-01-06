@@ -10,6 +10,8 @@ class ProsafetBase < ActiveRecord::Base
 
   include Noticeable
   include Messageable
+  include ExtensionRequestable
+  include Verifiable
 
   self.abstract_class = true
   include Rails.application.routes.url_helpers #For path method
@@ -55,6 +57,20 @@ class ProsafetBase < ActiveRecord::Base
   # Returns the class with namespacing separated by / for url pathing
   def self.pathify
     self.name.gsub(/\:\:/, '/').pluralize.downcase
+  end
+
+
+  # Get full status including verification and extension
+  def get_status
+    verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0 rescue false
+    extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
+    if verification_needed
+      "#{status}, Verification Required"
+    elsif extension_requested
+      "#{status}, Extension Requested"
+    else
+      status
+    end
   end
 
 end

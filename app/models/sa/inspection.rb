@@ -16,6 +16,7 @@ class Inspection < Sa::SafetyAssuranceBase
   include SmsTaskable
   include Transactionable
 
+
 #Associations List
   belongs_to :approver,             foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :responsible_user,     foreign_key: 'responsible_user_id', class_name: 'User'

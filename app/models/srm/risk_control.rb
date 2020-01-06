@@ -9,7 +9,7 @@ class RiskControl < Srm::SafetyRiskManagementBase
   include Costable
   include Occurrenceable
   include Transactionable
-  include Noticeable
+  include ExtensionRequestable
 
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"
   belongs_to  :approver,          foreign_key: 'approver_id',           class_name: 'User'
@@ -37,8 +37,8 @@ class RiskControl < Srm::SafetyRiskManagementBase
   end
 
 
-  def get_completion_date
-    self.scheduled_completion_date.present? ? self.scheduled_completion_date.strftime("%Y-%m-%d") : ""
+  def get_due_date
+    self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
 
 
