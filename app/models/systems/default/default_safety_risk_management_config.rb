@@ -169,9 +169,9 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete approve_reject hazard reopen comment],
+          *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[hazards agendas records occurrences comments attachments transaction_log
+        panels: %i[agendas occurrences comments extension_requests verifications records hazards attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
@@ -299,7 +299,7 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_hazard attach_in_message expand_all],
           #INLINE
-          *%i[assign complete cost approve_reject reopen comment],
+          *%i[assign complete cost request_extension schedule_verification approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
@@ -322,7 +322,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[descriptions costs occurrences comments attachments transaction_log
+        panels: %i[descriptions costs occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'SafetyPlan' => {
