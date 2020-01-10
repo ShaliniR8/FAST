@@ -140,7 +140,7 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'panel_end', visible: 'form,show'
           },
           regulatory_compliances_panel_start: {
-            title: 'Affected Regulatory Compliances',
+            field: 'compliances', title: 'Affected Regulatory Compliances',
             num_cols: 12, type: 'panel_start', visible: 'form,show'
           },
           compliances: {
