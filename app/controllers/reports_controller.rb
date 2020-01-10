@@ -502,16 +502,18 @@ class ReportsController < ApplicationController
         record.status = 'Closed'
         record.save
         submission = record.submission
-        notify(record.submission, notice: {
-          users_id: record.created_by.id,
-          content: "Your submission ##{record.submission.id} has been closed by analyst."},
-          mailer: true, subject: "Submission ##{record.submission.id} Closed by Analyst")
-        Transaction.build_for(
-          submission,
-          'Close',
-          current_user.id,
-          'Report has been closed.'
-        )
+        if submission.present?
+          notify(record.submission, notice: {
+            users_id: record.created_by.id,
+            content: "Your submission ##{record.submission.id} has been closed by analyst."},
+            mailer: true, subject: "Submission ##{record.submission.id} Closed by Analyst")
+          Transaction.build_for(
+            submission,
+            'Close',
+            current_user.id,
+            'Report has been closed.'
+          )
+        end
         Transaction.build_for(
           record,
           'Close',
