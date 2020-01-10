@@ -158,13 +158,23 @@ class QueriesController < ApplicationController
       arr.each do |record|
         x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
         series = record[:series].blank? ? 'N/A' : record[:series]
-        if data_hash[x_axis] && data_hash[x_axis][series]
-          data_hash[x_axis][series] += 1
-        elsif data_hash[x_axis]
-          data_hash[x_axis][series] = 1
+
+        if x_axis.is_a?(Array) && series.is_a?(Array)
+          x_axis.each do |x|
+            series.each do |y|
+              populate_hash(data_hash, x, y)
+            end
+          end
+        elsif x_axis.is_a?(Array)
+          x_axis.each do |x|
+            populate_hash(data_hash, x, series)
+          end
+        elsif series.is_a?(Array)
+          series.each do |y|
+            populate_hash(data_hash, x_axis, y)
+          end
         else
-          data_hash[x_axis] = Hash.new
-          data_hash[x_axis][series] = 1
+          populate_hash(data_hash, x_axis, series)
         end
       end
       # get first row and first column values
@@ -543,7 +553,7 @@ class QueriesController < ApplicationController
     when 'boolean_box', 'boolean'
       (value ? 'Yes' : 'No') rescue 'No'
     when 'checkbox'
-      value.split(';')
+      value.split(';') rescue nil
     when 'list'
       value.split('<br>')
     else
@@ -573,6 +583,19 @@ class QueriesController < ApplicationController
       res
     end
     arr
+  end
+
+
+  # return 2D hash of x_axis and series values
+  def populate_hash(data_hash, x_axis, series)
+    if data_hash[x_axis] && data_hash[x_axis][series]
+      data_hash[x_axis][series] += 1
+    elsif data_hash[x_axis]
+      data_hash[x_axis][series] = 1
+    else
+      data_hash[x_axis] = Hash.new
+      data_hash[x_axis][series] = 1
+    end
   end
 
 end
