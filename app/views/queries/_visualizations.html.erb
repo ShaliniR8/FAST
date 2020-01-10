@@ -48,7 +48,7 @@
     $("#add_btn").on("click", function(e){
       e.preventDefault();
       $.ajax({
-        type: "GET",
+        type: "POST",
         url: "<%=add_visualization_query_path(@owner)%>",
         data: {"records": "<%=@records.map(&:id).join(',')%>"},
         success: function(response){$("#visualizations").prepend(response);},

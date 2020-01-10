@@ -102,7 +102,7 @@
       var visualization_id = $(this).data("visualization-id");
 
       $.ajax({
-        type: "GET",
+        type: "POST",
         url: "<%=generate_visualization_query_path(@owner)%>",
         data: {
           "visualization_id": visualization_id,
