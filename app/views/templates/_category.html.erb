@@ -1,38 +1,60 @@
-<div class="col-sm-12 col-md-12 col-lg-12"%>
-  <div class="panel <%=cat.panel%>">
+<div class="col-sm-12 col-md-12 col-lg-12">
+  <div class="panel <%=cat.panel%> category-panel">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b><%=cat.title%> <font color="grey">(#<%=cat.id%>)</font></b>
-        <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
       </div>
     </div>
     <div class="panel-body" style="display:none">
-      <p><%=cat.description%><br></p>
+
       <div class="row">
-        <%cat.fields.where(:deleted => false, :nested_field_id => nil).order(:field_order).each do |field|%>
+        <div class="col-xs-12">
+          <font style="color:blue;font-weight:bold"><%=cat.description%></font>
+        </div>
+
+        <%cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order).each do |field|%>
           <%=render "field", :field => field%>
-
-
-          <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-            <div class="form-group nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>" style="display:none;">
-              <font color="blue"%><%=render "field", :field => nested_field%></font>
+          <%if field.nested_fields.where(:deleted => false).present?%>
+            <div class='col-xs-12'>
+              <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+                <div class="nested_field
+                  nested_field_<%=field.id%>
+                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                  style="display:none;">
+                  <%=render "field", :field => nested_field%>
+                </div>
+              <%end%>
             </div>
           <%end%>
-
-
         <%end%>
       </div>
     </div>
   </div>
 </div>
 
+<style>
+  .smallselect {
+    position: relative;
+    top: 50%;
+  }
+</style>
 
 <script>
-  $(".field_select").on("change", function(){
-    var field_id = $(this).find(':selected').attr('data-id')
-    var field_value = $(this).val();
-    $(".nested_field_" + field_id).hide();
-    $(".nested_field_" + field_id + "_" + field_value).show();
+  $(function(){
+    $(".required_field").css('border-color', '');
+    $(".required_field").closest('.form-group').find('label').css("color", "red");
+    $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
+    $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
+
+    $(".field_select").on("change", function(){
+      var field_id = $(this).attr("data-id");
+      var field_value = $(this).val();
+      $(".nested_field_" + field_id).hide();
+      $(".nested_field_" + field_id + "_" + field_value).show();
+    });
   });
 </script>
 

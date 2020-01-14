@@ -1,131 +1,118 @@
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
-<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
-<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
-<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
-<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
-
-
-<%size = "col-md-" + field.display_size.to_s + " col-xs-" + "12" + " col-sm-" + "6" + " col-lg-" + field.display_size.to_s%>
+<%xs_val = field.display_size.to_s%>
+<%if xs_val.to_i < 6 %>
+  <%xs_val = "6"%>
+<%end%>
+<%size = "col-md-" + field.display_size.to_s +
+  " col-xs-" + xs_val + " col-sm-" +
+  field.display_size.to_s + " col-lg-" +
+  field.display_size.to_s%>
 
 <div class="<%=size%> form-group">
 
-  <label><%=field.label%> <font color="grey">(#<%=field.id%>)</font></label>
+  <label>
+    <%=field.get_label.present? ? field.get_label.html_safe : nil%>
+  </label>
 
-  <%if field.display_type == "text"%>
-    <input type="text" class="form-control <%= (field.data_type=='date'|| field.data_type=='datetime') ? 'field-'+field.data_type : ''%>" placeholder="<%=field.label%>" <%= field.data_type=='date' ? 'Readonly' : ''%>>
+  <%required = field.required? ? "required_field" : "" %>
 
+  <%if field.display_type == 'text'%>
+    <%if field.data_type == 'date'%>
+      <%field_class = 'field-date form-control'%>
+    <%elsif field.data_type == 'datetime'%>
+      <%field_class = 'field-datetime form-control'%>
+    <%else%>
+      <%field_class = 'form-control'%>
+    <%end%>
+    <%=text_field_tag :value, nil, {class: "#{required} #{field_class} #{field.element_class}", id: field.element_id}%>
+
+
+  <%elsif field.display_type == 'textarea'%>
+    <%=text_area_tag :value, nil,
+      {class: "#{required} form-control #{field.element_class}",
+      rows: 4,
+      id: field.element_id}%>
 
   <%elsif field.display_type == "dropdown"%>
-    <select class="form-control field_select" id="preview_select" name="preview_select">
-      <option></option>
-      <%field.getOptions.each do |option|%>
-        <option data-id="<%=field.id%>"><%=option%></option>
-      <%end%>
-    </select>
+    <%if field.data_type == "timezone"%>
+      <div class="input-group">
+        <%=select_tag :value,
+          options_for_select(field.getOptions),
+          {class: 'form-control tz atz timezone_field field_select ' + required,
+          :id => "#{field.id}"}%>
+        <span class="input-group-addon tc">All</span>
+      </div>
+    <%else%>
+      <%=select_tag :value, options_for_select(field.getOptions),
+        { include_blank: '',
+          "data-id" => field.id,
+          class: "#{required} field_select form-control #{field.element_class}",
+          id: field.element_id}%>
+    <%end%>
 
-
-  <%elsif field.display_type == "checkbox"%>
+  <%elsif field.display_type == 'checkbox'%>
     </br>
-    <div  class="smallselect">
-      <%field.getOptions.each do |option|%>
-        <input type="checkbox" value="">&nbsp&nbsp&nbsp<%=option%>&nbsp&nbsp&nbsp
-      <%end%>
+    <div class="<%=field.display_size == 12 && field.show_label ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+      <div class="col-xs-12">
+        <%field.getOptions.each do |option|%>
+          <div class="col-xs-6">
+            <label class="checkbox">
+              <%=check_box_tag :value, nil, nil, {class: 'checkbox'}%>
+              <%=option%>
+            </label>
+          </div>
+        <%end%>
+      </div>
     </div>
-
-
   <%elsif field.display_type == "radio"%>
-    <div  class="smallselect">
-      <%temp_name=SecureRandom.uuid.to_s%><br>
-      <%field.getOptions.each do |option|%>
-        <input type="radio" name="<%=temp_name%>" value="<%=option%>">&nbsp&nbsp&nbsp<%=option%>&nbsp&nbsp&nbsp
-      <%end%>
+    <div  class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> <%=field.show_label ? 'mt5' : ''%>">
+      <div class="col-xs-12">
+        <%field.getOptions.each do |option|%>
+          <div class="col-xs-6">
+            <label class="radio">
+              <%=radio_button_tag :value, option%>
+              <%=option%>
+            </label>
+          </div>
+        <%end%>
+      </div>
     </div>
-
-
-  <%elsif field.display_type == "textarea"%>
-    <textarea class="form-control" placeholder="<%=field.label%>"></textarea>
-
-  <%elsif field.display_type == "datalist"%>
-    <textfield class="form-control" placeholder="<%=field.label%>"></textfield>
-
   <%elsif field.display_type == "employee"%>
     <div class="input-group">
-      <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp",:readonly=>true,:id=>"emp#{field.id}"}%>
+      <%=text_field_tag field.get_label, nil,
+        { class: "form-control ml5 emp #{required}",
+          readonly: true,
+          id: "emp#{field.id}"}%>
       <span class="input-group-btn">
-        <%=link_to "...", "#", :class=>"btn btn-info emp_button", "data-toggle"=>"modal", "data-target"=>".bs-example-modal-lg", :id=>"#{field.id}"%>
+        <%=link_to "...", "#",
+          :class => "btn btn-info emp_button",
+          "data-toggle"=>"modal",
+          "data-target"=>".emp_modal",
+          :id=>"#{field.id}"%>
       </span>
     </div>
-
-
   <%elsif field.display_type == "airport"%>
     <div class="input-group">
-      <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 airport",:readonly=>true,:id=>"airport#{field.id}"}%>
-      <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg", :id=>"#{field.id}"%></span>
+      <%=text_field_tag field.get_label, nil,
+        {:class => "form-control ml5 airport " + required,
+          :readonly => true,
+          :id => "airport#{field.id}"}%>
+      <span class="input-group-btn">
+        <%=link_to "...", "#",
+          :class => "btn btn-info airport_button",
+          "data-toggle" => "modal",
+          "data-target" => ".airport_modal",
+          :id => "#{field.id}"%>
+      </span>
     </div>
+  <%elsif field.display_type == "datalist"%>
+    <%=text_field_tag :value, nil,
+      {:list => "#{field.id}",
+      :class => "field_select form-control " + required,
+      "data-id" => field.id}%>
+    <datalist id="<%=field.id%>">
+      <%field.getOptions.each do |opt|%>
+        <option value="<%=opt%>"></option>
+      <%end%>
+    </datalist>
   <%end%>
-
 </div>
-
-
-
-
-<style>
-.smallselect {
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-}
-</style>
-
-
-
-<script>
-
-  var table = new Array();
-
-  function build_table(){
-    table["<%=field.id%>"] = $('#employees<%=field.id%>').DataTable({
-        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-        "iDisplayLength": 5
-    });
-  }
-
-  function clear_table(){
-    table["<%=field.id%>"].destroy();
-  }
-
-
-  $(document).ready(function(){
-    <%if field.display_type=="employee"%>
-      build_table();
-      $('#emp<%=field.id%>').on('click',function(){
-        $("#employee_<%=field.id%>").show();
-        $(window).trigger('resize');
-        clear_table();
-        $('tbody tr' ).unbind();
-        $('.close' ).unbind();
-        $('tbody tr').on('click',function(){
-          $('#emp_<%=field.id%>').val($(this).find('td').eq(3).text());
-          $('#employee-select<%=field.id%>').val($(this).find('td').eq(0).text());
-          $('#emp_div').hide();
-          $("#employee_<%=field.id%>").modal('toggle');
-        });
-        $('.close').on('click',function(){
-          $('#emp_<%=field.id%>').val("");
-          $('#employee-select<%=field.id%>').val("");
-          $('#emp_div').hide();
-        });
-        build_table();
-      });
-    <%end%>
-  });
-
-
-</script>
-
-

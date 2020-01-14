@@ -2,12 +2,22 @@
 <script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
+<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
     <div class="col-lg-12">
       <%=render "shared/alerts"%>
-      <div class="panel panel-primary">
+      <div class="panel panel-steelblue">
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
@@ -16,7 +26,7 @@
             <div class="top_buttons pull-right">
               <%=link_to "Expand All",
                 "#",
-                :class => "btn btn-warning expandall"%>
+                :class => "btn btn-default expandall"%>
               <%=link_to "Create Record",
                 new_submission_path(:template => @template),
                 :id => "record-btn",
@@ -45,6 +55,34 @@
             <b>Last Updated: </b><%=@template.updated%><br>
           </div>
 
+          <div class="col-xs-12 col-sm-2 mb20">
+            <%=label_tag :submitted_by, 'Submitted By'%>
+            <%=text_field_tag :submitted_by, current_user.full_name, class: 'form-control', disabled: true%>
+          </div>
+
+          <%if BaseConfig.airline[:submission_description]%>
+            <div class="col-xs-12 col-sm-4">
+              <%=label_tag :event_title, 'Event Title'%>
+              <%=text_field_tag :event_title, nil, class: 'form-control'%>
+            </div>
+          <%end%>
+
+          <div class="col-xs-12 col-sm-4 mb20">
+            <%=label_tag :event_date, 'Date and Time of Event'%>
+            <%=text_field_tag :event_date, nil, class: 'form-control field-datetime'%>
+          </div>
+
+          <%if BaseConfig.airline[:submission_time_zone]%>
+            <div class="col-xs-12 col-sm-2 mb5">
+              <%=label_tag :event_time_zone, "Time Zone"%>
+              <div class="input-group">
+                <%=select_tag :event_time_zone, [], {class: 'form-control tz atz toplevel_timezone'}%>
+                <span class="input-group-addon tc">All</span>
+              </div>
+            </div>
+          <%end%>
+
+
           <%@template.categories.where(deleted: false).order(:category_order).each do |cat|%>
             <%if cat.id == 338%>
               <%=render "observation_phases", :cat => cat%>
@@ -58,4 +96,20 @@
     </div>
   </div>
 </div>
+
+
+<style>
+  .checkbox,
+  .radio{
+    cursor: pointer;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+  .checkbox:hover {
+    font-weight:bold;
+  }
+  .radio:hover {
+    font-weight:bold;
+  }
+</style>
 
