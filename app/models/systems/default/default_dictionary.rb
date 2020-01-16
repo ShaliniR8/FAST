@@ -570,6 +570,14 @@ class DefaultDictionary
       field: 'get_root_causes', title: 'Root Causes',
       type: 'list', visible: '' #should include index w/ CONFIG[:has_root_causes]
     },
+    occurrences: {
+      field: 'get_occurrences', title: 'Occurrences',
+      type: 'list', visible: 'index'
+    },
+    occurrences_full: {
+      field: 'get_occurrences_full', title: 'Occurrences Full',
+      type: 'list', visible: 'index'
+    },
     description: {
       field: 'description', title: 'Event Title',
       num_cols: 12, type: 'text', visible: 'index,show',
