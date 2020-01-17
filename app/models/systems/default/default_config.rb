@@ -193,9 +193,9 @@ class DefaultConfig
     },
 
     risk_table_index: {
-      red:        "High",
-      yellow:     "Moderate",
-      limegreen:  "Low"
+      "High"      => 'red',
+      "Moderate"  => 'yellow',
+      "Low"       => 'limegreen'
     },
 
     risk_table_dict: {
