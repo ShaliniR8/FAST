@@ -222,11 +222,11 @@ class DefaultConfig
   end
 
   def self.print_severity(owner, severity_score)
-    MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
+    self::MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
   end
 
   def self.print_probability(owner, probability_score)
-    MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
+    self::MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
   end
 
   def self.print_risk(probability_score, severity_score)

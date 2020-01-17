@@ -192,7 +192,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           departments: {
-            field: 'departments', title: 'Affected Department',
+            field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: Hazard.get_custom_options('Departments')
           },
@@ -259,7 +259,7 @@ class DefaultSafetyRiskManagementConfig
           created_by: { default: true },
           title: { default: true },
           departments: {
-            field: 'departments', title: 'Affected Department',
+            field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: RiskControl.get_custom_options('Departments')
           },

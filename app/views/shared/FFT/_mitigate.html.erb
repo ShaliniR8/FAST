@@ -144,11 +144,11 @@
 
   function set_mitigate(row_index,column_index){
     clear_mitigate();
-    risk_table_def = <%=FFT_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=FFT_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_def = <%=FFTConfig::MATRIX_INFO[:risk_table][:rows_content].to_json.html_safe%>
+    risk_table_dic = <%=FFTConfig::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
     $('.mitigate_risk_td').each(function(){
-      if($(this).data("row")==row_index && $(this).data("column")==column_index){
-      $(this).html("<span class='glyphicon glyphicon-ok' style='color:black'></span>");
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
+        $(this).find('.content').addClass('circle mitigated-circle');
         $('#sev').val(row_index);
         $('#like').val(column_index);
         $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
@@ -158,7 +158,7 @@
 
   function clear_mitigate(){
     $('.mitigate_risk_td').each(function(){
-        $(this).text("");
+      $(this).find('.content').removeClass('circle mitigated-circle');
     });
   }
 
@@ -166,7 +166,7 @@
     clear_mitigate();
     $('.mitigate_risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column")==column_index){
-        $(this).html("<span class='glyphicon glyphicon-ok style='color:black'></span>");
+        $(this).find('.content').addClass('circle mitigated-circle');
         $('#sev').val(row_index);
         $('#like').val(column_index);
       }
