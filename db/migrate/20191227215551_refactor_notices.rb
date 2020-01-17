@@ -1,9 +1,8 @@
 class RefactorNotices < ActiveRecord::Migration
   def self.up
-    change_column :notices, :status, :integer, :default => 1
+
     add_column :notices, :category, :integer, :default => 1
     add_column :notices, :end_date, :date
-
 
     type_hash_map = {
       'sras' => 'SRA',
@@ -37,6 +36,7 @@ class RefactorNotices < ActiveRecord::Migration
       end
     end
 
+    change_column :notices, :status, :integer, :default => 1
     remove_column :notices, :expire_date
     remove_column :notices, :action
     remove_column :notices, :create_email
