@@ -54,10 +54,10 @@ class BSKSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
     objects:{
       'Hazard' => {
         actions: {
-          complete: {
+          complete_hazard: {
             access: proc { |owner:,user:,**op|
               # Request for Hazards to not be completed without root cause analysis - 11/2019 Armando Martinez
-              super_proc('Hazard',:complete).call(owner:owner,user:user,**op) && owner.root_causes.present?
+              super_proc('Hazard',:complete_hazard).call(owner:owner,user:user,**op) && owner.root_causes.present?
             },
           },
         },
