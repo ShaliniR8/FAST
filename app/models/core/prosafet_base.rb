@@ -83,7 +83,7 @@ class ProsafetBase < ActiveRecord::Base
   end
 
   def get_risk_classification_after
-    risk_factor_after.split('-').reject(&:empty?).first rescue risk_factor
+    risk_factor_after.split('-').reject(&:empty?).first rescue risk_factor_after
   end
 
   def get_risk_score_after
