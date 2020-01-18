@@ -192,7 +192,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           departments: {
-            field: 'departments', title: 'Affected Department',
+            field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: Hazard.get_custom_options('Departments')
           },
@@ -212,9 +212,11 @@ class DefaultSafetyRiskManagementConfig
           likelihood: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Likelihood" },
           severity: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Severity" },
           risk_factor: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk" },
+          risk_score: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk Score" },
           likelihood_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Likelihood" },
           severity_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Severity" },
           risk_factor_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Risk" },
+          risk_score_after: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk Score" },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -259,7 +261,7 @@ class DefaultSafetyRiskManagementConfig
           created_by: { default: true },
           title: { default: true },
           departments: {
-            field: 'departments', title: 'Affected Department',
+            field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: RiskControl.get_custom_options('Departments')
           },

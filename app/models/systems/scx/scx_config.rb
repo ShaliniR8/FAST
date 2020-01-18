@@ -203,12 +203,21 @@ class SCXConfig < DefaultConfig
     },
 
     risk_table_index: {
+      "High" => 'crimson',
+      "Serious" => 'coral',
+      "Moderate" => 'yellow',
+      "Minor" => 'steelblue',
+      "Low" => 'mediumseagreen'
+    },
+
+    risk_table_dict: {
       crimson:        "High",
       coral:          "Serious",
       yellow:         "Moderate",
       steelblue:      "Minor",
       mediumseagreen: "Low"
     },
+
 
     risk_definitions: {
       crimson:          { rating: 'High',      cells: 'A/1, A/2, and B/1',                      description: '' },

@@ -143,25 +143,10 @@ class NAMSConfig < DefaultConfig
       row_header: ['A', 'B', 'C', 'D'],
       rows: [
         ['crimson',     'crimson',          'coral',              'yellow'              ],
-        ['crimson',     'coral',            'yellow',               'mediumseagreen'    ],
-        ['coral',       'yellow',             'yellow',               'mediumseagreen'    ],
+        ['crimson',     'coral',            'yellow',             'mediumseagreen'    ],
+        ['coral',       'yellow',           'yellow',             'mediumseagreen'    ],
         ['yellow',      'mediumseagreen',   'mediumseagreen',     'mediumseagreen'    ],
       ]
-    },
-
-
-    risk_table_dict: {
-      crimson:        "Red (A/I, A/II, B/I) - HIGH",
-      coral:          "Orange (A/III, B/II, C/I) - SERIOUS",
-      yellow:         "Yellow (A/IV, B/III, C/II, C/III, D/I) - MODERATE",
-      mediumseagreen: "Green (B/IV, C/IV, D/II, D/III, D/IV) - LOW"
-    },
-
-    risk_table_index: {
-      crimson:        "HIGH",
-      coral:          "SERIOUS",
-      yellow:         "MODERATE",
-      mediumseagreen: "LOW"
     },
 
     risk_definitions: {
@@ -169,7 +154,23 @@ class NAMSConfig < DefaultConfig
       coral:            {rating: "SERIOUS",   cells: "A/III, B/II, and C/I",                  description: ""},
       yellow:           {rating: "MODERATE",  cells: "A/IV, B/III, C/II, C/III, and D/I",     description: ""},
       mediumseagreen:   {rating: "LOW",       cells: "B/IV, C/IV, D/II, D/III and D/IV",      description: ""}
-    }
+    },
+
+    risk_table_index: {
+      "HIGH" => 'crimson',
+      "SERIOUS" => 'coral',
+      "MODERATE" => 'yellow',
+      "LOW" => 'mediumseagreen'
+    },
+
+    risk_table_dict: {
+      crimson:        "HIGH",
+      coral:          "SERIOUS",
+      yellow:         "MODERATE",
+      mediumseagreen: "LOW"
+    },
+
+
   }
 
 end

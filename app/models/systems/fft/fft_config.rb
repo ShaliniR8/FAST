@@ -1,47 +1,23 @@
-class FFT_Config
+class FFTConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  GENERAL = DefaultConfig::GENERAL.merge({
+    # AIRLINE-SPECIFIC CONFIGS
+    name:                               'Frontier Airlines',
+    time_zone:                          'Mountain Time (US & Canada)',
 
-  def self.airline_config
-    {
-      :version                                        => "1.1.3",
+    # SYSTEM CONFIGS
 
-      :name                                           => 'Frontier Airlines',
-      :code                                           => "FFT",
-      :time_zone                                      => "Mountain Time (US & Canada)",
+    # SYSTEM-WIDE FORM CONFIGS
+    base_risk_matrix:                  false,
+    allow_reopen_forms:                false,
+    has_root_causes:                   false,
+  })
 
-      :base_risk_matrix                               => false,
-      :event_summary                                  => true,
-      :event_tabulation                               => true,
-      :enable_configurable_risk_matrices              => false,
-      :allow_set_alert                                => false,
-      :has_verification                               => false,
-      :has_mobile_app                                 => false,
-      :enable_mailer                                  => true,
-
-      # Safety Reporting Module
-      :show_submitter_name                            => true,
-      :submission_description                         => true,
-      :submission_time_zone                           => true,
-      :enable_orm                                     => false,
-      :observation_phases_trend                       => false,
-      :allow_template_nested_fields                   => false,
-      :checklist_version                              => '1',
-
-      # Safety Assurance Module
-      :allow_reopen_report                            => true,
-      :has_root_causes                                => true,
-      :enable_recurrence                              => true,
-      :enable_shared_links                            => false,
-
-      # SMS IM Module
-      :has_framework                                  => false,
-    }
-  end
 
 
   FAA_INFO = {
@@ -51,12 +27,7 @@ class FFT_Config
     "ASAP MOU Holder FAA Designator"=>"BASE"
   }
 
-  OBSERVATION_PHASES = [
-    "Observation Phase",
-    "Condition",
-    "Threat", "Sub Threat",
-    "Error", "Sub Error",
-    "Human Factor", "Comment"]
+
 
   MATRIX_INFO = {
     severity_table: {
@@ -138,6 +109,13 @@ class FFT_Config
         ["limegreen",     "steelblue",    "yellow",         "yellow",       "orange"     ],
         ["steelblue",     "yellow",       "yellow",         "orange",       "red"        ],
         ["steelblue",     "yellow",       "orange",         "red",          "red"        ]
+      ],
+      rows_content: [
+        ['2',     '3',    '4',      '5',    '6'  ],
+        ['4',     '6',    '8',      '10',   '12' ],
+        ['6',     '9',    '12',     '15',   '18' ],
+        ['8',     '12',   '16',     '20',   '24' ],
+        ['10',    '15',   '20',     '25',   '30' ]
       ]
     },
 
@@ -150,51 +128,43 @@ class FFT_Config
     },
 
     risk_table_index: {
-      red:            "High",
-      orange:         "Serious",
-      yellow:         "Medium",
-      steelblue:      "Minor",
-      limegreen:      "Low"
+      'Low - 2' => 'limegreen',
+      'Low - 3' => 'limegreen',
+      'Low - 4' => 'limegreen',
+      'Low - 5' => 'limegreen',
+      'Low - 6' => 'limegreen',
+      'Minor - 8' => 'steelblue',
+      'Minor - 9' => 'steelblue',
+      'Minor - 10' => 'steelblue',
+      'Medium - 12' => 'yellow',
+      'Medium - 15' => 'yellow',
+      'Medium - 16' => 'yellow',
+      'Serious - 18' => 'orange',
+      'Serious - 20' => 'orange',
+      'High - 24' => 'red',
+      'High - 25' => 'red',
+      'High - 30' => 'red',
     },
 
     risk_table_dict: {
-      red:            'High',
-      orange:         'Serious',
-      yellow:         'Medium',
-      steelblue:      'Minor',
-      limegreen:      'Low'
+      2 => 'Low - 2',
+      3 => 'Low - 3',
+      4 => 'Low - 4',
+      5 => 'Low - 5',
+      6 => 'Low - 6',
+      8 => 'Minor - 8',
+      9 => 'Minor - 9',
+      10 => 'Minor - 10',
+      12 => 'Medium - 12',
+      15 => 'Medium - 15',
+      16 => 'Medium - 16',
+      18 => 'Serious - 18',
+      20 => 'Serious - 20',
+      24 => 'High - 24',
+      25 => 'High - 25',
+      30 => 'High - 30',
     }
   }
 
-  # Calculate the severity based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_severity(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).max
-    end
-  end
-
-  # Calculate the probability based on #{BaseConfig.airline[:code]}'s risk matrix
-  def self.calculate_probability(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).last
-    end
-  end
-
-  def self.print_severity(owner, severity_score)
-    MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
-  end
-
-  def self.print_probability(owner, probability_score)
-    MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
-  end
-
-  def self.print_risk(probability_score, severity_score)
-    if !probability_score.nil? && !severity_score.nil?
-      lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_dict][lookup_table[severity_score][probability_score].to_sym] rescue nil
-    end
-  end
 
 end

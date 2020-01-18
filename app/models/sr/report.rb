@@ -1,4 +1,4 @@
-class Report < ActiveRecord::Base
+class Report < ProsafetBase
   include ModelHelpers
 
 #Concerns List

@@ -6,7 +6,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
     # Airline-Specific Features:
   })
 
-  HIERARCHY = DefaultSafetyAssuranceConfig::HIERARCHY.deep_merge({
+  HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
     objects:{
       'Submission' => {
         actions: {

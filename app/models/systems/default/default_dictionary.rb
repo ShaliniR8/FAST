@@ -512,8 +512,13 @@ class DefaultDictionary
       required: false
     },
     risk_factor: {
-      field: 'risk_factor', title: 'Baseline Risk',
+      field: 'get_risk_classification', title: 'Baseline Risk',
       num_cols: 12, type: 'text', visible: 'index',
+      required: false,  html_class: 'get_before_risk_color'
+    },
+    risk_score: {
+      field: 'get_risk_score', title: 'Baseline Risk Score',
+      num_cols: 12, type: 'text', visible: 'query',
       required: false,  html_class: 'get_before_risk_color'
     },
     likelihood_after: {
@@ -527,10 +532,16 @@ class DefaultDictionary
       required: false
     },
     risk_factor_after: {
-      field: 'risk_factor_after', title: 'Mitigated Risk',
+      field: 'get_risk_classification_after', title: 'Mitigated Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_after_risk_color'
     },
+    risk_score_after: {
+      field: 'get_risk_score_after', title: 'Baseline Risk Score',
+      num_cols: 12, type: 'text', visible: 'query',
+      required: false,  html_class: 'get_before_risk_color'
+    },
+
     final_comment: {
       field: 'final_comment', title: 'Final Comment',
       num_cols: 12, type: 'textarea', visible: 'show',

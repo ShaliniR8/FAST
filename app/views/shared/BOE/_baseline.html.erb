@@ -2,7 +2,10 @@
 
   <div class="panel-heading">
     <div class="panel-title">
-      <b>Baseline Risk Assessment</b><button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+      <b>Baseline Risk Assessment</b>
+      <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
     </div>
   </div>
 
@@ -136,9 +139,9 @@
   function set_baseline(row_index,column_index){
     clear_baseline();
     risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
     $('.baseline_risk_td').each(function(){
-      if($(this).data("row")==row_index && $(this).data("column")==column_index){
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
         $('#sev').val(row_index);
         $('#like').val(column_index);

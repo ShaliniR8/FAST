@@ -3,7 +3,9 @@
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b>Risk Assessment</b>
-        <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
       </div>
     </div>
 
@@ -48,8 +50,6 @@
             <span class="label label-mitigated">Residual</span>
             <span class="label label-overlapped">Overlapped</span>
           </h4>
-          <span class='glyphicon glyphicon-remove'></span><b> Initial Risk Assessment</b>
-          <span class='glyphicon glyphicon-ok'></span><b> Residual Risk Assessment</b>
         </div>
 
         <div class="col-xs-12 col-sm-12 col-md-6">
@@ -194,17 +194,26 @@
   function set_risk(row_index,column_index){
     $('.risk_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
-        $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
+        $(this).find('.content').addClass('circle initial-circle');
+        handle_overlap($(this).find('.content'));
       }
     });
   }
 
   function set_mitigated(row_index,column_index){
     $('.risk_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if($(this).data("row")==row_index && $(this).data("column")==column_index){
-        $(this).append("<span class='glyphicon glyphicon-ok' style='color:black'></span>");
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
+        $(this).find('.content').addClass('circle mitigated-circle');
+        handle_overlap($(this).find('.content'));
       }
     });
+  }
+
+  function handle_overlap(cell) {
+    console.log($(cell).hasClass('mitigated-circle'));
+    console.log($(cell).hasClass('initial-circle'));
+    if ($(cell).hasClass('mitigated-circle') && $(cell).hasClass('initial-circle'))
+      $(cell.addClass('overlap-circle'));
   }
 
   load_data();

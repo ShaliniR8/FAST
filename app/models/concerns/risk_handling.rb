@@ -47,11 +47,12 @@ module RiskHandling
 
 
   def display_after_risk_factor
-    if CONFIG::GENERAL[:base_risk_matrix]
-      risk_factor_after rescue 'N/A'
-    else
-      get_risk_values[:risk_2] rescue 'N/A'
-    end
+    risk_factor_after
+    # if CONFIG::GENERAL[:base_risk_matrix]
+    #   risk_factor_after rescue 'N/A'
+    # else
+    #   get_risk_values[:risk_2] rescue 'N/A'
+    # end
   end
 
 
@@ -74,11 +75,12 @@ module RiskHandling
 
 
   def display_before_risk_factor
-    if CONFIG::GENERAL[:base_risk_matrix]
-      risk_factor rescue 'N/A'
-    else
-      get_risk_values[:risk_1] rescue 'N/A'
-    end
+    risk_factor
+    # if CONFIG::GENERAL[:base_risk_matrix]
+    #   risk_factor rescue 'N/A'
+    # else
+    #   get_risk_values[:risk_1] rescue 'N/A'
+    # end
   end
 
 
@@ -95,8 +97,7 @@ module RiskHandling
     if CONFIG::GENERAL[:base_risk_matrix]
       CONFIG::RISK_MATRIX[:risk_factor][display_after_risk_factor]
     else
-      CONFIG::MATRIX_INFO[:risk_table_index]
-        .index(display_after_risk_factor)
+      CONFIG::MATRIX_INFO[:risk_table_index][display_after_risk_factor]
     end
   end
 
@@ -105,8 +106,7 @@ module RiskHandling
     if CONFIG::GENERAL[:base_risk_matrix]
       CONFIG::RISK_MATRIX[:risk_factor][display_before_risk_factor]
     else
-      CONFIG::MATRIX_INFO[:risk_table_index]
-        .index(display_before_risk_factor)
+      CONFIG::MATRIX_INFO[:risk_table_index][display_before_risk_factor]
     end
   end
 
