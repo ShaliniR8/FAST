@@ -15,6 +15,7 @@ class Hazard < Srm::SafetyRiskManagementBase
   belongs_to :sra,                :foreign_key => "sra_id",                 :class_name => "Sra"
   belongs_to :responsible_user,   :foreign_key => "responsible_user_id",    :class_name => "User"
   belongs_to :created_by,         :foreign_key => "created_by_id",          :class_name => "User"
+  belongs_to :approver,           :foreign_key => 'approver_id',            :class_name => 'User'
 
   has_many :risk_controls,        :foreign_key => "hazard_id",              :class_name => "RiskControl",         :dependent => :destroy
   has_many :descriptions,         :foreign_key => "owner_id",               :class_name => "HazardDescription",   :dependent => :destroy
@@ -88,12 +89,6 @@ class Hazard < Srm::SafetyRiskManagementBase
   end
 
 
-  def can_complete?(user, form_conds: false, user_conds: false)
-    form_confirmed = self.status == 'New' || form_conds
-    user_confirmed = true
-    form_confirmed && user_confirmed && !self.root_cause_lock?
-  end
-
   def self.get_avg_complete
     candidates=self.where("status=? and close_date is not ? and created_at is not ?","Completed",nil,nil)
     if candidates.present?
@@ -105,4 +100,10 @@ class Hazard < Srm::SafetyRiskManagementBase
       "N/A"
     end
   end
+
+
+  def get_due_date
+    self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
+  end
+
 end
