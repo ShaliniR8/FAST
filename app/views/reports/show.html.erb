@@ -180,6 +180,8 @@
           <%=render '/causes/all', :owner => @report, :cause_type => 'suggestion', :can_change => can_change%>
 
 
+          <%= render '/panels/show_panels', owner: @report%>
+
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>
               <div class="panel panel-info">
@@ -227,7 +229,6 @@
               </div>
             </div>
           <%end%>
-
 
           <%=render "/forms/show_comment", :owner => @report%>
           <%=render "/forms/attachments_show", :owner => @report, :attachments => @report.attachments + @report.records.map(&:attachments).flatten%>

@@ -80,6 +80,10 @@ class FindingsController < SafetyAssuranceController
   def show
     load_special_matrix(@owner)
     @type = @owner.get_owner
+
+    # Occurrence template panel label
+    root = find_top_level_section('Finding')
+    @label = root.label
   end
 
 

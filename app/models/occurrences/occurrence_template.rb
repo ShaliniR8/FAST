@@ -19,7 +19,6 @@ class OccurrenceTemplate < ActiveRecord::Base
     {
       section:      'Section',
       selection:    'Drop Down',
-      boolean_box:  'Checkbox',
       checkbox:     'Checkboxes',
       text:         'Text'
     }

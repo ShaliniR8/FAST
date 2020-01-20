@@ -80,6 +80,10 @@ class CorrectiveActionsController < ApplicationController
     if @corrective_action.record.present?
       @record = record_display(@corrective_action.record) ? @corrective_action.record : ''
     end
+
+    # Occurrence template panel label
+    root = find_top_level_section(@corrective_action.class.name.titleize)
+    @label = root.label
   end
 
   def override_status

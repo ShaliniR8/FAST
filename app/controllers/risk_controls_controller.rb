@@ -169,6 +169,10 @@ class RiskControlsController < ApplicationController
   def show
     @risk_control = RiskControl.find(params[:id])
     @fields = RiskControl.get_meta_fields('show')
+
+    # Occurrence template panel label
+    root = find_top_level_section(@risk_control.class.name.titleize)
+    @label = root.label
   end
 
 

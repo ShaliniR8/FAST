@@ -26,7 +26,7 @@ class SmsTask < ActiveRecord::Base
       {                                                                             type: "newline",      visible: 'form'},
       { field: "id",              title: "ID",                        num_cols: 6,  type: "text",         visible: 'index',             required: false},
       { field: "title",           title: "Title",                     num_cols: 6,  type: "text",         visible: 'index,form,show',   required: false},
-      { field: "completion",      title: "Scheduled Completion Date", num_cols: 6,  type: "date",         visible: 'form,show',         required: false},
+      { field: "due_date",        title: "Scheduled Completion Date", num_cols: 6,  type: "date",         visible: 'form,show',         required: false},
       { field: "res",             title: "Responsible User Name",     num_cols: 6,  type: "user",         visible: 'form,show',         required: false},
       { field: "app_id",          title: "Final Approver",            num_cols: 6,  type: "user",         visible: 'form,show',         required: false},
       { field: "department",      title: "Responsible Department",    num_cols: 6,  type: "text",         visible: 'form,show',         required: false},

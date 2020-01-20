@@ -12,10 +12,9 @@
         .panel-heading
           .panel-title
             .top_text
-              b Occurrence Hierarchies
+              b Category/Root Cause Templates
             .top_buttons.pull-right
-              /btns here
-              = link_to 'New Occurrence Category',
+              = link_to 'New Category',
                 new_root_occurrence_templates_path,
                 method: :post,
                 class: 'btn btn-success pull-right'
@@ -26,4 +25,3 @@
             | Please note that <b>archiving</b> an occurrence will also archive all of its nested occurrences, use this with caution.
           - @records.each do |parent|
             = render 'show', owner: parent
-

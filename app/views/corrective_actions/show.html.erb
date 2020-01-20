@@ -122,6 +122,7 @@
 
         <%=render "/forms/show_fields", :fields => @fields, :record => @corrective_action%>
 
+        <%= render '/panels/show_panels', owner: @corrective_action%>
         <%=render "/forms/show_comment", :owner => @corrective_action%>
         <%=render "/forms/attachments_show", :owner => @corrective_action%>
         <%=render "records/transactions", :owner => @corrective_action%>

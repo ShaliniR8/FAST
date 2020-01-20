@@ -3,10 +3,13 @@ class OccurrencesController < ApplicationController
   def new
     @templates = OccurrenceTemplate.where(archived: false)
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    root = OccurrenceTemplate.preload(:children)
-      .where(archived: false).find_by_title(owner.class.name.titleize)
-    root ||= OccurrenceTemplate.preload(:children).find(1) # This has to be the default node
+
+    # find the top-level occurrence template's section
+    root = find_top_level_section(owner.class.name.titleize)
+
     @tree = root.form_tree(@templates)
+    @label = root.label
+
     render partial: 'new', locals: {
       owner: owner,
       root: root
@@ -26,10 +29,10 @@ class OccurrencesController < ApplicationController
     end
   end
 
-
   def add
     #Despite us calling POST to here, Rails posts all to update from here.
   end
+
   def update
     Occurrence.transaction do
       params[:occurrences].each do |template_id, occurrence|
@@ -49,5 +52,4 @@ class OccurrencesController < ApplicationController
       redirect_to '/home'
     end
   end
-
 end

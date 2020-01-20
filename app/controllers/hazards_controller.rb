@@ -47,6 +47,10 @@ class HazardsController < ApplicationController
     load_options
     @fields = Hazard.get_meta_fields('show')
     load_special_matrix(@hazard)
+
+    # Occurrence template panel label
+    root = find_top_level_section(@hazard.class.name.titleize)
+    @label = root.label
   end
 
 

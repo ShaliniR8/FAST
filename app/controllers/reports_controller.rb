@@ -294,6 +294,10 @@ class ReportsController < ApplicationController
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
     @fields = Report.get_meta_fields('show', @report.status == 'Closed' ? 'close' : '', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
+
+    # Occurrence template panel label
+    root = find_top_level_section(@report.class.name.titleize)
+    @label = root.label
   end
 
 

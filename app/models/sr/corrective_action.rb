@@ -1,12 +1,10 @@
-class CorrectiveAction < ActiveRecord::Base
+class CorrectiveAction < ProsafetBase
   extend AnalyticsFilters
 
 #Concerns List
   include Attachmentable
   include Commentable
-  include Noticeable
   include Transactionable
-  include ExtensionRequestable
 
 #Associations List
   belongs_to  :report,                foreign_key: 'reports_id',          class_name: 'Report'

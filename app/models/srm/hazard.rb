@@ -7,7 +7,6 @@ class Hazard < Srm::SafetyRiskManagementBase
 #Concerns List
   include Attachmentable
   include Commentable
-  include Occurrenceable
   include Transactionable
   include RootCausable
 

@@ -151,6 +151,10 @@ class InspectionsController < SafetyAssuranceController
     load_options
     @fields = Inspection.get_meta_fields('show')
     @checklist_headers = InspectionRequirement.get_meta_fields('show')
+
+    # Occurrence template panel label
+    root = find_top_level_section('Inspection')
+    @label = root.label
   end
 
 
