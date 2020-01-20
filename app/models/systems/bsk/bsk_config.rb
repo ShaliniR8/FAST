@@ -18,6 +18,7 @@ class BSKConfig < DefaultConfig
 
     # TO BE REMOVED
     has_verification:             true,
+    hazard_root_cause_lock:       true
   })
 
     # SMS IM Module
