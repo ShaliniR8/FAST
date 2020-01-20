@@ -131,6 +131,7 @@ class AuditsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:audit])
     send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'

@@ -63,6 +63,7 @@ class EvaluationsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:evaluation])
     send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'

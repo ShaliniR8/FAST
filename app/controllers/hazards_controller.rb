@@ -86,7 +86,33 @@ class HazardsController < ApplicationController
   def update
     transaction = true
     @owner = Hazard.find(params[:id])
+    @owner.update_attributes(params[:hazard])
     case params[:commit]
+    when 'Assign'
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Hazard ##{@owner.id} has been assigned to you."},
+        mailer: true, subject: 'Hazard Assigned')
+    when 'Complete'
+      if @owner.approver
+        notify(@owner, notice: {
+          users_id: @owner.approver.id,
+          content: "Hazard ##{@owner.id} needs your Approval."},
+          mailer: true, subject: 'Hazard Pending Approval')
+      else
+        @owner.close_date = Time.now rescue nil
+      end
+    when 'Reject'
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Hazard ##{@owner.id} was Rejected by the Final Approver."},
+        mailer: true, subject: 'Hazard Reject')
+    when 'Approve'
+      @owner.close_date = Time.now rescue nil
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Hazard ##{@owner.id} was Approved by the Final Approver."},
+        mailer: true, subject: 'Hazard Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
       params[:hazard][:close_date] = params[:hazard][:status] == 'Completed' ? Time.now : nil

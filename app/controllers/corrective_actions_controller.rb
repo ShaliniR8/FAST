@@ -110,6 +110,7 @@ class CorrectiveActionsController < ApplicationController
   def update
     transaction = true
     @owner = CorrectiveAction.find(params[:id])
+    @owner.update_attributes(params[:corrective_action])
     send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'

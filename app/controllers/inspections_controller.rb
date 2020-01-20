@@ -64,6 +64,7 @@ class InspectionsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:inspection])
     send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
