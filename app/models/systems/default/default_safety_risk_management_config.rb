@@ -196,6 +196,12 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 6, type: 'select', visible: 'form,index,show',
             required: false, options: Hazard.get_custom_options('Departments')
           },
+          responsible_user: { default: true },
+          approver: { default: true },
+          due_date: { default: true,
+            field: 'due_date',
+            required: false
+          },
           description: {
             field: 'description', title: 'Description',
             num_cols: 12, type: 'textarea', visible: 'form,show',
@@ -224,19 +230,12 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_sra attach_in_message expand_all],
           #INLINE
-          *%i[reject complete_hazard risk_control reopen comment],
+          *%i[assign complete approve_reject risk_control reopen comment],
+          #*%i[assign complete approve_reject reject complete_hazard risk_control reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
-          complete_hazard: {
-            btn: :complete_hazard,
-            btn_loc: [:inline],
+          complete: {
             access: proc { |owner:,user:,**op|
               owner.can_complete?(user)
-            },
-          },
-          edit: {
-            access: proc { |owner:,user:,**op|
-              DICTIONARY::ACTION[:edit][:access].call(owner:owner,user:user,**op) &&
-              owner.status == 'New'
             },
           },
           reopen: {
@@ -301,7 +300,7 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[delete override_status edit deid_pdf pdf view_hazard attach_in_message expand_all],
           #INLINE
-          *%i[assign complete cost request_extension schedule_verification approve_reject reopen comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen cost comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|

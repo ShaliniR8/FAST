@@ -100,6 +100,7 @@ class RiskControlsController < ApplicationController
   def update
     transaction = true
     @owner = RiskControl.find(params[:id]).becomes(RiskControl)
+    @owner.update_attributes(params[:risk_control])
     case params[:commit]
     when 'Assign'
       @owner.date_open = Time.now

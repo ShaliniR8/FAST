@@ -429,6 +429,21 @@ class HomeController < ApplicationController
         end
       end
 
+      hazards = Hazard.where(status: 'Assigned', responsible_user_id: current_user_id)
+      hazards << Hazard.where(status: 'Pending Approval', approver_id: current_user_id)
+      hazards.flatten.each do |a|
+        if a.due_date.present?
+          @calendar_entries.push({
+            :url => hazard_path(a),
+            :start => a.get_due_date,
+            :color => (a.overdue ? "lightcoral" : "skyblue"),
+            :textColor => "darkslategrey",
+            :title => "Hazard ##{a.id}: " + a.title + " (#{a.status})"
+          })
+        end
+      end
+
+
       if current_user.has_access("srm_meeting","index")
         meetings = SrmMeeting.where("status!=?","Closed")
         meetings = meetings.select{|x| x.has_user(current_user)}

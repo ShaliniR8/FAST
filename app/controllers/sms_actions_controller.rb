@@ -112,6 +112,7 @@ class SmsActionsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:sms_action])
     send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Reassign'

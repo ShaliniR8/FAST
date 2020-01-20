@@ -90,6 +90,7 @@ class SrasController < ApplicationController
     @owner = Sra.find(params[:id]).becomes(Sra)
     sra_meeting = @owner.meeting
     meeting_redirect = false
+    @owner.update_attributes(params[:sra])
     case params[:commit]
     when 'Assign'
       notify(@owner,

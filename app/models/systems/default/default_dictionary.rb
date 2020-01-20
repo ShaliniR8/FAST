@@ -75,7 +75,7 @@ class DefaultDictionary
     edit: {
       btn: :edit,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'edit',true,true) },
+      access: proc { |owner:,user:,**op| owner.status != 'Completed' && priv_check.call(owner,user,'edit',true,true) },
     },
     evaluate: {
       btn: :evaluate,
@@ -184,7 +184,7 @@ class DefaultDictionary
     sign: {
       btn: :sign,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| true }
+      access: proc { |owner:,user:,**op| owner.status != 'Completed'}
     },
     sms_action: {
       btn: :sms_action,
