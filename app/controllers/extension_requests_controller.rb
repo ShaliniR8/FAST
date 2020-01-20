@@ -50,13 +50,13 @@ class ExtensionRequestsController < ApplicationController
 
 
   def send_notification(commit, ext_req)
-    users_id = commit == 'Address' ? ext_req.requester.id : ext_req.approver.id
+    users_id = commit == 'Address' ? ext_req.requester.id : ext_req.approver.id rescue nil
     verb = commit == 'Address' ? 'Addresse' : commit
     notify(ext_req.owner, notice: {
       users_id: users_id,
       content: "Extension Request for #{ext_req.owner.class.name} ##{ext_req.owner.id} has been #{verb}d."},
       mailer: true,
-      subject: "Extension Request #{verb}d")
+      subject: "Extension Request #{verb}d") if users_id.present?
   end
 
 end
