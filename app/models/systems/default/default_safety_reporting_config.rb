@@ -92,7 +92,51 @@ class DefaultSafetyReportingConfig
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
           final_comment: { default: true },
-
+          eir: {
+            field: 'eir', title: 'EIR Number',
+            num_cols: 6, type: 'text', visible: 'close',
+            required: false
+          },
+          scoreboard: {
+            field: 'scoreboard', title: 'Exclude from Scoreboard',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: true
+          },
+          asap: {
+            field: 'asap', title: 'Accepted Into ASAP',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: true
+          },
+          sole: {
+            field: 'sole', title: 'Sole Source',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: true
+          },
+          disposition: {
+            field: 'disposition', title: 'Disposition',
+            num_cols: 6, type: 'datalist', visible: 'close',
+            required: false,  options: Report.get_custom_options('Dispositions')
+          },
+          company_disposition: {
+            field: 'company_disposition', title: 'Company Disposition',
+            num_cols: 6, type: 'datalist', visible: 'close',
+            required: false,  options: Report.get_custom_options('Company Dispositions')
+          },
+          narrative: {
+            field: 'narrative', title: 'Narrative',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
+          regulation: {
+            field: 'regulation', title: 'Regulation',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
+          notes: {
+            field: 'notes', title: 'Closing Notes',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
           likelihood: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Risk" },
@@ -197,12 +241,6 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },
-
-          occurrences: {default: true, title: (Report.find_top_level_section.label rescue nil)},
-          occurrences_full: {default: true,
-            visible: 'query',
-            title: "Full #{Report.find_top_level_section.label rescue nil}"},
-
           likelihood: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Risk",
