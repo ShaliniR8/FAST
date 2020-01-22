@@ -10,6 +10,7 @@ class DefaultSafetyReportingConfig
     show_submitter_name:      true,      # Displays submitter names when access to show (admins will always see it)- default on
     submission_description:   true,      # Changes Character Limit or adds General Description - default on
     template_nested_fields:   false,     # WIP nested smart forms functionality - default off
+    enable_dual_report:       true,
 
     # Airline-Specific Features:
     observation_phases_trend: false,     # Specific Feature for BSK - default off
@@ -204,7 +205,7 @@ class DefaultSafetyReportingConfig
           scoreboard: {
             field: 'scoreboard', title: 'Exclude from Scoreboard',
             num_cols: 6, type: 'boolean', visible: 'close',
-            required: true
+            required: false
           },
           asap: {
             field: 'asap', title: 'Accepted Into ASAP',
