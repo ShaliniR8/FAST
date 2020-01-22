@@ -100,7 +100,7 @@ class DefaultSafetyReportingConfig
           scoreboard: {
             field: 'scoreboard', title: 'Exclude from Scoreboard',
             num_cols: 6, type: 'boolean', visible: 'close',
-            required: true
+            required: false
           },
           asap: {
             field: 'asap', title: 'Accepted Into ASAP',
