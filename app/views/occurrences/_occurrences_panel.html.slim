@@ -17,22 +17,28 @@ ruby:
             class: 'btn btn-success pull-right mr5',
             id: 'add_occurrence_btn'
       .row.col-xs-12
-        table.table.table-striped.table-bordered width="100%"
-          thead
-            tr
-              - Occurrence.get_meta_fields('index').each do |header|
-                th =header[:title]
-              - if show_btns
-                th Action
-          tbody
-            - owner.occurrences.each do |occurrence|
+        - if !owner.occurrences[0].nil?
+          table.table.table-striped.table-bordered width="100%"
+            thead
               tr
-                - Occurrence.get_meta_fields('index').each do |header|
-                  td =render '/forms/show_field', :field_hash => header, :record => occurrence
+                / display categories except the top level section
+                - (1..(owner.occurrences.first.get_category.length - 1)).each do |x|
+                  th = @label + ' ' + x.to_s
+                th Value
                 - if show_btns
-                  td =link_to 'Delete', '#',
-                  class: 'btn btn-danger delete_occurrence_btn',
-                  'data-cid' => occurrence.id
+                  th Action
+            tbody
+              - owner.occurrences.each do |occurrence|
+                tr
+                  - categories = occurrence.get_category
+                  - categories.shift #
+                  - categories.each do |category|
+                    td = category
+                  td = occurrence.value
+                  - if show_btns
+                    td =link_to 'Delete', '#',
+                    class: 'btn btn-danger delete_occurrence_btn',
+                    'data-cid' => occurrence.id
 javascript:
   $(function(){
     $('#add_occurrence_btn').on('click', function(){

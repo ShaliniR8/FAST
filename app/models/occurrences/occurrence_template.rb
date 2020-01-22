@@ -54,4 +54,12 @@ class OccurrenceTemplate < ActiveRecord::Base
     end
   end
 
+  def get_category(path = '')
+    if self.parent.nil?
+      path = (self.title + ' >' + path).split(' >')
+      return path
+    end
+
+    self.parent.get_category(self.title + ' >' + path)
+  end
 end

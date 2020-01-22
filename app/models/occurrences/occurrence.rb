@@ -15,6 +15,7 @@ class Occurrence < ActiveRecord::Base
   def parent_section
     parent_section_helper(template).title
   end
+
   def parent_section_helper(template)
     return template if template.parent.nil?
     if template.format == 'section'
@@ -24,10 +25,12 @@ class Occurrence < ActiveRecord::Base
     end
   end
 
-
-
   def title
     self.template.title
+  end
+
+  def get_category
+    self.template.get_category
   end
 
 end
