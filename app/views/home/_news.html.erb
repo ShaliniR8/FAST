@@ -1,5 +1,5 @@
 <div class="col-xs-12">
-  <div class="panel panel-warning">
+  <div class="panel panel-thin panel-warning">
     <div class="panel-heading">
       <div class="panel-title">
         <div class='top_text'>
@@ -15,7 +15,10 @@
         <tbody>
           <%@notices.each do |notice|%>
             <tr data-link="<%=read_message_notice_path(notice)%>">
-              <td><%=sanitize notice.content.html_safe%></td>
+              <td style=<%=Notice.get_category[notice.category][:style]%>>
+                <i class='glyphicon glyphicon-<%=Notice.get_category[notice.category][:icon]%>'> </i>
+                <%=sanitize notice.content.html_safe%>
+              </td>
               <td style='text-align:right'>
                 <%=time_ago_in_words(notice.created_at).scan(/\w+/).join(' ')%> ago
               </td>
