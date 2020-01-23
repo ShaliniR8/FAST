@@ -23,8 +23,9 @@ class Notice < ActiveRecord::Base
 
   def self.get_category
     {
-      1 => 'Notice',
-      2 => 'Broadcast'
+      1 => {title: 'Notice',      icon: nil, style: nil},
+      2 => {title: 'Broadcast',   icon: nil, style: 'color:steelblue;font-weight:bold'},
+      3 => {title: 'Annoucement', icon: 'bullhorn', style: 'color:teal;font-weight:bold'}
     }
   end
 
