@@ -42,7 +42,7 @@ class NoticesController < ApplicationController
     @owner = Notice.find(params[:id])
     @owner.status = 2
     @owner.save
-    redirect_to @owner.owner
+    redirect_to @owner.owner || home_index_path
   end
 
 
