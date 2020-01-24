@@ -22,7 +22,7 @@
         id="nav-<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"
         role="tabpanel"
         aria-labelledby="nav-<%=chart[:chart_name].parameterize%>-tab-<%=@visualization.id%>">
-        <div class='mt10' id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"></div>
+        <div class='mt10' id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>" style="width:'100%'"></div>
         <div class="mr5" id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download" align="right"></div>
 
         <%case chart[:val]%>
@@ -56,6 +56,11 @@
           <script type="text/javascript">
             google.charts.load("current", {packages:["corechart"]});
             google.charts.setOnLoadCallback(drawPieChart);
+
+            $(window).bind('resizeEnd', function(){
+              drawPieChart();
+            });
+
             function drawPieChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
               var options = <%=raw options.to_json%>;
@@ -72,6 +77,11 @@
           <script>
             google.charts.load("current", {'packages': ["bar"]});
             google.charts.setOnLoadCallback(drawBarChart);
+
+            $(window).bind('resizeEnd', function(){
+              drawBarChart();
+            });
+
             function drawBarChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
               var options = <%=raw options.to_json%>;
@@ -88,6 +98,11 @@
           <script>
             google.charts.load("current", {'packages': ["line"]});
             google.charts.setOnLoadCallback(drawLineChart);
+
+            $(window).bind('resizeEnd', function(){
+              drawLineChart();
+            });
+
             function drawLineChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
               var options = <%=raw options.to_json%>;
@@ -104,6 +119,11 @@
           <script>
             google.charts.load("current", {'packages': ['corechart']});
             google.charts.setOnLoadCallback(drawStackedChart);
+
+            $(window).bind('resizeEnd', function(){
+              drawStackedChart();
+            });
+
             function drawStackedChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
               var options = <%=raw options.to_json%>;
@@ -129,9 +149,9 @@
     height: 1px;
     overflow: hidden;
     display: block;
-   visibility: hidden;
+    visibility: hidden;
   }
-  .tab-content>.active {
+  .tab-content > .active {
     height: auto;
     overflow: auto;
     visibility: visible;
