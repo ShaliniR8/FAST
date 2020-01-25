@@ -53,7 +53,7 @@ class VerificationsController < ApplicationController
       users_id: verification.validator.id,
       content: "Verification for #{verification.owner.class.name.titleize} ##{verification.owner.id} has been #{commit}d."},
       mailer: true,
-      subject: "Verification #{commit}d")
+      subject: "Verification #{commit}d") if verification.validator.present?
   end
 
 end
