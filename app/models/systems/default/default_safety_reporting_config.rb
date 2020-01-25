@@ -175,12 +175,12 @@ class DefaultSafetyReportingConfig
           event_label: {
             field: 'event_label', title: 'Event Type',
             num_cols: 6, type: 'select', visible: 'event_summary',
-            required: false,  options: Report.get_custom_options('Event Types')
+            required: false,  options: CONFIG.custom_options['Event Types']
           },
           venue: {
             field: 'venue', title: 'Venue',
             num_cols: 6, type: 'select', visible: 'event_summary',
-            required: false,  options: Report.get_custom_options('Event Venues')
+            required: false,  options: CONFIG.custom_options['Event Venues']
           },
           icao: {
             field: 'icao', title: 'ICAO',
@@ -220,12 +220,12 @@ class DefaultSafetyReportingConfig
           disposition: {
             field: 'disposition', title: 'Disposition',
             num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: Report.get_custom_options('Dispositions')
+            required: false,  options: CONFIG.custom_options['Dispositions']
           },
           company_disposition: {
             field: 'company_disposition', title: 'Company Disposition',
             num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: Report.get_custom_options('Company Dispositions')
+            required: false,  options: CONFIG.custom_options['Company Dispositions']
           },
           narrative: {
             field: 'narrative', title: 'Narrative',

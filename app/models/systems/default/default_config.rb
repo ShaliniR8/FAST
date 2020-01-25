@@ -41,6 +41,8 @@ class DefaultConfig
     has_verification:                   true,   # Allows forms to be verified (additional step)
   }
 
+
+
   def self.getTimeFormat
     {
       :timepicker       => 'H:i',
@@ -93,6 +95,12 @@ class DefaultConfig
   def self.sso
     Object.const_get("#{AIRLINE_CODE}SsoConfig") rescue DefaultSsoConfig
   end
+
+
+  def self.custom_options
+    CustomOption.all.map{|x| [x.title, (x.options.split(';') rescue [''])]}.to_h
+  end
+
 
   def self.hierarchy
     {

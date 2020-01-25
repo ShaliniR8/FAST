@@ -118,7 +118,7 @@ class RecordsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("Record")
+    @table = Object.const_get("Record").preload(:created_by, :template)
     index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
       args << 'admin' if (current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name])
       args

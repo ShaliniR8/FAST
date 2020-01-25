@@ -520,7 +520,7 @@ class HomeController < ApplicationController
     }
 
     @employee_groups = Template.select("distinct emp_group").map(&:emp_group)
-    @departments_list = Sra.get_custom_options('Departments')
+    @departments_list = CONFIG.custom_options['Departments']
 
     if session[:mode] == "ASAP"
       if current_user.has_access('submissions','index')
