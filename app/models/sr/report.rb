@@ -1,4 +1,4 @@
-class Report < ProsafetBase
+class Report < Sr::SafetyReportingBase
   include ModelHelpers
 
 #Concerns List

@@ -432,4 +432,17 @@ module ApplicationHelper
       obj_class.name.downcase.pluralize
     end
   end
+
+  # find the occurrence template to match
+  def find_top_level_section(class_name)
+    titles = OccurrenceTemplate.preload.where(archived: false, parent_id: nil).map(&:title)
+    title = titles.find { |title| title.include? class_name }
+
+    root = OccurrenceTemplate.preload(:children)
+      .where(archived: false, parent_id: nil).find_by_title(title)
+    root ||= OccurrenceTemplate.preload(:children)
+      .where(archived: false, parent_id: nil).find_by_title('Default')
+
+    return root
+  end
 end

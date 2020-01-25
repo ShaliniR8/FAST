@@ -8,6 +8,7 @@
   # open_date (datetime) for defining completion time
 class ProsafetBase < ActiveRecord::Base
 
+  include Occurrenceable
   include Noticeable
   include Messageable
   include ExtensionRequestable

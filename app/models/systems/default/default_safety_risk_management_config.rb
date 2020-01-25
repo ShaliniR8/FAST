@@ -171,7 +171,7 @@ class DefaultSafetyRiskManagementConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[agendas occurrences comments extension_requests verifications records hazards attachments transaction_log
+        panels: %i[agendas comments extension_requests verifications records hazards attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
@@ -411,7 +411,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[occurrences comments attachments transaction_log
+        panels: %i[comments attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Meeting' => {

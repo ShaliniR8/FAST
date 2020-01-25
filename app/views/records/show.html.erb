@@ -300,6 +300,8 @@
             </div>
           <%end%>
 
+
+          <%=render '/panels/show_panels', :owner => @record%>
           <%=render "/forms/show_comment",:owner => @record%>
           <%=render "/forms/attachments_show", :owner => @record%>
           <%=render "/records/transactions", :owner => @record%>

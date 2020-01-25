@@ -396,6 +396,10 @@ class RecordsController < ApplicationController
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
     load_special_matrix(@record)
+
+    # Occurrence template panel label
+    root = find_top_level_section(@record.class.name.titleize)
+    @label = root.label
   end
 
 

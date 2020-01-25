@@ -1,28 +1,51 @@
 css:
-  input.large[type='checkbox'] {
+  input[type='checkbox'] {
       -webkit-appearance:none;
-      width:30px;
-      height:30px;
+      width:15px;
+      height:15px;
       background:white;
       border-radius:5px;
       border:2px solid #555;
+      margin-right: 10px;
   }
-  input.large[type='checkbox']:checked {
+  input[type='checkbox']:checked {
       background: #777;
+  }
+  .custom-swal {
+    text-align: left !important;
+  }
+  .swal2-modal .swal2-content {
+    text-align: left !important;
+    font-size: 14px !important;
+  }
+
+  #content{
+    max-height: 280px;
+    overflow-y: scroll;
   }
 
 javascript:
   swal({
-    title: 'Add Occurrence',
+    title: "Add #{@label}",
     html: "#{escape_javascript render('/occurrences/form', owner: owner)}",
     customClass: 'custom-swal',
     showCancelButton: false,
     showConfirmButton: false,
-    allowOutsideClick: true,
+    allowOutsideClick: false,
     width: '800px'
   }).catch(swal.noop)
 
   $(document).ready(function(){
+    $(document).on('change', '.other-field', function(){
+      $(this).parent().find('.checkboxes-elem').val($(this).val());
+      $(this).parent().find('.checkboxes-elem').prop("checked", true);
+
+      target = $(this).parent().siblings('input')
+      value = target.val() + $(this).val()
+
+      target.prop('value', value)
+    });
+
     var tree = #{@tree.to_json.html_safe}
     var content = document.getElementById("content")
     interpretNode(content, tree, true)
@@ -36,6 +59,7 @@ javascript:
     })
     $(this).closest('.content').find('.content .selection-field').prop('selectedIndex', 0)
     var revealed = $('#content-' + this.value)
+    $('#content-' + this.value).find('label').hide()
     revealed.show()
     // Catch case of section node that has no children section nodes and show all children instead
     if(revealed.children('.section-field').length == 0){
@@ -65,14 +89,18 @@ javascript:
     body.setAttribute('id', 'content-' + id)
     $(body).addClass(' content col-xs-12')
     content.appendChild(body)
-    label = document.createElement('label')
+    if (node.type != 'section') {
+      label = document.createElement('h4')
+      $(body).addClass(' panel')
+    } else {
+      label = document.createElement('label')
+      if (root) { $(label).addClass('hidden') }
+    }
     label.innerHTML = node.title
     body.appendChild(label)
-    body.appendChild(document.createElement('br'))
     switch(node.type) {
       case 'section':
-        // if node.nodes doesn't contain any sections, skip selection step and render children
-        var hasChildSection = false
+        var hasChildSection = root
         node.nodes.forEach(function(child){ if(child.type === 'section'){ hasChildSection = true } })
         if(hasChildSection){
           field = generateSelectionField(node.options)
@@ -83,20 +111,13 @@ javascript:
         field = generateSelectionField(node.options)
         $(field).addClass('input-field selection-field mb5')
         break;
-      case 'boolean_box':
-        var field = document.createElement('input')
-        field.setAttribute('type', 'checkbox')
-        field.innerHTML = node.title
-        field.value = 0
-        $(field).addClass('input-field boolean-field large mb5')
-        break;
       case 'checkbox':
         field = generateCheckboxes(node)
         $(field).addClass('input-field checkbox-field mb5')
         break;
       case 'text':
         field = document.createElement('input')
-        $(field).addClass('input-field text-field mb5')
+        $(field).addClass('input-field text-field form-control mb5')
         break;
       default:
         break;
@@ -116,7 +137,7 @@ javascript:
     field = document.createElement('select')
     var fragment = document.createDocumentFragment()
     var initial = document.createElement('option')
-    initial.style.display = 'none'
+    initial.innerHTML = ''
     fragment.appendChild(initial)
     options.forEach(function(option, index) {
       var opt = document.createElement('option')
@@ -131,12 +152,11 @@ javascript:
       fragment.appendChild(opt)
     })
     field.appendChild(fragment)
-    $(field).addClass('selection-field')
+    $(field).addClass('selection-field form-control')
     return field
   }
 
   function generateCheckboxes(node){
-    manyOptions = node.options.length > 6
     field = document.createElement('fieldset')
     var hidden = document.createElement('input')
     hidden.setAttribute('type', 'hidden')
@@ -147,29 +167,33 @@ javascript:
     var fragment = document.createDocumentFragment()
     var container = document.createElement('div')
     node.options.forEach(function(option, index){
-      if(!manyOptions){ //Use same||get new based on count
-        container = document.createElement('div')
-        $(container).addClass('col-xs-' + (manyOptions ? '' : '4'))
-      }
-      var label = document.createElement('label')
+      container = document.createElement('div')
+      $(container).addClass('col-xs-12')
+      var label = document.createElement('span')
       label.innerHTML = Array.isArray(option) ? option[0] : option
       var opt = document.createElement('input')
       $(opt).addClass('checkboxes-elem') // For onchange listener (checkboxes-elem)
       opt.setAttribute('type', 'checkbox')
       opt.innerHTML = Array.isArray(option) ? option[0] : option
       opt.value = Array.isArray(option) ? option[1] : option
+      container.appendChild(opt)
       container.appendChild(label)
-      if(!manyOptions){//place checkbox below
-        container.appendChild(document.createElement('br'))
-        $(opt).addClass('large')
-        container.appendChild(opt)
-      }
-      else{
-        container.appendChild(opt)
-        container.appendChild(document.createElement('br'))
-      }
       fragment.appendChild(container)
     })
+
+    // the last option for checkboxes is the blank input filed
+    container = document.createElement('div')
+    $(container).addClass('col-xs-12')
+    var label = document.createElement('input')
+    $(label).addClass('other-field')
+    var opt = document.createElement('input')
+    $(opt).addClass('checkboxes-elem') // For onchange listener (checkboxes-elem)
+    opt.setAttribute('type', 'checkbox')
+    opt.value = "\r\n";
+    container.appendChild(opt)
+    container.appendChild(label)
+    fragment.appendChild(container)
+
     field.appendChild(fragment)
     $(field).addClass('input-field checkboxes-field')
     return field
@@ -183,3 +207,9 @@ javascript:
     $('form').find('.input-field:hidden').prop('disabled', true)
   }
 
+  function cancelForm() {
+    event.preventDefault()
+    var e=$.Event('keydown')
+    e.which=27
+    $('.swal2-modal').trigger(e)
+  }

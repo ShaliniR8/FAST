@@ -5,58 +5,62 @@ css:
   .list-group{
     margin-bottom: 0;
   }
+  .list-group.well{
+    padding: 0;
+    overflow: hidden;
+  }
   .list-group-item{
     border-radius: 0;
     border-width: 1px 0 0 0;
+    padding-bottom: 22px;
+  }
+  .list-group-item .glyphicon {
+    margin-right: 5px;
+  }
+  .list-group-item li {
+    font-weight: normal;
   }
   th {
     min-height: 25px;
   }
 
 - if owner.format != 'section'
-  .col-xs-12 style="margin-top: 15px"
-    .col-xs-3
-      p <b>Title:</b> #{owner.title}
-    .col-xs-2
-      p <b>Format:</b> #{@formats[owner.format.to_sym]}
-    .col-xs-4
-      - if ['checkbox','selection'].include? owner.format
-        p <b>Options:</b> #{owner.options}
-    .col-xs-2.pull-right aid="#{owner.id}" id="#{owner.id}"
-      = link_to 'Edit',
-        '#',
-        class: 'ml5 btn edit_btn btn-warning',
-        'data-toggle' => 'modal',
-        'data-target' => '.bs-example-modal-lg'
-      = link_to 'Archive',
-        archive_occurrence_template_path(owner),
-        class: 'ml5 btn btn-danger',
-        method: :post,
-        confirm: 'Are you sure?'
+  .col-xs-12 style="margin: 10px"
+    .list-group.well
+      .list-group-item
+        .col-xs-4
+          b = owner.title
+        .col-xs-6
+          small <b>Type:</b> #{@formats[owner.format.to_sym]}
+
+        .pull-right aid="#{owner.id}" id="#{owner.id}"
+          a href="#" class="glyphicon glyphicon-cog ml5 edit_btn" data-toggle="modal" data-target=".bs-example-modal-lg"
+          a href="#{archive_occurrence_template_path(owner)}" class="glyphicon glyphicon-trash ml5" data-method="post" data-confirm="Are you sure?"
+
+        - if ['checkbox','selection'].include? owner.format
+          .col-xs-12.pt10
+            b Options:
+            ul
+              - owner.options.split("\r\n").each do |option|
+                li #{option}
+
 - else
   .col-xs-12 style="margin: 10px"
-    .list-group.well style="padding: 0; overflow: hidden;"
+    .list-group.well
       .list-group-item
         - if owner.children.present?
           a href="#list_#{owner.id}" class="cat_#{owner.id} glyphicon glyphicon-chevron-right" data-toggle="collapse"
+
         b = owner.title
+        small = (owner.parent_id.nil? ? " (#{owner.label})" : '')
+
         .pull-right aid="#{owner.id}" id="#{owner.id}"
-          /btns here
-          = link_to 'Add',
-            '#',
-            class: 'ml5 btn add_btn btn-success',
-            'data-toggle' => 'modal',
-            'data-target' => '.bs-example-modal-lg'
-          = link_to 'Edit',
-            '#',
-            class: 'ml5 btn edit_btn btn-warning',
-            'data-toggle' => 'modal',
-            'data-target' => '.bs-example-modal-lg'
-          = link_to 'Archive',
-            archive_occurrence_template_path(owner),
-            class: 'ml5 btn btn-danger',
-            method: :post,
-            confirm: 'Are you sure?'
+          / = link_to 'Add'
+          a href="#" class="glyphicon glyphicon-plus ml5 add_btn" data-toggle="modal" data-target=".bs-example-modal-lg"
+          / = link_to 'Edit'
+          a href="#" class="glyphicon glyphicon-cog ml5 edit_btn" data-toggle="modal" data-target=".bs-example-modal-lg"
+          / = link_to 'Archive'
+          a href="#{archive_occurrence_template_path(owner)}" class="glyphicon glyphicon-trash ml5" data-method="post" data-confirm="Are you sure?"
         .list-group.collapse id="list_#{owner.id}"
           - owner.children.where(archived: false).each do |x|
             = render 'show', owner: x

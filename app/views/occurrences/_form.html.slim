@@ -4,8 +4,9 @@
   = hidden_field_tag 'owner_type', value = owner.class.name
   .col-xs-12.content id="content"
   .mt10.mr10
-    = f.submit 'Add Occurrences',
+    = f.submit "Add #{@label}",
       class: 'btn btn-success pull-right',
       onclick: 'disableHiddenForSubmit()',
       disable_with: 'Adding...',
       id: 'add-occurrences-btn'
+    = link_to 'Cancel', '#', class: 'btn btn-warning pull-right mr5', onclick: 'cancelForm()'

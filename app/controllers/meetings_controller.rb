@@ -240,20 +240,12 @@ class MeetingsController < ApplicationController
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
     when 'Close'
-<<<<<<< HEAD
-      send_notices(
-        @owner.invitations,
-        "Meeting ##{@owner.get_id}: #{@owner.title} has been Closed." + g_link(@owner),
-        true,
-        "Meeting ##{@owner.get_id}: #{@owner.title} Closed")
-=======
       @owner.invitations.each do |inv|
         notify(@owner, notice: {
           users_id: inv.users_id,
           content: "Meeting ##{@owner.id} has been closed."},
           mailer: true, subject: "Meeting Closed")
       end
->>>>>>> 1d6bdc3... Adds polymophic notices to SR
     when 'Add Attachment'
       transaction = false
     when 'Save Agenda'
@@ -268,16 +260,10 @@ class MeetingsController < ApplicationController
           new_inv.users_id = val
           new_inv.meeting = @owner
           new_inv.save
-<<<<<<< HEAD
-          send_notice(new_inv,
-            "You are invited to Meeting ##{@owner.get_id}: #{@owner.title}.  " + g_link(@owner),
-            true, "New Meeting Invitation: #{@owner.title}")
-=======
           notify(@owner, notice: {
             users_id: new_inv.users_id,
             content: "You are invited to Meeting ##{@owner.get_id}."},
             mailer: true, subject: "New Meeting Invitation")
->>>>>>> 1d6bdc3... Adds polymophic notices to SR
         end
       end
     end
@@ -285,18 +271,11 @@ class MeetingsController < ApplicationController
       params[:cancellation].each_pair do |index, val|
         inv = @owner.invitations.where("users_id = ?", val).first
         if inv.present?
-<<<<<<< HEAD
-          send_notice(inv.first,
-            "You are no longer invited to Meeting ##{@owner.id}: #{@owner.title}.",
-            true, "Removed from Meeting: #{@owner.title}")
-          inv.first.destroy
-=======
           notify(@owner, notice: {
             users_id: inv.users_id,
             content: "You are no longer invited to Meeting ##{@owner.id}."},
             mailer: true, subject: 'Removed from Meeting')
           inv.destroy
->>>>>>> 1d6bdc3... Adds polymophic notices to SR
         end
       end
     end
@@ -373,23 +352,6 @@ class MeetingsController < ApplicationController
     users.push(@meeting.host.user)
     users.uniq!{|x| x.id}
 
-<<<<<<< HEAD
-    message = Message.create(
-      :subject => params[:subject],
-      :content => params[:message],
-      owner: @meeting,
-      :time => Time.now)
-    sent_from = SendFrom.create(
-      :messages_id => message.id,
-      :users_id => current_user.id)
-    users.each do |user|
-      SendTo.create(
-        :messages_id => message.id,
-        :users_id => user.id)
-      notify(User.find(user),
-        "You have a new internal message sent from Meeting ##{@meeting.id}: #{@meeting.title}. #{g_link(message)}",
-        true, 'New Internal Meeting Message')
-=======
     message = @meeting.messages.create({
       subject: params[:subject],
       content: params[:message],
@@ -403,7 +365,6 @@ class MeetingsController < ApplicationController
         users_id: user,
         content: "You have a new internal message sent from Meeting ##{@meeting.id}."},
         mailer: true, subject: 'New Internal Meeting Message')
->>>>>>> 1d6bdc3... Adds polymophic notices to SR
     end
     redirect_to meeting_path(@meeting)
   end
