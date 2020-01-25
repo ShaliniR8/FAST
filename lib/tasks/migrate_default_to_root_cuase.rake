@@ -33,7 +33,6 @@ task :migrate_root_cause => :environment do
 
               if level_2.options != ' '
                 options = options + "\r\n" + child3.name
-                # p options
               else
                 options = child3.name
               end

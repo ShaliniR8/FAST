@@ -22,8 +22,7 @@ ruby:
             thead
               tr
                 / display categories except the top level section
-                - (1..(owner.occurrences.first.get_category.length - 1)).each do |x|
-                  th = @label + ' ' + x.to_s
+                th = @label
                 th Value
                 - if show_btns
                   th Action
@@ -31,10 +30,9 @@ ruby:
               - owner.occurrences.each do |occurrence|
                 tr
                   - categories = occurrence.get_category
-                  - categories.shift #
-                  - categories.each do |category|
-                    td = category
-                  td = occurrence.value
+                  - categories.shift # remvoe the top level section
+                  td = categories.join(' > ')
+                  td = occurrence.value.gsub(/[\r\n]+/, '<br>').html_safe
                   - if show_btns
                     td =link_to 'Delete', '#',
                     class: 'btn btn-danger delete_occurrence_btn',

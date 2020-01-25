@@ -19,6 +19,11 @@ css:
     font-size: 14px !important;
   }
 
+  #content{
+    max-height: 280px;
+    overflow-y: scroll;
+  }
+
 javascript:
   swal({
     title: "Add #{@label}",
@@ -31,6 +36,16 @@ javascript:
   }).catch(swal.noop)
 
   $(document).ready(function(){
+    $(document).on('change', '.other-field', function(){
+      $(this).parent().find('.checkboxes-elem').val($(this).val());
+      $(this).parent().find('.checkboxes-elem').prop("checked", true);
+
+      target = $(this).parent().siblings('input')
+      value = target.val() + $(this).val()
+
+      target.prop('value', value)
+    });
+
     var tree = #{@tree.to_json.html_safe}
     var content = document.getElementById("content")
     interpretNode(content, tree, true)
@@ -165,6 +180,20 @@ javascript:
       container.appendChild(label)
       fragment.appendChild(container)
     })
+
+    // the last option for checkboxes is the blank input filed
+    container = document.createElement('div')
+    $(container).addClass('col-xs-12')
+    var label = document.createElement('input')
+    $(label).addClass('other-field')
+    var opt = document.createElement('input')
+    $(opt).addClass('checkboxes-elem') // For onchange listener (checkboxes-elem)
+    opt.setAttribute('type', 'checkbox')
+    opt.value = "\r\n";
+    container.appendChild(opt)
+    container.appendChild(label)
+    fragment.appendChild(container)
+
     field.appendChild(fragment)
     $(field).addClass('input-field checkboxes-field')
     return field
