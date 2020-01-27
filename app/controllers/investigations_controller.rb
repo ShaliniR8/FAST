@@ -158,10 +158,6 @@ class InvestigationsController < SafetyAssuranceController
     @fields = Investigation.get_meta_fields('show')
     @recommendation_fields = Recommendation.get_meta_fields('show')
     load_special_matrix(@investigation)
-
-    # Occurrence template panel label
-    root = find_top_level_section('Investigation')
-    @label = root.label
   end
 
 

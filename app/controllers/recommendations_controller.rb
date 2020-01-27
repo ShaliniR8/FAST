@@ -70,10 +70,6 @@ class RecommendationsController < SafetyAssuranceController
   def show
     @type = @owner.owner_type
     @fields = Recommendation.get_meta_fields('show')
-
-    # Occurrence template panel label
-    root = find_top_level_section('Recommendation')
-    @label = root.label
   end
 
 

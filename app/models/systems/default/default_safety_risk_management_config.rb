@@ -249,7 +249,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[risk_assessment root_causes occurrences descriptions risk_controls comments attachments transaction_log
+        panels: %i[risk_assessment occurrences risk_controls comments attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'RiskControl' => {
@@ -323,7 +323,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[descriptions costs occurrences comments extension_requests verifications attachments transaction_log
+        panels: %i[costs occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'SafetyPlan' => {
