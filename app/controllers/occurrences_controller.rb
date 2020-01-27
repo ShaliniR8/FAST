@@ -5,7 +5,7 @@ class OccurrencesController < ApplicationController
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
 
     # find the top-level occurrence template's section
-    root = find_top_level_section(owner.class.name.titleize)
+    root = owner.class.find_top_level_section(owner.class.name.titleize)
 
     @tree = root.form_tree(@templates)
     @label = root.label

@@ -154,10 +154,6 @@ class EvaluationsController < SafetyAssuranceController
       return
     end
     @checklist_headers = EvaluationRequirement.get_meta_fields('show')
-
-    # Occurrence template panel label
-    root = find_top_level_section('Evaluation')
-    @label = root.label
   end
 
 

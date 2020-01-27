@@ -80,10 +80,6 @@ class SmsActionsController < SafetyAssuranceController
     load_options
     @fields = SmsAction.get_meta_fields('show')
     @type = get_car_owner(@owner) || 'sms_actions'
-
-    # Occurrence template panel label
-    root = find_top_level_section('SmsAction')
-    @label = root.label
   end
 
 

@@ -183,10 +183,6 @@ class AuditsController < SafetyAssuranceController
         @recommendation_fields = Recommendation.get_meta_fields('show')
         @type = 'audits'
         @checklist_headers = AuditItem.get_headers
-
-        # Occurrence template panel label
-        root = find_top_level_section('Audit')
-        @label = root.label
       end
       format.json { show_as_json }
     end

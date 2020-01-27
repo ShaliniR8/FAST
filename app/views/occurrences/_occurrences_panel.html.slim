@@ -1,18 +1,19 @@
 ruby:
   show_btns ||= %w[New Assigned].include?(owner.status) &&
     current_user.has_access(owner.class, 'Edit', admin: true)
+  occurrence_label = owner.class.find_top_level_section(owner.class.name.titleize).label
 
 .col-xs-12
   .panel.panel-lightskyblue
     .panel-heading.click-heading.collapsed
       .panel-title
-        b #{@label}
+        b = occurrence_label
         span class="pull-right clickable"
           i class="mt5 glyphicon glyphicon-chevron-down"
     .panel-body style="display:none;"
       .row.col-xs-12
         - if show_btns
-          = link_to "Add #{@label}",
+          = link_to "Add #{occurrence_label}",
             '#',
             class: 'btn btn-success pull-right mr5',
             id: 'add_occurrence_btn'
@@ -22,7 +23,7 @@ ruby:
             thead
               tr
                 / display categories except the top level section
-                th = @label
+                th = occurrence_label
                 th Value
                 - if show_btns
                   th Action
