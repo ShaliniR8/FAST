@@ -1,7 +1,7 @@
 class CreatesMeetingRelatedPrivileges < ActiveRecord::Migration
   def self.up
 
-    if BaseConfig.airline[:code] == 'SCX'
+    if CONFIG == 'SCXConfig'
       module_access = AccessControl.where(entry: 'ASAP').first
 
       Template.all.each do |template|
@@ -34,7 +34,7 @@ class CreatesMeetingRelatedPrivileges < ActiveRecord::Migration
   end
 
   def self.down
-    if BaseConfig.airline[:code] == 'SCX'
+    if CONFIG == 'SCXConfig'
       Privilege.where('name LIKE "BLAIR TEST:%"').destroy_all
     end
   end
