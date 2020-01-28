@@ -95,6 +95,11 @@ class Report < Sr::SafetyReportingBase
   end
 
 
+  def included_reports_types
+    records.map{|record| record.get_template}.join(';')
+  end
+
+
   def reopen(new_status)
     self.status = new_status
     self.close_date = nil

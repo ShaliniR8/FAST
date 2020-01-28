@@ -129,10 +129,9 @@ PrdgSession::Application.routes.draw do |map|
   resources :queries do
     member do
       get "clone"
-      get "add_visualization"
+      post "add_visualization"
       get "remove_visualization"
-      get "generate_visualization"
-      get "generate_visualization_dynamic"
+      post "generate_visualization"
     end
     collection do
       get 'load_conditions_block'

@@ -477,7 +477,7 @@ class SubmissionsController < ApplicationController
           )
         end
       when "Save for Later"
-        notify(owner, notiice: {
+        notify(owner, notice: {
           users_id: owner.created_by.id,
           content: "You have a #{owner.template.name} Submission in progress."},
           mailer: false)

@@ -54,7 +54,7 @@ class DefaultConfig
 
   def self.mobile_modules
     mobile_mobile_access = CONFIG::MOBILE_MODULES rescue ['ASAP', 'SMS']
-    mobile_mobile_access.map{ |module_key| HIERARCHY[module_key][:display_name] }
+    mobile_mobile_access.map{ |module_key| hierarchy[module_key][:display_name] }
   end
 
   FAA_INFO = {

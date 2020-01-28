@@ -1,7 +1,7 @@
 ruby:
   show_btns ||= %w[New Assigned].include?(owner.status) &&
     current_user.has_access(owner.class, 'Edit', admin: true)
-  occurrence_label = owner.class.find_top_level_section(owner.class.name.titleize).label
+  occurrence_label = owner.class.find_top_level_section.label
 
 .col-xs-12
   .panel.panel-lightskyblue

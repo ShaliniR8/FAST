@@ -140,7 +140,7 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'panel_end', visible: 'form,show'
           },
           regulatory_compliances_panel_start: {
-            title: 'Affected Regulatory Compliances',
+            field: 'compliances', title: 'Affected Regulatory Compliances',
             num_cols: 12, type: 'panel_start', visible: 'form,show'
           },
           compliances: {
@@ -215,6 +215,8 @@ class DefaultSafetyRiskManagementConfig
             field: 'get_root_causes', title: "#{I18n.t("srm.hazard.root_cause.title")}",
             type: 'list', visible: 'index'
           },
+          occurrences: {default: true},
+          occurrences_full: {default: true},
           likelihood: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Likelihood" },
           severity: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Severity" },
           risk_factor: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk" },
