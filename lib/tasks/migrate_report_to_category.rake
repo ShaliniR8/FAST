@@ -8,7 +8,7 @@ task :migrate_category => :environment do
   record = CauseOption.where(name: 'Report') # Report
   if record.length > 0
     p '-- Create ' + record[0].name + ' section!'
-    root = OccurrenceTemplate.create(title: record[0].name, format: 'section')
+    root = OccurrenceTemplate.create(title: 'Report,Record', format: 'section')
 
     index = 1
 
