@@ -510,22 +510,24 @@ class QueriesController < ApplicationController
 
   # returns the field that matches field_label
   def get_field(query, object_type, field_label)
+    label = field_label.split(',').map(&:strip)[0]
     # if top level field
     field = object_type.get_meta_fields('show', 'index', 'invisible', 'query')
-      .keep_if{|f| f[:title] == field_label}.first
+      .keep_if{|f| f[:title] == label}.first
     # else check template fields
     field = Template.preload(:categories, :fields)
       .where(id: query.templates)
       .map(&:fields)
       .flatten
-      .select{|x| x.label == field_label}
+      .select{|x| x.label == label}
       .first if field.nil?
-    field
+    [field, field_label.split(',').map(&:strip)[1]]
   end
 
 
   # returns the formatted values of record's field
-  def get_val(record, field)
+  def get_val(record, field_arr)
+    field = field_arr[0]
     if field.is_a?(Field)
       field_type = field.display_type
       if record.class == Submission
@@ -539,12 +541,12 @@ class QueriesController < ApplicationController
       field_type = field[:type]
       value = record.send(field[:field])
     end
-    format_val(value, field_type)
+    format_val(value, field_type, field_arr[1])
   end
 
 
   # helper for get_val: formats value based on field type
-  def format_val(value, field_type)
+  def format_val(value, field_type, field_param=nil)
     case field_type
     when 'user', 'employee'
       User.find_by_id(value).full_name rescue 'N/A'
@@ -556,6 +558,8 @@ class QueriesController < ApplicationController
       value.split(';') rescue nil
     when 'list'
       value.split('<br>')
+    when 'category'
+      value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
     else
       value
     end

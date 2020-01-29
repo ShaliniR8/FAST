@@ -90,10 +90,6 @@ class DefaultSafetyReportingConfig
           submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
-          root_causes_full: { default: true, title: "#{I18n.t("sr.report.root_cause.title")}" },
-          root_causes: { default: true, title: "#{I18n.t("sr.report.root_cause.title")}",
-            visible: CONFIG::GENERAL[:has_root_causes] ? 'index' : ''
-          },
           description: { default: true, visible: 'form,index,show' },
           final_comment: { default: true },
 
@@ -130,10 +126,6 @@ class DefaultSafetyReportingConfig
             field: 'included_reports', title: 'Included Reports',
             num_cols: 6, type: 'text', visible: 'index,meeting_form',
             required: false, on_newline: true
-          },
-          root_causes_full: { default: true, title: "Full #{I18n.t("sr.event.root_cause.title")}" },
-          root_causes: { default: true, title: "#{I18n.t("sr.event.root_cause.title")}",
-            visible: CONFIG::GENERAL[:has_root_causes] ? 'index,meeting_form' : ''
           },
           event_label: {
             field: 'event_label', title: 'Event Type',
@@ -205,6 +197,12 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },
+
+          occurrences: {default: true, title: (Report.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Report.find_top_level_section.label rescue nil}"},
+
           likelihood: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Risk",

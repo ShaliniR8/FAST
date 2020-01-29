@@ -207,16 +207,10 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          root_causes_full: {
-            field: 'get_root_causes_full', title: "#{I18n.t("srm.hazard.root_cause.title")}",
-            type: 'list', visible: 'invisible'
-          },
-          root_causes: {
-            field: 'get_root_causes', title: "#{I18n.t("srm.hazard.root_cause.title")}",
-            type: 'list', visible: 'index'
-          },
-          occurrences: {default: true},
-          occurrences_full: {default: true},
+          occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Hazard.find_top_level_section.label rescue nil}"},
           likelihood: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Likelihood" },
           severity: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Severity" },
           risk_factor: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk" },
