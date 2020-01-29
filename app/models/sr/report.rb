@@ -46,6 +46,10 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+  def title
+    name
+  end
+
 
   def self.progress
     {
@@ -65,13 +69,12 @@ class Report < Sr::SafetyReportingBase
 
 
   def is_asap
-    result = false
-    records.each do |x|
-      result = result || x.template.report_type == "asap"
-    end
-    return result
+    records.any? { |record| record.template.report_type == 'asap' }
   end
 
+  def has_open_asap
+    records.any? { |record| record.template.report_type == 'asap' && record.status != 'Closed' }
+  end
 
   def additional_info
     if attachments.length > 0 || records.map(&:attachments).flatten.length > 0

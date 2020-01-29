@@ -225,6 +225,7 @@
           <%
             meta_field_args = ['show']
             meta_field_args.push('admin') if current_user.global_admin?
+            meta_field_args.push('close') if @record.status == 'Closed' && @record.is_asap
           %>
           <%=render "forms/show_fields", :fields => Record.get_meta_fields(*meta_field_args), :record => @record%>
 

@@ -293,14 +293,14 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show', @report.status == 'Closed' ? 'close' : '', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('show', CONFIG::GENERAL[:event_summary] ? 'event_summary' : '')
   end
 
 
   def close
     @fields = Report.get_meta_fields('close')
     @owner = Report.find(params[:id])
-    if @owner.is_asap
+    if @owner.has_open_asap
       render :partial => 'reports/close'
     else
       params[:commit] = "close_event"
@@ -436,13 +436,12 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def change_privilege
     @privileges = Privileges.find(:all)
     @target = Report.find(params[:id])
     render :partial => "shared/privilege"
   end
+
 
   def mitigate
     @owner=Report.find(params[:id])
@@ -468,18 +467,19 @@ class ReportsController < ApplicationController
   end
 
 
-
   def new_minutes
     @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
     render :partial => "shared/add_minutes"
   end
 
+
   def show_narrative
     @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
     render :partial => "show_narrative"
   end
+
 
   def airport_data
     icao = "%"+params[:icao]+"%"
@@ -498,19 +498,22 @@ class ReportsController < ApplicationController
     owner.records.each do |record|
       if record.status != 'Closed'
         record.close_date = Time.now
+        record.update_attributes(params[:report]) if record.is_asap
         record.status = 'Closed'
         record.save
         submission = record.submission
-        notify(record.submission, notice: {
-          users_id: record.created_by.id,
-          content: "Your submission ##{record.submission.id} has been closed by analyst."},
-          mailer: true, subject: "Submission ##{record.submission.id} Closed by Analyst")
-        Transaction.build_for(
-          submission,
-          'Close',
-          current_user.id,
-          'Report has been closed.'
-        )
+        if submission.present?
+          notify(record.submission, notice: {
+            users_id: record.created_by.id,
+            content: "Your submission ##{record.submission.id} has been closed by analyst."},
+            mailer: true, subject: "Submission ##{record.submission.id} Closed by Analyst")
+          Transaction.build_for(
+            submission,
+            'Close',
+            current_user.id,
+            'Report has been closed.'
+          )
+        end
         Transaction.build_for(
           record,
           'Close',

@@ -3,6 +3,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     # General Module Features:
     show_submitter_name:      false,
+    enable_dual_report:       false,
     # Airline-Specific Features:
   })
 

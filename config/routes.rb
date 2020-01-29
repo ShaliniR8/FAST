@@ -93,6 +93,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'foward'
       get 'inbox'
       get 'prev'
+      put 'read'
     end
     collection do
       get 'sent'

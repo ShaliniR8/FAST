@@ -65,44 +65,15 @@ class FaaReport < ActiveRecord::Base
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}
-    asap_events = asap_reports.map{|x| x.report}.uniq.compact
-
-    result = {}
-
-    result[:asap_submitted] = asap_reports.map(&:id)
-    result[:asap_accepted] = asap_events
-      .select{|x| x.asap}
-      .map{|x| x.records.keep_if{|y|
-        (y.template.name.include? "ASAP") &&
-        (y.template.name.include? "#{self.employee_group}")}}
-      .flatten.map(&:id)
-    result[:asap_accepted_sole_source] = asap_events
-      .select{|x| x.asap && x.sole}.map{|x| x.records.keep_if{|y|
-        (y.template.name.include? "ASAP") &&
-        (y.template.name.include? "#{self.employee_group}")}}
-      .flatten.map(&:id)
-    result[:asap_accepted_closed] = asap_events
-      .select{|x| x.asap && x.status == "Closed"}
-      .map{|x| x.records.keep_if{|y|
-        (y.template.name.include? "ASAP") &&
-        (y.template.name.include? "#{self.employee_group}")}}
-      .flatten.map(&:id)
-    result[:asap_accepted_employee_car] = asap_reports
-      .select{|x|
-        (x.report.present? && x.report.asap && x.report.has_emp) || (x.has_emp)}
-      .keep_if{|y|
-        (y.template.name.include? "ASAP") &&
-        (y.template.name.include? "#{self.employee_group}")}
-      .flatten.map(&:id)
-    result[:asap_aceepted_company_car] = asap_reports
-      .select{|x|
-        (x.report.present? && x.report.asap && x.report.has_com) ||
-        (x.has_com)}
-      .keep_if{|y|
-        (y.template.name.include? "ASAP") &&
-        (y.template.name.include? "#{self.employee_group}")}
-      .flatten.map(&:id)
-
+    accepted_reports = asap_reports.select{|report| report.asap}
+    result = {
+      asap_submitted: asap_reports.map(&:id),
+      asap_accepted: accepted_reports.map(&:id),
+      asap_accepted_sole_source: accepted_reports.select{|report| report.sole}.map(&:id),
+      asap_accepted_closed: accepted_reports.select{|report| report.status == 'Closed'}.map(&:id),
+      asap_accepted_employee_car: accepted_reports.select{|report| report.has_emp}.map(&:id),
+      asap_aceepted_company_car: accepted_reports.select{|report| report.has_com}.map(&:id)
+    }
     result
   end
 

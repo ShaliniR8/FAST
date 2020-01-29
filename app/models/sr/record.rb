@@ -59,6 +59,11 @@ class Record < Sr::SafetyReportingBase
   end
 
 
+  def is_asap
+    self.template.report_type == 'asap'
+  end
+
+
   def reopen(new_status)
     self.status = new_status
     self.close_date = nil
@@ -154,6 +159,11 @@ class Record < Sr::SafetyReportingBase
 
   def self.getStatus
     ["New", "In Progress", "Closed"]
+  end
+
+
+  def title
+    description
   end
 
 
