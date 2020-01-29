@@ -75,7 +75,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts findings costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[tasks contacts findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -138,7 +138,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -205,7 +205,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -290,7 +290,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[occurrences findings sms_actions recommendations contacts tasks costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[findings sms_actions recommendations contacts tasks costs signatures comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -309,11 +309,6 @@ class DefaultSafetyAssuranceConfig
           responsible_user: { default: true },
           approver: { default: true, visible: 'index,form,show' },
           due_date: { field: 'due_date', default: true },
-
-          root_causes_full: { default: true, title: "#{I18n.t("sa.finding.root_cause.title")}" },
-          root_causes: { default: true, title: "#{I18n.t("sa.finding.root_cause.title")}",
-            visible: CONFIG::GENERAL[:has_root_causes] ? 'index' : ''
-          },
           reference: { default: true, title: 'Reference or Requirement' },
           regulatory_violation: {
             field: 'regulatory_violation', title: 'Regulatory Violation',
@@ -411,6 +406,12 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true, type: 'text' },
+
+          occurrences: {default: true, title: (Finding.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Finding.find_top_level_section.label rescue nil}"},
+
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -527,7 +528,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments extension_requests verifications attachments transaction_log
+        panels: %i[comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
@@ -593,7 +594,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments extension_requests verifications attachments transaction_log
+        panels: %i[comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       }
     },
