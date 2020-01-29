@@ -100,9 +100,10 @@ class RiskControlsController < ApplicationController
   def update
     transaction = true
     @owner = RiskControl.find(params[:id]).becomes(RiskControl)
-    @owner.update_attributes(params[:risk_control])
+
     case params[:commit]
     when 'Assign'
+      @owner.update_attributes(params[:risk_control])
       @owner.date_open = Time.now
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,
@@ -122,14 +123,14 @@ class RiskControlsController < ApplicationController
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,
         content: "Risk Control ##{@owner.id} was Rejected by the Final Approver."},
-        mailer: true, subject: 'Risk Control Reject')
+        mailer: true, subject: 'Risk Control Reject') if @owner.responsible_user
     when 'Approve'
       @owner.date_complete = Time.now
       @owner.close_date = Time.now
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,
         content: "Risk Control ##{@owner.id} was Approved by the Final Approver."},
-        mailer: true, subject: 'Risk Control Approved')
+        mailer: true, subject: 'Risk Control Approved') if @owner.responsible_user
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:risk_control][:status]}"
       params[:risk_control][:close_date] = params[:risk_control][:status] == 'Completed' ? Time.now : nil

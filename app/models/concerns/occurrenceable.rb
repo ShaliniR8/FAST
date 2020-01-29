@@ -21,6 +21,14 @@ module Occurrenceable
         .join('<br>').html_safe
     end
 
+    def has_occurrences?
+      occurrences.present?
+    end
+
+    def occurrence_lock?
+      #Used to indicate whether or not an action should be locked based on Config and root_causes
+      CONFIG::GENERAL["#{self.class.name.downcase}_root_cause_lock".to_sym] && !self.has_occurrences? rescue false
+    end
 
   end
 

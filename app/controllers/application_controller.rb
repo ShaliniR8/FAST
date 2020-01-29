@@ -198,8 +198,16 @@ class ApplicationController < ActionController::Base
     case params[:act].to_sym
 
     when :approve_reject # was approve route
-      status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
-      render partial: '/forms/workflow_forms/process', locals: {status: status}
+      if @owner.class.name == 'Hazard'
+        status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
+        render partial: '/forms/workflow_forms/process', locals: {status: status}
+      else
+        @owner = Sra.find(params[:id]).becomes(Sra)
+        pending_approval = @owner.status == 'Pending Approval'
+        status = params[:commit].downcase == 'approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
+        field = pending_approval ? :approver_comment : :reviewer_comment
+        render :partial => '/forms/workflow_forms/process', locals: {status: status, field: field }
+      end
 
     when :assign # was assign route
       render partial: '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
