@@ -562,22 +562,32 @@ class DefaultDictionary
       num_cols: 6, type: 'datetime', visible: 'index,show',
       required: false
     },
-    root_causes_full: {
-      field: 'get_root_causes_full', title: 'Full Root Causes',
-      type: 'list', visible: 'invisible'
-    },
-    root_causes: {
-      field: 'get_root_causes', title: 'Root Causes',
-      type: 'list', visible: '' #should include index w/ CONFIG[:has_root_causes]
-    },
+    # root_causes_full: {
+    #   field: 'get_root_causes_full', title: 'Full Root Causes',
+    #   type: 'list', visible: 'invisible'
+    # },
+    # root_causes: {
+    #   field: 'get_root_causes', title: 'Root Causes',
+    #   type: 'list', visible: '' #should include index w/ CONFIG[:has_root_causes]
+    # },
     occurrences: {
       field: 'get_occurrences', title: 'Occurrences',
-      type: 'list', visible: 'index'
+      type: 'category', visible: 'index'
     },
     occurrences_full: {
       field: 'get_occurrences_full', title: 'Occurrences Full',
-      type: 'list', visible: 'index'
+      type: 'category', visible: 'index'
     },
+    # occurrences_category: {
+    #   field: 'get_occurrence_category', title: 'Occurrence Category',
+    #   type: 'list', visible: 'index'
+    # },
+    # occurrences_subcategory: {
+
+    # },
+    # occurrences_value: {
+
+    # },
     description: {
       field: 'description', title: 'Event Title',
       num_cols: 12, type: 'text', visible: 'index,show',
