@@ -129,7 +129,7 @@ class CorrectiveActionsController < ApplicationController
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:corrective_action])
+    # @owner.update_attributes(params[:corrective_action])
     if transaction
       Transaction.build_for(
         @owner,
