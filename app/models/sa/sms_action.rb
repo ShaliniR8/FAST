@@ -57,7 +57,7 @@ class SmsAction < Sa::SafetyAssuranceBase
 
 
   def get_completion_date
-    self.schedule_completion_date.strftime("%Y-%m-%d") rescue ''
+    self.due_date.strftime("%Y-%m-%d") rescue ''
   end
 
 

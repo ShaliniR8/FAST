@@ -31,6 +31,22 @@
           <%end%>
         </div>
 
+        <%= render '/forms/show_fields', :fields => @fields, :record => @owner %>
+
+        <% can_change = @owner.status != "Completed" &&
+          @owner.status != "Pending Approval" &&
+          current_user.has_access("sms_actions","edit")%>
+
+        <%= render 'shared/choose_show_matrix',
+          :owner => @owner,
+          :show_btn => true,
+          :type => "sms_actions",
+          :like => @like,
+          :color_matrix => @color_matrix,
+          :frequency => @frequency,
+          :allow_mitigate => true,
+          :can_change => can_change %>
+
         <%= render '/panels/show_panels', owner: @owner %>
 
       </div>

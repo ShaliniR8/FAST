@@ -81,7 +81,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[tasks contacts findings costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[comments findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -144,7 +144,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -211,7 +211,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[tasks contacts requirements findings costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -296,7 +296,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[findings sms_actions recommendations contacts tasks costs signatures comments extension_requests verifications attachments transaction_log
+        panels: %i[comments findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -440,7 +440,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences extension_requests verifications attachments transaction_log
+        panels: %i[comments occurrences extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -534,7 +534,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[comments extension_requests verifications attachments transaction_log
+        panels: %i[comments costs extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 

@@ -80,7 +80,7 @@ class Evaluation < Sa::SafetyAssuranceBase
 
 
   def get_completion_date
-    self.completion.present? ? self.completion.strftime("%Y-%m-%d") : ""
+    self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
 
 

@@ -39,6 +39,9 @@ class Recommendation < Sa::SafetyAssuranceBase
       (self.immediate_action || self.owner.status == 'Completed')
   end
 
+  def get_completion_date
+    self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
+  end
 
   def get_source
     case owner.class.name
