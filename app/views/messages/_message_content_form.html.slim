@@ -31,11 +31,11 @@ ruby:
     p style='overflow-y:auto' id='cc_list'
 
 .col-xs-12.mt10
-  = f.label_tag :distribution_list, 'Distribution List', class: 'control-label col-xs-2'
-    .col-xs-6
-      = select_tag :distribution_list,
-        options_for_select(DistributionList.all.collect{|p| [p['title'], p['id']]}),
-        {include_blank: true, class: 'form-control distribution_list'}
+  = f.label :distribution_list, 'Distribution List', class: 'control-label col-xs-2'
+  .col-xs-6
+    = select_tag :distribution_list,
+      options_for_select(DistributionList.all.collect{|p| [p['title'], p['id']]}),
+      {include_blank: true, class: 'form-control distribution_list'}
 
 .col-xs-12.mt10
   = label_tag 'template', 'Template', class: 'control-label col-xs-2'
