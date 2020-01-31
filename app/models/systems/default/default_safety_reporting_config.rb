@@ -84,6 +84,7 @@ class DefaultSafetyReportingConfig
 
       'Record' => {
         title: 'Report',
+        preload: [:created_by, :template],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },

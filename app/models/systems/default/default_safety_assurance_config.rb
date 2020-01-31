@@ -17,6 +17,12 @@ class DefaultSafetyAssuranceConfig
 
       'Audit' => {
         title: 'Audit',
+        preload: [
+          :approver,
+          :responsible_user,
+          :created_by,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },

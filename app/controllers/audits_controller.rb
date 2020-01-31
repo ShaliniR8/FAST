@@ -45,6 +45,7 @@ class AuditsController < SafetyAssuranceController
     respond_to do |format|
       format.html do
         @table = Object.const_get("Audit")
+          .preload(CONFIG.hierarchy[session[:mode]][:objects]['Audit'][:preload])
         @headers = @table.get_meta_fields('index')
         @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
         handle_search
