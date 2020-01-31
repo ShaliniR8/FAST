@@ -395,6 +395,9 @@ class RecordsController < ApplicationController
     end
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
+    redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
+                              access_level.split(',').include?('full') ||
+                              (access_level.split(',').include?('viewer') && @record.viewer_access)
     load_special_matrix(@record)
   end
 
