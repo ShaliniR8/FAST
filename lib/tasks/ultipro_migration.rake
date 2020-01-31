@@ -44,6 +44,7 @@ namespace :ultipro do
                 next if user.nil?
                 @log_entry << " Account Created"
               end
+              update_account_detail user, user_hash
               update_privileges user, user_hash
               if !@log_entry.empty?
                 @log_data << ("  [User] #{user.username}:" << @log_entry)
@@ -77,7 +78,7 @@ namespace :ultipro do
  ### Helper Methods
 
     def assign_configs
-      configs = Object.const_get("#{YAML.load_file("#{::Rails.root}/config/airline_code.yml")}_Config")::ULTIPRO_DATA
+      configs = Object.const_get("#{YAML.load_file("#{::Rails.root}/config/airline_code.yml")}Config")::ULTIPRO_DATA
       @upload_path = configs[:upload_path]
       @expand_output =  configs[:expand_output]
       @dry_run = configs[:dry_run]
@@ -146,6 +147,24 @@ namespace :ultipro do
         end
       end
     end
+
+
+    def update_account_detail user, user_hash
+      if user.email != user_hash['email_address']
+        @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
+        user.email = user_hash['email_address']
+      end
+      if user.first_name != user_hash['first_name']
+        @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"
+        user.first_name = user_hash['first_name']
+      end
+      if user.last_name != user_hash['last_name']
+        @log_entry << "\n     Update Last Name: #{user.last_name} => #{user_hash['last_name']}"
+        user.last_name = user_hash['last_name']
+      end
+      user.save
+    end
+
 
 
     def map_account_level employee_group
