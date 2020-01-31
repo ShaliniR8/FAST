@@ -331,7 +331,7 @@ class ReportsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("Report")
+    @table = Object.const_get("Report").preload(:records => [:created_by])
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     @title = "Events"

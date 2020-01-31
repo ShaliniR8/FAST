@@ -45,7 +45,7 @@ class SubmissionsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @table = Object.const_get('Submission')
+        @table = Object.const_get('Submission').preload(CONFIG.hierarchy[session[:mode]][:objects]['Submission'][:preload])
         index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
           args << 'admin' if current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name]
           args

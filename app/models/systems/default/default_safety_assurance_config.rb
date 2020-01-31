@@ -17,6 +17,12 @@ class DefaultSafetyAssuranceConfig
 
       'Audit' => {
         title: 'Audit',
+        preload: [
+          :approver,
+          :responsible_user,
+          :created_by,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -29,30 +35,30 @@ class DefaultSafetyAssuranceConfig
           department: {
             field: 'department', title: 'Auditing Department',
             num_cols: 6,  type: 'select', visible: 'index,form,show',
-            required: false, options: Audit.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           audit_department: {
             field: 'audit_department', title: 'Department being Audited',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: Audit.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           audit_type: {
             field: 'audit_type', title: 'Audit Type',
             num_cols: 6,  type: 'select', visible: 'index,form,show',
-            required: false, options: Audit.get_custom_options('Audit Types')
+            required: false, options: CONFIG.custom_options['Audit Types']
           },
           location: { default: true },
           station_code: {
             field: 'station_code', title: 'Station Code',
             num_cols: 6,  type: 'datalist', visible: 'form,show',
-            required: false, options: Audit.get_custom_options('Station Codes')
+            required: false, options: CONFIG.custom_options['Station Codes']
           },
           vendor: { default: true },
           process: { default: true },
           supplier: {
             field: 'supplier', title: 'Internal/External/Supplier',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: Audit.get_custom_options('Suppliers')
+            required: false, options: CONFIG.custom_options['Suppliers']
           },
           planned: { default: true },
           objective: { default: true },
@@ -94,12 +100,12 @@ class DefaultSafetyAssuranceConfig
           department: {
             field: 'department', title: 'Inspection Department',
             num_cols: 6,  type: 'select', visible: 'index,form,show',
-            required: false,      options: Inspection.get_custom_options('Departments')
+            required: false,      options: CONFIG.custom_options['Departments']
           },
           inspection_department: {
             field: 'inspection_department', title: 'Department being Inspected',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false,      options: Inspection.get_custom_options('Departments')
+            required: false,      options: CONFIG.custom_options['Departments']
           },
           planned: { default: true },
           inspection_type: {
@@ -111,14 +117,14 @@ class DefaultSafetyAssuranceConfig
           station_code: {
             field: 'station_code', title: 'Station Code',
             num_cols: 6,  type: 'datalist', visible: 'form,show',
-            required: false,      options: Inspection.get_custom_options('Station Codes')
+            required: false,      options: CONFIG.custom_options['Station Codes']
           },
           vendor: { default: true },
           process: { default: true },
           supplier: {
             field: 'supplier', title: 'Internal/External/Supplier',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false,      options: Inspection.get_custom_options('Suppliers')
+            required: false,      options: CONFIG.custom_options['Suppliers']
           },
           objective: { default: true },
           reference: { default: true },
@@ -157,17 +163,17 @@ class DefaultSafetyAssuranceConfig
           department: {
             field: 'department', title: 'Evaluation Department',
             num_cols: 6, type: 'select', visible: 'index,form,show',
-            required: false, options: Evaluation.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           evaluation_department: {
             field: 'evaluation_department', title: 'Department being Evaluated',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: Evaluation.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           evaluation_type: {
             field: 'evaluation_type', title: 'Type',
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
-            required: false, options: Evaluation.get_custom_options('Evaluation Types')
+            required: false, options: CONFIG.custom_options['Evaluation Types']
           },
           location: {
             field: 'location', title: 'Location',
@@ -177,14 +183,14 @@ class DefaultSafetyAssuranceConfig
           station_code: {
             field: 'station_code', title: 'Station Code',
             num_cols: 6, type: 'datalist', visible: 'form,show',
-            required: false, options: Evaluation.get_custom_options('Station Codes')
+            required: false, options: CONFIG.custom_options['Station Codes']
           },
           vendor: { default: true },
           process: { default: true },
           supplier: {
             field: 'supplier', title: 'Internal/External/Supplier',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: Evaluation.get_custom_options('Suppliers')
+            required: false, options: CONFIG.custom_options['Suppliers']
           },
           planned: { default: true },
           objective: { default: true },
@@ -239,11 +245,11 @@ class DefaultSafetyAssuranceConfig
           inv_type: {
             field: 'inv_type', title: 'Investigation Type',
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
-            required: false, options: Investigation.get_custom_options('Investigation Types')},
+            required: false, options: CONFIG.custom_options['Investigation Types']},
           source: {
             field: 'source', title: 'Source',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: Investigation.get_custom_options('Sources')},
+            required: false, options: CONFIG.custom_options['Sources']},
           ntsb: {
             field: 'ntsb', title: 'NTSB Reportable',
             num_cols: 6, type: 'boolean_box', visible: 'form,show',
@@ -373,12 +379,12 @@ class DefaultSafetyAssuranceConfig
           classification: {
             field: 'classification', title: 'Classification',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, on_newline: true, options: Finding.get_custom_options('Classifications')
+            required: false, on_newline: true, options: CONFIG.custom_options['Classifications']
           },
           department: {
             field: 'department', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: Finding.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           action_taken: {
             field: 'action_taken', title: 'Immediate Action Taken',
@@ -457,7 +463,7 @@ class DefaultSafetyAssuranceConfig
           responsible_department: {
             field: 'responsible_department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: SmsAction.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           emp: {
             field: 'emp', title: 'Employee Corrective Action',
@@ -492,7 +498,7 @@ class DefaultSafetyAssuranceConfig
           action_taken: {
             field: 'action_taken', title: 'Action Taken',
             num_cols: 12, type: 'datalist', visible: 'form,show',
-            required: false, options: SmsAction.get_custom_options('Actions Taken')
+            required: false, options: CONFIG.custom_options['Actions Taken']
           },
           description: {
             field: 'description', title: 'Description of Corrective Action',
@@ -555,7 +561,7 @@ class DefaultSafetyAssuranceConfig
           department: {
             field: 'department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'index,form,show',
-            required: false,  options: Recommendation.get_custom_options('Departments'), on_newline: true
+            required: false,  options: CONFIG.custom_options['Departments'], on_newline: true
           },
           immediate_action: {
             field: 'immediate_action', title: 'Immediate Action Required',
@@ -565,7 +571,7 @@ class DefaultSafetyAssuranceConfig
           recommended_action: {
             field: 'recommended_action', title: 'Action',
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
-            required: false,  options: Recommendation.get_custom_options('Actions Taken'), on_newline: true
+            required: false,  options: CONFIG.custom_options['Actions Taken'], on_newline: true
           },
           description: {
             field: 'description', title: 'Description of Recommendation',
