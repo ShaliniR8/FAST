@@ -80,6 +80,7 @@ class FindingsController < SafetyAssuranceController
   def show
     load_special_matrix(@owner)
     @type = @owner.get_owner
+    @fields = Finding.get_meta_fields('show')
   end
 
 
@@ -126,7 +127,7 @@ class FindingsController < SafetyAssuranceController
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:finding])
+    # @owner.update_attributes(params[:finding])
     if transaction
       Transaction.build_for(
         @owner,

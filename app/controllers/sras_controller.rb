@@ -90,9 +90,10 @@ class SrasController < ApplicationController
     @owner = Sra.find(params[:id]).becomes(Sra)
     sra_meeting = @owner.meeting
     meeting_redirect = false
-    @owner.update_attributes(params[:sra])
+
     case params[:commit]
     when 'Assign'
+      @owner.update_attributes(params[:sra])
       notify(@owner,
         notice: {
           users_id: @owner.responsible_user.id,
@@ -129,7 +130,7 @@ class SrasController < ApplicationController
             users_id: @owner.responsible_user.id,
             content: "SRA ##{@owner.id} was Rejected by the Quality Reviewer."},
           mailer: true,
-          subject: 'SRA Rejected')
+          subject: 'SRA Rejected') if @owner.responsible_user
         transaction_content = 'Rejected by the Quality Reviewer'
       else
         update_status = 'Assigned'
@@ -138,7 +139,7 @@ class SrasController < ApplicationController
             users_id: @owner.responsible_user.id,
             content: "SRA ##{@owner.id} was Rejected by the Final Approver."},
           mailer: true,
-          subject: 'SRA Rejected')
+          subject: 'SRA Rejected') if @owner.responsible_user
         transaction_content = 'Rejected by the Final Approver'
       end
     when 'Approve'
@@ -149,7 +150,7 @@ class SrasController < ApplicationController
             users_id: @owner.responsible_user.id,
             content: "SRA ##{@owner.id} was Approved by the Quality Reviewer."},
           mailer: true,
-          subject: 'SRA Approved')
+          subject: 'SRA Approved') if @owner.responsible_user
         transaction_content = 'Approved by the Quality Reviewer'
       elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
         update_status = 'Pending Approval'
@@ -158,7 +159,7 @@ class SrasController < ApplicationController
             users_id: @owner.responsible_user.id,
             content: "SRA ##{@owner.id} needs your Approval."},
           mailer: true,
-          subject: 'SRA Pending Approval')
+          subject: 'SRA Pending Approval') if @owner.responsible_user
         transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.date_complete = Time.now

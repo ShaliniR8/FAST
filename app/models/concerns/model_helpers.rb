@@ -63,7 +63,9 @@ module ModelHelpers
 
 
   def overdue
-    if self.respond_to?(:completion) #Mostly the primary forms of SA
+    if self.respond_to?(:due_date) # temporary for SR (keep below incase)
+      self.due_date < Time.now.to_date && self.status != 'Completed' rescue false
+    elsif self.respond_to?(:completion) #Mostly the primary forms of SA
       self.completion < Time.now.to_date && self.status != 'Completed' rescue false
     elsif self.respond_to?(:scheduled_completion_date) #Mostly SRA module
       self.status != "Completed" && self.scheduled_completion_date < Time.now.to_date rescue false

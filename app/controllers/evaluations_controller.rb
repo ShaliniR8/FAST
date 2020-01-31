@@ -86,7 +86,7 @@ class EvaluationsController < SafetyAssuranceController
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:evaluation])
+    # @owner.update_attributes(params[:evaluation])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(

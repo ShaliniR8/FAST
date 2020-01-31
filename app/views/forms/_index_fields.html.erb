@@ -9,7 +9,11 @@
   <%=render "access_controls/new_modal"%>
 
   <%title = (defined? @title) ? @title : @table.name.pluralize.titleize%>
-  <div class="panel panel-primary">
+  <% if ['Safety Reports Templates', 'Checklist Templates'].include? @title %>
+    <div class="panel panel-steelblue">
+  <% else %>
+    <div class="panel panel-primary">
+  <% end %>
     <div class="panel-heading">
       <div class="panel-title">
         <div class="top_text">

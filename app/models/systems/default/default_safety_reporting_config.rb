@@ -199,48 +199,48 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
-          eir: {
-            field: 'eir', title: 'EIR Number',
-            num_cols: 6, type: 'text', visible: 'close',
-            required: false
-          },
-          scoreboard: {
-            field: 'scoreboard', title: 'Exclude from Scoreboard',
-            num_cols: 6, type: 'boolean', visible: 'close',
-            required: false
-          },
-          asap: {
-            field: 'asap', title: 'Accepted Into ASAP',
-            num_cols: 6, type: 'boolean', visible: 'close',
-            required: true
-          },
-          sole: {
-            field: 'sole', title: 'Sole Source',
-            num_cols: 6, type: 'boolean', visible: 'close',
-            required: true
-          },
-          disposition: {
-            field: 'disposition', title: 'Disposition',
-            num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: CONFIG.custom_options['Dispositions']
-          },
-          company_disposition: {
-            field: 'company_disposition', title: 'Company Disposition',
-            num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: CONFIG.custom_options['Company Dispositions']
-          },
-          narrative: {
-            field: 'narrative', title: 'Narrative',
-            num_cols: 12, type: 'textarea', visible: 'close',
-            required: false
-          },
-          regulation: {
-            field: 'regulation', title: 'Regulation',
-            num_cols: 12, type: 'textarea', visible: 'close',
-            required: false
-          },
+          # eir: {
+          #   field: 'eir', title: 'EIR Number',
+          #   num_cols: 6, type: 'text', visible: 'close',
+          #   required: false
+          # },
+          # scoreboard: {
+          #   field: 'scoreboard', title: 'Exclude from Scoreboard',
+          #   num_cols: 6, type: 'boolean', visible: 'close',
+          #   required: false
+          # },
+          # asap: {
+          #   field: 'asap', title: 'Accepted Into ASAP',
+          #   num_cols: 6, type: 'boolean', visible: 'close',
+          #   required: true
+          # },
+          # sole: {
+          #   field: 'sole', title: 'Sole Source',
+          #   num_cols: 6, type: 'boolean', visible: 'close',
+          #   required: true
+          # },
+          # disposition: {
+          #   field: 'disposition', title: 'Disposition',
+          #   num_cols: 6, type: 'datalist', visible: 'close',
+          #   required: false,  options: Report.get_custom_options('Dispositions')
+          # },
+          # company_disposition: {
+          #   field: 'company_disposition', title: 'Company Disposition',
+          #   num_cols: 6, type: 'datalist', visible: 'close',
+          #   required: false,  options: Report.get_custom_options('Company Dispositions')
+          # },
+          # narrative: {
+          #   field: 'narrative', title: 'Narrative',
+          #   num_cols: 12, type: 'textarea', visible: 'close',
+          #   required: false
+          # },
+          # regulation: {
+          #   field: 'regulation', title: 'Regulation',
+          #   num_cols: 12, type: 'textarea', visible: 'close',
+          #   required: false
+          # },
           notes: {
-            field: 'notes', title: 'Closing Notes',
+            field: 'notes', title: 'Final Commnet',
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },

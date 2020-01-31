@@ -14,11 +14,15 @@
       <div class="col-xs-12">
         <%=render "/records/show_template_fields", :record => @record%>
 
-        <%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => false%>
-        <%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => false%>
-        <%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => false%>
-        <%=render '/causes/all', :owner => @record, :cause_type => 'reaction', :can_change => false%>
-        <%=render '/causes/all', :owner => @record, :cause_type => 'suggestion', :can_change => false%>
+        <% if false %>
+          comment out for v1.2
+          <%= render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => false%>
+          <%= render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => false%>
+          <%= render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => false%>
+          <%= render '/causes/all', :owner => @record, :cause_type => 'reaction', :can_change => false%>
+          <%= render '/causes/all', :owner => @record, :cause_type => 'suggestion', :can_change => false%>
+          Probably need to add Occurrence (root cause) panel here
+        <% end %>
 
       </div>
     </div>

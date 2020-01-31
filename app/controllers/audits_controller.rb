@@ -155,7 +155,7 @@ class AuditsController < SafetyAssuranceController
     when 'Add Cost', 'Add Contact', 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:audit])
+    # @owner.update_attributes(params[:audit])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(

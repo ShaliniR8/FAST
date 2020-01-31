@@ -133,7 +133,7 @@ class SmsActionsController < SafetyAssuranceController
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:sms_action])
+    # @owner.update_attributes(params[:sms_action])
     if transaction
       Transaction.build_for(
         @owner,

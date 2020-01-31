@@ -109,7 +109,7 @@ class RecommendationsController < SafetyAssuranceController
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:recommendation])
+    # @owner.update_attributes(params[:recommendation])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(

@@ -31,6 +31,7 @@
             <%end%>
           </div>
 
+          <%= render '/forms/show_fields', :fields => @fields, :record => @owner %>
           <%= render '/panels/show_panels', owner: @owner %>
 
       </div>

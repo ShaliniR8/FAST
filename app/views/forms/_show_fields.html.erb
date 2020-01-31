@@ -13,7 +13,7 @@
     <div class="col-xs-12"></div>
   <%elsif field_type == "panel_start"%>
     <div class="col-xs-12">
-      <div class="panel panel-lightskyblue mt10">
+      <div class="panel panel-lightskyblue">
         <div class="panel-heading click-heading">
           <div class="panel-title">
             <b><%=field_description%></b>
@@ -56,7 +56,7 @@
 
 
   <%else%>
-    <div class="form-group col-xs-<%=field_col%> <%=field_name%>">
+    <div class="form-group col-xs-<%=field_col%> <%=field_name%> mb10">
       <b><%=field_description%>: </b>
       <%if field_value.to_s.present?%>
 

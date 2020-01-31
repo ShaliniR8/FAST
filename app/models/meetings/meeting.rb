@@ -191,7 +191,7 @@ class Meeting < ProsafetBase
 
 
   def get_time(field)
-    self.send(field).strftime("%Y-%m-%d %H:%M:%S") rescue ''
+    self.send(field).in_time_zone(CONFIG::GENERAL[:time_zone]).strftime("%Y-%m-%d %H:%M:%S") rescue ''
   end
 
 
