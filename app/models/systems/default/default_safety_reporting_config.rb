@@ -32,6 +32,7 @@ class DefaultSafetyReportingConfig
 
       'Submission' => {
         title: 'Submission',
+        preload: [:created_by, :template],
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },
