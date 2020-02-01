@@ -50,7 +50,7 @@ module Concerns
         mobile_user_info[:permissions] = permissions
 
         # change when configs are updated to v1.2
-        mobile_user_info[:enable_dual_report] = BaseConfig.airline[:enable_dual_report]
+        mobile_user_info[:enable_dual_report] = CONFIG.sr::GENERAL[:enable_dual_report]
 
         render :json => mobile_user_info
       end
