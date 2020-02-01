@@ -572,7 +572,7 @@ class DefaultDictionary
     # },
     occurrences: {
       field: 'get_occurrences', title: 'Occurrences',
-      type: 'category', visible: 'index'
+      type: 'list', visible: 'index'
     },
     occurrences_full: {
       field: 'get_occurrences_full', title: 'Occurrences Full',

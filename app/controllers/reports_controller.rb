@@ -293,12 +293,15 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show', CONFIG::GENERAL[:event_summary] ? 'event_summary' : '', @report.status == 'Closed' ? 'close' : '')
+    @fields = Report.get_meta_fields(
+      'show',
+      CONFIG::GENERAL[:event_summary] ? 'event_summary' : '',
+      @report.status == 'Closed' ? 'close' : '')
   end
 
 
   def close
-    @fields = Report.get_meta_fields('close')
+    @fields = Report.get_meta_fields('asap')
     @owner = Report.find(params[:id])
     if @owner.has_open_asap
       render :partial => 'reports/close'
@@ -331,7 +334,7 @@ class ReportsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("Report").preload(:records => [:created_by])
+    @table = Object.const_get("Report").preload(:occurrences, :records => [:created_by])
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
     @title = "Events"
