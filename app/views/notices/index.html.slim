@@ -15,16 +15,10 @@
             tbody
               - @records.each do |notice|
                 tr data-notice-id="#{notice.id}" class='#{notice.status == 1 ? "unread" : ""}' data-link="#{read_message_notice_path(notice)}"
-                  td
+                  td style="#{Notice.get_category[notice.category][:style]}"
                     i class='mr5 glyphicon glyphicon-#{Notice.get_category[notice.category][:icon]}'
-                    = notice.content
+                    = sanitize notice.content.html_safe
                   td = "#{time_ago_in_words(notice.created_at).scan(/\w+/).join(' ')} ago"
-
-              <td style=<%=Notice.get_category[notice.category][:style]%>>
-                <i class='glyphicon glyphicon-<%=Notice.get_category[notice.category][:icon]%>'> </i>
-                <%=sanitize notice.content.html_safe%>
-              </td>
-
 
 css:
   .unread {
