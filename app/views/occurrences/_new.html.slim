@@ -36,14 +36,14 @@ javascript:
   }).catch(swal.noop)
 
   $(document).ready(function(){
-    $(document).on('change', '.other-field', function(){
-      $(this).parent().find('.checkboxes-elem').val($(this).val());
-      $(this).parent().find('.checkboxes-elem').prop("checked", true);
-
-      target = $(this).parent().siblings('input')
-      value = target.val() + $(this).val()
-
-      target.prop('value', value)
+    $('form').on('submit', function(){
+      $('.other-field').each(function(index) {
+        if ($(this).siblings('input:checked')) {
+          target = $(this).parent().siblings('input')
+          value = $(this).val()
+          target.prop('value', target.val().split('\r\n').filter(n => n) + value)
+        }
+      })
     });
 
     var tree = #{@tree.to_json.html_safe}
