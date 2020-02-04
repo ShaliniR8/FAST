@@ -11,6 +11,19 @@ class BSKSafetyReportingConfig < DefaultSafetyReportingConfig
     "Condition",
     "Threat", "Sub Threat",
     "Error", "Sub Error",
-    "Human Factor", "Comment"]
+    "Human Factor", "Comment"
+  ]
+
+  HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
+    objects: {
+      'CorrectiveAction' => {
+          fields: {
+            recommendation: { visible: '' },
+            company: { visible: '' },
+            employee: { visible: '' }
+          }
+      }
+    }
+  })
 
 end

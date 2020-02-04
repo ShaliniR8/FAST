@@ -316,6 +316,16 @@ class DefaultSafetyAssuranceConfig
           approver: { default: true, visible: 'index,form,show' },
           due_date: { field: 'due_date', default: true },
           reference: { default: true, title: 'Reference or Requirement' },
+          classification: {
+            field: 'classification', title: 'Classification',
+            num_cols: 6, type: 'select', visible: 'form,show',
+            required: false, on_newline: true, options: CONFIG.custom_options['Classifications']
+          },
+          department: {
+            field: 'department', title: 'Department',
+            num_cols: 6, type: 'select', visible: 'form,show',
+            required: false, options: CONFIG.custom_options['Departments']
+          },
           regulatory_violation: {
             field: 'regulatory_violation', title: 'Regulatory Violation',
             num_cols: 6, type: 'boolean_box', visible: 'form,show',
@@ -375,16 +385,6 @@ class DefaultSafetyAssuranceConfig
             field: 'immediate_action', title: 'Immediate Action Required',
             num_cols: 12, type: 'boolean_box', visible: 'form,show',
             required: false
-          },
-          classification: {
-            field: 'classification', title: 'Classification',
-            num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, on_newline: true, options: CONFIG.custom_options['Classifications']
-          },
-          department: {
-            field: 'department', title: 'Department',
-            num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: CONFIG.custom_options['Departments']
           },
           action_taken: {
             field: 'action_taken', title: 'Immediate Action Taken',

@@ -53,6 +53,13 @@ class BSKSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
     objects:{
+      'Sra' => {
+        fields: {
+          system_task: { visible: '' },
+          reviewer: { visible: '' }
+        }
+      },
+
       'Hazard' => {
         actions: {
           complete: {
