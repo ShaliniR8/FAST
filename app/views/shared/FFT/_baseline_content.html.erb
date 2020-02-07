@@ -1,11 +1,6 @@
 <%=render "shared/instructions", :instruction =>
   "Select <b>Initial Severity</b> and <b>Initial Probability</b> from the table to assess risk."%>
 
-<div class="form-group col-xs-12">
-  <%=f.label :statement, "Notes"%>
-  <%=f.text_area :statement, {class: "form-control ml5", rows: "2"}%>
-</div>
-
 <div class="col-xs-12 col-sm-12 col-md-6">
   <%=render "shared/#{AIRLINE_CODE}/form_baseline_risk"%>
   <%=render "shared/#{AIRLINE_CODE}/form_baseline_probability"%>

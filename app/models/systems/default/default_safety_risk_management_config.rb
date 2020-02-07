@@ -207,6 +207,7 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
+          final_comment: { default: true },
           occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
@@ -319,7 +320,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[costs occurrences comments extension_requests verifications attachments transaction_log
+        panels: %i[costs comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'SafetyPlan' => {

@@ -14,12 +14,7 @@
       <%=f.hidden_field :risk_factor_after, :value => "", :id => "risk_fact"%>
 
       <%=render "shared/instructions", :instruction =>
-        "Select <b>Residual Probability</b> and <b>Residual Severity</b> from the table to assess risk."%>
-
-      <div class="form-group col-xs-12">
-        <%=f.label :statement, "Notes"%>
-        <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
-      </div>
+        "Select <b>Residual Severity</b> and <b>Residual Probability</b> from the table to assess risk."%>
 
       <div class="col-xs-12 col-sm-12 col-md-6">
         <%=render "shared/#{AIRLINE_CODE}/form_mitigated_risk"%>

@@ -14,7 +14,6 @@
       <div class="row">
         <%=render "/forms/show_fields", :fields => RiskControl.get_meta_fields('show'), :record => risk_control%>
         <%=render "/forms/cost",  :owner => risk_control%>
-        <%=render '/causes/all', :owner => risk_control, :cause_type => 'description', :can_change => false%>
       </div>
     </div>
   </div>
