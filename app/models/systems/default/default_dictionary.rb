@@ -427,7 +427,7 @@ class DefaultDictionary
       required: true
     },
     status: {
-      field: 'status', title: 'Status',
+      field: 'get_status', title: 'Status',
       num_cols: 6,  type: 'text', visible: 'index,show',
       required: false
     },
