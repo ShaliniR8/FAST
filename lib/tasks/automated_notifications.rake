@@ -22,6 +22,7 @@ namespace :notifications do
         user = User.find(record.send(audience_field)) rescue nil
         if user.present?
           NotifyMailer.automated_reminder(user, subject, content, record)
+          content = content[0..251] + '...' if content.length > 255
           record.notices.create({users_id: user.id, content: content})
         end
       end
