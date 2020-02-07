@@ -6,7 +6,7 @@ class DefaultSafetyReportingConfig
 
   GENERAL = {
     # General Module Features:
-    enable_orm:               false,     # Enables ORM Reports - default off
+    enable_orm:               true,     # Enables ORM Reports - default off
     show_submitter_name:      true,      # Displays submitter names when access to show (admins will always see it)- default on
     submission_description:   true,      # Changes Character Limit or adds General Description - default on
     template_nested_fields:   false,     # WIP nested smart forms functionality - default off
@@ -366,9 +366,69 @@ class DefaultSafetyReportingConfig
         panels: %i[occurrences
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
-    }
-  }
+    },
+    menu_items:
+      [
+        {title: 'Submissions', path: '#',
+          display: proc{|user:,**op|
+            priv_check.call(Object.const_get('Submission'), user, 'index', true, true) ||
+            priv_check.call(Object.const_get('Submission'), user, 'new', true, true) ||
+            priv_check.call(Object.const_get('Submission'), user, 'full', true, true)
+          },
+          subMenu: [
+            {title: 'All', path: 'submissions_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', true, true)}},
+            {title: 'In Progress', path: 'incomplete_submissions_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
+            {title: 'New', path: 'new_submission_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
+            {title: 'ORMs', path: '#',  header: true,
+              display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            {title: 'All', path: 'orm_submissions_path',
+              display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            {title: 'New', path: 'new_orm_submission_path',
+              display: proc{|user:,**op| GENERAL[:enable_orm]}},
+          ]
+        },
+        {title: 'Reports', path: 'records_path',
+          display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', true, true)}},
+        {title: 'Events',  path: 'reports_path',
+          display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
+        {title: 'Meetings', path: '#',
+          display: proc{|user:,**op|
+            priv_check.call(Object.const_get('Meeting'), user, 'index', true, true) ||
+            priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)
+          },
+          subMenu: [
+            {title: 'All', path: 'meetings_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)}},
+            {title: 'New', path: 'new_meeting_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+          ]
+        },
+        {title: 'Corrective Actions', path: 'corrective_actions_path',
+          display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', true, true)}},
+        {title: 'FAA Reports', path: '#',
+          display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: true)},
+          subMenu: [
+            {title: 'All', path: 'faa_reports_path',
+              display: proc{|user:,**op| true}},
+            {title: 'New', path: 'new_faa_report_path',
+              display: proc{|user:,**op| true}},
+          ]
+        },
+        {title: 'Query Center', path: '#',
+          display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+          subMenu: [
+            {title: 'All', path: 'queries_path',
+              display: proc{|user:,**op| true}},
+            {title: 'New', path: 'new_query_path',
+              display: proc{|user:,**op| true}},
+          ]
+        },
+      ]
 
+  }
 
 
 end
