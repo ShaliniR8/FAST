@@ -93,14 +93,6 @@ class ProsafetBase < ActiveRecord::Base
 
   # find the occurrence template to match
   def self.find_top_level_section
-    titles = OccurrenceTemplate.preload.where(archived: false, parent_id: nil).map(&:title)
-    title = titles.find { |title| title.split(',').include? self.name }
-
-    root = OccurrenceTemplate.preload(:children)
-      .where(archived: false, parent_id: nil).find_by_title(title)
-    root ||= OccurrenceTemplate.preload(:children)
-      .where(archived: false, parent_id: nil).find_by_title('Default')
-
-    return root
+    Rails.application.config.occurrence_templates[self.name]
   end
 end
