@@ -281,7 +281,7 @@ class ApplicationController < ActionController::Base
 
     when :schedule_verification
       @verification = @owner.verifications.new
-      @verification.validator = @owner.approver
+      @verification.validator = @owner.responsible_user
       render :partial => 'verifications/new'
 
     else
