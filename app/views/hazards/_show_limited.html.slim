@@ -24,22 +24,6 @@ css:
           show_btn: show_btn,
           type: 'hazards',
           can_change: !%w[Rejected Completed].include?(owner.status)
-        - if CONFIG::GENERAL[:has_root_causes] && owner.root_causes.present?
-          .col-xs-12
-            .panel.clickable.panel-lightskyblue
-              .panel-heading.click-heading.collapsed
-                .panel-title
-                  b Root Causes
-                  span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
-              .panel-body style='display:none'
-                = render '/root_causes/root_causes_table',
-                    owner: owner,
-                    show_btns: false,
-                    headers: HazardRootCause.get_headers
-        = render '/hazards/descriptions',
-          owner: owner,
-          show_btns: false,
-          headers: Cause.get_meta_fields('show')
         - if owner.risk_controls.present?
           .col-xs-12
             .panel.clickable.panel-info
@@ -52,3 +36,13 @@ css:
                   - owner.risk_controls.each do |risk_control|
                     = render '/hazards/show_risk_control',
                       risk_control: risk_control
+        - if owner.has_occurrences?
+          .col-xs-12
+            .panel.clickable.panel-info
+              .panel-heading.click-heading.collapsed
+                .panel-title
+                  b = owner.class.find_top_level_section.label
+                  span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+              .panel-body style='display:none'
+                .row
+                  = render '/occurrences/occurrences_panel', owner: owner, show_only_table: true

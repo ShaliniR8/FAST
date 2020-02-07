@@ -2,42 +2,57 @@ ruby:
   show_btns ||= %w[New Assigned].include?(owner.status) &&
     current_user.has_access(owner.class, 'Edit', admin: true)
   occurrence_label = owner.class.find_top_level_section.label
+  show_only_table ||= false
 
-.col-xs-12
-  .panel.panel-lightskyblue
-    .panel-heading.click-heading.collapsed
-      .panel-title
-        b = occurrence_label
-        span class="pull-right clickable"
-          i class="mt5 glyphicon glyphicon-chevron-down"
-    .panel-body style="display:none;"
-      .row.col-xs-12
-        - if show_btns
-          = link_to "Add #{occurrence_label}",
-            '#',
-            class: 'btn btn-success pull-right mr5',
-            id: 'add_occurrence_btn'
-      .row.col-xs-12
-        - if !owner.occurrences[0].nil?
-          table.table.table-striped.table-bordered width="100%"
-            thead
-              tr
-                / display categories except the top level section
-                th = occurrence_label
-                th Value
-                - if show_btns
-                  th Action
-            tbody
-              - owner.occurrences.each do |occurrence|
+- if show_only_table && !owner.occurrences[0].nil?
+  table.table.table-striped.table-bordered width="100%"
+    thead
+      tr
+        th = occurrence_label
+        th Value
+    tbody
+      - owner.occurrences.each do |occurrence|
+        tr
+          - categories = occurrence.get_category
+          - categories.shift # remvoe the top level section
+          td = categories.join(' > ')
+          td = occurrence.value.gsub(/[\r\n]+/, '<br>').html_safe
+- else
+  .col-xs-12
+    .panel.panel-lightskyblue
+      .panel-heading.click-heading.collapsed
+        .panel-title
+          b = occurrence_label
+          span class="pull-right clickable"
+            i class="mt5 glyphicon glyphicon-chevron-down"
+      .panel-body style="display:none;"
+        .row.col-xs-12
+          - if show_btns
+            = link_to "Add #{occurrence_label}",
+              '#',
+              class: 'btn btn-success pull-right mr5',
+              id: 'add_occurrence_btn'
+        .row.col-xs-12
+          - if !owner.occurrences[0].nil?
+            table.table.table-striped.table-bordered width="100%"
+              thead
                 tr
-                  - categories = occurrence.get_category
-                  - categories.shift # remvoe the top level section
-                  td = categories.join(' > ')
-                  td = occurrence.value.gsub(/[\r\n]+/, '<br>').html_safe
+                  / display categories except the top level section
+                  th = occurrence_label
+                  th Value
                   - if show_btns
-                    td =link_to 'Delete', '#',
-                    class: 'btn btn-danger delete_occurrence_btn',
-                    'data-cid' => occurrence.id
+                    th Action
+              tbody
+                - owner.occurrences.each do |occurrence|
+                  tr
+                    - categories = occurrence.get_category
+                    - categories.shift # remvoe the top level section
+                    td = categories.join(' > ')
+                    td = occurrence.value.gsub(/[\r\n]+/, '<br>').html_safe
+                    - if show_btns
+                      td =link_to 'Delete', '#',
+                      class: 'btn btn-danger delete_occurrence_btn',
+                      'data-cid' => occurrence.id
 javascript:
   $(function(){
     $('#add_occurrence_btn').on('click', function(){

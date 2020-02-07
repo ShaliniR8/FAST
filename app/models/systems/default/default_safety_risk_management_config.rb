@@ -319,7 +319,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[costs occurrences comments extension_requests verifications attachments transaction_log
+        panels: %i[costs comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'SafetyPlan' => {
