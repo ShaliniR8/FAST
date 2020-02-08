@@ -6,9 +6,7 @@ require 'carrierwave/orm/activerecord'
 PrdgSession::Application.initialize!
 
 
-unless Object.const_defined? 'CONFIG'
-  CONFIG ||= Object.const_get("#{AIRLINE_CODE}Config")
-end
+
 
 unless Object.const_defined? 'CONFIG_IM'
   CONFIG_IM ||= Object.const_get("#{AIRLINE_CODE}ImplementationManagementConfig") rescue DefaultImplementationManagementConfig
