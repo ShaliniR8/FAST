@@ -1,0 +1,44 @@
+= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css"
+= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js"
+= javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"
+= javascript_include_tag "/javascripts/utility/format-builder.js"
+
+
+= render 'shared/alerts'
+= render 'access_controls/new_modal'
+
+.panel.panel-primary
+  .panel-body
+    h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
+    ul class="nav nav-pills"
+      - @object[:status].each do |status|
+        li class="nav-item status-#{status.parameterize}"
+          a data-toggle="pill" href="#table" onclick="loadContent('#{status}')"
+            = "#{status} <span class='badge badge-pill badge-info'>#{(@records[status] || []).length}</span>".html_safe
+
+    .tab-content.mt20
+      .tab-pane.fade.in.active id='table'
+        .records-table
+
+
+css:
+  .nav-pills {
+    border-bottom: 1px solid #0bacd3;
+  }
+  .nav-pills > li > a {
+    background-color: white;
+  }
+
+
+javascript:
+  $(function(){
+    loadContent("#{@default_tab}");
+  });
+
+  function loadContent(status) {
+    $('li').removeClass('active');
+    $('.status-' + status.toLowerCase()).addClass('active');
+    $.get('#{eval("load_records_#{controller_name}_path")}?status=' + status, function(data){
+      $('.records-table').html(data);
+    });
+  }

@@ -309,6 +309,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
     end
     collection do
+      get 'load_records'
       post "search"
       post "search_all"
       post "filter"
@@ -337,6 +338,7 @@ PrdgSession::Application.routes.draw do |map|
       get "advanced_search"
       get "summary"
       get "tabulation"
+      get 'load_records'
     end
     member do
       get 'mitigate'
