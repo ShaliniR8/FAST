@@ -93,6 +93,7 @@ class ProsafetBase < ActiveRecord::Base
 
   # find the occurrence template to match
   def self.find_top_level_section
-    Rails.application.config.occurrence_templates[self.name]
+    Rails.application.config.occurrence_templates[self.name] ||
+      Rails.application.config.occurrence_templates['Default']
   end
 end

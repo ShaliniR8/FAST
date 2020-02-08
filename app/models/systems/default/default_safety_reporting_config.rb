@@ -85,7 +85,8 @@ class DefaultSafetyReportingConfig
 
       'Record' => {
         title: 'Report',
-        preload: [:created_by, :template, :occurrences],
+        status: ['New', 'Open', 'Linked', 'Closed'],
+        preload: [:created_by, :template],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },
@@ -118,12 +119,12 @@ class DefaultSafetyReportingConfig
           disposition: {
             field: 'disposition', title: 'Disposition',
             num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: Report.get_custom_options('Dispositions')
+            required: false,  options: CONFIG.custom_options['Dispositions']
           },
           company_disposition: {
             field: 'company_disposition', title: 'Company Disposition',
             num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: Report.get_custom_options('Company Dispositions')
+            required: false,  options: CONFIG.custom_options['Company Dispositions']
           },
           narrative: {
             field: 'narrative', title: 'Narrative',
@@ -160,6 +161,8 @@ class DefaultSafetyReportingConfig
 
       'Report' => {
         title: 'Event',
+        status: ['New', 'Meeting Ready', 'Under Review', 'Closed'],
+        preload: [:records => [:created_by]],
         fields: {
           id: { default: true, visible: 'index,meeting_form,show' },
           status: { default: true, visible: 'index,meeting_form,show' },
@@ -314,7 +317,7 @@ class DefaultSafetyReportingConfig
           department: {
             field: 'department', title: 'Department',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: Report.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           responsible_user: { default: true, on_newline: true }, # for form and show
           approver: { default: true },
@@ -390,9 +393,9 @@ class DefaultSafetyReportingConfig
               display: proc{|user:,**op| GENERAL[:enable_orm]}},
           ]
         },
-        {title: 'Reports', path: 'records_path',
+        {title: 'Reports', path: 'records_path(status: "New")',
           display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', true, true)}},
-        {title: 'Events',  path: 'reports_path',
+        {title: 'Events',  path: 'reports_path(status: "New")',
           display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
         {title: 'Meetings', path: '#',
           display: proc{|user:,**op|

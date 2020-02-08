@@ -70,21 +70,22 @@ class Hazard < Srm::SafetyRiskManagementBase
 
 
   def self.root_causes
-    custom_options = CustomOption.where(:title => "Manuals").first
-    if custom_options.present?
-      custom_options.options.split(";")
-    else
-      [
-        'Inadequate development / implementation of policy or procedure',
-        'Inadequate training',
-        'Inadequate training materials',
-        'Lack of or inadequate policy or procedure',
-        'Emotional overload',
-        'Extreme judgement decisions/demands',
-        'Preoccupation with problems',
-        'Other'
-      ]
-    end
+    CONFIG.custom_options['Manuals']
+    # custom_options = CustomOption.where(:title => "Manuals").first
+    # if custom_options.present?
+    #   custom_options.options.split(";")
+    # else
+    #   [
+    #     'Inadequate development / implementation of policy or procedure',
+    #     'Inadequate training',
+    #     'Inadequate training materials',
+    #     'Lack of or inadequate policy or procedure',
+    #     'Emotional overload',
+    #     'Extreme judgement decisions/demands',
+    #     'Preoccupation with problems',
+    #     'Other'
+    #   ]
+    # end
   end
 
 

@@ -18,7 +18,7 @@ class Expectation < ActiveRecord::Base
   end
 
   def self.get_departments
-    CustomOption.where(:title => 'Departments').first.options.split(';') rescue ['Please go to Custom Options to add options.']
+    CONFIG.custom_options['Departments']
   end
 
 

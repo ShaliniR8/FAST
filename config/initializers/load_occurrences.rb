@@ -6,3 +6,4 @@ Rails.application.config.occurrence_templates = OccurrenceTemplate
                                                   .where(archived: false, parent_id: nil)
                                                   .map{|x| [x.title, x]}.to_h
                                                   .map{|key, value| key.split(',').map{|x| [x, value]}.to_h}
+                                                  .reduce rescue nil
