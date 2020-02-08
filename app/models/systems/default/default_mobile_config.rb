@@ -20,9 +20,9 @@ class DefaultMobileConfig
     nams_general:     { label: 'General',                       subdomain: 'nams' },
 
     #SCX Portals
-    scx_general_sso:  { label: 'General',                       subdomain: 'scx',           sso: true },
-    scx_general_dir:  { label: 'General (ProSafeT)',            subdomain: 'scx', },
-    scx_shared_sso:   { label: 'General (Shared)',              subdomain: 'scx',           sso: true,  shared: true },
+    scx_general_sso:  { label: 'Personal Device',               subdomain: 'scx',           sso: true },
+    scx_general_dir:  { label: 'External User',                 subdomain: 'scx', },
+    scx_shared_sso:   { label: 'Shared Device',                 subdomain: 'scx',           sso: true,  shared: true },
     scx_shared_dir:   { label: 'General (Shared) (ProSafeT)',   subdomain: 'scx',                       shared: true },
     scx_training_sso: { label: 'Training',                      subdomain: 'scx-training',  sso: true },
     scx_training_dir: { label: 'Training (ProSafeT)',           subdomain: 'scx-training', },
@@ -68,11 +68,6 @@ class DefaultMobileConfig
         scx_general_sso
         scx_general_dir
         scx_shared_sso
-        scx_shared_dir
-        scx_training_sso
-        scx_training_dir
-        scx_shrtrain_sso
-        scx_shrtrain_dir
       ]
     },
 
