@@ -70,7 +70,7 @@ class DefaultDictionary
     delete:{
       btn: :delete,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'destroy',true,true) },
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'destroy',false,true) },
     },
     edit: {
       btn: :edit,
