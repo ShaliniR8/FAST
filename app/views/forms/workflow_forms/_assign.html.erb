@@ -41,8 +41,7 @@
       </div>
 
       <%=f.submit "Assign",
-        :class => "btn btn-warning pull-right mt5",
-        :disable_with => "Assigning..."%>
+        :class => "btn btn-warning pull-right mt5"%>
 
     </div>
   </div>
@@ -120,6 +119,8 @@
       $(this).find('.required_field').each(function(){
         if ($(this).val() == ''){
           event.preventDefault();
+          $(this).css('border-color', 'red');
+          alert('Please fill in all required fields.');
         }
       });
     });
