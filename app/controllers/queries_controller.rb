@@ -184,7 +184,7 @@ class QueriesController < ApplicationController
       row1 = [params[:x_axis]] << series.sort
       @data = [row1.flatten]
       x_axis.sort.each do |x|
-        @data << series.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
+        @data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
       end
     else # when series not present, use default charts
       @data = [[params[:x_axis], 'Count']]
