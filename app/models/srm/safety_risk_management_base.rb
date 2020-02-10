@@ -3,7 +3,11 @@
   # Any new methods added here are available to all Safety Risk Management Objects
 module Srm
   class SafetyRiskManagementBase < ProsafetBase
-  self.abstract_class = true
+
+    include ExtensionRequestable
+    include Verifiable
+
+    self.abstract_class = true
 
     def panel_btns
       {

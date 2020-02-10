@@ -553,7 +553,7 @@ class ApplicationController < ActionController::Base
         @records = @records.select{|x| x.type == params[:type]}
       end
     end
-    if params[:status].present?
+    if params[:status].present? && params[:status] != 'All'
       if params[:status] == "Overdue"
         @records = @records.select{|x| x.overdue}
       else

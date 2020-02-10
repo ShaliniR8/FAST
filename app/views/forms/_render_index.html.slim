@@ -14,7 +14,7 @@
       - @object[:status].each do |status|
         li class="nav-item status-#{status.parameterize}"
           a data-toggle="pill" href="#table" onclick="loadContent('#{status}')"
-            = "#{status} <span class='badge badge-pill badge-info'>#{(@records[status] || []).length}</span>".html_safe
+            = "#{status} <span class='badge badge-pill badge-info'>#{(@records_hash[status] || []).length}</span>".html_safe
 
     .tab-content.mt20
       .tab-pane.fade.in.active id='table'

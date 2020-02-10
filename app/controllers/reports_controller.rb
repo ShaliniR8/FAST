@@ -337,7 +337,8 @@ class ReportsController < ApplicationController
     @table = Object.const_get(object_name).preload(@object[:preload])
     @default_tab = params[:status]
     @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records = @records.group_by(&:status)
+    @records_hash = @records.group_by(&:status)
+    @records_hash['All'] = @records
   end
 
 

@@ -36,7 +36,7 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
+          submitter: { default: true, visible: "admin,index,show" },
           event_date: { default: true },
           description: { default: true },
         }.reduce({}) { |acc,(key,data)|
@@ -85,13 +85,13 @@ class DefaultSafetyReportingConfig
 
       'Record' => {
         title: 'Report',
-        status: ['New', 'Open', 'Linked', 'Closed'],
-        preload: [:created_by, :template],
+        status: ['New', 'Open', 'Linked', 'Closed', 'All'],
+        preload: [:created_by, :template, :occurrences],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },
           template: { default: true, title: 'Type' },
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
+          submitter: { default: true, visible: "admin,index,show" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
@@ -161,8 +161,8 @@ class DefaultSafetyReportingConfig
 
       'Report' => {
         title: 'Event',
-        status: ['New', 'Meeting Ready', 'Under Review', 'Closed'],
-        preload: [:records => [:created_by]],
+        status: ['New', 'Meeting Ready', 'Under Review', 'Closed', 'All'],
+        preload: [ :attachments, :occurrences, :records => [:created_by]],
         fields: {
           id: { default: true, visible: 'index,meeting_form,show' },
           status: { default: true, visible: 'index,meeting_form,show' },

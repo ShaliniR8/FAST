@@ -123,7 +123,8 @@ class RecordsController < ApplicationController
     @table = Object.const_get(object_name).preload(@object[:preload])
     @default_tab = params[:status]
     @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records = @records.group_by(&:status)
+    @records_hash = @records.group_by(&:status)
+    @records_hash['All'] = @records
   end
 
 
@@ -406,8 +407,8 @@ class RecordsController < ApplicationController
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
     redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
-                              access_level.split(',').include?('full') ||
-                              (access_level.split(',').include?('viewer') && @record.viewer_access)
+                              access_level.split(';').include?('full') ||
+                              (access_level.split(';').include?('viewer') && @record.viewer_access)
     load_special_matrix(@record)
   end
 
