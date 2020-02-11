@@ -34,5 +34,17 @@
         :deidentified => @deidentified%>
     </div>
   <%end%>
+
+  <div class="col-xs-12">
+    <%
+      @audit.checklists.includes(
+        checklist_rows: { checklist_cells: :checklist_header_item },
+        checklist_header: :checklist_header_items
+      ).each do |checklist|
+    %>
+      <p><b>Checklist Title: </b><%= checklist.title %></p>
+      <%= render '/checklists/checklist_table', checklist: checklist %>
+    <%end%>
+  </div>
 </div>
 
