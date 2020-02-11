@@ -553,7 +553,7 @@ class ApplicationController < ActionController::Base
         @records = @records.select{|x| x.type == params[:type]}
       end
     end
-    if params[:status].present?
+    if params[:status].present? && params[:status] != 'All'
       if params[:status] == "Overdue"
         @records = @records.select{|x| x.overdue}
       else
@@ -739,6 +739,17 @@ class ApplicationController < ActionController::Base
   helper_method :airport_admin, :airport_has_access?, :current_airport_admin
 
 
+
+  # load records on index page
+  def load_records
+    object = CONFIG.hierarchy[session[:mode]][:objects][controller_name.classify]
+    @table = Object.const_get(controller_name.classify).preload(object[:preload])
+    handle_search
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    @records = @records.to_a & records.to_a
+    @fields = @table.get_meta_fields('index')
+    render :partial => 'forms/render_index_tab'
+  end
 
 
   private

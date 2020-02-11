@@ -98,7 +98,8 @@ class DefaultConfig
 
 
   def self.custom_options
-    CustomOption.all.map{|x| [x.title, (x.options.split(';') rescue [''])]}.to_h
+    Rails.application.config.custom_options
+    #CustomOption.all.map{|x| [x.title, (x.options.split(';') rescue [''])]}.to_h
   end
 
 

@@ -11,8 +11,7 @@ class ProsafetBase < ActiveRecord::Base
   include Occurrenceable
   include Noticeable
   include Messageable
-  include ExtensionRequestable
-  include Verifiable
+
 
   self.abstract_class = true
   include Rails.application.routes.url_helpers #For path method
@@ -64,7 +63,7 @@ class ProsafetBase < ActiveRecord::Base
   # Get full status including verification and extension
   def get_status
     verification_needed = self.verifications.select{|x| x.status == 'New'}.length > 0 rescue false
-    extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0
+    extension_requested = self.extension_requests.select{|x| x.status == "New"}.length > 0 rescue false
     if verification_needed
       "#{status}, Verification Required"
     elsif extension_requested
@@ -93,14 +92,7 @@ class ProsafetBase < ActiveRecord::Base
 
   # find the occurrence template to match
   def self.find_top_level_section
-    titles = OccurrenceTemplate.preload.where(archived: false, parent_id: nil).map(&:title)
-    title = titles.find { |title| title.split(',').include? self.name }
-
-    root = OccurrenceTemplate.preload(:children)
-      .where(archived: false, parent_id: nil).find_by_title(title)
-    root ||= OccurrenceTemplate.preload(:children)
-      .where(archived: false, parent_id: nil).find_by_title('Default')
-
-    return root
+    Rails.application.config.occurrence_templates[self.name] ||
+      Rails.application.config.occurrence_templates['Default']
   end
 end

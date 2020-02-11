@@ -118,32 +118,43 @@ class RecordsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("Record").preload(CONFIG.hierarchy[session[:mode]][:objects]['Record'][:preload])
-    index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-      args << 'admin' if (current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name])
-      args
-    end
-    @headers = @table.get_meta_fields(*index_meta_field_args)
-    @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{|x| x[:field].present?}
-    @title = 'Reports'
-    handle_search
-
-    @fields = Field.find(:all)
-    @categories = Category.find(:all)
-    @templates = Template.find(:all)
-
-    records = Record.preload(:created_by, :template).can_be_accessed(current_user)
-    records = Record.filter_array_by_emp_groups(records, params[:emp_groups])
-
-    @records = @records.to_a & records.to_a
-
-    # handle custom view
-    if params[:custom_view].present?
-      selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
-      @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
-      @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
-    end
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    @records_hash = @records.group_by(&:status)
+    @records_hash['All'] = @records
   end
+
+
+  # def index_old
+  #   @table = Object.const_get("Record").preload(CONFIG.hierarchy[session[:mode]][:objects]['Record'][:preload])
+  #   index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+  #     args << 'admin' if (current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name])
+  #     args
+  #   end
+  #   @headers = @table.get_meta_fields(*index_meta_field_args)
+  #   @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{|x| x[:field].present?}
+  #   @title = 'Reports'
+  #   handle_search
+
+  #   @fields = Field.find(:all)
+  #   @categories = Category.find(:all)
+  #   @templates = Template.find(:all)
+
+  #   records = Record.preload(:created_by, :template).can_be_accessed(current_user)
+  #   records = Record.filter_array_by_emp_groups(records, params[:emp_groups])
+
+  #   @records = @records.to_a & records.to_a
+
+  #   # handle custom view
+  #   if params[:custom_view].present?
+  #     selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
+  #     @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
+  #     @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+  #   end
+  # end
 
 
 
@@ -396,8 +407,8 @@ class RecordsController < ApplicationController
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
     redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
-                              access_level.split(',').include?('full') ||
-                              (access_level.split(',').include?('viewer') && @record.viewer_access)
+                              access_level.split(';').include?('full') ||
+                              (access_level.split(';').include?('viewer') && @record.viewer_access)
     load_special_matrix(@record)
   end
 

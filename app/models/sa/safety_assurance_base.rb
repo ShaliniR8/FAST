@@ -3,7 +3,8 @@
   # Any new methods added here are available to all Safety Assurance Objects
 module Sa
   class SafetyAssuranceBase < ProsafetBase
-  self.abstract_class = true
+
+    self.abstract_class = true
 
     def panel_btns
       {

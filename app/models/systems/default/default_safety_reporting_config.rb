@@ -6,7 +6,7 @@ class DefaultSafetyReportingConfig
 
   GENERAL = {
     # General Module Features:
-    enable_orm:               false,     # Enables ORM Reports - default off
+    enable_orm:               true,     # Enables ORM Reports - default off
     show_submitter_name:      true,      # Displays submitter names when access to show (admins will always see it)- default on
     submission_description:   true,      # Changes Character Limit or adds General Description - default on
     template_nested_fields:   false,     # WIP nested smart forms functionality - default off
@@ -36,7 +36,7 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
+          submitter: { default: true, visible: "admin,index,show" },
           event_date: { default: true },
           description: { default: true },
         }.reduce({}) { |acc,(key,data)|
@@ -85,12 +85,13 @@ class DefaultSafetyReportingConfig
 
       'Record' => {
         title: 'Report',
+        status: ['New', 'Open', 'Linked', 'Closed', 'All'],
         preload: [:created_by, :template, :occurrences],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },
           template: { default: true, title: 'Type' },
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
+          submitter: { default: true, visible: "admin,index,show" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
@@ -118,12 +119,12 @@ class DefaultSafetyReportingConfig
           disposition: {
             field: 'disposition', title: 'Disposition',
             num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: Report.get_custom_options('Dispositions')
+            required: false,  options: CONFIG.custom_options['Dispositions']
           },
           company_disposition: {
             field: 'company_disposition', title: 'Company Disposition',
             num_cols: 6, type: 'datalist', visible: 'close',
-            required: false,  options: Report.get_custom_options('Company Dispositions')
+            required: false,  options: CONFIG.custom_options['Company Dispositions']
           },
           narrative: {
             field: 'narrative', title: 'Narrative',
@@ -160,6 +161,8 @@ class DefaultSafetyReportingConfig
 
       'Report' => {
         title: 'Event',
+        status: ['New', 'Meeting Ready', 'Under Review', 'Closed', 'All'],
+        preload: [ :attachments, :occurrences, :records => [:created_by]],
         fields: {
           id: { default: true, visible: 'index,meeting_form,show' },
           status: { default: true, visible: 'index,meeting_form,show' },
@@ -314,7 +317,7 @@ class DefaultSafetyReportingConfig
           department: {
             field: 'department', title: 'Department',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: Report.get_custom_options('Departments')
+            required: false, options: CONFIG.custom_options['Departments']
           },
           responsible_user: { default: true, on_newline: true }, # for form and show
           approver: { default: true },
@@ -366,9 +369,69 @@ class DefaultSafetyReportingConfig
         panels: %i[occurrences
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
-    }
-  }
+    },
+    menu_items:
+      [
+        {title: 'Submissions', path: '#',
+          display: proc{|user:,**op|
+            priv_check.call(Object.const_get('Submission'), user, 'index', true, true) ||
+            priv_check.call(Object.const_get('Submission'), user, 'new', true, true) ||
+            priv_check.call(Object.const_get('Submission'), user, 'full', true, true)
+          },
+          subMenu: [
+            {title: 'All', path: 'submissions_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', true, true)}},
+            {title: 'In Progress', path: 'incomplete_submissions_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
+            {title: 'New', path: 'new_submission_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
+            {title: 'ORMs', path: '#',  header: true,
+              display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            {title: 'All', path: 'orm_submissions_path',
+              display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            {title: 'New', path: 'new_orm_submission_path',
+              display: proc{|user:,**op| GENERAL[:enable_orm]}},
+          ]
+        },
+        {title: 'Reports', path: 'records_path(status: "New")',
+          display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', true, true)}},
+        {title: 'Events',  path: 'reports_path(status: "New")',
+          display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
+        {title: 'Meetings', path: '#',
+          display: proc{|user:,**op|
+            priv_check.call(Object.const_get('Meeting'), user, 'index', true, true) ||
+            priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)
+          },
+          subMenu: [
+            {title: 'All', path: 'meetings_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)}},
+            {title: 'New', path: 'new_meeting_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+          ]
+        },
+        {title: 'Corrective Actions', path: 'corrective_actions_path',
+          display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', true, true)}},
+        {title: 'FAA Reports', path: '#',
+          display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: true)},
+          subMenu: [
+            {title: 'All', path: 'faa_reports_path',
+              display: proc{|user:,**op| true}},
+            {title: 'New', path: 'new_faa_report_path',
+              display: proc{|user:,**op| true}},
+          ]
+        },
+        {title: 'Query Center', path: '#',
+          display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+          subMenu: [
+            {title: 'All', path: 'queries_path',
+              display: proc{|user:,**op| true}},
+            {title: 'New', path: 'new_query_path',
+              display: proc{|user:,**op| true}},
+          ]
+        },
+      ]
 
+  }
 
 
 end

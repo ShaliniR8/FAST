@@ -9,7 +9,8 @@ class Hazard < Srm::SafetyRiskManagementBase
   include Commentable
   include Transactionable
   include RootCausable
-
+  include ExtensionRequestable
+  include Verifiable
 #Associations List
   belongs_to :sra,                :foreign_key => "sra_id",                 :class_name => "Sra"
   belongs_to :responsible_user,   :foreign_key => "responsible_user_id",    :class_name => "User"
@@ -70,21 +71,22 @@ class Hazard < Srm::SafetyRiskManagementBase
 
 
   def self.root_causes
-    custom_options = CustomOption.where(:title => "Manuals").first
-    if custom_options.present?
-      custom_options.options.split(";")
-    else
-      [
-        'Inadequate development / implementation of policy or procedure',
-        'Inadequate training',
-        'Inadequate training materials',
-        'Lack of or inadequate policy or procedure',
-        'Emotional overload',
-        'Extreme judgement decisions/demands',
-        'Preoccupation with problems',
-        'Other'
-      ]
-    end
+    CONFIG.custom_options['Manuals']
+    # custom_options = CustomOption.where(:title => "Manuals").first
+    # if custom_options.present?
+    #   custom_options.options.split(";")
+    # else
+    #   [
+    #     'Inadequate development / implementation of policy or procedure',
+    #     'Inadequate training',
+    #     'Inadequate training materials',
+    #     'Lack of or inadequate policy or procedure',
+    #     'Emotional overload',
+    #     'Extreme judgement decisions/demands',
+    #     'Preoccupation with problems',
+    #     'Other'
+    #   ]
+    # end
   end
 
 

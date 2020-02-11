@@ -10,6 +10,7 @@ class RiskControl < Srm::SafetyRiskManagementBase
   include Occurrenceable
   include Transactionable
   include ExtensionRequestable
+  include Verifiable
 
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"
   belongs_to  :approver,          foreign_key: 'approver_id',           class_name: 'User'

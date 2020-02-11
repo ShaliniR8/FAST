@@ -10,11 +10,13 @@ module AnalyticsFilters
       preload(:template)
         .where("submissions.templates_id IN (?) #{shared_user ? '' : " OR submissions.user_id = #{current_user.id}"}",
           full_access_templates)
-    else
+    elsif self.to_s == 'Record'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer])
       preload(:template)
         .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
           full_access_templates, viewer_access_templates)
+    else
+      all
     end
   end
 

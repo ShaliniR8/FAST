@@ -331,15 +331,24 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def index
-    @table = Object.const_get("Report").preload(:occurrences, :records => [:created_by])
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    @title = "Events"
-    handle_search
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    @records_hash = @records.group_by(&:status)
+    @records_hash['All'] = @records
   end
+
+
+  # def index_old
+  #   @table = Object.const_get("Report").preload(:records => [:created_by])
+  #   @headers = @table.get_meta_fields('index')
+  #   @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+  #   @title = "Events"
+  #   handle_search
+  # end
 
 
   def summary
