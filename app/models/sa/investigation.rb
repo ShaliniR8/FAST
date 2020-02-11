@@ -18,6 +18,8 @@ class Investigation < Sa::SafetyAssuranceBase
   include SmsActionable
   include SmsTaskable
   include Transactionable
+  include ExtensionRequestable
+  include Verifiable
 
 #Associations List
   belongs_to :owner,                    polymorphic: true

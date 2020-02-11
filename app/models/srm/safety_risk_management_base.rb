@@ -4,9 +4,6 @@
 module Srm
   class SafetyRiskManagementBase < ProsafetBase
 
-    include ExtensionRequestable
-    include Verifiable
-
     self.abstract_class = true
 
     def panel_btns

@@ -10,7 +10,8 @@ class Sra < Srm::SafetyRiskManagementBase
   include Noticeable
   include Occurrenceable
   include Transactionable
-
+  include ExtensionRequestable
+  include Verifiable
 #Association List
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy

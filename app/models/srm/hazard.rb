@@ -9,7 +9,8 @@ class Hazard < Srm::SafetyRiskManagementBase
   include Commentable
   include Transactionable
   include RootCausable
-
+  include ExtensionRequestable
+  include Verifiable
 #Associations List
   belongs_to :sra,                :foreign_key => "sra_id",                 :class_name => "Sra"
   belongs_to :responsible_user,   :foreign_key => "responsible_user_id",    :class_name => "User"

@@ -4,10 +4,6 @@
 module Sa
   class SafetyAssuranceBase < ProsafetBase
 
-    include ExtensionRequestable
-    include Verifiable
-
-
     self.abstract_class = true
 
     def panel_btns

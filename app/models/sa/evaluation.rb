@@ -15,6 +15,8 @@ class Evaluation < Sa::SafetyAssuranceBase
   include Signatureable
   include SmsTaskable
   include Transactionable
+  include ExtensionRequestable
+  include Verifiable
 
 #Associations List
   belongs_to  :approver,          foreign_key: 'approver_id',             class_name: 'User'
