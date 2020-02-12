@@ -14,7 +14,7 @@ class RefactorNotices < ActiveRecord::Migration
       'findings' => 'Finding',
       'sms_actions' => 'SmsAction',
       'recommendations' => 'Recommendation',
-      'submissions' => 'Submisssion',
+      'submissions' => 'Submission',
       'records' => 'Record',
       'reports' => 'Report',
       'corrective_actions' => 'CorrectiveAction',
@@ -23,16 +23,18 @@ class RefactorNotices < ActiveRecord::Migration
     }
 
     # migrate old notices to fit into new notice table
-    Notice.all.each do |notice|
-      content = notice.content
-      href_match = /href\s*=\s*(?:'|")([^'"]*)(?:'|")/.match(content)
-      if href_match.present?
-        parsed_content = href_match[1].split('/').reverse
-        notice.status = 1
-        notice.category = 1
-        notice.owner_id, notice.owner_type = parsed_content[0], type_hash_map[parsed_content[1]]
-        notice.content = content.gsub(/<a.*/, '').strip
-        notice.save
+    Notice.transaction do
+      Notice.all.each do |notice|
+        content = notice.content
+        href_match = /href\s*=\s*(?:'|")([^'"]*)(?:'|")/.match(content)
+        if href_match.present?
+          parsed_content = href_match[1].split('/').reverse
+          notice.status = 1
+          notice.category = 1
+          notice.owner_id, notice.owner_type = parsed_content[0], type_hash_map[parsed_content[1]]
+          notice.content = content.gsub(/<a.*/, '').strip
+          notice.save
+        end
       end
     end
 
