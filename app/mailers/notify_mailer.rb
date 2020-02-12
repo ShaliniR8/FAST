@@ -10,7 +10,7 @@ class NotifyMailer < ApplicationMailer
     @notice = notice
     @link = g_link(notice.owner)
     if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
-      mail(to: notice.user, subject: subject).deliver
+      mail(**to_email(notice.user.email), subject: subject).deliver
     end
     mail(to: 'noc@prosafet.com', subject: subject).deliver
   end
