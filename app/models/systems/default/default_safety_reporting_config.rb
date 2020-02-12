@@ -6,7 +6,7 @@ class DefaultSafetyReportingConfig
 
   GENERAL = {
     # General Module Features:
-    enable_orm:               false,     # Enables ORM Reports - default off
+    enable_orm:               true,     # Enables ORM Reports - default off
     show_submitter_name:      true,      # Displays submitter names when access to show (admins will always see it)- default on
     submission_description:   true,      # Changes Character Limit or adds General Description - default on
     template_nested_fields:   false,     # WIP nested smart forms functionality - default off
@@ -395,8 +395,19 @@ class DefaultSafetyReportingConfig
         },
         {title: 'Reports', path: 'records_path(status: "New")',
           display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', true, true)}},
-        {title: 'Events',  path: 'reports_path(status: "New")',
-          display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
+        {title: 'Events',  path: '#',
+          display: proc{|user:,**op|
+            priv_check.call(Object.const_get('Report'), user, 'index', true, true)
+          },
+          subMenu: [
+            {title: 'All', path: 'reports_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
+            {title: 'Summary', path: 'summary_reports_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_summary]}},
+            {title: 'Tabulation', path: 'tabulation_reports_path',
+              display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_tabulation]}},
+          ]
+        },
         {title: 'Meetings', path: '#',
           display: proc{|user:,**op|
             priv_check.call(Object.const_get('Meeting'), user, 'index', true, true) ||
