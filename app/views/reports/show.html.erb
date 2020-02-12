@@ -66,12 +66,15 @@
                   :deidentified => true,
                   :format => :pdf),
                 :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
-              <%=link_to "PDF",
-                print_report_path(
-                  @report,
-                  :deidentified => false,
-                  :format => :pdf),
-                :class => 'btn btn-darkturquoise pull-right mr5 mb5'%>
+
+              <%if current_user.has_access('reports', 'admin', admin: true, strict: true)%>
+                <%=link_to "PDF",
+                  print_report_path(
+                    @report,
+                    :deidentified => false,
+                    :format => :pdf),
+                  :class => 'btn btn-darkturquoise pull-right mr5 mb5'%>
+              <%end%>
 
               <%#if @report.active_meetings.present? &&
                 current_user.has_access('meetings', 'show', admin: true)%>
