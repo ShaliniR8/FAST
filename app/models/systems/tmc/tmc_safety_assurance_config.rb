@@ -3,7 +3,7 @@ class TMCSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
   GENERAL = DefaultSafetyAssuranceConfig::GENERAL.merge({
     # General Module Features:
     checklist_version:                  '3',
-    enable_recurrence:                  false,
+    enable_recurrence:                  true,
 
     # Airline-Specific Features:
   })
