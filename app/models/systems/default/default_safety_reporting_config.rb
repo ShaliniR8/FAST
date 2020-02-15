@@ -400,7 +400,7 @@ class DefaultSafetyReportingConfig
             priv_check.call(Object.const_get('Report'), user, 'index', true, true)
           },
           subMenu: [
-            {title: 'All', path: 'reports_path',
+            {title: 'All', path: 'reports_path(status: "New")',
               display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
             {title: 'Summary', path: 'summary_reports_path',
               display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_summary]}},
