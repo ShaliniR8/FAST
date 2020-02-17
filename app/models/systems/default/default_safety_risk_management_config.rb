@@ -29,12 +29,12 @@ class DefaultSafetyRiskManagementConfig
           type_of_change: {
             field: 'type_of_change', title: 'Type of Change',
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
-            required: false, options: CONFIG.custom_options['SRA Type of Change']
+            required: false, options: "CONFIG.custom_options['SRA Type of Change']"
           },
           system_task: {
             field: 'system_task', title: 'System/Task',
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
-            required: false, options: CONFIG.custom_options['Systems/Tasks']
+            required: false, options: "CONFIG.custom_options['Systems/Tasks']"
           },
           responsible_user: { default: true },
           reviewer: {
@@ -80,7 +80,7 @@ class DefaultSafetyRiskManagementConfig
           departments: {
             field: 'departments', title: 'Affected Departments',
             num_cols: 12, type: 'checkbox', visible: 'form,show',
-            required: false, options: CONFIG.custom_options['Departments']
+            required: false, options: "CONFIG.custom_options['Departments']"
           },
           other_department: {
             field: 'other_department', title: 'Other Affected Departments',
@@ -102,7 +102,7 @@ class DefaultSafetyRiskManagementConfig
           programs: {
             field: 'programs', title: 'Affected Programs',
             num_cols: 12, type: 'checkbox', visible: 'form,show',
-            required: false, options: CONFIG.custom_options['Programs']
+            required: false, options: "CONFIG.custom_options['Programs']"
           },
           other_program: {
             field: 'other_program', title: 'Other Affected Programs',
@@ -124,7 +124,7 @@ class DefaultSafetyRiskManagementConfig
           manuals: {
             field: 'manuals', title: 'Affected Manuals',
             num_cols: 12, type: 'checkbox', visible: 'form,show',
-            required: false, options: CONFIG.custom_options['Manuals']
+            required: false, options: "CONFIG.custom_options['Manuals']"
           },
           other_manual: {
             field: 'other_manual', title: 'Other Affected Manuals',
@@ -146,7 +146,7 @@ class DefaultSafetyRiskManagementConfig
           compliances: {
             field: 'compliances', title: 'Affected Regulatory Compliances',
             num_cols: 12, type: 'checkbox', visible: 'form,show',
-            required: false, options: CONFIG.custom_options['Regulatory Compliances']
+            required: false, options: "CONFIG.custom_options['Regulatory Compliances']"
           },
           other_compliance: {
             field: 'other_compliance', title: 'Other Affected Regulatory Compliances',
@@ -194,7 +194,7 @@ class DefaultSafetyRiskManagementConfig
           departments: {
             field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
-            required: false, options: CONFIG.custom_options['Departments']
+            required: false, options: "CONFIG.custom_options['Departments']"
           },
           responsible_user: { default: true },
           approver: { default: true },
@@ -259,7 +259,7 @@ class DefaultSafetyRiskManagementConfig
           departments: {
             field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
-            required: false, options: CONFIG.custom_options['Departments']
+            required: false, options: "CONFIG.custom_options['Departments']"
           },
           due_date: { default: true,
             field: 'due_date',
@@ -277,7 +277,7 @@ class DefaultSafetyRiskManagementConfig
           control_type: {
             field: 'control_type', title: 'Type',
             num_cols: 6, type: 'datalist', visible: 'form,show',
-            required: false, options: CONFIG.custom_options['Risk Control Types']
+            required: false, options: "CONFIG.custom_options['Risk Control Types']"
           },
           description: {
             field: 'description', title: 'Description of Risk Control/Mitigation Plan',
@@ -336,7 +336,7 @@ class DefaultSafetyRiskManagementConfig
           risk_factor: {
             field: 'risk_factor', title: 'Baseline Risk',
             num_cols: 12, type: 'select', visible: 'index,form,show',
-            required: false, on_newline: true, options: CONFIG.custom_options['Risk Factors']
+            required: false, on_newline: true, options: "CONFIG.custom_options['Risk Factors']"
           },
           concern: {
             field: 'concern', title: 'Concern',
@@ -375,12 +375,12 @@ class DefaultSafetyRiskManagementConfig
           result: {
             field: 'result', title: 'Result',
             num_cols: 6, type: 'select', visible: 'show,eval',
-            required: false,  options: CONFIG.custom_options['Results']
+            required: false,  options: "CONFIG.custom_options['Results']"
           },
           risk_factor_after: {
             field: 'risk_factor_after', title: 'Mitigated Risk',
             num_cols: 6,  type: 'select', visible: 'index,eval,show',
-            required: false,  options: CONFIG.custom_options['Risk Factors']
+            required: false,  options: "CONFIG.custom_options['Risk Factors']"
           },
           evaluation_panel_end: {
             type: 'panel_end', visible: 'show,eval'

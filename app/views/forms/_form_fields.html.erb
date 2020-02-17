@@ -46,7 +46,7 @@
   <%field_name            = field_hash[:field]%>
   <%field_required_field  = field_hash[:required] ? "required_field" : ""%>
   <%field_required_label  = field_hash[:required] ? "required_label" : ""%>
-  <%field_options         = field_hash[:options].sort! rescue []%>
+  <%field_options         = eval(field_hash[:options]).sort! rescue []%>
 
   <%if field_name%>
     <div class="form-group col-xs-<%=field_num_cols%> <%=field_name%>">
