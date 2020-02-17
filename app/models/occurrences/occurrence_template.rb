@@ -3,6 +3,11 @@ class OccurrenceTemplate < ActiveRecord::Base
   belongs_to :parent,               foreign_key: 'parent_id',               class_name: 'OccurrenceTemplate'
   has_many :children,               foreign_key: 'parent_id',               class_name: 'OccurrenceTemplate'
 
+
+  after_save :update_occurrence_templates
+  after_destroy :update_occurrence_templates
+
+
   # serialize :options, Array
 
   def self.get_meta_fields(*args)
@@ -61,5 +66,16 @@ class OccurrenceTemplate < ActiveRecord::Base
     end
 
     self.parent.get_category(self.title + ' >' + path)
+  end
+
+
+  def update_occurrence_templates
+    Rails.application.config.occurrence_templates = OccurrenceTemplate
+                                                      .preload(:children)
+                                                      .where(archived: false, parent_id: nil)
+                                                      .map{|x| [x.title, x]}.to_h
+                                                      .map{|key, value| key.split(',').map{|x| [x, value]}.to_h}
+                                                      .reduce Hash.new, :merge rescue ['error']
+    Rails.logger.info "[INFO] Occurrence Templates have been updated- occurrence_templates application config updated"
   end
 end
