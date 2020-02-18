@@ -68,12 +68,14 @@
         <%if current_user.has_access("safety_plans","index")%><%=render "safety_plans"%><%end%>
         <%if current_user.has_access('hazards','index') && AIRLINE_CODE != 'Demo'%>
           <div id="risk-matrix-parent">
-            <%if CONFIG::GENERAL[:base_risk_matrix]%>
-              <%=render "risk_matrix"%><%=render "after_matrix"%>
-            <%else%>
-              <%=render "shared/#{AIRLINE_CODE}/dashboard_risk_matrix"%>
-              <%=render "shared/#{AIRLINE_CODE}/dashboard_after_matrix"%>
-            <%end%>
+            <% if AIRLINE_CODE != 'Demo' && AIRLINE_CODE != 'Trial'%>
+              <%if CONFIG::GENERAL[:base_risk_matrix]%>
+                <%=render "risk_matrix"%><%=render "after_matrix"%>
+              <%else%>
+                <%=render "shared/#{AIRLINE_CODE}/dashboard_risk_matrix"%>
+                <%=render "shared/#{AIRLINE_CODE}/dashboard_after_matrix"%>
+              <%end%>
+            <% end %>
           </div>
         <%end%>
 

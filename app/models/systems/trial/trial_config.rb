@@ -1,4 +1,4 @@
-class TrialConfig
+class TrialConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[audit]
