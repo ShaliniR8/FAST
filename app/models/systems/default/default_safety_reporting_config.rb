@@ -9,7 +9,7 @@ class DefaultSafetyReportingConfig
     enable_orm:               false,     # Enables ORM Reports - default off
     show_submitter_name:      true,      # Displays submitter names when access to show (admins will always see it)- default on
     submission_description:   true,      # Changes Character Limit or adds General Description - default on
-    template_nested_fields:   false,     # WIP nested smart forms functionality - default off
+    template_nested_fields:   true,     # WIP nested smart forms functionality - default off
     enable_dual_report:       true,
 
     # Airline-Specific Features:
