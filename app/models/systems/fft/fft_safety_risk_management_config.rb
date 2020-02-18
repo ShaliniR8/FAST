@@ -29,6 +29,9 @@ class FFTSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
       'Hazard' => {
         fields: {
+          responsible_user: { title: 'Lead Analyst' },
+          approver: { title: 'Risk Acceptor' },
+          due_date: { title: 'Date to Validate Effectiveness'},
           departments: { required: true },
           description: { required: true }
         }
