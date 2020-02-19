@@ -25,18 +25,7 @@
     headers: RootCause.get_headers %>
 <% end %>
 
-<%=render '/sms_actions/show_all', :owner => owner, :show_btn => false%>
-<%=render '/recommendations/show_all', :owner => owner, :show_btn => false%>
-
-<%=render '/causes/all',
-  :owner => owner,
-  :cause_type => 'description',
-  :can_change => can_change%>
-<%=render '/causes/all',
-  :owner => owner,
-  :cause_type => 'cause',
-  :can_change => can_change%>
-
-
+<%=render '/sms_actions/show_all', :owner => owner, :show_btns => false%>
+<%=render '/recommendations/show_all', :owner => owner, :show_btns => false%>
 
 <%=render "/forms/show_comment", :owner => owner%>
