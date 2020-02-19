@@ -121,8 +121,15 @@ class Submission < Sr::SafetyReportingBase
         status:             'New',
         anonymous:          anonymous,
         event_time_zone:    event_time_zone,
-        attachments:        [].tap{ |att| self.attachments.each{ |x| att.push(x.clone) } },
       )
+
+      self.attachments.each do |x|
+        temp = Attachment.new(
+          :name => x.name,
+          :caption => x.caption)
+        self.record.attachments.push(temp)
+      end
+
       self.save
       submission_fields.each do |f|
         RecordField.create(
