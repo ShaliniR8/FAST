@@ -442,7 +442,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[comments occurrences extension_requests verifications attachments transaction_log
+        panels: %i[comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
