@@ -174,7 +174,7 @@ javascript:
       var opt = document.createElement('input')
       $(opt).addClass('checkboxes-elem') // For onchange listener (checkboxes-elem)
       opt.setAttribute('type', 'checkbox')
-      opt.innerHTML = Array.isArray(option) ? option[0] : option
+      // opt.innerHTML = Array.isArray(option) ? option[0] : option
       opt.value = Array.isArray(option) ? option[1] : option
       container.appendChild(opt)
       container.appendChild(label)
