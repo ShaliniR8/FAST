@@ -137,8 +137,8 @@
 
   function set_risk(row_index, column_index){
     clear_risk();
-    risk_table_def = <%=NAMS_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=NAMS_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_def = <%=NAMSConfig::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=NAMSConfig::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
