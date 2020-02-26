@@ -29,6 +29,9 @@ class DefaultMobileConfig
     scx_shrtrain_sso: { label: 'Training (Shared)',             subdomain: 'scx-training',  sso: true,  shared: true },
     scx_shrtrain_dir: { label: 'Training (Shared) (ProSafeT)',  subdomain: 'scx-training',              shared: true },
 
+    #FFT portals
+    fft_training_dir: { label: 'Training',                      subdomain: 'fft-training'},
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -78,6 +81,14 @@ class DefaultMobileConfig
         scx_training_dir
         scx_shrtrain_sso
         scx_shrtrain_dir
+      ]
+    },
+
+
+    'FFT Beta Key' =>{ # EE6C-D7FB-19B0-8377
+      key_name: 'Frontier Airlines Mobile Beta',
+      portals: %i[
+        fft_training_dir
       ]
     },
 
