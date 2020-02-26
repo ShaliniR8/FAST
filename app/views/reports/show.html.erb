@@ -66,12 +66,15 @@
                   :deidentified => true,
                   :format => :pdf),
                 :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
-              <%=link_to "PDF",
-                print_report_path(
-                  @report,
-                  :deidentified => false,
-                  :format => :pdf),
-                :class => 'btn btn-darkturquoise pull-right mr5 mb5'%>
+
+              <%if current_user.has_access('reports', 'admin', admin: true, strict: true)%>
+                <%=link_to "PDF",
+                  print_report_path(
+                    @report,
+                    :deidentified => false,
+                    :format => :pdf),
+                  :class => 'btn btn-darkturquoise pull-right mr5 mb5'%>
+              <%end%>
 
               <%#if @report.active_meetings.present? &&
                 current_user.has_access('meetings', 'show', admin: true)%>
@@ -166,19 +169,7 @@
             # :like => @like,
             :can_change => can_change%>
 
-          <%if BaseConfig.airline[:has_root_causes]%>
-            <%=render '/root_causes/root_causes',
-              :owner => @report,
-              :show_btns => true,
-              :headers => RootCause.get_headers%>
-          <%end%>
-
-          <%=render '/causes/all', :owner => @report, :cause_type => 'description', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @report, :cause_type => 'cause', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @report, :cause_type => 'detection', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @report, :cause_type => 'reaction', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @report, :cause_type => 'suggestion', :can_change => can_change%>
-
+          <%= render '/panels/show_panels', owner: @report%>
 
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>
@@ -227,7 +218,6 @@
               </div>
             </div>
           <%end%>
-
 
           <%=render "/forms/show_comment", :owner => @report%>
           <%=render "/forms/attachments_show", :owner => @report, :attachments => @report.attachments + @report.records.map(&:attachments).flatten%>

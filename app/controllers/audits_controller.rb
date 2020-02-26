@@ -22,19 +22,11 @@ class AuditsController < SafetyAssuranceController
   before_filter :oauth_load
   before_filter(only: [:show]) { check_group('audit') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
+    :interpret,
     :new_attachment,
-    :new_contact,
-    :new_cost,
-    :new_signature,
-    :new_task,
     :override_status,
-    :reopen,
     :show,
     :update,
     :update_checklist_records,
@@ -53,6 +45,7 @@ class AuditsController < SafetyAssuranceController
     respond_to do |format|
       format.html do
         @table = Object.const_get("Audit")
+          .preload(CONFIG.hierarchy[session[:mode]][:objects]['Audit'][:preload])
         @headers = @table.get_meta_fields('index')
         @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
         handle_search
@@ -139,40 +132,30 @@ class AuditsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:audit])
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Audit ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Audit Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Audit ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Audit Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Audit ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Audit Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Audit ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Audit Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
       params[:audit][:close_date] = params[:audit][:status] == 'Completed' ? Time.now : nil
     when 'Add Cost', 'Add Contact', 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:audit])
+    # @owner.update_attributes(params[:audit])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(

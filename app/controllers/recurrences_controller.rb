@@ -4,7 +4,7 @@ class RecurrencesController < ApplicationController
   before_filter :recurrence_enabled
 
   def recurrence_enabled
-    unless BaseConfig.airline[:enable_recurrence]
+    unless CONFIG.sa::GENERAL[:enable_recurrence]
       redirect_to errors_path
     end
   end

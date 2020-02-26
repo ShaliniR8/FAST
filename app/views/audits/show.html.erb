@@ -1,11 +1,16 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2',
+    'utility/jquery.dataTables.min',
+    'utility/dataTables.bootstrap.min',
+    'utility/dataTables.buttons.min',
+    'utility/format-builder',
+    'utility/validate-form.js',
+    'utility/extra_fields'
+  )
+%>
+
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
-<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -18,20 +23,7 @@
             <%="Audit ##{@owner.get_id}: #{@owner.title}"%>
           </div>
           <div class="top_buttons pull-right">
-            <%= render '/forms/btns/render_btns',
-              btns: [
-                'delete',
-                'override_status',
-                'edit',
-                'sign',
-                'deid_pdf',
-                'pdf',
-                'viewer_access',
-                'attach_in_message',
-                'expand_all',
-                'private_link'
-              ],
-              owner: @owner %>
+            <%= render '/forms/render_buttons', owner: @owner, env: :top %>
 
           </div>
         </div>
@@ -39,37 +31,14 @@
 
       <div class="panel-body">
         <div class="col-xs-12 mb15">
-          <%= render '/forms/btns/render_btns',
-            btns: [
-              'assign',
-              'complete',
-              'approve_reject',
-              'reopen',
-              'contact',
-              #'task',
-              'cost',
-              'finding',
-              'comment'
-            ],
-            owner: @owner %>
+          <%= render '/forms/render_buttons', owner: @owner, env: :inline %>
 
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
         <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
 
-        <%=render "/ims/show_task", :owner => @owner, :fields => SmsTask.get_meta_fields('show')%>
-        <%=render "/ims/show_contact", :owner => @owner, :fields => Contact.get_meta_fields('show')%>
-
-        <%=render '/findings/show_all', :owner => @owner, :show_btn => false%>
-        <%=render '/forms/cost', :owner => @owner%>
-
-        <%=render 'forms/signatures/show_signatures', owner: @owner %>
-
-
-        <%=render "/forms/show_comment", :owner => @owner%>
-        <%=render "/forms/attachments_show", :owner => @owner%>
-        <%=render "/records/transactions", :owner => @owner%>
+        <%=render '/panels/show_panels', owner: @owner%>
 
       </div>
     </div>

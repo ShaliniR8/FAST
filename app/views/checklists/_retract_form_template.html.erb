@@ -27,7 +27,12 @@
         <%end%>
       </tbody>
     </table>
-    <%=link_to_add_fields "Add a Row", f, :checklist_rows, {:checklist_header => @template.checklist_header}%>
+    <%=link_to_add_fields "Add a Row",
+      f,
+      :checklist_rows,
+      {:checklist_header => @template.checklist_header},
+      partial: 'checklist_row_fields'
+    %>
   </div>
 
   <div class="mr10 mt10">

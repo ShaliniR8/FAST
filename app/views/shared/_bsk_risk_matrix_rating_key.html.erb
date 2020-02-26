@@ -2,7 +2,7 @@
   <h4><b>RISK RATING KEY</b></h4>
   <table class="table table-bordered table-fixed table-centered">
     <tr>
-      <%BaseConfig::RISK_MATRIX[:risk_factor].each do |k, v| %>
+      <%CONFIG::RISK_MATRIX[:risk_factor].each do |k, v| %>
         <th bgcolor="<%=v%>"><%=k%></th>
       <%end%>
     </tr>

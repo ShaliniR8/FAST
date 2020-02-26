@@ -225,6 +225,7 @@
           <%
             meta_field_args = ['show']
             meta_field_args.push('admin') if current_user.global_admin?
+            meta_field_args.push('close') if @record.status == 'Closed' && @record.is_asap
           %>
           <%=render "forms/show_fields", :fields => Record.get_meta_fields(*meta_field_args), :record => @record%>
 
@@ -264,21 +265,6 @@
             :frequency => @frequency,
             :can_change => can_change%>
 
-
-          <% if BaseConfig.airline[:has_root_causes] %>
-            <%=render '/root_causes/root_causes',
-              :owner => @record,
-              :show_btns => true,
-              :headers => RootCause.get_headers%>
-          <%end%>
-
-          <%=render '/causes/all', :owner => @record, :cause_type => 'description', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @record, :cause_type => 'cause', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @record, :cause_type => 'detection', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @record, :cause_type => 'reaction', :can_change => can_change%>
-          <%=render '/causes/all', :owner => @record, :cause_type => 'suggestion', :can_change => can_change%>
-
-
           <%if @record.corrective_actions.present?%>
             <div class="col-xs-12 col-lg-12">
               <div class="panel panel-info">
@@ -300,6 +286,8 @@
             </div>
           <%end%>
 
+
+          <%=render '/panels/show_panels', :owner => @record%>
           <%=render "/forms/show_comment",:owner => @record%>
           <%=render "/forms/attachments_show", :owner => @record%>
           <%=render "/records/transactions", :owner => @record%>

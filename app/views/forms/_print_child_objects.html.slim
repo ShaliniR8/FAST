@@ -1,0 +1,33 @@
+.title
+  = "#{owner.class.name.titleize} ##{owner.id}: #{owner.title}"
+
+.content
+  - fields = owner.get_meta_fields('show')
+  = render 'print_fields',
+    fields: fields,
+    owner: owner,
+    deidentified: @deidentified
+
+  - if owner.respond_to?(:tasks)
+    - owner.tasks.each do |task|
+      .col-xs-12
+        hr
+        = render 'ims/print_task',
+          owner: task,
+          deidentified: @deidentified
+
+  - if owner.respond_to?(:contacts)
+    - owner.contacts.each do |contact|
+      .col-xs-12
+      hr
+      = render 'ims/print_contact',
+        owner: contact,
+        deidentified: @deidentified
+
+  - if owner.respond_to?(:findings)
+    - owner.findings.each do |finding|
+      .col-xs-12
+      hr
+      = render 'findings/print',
+        owner: finding,
+        deidentified: @deidentified

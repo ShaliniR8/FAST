@@ -191,6 +191,9 @@
         background-color: rosybrown;
         color: white;
       }
+      .panel-thin .panel-heading .panel-title {
+        padding: 5px;
+      }
       .tooltip-inner {
         max-width: 80% !important;
         font-weight: bold;
@@ -262,6 +265,26 @@
         font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
         font-size: 14px;
       }
+      .bold {
+        font-weight: bold;
+      }
+      .circle {
+        background: transparent;
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        border-radius: 50%;
+      }
+      .initial-circle {
+        border: 3px solid #87CEEB;
+      }
+      .mitigated-circle {
+        border: 3px solid #FF69B4;
+      }
+      .overlap-circle {
+        border: 3px solid #9400D3;
+      }
 
     </style>
 
@@ -322,21 +345,20 @@
                   <li>
                     <%=link_to "Safety Reports Templates", templates_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:enable_orm] ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG.sr::GENERAL[:enable_orm] ? 'block' : 'none'%>">
                     <%=link_to "ORM Templates", orm_templates_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:enable_configurable_risk_matrices] ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG::GENERAL[:configurable_risk_matrices] ? 'block' : 'none'%>">
                     <%=link_to "Risk Matrices", risk_matrix_groups_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:has_root_causes] ? 'block' : 'none'%>">
-                    <%=link_to "Root Causes Templates", cause_options_path%>
-                  </li>
+                  <li><%=link_to "Category/Root Cause Templates", occurrence_templates_path%></li>
                   <li><%=link_to "Custom Options", custom_options_path%></li>
                   <li><%=link_to "Message Templates", canned_messages_path%></li>
-                  <li style="display:<%=BaseConfig.airline[:checklist_version] == '2' ? 'block' : 'none'%>">
+                  <li><%=link_to "Message Distribution Lists", distribution_lists_path%></li>
+                  <li style="display:<%=CONFIG.sa::GENERAL[:checklist_version] == '2' ? 'block' : 'none'%>">
                     <%=link_to "Checklists", checklist_templates_path%>
                   </li>
-                  <li style="display:<%=BaseConfig.airline[:checklist_version] == '3' ? 'block' : 'none'%>">
+                  <li style="display:<%=CONFIG.sa::GENERAL[:checklist_version] == '3' ? 'block' : 'none'%>">
                     <%=link_to "Checklist Templates", checklists_path%>
                   </li>
 
@@ -427,7 +449,7 @@
 
     <div class="module_label">
       <span class="pull-right">
-        <% prefix = "#{BaseConfig.airline[:name]}
+        <% prefix = "#{CONFIG::GENERAL[:name]}
           #{" <span style='color:red'>#{Rails.env.titleize}</span>" if !Rails.env.production?} | "%>
         <%=case session[:mode]
           when 'SMS'

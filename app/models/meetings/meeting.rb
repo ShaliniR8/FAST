@@ -1,11 +1,10 @@
-class Meeting < ActiveRecord::Base
+class Meeting < ProsafetBase
 
   include ModelHelpers
 
 #Concerns List
   include Attachmentable
   include Commentable
-  include Noticeable
   include Reportable
   include Transactionable
 
@@ -38,7 +37,7 @@ class Meeting < ActiveRecord::Base
       {field: 'id',               title: 'ID',                num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
       {field: 'status',           title: 'Status',            num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
       {field: 'get_host',         title: 'Host',              num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
-      {field: 'title',            title: 'Title',             num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: get_custom_options('Meeting Titles')},
+      {field: 'title',            title: 'Title',             num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: CONFIG.custom_options['Meeting Titles']},
       {                                                                     type: 'newline',    visible: 'form,show'},
       {field: 'review_start',     title: 'Review Start',      num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
       {field: 'review_end',       title: 'Review End',        num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
@@ -79,7 +78,7 @@ class Meeting < ActiveRecord::Base
 
 
   def covert_time(time)
-    timezone = BaseConfig.airline[:time_zone]
+    timezone = CONFIG::GENERAL[:time_zone]
     (time.in_time_zone(timezone) - time.in_time_zone(timezone).utc_offset).utc
   end
 
@@ -192,7 +191,7 @@ class Meeting < ActiveRecord::Base
 
 
   def get_time(field)
-    self.send(field).strftime("%Y-%m-%d %H:%M:%S") rescue ''
+    self.send(field).in_time_zone(CONFIG::GENERAL[:time_zone]).strftime("%Y-%m-%d %H:%M:%S") rescue ''
   end
 
 

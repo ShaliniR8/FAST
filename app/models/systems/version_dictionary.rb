@@ -1,8 +1,30 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.1.3',
+      title: 'Version 1.2.0',
       tag: 'New',
+      toggle: 'v1_2_0',
+      date: '2/11/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Stacked and Line chart options to Query Center.',
+          'Added Series capability to Query Center.',
+          'Added Distribution List feature to Message Center.',
+          'Added Verification to various forms',
+          'Added Department to Dashboard filter',
+          'Added View All and Mark All as Read functionalities to News.',
+          'Added Tab view on Reports and Events page',
+        ],
+        'Optimizations & Fixes' => [
+          'Updated Close Report form content',
+          'Updated Root Cause Analysis UI.',
+          'Fixed Calendar displaying issue for Meetings',
+          'Fixed Dashboard stats for overdue items inaccurate issue',
+        ]
+      }
+    },
+    {
+      title: 'Version 1.1.3',
       toggle: 'v1_1_3',
       date: '12/6/2019',
       sections: {

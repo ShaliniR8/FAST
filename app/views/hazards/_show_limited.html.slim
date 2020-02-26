@@ -1,0 +1,48 @@
+css:
+  .datepicker{ z-index: 1200!important; }
+  td,th { text-align: center; }
+
+= javascript_include_tag('utility/format-builder.js')
+
+.col-xs-12
+  .panel.clickable.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b style='overflow-wrap: break-word; word-wrap: break-word; hyphens:auto'
+          = link_to "##{owner.get_id} #{owner.title}",
+            hazard_path(owner),
+            style: 'color:white'
+        span.pull-right.clickable: i.mt4.glyphicon.glyphicon-chevron-down
+    .panel-body style='display:none'
+      .row style='overflow-wrap: break-word; word-wrap: break-word; hyphens:auto'
+        .col-xs-12.mt20
+          = render '/forms/show_fields',
+            fields: Hazard.get_meta_fields('show'),
+            record: owner
+        = render '/shared/choose_show_matrix',
+          owner: owner,
+          show_btn: show_btn,
+          type: 'hazards',
+          can_change: !%w[Rejected Completed].include?(owner.status)
+        - if owner.risk_controls.present?
+          .col-xs-12
+            .panel.clickable.panel-info
+              .panel-heading.click-heading.collapsed
+                .panel-title
+                  b Risk Controls
+                  span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+              .panel-body style='display:none'
+                .row
+                  - owner.risk_controls.each do |risk_control|
+                    = render '/hazards/show_risk_control',
+                      risk_control: risk_control
+        - if owner.has_occurrences?
+          .col-xs-12
+            .panel.clickable.panel-info
+              .panel-heading.click-heading.collapsed
+                .panel-title
+                  b = owner.class.find_top_level_section.label
+                  span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+              .panel-body style='display:none'
+                .row
+                  = render '/occurrences/occurrences_panel', owner: owner, show_only_table: true

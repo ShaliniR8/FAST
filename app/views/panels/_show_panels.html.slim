@@ -1,0 +1,2 @@
+- prepare_panels(owner).each do |panel|
+  = render panel[:partial], **panel.except(:partial)

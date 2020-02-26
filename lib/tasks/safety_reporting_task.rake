@@ -1,8 +1,8 @@
 namespace :safety_reporting do
 
+  desc "Update historical anonymous transactions."
   task :update_anonymous_transactions => :environment do
 
-    desc "Update historical anonymous transactions."
 
     submitter_actions = ['Create', 'Add Attachment', 'Dual Report', 'Add Notes']
 

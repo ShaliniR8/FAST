@@ -1,7 +1,7 @@
 namespace :notifications do
 
+  desc "Send automated notifications/reminders."
   task :automated_notifications => :environment do
-    desc "Send automated notifications/reminders."
 
     all_rules = AutomatedNotification.all
 
@@ -20,14 +20,17 @@ namespace :notifications do
       puts "Alert ##{rule.id} count: #{records.length}"
       records.each do |record|
         user = User.find(record.send(audience_field)) rescue nil
-        NotifyMailer.automated_reminder(user, subject, content, record) if user.present?
-        #Notice.create({:user => user, :content => g_link(record)})
+        if user.present?
+          NotifyMailer.automated_reminder(user, subject, content, record)
+          content = content[0..251] + '...' if content.length > 255
+          record.notices.create({users_id: user.id, content: content})
+        end
       end
     end
   end
 
+  desc 'Send out user-designated email reminders'
   task :send_reminders => :environment do
-    desc 'Send out user-designated email reminders'
 
     Notice.where('create_email = TRUE AND
       (expire_date > ? OR expire_date IS NULL) AND

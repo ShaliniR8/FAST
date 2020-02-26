@@ -4,10 +4,11 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <script type="text/javascript" src="/javascripts/messages/recipients-control.js"></script>
 
-<div class="panel panel-default">
+<div class="panel panel-primary">
   <div class="panel-heading">
-    <div class="panel-title">
+    <div class="panel-title" style="color:white">
       To
+      <a class="btn btn-default pull-right clear_btn mb10" style="color:black">Clear</a>
     </div>
   </div>
   <div class="panel-body">
@@ -25,7 +26,7 @@
         </thead>
         <tbody>
           <%@users.each do |user|%>
-            <tr user="<%=user.id%>">
+            <tr user="<%=user.id%>" name="<%=user.full_name%>">
               <%@headers.each do |header|%>
                 <td><%=user.send(header[:field])%></td>
               <%end%>
@@ -37,7 +38,7 @@
                     <%if @send_to==user.id%>
                       <a class="btn btn-danger send_btn disabled">TO</a>
                     <%else%>
-                      <a class="btn btn-transparent send_btn">TO</a>
+                      <a class="btn btn-transparent send_btn id_<%=user.id%>">TO</a>
                       <a class="btn btn-transparent cc_btn">CC</a>
                     <%end%>
                   <%end%>
@@ -45,7 +46,7 @@
                   <%if @send_to==user.id%>
                     <a class="btn btn-danger send_btn disabled">TO</a>
                   <%else%>
-                    <a class="btn btn-transparent send_btn">TO</a>
+                    <a class="btn btn-transparent send_btn id_<%=user.id%>">TO</a>
                     <a class="btn btn-transparent cc_btn">CC</a>
                   <%end%>
                 <%end%>

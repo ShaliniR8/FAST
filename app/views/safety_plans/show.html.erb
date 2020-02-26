@@ -1,4 +1,8 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2'
+  )
+%>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -10,80 +14,21 @@
           <div class="top_text">
             <%="Safety Plan ##{@safety_plan.get_id}: #{@safety_plan.title}"%>
           </div>
+
           <div class="top_buttons pull-right">
-            <% if current_user.has_access('safety_plans', 'destroy', admin: true, strict: true) %>
-              <%=link_to "Delete",
-                safety_plan_path(@safety_plan),
-                :method => "delete",
-                :confirm => 'Are you sure?',
-                :class => "btn btn-danger pull-right mr5 mb5",
-                :disable_with => "Deleting..."%>
-            <%end%>
-
-            <% if current_user.has_access('safety_plans', 'admin', admin: true, strict: true) %>
-              <%=link_to 'Override Status', '#',
-                :class => 'btn btn-danger pull-right mr5 mb5',
-                :id => 'override_status_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-
-            <%if @safety_plan.status != "Completed"%>
-              <% if current_user.has_access('safety_plans', 'edit', admin: true) %>
-                <%=link_to "Edit",
-                  edit_safety_plan_path(@safety_plan, :evaluate => false),
-                  :class => "btn btn-warning pull-right mr5 mb5",
-                  :disable_with => "Editing..."%>
-              <%end%>
-            <%end%>
-            <%=link_to "PDF",
-              print_safety_plan_path(@safety_plan, format: :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-            <%=render '/forms/btns/attach_in_message_btn', owner: @safety_plan%>
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 expandall pull-right ml5 mb5"%>
+            <%= render '/forms/render_buttons', owner: @safety_plan, env: :top %>
           </div>
+
         </div>
       </div>
+
       <div class="panel-body" id="form_body">
         <div class="col-xs-12 mb20">
-          <%if @safety_plan.status == "Evaluated"%>
-            <%=link_to "Complete",
-              complete_safety_plan_path(@safety_plan),
-              :class => "btn btn-warning pull-right mr5 mb5",
-              :disable_with => "Completing...",
-              :confirm => "Are you sure?"%>
-          <%end%>
-          <%if @safety_plan.status != "Completed"%>
-            <%=link_to "Evaluate",
-              edit_safety_plan_path(@safety_plan, :evaluate => true),
-              :class => "btn btn-warning pull-right mr5 mb5",
-              :disable_with => "Evaluating..."%>
-          <%end%>
-          <% if @safety_plan.status == "Completed" &&
-            current_user.has_access('safety_plans', 'new', admin: true) %>
-            <%if BaseConfig.airline[:allow_reopen_report]%>
-              <%=link_to "Reopen",
-                reopen_safety_plan_path(@safety_plan),
-                :class => "btn btn-warning pull-right mr5",
-                :disable_with => "Reopening...",
-                :confirm => "Are you sure?"%>
-            <%end%>
-          <%end%>
-
-          <%=link_to "Add Comment", "#",
-            :class => "btn btn-success pull-right mr5 mb5",
-            :id => 'comment_btn',
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg"%>
+          <%= render '/forms/render_buttons', owner: @safety_plan, env: :inline %>
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @safety_plan%>
-        <%=render "/forms/show_comment", :owner => @safety_plan%>
-        <%=render "/forms/attachments_show", :owner => @safety_plan%>
-        <%=render "/records/transactions", :owner => @safety_plan%>
+        <%= render '/forms/show_fields', :fields => @fields, :record => @safety_plan%>
+        <%= render '/panels/show_panels', owner: @safety_plan%>
 
       </div>
     </div>
@@ -100,18 +45,5 @@
         $(window).trigger('resize');
       });
     });
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_safety_plan_path(@safety_plan)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_safety_plan_path(@safety_plan)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
   });
 </script>

@@ -25,7 +25,7 @@ module Concerns
             submodules.push('Audits') if current_user.has_access('audits', 'show', admin: true, strict: true)
           end
           module_access[module_name] = submodules if submodules.length > 0 &&
-            BaseConfig.mobile_modules.include?(module_name)
+            CONFIG.mobile_modules.include?(module_name)
           module_access
         end
 
@@ -48,6 +48,9 @@ module Concerns
         permissions = { :submissions => [], :audits => [] }
         permissions[:submissions].push('new') if current_user.has_access('submissions', 'new', admin: true, strict: true)
         mobile_user_info[:permissions] = permissions
+
+        # change when configs are updated to v1.2
+        mobile_user_info[:enable_dual_report] = CONFIG.sr::GENERAL[:enable_dual_report]
 
         render :json => mobile_user_info
       end

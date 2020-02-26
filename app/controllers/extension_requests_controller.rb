@@ -21,43 +21,26 @@ class ExtensionRequestsController < ApplicationController
   before_filter :login_required
 
 
-  def new
-    @table = "#{params[:owner_type]}"
-    @owner_id = params[:owner_id]
-    @user_id = params[:user_id]
-    @extension_request = Object.const_get("#{@table}ExtensionRequest").new.becomes(ExtensionRequest)
-    render :partial => '/extension_requests/new'
-  end
-
-
-
   def create
-    @table = params[:owner_type]
-    @extension_request = Object.const_get("#{@table}ExtensionRequest").new(params[:extension_request])
-    @extension_request.status = "New"
-    @extension_request.save
-    send_notification('New', @extension_request)
-    redirect_to "/#{Object.const_get(@table).table_name}/#{params[:extension_request][:owner_id]}"
+    @extension_request = ExtensionRequest.create(params[:extension_request])
+    send_notification(params[:commit], @extension_request)
+    redirect_to @extension_request.owner
   end
-
 
 
   def edit
-    @extension_request = ExtensionRequest
-      .find(params[:id])
-      .becomes(ExtensionRequest)
-    render :partial => '/extension_requests/edit'
+    @extension_request = ExtensionRequest.find(params[:id])
+    render :partial => '/extension_requests/new'
   end
-
 
 
   def update
     @extension_request = ExtensionRequest.find(params[:id])
     @extension_request.update_attributes(params[:extension_request])
-    send_notification('Address', @extension_request)
+    @extension_request.owner.update_attribute(:due_date, params[:due_date]) if params[:due_date].present?
+    send_notification(params[:commit], @extension_request)
     redirect_to @extension_request.owner
   end
-
 
 
   def address
@@ -66,18 +49,14 @@ class ExtensionRequestsController < ApplicationController
   end
 
 
-
-  def send_notification(status, ext_req)
-    case status
-    when 'New'
-      notify(ext_req.requester,
-        "A new Extension Request has been submitted." + g_link(ext_req.owner),
-        true, 'Extension Request submitted')
-    else
-      notify(ext_req.approver,
-        "Your Extension Request has been addressed." + g_link(ext_req.owner),
-        true, 'Extension Request addressed')
-    end
+  def send_notification(commit, ext_req)
+    users_id = commit == 'Address' ? ext_req.requester.id : ext_req.approver.id rescue nil
+    verb = commit == 'Address' ? 'Addresse' : commit
+    notify(ext_req.owner, notice: {
+      users_id: users_id,
+      content: "Extension Request for #{ext_req.owner.class.name} ##{ext_req.owner.id} has been #{verb}d."},
+      mailer: true,
+      subject: "Extension Request #{verb}d") if users_id.present?
   end
 
 end

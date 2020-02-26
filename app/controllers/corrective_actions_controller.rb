@@ -30,8 +30,6 @@ class CorrectiveActionsController < ApplicationController
   end
 
 
-
-
   def new
     @privileges = Privilege.find(:all)
     @corrective_action = CorrectiveAction.new
@@ -43,7 +41,6 @@ class CorrectiveActionsController < ApplicationController
     end
     @fields = CorrectiveAction.get_meta_fields('form')
   end
-
 
 
   def index
@@ -113,36 +110,26 @@ class CorrectiveActionsController < ApplicationController
   def update
     transaction = true
     @owner = CorrectiveAction.find(params[:id])
+    @owner.update_attributes(params[:corrective_action])
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.assigned_date = Time.now
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Assigned to you." + g_link(@owner),
-        true, 'Corrective Action Assigned')
     when 'Complete'
       if @owner.approver
-        notify(@owner.approver,
-          "Corrective Action ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Corrective Action Pending Approval')
       else
         @owner.close_date = Time.now
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Rejected by the Final Approver." + g_link(@owner),
-        true, 'Corrective Action Rejected')
     when 'Approve'
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Approved by the Final Approver." + g_link(@owner),
-        true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:corrective_action][:status]}"
       params[:corrective_action][:close_date] = params[:corrective_action][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:corrective_action])
+    # @owner.update_attributes(params[:corrective_action])
     if transaction
       Transaction.build_for(
         @owner,

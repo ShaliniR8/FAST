@@ -54,7 +54,10 @@ class ChecklistsController < ApplicationController
 
 
   def edit
-    @record = @table.find(params[:id])
+    @record = @table.includes(
+      checklist_rows: { checklist_cells: :checklist_header_item },
+      checklist_header: :checklist_header_items,
+    ).find(params[:id])
     render :partial => 'edit'
   end
 
@@ -68,12 +71,18 @@ class ChecklistsController < ApplicationController
 
   def show
     @fields = @table.get_meta_fields('show')
-    @record = @table.find(params[:id])
+    @record = @table.includes(
+      checklist_rows: { checklist_cells: :checklist_header_item },
+      checklist_header: :checklist_header_items,
+    ).find(params[:id])
   end
 
 
   def start
-    @record = @table.find(params[:id])
+    @record = @table.includes(
+      checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
+      checklist_header: :checklist_header_items,
+    ).find(params[:id])
     render :partial => 'edit'
   end
 

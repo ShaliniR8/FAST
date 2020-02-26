@@ -1,5 +1,11 @@
 class NoticesController < ApplicationController
 
+
+  def index
+    @records = current_user.notices.reverse
+  end
+
+
   def new
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     @notice = owner.notices.new
@@ -12,6 +18,7 @@ class NoticesController < ApplicationController
     }
   end
 
+
   def create
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     @table = params[:owner_type]
@@ -21,6 +28,7 @@ class NoticesController < ApplicationController
     redirect_to "/#{Object.const_get(@table).table_name}/#{@notice.owner_id}"
   end
 
+
   def destroy
     if Notice.find(params[:id]).destroy
       render json: {}, status: 200
@@ -28,5 +36,20 @@ class NoticesController < ApplicationController
       render json: {}, status: 500
     end
   end
+
+
+  def read_message
+    @owner = Notice.find(params[:id])
+    @owner.status = 2
+    @owner.save
+    redirect_to @owner.owner || home_index_path
+  end
+
+
+  def mark_all_as_read
+    Notice.where(id: params[:notices]).update_all(status: 2)
+    render :json => {status: :ok}
+  end
+
 
 end

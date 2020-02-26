@@ -51,7 +51,14 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
   resources :notifications
-  resources :notices
+  resources :notices do
+    member do
+      get 'read_message'
+    end
+    collection do
+      post 'mark_all_as_read'
+    end
+  end
   resources :private_links
   resources :verifications do
     member do
@@ -86,6 +93,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'foward'
       get 'inbox'
       get 'prev'
+      put 'read'
     end
     collection do
       get 'sent'
@@ -122,10 +130,9 @@ PrdgSession::Application.routes.draw do |map|
   resources :queries do
     member do
       get "clone"
-      get "add_visualization"
+      post "add_visualization"
       get "remove_visualization"
-      get "generate_visualization"
-      get "generate_visualization_dynamic"
+      post "generate_visualization"
     end
     collection do
       get 'load_conditions_block'
@@ -135,6 +142,7 @@ PrdgSession::Application.routes.draw do |map|
 
   # Configurations
   resources :canned_messages
+  resources :distribution_lists
   resources :custom_options
   resources :cause_options do
     member do
@@ -157,6 +165,19 @@ PrdgSession::Application.routes.draw do |map|
       get 'retract_categories'
       post 'add'
       get 'reload'
+    end
+  end
+  resources :occurrence_templates do
+    collection do
+      post 'new_root'
+    end
+    member do
+      post 'archive'
+    end
+  end
+  resources :occurrences do
+    collection do
+      post 'add'
     end
   end
   resources :checklist_templates do
@@ -246,6 +267,7 @@ PrdgSession::Application.routes.draw do |map|
   # Safety Reporting Module
   resources :submissions do
     member do
+      get 'interpret'
       get 'print'
       get 'export'
       get 'continue'
@@ -287,6 +309,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
     end
     collection do
+      get 'load_records'
       post "search"
       post "search_all"
       post "filter"
@@ -315,6 +338,7 @@ PrdgSession::Application.routes.draw do |map|
       get "advanced_search"
       get "summary"
       get "tabulation"
+      get 'load_records'
     end
     member do
       get 'mitigate'
@@ -410,27 +434,17 @@ PrdgSession::Application.routes.draw do |map|
   # Safety Assurance Module
   resources :audits do
     member do
-      get 'reoccur'
       get 'download_checklist'
-      get 'new_task'
-      get 'new_contact'
-      get 'new_cost'
-      get 'new_requirement'
-      get 'new_signature'
-      get 'new_checklist'
-      post 'upload_checklist'
-      get 'update_checklist'
-      get 'assign'
-      get 'complete'
-      get 'approve'
-      get 'viewer_access'
-      get 'comment'
-      get 'print'
-      get 'print_deidentified'
+      get 'interpret'
       get 'new_attachment'
-      get 'reopen'
-      get 'update_checklist_records'
+      get 'new_checklist'
+      get 'new_requirement'
       get 'override_status'
+      get 'print'
+      get 'update_checklist'
+      get 'update_checklist_records'
+      get 'viewer_access'
+      post 'upload_checklist'
     end
     collection do
       get "advanced_search"
@@ -438,55 +452,31 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :inspections do
     member do
-      get 'new_task'
-      get 'new_contact'
-      get 'new_cost'
-      get 'new_requirement'
-      get 'new_signature'
-      get 'new_finding'
-      get 'new_checklist'
-      post 'upload_checklist'
-      get 'open'
-      get 'update_checklist'
-      get 'assign'
-      get 'complete'
-      get 'approve'
-      get 'viewer_access'
-      get 'comment'
-      get 'print'
-      get 'print_deidentified'
-      get 'new_attachment'
       get 'download_checklist'
-      get 'reopen'
+      get 'interpret'
+      get 'new_attachment'
+      get 'new_checklist'
+      get 'new_requirement'
       get 'override_status'
+      get 'print'
+      get 'update_checklist'
+      get 'viewer_access'
+      post 'upload_checklist'
     end
     collection do
-      get "advanced_search"
+      get 'advanced_search'
     end
   end
   resources :evaluations do
     member do
-      get 'new_task'
-      get 'new_contact'
-      get 'new_cost'
-      get 'new_requirement'
-      get 'new_signature'
-      get 'new_finding'
-      get 'new_checklist'
-      post 'upload_checklist'
-      get 'open'
-      get 'update_checklist'
-      get 'assign'
-      get 'complete'
-      get 'approve'
-      get 'viewer_access'
-      get 'comment'
-      get 'print'
-      get 'print_deidentified'
+      get 'interpret'
       get 'new_attachment'
-      get 'download_checklist'
-      get 'reopen'
+      get 'new_checklist'
       get 'override_status'
+      get 'print'
+      get 'update_checklist'
+      get 'viewer_access'
+      post 'upload_checklist'
     end
     collection do
       get "advanced_search"
@@ -494,30 +484,17 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :investigations do
     member do
-      get 'mitigate'
       get 'baseline'
-      get 'new_recommendation'
-      get 'new_signature'
-      get 'new_contact'
-      get 'new_finding'
-      get 'new_action'
-      get 'new_task'
-      get 'new_cost'
-      get 'assign'
-      get 'approve'
-      get 'complete'
-      get 'print'
-      get 'print_deidentified'
-      get 'viewer_access'
-      get "new_cause"
-      post 'add_causes'
+      get 'interpret'
+      get 'mitigate'
+      get 'new_cause'
       get 'new_desc'
-      post 'add_desc'
       get 'new_attachment'
-      get 'download_checklist'
-      get 'reopen'
       get 'override_status'
-      get 'comment'
+      get 'print'
+      get 'viewer_access'
+      post 'add_causes'
+      post 'add_desc'
     end
     collection do
       get 'retract_cause_attributes'
@@ -527,26 +504,18 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :findings do
     member do
-      get 'mitigate'
       get 'baseline'
-      get "open"
-      get 'assign'
-      get "reassign"
-      get 'new_action'
-      get 'complete'
-      get 'approve'
-      get 'new_recommendation'
+      get 'interpret'
+      get 'reassign'
       get 'comment'
+      get 'mitigate'
       get 'new_attachment'
       get 'print'
-      get 'print_deidentified'
-      get 'release_finding_transaction'
-      get 'release_with_user'
       get 'reopen'
       get 'override_status'
     end
     collection do
-      get "advanced_search"
+      get 'advanced_search'
     end
   end
   resources :sms_actions do
@@ -555,34 +524,22 @@ PrdgSession::Application.routes.draw do |map|
       get 'get_term'
     end
     member do
-      get 'assign'
-      get 'reassign'
-      get 'new_cost'
-      get 'complete'
-      get 'approve'
-      get 'new_attachment'
-      get 'print'
-      get 'print_deidentified'
-      get 'mitigate'
       get 'baseline'
-      get 'reopen'
+      get 'interpret'
+      get 'mitigate'
+      get 'new_attachment'
       get 'override_status'
-      get 'comment'
+      get 'print'
+      get 'reassign'
     end
   end
-  resources :finding_action, :controller => 'sms_actions'
 
   resources :recommendations do
     member do
-      get 'assign'
-      get 'complete'
-      get 'approve'
-      get 'release'
+      get 'interpret'
       get 'new_attachment'
-      get 'print'
-      get 'reopen'
       get 'override_status'
-      get 'comment'
+      get 'print'
     end
     collection do
       get 'advanced_search'
@@ -596,6 +553,7 @@ PrdgSession::Application.routes.draw do |map|
   # SRA Module
   resources :sras do
     member do
+      get 'interpret'
       get 'mitigate'
       get 'baseline'
       get 'carryover'
@@ -624,6 +582,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :hazards do
     member do
+      get 'interpret'
       get 'mitigate'
       get 'baseline'
       get 'new_risk_control'
@@ -652,6 +611,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'advanced_search'
     end
     member do
+      get 'interpret'
       get "new_cost"
       get 'assign'
       get 'complete'
@@ -669,6 +629,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'advanced_search'
     end
     member do
+      get 'interpret'
       get "new_attachment"
       get "print"
       get 'complete'
@@ -679,6 +640,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :srm_meetings do
     member do
+      get 'interpret'
       get "message"
       post "send_message"
       get "close"

@@ -92,7 +92,7 @@
           </div>
 
           <!-- Login form -->
-          <div class='col-xs-12 col-md-8 <%=BaseConfig.airline[:enable_sso] ? '' : 'col-md-offset-2'%>'>
+          <div class='col-xs-12 col-md-8 <%=CONFIG::GENERAL[:enable_sso] ? '' : 'col-md-offset-2'%>'>
             <div class='col-xs-12 form-group'>
               <%= label_tag :login, 'Username',
                 class: 'control-label col-xs-3 col-sm-2 col-sm-offset-1' %>
@@ -125,7 +125,7 @@
             </div>
           </div>
 
-          <% if BaseConfig.airline[:enable_sso] %>
+          <% if CONFIG::GENERAL[:enable_sso] %>
             <style>
               @media (min-width: 1023px) {
                 .sso-border {
@@ -141,7 +141,7 @@
             </style>
             <div class='sso-border col-xs-10 col-xs-offset-1 col-md-3 col-md-offset-0'>
               <div class='text-center'>
-                <% airline = BaseConfig.airline[:name] %>
+                <% airline = CONFIG::GENERAL[:name] %>
                 <b>Or Login with <%= "#{airline}#{airline[-1]=='s' ? '\'' : '\'s'}"%><br/></b>
                 <%=link_to '<b>Single Sign-On</b>'.html_safe,
                   init_path,

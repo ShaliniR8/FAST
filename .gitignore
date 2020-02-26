@@ -12,3 +12,9 @@ nasa/**
 
 .byebug_history
 *.svn
+
+Gemfile.lock
+db/schema.rb
+
+lib/tasks/ultipro_data.xml
+lib/tasks/ultipro_data_prior.xml

@@ -1,11 +1,15 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
-<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
-<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2',
+    'utility/validate-form',
+    'utility/delete',
+    'utility/jquery.dataTables.min',
+    'utility/dataTables.bootstrap.min',
+    'utility/dataTables.buttons.min'
+  )
+%>
 
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <%=render "access_controls/new_modal"%>
 
@@ -18,149 +22,22 @@
           <div class="top_text">
             Hazard #<%=@hazard.get_id%>: <%=@hazard.title%>
           </div>
+
           <div class="top_buttons pull-right">
-            <% if current_user.has_access('hazards', 'destroy', admin: true, strict: true) %>
-              <%=link_to "Delete",
-                hazard_path(@hazard),
-                :method => "delete",
-                :confirm => 'Are you sure?',
-                :class => "btn btn-danger pull-right mr5 mb5"%>
-            <%end%>
-
-            <% if current_user.has_access('hazards', 'admin', admin: true, strict: true) %>
-              <%=link_to 'Override Status', '#',
-                :class => 'btn btn-danger pull-right mr5 mb5',
-                :id => 'override_status_btn',
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg"%>
-            <%end%>
-
-
-            <% if @hazard.status == "New" &&
-              current_user.has_access('hazards', 'edit', admin: true) %>
-              <%=link_to "Edit",
-                edit_hazard_path(@hazard),
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Editing..."%>
-            <%end%>
-
-            <%=link_to "De-ID PDF",
-              print_hazard_path(
-                @hazard,
-                :deidentified => true,
-                :format => :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-            <%=link_to "PDF",
-              print_hazard_path(
-                @hazard,
-                :deidentified => false,
-                :format => :pdf),
-              :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
-
-            <%=link_to "View SRA(SRM)",
-              sra_path(@hazard.sra),
-              :class => "btn btn-info pull-right mr5 mb5",
-              :disable_with => "Redirecting..."%>
-            <%=render '/forms/btns/attach_in_message_btn', owner: @hazard%>
-            <%=link_to "Expand All",
-              "#",
-              :class => "btn btn-default mr5 mb5 expandall pull-right ml5"%>
+            <%= render '/forms/render_buttons', owner: @hazard, env: :top %>
           </div>
+
         </div>
       </div>
 
       <div class="panel-body">
         <div class="col-xs-12 mb20">
-        <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before Completing/Rejecting" if @hazard.root_cause_lock? %></b>
-          <%if @hazard.can_complete?(current_user)%>
-            <%=link_to "Reject",
-              complete_hazard_path(@hazard, :status => "Rejected"),
-              :class => "btn btn-danger pull-right mr5 mb5",
-              :disable_with => "Rejecting...",
-              :confirm => "Are you sure?"%>
-            <%=link_to "Complete",
-              complete_hazard_path(@hazard, :status => "Completed"),
-              :class => "btn btn-warning pull-right mr5 mb5",
-              :disable_with => "Completing...",
-              :confirm => "Are you sure?"%>
-          <%end%>
-          <%if !['Completed', 'Rejected'].include?(@hazard.status) && !@hazard.root_cause_lock?%>
-            <%=link_to "Add Risk Control",
-              new_risk_control_path(
-                :owner_id => @hazard.id,
-                :owner_type => @hazard.class.name),
-              :class => "btn btn-success pull-right mr5 mb5",
-              :disable_with => "Adding..."%>
-          <%end%>
-          <%if ['Completed', 'Rejected'].include? @hazard.status%>
-            <%if @hazard.can_reopen? current_user%>
-              <%= link_to "Reopen",
-                reopen_hazard_path(@hazard),
-                :class => "btn btn-success pull-right mr5",
-                :disable_with => "Reopening...",
-                :confirm => "Are you sure?"%>
-            <%end%>
-          <%end%>
-          <%=link_to "Add Comment", "#",
-            :class => "btn btn-success pull-right mr5 mb5",
-            :id => 'comment_btn',
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg"%>
+        <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before Completing/Rejecting" if @hazard.occurrence_lock? %></b>
+          <%= render '/forms/render_buttons', owner: @hazard, env: :inline %>
         </div>
 
-        <%=render "/forms/show_fields",
-          :fields => Hazard.get_meta_fields('show'),
-          :record => @hazard%>
-
-        <%can_change = @hazard.status != "Completed" && current_user.has_access("hazards", "edit")%>
-
-        <%=render 'shared/choose_show_matrix',
-          :owner => @hazard,
-          :show_btn => true,
-          :type => 'hazards',
-          :allow_mitigate => true,
-          :can_change => can_change,
-          :like => @like,
-          :color_matrix => @color_matrix,
-          :frequency => @frequency%>
-
-        <%if BaseConfig.airline[:has_root_causes]%>
-          <%=render '/root_causes/root_causes',
-            :owner => @hazard,
-            :show_btns => true,
-            :headers => RootCause.get_headers%>
-        <%end%>
-
-        <%=render '/causes/all',
-          :owner => @hazard,
-          :cause_type => 'description',
-          :can_change => @hazard.status == "New" && current_user.has_access('hazards', 'edit', admin: true)%>
-
-        <%if @hazard.risk_controls.present?%>
-          <div class="col-xs-12">
-            <div class="panel clickable panel-info">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Risk Controls</b>
-                  <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row" style="overflow-wrap: break-word; word-wrap: break-word; hyphens:auto">
-                  <%@hazard.risk_controls.each do |risk_control|%>
-                    <%=render "show_risk_control", :risk_control => risk_control%>
-                  <%end%>
-                </div>
-              </div>
-            </div>
-          </div>
-        <%end%>
-
-        <%=render "/forms/show_comment", :owner => @hazard%>
-        <%=render "/forms/attachments_show", :owner => @hazard%>
-        <%=render "/records/transactions", :owner => @hazard%>
+        <%= render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => @hazard%>
+        <%= render '/panels/show_panels', owner: @hazard%>
 
       </div>
     </div>
@@ -172,12 +49,6 @@
 
 <script>
   $(document).ready(function(){
-    $('#comment_btn').on('click',function(){
-      $.get("<%=comment_hazard_path(@hazard)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#mitigate_btn').on('click',function(){
       $.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
         $(".modal-content").html(data);
@@ -196,14 +67,5 @@
         $(window).trigger('resize');
       });
     });
-
-    $('#override_status_btn').on('click',function(){
-      $.get("<%=override_status_hazard_path(@hazard)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
-
   });
 </script>

@@ -5,8 +5,8 @@ namespace :connection_converter do
    "[#{datetime}]: #{msg}\n"
   end
 
+  desc 'Converts ReportMeetings join table with Connection objects'
   task :report_meetings => :environment do
-    desc 'Converts ReportMeetings join table with Connection objects'
     logger.info 'Converting ReportMeeting Objects to Connection Objects...'
     Connection.transaction do
       ReportMeeting.includes(:report, :meeting).all.each do |pair|

@@ -21,66 +21,16 @@ class SafetyAssuranceController < ApplicationController
   ####    SHARED FORMS     ####
   #############################
 
-  def approve
-    if !@owner.can_approve? current_user
-      redirect_to errors_path
-      return false
-    end
-    status = params[:commit] == "approve" ? "Completed" : "Assigned"
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
+  # Interpret is found in the ApplicationController
 
-  def assign
-    if !@owner.can_assign?(current_user)
-      redirect_to errors_path
-      return false
-    end
-    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
-  end
-
-  def comment
-    @comment = @owner.comments.new
-    render :partial => "forms/viewer_comment"
-  end
-
-  def complete
-    if !@owner.can_complete?(current_user)
-      redirect_to errors_path
-      return false
-    end
-    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
-  end
-
-  def destroy
+  def destroy #KEEP
     @owner.destroy
     redirect_to eval("#{@class.name.underscore}s_path"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
   end
 
-  def new_attachment
+  def new_attachment #KEEP
     @attachment = Attachment.new
-    render :partial => "shared/attachment_modal"
-  end
-
-  def new_contact
-    @contact = Contact.new
-    render :partial => 'forms/contact_form'
-  end
-
-  def new_cost
-    @cost = @owner.costs.new
-    render :partial => 'forms/new_cost'
-  end
-
-  def new_signature
-    @signature = Signature.new
-    render partial: 'forms/signatures/sign'
-  end
-
-  def new_task
-    load_options
-    @task = @owner.tasks.new
-    render :partial => 'forms/task'
+    render :partial => 'shared/attachment_modal'
   end
 
   def override_status
@@ -91,17 +41,12 @@ class SafetyAssuranceController < ApplicationController
     render :partial => '/forms/workflow_forms/override_status'
   end
 
-  def reopen
-    redirect_to errors_path if !@owner.can_reopen? current_user
-    reopen_report(@owner)
-  end
-
   def viewer_access
     @owner.viewer_access = !@owner.viewer_access
     if @owner.viewer_access
-      content = "Viewer Access Enabled"
+      content = 'Viewer Access Enabled'
     else
-      content = "Viewer Access Disabled"
+      content = 'Viewer Access Disabled'
     end
     Transaction.build_for(
       @owner,
@@ -110,6 +55,69 @@ class SafetyAssuranceController < ApplicationController
     )
     @owner.save
     redirect_to eval("#{@class.name.underscore}_path(@owner)")
+  end
+
+  #############################
+  ##### Deprecated Routes #####
+  #############################
+
+  def approve # DEPRECATED
+    unless CONFIG.check_action(current_user, :approve_reject, @owner)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unable to approve #{@owner.class.titleize}."}
+      return false
+    end
+    status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
+    render :partial => '/forms/workflow_forms/process', locals: {status: status}
+  end
+
+  def assign # DEPRECATED
+    unless CONFIG.check_action(current_user, :assign, @owner)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unable to assign #{@owner.class.titleize}."}
+      return false
+    end
+    render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
+  end
+
+  def comment # DEPRECATED
+    @comment = @owner.comments.new
+    render :partial => 'forms/viewer_comment'
+  end
+
+  def complete # DEPRECATED
+    if !@owner.can_complete?(current_user)
+      redirect_to errors_path
+      return false
+    end
+    status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
+    render :partial => '/forms/workflow_forms/process', locals: {status: status}
+  end
+
+  def new_contact # DEPRECATED
+    @contact = Contact.new
+    render :partial => 'forms/contact_form'
+  end
+
+  def new_cost # DEPRECATED
+    @cost = @owner.costs.new
+    render :partial => 'forms/new_cost'
+  end
+
+  def new_signature # DEPRECATED
+    @signature = Signature.new
+    render partial: 'forms/signatures/sign'
+  end
+
+  def new_task # DEPRECATED
+    load_options
+    @task = @owner.tasks.new
+    render :partial => 'forms/task'
+  end
+
+  def reopen # DEPRECATED
+    redirect_to errors_path if !@owner.can_reopen? current_user
+    reopen_report(@owner)
   end
 
 end

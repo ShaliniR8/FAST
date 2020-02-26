@@ -1,43 +1,37 @@
 module ApplicationHelper
+  include ShowFormHelper
+
   def getAlltemplates
     return Template.find(:all)
   end
 
-  def airport_config
-    Object.const_get("#{BaseConfig.airline[:code]}_Config")
-  end
-
-  def matrix_config
-    airport_config::MATRIX_INFO
-  end
-
   # Calculate the severity based on airport's risk matrix
   def calculate_severity(list)
-    return airport_config.calculate_severity(list)
+    return CONFIG.calculate_severity(list)
   end
 
   # Calculate the probability based on airport's risk matrix
   def calculate_probability(list)
-    return airport_config.calculate_probability(list)
+    return CONFIG.calculate_probability(list)
   end
 
   def print_severity(owner, severity_score)
-    return airport_config.print_severity(owner, severity_score)
+    return CONFIG.print_severity(owner, severity_score)
   end
 
   def print_probability(owner, probability_score)
-    return airport_config.print_probability(owner, probability_score)
+    return CONFIG.print_probability(owner, probability_score)
   end
 
   def print_risk(probability_score, severity_score)
-    return airport_config.print_risk(probability_score, severity_score)
+    return CONFIG.print_risk(probability_score, severity_score)
   end
 
   def special_matrix
-    #@js_link="/javascripts/#{BaseConfig.airline[:code]}/risk_matrix.js"
-    @severity_table= matrix_config[:severity_table]
-    @probability_table= matrix_config[:probability_table]
-    @risk_table= matrix_config[:risk_table]
+    #@js_link="/javascripts/#{AIRLINE_CODE}/risk_matrix.js"
+    @severity_table= CONFIG::MATRIX_INFO[:severity_table]
+    @probability_table= CONFIG::MATRIX_INFO[:probability_table]
+    @risk_table= CONFIG::MATRIX_INFO[:risk_table]
   end
 
   def risk_matrix_initializer
@@ -100,10 +94,9 @@ module ApplicationHelper
   end
 
   def choose_load_special_matrix_form(target, risk_type)
-    airline_config = Object.const_get("#{BaseConfig.airline_code}_Config")
-    if defined?(airline_config::RISK_ARRAY)
-      if (airline_config::RISK_ARRAY[risk_type.pluralize.to_sym][:form].present?)
-        form_type = airline_config::RISK_ARRAY[risk_type.pluralize.to_sym][:form]
+    if defined?(CONFIG::RISK_ARRAY) #TODO- This will always be the case, clear out excess
+      if (CONFIG::RISK_ARRAY[risk_type.pluralize.to_sym][:form].present?)
+        form_type = CONFIG::RISK_ARRAY[risk_type.pluralize.to_sym][:form]
         load_special_matrix_form(risk_type, form_type, target)
       end
     else
@@ -244,19 +237,7 @@ module ApplicationHelper
       entry_url = investigation_url(entry)
     when 'Finding'
       entry_url = finding_url(entry)
-    when 'AuditFinding'
-      entry_url = finding_url(entry)
-    when 'InspectionFinding'
-      entry_url = finding_url(entry)
-    when 'EvaluationFinding'
-      entry_url = finding_url(entry)
-    when 'InvestigationFinding'
-      entry_url = finding_url(entry)
     when 'Recommendation'
-      entry_url = recommendation_url(entry)
-    when 'InvestigationRecommendation'
-      entry_url = recommendation_url(entry)
-    when 'FindingRecommendation'
       entry_url = recommendation_url(entry)
     when 'Sra'
       entry_url = sra_url(entry)
@@ -266,13 +247,12 @@ module ApplicationHelper
       entry_url = risk_control_url(entry)
     when 'SmsAction'
       entry_url = sms_action_url(entry)
-    when 'FindingAction'
-      entry_url = sms_action_url(entry)
-    when 'InvestigationAction'
-      entry_url = sms_action_url(entry)
     when 'SafetyPlan'
       entry_url = safety_plan_url(entry)
+    when 'VpIm', "JobAid", "FrameworkIm"
+      entry_url = im_url(entry)
     else
+      byebug
       entry_url = "N/A"
     end
     "    <a style='font-weight:bold;text-decoration:underline' href='#{entry_url}'>View</a>"
@@ -347,11 +327,12 @@ module ApplicationHelper
     "    <a href='#{entry_url}'>#{message}</a>"
   end
 
-  def link_to_add_fields(name, f, association, locals={})
+  def link_to_add_fields(name, f, association, locals={}, partial: nil)
     target = association.to_s
     new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
+    partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields"
     fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(association.to_s.singularize.downcase + "_fields", :f => builder, :source => "New", :guest => @guest, :locals => locals)
+      render(partial, :f => builder, :source => 'New', :guest => @guest, :locals => locals)
     end
     link_to_function(name, "add_fields(this, \"#{association}\", \"#{escape_javascript(fields)}\", \"#{target}\")")
   end
@@ -392,23 +373,23 @@ module ApplicationHelper
   end
 
   def load_objects(module_name)
-    @types = BaseConfig::MODULES[module_name][:objects].invert
+    @types = CONFIG.hierarchy[module_name][:objects].invert
     @types
   end
 
 
   def date_to_string(date)
-    date.strftime(BaseConfig.getTimeFormat[:dateformat]) rescue ''
+    date.strftime(CONFIG.getTimeFormat[:dateformat]) rescue ''
   end
 
 
   def datetime_to_string(datetime)
-    datetime.strftime(BaseConfig.getTimeFormat[:datetimeformat]) rescue ''
+    datetime.strftime(CONFIG.getTimeFormat[:datetimeformat]) rescue ''
   end
 
 
   def datetimez_to_string(datetime)
-    datetime.in_time_zone(BaseConfig.airline[:time_zone]).strftime(BaseConfig.getTimeFormat[:datetimezformat]) rescue ''
+    datetime.in_time_zone(CONFIG::GENERAL[:time_zone]).strftime(CONFIG.getTimeFormat[:datetimezformat]) rescue ''
   end
 
 
@@ -431,7 +412,7 @@ module ApplicationHelper
   end
 
   def module_display_to_mode module_display
-    mode, val = BaseConfig::MODULES.select{|k, hash| hash[:display_name] == module_display}.first
+    mode, val = CONFIG.hierarchy.find{|k, hash| hash[:display_name] == module_display}
     mode
   end
 
@@ -441,4 +422,14 @@ module ApplicationHelper
     array.reduce({}) { |id_map, element| id_map.merge({ element[key || 'id'] => element }) }
   end
 
+
+  def class_to_table(obj_class)
+    case obj_class.name
+    when 'CorrectiveAction'
+      'corrective_actions'
+    # TODO more classes need to be handled
+    else
+      obj_class.name.downcase.pluralize
+    end
+  end
 end

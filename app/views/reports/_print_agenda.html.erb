@@ -47,7 +47,7 @@ table{
     <div class="category">
       <b>Event ID: </b><%=report.id%></br>
       <b>Event Title: </b><%=report.name%></br>
-      <%if BaseConfig.airline[:event_summary]%>
+      <%if CONFIG.sr::GENERAL[:event_summary]%>
         <b>Type: </b><%=report.get_label%></br>
         <b>Venue: </b><%=report.get_venue%></br>
         <b>ICAO: </b><%=report.get_icao%></br>

@@ -137,13 +137,13 @@
   function mitigate(row_index,column_index){
     clear_mitigate();
     $('.mitigate_risk_td').each(function(){
-      risk_table_def = <%=JUS_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-      risk_table_indx = <%=JUS_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+      risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+      risk_table_indx = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
       if($(this).data("row")==row_index && $(this).data("column")==column_index){
         $(this).html("<span class='glyphicon glyphicon-ok style='color:black'></span>");
         $('#sev').val(row_index);
         $('#like').val(column_index);
-        $('#risk_fact').val(risk_table_indx[risk_table_def[row_index][column_index]]);      
+        $('#risk_fact').val(risk_table_indx[risk_table_def[row_index][column_index]]);
       }
     });
   }

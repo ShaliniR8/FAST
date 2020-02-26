@@ -1,7 +1,10 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<%= javascript_include_tag(
+  'utility/collapse-panel2',
+  'utility/jquery.dataTables.min',
+  'utility/dataTables.bootstrap.min.js',
+  'utility/dataTables.buttons.min.js',
+  )
+%>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 <%=render "access_controls/new_modal"%>
@@ -16,18 +19,7 @@
               <%="Finding ##{@owner.get_id}: #{@owner.title}"%>
             </div>
             <div class="top_buttons pull-right">
-              <%= render '/forms/btns/render_btns',
-                btns: [
-                  'delete',
-                  'override_status',
-                  'edit',
-                  'deid_pdf',
-                  'pdf',
-                  'view_parent',
-                  'attach_in_message',
-                  'expand_all'
-                ],
-                owner: @owner %>
+              <%= render '/forms/render_buttons', owner: @owner, env: :top %>
             </div>
           </div>
         </div>
@@ -35,26 +27,30 @@
         <div class="panel-body">
           <div class="col-xs-12 mb20">
 
-            <%= render 'forms/btns/render_btns',
-              btns: [
-                'assign',
-                'complete',
-                'recommendation',
-                'sms_action',
-                'approve_reject',
-                'reopen',
-                'comment'
-              ],
-              owner: @owner %>
+            <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
 
             <%if @owner.status == "New" && !@owner.can_assign?(current_user)%>
               <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
             <%end%>
           </div>
 
-          <%=render '/findings/show', :owner => @owner, :show_btn => true%>
-          <%=render "/forms/attachments_show", :owner => @owner%>
-          <%=render "/records/transactions", :owner => @owner%>
+          <%= render '/forms/show_fields', :fields => @fields, :record => @owner %>
+
+          <% can_change = @owner.status != "Completed" &&
+             @owner.status != "Pending Approval" &&
+             current_user.has_access("findings","edit")%>
+
+          <%= render 'shared/choose_show_matrix',
+            :owner => @owner,
+            :show_btn => true,
+            :type => "findings",
+            :like => @like,
+            :color_matrix => @color_matrix,
+            :frequency => @frequency,
+            :allow_mitigate => true,
+            :can_change => can_change %>
+
+          <%= render '/panels/show_panels', owner: @owner %>
 
         </div>
       </div>

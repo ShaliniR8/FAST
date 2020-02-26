@@ -139,7 +139,7 @@ class Config < Thor
 
   #Defines ENABLED_SYSTEMS and SYSTEM_ENVIRONMENTS from the airline config for use in the thor task
   def set_enabled_systems_and_environments
-    config = File.join('app', 'models', 'systems', "#{underscore(@airline_code)}_config.rb")
+    config = File.join('app', 'models', 'systems', "#{underscore(@airline_code)}", "#{underscore(@airline_code)}_config.rb")
 
     if File.exists?(config)
       File.open(config, 'r') do |f|

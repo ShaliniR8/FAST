@@ -19,38 +19,19 @@ class InvestigationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('investigation') }
   before_filter :define_owner, only:[
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
-    :new_attachment,
-    :new_contact,
-    :new_cost,
-    :new_signature,
-    :new_task,
+    :interpret,
     :override_status,
-    :reopen,
+    :new_attachment,
     :show,
     :update,
     :viewer_access
-
   ]
 
   def define_owner
     @class = Object.const_get('Investigation')
     @owner = Investigation.find(params[:id])
-  end
-
-  def new_recommendation
-    @predefined_actions = SmsAction.get_actions
-    @departments = SmsAction.departments
-    load_options
-    @finding = Investigation.find(params[:id])
-    @recommendation = Recommendation.new
-    @fields = Recommendation.get_meta_fields('form')
-    render :partial => "findings/new_recommendation"
   end
 
 
@@ -78,40 +59,30 @@ class InvestigationsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:investigation])
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Investigation ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Investigation Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Investigation ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Investigation Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Investigation ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Investigation Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Investigation ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Investigation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:investigation][:status]}"
       params[:investigation][:close_date] = params[:investigation][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:investigation])
+    # @owner.update_attributes(params[:investigation])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(
@@ -206,10 +177,10 @@ class InvestigationsController < SafetyAssuranceController
     @owner = Investigation.find(params[:id])
     load_special_matrix_form("investigation", "mitigate", @owner)
     load_options
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/mitigate"
+      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
     end
   end
 
@@ -217,10 +188,10 @@ class InvestigationsController < SafetyAssuranceController
     @owner = Investigation.find(params[:id])
     load_options
     load_special_matrix_form("investigation", "baseline", @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
 

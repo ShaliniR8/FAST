@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
 
   def track_activity
     #if Trial or Demo and user is not prosafet_admin then track log
-    track_airline_log = BaseConfig.airline[:track_log]
+    track_airline_log = CONFIG::GENERAL[:track_log]
     if track_airline_log
       date_time = DateTime.now.in_time_zone('Pacific Time (US & Canada)')
       file_date = date_time.strftime("%Y%m%d")
@@ -65,7 +65,7 @@ class ApplicationController < ActionController::Base
 
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100 && !BaseConfig.airline[:enable_sso] && !current_token.present?
+    elsif (Time.now - session[:last_active])/60 > 100 && !CONFIG::GENERAL[:enable_sso] && !current_token.present?
        redirect_to logout_path
        return false
     else
@@ -173,6 +173,120 @@ class ApplicationController < ActionController::Base
       else
         nil
       end
+    end
+  end
+
+
+  #############################
+  ####    SHARED FORMS     ####
+  #############################
+
+  # Handles permissions and ability to execute button actions
+  def interpret
+    begin
+      unless CONFIG.check_action(current_user, params[:act].to_sym, @owner)
+        redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+          flash: {danger: "Unable to #{params[:commit] || params[:act]} #{@owner.class.titleize}."}
+        return false
+      end
+    rescue
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: "Unknown process #{params[:act]}- action aborted."}
+        return false
+    end
+
+    case params[:act].to_sym
+
+    when :approve_reject # was approve route
+      if @owner.class.name == 'Sra'
+        @owner = Sra.find(params[:id]).becomes(Sra)
+        pending_approval = @owner.status == 'Pending Approval'
+        status = params[:commit].downcase == 'approve' ? ( pending_approval ? 'Completed' : 'Pending Approval') : 'Assigned'
+        field = pending_approval ? :approver_comment : :reviewer_comment
+        render :partial => '/forms/workflow_forms/process', locals: {status: status, field: field }
+      else
+        status = params[:commit] == 'approve' ? 'Completed' : 'Assigned'
+        render partial: '/forms/workflow_forms/process', locals: {status: status}
+      end
+
+    when :assign # was assign route
+      render partial: '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
+
+    when :attach_in_message
+      redirect_to new_message_path(owner_id: @owner.id, owner_class: @owner.class)
+
+    when :comment
+      @comment = @owner.comments.new
+      render partial: '/forms/viewer_comment'
+
+    when :complete # was complete route
+      status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
+      case @class.name
+      when 'Sra'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :closing_comment}
+      else
+        render partial: '/forms/workflow_forms/process', locals: {status: status}
+      end
+
+    when :contact
+      @contact = Contact.new
+      render :partial => 'forms/contact_form'
+
+    when :cost
+      @cost = @owner.costs.new
+      render :partial => 'forms/new_cost'
+
+    # :delete handled safely by link_to in render_buttons
+
+    # :edit handled safely by link_to in render_buttons
+
+    #TODO- properly make the print functionality class ambiguous (applies for pdf and deid_pdf)
+    # when :print
+    #   # Add to filter_before for defining @owner and class
+    #   @deidentified = params[:deidentified]
+    #   html = render_to_string(:template=>"/audits/print.html.erb")
+    #   pdf = PDFKit.new(html)
+    #   pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    #   pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    #   filename = "Audit_#{@audit.get_id}" + (@deidentified ? '(de-identified)' : '')
+    #   send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+
+    # :finding redirect handled in render_buttons
+
+    # :hazard redirect handled in render_buttons
+
+    when :reopen
+      @owner.update_attribute(:status, 'New')
+      Transaction.build_for(@owner, 'Reopen', current_user.id)
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {success: " #{@owner.class.titleize} Reopened."}
+
+    when :sign
+      @signature = Signature.new
+      render partial: 'forms/signatures/sign'
+
+    when :task
+      load_options
+      @task = @owner.tasks.new
+      render :partial => 'forms/task'
+
+      #message submitter, override status, private link, reopen
+
+    when :request_extension
+      @extension_request = @owner.extension_requests.new
+      @extension_request.requester = current_user
+      @extension_request.approver = @owner.approver
+      @extension_request.request_date = Time.now
+      render :partial => 'extension_requests/new'
+
+    when :schedule_verification
+      @verification = @owner.verifications.new
+      @verification.validator = @owner.responsible_user
+      render :partial => 'verifications/new'
+
+    else
+      redirect_to eval("#{@class.name.underscore}_path(@owner)"),
+        flash: {danger: 'Unknown process- action aborted.'}
     end
   end
 
@@ -439,7 +553,7 @@ class ApplicationController < ActionController::Base
         @records = @records.select{|x| x.type == params[:type]}
       end
     end
-    if params[:status].present?
+    if params[:status].present? && params[:status] != 'All'
       if params[:status] == "Overdue"
         @records = @records.select{|x| x.overdue}
       else
@@ -563,23 +677,55 @@ class ApplicationController < ActionController::Base
   end
 
 
+  def send_notification(owner, commit)
+    object_name = owner.is_a?(SmsAction) ? 'Corrective Action' : owner.class.name.titleize
+    case commit
+    when 'Reassign'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user_id,
+          content: "#{object_name} ##{owner.get_id} has been Reassigned to you."},
+        mailer: true,
+        subject: "#{object_name} Reassigned")
+    when 'Assign'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user.id,
+          content: "#{object_name} ##{owner.id} has been assigned to you."},
+        mailer: true,
+        subject: "#{object_name} Assigned")
+    when 'Complete'
+      notify(owner,
+        notice: {
+          users_id: owner.approver.id,
+          content: "#{object_name} ##{owner.id} needs your Approval."},
+        mailer: true,
+        subject: "#{object_name} Pending Approval") if owner.approver.present?
+    when 'Reject'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user.id,
+          content: "#{object_name} ##{owner.id} was Rejected by the Final Approver."},
+        mailer: true,
+        subject: "#{object_name} Rejected") if owner.approver.present?
+    when 'Approve'
+      notify(owner,
+        notice: {
+          users_id: owner.responsible_user.id,
+          content: "#{object_name} ##{owner.id} was Approved by the Final Approver."},
+        mailer: true,
+        subject: "#{object_name} Approved") if owner.approver.present?
+    end
+  end
 
 
-  def notify(user, message, mailer=false, subject=nil)
-    if user.present?
-      content = {
-        :user => user,
-        :content => message,
-        :start_date => DateTime.now.beginning_of_day
-      }
-      begin
-        notice = @owner.notices.create(content)
-      rescue
-        Rails.logger.warn 'WARNING: notify failed, @owner not defined- defaulting to unidentified Notice'
-        notice = Notice.create(content)
-      end
-      if mailer
-        NotifyMailer.notify(user, message, subject)
+  # sample arg => notice: {users_id: 1, content: 'Audit is assigned'}, mailer: true, subject: 'Audit Assigned'
+  def notify(record, arg)
+    if arg[:notice][:users_id].present? && record.present?
+      notice = record.notices.create(arg[:notice])
+      byebug if notice.owner_type.nil?
+      if arg[:mailer]
+        NotifyMailer.notify(notice, arg[:subject])
       end
     end
   end
@@ -593,6 +739,17 @@ class ApplicationController < ActionController::Base
   helper_method :airport_admin, :airport_has_access?, :current_airport_admin
 
 
+
+  # load records on index page
+  def load_records
+    object = CONFIG.hierarchy[session[:mode]][:objects][controller_name.classify]
+    @table = Object.const_get(controller_name.classify).preload(object[:preload])
+    handle_search
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    @records = @records.to_a & records.to_a
+    @fields = @table.get_meta_fields('index')
+    render :partial => 'forms/render_index_tab'
+  end
 
 
   private

@@ -10,7 +10,7 @@ class DocumentsController < ApplicationController
     @document = Document.new
     @category_options = Document.get_categories
     @file_options = ['File Upload', 'External Link']
-    if BaseConfig.airline[:has_mobile_app]
+    if CONFIG::GENERAL[:has_mobile_app]
       @file_options.push('File Upload (Tracked)')
     end
     render :partial =>"new"

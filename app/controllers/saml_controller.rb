@@ -3,7 +3,7 @@ class SamlController < ApplicationController
   helper_method :saml_config
 
   def saml_config
-    Object.const_get("#{BaseConfig.airline_code}_Config")
+    CONFIG.sso
   end
 
   def init

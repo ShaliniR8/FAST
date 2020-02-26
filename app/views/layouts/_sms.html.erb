@@ -11,7 +11,7 @@
       <% if audit_new %>
         <li><a href=<%=new_audit_path%>>New</a></li>
       <%end%>
-      <% if BaseConfig.airline[:enable_recurrence] && audit_admin %>
+      <% if CONFIG.sa::GENERAL[:enable_recurrence] && audit_admin %>
         <li><a href=<%="#{recurrences_path}?form_type=Audit"%>>Recurring Audits</a></li>
         <li><a href=<%="#{new_recurrence_path}?form_type=Audit"%>>New Recurring Audit</a></li>
       <%end%>
@@ -33,7 +33,7 @@
       <% if inspection_new %>
         <li><a href=<%=new_inspection_path%>>New</a></li>
       <%end%>
-      <% if BaseConfig.airline[:enable_recurrence] && inspection_admin %>
+      <% if CONFIG.sa::GENERAL[:enable_recurrence] && inspection_admin %>
         <li><a href=<%="#{recurrences_path}?form_type=Inspection"%>>Recurring Inspections</a></li>
         <li><a href=<%="#{new_recurrence_path}?form_type=Inspection"%>>New Recurring Inspection</a></li>
       <%end%>
@@ -55,7 +55,7 @@
       <% if evaluation_new %>
         <li><a href=<%=new_evaluation_path%>>New</a></li>
       <%end%>
-      <% if BaseConfig.airline[:enable_recurrence] && evaluation_admin %>
+      <% if CONFIG.sa::GENERAL[:enable_recurrence] && evaluation_admin %>
         <li><a href=<%="#{recurrences_path}?form_type=Evaluation"%>>Recurring Evaluations</a></li>
         <li><a href=<%="#{new_recurrence_path}?form_type=Evaluation"%>>New Recurring Evaluation</a></li>
       <%end%>

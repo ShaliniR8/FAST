@@ -45,13 +45,13 @@
         </div>
 
         <div class="col-xs-12 col-sm-12 col-md-6">
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_risk_factor",           :owner => owner%>
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_risk_probability",      :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_factor",           :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_probability",      :owner => owner%>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-6">
-          <%=render "shared/#{BaseConfig.airline[:code]}/show_risk_severity",         :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_severity",         :owner => owner%>
         </div>
-        <%=render "shared/#{BaseConfig.airline[:code]}/risk_definitions"%>
+        <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
 
       </div>
 

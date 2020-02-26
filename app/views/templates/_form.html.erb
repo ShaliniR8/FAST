@@ -92,7 +92,10 @@
               <%end%>
             </div>
 
-            <%=link_to_add_fields "Add a Category", f, :categories%></br>
+            <%=link_to_add_fields 'Add a Category',
+              f,
+              :categories,
+              partial: 'category_fields'%></br>
 
 
             <div class="form-actions pull-right">

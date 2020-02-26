@@ -20,7 +20,12 @@ class SrasController < ApplicationController
 
   before_filter :login_required
   before_filter :load_options
+  before_filter :define_owner, only: [:show, :interpret]
 
+  def define_owner
+    @class = Object.const_get('Sra')
+    @owner = Sra.find(params[:id])
+  end
 
   def index
     @title = "SRAs"
@@ -85,22 +90,33 @@ class SrasController < ApplicationController
     @owner = Sra.find(params[:id]).becomes(Sra)
     sra_meeting = @owner.meeting
     meeting_redirect = false
+
     case params[:commit]
     when 'Assign'
-      notify(@owner.responsible_user,
-        "SRA ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'SRA Assigned')
+      @owner.update_attributes(params[:sra])
+      notify(@owner,
+        notice: {
+          users_id: @owner.responsible_user.id,
+          content: "SRA ##{@owner.id} has been assigned to you."},
+        mailer: true,
+        subject: 'SRA Assigned')
     when 'Complete'
       if @owner.reviewer
+        notify(@owner,
+          notice: {
+            users_id: @owner.reviewer.id,
+            content: "SRA ##{@owner.id} needs your Review."},
+          mailer: true,
+          subject: 'SRA Pending Review')
         update_status = 'Pending Review'
-        notify(@owner.reviewer,
-          "SRA ##{@owner.id} needs your Review." + g_link(@owner),
-          true, 'SRA Pending Review')
       elsif @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "SRA ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'SRA Pending Approval')
+        notify(@owner,
+          notice: {
+            users_id: @owner.approver.id,
+            content: "SRA ##{@owner.id} needs your Approval."},
+          mailer: true,
+          subject: 'SRA Pending Approval')
       else
         @owner.date_complete = Time.now
         @owner.close_date = Time.now
@@ -109,36 +125,51 @@ class SrasController < ApplicationController
     when 'Reject'
       if @owner.status == 'Pending Review'
         update_status = 'Assigned'
-        notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Rejected by the Quality Reviewer." + g_link(@owner),
-          true, 'SRA Rejected')
+        notify(@owner,
+          notice: {
+            users_id: @owner.responsible_user.id,
+            content: "SRA ##{@owner.id} was Rejected by the Quality Reviewer."},
+          mailer: true,
+          subject: 'SRA Rejected') if @owner.responsible_user
         transaction_content = 'Rejected by the Quality Reviewer'
       else
         update_status = 'Assigned'
-        notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-          true, 'SRA Rejected')
+        notify(@owner,
+          notice: {
+            users_id: @owner.responsible_user.id,
+            content: "SRA ##{@owner.id} was Rejected by the Final Approver."},
+          mailer: true,
+          subject: 'SRA Rejected') if @owner.responsible_user
         transaction_content = 'Rejected by the Final Approver'
       end
     when 'Approve'
       if !@owner.approver #Approved by reviewer with absent approver case
         update_status = 'Completed'
-        notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Approved by the Quality Reviewer." + g_link(@owner),
-          true, 'SRA Approved')
+        notify(@owner,
+          notice: {
+            users_id: @owner.responsible_user.id,
+            content: "SRA ##{@owner.id} was Approved by the Quality Reviewer."},
+          mailer: true,
+          subject: 'SRA Approved') if @owner.responsible_user
         transaction_content = 'Approved by the Quality Reviewer'
       elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "SRA ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'SRA Pending Approval')
+        notify(@owner,
+          notice: {
+            users_id: @owner.responsible_user.id,
+            content: "SRA ##{@owner.id} needs your Approval."},
+          mailer: true,
+          subject: 'SRA Pending Approval') if @owner.responsible_user
         transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.date_complete = Time.now
         @owner.close_date = Time.now
-        notify(@owner.responsible_user,
-          "SRA ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-          true, 'SRA Approved')
+        notify(@owner,
+          notice: {
+            users_id: @owner.responsible_user.id,
+            content: "SRA ##{@owner.id} was Approved by the Final Approver."},
+          mailer: true,
+          subject: 'SRA Approved')
         transaction_content = 'Approved by the Final Approver'
       end
     when 'Override Status'
@@ -320,7 +351,7 @@ class SrasController < ApplicationController
     @risk_group = @owner.matrix_connection.matrix_group
     load_options
     mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial=>"shared/mitigate"
     else
       render :partial => "/risk_matrix_groups/form_mitigated"
@@ -334,7 +365,7 @@ class SrasController < ApplicationController
     @risk_group = @owner.matrix_connection.matrix_group
     form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
     load_options
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial=>"shared/baseline"
     else
       render :partial => "/risk_matrix_groups/form_baseline"
@@ -367,12 +398,11 @@ class SrasController < ApplicationController
 
   def reopen
     @sra = Sra.find(params[:id])
-    notify(
-      @sra.responsible_user,
-      "SRA ##{@sra.get_id} has been reopened and assigned." +
-        g_link(@sra),
-      true,
-      "SRA ##{@sra.get_id} Reopened and Assigned")
+    notify(@sra, notice: {
+      users_id: @sra.responsible_user.id,
+      content: "SRA ##{@sra.get_id} has been reopened and assigned."},
+      mailer: true,
+      subject: "SRA ##{@sra.get_id} Reopened and Assigned")
     reopen_report(@sra)
   end
 

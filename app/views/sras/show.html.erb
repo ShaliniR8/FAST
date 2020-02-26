@@ -1,9 +1,14 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2',
+    'utility/jquery.dataTables.min',
+    'utility/dataTables.bootstrap.min',
+    'utility/dataTables.buttons.min',
+    'utility/format-builder'
+  )
+%>
+
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -13,103 +18,23 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            SRA(SRM) #<%=@sra.get_id%>: <%=@sra.title%>
+            <%="SRA(SRM) ##{@sra.get_id}: #{@sra.title}"%>
           </div>
-          <div class="top_buttons pull-right">
-            <%= render '/forms/btns/render_btns',
-              btns: [
-                'delete',
-                'override_status',
-                'edit',
-                'deid_pdf',
-                'pdf',
-                'view_meeting',
-                'view_parent',
-                'viewer_access',
-                'attach_in_message',
-                'expand_all'
-              ],
-              owner: @owner %>
 
+          <div class="top_buttons pull-right">
+            <%= render '/forms/render_buttons', owner: @owner, env: :top %>
           </div>
+
         </div>
       </div>
 
       <div class="panel-body">
         <div class="col-xs-12 mb20">
-          <%= render '/forms/btns/render_btns',
-            btns: [
-              'assign',
-              'complete',
-              'approve_reject',
-              'hazard',
-              'reopen',
-              'comment'
-            ],
-            owner: @owner %>
-
+          <%= render '/forms/render_buttons', owner: @owner, env: :inline %>
         </div>
 
-        <%=render '/forms/show_fields', :fields => @fields, :record => @sra%>
-
-        <%if @sra.hazards.present?%>
-          <div class="col-xs-12 mt10">
-            <div class="panel clickable panel-info">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Hazards</b>
-                  <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row">
-                  <%@sra.hazards.each do |hazard|%>
-                    <%=render "/sras/show_hazard",
-                      :owner => hazard,
-                      :like => @like,
-                      :color_matrix => @color_matrix,
-                      :frequency => @frequency,
-                      :show_btn => false%>
-                  <%end%>
-                </div>
-              </div>
-            </div>
-          </div>
-        <%end%>
-
-        <%if @sra.srm_agendas.present?%>
-          <div class="col-xs-12">
-            <div class="panel clickable panel-info">
-              <div class="panel-heading click-heading collapsed">
-                <div class="panel-title">
-                  <b>Agendas</b>
-                  <span class="pull-right clickable">
-                    <i class="mt5 glyphicon glyphicon-chevron-down"></i>
-                  </span>
-                </div>
-              </div>
-              <div class="panel-body" style="display:none">
-                <div class="row">
-                  <%=render "agendas",:sra=>@sra%>
-                </div>
-              </div>
-            </div>
-          </div>
-        <%end%>
-
-        <%#=render "/responsible_users/show_responsible_users", :owner => @sra%>
-
-        <%@sra.sections.each do |section|%>
-          <%#=render "/sections/display", :section => section%>
-        <%end%>
-
-        <%=render '/forms/list_records', :records => Array(@sra.owner), :title => 'Report'%>
-
-        <%=render "/forms/show_comment", :owner => @sra%>
-        <%=render "/forms/attachments_show", :owner => @sra%>
-        <%=render "/records/transactions", :owner => @sra%>
+        <%= render '/forms/show_fields', :fields => @fields, :record => @sra%>
+        <%= render '/panels/show_panels', owner: @owner%>
 
       </div>
     </div>

@@ -10,6 +10,7 @@ class HomeController < ApplicationController
       return
     end
     @action = "home"
+    @notices = current_user.notices.where(status: 1).reverse.first(6)
     prepare_analytics
     prepare_calendar
     prepare_special_risk_matrix
@@ -403,10 +404,10 @@ class HomeController < ApplicationController
       sras << Sra.where(status: 'Pending Review', reviewer_id: current_user_id)
       sras << Sra.where(status: 'Pending Approval', approver_id: current_user_id)
       sras.flatten.each do |a|
-        if a.scheduled_completion_date.present?
+        if a.due_date.present?
           @calendar_entries.push({
             :url => sra_path(a),
-            :start => a.get_completion_date,
+            :start => a.get_due_date,
             :color => (a.overdue ? "lightcoral" : "skyblue"),
             :textColor => "darkslategrey",
             :title=>"SRA ##{a.id}: "+ a.title + " (#{a.status})"
@@ -417,16 +418,31 @@ class HomeController < ApplicationController
       risk_controls = RiskControl.where(status: 'Assigned', responsible_user_id: current_user_id)
       risk_controls << RiskControl.where(status: 'Pending Approval', approver_id: current_user_id)
       risk_controls.flatten.each do |a|
-        if a.scheduled_completion_date.present?
+        if a.due_date.present?
           @calendar_entries.push({
             :url => risk_control_path(a),
-            :start => a.get_completion_date,
+            :start => a.get_due_date,
             :color => (a.overdue ? "lightcoral" : "skyblue"),
             :textColor => "darkslategrey",
             :title => "Risk Control ##{a.id}: " + a.title + " (#{a.status})"
           })
         end
       end
+
+      hazards = Hazard.where(status: 'Assigned', responsible_user_id: current_user_id)
+      hazards << Hazard.where(status: 'Pending Approval', approver_id: current_user_id)
+      hazards.flatten.each do |a|
+        if a.due_date.present?
+          @calendar_entries.push({
+            :url => hazard_path(a),
+            :start => a.get_due_date,
+            :color => (a.overdue ? "lightcoral" : "skyblue"),
+            :textColor => "darkslategrey",
+            :title => "Hazard ##{a.id}: " + a.title + " (#{a.status})"
+          })
+        end
+      end
+
 
       if current_user.has_access("srm_meeting","index")
         meetings = SrmMeeting.where("status!=?","Closed")
@@ -442,6 +458,20 @@ class HomeController < ApplicationController
             :description=>a.get_tooltip})
         end
       end
+
+      Verification.where(:status => 'New').each do |x|
+        if x.validator == current_user
+          owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
+          @calendar_entries.push({
+            :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+            :start => x.verify_date,
+            :color => 'skyblue',
+            :textColor => "darkslategrey",
+            :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
+          })
+        end
+      end
+
 
     elsif session[:mode] == "SMS IM"
       if current_user.has_access("sms_meeting","index")
@@ -504,7 +534,7 @@ class HomeController < ApplicationController
     }
 
     @employee_groups = Template.select("distinct emp_group").map(&:emp_group)
-    @departments_list = Sra.get_custom_options('Departments')
+    @departments_list = CONFIG.custom_options['Departments']
 
     if session[:mode] == "ASAP"
       if current_user.has_access('submissions','index')
@@ -665,7 +695,7 @@ class HomeController < ApplicationController
     @departments = params[:departments] ? params[:departments] : nil
     prepare_analytics
     prepare_calendar
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       prepare_risk_matrix
     else
       prepare_special_risk_matrix

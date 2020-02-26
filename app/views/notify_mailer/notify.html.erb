@@ -3,8 +3,10 @@
     Hello <%=@user.first_name%>,
     <br>
     <br>
-    <%=@message.html_safe rescue ''%>
+    <%=@notice.content.html_safe rescue ''%>
     <br>
+    <br>
+    <%=@link.html_safe%>
     <br>
     <br>
     Thank you,<br>

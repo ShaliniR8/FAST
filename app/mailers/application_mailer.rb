@@ -3,7 +3,7 @@ class ApplicationMailer < ActionMailer::Base
 
   protected
   def to_email(email)
-    BaseConfig.airline[:enable_mailer] && Rails.env.production? ?
+    CONFIG::GENERAL[:enable_mailer] && Rails.env.production? ?
       {to: email, bcc: 'noc@prosafet.com'} : {to: 'noc@prosafet.com'}
   end
 

@@ -1,7 +1,10 @@
-<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
-<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
-<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
-
+<%=
+  javascript_include_tag(
+    'utility/collapse-panel2.js',
+    'utility/format-builder.js',
+    'utility/jquery.dataTables.min.js'
+  )
+%>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -15,42 +18,21 @@
               Recommendation #<%=@owner.get_id%>: <%=@owner.title%>
             </div>
             <div class="top_buttons pull-right">
-              <%= render 'forms/btns/render_btns',
-                btns: [
-                  'delete',
-                  'override_status',
-                  'edit',
-                  'deid_pdf',
-                  'pdf',
-                  'view_parent',
-                  'attach_in_message',
-                  'expand_all'
-                ],
-                owner: @owner %>
+              <%= render 'forms/render_buttons', owner: @owner, env: :top %>
             </div>
           </div>
         </div>
         <div class="panel-body">
           <div class="col-xs-12 mb15">
-            <%= render 'forms/btns/render_btns',
-              btns: [
-                'assign',
-                'complete',
-                'approve_reject',
-                'reopen',
-                'comment'
-              ],
-              owner: @owner %>
+            <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
 
             <%if @owner.status == 'New' && !@owner.can_assign?(current_user) %>
               <b style='color:red;'>*Please complete the Source of Input before assigning the Recommendation.</b>
             <%end%>
           </div>
 
-          <%=render '/recommendations/show', :owner => @owner, :show_btn => true%>
-          <%=render "/forms/show_comment", :owner => @owner%>
-          <%=render "/forms/attachments_show", :owner => @owner%>
-          <%=render "/records/transactions", :owner => @owner%>
+          <%= render '/forms/show_fields', :fields => @fields, :record => @owner %>
+          <%= render '/panels/show_panels', owner: @owner %>
 
       </div>
     </div>

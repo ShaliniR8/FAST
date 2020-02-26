@@ -20,49 +20,40 @@ class VerificationsController < ApplicationController
 
   before_filter :login_required
 
-
-
-  def new
-    @table = "#{params[:owner_type]}"
-    @owner_id = params[:owner_id]
-    @user_id = params[:user_id]
-    @verification = Object.const_get(@table).new.becomes(Verification)
-    render :partial => '/verifications/new'
-  end
-
-
-
   def create
-    @table = params[:owner_type]
-    @verification = Object.const_get("#{@table}Verification").new(params[:verification])
-    @verification.status = "New"
-    @verification.save
-    redirect_to "/#{Object.const_get(@table).table_name}/#{params[:verification][:owner_id]}"
+    @verification = Verification.create(params[:verification])
+    send_notification(params[:commit], @verification)
+    redirect_to @verification.owner
   end
-
 
 
   def edit
-    @verification = Verification
-      .find(params[:id])
-      .becomes(Verification)
-    render :partial => '/verifications/edit'
+    @verification = Verification.find(params[:id])
+    render :partial => '/verifications/new'
   end
 
 
   def update
     @verification = Verification.find(params[:id])
     @verification.update_attributes(params[:verification])
-    Rails.logger.debug "#{@verification.owner.class}"
+    send_notification(params[:commit], @verification)
     redirect_to @verification.owner
   end
 
 
-
   def address
-    @verification = Verification.find(params[:id]).becomes(Verification)
+    @verification = Verification.find(params[:id])
     render :partial => '/verifications/address'
   end
 
+
+  def send_notification(commit, verification)
+    commit = 'Addresse' if commit == 'Address'
+    notify(verification.owner, notice: {
+      users_id: verification.validator.id,
+      content: "Verification for #{verification.owner.class.name.titleize} ##{verification.owner.id} has been #{commit}d."},
+      mailer: true,
+      subject: "Verification #{commit}d") if verification.validator.present?
+  end
 
 end

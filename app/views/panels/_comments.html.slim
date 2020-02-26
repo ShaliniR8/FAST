@@ -1,0 +1,21 @@
+- if comments.present?
+  .col-xs-12
+    .panel.panel-lightskyblue
+      .panel-heading.click-heading.collapsed
+        .panel-title
+          b Comments
+          span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+      .panel-body style='display:none'
+        .row
+          .col-xs-12
+            table.table.table-striped.table-bordered
+              thead
+                th Submitter
+                th Submit Date
+                th Content
+              tbody
+                - comments.each do |c|
+                  tr
+                    td #{c.viewer.full_name rescue "<b>External</b> #{c.alt_user}".html_safe}
+                    td #{c.get_subnmission_time}
+                    td #{c.get_content}

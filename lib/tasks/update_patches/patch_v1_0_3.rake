@@ -5,8 +5,8 @@ namespace :v1_0_3 do
    "[#{datetime}]: #{msg}\n"
   end
 
+  desc 'Run all updates from v1.0.2 to v1.0.3'
   task :patch_all => :environment do
-    desc 'Run all updates from v1.0.2 to v1.0.3'
     logger.info '###########################'
     logger.info '### VERSION 1.0.3 PATCH ###'
     logger.info '###########################'
@@ -20,8 +20,8 @@ namespace :v1_0_3 do
     logger.info "Finish Time: #{DateTime.now.strftime("%F %R")}"
   end
 
+  desc 'Populates Access Controls with core rules'
   task :add_access_controls => :environment do
-    desc 'Populates Access Controls with core rules'
     logger.info 'Executing Access Control Additions Patch'
     rules = AccessControl.get_meta
     rules.each do |rule, data|
@@ -35,8 +35,8 @@ namespace :v1_0_3 do
     end
   end
 
+  desc 'Adds new, common privileges'
   task :add_common_privileges => :environment do
-    desc 'Adds new, common privileges'
     logger.info 'Executing Common Privilege Additions Patch'
     OBSERVATION_SUBMITTER_ID = 127
     OBSERVATION_ANALYST_ID = 128
@@ -83,8 +83,8 @@ namespace :v1_0_3 do
     end
   end
 
+  desc 'Updates all transactions for polymorphism and populates created_by_id fields'
   task :populate_created_by => :environment do
-    desc 'Updates all transactions for polymorphism and populates created_by_id fields'
     logger.info 'Executing Transaction Updates and populating created_by_id Fields'
     transaction_types = [
       "CorrectiveActionTransaction",
@@ -120,8 +120,8 @@ namespace :v1_0_3 do
     end
   end
 
+  desc 'Redefines all custom_options fields'
   task :populate_custom_options => :environment do
-    desc 'Redefines all custom_options fields'
     logger.info 'Executing Population of Custom Options'
 
     CustomOption.where(:title => "Risk Control Type").destroy_all
@@ -281,8 +281,8 @@ namespace :v1_0_3 do
     end
   end
 
+  desc 'Reorganizes risk matrix order to proper form for each airline'
   task :risk_matrix_transform => :environment do
-    desc 'Reorganizes risk matrix order to proper form for each airline'
     logger.info 'Executing Risk Matrix Transform Patch'
     case BaseConfig.airline_code
     when "BOE"

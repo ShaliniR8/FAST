@@ -23,7 +23,7 @@
           <table id="observation_phases_table" class="table table-bordered" width="100%">
             <thead>
               <tr>
-                <%BaseConfig.observation_phases.each do |x|%>
+                <%CONFIG.sr::OBSERVATION_PHASES.each do |x|%>
                   <th><%=x%></th>
                 <%end%>
               </tr>

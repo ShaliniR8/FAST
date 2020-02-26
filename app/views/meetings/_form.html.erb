@@ -125,7 +125,8 @@
 
       var dt=$('#reports').DataTable({
         "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-        "iDisplayLength": 5
+        "iDisplayLength": 5,
+        "order": [[0, "desc"]]
       });
 
       $('form').on('submit',function(){

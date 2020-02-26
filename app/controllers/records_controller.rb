@@ -105,47 +105,56 @@ class RecordsController < ApplicationController
       'Report Opened.'
     )
     begin #TODO - Review case for if submission is deleted then report is opened
-      notify(
-        @record.submission.created_by,
-        "Your submission ##{@record.submission.id} has been opened by analyst." + g_link(@record.submission),
-        true,
-        "Submission ##{@record.submission.id} Opened by Analyst")
+      notify(@record.submission, notice: {
+        users_id: @record.created_by.id,
+        content: "Your submission ##{@record.submission.id} has been opened by analyst."},
+        mailer: true, subject: "Submission ##{@record.submission.id} Opened by Analyst")
     rescue
     end
     @record.save
-    redirect_to @record,
-      :flash => {:success => "Report Opened."}
+    redirect_to @record, flash: {success: "Report Opened."}
   end
 
 
 
   def index
-    @table = Object.const_get("Record")
-    index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-      args << 'admin' if current_user.global_admin?
-      args
-    end
-    @headers = @table.get_meta_fields(*index_meta_field_args)
-    @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{|x| x[:field].present?}
-    @title = 'Reports'
-    handle_search
-
-    @fields = Field.find(:all)
-    @categories = Category.find(:all)
-    @templates = Template.find(:all)
-
-    records = Record.preload(:created_by, :template).can_be_accessed(current_user)
-    records = Record.filter_array_by_emp_groups(records, params[:emp_groups])
-
-    @records = @records.to_a & records.to_a
-
-    # handle custom view
-    if params[:custom_view].present?
-      selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
-      @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
-      @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
-    end
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    @records_hash = @records.group_by(&:status)
+    @records_hash['All'] = @records
   end
+
+
+  # def index_old
+  #   @table = Object.const_get("Record").preload(CONFIG.hierarchy[session[:mode]][:objects]['Record'][:preload])
+  #   index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+  #     args << 'admin' if (current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name])
+  #     args
+  #   end
+  #   @headers = @table.get_meta_fields(*index_meta_field_args)
+  #   @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{|x| x[:field].present?}
+  #   @title = 'Reports'
+  #   handle_search
+
+  #   @fields = Field.find(:all)
+  #   @categories = Category.find(:all)
+  #   @templates = Template.find(:all)
+
+  #   records = Record.preload(:created_by, :template).can_be_accessed(current_user)
+  #   records = Record.filter_array_by_emp_groups(records, params[:emp_groups])
+
+  #   @records = @records.to_a & records.to_a
+
+  #   # handle custom view
+  #   if params[:custom_view].present?
+  #     selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
+  #     @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
+  #     @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+  #   end
+  # end
 
 
 
@@ -215,12 +224,10 @@ class RecordsController < ApplicationController
           current_user.id,
           'Report has been opened.'
         )
-        notify(
-          @record.submission.created_by,
-          "The Report for Submission ##{@record.submission.get_id} has been opened by analyst." +
-            g_link(@record.submission),
-          true,
-          "Report for Submission ##{@record.submission.get_id} Opened by Analyst")
+        notify(@record.submission, notice: {
+          users_id: @record.created_by.id,
+          content: "Your submission ##{@record.submission.id} has been opened by analyst."},
+          mailer: true, subject: "Submission ##{@record.submission.id} Opened by Analyst")
       end
     end
     @record.save
@@ -399,6 +406,9 @@ class RecordsController < ApplicationController
     end
     @template = @record.template
     access_level = current_user.has_template_access(@template.name)
+    redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
+                              access_level.split(';').include?('full') ||
+                              (access_level.split(';').include?('viewer') && @record.viewer_access)
     load_special_matrix(@record)
   end
 
@@ -440,9 +450,10 @@ class RecordsController < ApplicationController
     case params[:commit]
     when 'Close'
       if @owner.submission.present?
-        notify(@owner.submission.created_by,
-          "Your submission ##{@owner.submission.id} has been closed by analyst." + g_link(@owner.submission),
-          true, "Submission ##{@owner.submission.id} Closed")
+        notify(@owner.submission, notice: {
+          users_id: @owner.created_by.id,
+          content: "Your submission ##{@owner.submission.id} has been closed by analyst."},
+          mailer: true, subject: "Submission ##{@owner.submission.id} Closed by Analyst")
         Transaction.build_for(
           @owner.submission,
           params[:commit],
@@ -535,10 +546,10 @@ class RecordsController < ApplicationController
     @owner = Record.find(params[:id])
     load_special_matrix_form('record', 'mitigate', @owner)
     load_options
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/mitigate"
+      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
     end
   end
 
@@ -547,18 +558,23 @@ class RecordsController < ApplicationController
     @owner = Record.find(params[:id])
     load_options
     load_special_matrix_form('record', 'baseline', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
 
 
 
   def close
+    @fields = Record.get_meta_fields('close')
     @owner = Record.find(params[:id])
-    render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
+    if @owner.is_asap
+      render partial: 'records/close'
+    else
+      render partial: '/forms/workflow_forms/process', locals: {status: 'Closed'}
+    end
   end
 
 

@@ -23,16 +23,11 @@ class SmsActionsController < SafetyAssuranceController
   before_filter :load_options
   before_filter(only: [:show]) { check_group('sms_action') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
+    :interpret,
     :new_attachment,
-    :new_cost,
     :override_status,
-    :reopen,
     :show,
     :update
   ]
@@ -117,41 +112,28 @@ class SmsActionsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:sms_action])
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Reassign'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{car.get_id} has been reassigned to you." + g_link(car),
-        true, 'Corrective Action Reassigned')
     when 'Assign'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Corrective Action Assigned')
     when 'Complete'
       if @owner.approver
-        notify(@owner.approver,
-          "Corrective Action ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Corrective Action Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Rejected by the Final Approver." + g_link(@owner),
-        true, 'Corrective Action Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Corrective Action ##{@owner.id} has been Approved by the Final Approver." + g_link(@owner),
-        true, 'Corrective Action Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
       params[:sms_action][:close_date] = params[:sms_action][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:sms_action])
+    # @owner.update_attributes(params[:sms_action])
     if transaction
       Transaction.build_for(
         @owner,
@@ -181,10 +163,10 @@ class SmsActionsController < SafetyAssuranceController
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     load_options
     load_special_matrix_form('sms_action', 'mitigate', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/mitigate"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/mitigate"
+      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
     end
   end
 
@@ -193,10 +175,10 @@ class SmsActionsController < SafetyAssuranceController
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     load_options
     load_special_matrix_form('sms_action', 'baseline', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial => "shared/baseline"
     else
-      render :partial => "shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
 

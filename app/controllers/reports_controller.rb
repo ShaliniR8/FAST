@@ -149,7 +149,7 @@ class ReportsController < ApplicationController
       base.report = @report
       @report.records.push(base)
     end
-    @fields = Report.get_meta_fields('form', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('form', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
     @report_fields = Record.get_meta_fields('index')
     @candidates = Record
       .find(:all)
@@ -199,7 +199,7 @@ class ReportsController < ApplicationController
       .sort_by!{|a| a.name}
     @action = "edit"
     @report = Report.find(params[:id])
-    @fields = Report.get_meta_fields('form', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields('form', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
     load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
@@ -293,14 +293,17 @@ class ReportsController < ApplicationController
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
-    @fields = Report.get_meta_fields('show', @report.status == "Closed" ? 'close' : '', BaseConfig.airline[:event_summary] ? 'event_summary' : '')
+    @fields = Report.get_meta_fields(
+      'show',
+      CONFIG::GENERAL[:event_summary] ? 'event_summary' : '',
+      @report.status == 'Closed' ? 'close' : '')
   end
 
 
   def close
-    @fields = Report.get_meta_fields('close')
+    @fields = Report.get_meta_fields('asap')
     @owner = Report.find(params[:id])
-    if @owner.is_asap
+    if @owner.has_open_asap
       render :partial => 'reports/close'
     else
       params[:commit] = "close_event"
@@ -328,15 +331,24 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def index
-    @table = Object.const_get("Report")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    @title = "Events"
-    handle_search
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    @records_hash = @records.group_by(&:status)
+    @records_hash['All'] = @records
   end
+
+
+  # def index_old
+  #   @table = Object.const_get("Report").preload(:records => [:created_by])
+  #   @headers = @table.get_meta_fields('index')
+  #   @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+  #   @title = "Events"
+  #   handle_search
+  # end
 
 
   def summary
@@ -436,22 +448,21 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def change_privilege
     @privileges = Privileges.find(:all)
     @target = Report.find(params[:id])
     render :partial => "shared/privilege"
   end
 
+
   def mitigate
     @owner=Report.find(params[:id])
     load_options
     load_special_matrix_form('report', 'mitigate', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
         render :partial=>"shared/mitigate"
       else
-        render :partial=>"shared/#{BaseConfig.airline[:code]}/mitigate"
+        render :partial=>"shared/#{AIRLINE_CODE}/mitigate"
       end
   end
 
@@ -460,13 +471,12 @@ class ReportsController < ApplicationController
     @owner=Report.find(params[:id])
     load_options
     load_special_matrix_form('report', 'baseline', @owner)
-    if BaseConfig.airline[:base_risk_matrix]
+    if CONFIG::GENERAL[:base_risk_matrix]
       render :partial=>"shared/baseline"
     else
-      render :partial=>"shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial=>"shared/#{AIRLINE_CODE}/baseline"
     end
   end
-
 
 
   def new_minutes
@@ -475,11 +485,13 @@ class ReportsController < ApplicationController
     render :partial => "shared/add_minutes"
   end
 
+
   def show_narrative
     @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
     render :partial => "show_narrative"
   end
+
 
   def airport_data
     icao = "%"+params[:icao]+"%"
@@ -498,18 +510,22 @@ class ReportsController < ApplicationController
     owner.records.each do |record|
       if record.status != 'Closed'
         record.close_date = Time.now
+        record.update_attributes(params[:report]) if record.is_asap
         record.status = 'Closed'
         record.save
         submission = record.submission
-        notify(record.submission.created_by,
-          "Your submission ##{submission.id} has been closed by analyst." + g_link(submission),
-          true, "Submission ##{submission.id} Closed")
-        Transaction.build_for(
-          submission,
-          'Close',
-          current_user.id,
-          'Report has been closed.'
-        )
+        if submission.present?
+          notify(record.submission, notice: {
+            users_id: record.created_by.id,
+            content: "Your submission ##{record.submission.id} has been closed by analyst."},
+            mailer: true, subject: "Submission ##{record.submission.id} Closed by Analyst")
+          Transaction.build_for(
+            submission,
+            'Close',
+            current_user.id,
+            'Report has been closed.'
+          )
+        end
         Transaction.build_for(
           record,
           'Close',

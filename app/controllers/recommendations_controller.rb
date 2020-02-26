@@ -20,15 +20,11 @@ class RecommendationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('recommendation') }
   before_filter :define_owner, only:[
-    :approve,
-    :assign,
-    :comment,
-    :complete,
-    :edit,
     :destroy,
+    :edit,
+    :interpret,
     :new_attachment,
     :override_status,
-    :reopen,
     :show,
     :update
   ]
@@ -90,40 +86,30 @@ class RecommendationsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:recommendation])
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Recommendation ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Recommendation Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Recommendation ##{@owner.id} needs your Approval." + g_link(@owner),
-          true, 'Recommendation Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Recommendation ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Recommendation Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Recommendation ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Recommendation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
       params[:recommendation][:close_date] = params[:recommendation][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:recommendation])
+    # @owner.update_attributes(params[:recommendation])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(

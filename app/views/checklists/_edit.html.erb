@@ -57,14 +57,14 @@
           <table class="table table-bordered table-striped mt10">
             <thead>
               <tr>
-                <%@record.checklist_header.checklist_header_items.order(:display_order).each do |item|%>
+                <%@record.checklist_header.checklist_header_items.each do |item|%>
                   <th width="<%=item.size%>%"><%=item.title%></th>
                 <%end%>
                 <%if action_name == 'edit'%><th>Actions</th><%end%>
               </tr>
             </thead>
             <tbody id="checklist_rows">
-              <%@record.checklist_rows.preload(:checklist_cells).each do |checklist_row|%>
+              <%@record.checklist_rows.each do |checklist_row|%>
                 <%=f.fields_for :checklist_rows, checklist_row do |row_form|%>
                   <%=render 'checklist_row_fields', :checklist_row => checklist_row, :f => row_form, :source => 'Existing'%>
                 <%end%>
@@ -73,7 +73,12 @@
           </table>
 
           <%if action_name == 'edit'%>
-            <%=link_to_add_fields "Add a Row", f, :checklist_rows, {:checklist_header => @record.checklist_header}%>
+            <%=link_to_add_fields 'Add a Row',
+              f,
+              :checklist_rows,
+              {:checklist_header => @record.checklist_header},
+              partial: 'checklist_row_fields'
+            %>
           <%end%>
 
         </div>

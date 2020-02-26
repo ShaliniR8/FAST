@@ -1,7 +1,12 @@
 class HazardsController < ApplicationController
 
   before_filter :set_table_name,:login_required
+  before_filter :define_owner, only: [:interpret]
 
+  def define_owner
+    @class = Object.const_get('Hazard')
+    @owner = Hazard.find(params[:id])
+  end
 
 
   def set_table_name
@@ -23,13 +28,11 @@ class HazardsController < ApplicationController
     @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
     @headers = @table.get_meta_fields('index')
     @table_name = "hazards"
-    if !current_user.has_access('sras', 'admin', admin: true, strict: true)
+    if !current_user.has_access('hazards', 'admin', admin: true, strict: true)
       hazards = Hazard.includes(:sra)
-      cars = hazards.where('sras.status in (?) and sras.responsible_user_id = ?',
+      cars = hazards.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'], current_user.id)
-      cars += hazards.where('sras.approver_id = ? OR sras.reviewer_id = ?',
-        current_user.id, current_user.id)
-      cars += hazards.where('sras.viewer_access = 1') if current_user.has_access('sras','viewer')
+      cars += hazards.where('approver_id = ?', current_user.id)
       cars += Hazard.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
@@ -81,7 +84,34 @@ class HazardsController < ApplicationController
   def update
     transaction = true
     @owner = Hazard.find(params[:id])
+
     case params[:commit]
+    when 'Assign'
+      @owner.update_attributes(params[:hazard])
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Hazard ##{@owner.id} has been assigned to you."},
+        mailer: true, subject: 'Hazard Assigned')
+    when 'Complete'
+      if @owner.approver
+        notify(@owner, notice: {
+          users_id: @owner.approver.id,
+          content: "Hazard ##{@owner.id} needs your Approval."},
+          mailer: true, subject: 'Hazard Pending Approval')
+      else
+        @owner.close_date = Time.now rescue nil
+      end
+    when 'Reject'
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Hazard ##{@owner.id} was Rejected by the Final Approver."},
+        mailer: true, subject: 'Hazard Reject') if @owner.responsible_user
+    when 'Approve'
+      @owner.close_date = Time.now rescue nil
+      notify(@owner, notice: {
+        users_id: @owner.responsible_user.id,
+        content: "Hazard ##{@owner.id} was Approved by the Final Approver."},
+        mailer: true, subject: 'Hazard Approved') if @owner.responsible_user
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:hazard][:status]}"
       params[:hazard][:close_date] = params[:hazard][:status] == 'Completed' ? Time.now : nil
@@ -258,10 +288,10 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     load_special_matrix_form("hazard", "mitigate", @owner)
-    if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
+    if CONFIG::GENERAL[:base_risk_matrix] && AIRLINE_CODE != 'Demo' && AIRLINE_CODE != 'Trial'
       render :partial=>"shared/mitigate"
     else
-      render :partial=>"shared/#{BaseConfig.airline[:code]}/mitigate"
+      render :partial=>"shared/#{AIRLINE_CODE}/mitigate"
     end
   end
 
@@ -271,10 +301,10 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     load_special_matrix_form("hazard", "baseline", @owner)
-    if BaseConfig.airline[:base_risk_matrix] && BaseConfig.airline_code != 'Demo'
+    if CONFIG::GENERAL[:base_risk_matrix] && AIRLINE_CODE != 'Demo' && AIRLINE_CODE != 'Trial'
       render :partial=>"shared/baseline"
     else
-      render :partial=>"shared/#{BaseConfig.airline[:code]}/baseline"
+      render :partial=>"shared/#{AIRLINE_CODE}/baseline"
     end
   end
 

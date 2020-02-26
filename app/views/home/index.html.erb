@@ -7,14 +7,12 @@
       <%=render "shared/alerts" %>
       <%if session[:mode] == "ASAP" && !@templates.empty?%>
         <%=render "new_submission"%>
-        <%if BaseConfig.airline[:enable_orm]%>
+        <%if CONFIG::GENERAL[:enable_orm]%>
           <%=render "new_orms"%>
         <%end%>
       <%end%>
       <%=render "news"%>
-      <div id="calendar-parent">
-        <%=render "calendar"%>
-      </div>
+      <%=render "calendar"%>
 
       <%= render "analytics_filter"%>
       <%= render "draw_chart" %>
@@ -27,11 +25,11 @@
         <%if current_user.has_access("corrective_actions", "index")%><%=render "corrective_actions"%><%end%>
         <%if current_user.has_access("records", "show") && current_user.has_access("reports", "show")%>
           <div id="risk-matrix-parent">
-            <%if BaseConfig.airline[:base_risk_matrix]%>
+            <%if CONFIG::GENERAL[:base_risk_matrix]%>
               <%=render "risk_matrix"%><%=render "after_matrix"%>
             <%else%>
-              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
-              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
+              <%=render "shared/#{AIRLINE_CODE}/dashboard_risk_matrix"%>
+              <%=render "shared/#{AIRLINE_CODE}/dashboard_after_matrix"%>
             <%end%>
           </div>
         <%end%>
@@ -52,11 +50,11 @@
         </div>
 
         <div id="risk-matrix-parent" class="col-xs-12 col-sm-12">
-          <%if BaseConfig.airline[:base_risk_matrix]%>
+          <%if CONFIG::GENERAL[:base_risk_matrix]%>
             <%=render "risk_matrix"%><%=render "after_matrix"%>
           <%else%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
-            <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
+            <%=render "shared/#{AIRLINE_CODE}/dashboard_risk_matrix"%>
+            <%=render "shared/#{AIRLINE_CODE}/dashboard_after_matrix"%>
           <%end%>
         </div>
 
@@ -68,14 +66,16 @@
         <%if current_user.has_access("hazards","index")%><%=render "hazards"%><%end%>
         <%if current_user.has_access("risk_controls","index")%><%=render "risk_controls"%><%end%>
         <%if current_user.has_access("safety_plans","index")%><%=render "safety_plans"%><%end%>
-        <%if current_user.has_access("hazards","index") && BaseConfig.airline_code != 'Demo'%>
+        <%if current_user.has_access('hazards','index') && AIRLINE_CODE != 'Demo'%>
           <div id="risk-matrix-parent">
-            <%if BaseConfig.airline[:base_risk_matrix]%>
-              <%=render "risk_matrix"%><%=render "after_matrix"%>
-            <%else%>
-              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_risk_matrix"%>
-              <%=render "shared/#{BaseConfig.airline[:code]}/dashboard_after_matrix"%>
-            <%end%>
+            <% if AIRLINE_CODE != 'Demo' && AIRLINE_CODE != 'Trial'%>
+              <%if CONFIG::GENERAL[:base_risk_matrix]%>
+                <%=render "risk_matrix"%><%=render "after_matrix"%>
+              <%else%>
+                <%=render "shared/#{AIRLINE_CODE}/dashboard_risk_matrix"%>
+                <%=render "shared/#{AIRLINE_CODE}/dashboard_after_matrix"%>
+              <%end%>
+            <% end %>
           </div>
         <%end%>
 
@@ -83,10 +83,10 @@
 
       <!-- SMS IM -->
       <%elsif session[:mode]=="SMS IM"%>
-        <%if BaseConfig.airline[:has_framework]%><%=render "frameworks"%><%end%> <!-- hide just for demo purpose, will release to Miami Air -->
+        <%if CONFIG.im::GENERAL[:has_framework]%><%=render "frameworks"%><%end%> <!-- hide just for demo purpose, will release to Miami Air -->
         <%=render "vps"%>
         <%=render "jobaids"%>
-        <%if BaseConfig.airline[:has_framework]%><%=render "fp"%><%end%><!-- hide just for demo purpose, will release to Miami Air -->
+        <%if CONFIG.im::GENERAL[:has_framework]%><%=render "fp"%><%end%><!-- hide just for demo purpose, will release to Miami Air -->
         <%=render "vpp"%>
         <%=render "jap"%>
       <%end%>

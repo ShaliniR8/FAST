@@ -1,6 +1,7 @@
+# Checklists V3
 class ChecklistHeaderItem < ActiveRecord::Base
-
-  belongs_to :checklist_header, foreign_key: :checklist_header_id, class_name: "ChecklistHeader"
+  default_scope order('display_order ASC')
+  belongs_to :checklist_header, foreign_key: :checklist_header_id, class_name: 'ChecklistHeader'
 
 
   def self.get_meta_fields(*args)

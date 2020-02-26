@@ -12,10 +12,10 @@ module ModelHelpers
   included do
 
     def self.get_avg_complete
-      candidates = self.where('status = ? and complete_date is not ? and open_date is not ? ', 'Completed', nil, nil)
+      candidates = self.where('status = ? and due_date is not ? and open_date is not ? ', 'Completed', nil, nil)
       if candidates.present?
         sum = 0
-        candidates.map{|x| sum += (x.complete_date - x.open_date).to_i}
+        candidates.map{|x| sum += (x.due_date - x.open_date).to_i}
         result = (sum.to_f / candidates.length.to_f).round(1)
         result
       else
@@ -63,7 +63,9 @@ module ModelHelpers
 
 
   def overdue
-    if self.respond_to?(:completion) #Mostly the primary forms of SA
+    if self.respond_to?(:due_date) # temporary for SR (keep below incase)
+      self.due_date < Time.now.to_date && self.status != 'Completed' rescue false
+    elsif self.respond_to?(:completion) #Mostly the primary forms of SA
       self.completion < Time.now.to_date && self.status != 'Completed' rescue false
     elsif self.respond_to?(:scheduled_completion_date) #Mostly SRA module
       self.status != "Completed" && self.scheduled_completion_date < Time.now.to_date rescue false

@@ -29,27 +29,20 @@
           <%=f.hidden_field :address_date, :value => Time.now%>
 
           <%=render "forms/form_fields",
-            :fields => ExtensionRequest.get_meta_fields('address'),
-            :record => @extension_request,
-            :f => f%>
+            fields: ExtensionRequest.get_meta_fields('address'),
+            record: @extension_request,
+            f: f%>
+
+          <div class="form-group col-xs-6">
+            <%=label_tag :due_date, 'Scheduled Completion Date'%>
+            <%=text_field_tag :due_date, @extension_request.owner.due_date, class: 'form-control field-date' %>
+          </div>
         </div>
-
-        <%=f.submit "Save",
-          :class => "btn btn-success pull-right mt10 mb20 mr20",
-          :disable_with => "Saving..."%>
-
+        <%=f.submit 'Address', class: "btn btn-success pull-right mt10 mr20", disable_with: "Adressing..."%>
       </div>
     <%end%>
-
   </div>
 </div>
-
-
-
-
-<script type="text/javascript">
-
-</script>
 
 
 

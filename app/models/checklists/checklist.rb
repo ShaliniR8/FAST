@@ -1,3 +1,4 @@
+# Checklist V3
 class Checklist < ActiveRecord::Base
 
   belongs_to :owner, polymorphic: true

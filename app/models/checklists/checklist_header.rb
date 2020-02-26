@@ -1,3 +1,4 @@
+# Checklist V3
 class ChecklistHeader < ActiveRecord::Base
   belongs_to :created_by, foreign_key: :created_by_id, class_name: "User"
   has_many :checklist_header_items, foreign_key: :checklist_header_id, dependent: :destroy

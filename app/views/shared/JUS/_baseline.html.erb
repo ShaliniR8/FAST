@@ -136,8 +136,8 @@
 
   function baseline(row_index,column_index){
     clear_baseline();
-    risk_table_def = <%=JUS_Config::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_indx = <%=JUS_Config::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_indx = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
     $('.baseline_risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");

@@ -66,14 +66,15 @@ class MeetingsController < ApplicationController
     if @meeting.review_end.blank? || @meeting.meeting_end.blank?
       end_time = Time.now
     else
-      end_time=@meeting.review_end > @meeting.meeting_end ?   @meeting.review_end  : @meeting.meeting_end
+      end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end  : @meeting.meeting_end
     end
 
-    send_notices(
-      @meeting.invitations,
-      "Meeting ##{@meeting.get_id} has been cancelled.",
-      true,
-      "Cancellation of Meeting ##{@meeting.get_id}")
+    @meeting.invitations.each do |inv|
+      notify(@meeting, notice: {
+        users_id: inv.users_id,
+        content: "Meeting ##{@meeting.id} has been canceled."},
+        mailer: true, subject: "Meeting Canceled")
+    end
 
     @meeting.reports.each do |x|
       Transaction.build_for(
@@ -94,15 +95,15 @@ class MeetingsController < ApplicationController
 
 
   def comment
-    @owner=Meeting.find(params[:id]).becomes(Meeting)
-    @comment=@owner.comments.new
-    render :partial=>"forms/viewer_comment"
+    @owner = Meeting.find(params[:id]).becomes(Meeting)
+    @comment = @owner.comments.new
+    render :partial => "forms/viewer_comment"
   end
 
 
   def set_table_name
     #Rails.logger.debug "#{controller_name}  #{action_name} set table!"
-    @table_name="meetings"
+    @table_name = "meetings"
   end
 
 
@@ -137,11 +138,12 @@ class MeetingsController < ApplicationController
       @meeting.set_datetimez
       @meeting.save
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
-      send_notices(
-        @meeting.invitations,
-        "You are invited to Meeting ##{@meeting.get_id}: #{@meeting.title}.  " + g_link(@meeting),
-        true,
-        "New Meeting Invitation")
+      @meeting.invitations.each do |inv|
+        notify(@meeting, notice: {
+          users_id: inv.users_id,
+          content: "You are invited to Meeting ##{@meeting.id}."},
+          mailer: true, subject: "New Meeting Invitation")
+      end
       redirect_to meeting_path(@meeting), flash: {success: "Meeting created."}
     else
       redirect_to new_meeting_path
@@ -238,11 +240,12 @@ class MeetingsController < ApplicationController
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
     when 'Close'
-      send_notices(
-        @owner.invitations,
-        "Meeting ##{@owner.get_id}: #{@owner.title} has been Closed." + g_link(@owner),
-        true,
-        "Meeting ##{@owner.get_id}: #{@owner.title} Closed")
+      @owner.invitations.each do |inv|
+        notify(@owner, notice: {
+          users_id: inv.users_id,
+          content: "Meeting ##{@owner.id} has been closed."},
+          mailer: true, subject: "Meeting Closed")
+      end
     when 'Add Attachment'
       transaction = false
     when 'Save Agenda'
@@ -257,20 +260,22 @@ class MeetingsController < ApplicationController
           new_inv.users_id = val
           new_inv.meeting = @owner
           new_inv.save
-          send_notice(new_inv,
-            "You are invited to Meeting ##{@owner.get_id}: #{@owner.title}.  " + g_link(@owner),
-            true, "New Meeting Invitation: #{@owner.title}")
+          notify(@owner, notice: {
+            users_id: new_inv.users_id,
+            content: "You are invited to Meeting ##{@owner.get_id}."},
+            mailer: true, subject: "New Meeting Invitation")
         end
       end
     end
     if params[:cancellation].present?
       params[:cancellation].each_pair do |index, val|
-        inv = @owner.invitations.where("users_id = ?", val)
+        inv = @owner.invitations.where("users_id = ?", val).first
         if inv.present?
-          send_notice(inv.first,
-            "You are no longer invited to Meeting ##{@owner.id}: #{@owner.title}.",
-            true, "Removed from Meeting: #{@owner.title}")
-          inv.first.destroy
+          notify(@owner, notice: {
+            users_id: inv.users_id,
+            content: "You are no longer invited to Meeting ##{@owner.id}."},
+            mailer: true, subject: 'Removed from Meeting')
+          inv.destroy
         end
       end
     end
@@ -287,42 +292,21 @@ class MeetingsController < ApplicationController
     @owner.set_datetimez
     @owner.save
     redirect_to meeting_path(@owner)
-
   end
-
-
 
 
   def edit
     @privileges = Privilege.find(:all)
-    @meeting=Meeting.find(params[:id])
-    @action="edit"
-    @headers=User.invite_headers
-    @users=User.find(:all) - [@meeting.host.user]
+    @meeting = Meeting.find(params[:id])
+    @action = 'edit'
+    @headers = User.invite_headers
+    @users = User.find(:all) - [@meeting.host.user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
-    @timezones=Meeting.get_timezones
-    @report_headers=Report.get_headers
+    @timezones = Meeting.get_timezones
+    @report_headers = Report.get_headers
     @associated_reports = @meeting.reports.map(&:id)
-    @reports= Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
   end
-
-
-
-
-  def send_notices(participations, message, mailer, subject)
-    participations.each do |p|
-      send_notice( p, message, true, subject)
-    end
-  end
-
-
-
-
-  def send_notice(p, message, mailer, subject=nil)
-    notify(p.user, message, mailer, subject)
-  end
-
-
 
 
   def get_reports
@@ -334,17 +318,13 @@ class MeetingsController < ApplicationController
   end
 
 
-
-
   def message
-    @meeting=Meeting.find(params[:id])
-    @users=@meeting.invitations.map{|x| x.user}
-    @options=Meeting.getMessageOptions
-    @headers=User.invite_headers
-    render :partial=>"message"
+    @meeting = Meeting.find(params[:id])
+    @users = @meeting.invitations.map{|x| x.user}
+    @options = Meeting.getMessageOptions
+    @headers = User.invite_headers
+    render :partial => "message"
   end
-
-
 
 
   def send_message
@@ -372,26 +352,22 @@ class MeetingsController < ApplicationController
     users.push(@meeting.host.user)
     users.uniq!{|x| x.id}
 
-    message = Message.create(
-      :subject => params[:subject],
-      :content => params[:message],
-      owner: @meeting,
-      :time => Time.now)
-    sent_from = SendFrom.create(
-      :messages_id => message.id,
-      :users_id => current_user.id)
+    message = @meeting.messages.create({
+      subject: params[:subject],
+      content: params[:message],
+      time: Time.now
+    })
+    sent_from = SendFrom.create(messages_id: message.id, users_id: current_user.id)
+
     users.each do |user|
-      SendTo.create(
-        :messages_id => message.id,
-        :users_id => user.id)
-      notify(User.find(user),
-        "You have a new internal message sent from Meeting ##{@meeting.id}: #{@meeting.title}. #{g_link(message)}",
-        true, 'New Internal Meeting Message')
+      SendTo.create(messages_id: message.id, users_id: user.id)
+      notify(message, notice: {
+        users_id: user,
+        content: "You have a new internal message sent from Meeting ##{@meeting.id}."},
+        mailer: true, subject: 'New Internal Meeting Message')
     end
     redirect_to meeting_path(@meeting)
   end
-
-
 
 
   def print
@@ -402,9 +378,6 @@ class MeetingsController < ApplicationController
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     send_data pdf.to_pdf, :filename => "Meeting_##{@meeting.get_id}.pdf"
   end
-
-
-
 
 
 end

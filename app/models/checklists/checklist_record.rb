@@ -1,3 +1,4 @@
+# Checklists V2
 class ChecklistRecord < ActiveRecord::Base
 
   def self.get_meta_fields(*args)

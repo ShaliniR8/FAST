@@ -19,19 +19,11 @@ class EvaluationsController < SafetyAssuranceController
   before_filter :login_required
   before_filter(only: [:show]) { check_group('evaluation') }
   before_filter :define_owner, only: [
-    :approve,
-    :assign,
-    :comment,
-    :complete,
     :destroy,
     :edit,
+    :interpret,
     :new_attachment,
-    :new_contact,
-    :new_cost,
-    :new_signature,
-    :new_task,
     :override_status,
-    :reopen,
     :show,
     :update,
     :upload_checklist,
@@ -71,40 +63,30 @@ class EvaluationsController < SafetyAssuranceController
 
   def update
     transaction = true
+    @owner.update_attributes(params[:evaluation])
+    send_notification(@owner, params[:commit])
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
-      notify(@owner.responsible_user,
-        "Evaluation ##{@owner.id} has been assigned to you." + g_link(@owner),
-        true, 'Evaluation Assigned')
     when 'Complete'
       if @owner.approver
         update_status = 'Pending Approval'
-        notify(@owner.approver,
-          "Evaluation ##{@owner.id} needs your Approval" + g_link(@owner),
-          true, 'Evaluation Pending Approval')
       else
         @owner.complete_date = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
     when 'Reject'
-      notify(@owner.responsible_user,
-        "Evaluation ##{@owner.id} was Rejected by the Final Approver." + g_link(@owner),
-        true, 'Evaluation Rejected')
     when 'Approve'
       @owner.complete_date = Time.now
       @owner.close_date = Time.now
-      notify(@owner.responsible_user,
-        "Evaluation ##{@owner.id} was Approved by the Final Approver." + g_link(@owner),
-        true, 'Evaluation Approved')
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:evaluation][:status]}"
       params[:evaluation][:close_date] = params[:evaluation][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
-    @owner.update_attributes(params[:evaluation])
+    # @owner.update_attributes(params[:evaluation])
     @owner.status = update_status || @owner.status
     if transaction
       Transaction.build_for(

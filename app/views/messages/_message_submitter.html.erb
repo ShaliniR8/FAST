@@ -9,8 +9,8 @@
   </div>
   <%=form_for @message, :html => {:multipart => true}, :class => "form-horizontal" do |f|%>
     <div class="panel-body">
-      <%=hidden_field_tag :to_anonymous, @owner.anonymous ? @owner.anonymous : !BaseConfig.airline[:show_submitter_name]%>
-      <%=render 'message_content_form', f: f%>
+      <%=hidden_field_tag :to_anonymous, @owner.anonymous ? @owner.anonymous : !CONFIG.sr::GENERAL[:show_submitter_name]%>
+      <%=render 'message_submitter_content_form', f: f%>
     </div>
   <%end%>
 </div>

@@ -66,3 +66,5 @@ gem 'oauth2', '~> 1.4.0'
 gem 'oauth', '~> 0.4.7'
 
 gem 'ruby-saml'
+
+gem 'roo', '2.7.0'
