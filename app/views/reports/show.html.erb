@@ -92,7 +92,7 @@
         </div>
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
-            <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.root_cause_lock? %></b>
+            <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.occurrence_lock? %></b>
             <%if current_user.has_access('reports','edit', admin: true)%>
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
