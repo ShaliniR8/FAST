@@ -339,8 +339,8 @@ module ApplicationHelper
     partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields" # #{association.to_s.singularize.downcase}_fields
     #partial ||= "#{association.to_s.singularize.downcase}_fields"
     target = customTarget || association.to_s
-    new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
-    fields = f.fields_for(target, new_object, :child_index => "new_#{association}") do |builder|
+    new_object = Object.const_get(association.to_s.singularize.titleize.delete(' ')).new
+    fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
       render partial, f:builder, source:'New', guest:@guest, locals: locals
     end
     link_to_function name,

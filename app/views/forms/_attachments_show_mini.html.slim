@@ -34,14 +34,14 @@ css:
           = attachment_field.hidden_field :id, value: attachment.id
       - else
         = link_to '<i class="glyphicon glyphicon-eye-open"></i>'.html_safe, '#',
-          class: 'btn btn-info show_preview_btn_mini pull-left',
+          class: 'btn btn-info btn-sm show_preview_btn_mini mt5',
           hover: 'tooltip',
           title: 'Preview',
           'data-toggle' => 'modal',
           'data-id' => attachment.id,
           'data-target' => '.bs-example-modal-lg'
         = link_to '<i class="glyphicon glyphicon-cloud-download"></i>'.html_safe, attachment.name.url,
-          class: 'btn btn-success pull-right',
+          class: 'btn btn-success btn-sm mt5',
           hover: 'tooltip',
           title: 'Download'
     div id="preview_attachment_#{attachment.id}" style='display: none;'
@@ -59,7 +59,8 @@ css:
       div id="#{owner.id}_add_attachments"
       = link_to_add_fields 'Add', f, :attachments, nil,
         { class: 'btn btn-success center-block add_attachment_mini' },
-        "#{owner.id}_add_attachments"
+        "#{owner.id}_add_attachments",
+        partial: "checklists/attachment_fields"
 
 javascript:
   $(function() {
@@ -67,7 +68,6 @@ javascript:
 
     $('.show_preview_btn_mini').click(function() {
       var attachment_id = $(this).data('id')
-      console.log(attachment_id)
       $('.modal-content').html($(`#preview_attachment_${attachment_id}`).html())
       $(window).trigger('resize')
     })
