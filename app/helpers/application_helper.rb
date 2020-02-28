@@ -327,24 +327,22 @@ module ApplicationHelper
   end
 
 
-  def link_to_add_fields(name, f, association, locals={}, linkOptions={}, customTarget=nil, partial:nil)
-    target = customTarget || association.to_s
-    new_object = Object.const_get(association.to_s.singularize.titleize.delete(' ')).new
-    #new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
-    partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields" # #{association.to_s.singularize.downcase}_fields
-    fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(partial, :f => builder, :source => 'New', :guest => @guest, :locals => locals)
-    end
-  # def link_to_add_fields(name, f, association, locals = {}, linkOptions = {}, customTarget = nil)
+  # def link_to_add_fields(name, f, association, locals={}, linkOptions={}, customTarget=nil, partial:nil)
   #   target = customTarget || association.to_s
   #   new_object = Object.const_get(association.to_s.singularize.titleize.delete(' ')).new
+  #   #new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
+  #   partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields" # #{association.to_s.singularize.downcase}_fields
   #   fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-  #     render "#{association.to_s.singularize.downcase}_fields",
-  #       f: builder,
-  #       source: 'New',
-  #       guest: @guest,
-  #       locals: locals
-    # end
+  #     render(partial, :f => builder, :source => 'New', :guest => @guest, :locals => locals)
+  #   end
+  def link_to_add_fields(name, f, association, locals={}, linkOptions={}, customTarget=nil, partial:nil)
+    partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields" # #{association.to_s.singularize.downcase}_fields
+    #partial ||= "#{association.to_s.singularize.downcase}_fields"
+    target = customTarget || association.to_s
+    new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
+    fields = f.fields_for(target, new_object, :child_index => "new_#{association}") do |builder|
+      render partial, f:builder, source:'New', guest:@guest, locals: locals
+    end
     link_to_function name,
       "add_fields(this, '#{association}', '#{escape_javascript(fields)}', '#{target}')",
       **linkOptions
