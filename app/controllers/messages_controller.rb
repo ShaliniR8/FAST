@@ -126,7 +126,7 @@ class MessagesController < ApplicationController
         send_to: :user,
         cc: :user
       ]).select(&:visible).map(&:message)
-    }.flatten
+    }.flatten.compact
     @messages.uniq!
 
     respond_to do |format|
