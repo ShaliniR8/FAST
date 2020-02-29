@@ -18,7 +18,7 @@
                 - comments.each do |c|
                   tr
                     td #{c.viewer.full_name rescue "<b>External</b> #{c.alt_user}".html_safe}
-                    td #{c.get_subnmission_time}
+                    td #{c.get_submission_time}
                     td #{c.get_content}
                     td
                       - if current_user == c.viewer
