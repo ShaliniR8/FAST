@@ -90,6 +90,7 @@
   function update_nested_fields(field) {
     var field_id = $(field).attr("data-id");
     var field_value = $(field).find('option:selected').attr("data-option");
+    //var field_value = $(field).val().trim().toLowerCase().replace(/[^a-zA-Z0-9 -]/, "").replace(/\s/g, "-");
     $(".nested_field_" + field_id).hide();
     $(".nested_field_" + field_id).parent().removeClass("graybox")
     $(".nested_field_" + field_id + "_" + field_value).show();
