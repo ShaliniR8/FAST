@@ -35,6 +35,9 @@ class Document < ActiveRecord::Base
           {name: 'User Privileges',               href: 'standard_video', class: 'tv', content: ['privileges']},
           {name: 'Creating/Editing a Custom ORM', href: 'standard_video', class: 'tv', content: ['custom_orms']},
           #{name: 'Risk Matrix Customization',     href: 'risk_matrix',    class: ''},
+          {name: 'Create Safety Reporting Templates', href: 'standard_video', class: 'tv', content: ['create_template']},
+          {name: 'Edit Safety Reporting Templates', href: 'standard_video', class: 'tv', content: ['edit_template']},
+          {name: 'Add Privileges to a Safety Reporting Template', href: 'standard_video', class: 'tv', content: ['add_privileges']},
         ]
       },
       {name: 'Safety Reporting', href: 'safety_reporting', class: 'doc title',
