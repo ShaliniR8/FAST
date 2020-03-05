@@ -371,77 +371,85 @@ class DefaultSafetyReportingConfig
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
     },
-    menu_items:
-      [
-        {title: 'Submissions', path: '#',
-          display: proc{|user:,**op|
-            priv_check.call(Object.const_get('Submission'), user, 'index', true, true) ||
-            priv_check.call(Object.const_get('Submission'), user, 'new', true, true) ||
-            priv_check.call(Object.const_get('Submission'), user, 'full', true, true)
-          },
-          subMenu: [
-            {title: 'All', path: 'submissions_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', true, true)}},
-            {title: 'In Progress', path: 'incomplete_submissions_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
-            {title: 'New', path: 'new_submission_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
-            {title: 'ORMs', path: '#',  header: true,
-              display: proc{|user:,**op| GENERAL[:enable_orm]}},
-            {title: 'All', path: 'orm_submissions_path',
-              display: proc{|user:,**op| GENERAL[:enable_orm]}},
-            {title: 'New', path: 'new_orm_submission_path',
-              display: proc{|user:,**op| GENERAL[:enable_orm]}},
-          ]
+    menu_items: {
+      'Submissions' => {
+        title: 'Submissions', path: '#',
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('Submission'), user, 'index', true, true) ||
+          priv_check.call(Object.const_get('Submission'), user, 'new', true, true) ||
+          priv_check.call(Object.const_get('Submission'), user, 'full', true, true)
         },
-        {title: 'Reports', path: 'records_path(status: "New")',
-          display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', true, true)}},
-        {title: 'Events',  path: '#',
-          display: proc{|user:,**op|
-            priv_check.call(Object.const_get('Report'), user, 'index', true, true)
-          },
-          subMenu: [
-            {title: 'All', path: 'reports_path(status: "New")',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
-            {title: 'Summary', path: 'summary_reports_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_summary]}},
-            {title: 'Tabulation', path: 'tabulation_reports_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_tabulation]}},
-          ]
+        subMenu: [
+          {title: 'All', path: 'submissions_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', true, true)}},
+          {title: 'In Progress', path: 'incomplete_submissions_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
+          {title: 'New', path: 'new_submission_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
+          {title: 'ORMs', path: '#',  header: true,
+            display: proc{|user:,**op| GENERAL[:enable_orm]}},
+          {title: 'All', path: 'orm_submissions_path',
+            display: proc{|user:,**op| GENERAL[:enable_orm]}},
+          {title: 'New', path: 'new_orm_submission_path',
+            display: proc{|user:,**op| GENERAL[:enable_orm]}},
+        ]
+      },
+      'Reports' => {
+        title: 'Reports', path: 'records_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', true, true)}
+      },
+      'Events' => {
+        title: 'Events',  path: '#',
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('Report'), user, 'index', true, true)
         },
-        {title: 'Meetings', path: '#',
-          display: proc{|user:,**op|
-            priv_check.call(Object.const_get('Meeting'), user, 'index', true, true) ||
-            priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)
-          },
-          subMenu: [
-            {title: 'All', path: 'meetings_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)}},
-            {title: 'New', path: 'new_meeting_path',
-              display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
-          ]
+        subMenu: [
+          {title: 'All', path: 'reports_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', true, true)}},
+          {title: 'Summary', path: 'summary_reports_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_summary]}},
+          {title: 'Tabulation', path: 'tabulation_reports_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_tabulation]}},
+        ]
+      },
+      'Meetings' => {
+        title: 'Meetings', path: '#',
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('Meeting'), user, 'index', true, true) ||
+          priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)
         },
-        {title: 'Corrective Actions', path: 'corrective_actions_path',
-          display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', true, true)}},
-        {title: 'FAA Reports', path: '#',
-          display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: true)},
-          subMenu: [
-            {title: 'All', path: 'faa_reports_path',
-              display: proc{|user:,**op| true}},
-            {title: 'New', path: 'new_faa_report_path',
-              display: proc{|user:,**op| true}},
-          ]
-        },
-        {title: 'Query Center', path: '#',
-          display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
-          subMenu: [
-            {title: 'All', path: 'queries_path',
-              display: proc{|user:,**op| true}},
-            {title: 'New', path: 'new_query_path',
-              display: proc{|user:,**op| true}},
-          ]
-        },
-      ]
+        subMenu: [
+          {title: 'All', path: 'meetings_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_meeting_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+        ]
+      },
+      'Corrective Actions' => {
+        title: 'Corrective Actions', path: 'corrective_actions_path',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', true, true)}
+      },
+      'FAA Reports' => {
+        title: 'FAA Reports', path: '#',
+        display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: true)},
+        subMenu: [
+          {title: 'All', path: 'faa_reports_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_faa_report_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
+      'Query Center' => {
+        title: 'Query Center', path: '#',
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        subMenu: [
+          {title: 'All', path: 'queries_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_query_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
+    }
 
   }
 
