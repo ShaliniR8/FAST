@@ -71,7 +71,7 @@
       $(window).trigger('resize');
     });
   });
-  $(".list_btn").on("click",function(){
+  $(document).on("click", ".list_btn", function() {
     $.get("/access_controls/"+$(this).closest('tr').attr('aid')+"/list_privileges",function(data){
       $(".modal-content").html(data);
       $(window).trigger('resize');
