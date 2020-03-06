@@ -11,6 +11,8 @@ class FFTConfig < DefaultConfig
     time_zone:                          'Mountain Time (US & Canada)',
 
     # SYSTEM CONFIGS
+    enable_sso:                         true,
+    has_mobile_app:                     true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
