@@ -10,6 +10,7 @@ class DefaultSafetyReportingConfig
     show_submitter_name:             true,      # Displays submitter names when access to show (admins will always see it)- default on
     submission_description:          true,      # Changes Character Limit or adds General Description - default on
     submission_description_required: true,
+    submission_time_zone:            false,
     template_nested_fields:          true,      # WIP nested smart forms functionality - default off
     enable_dual_report:              true,
 
