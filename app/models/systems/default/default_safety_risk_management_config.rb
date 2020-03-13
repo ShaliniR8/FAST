@@ -429,6 +429,56 @@ class DefaultSafetyRiskManagementConfig
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       }
     },
+    menu_items: {
+      'Sra' => {
+        title: 'SRA (SRM)', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'sras_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_sra_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'new', true, true)}},
+        ]
+      },
+      'Hazards' => {
+        title: 'Hazards', path: 'hazards_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Hazard'), user, 'index', true, true)},
+      },
+      'Risk Controls' => {
+        title: 'Risk Controls', path: 'risk_controls_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', true, true)},
+      },
+      'Safety Plans' => {
+        title: 'Safety Plans', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'safety_plans_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_safety_plan_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'new', true, true)}},
+        ]
+      },
+      'Meetings' => {
+        title: 'Meetings', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'srm_meetings_path(status: "All")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_srm_meeting_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+        ]
+      },
+      'Query Center' => {
+        title: 'Query Center', path: '#',
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        subMenu: [
+          {title: 'All', path: 'queries_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_query_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
+    }
   }
 
 end
