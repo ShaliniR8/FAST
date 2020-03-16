@@ -9,6 +9,7 @@
 
 .panel.panel-primary
   .panel-body
+    = link_to "Advanced Search", '#', class: "btn btn-primary pull-right mr5 ml10", id: "adv", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"
     h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
     ul class="nav nav-pills"
       - @object[:status].each do |status|
@@ -38,7 +39,19 @@ javascript:
   function loadContent(status) {
     $('li').removeClass('active');
     $('.status-' + status.toLowerCase()).addClass('active');
-    $.get('#{eval("load_records_#{controller_name}_path")}?status=' + status, function(data){
-      $('.records-table').html(data);
-    });
+    // $.get('#{eval("load_records_#{controller_name}_path")}?status=' + status, function(data){
+    //   $('.records-table').html(data);
+    // });
+
+    $.ajax({
+      type: "POST",
+      url: '#{eval("load_records_#{controller_name}_path")}?status=' + status,
+      data: {
+        ids: "#{escape_javascript(raw @records_id)}"
+      },
+      success: function(data){
+        $('.records-table').html(data);
+      }
+    })
+
   }

@@ -320,16 +320,7 @@
           <ul class="nav navbar-nav">
             <%if session[:mode].present?%>
               <li><a href ="/">Dashboard</a></li>
-            <%end%>
-
-            <%if session[:mode] == "ASAP"%>
-              <%=render :partial => '/layouts/asap'%>
-            <%elsif session[:mode] == "SMS IM"%>
-              <%=render :partial => '/layouts/smsim'%>
-            <%elsif session[:mode] == 'SMS'%>
-              <%=render :partial => '/layouts/sms'%>
-            <%elsif session[:mode] == 'SRM'%>
-              <%=render :partial => '/layouts/srm'%>
+              <%=render :partial => '/layouts/menu'%>
             <%end%>
           </ul>
 

@@ -43,6 +43,10 @@ class BSKSafetyReportingConfig < DefaultSafetyReportingConfig
             display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', true, true) && CONFIG.sr::GENERAL[:event_tabulation]}},
         ]
       },
+      'Corrective Actions' => {
+        title: 'Corrective Actions', path: 'corrective_actions_path(status: "All")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', true, true)}
+      },
     }
 
   })

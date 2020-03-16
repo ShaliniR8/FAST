@@ -152,7 +152,7 @@
   $(function(){
 
     $('#adv').on('click',function(){
-      $.get("<%=advanced_search_home_index_path(:table => @table)%>", function(data){
+      $.get("<%=advanced_search_home_index_path(:table => @table.name)%>", function(data){
         $(".modal-content").html(data);
         $(window).resize();
       });

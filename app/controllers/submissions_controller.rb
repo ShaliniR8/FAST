@@ -43,48 +43,60 @@ class SubmissionsController < ApplicationController
 
 
   def index
-    respond_to do |format|
-      format.html do
-        @table = Object.const_get('Submission').preload(CONFIG.hierarchy[session[:mode]][:objects]['Submission'][:preload])
-        index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-          args << 'admin' if current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name]
-          args
-        end
-        @headers = @table.get_meta_fields(*index_meta_field_args)
-        @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{
-          |x|
-          Rails.logger.info x[:field]
-          x[:field].present?
-        }
-        handle_search
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
 
-        @categories = Category.all
-        @fields = Field.all
-        @templates = Template.all
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
+    records = @records.to_a & records.to_a if @records.present?
 
-        records = @records
-          .where(:completed => 1)
-          .preload(:template, :created_by)
-          .can_be_accessed(current_user)
+    @records_hash = { 'All' => records }
+    @records_id   = { 'All' => records.map(&:id) }
 
-        @records = @records.to_a & records.to_a
-        records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
-        @records = @records.to_a & records.to_a
+    # respond_to do |format|
+    #   format.html do
+    #     @table = Object.const_get('Submission').preload(CONFIG.hierarchy[session[:mode]][:objects]['Submission'][:preload])
+    #     index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+    #       args << 'admin' if current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name]
+    #       args
+    #     end
+    #     @headers = @table.get_meta_fields(*index_meta_field_args)
+    #     @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{
+    #       |x|
+    #       Rails.logger.info x[:field]
+    #       x[:field].present?
+    #     }
+    #     handle_search
 
-        if params[:template]
-          records = @records.select{|x| x.template.name == params[:template]}
-        end
-        @records = @records.to_a & records.to_a
+    #     # @categories = Category.all
+    #     # @fields = Field.all
+    #     # @templates = Template.all
 
-        # handle custom view
-        if params[:custom_view].present?
-          selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
-          @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
-          @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
-        end
-      end
-      format.json { index_as_json }
-    end
+    #     # records = @records
+    #     #   .where(:completed => 1)
+    #     #   .preload(:template, :created_by)
+    #     #   .can_be_accessed(current_user)
+
+    #     # @records = @records.to_a & records.to_a
+    #     # records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
+    #     # @records = @records.to_a & records.to_a
+
+    #     # if params[:template]
+    #     #   records = @records.select{|x| x.template.name == params[:template]}
+    #     # end
+    #     # @records = @records.to_a & records.to_a
+
+    #     # # handle custom view
+    #     # if params[:custom_view].present?
+    #     #   selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
+    #     #   @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
+    #     #   @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+    #     # end
+    #   end
+    #   format.json { index_as_json }
+    # end
   end
 
 

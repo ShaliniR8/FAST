@@ -44,10 +44,13 @@ class CorrectiveActionsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("CorrectiveAction")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
 
     if !current_user.has_access('corrective_actions', 'admin', admin: true, strict: true)
       cars = CorrectiveAction.where('status in (?) and responsible_user_id = ?',
@@ -56,6 +59,12 @@ class CorrectiveActionsController < ApplicationController
       cars += CorrectiveAction.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
+
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 

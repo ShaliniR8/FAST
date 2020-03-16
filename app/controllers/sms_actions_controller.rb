@@ -60,18 +60,31 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def index
-    @table = Object.const_get("SmsAction")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @title = 'Corrective Actions'
-    if !current_user.has_access('sms_actions','admin', admin: true, strict: true)
-      cars = SmsAction.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += SmsAction.where('approver_id = ?',  current_user.id)
-      cars += SmsAction.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    # @table = Object.const_get("SmsAction")
+    # @headers = @table.get_meta_fields('index')
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+    # filter_sms_actions
+    # @title = 'Corrective Actions'
+
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_sms_actions
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+
   end
 
 
@@ -182,5 +195,16 @@ class SmsActionsController < SafetyAssuranceController
     end
   end
 
+private
+
+  def filter_sms_actions
+    if !current_user.has_access('sms_actions','admin', admin: true, strict: true)
+      cars = SmsAction.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+      cars += SmsAction.where('approver_id = ?',  current_user.id)
+      cars += SmsAction.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
+  end
 
 end

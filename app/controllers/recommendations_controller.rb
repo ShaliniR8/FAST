@@ -35,18 +35,29 @@ class RecommendationsController < SafetyAssuranceController
   end
 
   def index
-    @table = Object.const_get('Recommendation')
-    @headers = Recommendation.get_meta_fields('index')
-    @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
+    # @table = Object.const_get('Recommendation')
+    # @headers = Recommendation.get_meta_fields('index')
+    # @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+    # filter_recommendations
 
-    if !current_user.has_access('recommendations', 'admin', admin: true, strict: true)
-      cars = Recommendation.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Recommendation.where('approver_id = ?', current_user.id)
-      cars += Recommendation.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_recommendations
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -135,5 +146,16 @@ class RecommendationsController < SafetyAssuranceController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
+private
+
+  def filter_recommendations
+    if !current_user.has_access('recommendations', 'admin', admin: true, strict: true)
+      cars = Recommendation.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+      cars += Recommendation.where('approver_id = ?', current_user.id)
+      cars += Recommendation.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
+  end
 
 end

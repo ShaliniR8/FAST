@@ -33,6 +33,7 @@ class DefaultSafetyReportingConfig
 
       'Submission' => {
         title: 'Submission',
+        status: ['All'],
         preload: [:created_by, :template],
         fields: {
           id: { default: true, field: 'get_id' },
@@ -289,6 +290,7 @@ class DefaultSafetyReportingConfig
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',
+        status: ['New', 'Assigned', 'Completed', 'Pending Approval', 'All'],
         fields: {
           id: { default: true },
           status: { default: true, type: 'select', options: CorrectiveAction.getStatusOptions },
@@ -380,7 +382,7 @@ class DefaultSafetyReportingConfig
           priv_check.call(Object.const_get('Submission'), user, 'full', true, true)
         },
         subMenu: [
-          {title: 'All', path: 'submissions_path',
+          {title: 'All', path: 'submissions_path(status: "All")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', true, true)}},
           {title: 'In Progress', path: 'incomplete_submissions_path',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
@@ -426,7 +428,7 @@ class DefaultSafetyReportingConfig
         ]
       },
       'Corrective Actions' => {
-        title: 'Corrective Actions', path: 'corrective_actions_path',
+        title: 'Corrective Actions', path: 'corrective_actions_path(status: "New")',
         display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', true, true)}
       },
       'FAA Reports' => {
@@ -450,8 +452,6 @@ class DefaultSafetyReportingConfig
         ]
       },
     }
-
   }
-
 
 end

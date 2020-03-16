@@ -28,27 +28,30 @@ class SrasController < ApplicationController
   end
 
   def index
-    @title = "SRAs"
-    @table = Object.const_get("Sra")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    if params[:departments].present?
-      @records = @records.select{|rec| rec.departments.present? &&
-        rec.departments.any?{|x| params[:departments].include?(x)}
-      }
-    end
+    # @title = "SRAs"
+    # @table = Object.const_get("Sra")
+    # @headers = @table.get_meta_fields('index')
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+    # filter_sras
 
-    if !current_user.has_access('sras','admin', admin: true, strict: true)
-      cars = Sra.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
-        current_user.id)
-      cars += Sra.where('approver_id = ? OR reviewer_id = ?',
-        current_user.id, current_user.id)
-      cars += Sra.where(viewer_access: true) if current_user.has_access('sras','viewer')
-      cars += Sra.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_sras
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -455,5 +458,25 @@ class SrasController < ApplicationController
       edit_section(@section.owner.id, @section.id)
   end
 
+private
+
+  def filter_sras
+    if params[:departments].present?
+      @records = @records.select{|rec| rec.departments.present? &&
+        rec.departments.any?{|x| params[:departments].include?(x)}
+      }
+    end
+
+    if !current_user.has_access('sras','admin', admin: true, strict: true)
+      cars = Sra.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
+        current_user.id)
+      cars += Sra.where('approver_id = ? OR reviewer_id = ?',
+        current_user.id, current_user.id)
+      cars += Sra.where(viewer_access: true) if current_user.has_access('sras','viewer')
+      cars += Sra.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
+  end
 
 end

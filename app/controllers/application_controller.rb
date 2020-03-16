@@ -744,9 +744,16 @@ class ApplicationController < ActionController::Base
   def load_records
     object = CONFIG.hierarchy[session[:mode]][:objects][controller_name.classify]
     @table = Object.const_get(controller_name.classify).preload(object[:preload])
-    handle_search
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records = @records.to_a & records.to_a
+
+    ids = JSON.parse params["ids"].gsub('=>', ':')
+    if ids[params["status"]].present?
+      @records = @table.select { |record| ids[params["status"]].include? record.id }
+    else
+      @records = nil
+    end
+
+    # records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    # @records = @records.to_a & records.to_a
     @fields = @table.get_meta_fields('index')
     render :partial => 'forms/render_index_tab'
   end

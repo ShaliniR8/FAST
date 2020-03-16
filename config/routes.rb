@@ -279,6 +279,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'comment'
     end
     collection do
+      post 'load_records'
       get 'query'
       get 'advanced_search'
       get "detailed_search"
@@ -309,7 +310,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
     end
     collection do
-      get 'load_records'
+      post 'load_records'
       post "search"
       post "search_all"
       post "filter"
@@ -332,6 +333,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :reports do
     collection do
+      post 'load_records'
       get "add"
       get "bind"
       get 'print'
@@ -370,11 +372,14 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
     end
     collection do
+      post 'load_records'
+      get 'advanced_search'
       get "send_success"
     end
   end
   resources :corrective_actions do
     collection do
+      post 'load_records'
       get 'advanced_search'
       get 'get_term'
     end
@@ -447,6 +452,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'upload_checklist'
     end
     collection do
+      post 'load_records'
       get "advanced_search"
     end
   end
@@ -464,6 +470,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'upload_checklist'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
   end
@@ -479,6 +486,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'upload_checklist'
     end
     collection do
+      post 'load_records'
       get "advanced_search"
     end
   end
@@ -499,6 +507,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       get 'retract_cause_attributes'
       get 'retract_desc_attributes'
+      post 'load_records'
       get "advanced_search"
     end
   end
@@ -515,11 +524,13 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
   end
   resources :sms_actions do
     collection do
+      post 'load_records'
       get 'advanced_search'
       get 'get_term'
     end
@@ -542,6 +553,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
   end
@@ -573,6 +585,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'viewer_access'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
       get "new_section"
       post "add_section"
@@ -597,6 +610,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'comment'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
       get "retract_root_cause_categories"
       get "root_cause_trend"
@@ -608,6 +622,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :risk_controls do
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
     member do
@@ -626,6 +641,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :safety_plans do
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
     member do

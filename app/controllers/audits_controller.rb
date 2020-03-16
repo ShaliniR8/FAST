@@ -44,12 +44,30 @@ class AuditsController < SafetyAssuranceController
   def index
     respond_to do |format|
       format.html do
-        @table = Object.const_get("Audit")
-          .preload(CONFIG.hierarchy[session[:mode]][:objects]['Audit'][:preload])
-        @headers = @table.get_meta_fields('index')
-        @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-        handle_search
+        # @table = Object.const_get("Audit")
+        #   .preload(CONFIG.hierarchy[session[:mode]][:objects]['Audit'][:preload])
+        # @headers = @table.get_meta_fields('index')
+        # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+        # handle_search
+        # filter_audits
+
+        object_name = controller_name.classify
+        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+        @table = Object.const_get(object_name).preload(@object[:preload])
+        @default_tab = params[:status]
+
+        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+        if params[:advance_search].present?
+          handle_search
+        else
+          @records = records
+        end
         filter_audits
+        records = @records.to_a & records.to_a if @records.present?
+
+        @records_hash = records.group_by(&:status)
+        @records_hash['All'] = records
+        @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
       end
       format.json { index_as_json }
     end

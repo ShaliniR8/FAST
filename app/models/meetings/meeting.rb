@@ -1,5 +1,5 @@
 class Meeting < ProsafetBase
-
+  extend AnalyticsFilters
   include ModelHelpers
 
 #Concerns List

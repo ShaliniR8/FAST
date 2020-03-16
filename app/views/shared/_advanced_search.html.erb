@@ -12,6 +12,7 @@
   <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
     <%= form_tag @path, :method => "get" do%>
       <%=hidden_field_tag :advance_search, true%>
+      <%=hidden_field_tag :status, @status%>
       <%if @date_filter %>
         <%=render "shared/date_filter" %>
       <%end%>

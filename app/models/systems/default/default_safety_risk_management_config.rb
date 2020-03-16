@@ -17,6 +17,7 @@ class DefaultSafetyRiskManagementConfig
 
       'Sra' => {
         title: 'SRA',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },
@@ -176,6 +177,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'Hazard' => {
         title: 'Hazard',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         fields: {
           id: { default: true,
             field: 'get_id', title: 'Hazard ID'
@@ -251,6 +253,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'RiskControl' => {
         title: 'Risk Control',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         fields: {
           id: { default: true },
           status: { default: true },
@@ -325,6 +328,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'SafetyPlan' => {
         title: 'Safety Plan',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         fields: {
           id: { default: true,
             required: true

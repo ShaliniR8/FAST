@@ -336,9 +336,14 @@ class ReportsController < ApplicationController
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
     @default_tab = params[:status]
-    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records_hash = @records.group_by(&:status)
-    @records_hash['All'] = @records
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 

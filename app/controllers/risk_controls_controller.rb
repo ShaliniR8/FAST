@@ -31,20 +31,29 @@ class RiskControlsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("RiskControl")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
+    # @table = Object.const_get("RiskControl")
+    # @headers = @table.get_meta_fields('index')
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+    # filter_risk_controls
 
-    if !current_user.has_access('risk_controls', 'admin', admin: true, strict: true)
-      rcs = RiskControl.includes(hazard: :sra)
-      cars = rcs.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += rcs.where('approver_id = ?',  current_user.id)
-      cars += RiskControl.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_risk_controls
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -207,6 +216,22 @@ class RiskControlsController < ApplicationController
   def reopen
     @risk_control = RiskControl.find(params[:id])
     reopen_report(@risk_control)
+  end
+
+private
+
+  def filter_risk_controls
+
+    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
+
+    if !current_user.has_access('risk_controls', 'admin', admin: true, strict: true)
+      rcs = RiskControl.includes(hazard: :sra)
+      cars = rcs.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+      cars += rcs.where('approver_id = ?',  current_user.id)
+      cars += RiskControl.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
   end
 
 end
