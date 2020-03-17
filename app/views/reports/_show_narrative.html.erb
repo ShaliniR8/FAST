@@ -14,7 +14,7 @@
           <%if (current_user.has_template_access(record.template.name).include? 'full') ||
             ((current_user.has_template_access(record.template.name).include? 'viewer') && record.viewer_access)%>
             <%record.record_fields.each do |x|%>
-              <%if x.category.present? && x.category.title == 'Narratives' && !x.value.nil? && !x.value.empty?%>
+              <%if x.category.present? && x.display_type == 'textarea' && !x.value.nil? && !x.value.empty?%>
                 <b><%=x.field.label%></b></br>
                 <%=x.value %> </br></br>
               <%end%>

@@ -5,6 +5,8 @@ class FFTConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  MOBILE_MODULES = %w[ASAP]
+
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                               'Frontier Airlines',
