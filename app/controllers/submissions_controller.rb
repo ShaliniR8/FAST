@@ -227,6 +227,12 @@ class SubmissionsController < ApplicationController
       end
     end
 
+    # Update event_date in database (store in UTC)
+    event_date = DateTime.parse(params[:submission]["event_date"])
+    event_zone = params[:submission]["event_time_zone"]
+    utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
+    params[:submission]["event_date"] = utc_time
+
     @record = Submission.new(params[:submission])
 
     if @record.save

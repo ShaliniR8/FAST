@@ -72,7 +72,11 @@
             <%=date_to_string(field_value)%>
 
           <%when "datetime"%>
-            <%=datetime_to_string(field_value)%>
+            <% if record.event_time_zone.present? && field_name == "event_date" %>
+              <%=datetime_to_string(field_value.in_time_zone(record.event_time_zone)) + " " + record.event_time_zone%>
+            <% else %>
+              <%=datetime_to_string(field_value)%>
+            <% end %>
 
           <%when 'datetimez'%>
             <%=datetimez_to_string(field_value)%>

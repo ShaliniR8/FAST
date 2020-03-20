@@ -157,7 +157,7 @@
                 <%=label_tag :event_time_zone, "Time Zone"%>
                 <div class="input-group">
                   <%=f.select :event_time_zone,
-                    @record.getTimeZone,
+                     ActiveSupport::TimeZone.all.map(&:name),
                     {:include_blank => ""},
                     {:class => 'form-control tz atz toplevel_timezone'}%>
                   <span class="input-group-addon tc">All</span>
