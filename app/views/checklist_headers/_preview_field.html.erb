@@ -1,5 +1,6 @@
 <%options = (cell.options || item.options) rescue item.options%>
 
+
 <%case owner_type%>
 <%when 'Sample'%>
   <%case item.data_type%>
@@ -17,6 +18,15 @@
       <%options.split(";").each do |option|%>
         <label class="radio radio-inline">
           <%=radio_button_tag :value, option%>
+          <%=option%>
+        </label><br>
+      <%end%>
+    </div>
+  <%when 'checkboxes'%>
+    <div class="col-xs-12 ml5">
+      <%options.split(";").each do |option|%>
+        <label class="radio radio-inline">
+          <%=check_box_tag 'value[]', option%>
           <%=option%>
         </label><br>
       <%end%>
@@ -41,6 +51,17 @@
           <%=radio_button_tag "value_#{cell.id}", option, option == cell.value%>
           <%=option%>
         </label><br>
+      <%end%>
+    </div>
+  <%when 'checkboxes'%>
+    <div class="col-xs-12 ml5">
+      <%options.split(";").each do |option|%>
+        <div class="checkbox">
+          <label>
+            <%=check_box_tag "value_#{cell.id}", option, option == cell.value%>
+            <%=option%>
+          </label>
+        </div>
       <%end%>
     </div>
   <%end%>
