@@ -127,10 +127,11 @@
                 <%=label_tag :description,
                   "Event Title",
                   :style => "color:red" %>
-                  <%=f.text_field :description,
-                    {:class => "form-control required_field",
-                    :maxlength => "30",
-                    :placeholder => "please limit to 30 characters"}%>
+                <%=f.text_field :description,
+                  {:class => "form-control required_field",
+                  :maxlength => "30",
+                  :placeholder => "please limit to 30 characters"}%>
+                <h6 id="countchar" class="pull-right">0/30</h6>
               </div>
             <%end%>
 
@@ -288,6 +289,14 @@
 
   $(document).ready(function(){
 
+    // Count the characters limit
+    $('#submission_description, textarea').keyup(function(){
+      len = $(this).val().length;
+      max = $(this).attr('maxlength');
+
+      $(this).siblings('h6').text(len + '/' + max);
+    })
+
     update_timezones();
 
     // Get listing of all the airport buttons
@@ -320,18 +329,9 @@
         }
       });
     });
-
-
-
   });
 
-
-
-
-
-
 </script>
-
 
 
 <style type="text/css">

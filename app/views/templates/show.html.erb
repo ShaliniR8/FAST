@@ -60,7 +60,7 @@
             <%=text_field_tag :submitted_by, current_user.full_name, class: 'form-control', disabled: true%>
           </div>
 
-          <%if BaseConfig.airline[:submission_description]%>
+          <%if CONFIG.sr::GENERAL[:submission_description]%>
             <div class="col-xs-12 col-sm-4">
               <%=label_tag :event_title, 'Event Title'%>
               <%=text_field_tag :event_title, nil, class: 'form-control'%>
@@ -72,7 +72,7 @@
             <%=text_field_tag :event_date, nil, class: 'form-control field-datetime'%>
           </div>
 
-          <%if BaseConfig.airline[:submission_time_zone]%>
+          <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
             <div class="col-xs-12 col-sm-2 mb5">
               <%=label_tag :event_time_zone, "Time Zone"%>
               <div class="input-group">
@@ -81,7 +81,6 @@
               </div>
             </div>
           <%end%>
-
 
           <%@template.categories.where(deleted: false).order(:category_order).each do |cat|%>
             <%if cat.id == 338%>

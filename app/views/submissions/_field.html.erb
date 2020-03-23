@@ -33,10 +33,21 @@
           :id=>field.element_id}%>
 
       <%elsif field.display_type == "textarea"%>
-        <%=rf.text_area :value,
-          {:class => required + " form-control " + field.element_class,
-          :rows => 4,
-          :id => field.element_id}%>
+        <% if field.max_length.present? %>
+          <%=rf.text_area :value,
+            {:class => required + " form-control " + field.element_class,
+            :rows => 4,
+            :maxlength => field.max_length,
+            :placeholder => "please limit to #{ field.max_length} characters",
+            :id => field.element_id}%>
+
+          <h6 id="countchar" class="pull-right">0/<%= field.max_length %></h6>
+        <% else %>
+          <%=rf.text_area :value,
+            {:class => required + " form-control " + field.element_class,
+            :rows => 4,
+            :id => field.element_id}%>
+        <% end %>
 
       <%elsif field.display_type == "dropdown"%>
         <%if field.data_type == "timezone"%>
