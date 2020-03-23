@@ -64,6 +64,19 @@ class ChecklistsController < ApplicationController
 
   def update
     @record = @table.find(params[:id])
+
+    # TODO: refactor needed
+    params[:checklist][:checklist_rows_attributes].each do |x, y| 
+      y[:checklist_cells_attributes].each do |m, n| 
+        n.each do |key, value| 
+          if value.is_a?(Array)
+            n[:value].delete("")
+            n[:value] = n[:value].join(";")
+          end
+        end
+      end
+    end
+
     @record.update_attributes(params[:checklist])
     redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner
   end
