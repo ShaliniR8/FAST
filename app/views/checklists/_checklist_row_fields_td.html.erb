@@ -20,14 +20,10 @@
           <%end%>
         </div>
       <%else%>
-        <div class="col-xs-12 ml5">
-          <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
-            <label class="radio radio-inline">
-              <%=f.radio_button :value, option, class: "#{is_new ? 'changed' : ''}"%>
-              <%=option%>
-            </label><br>
-          <%end%>
-        </div>
+        <%=f.text_area :options,
+          value: (f.object.options || header_item.options),
+          class: "form-control #{is_new ? 'changed' : ''}",
+          rows: 4%>
       <%end%>
 
     <%when 'checkboxes'%>
@@ -43,17 +39,10 @@
           <%end%>
         </div>
       <%else%>
-        <!-- TODO: change to option text field -->
-        <div class="col-xs-12 ml5">
-          <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
-            <div class="checkbox">
-              <label>
-                <%=f.check_box :value, {class: "checkbox #{is_new ? 'changed' : ''}", multiple: true}, option, nil%>
-                <%=option%>
-              </label>
-            </div>
-          <%end%>
-        </div>
+        <%=f.text_area :options,
+          value: (f.object.options || header_item.options),
+          class: "form-control #{is_new ? 'changed' : ''}",
+          rows: 4%>
       <%end%>
 
     <%when 'dropdown'%>
