@@ -1,0 +1,125 @@
+ruby:
+	javascript_include_tag(
+		'utility/nested_fields',
+		'utility/checklist-control',
+		'utility/dirty-form',
+	)
+
+= form_for @record, html: {class: 'dirty-submit', multipart: true} do |f|
+
+	.col-xs-12
+		.panel.panel-warning
+			.panel-heading
+				.panel-title
+					= "#{action_name.titleize} Checklist"
+					= link_to "<span class='glyphicon glyphicon-remove'></span>".html_safe,
+						'#', class: 'close pull-right',
+						"data-dismiss" => "modal",
+						"aria-label" => "Close",
+						"data-backdrop" => "static",
+						"data-keyboard" => "false"
+
+			.panel-body style="max-height: calc(100vh - 210px);overflow-y:auto"
+				.col-xs-12
+
+					- if action_name == 'edit'
+
+						.col-xs-12.form-group.mb10
+							.col-xs-2.mt5
+								= f.label :title, 'Checklist Name', class: 'pull-right'
+							.col-xs-8
+								= f.text_field :title, class: 'form-control pull-left'
+
+						- if @record.owner_type != 'ChecklistHeader'
+							.col-xs-12.form-group.mb10
+								.col-xs-2.mt5
+									= f.label :assignee_ids, 'Assignees', class: 'pull-right'
+								.col-xs-8
+									= f.hidden_field :assignee_ids
+									= text_field_tag :assignee_names, '', class: 'form-control pull-left json-user-tags', id: 'assignee_names'
+
+						= render '/checklists/edit_instructions'
+
+					table class='table table-bordered table-striped mt10'
+						thead
+							tr
+								- @record.checklist_header.checklist_header_items.each do |item|
+									th width="#{item.size}%" = item.title
+								- if action_name == 'edit'
+									th Actions
+								- else
+									th Attachments
+						tbody id="checklist_rows"
+							- @record.checklist_rows.each do |checklist_row|
+								= f.fields_for :checklist_rows, checklist_row do |row_form|
+									= render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing'
+
+					- if action_name == 'edit'
+						= link_to_add_fields 'Add a Row', f, :checklist_rows, {checklist_header: @record.checklist_header}, partial: 'checklist_row_fields'
+
+					.mr10.mt10
+						= f.submit 'Save', class: 'btn btn-success pull-right', disable_with: 'Saving...'
+
+css:
+	.bootstrap-tagsinput {
+		padding: 6px 12px;
+	}
+	
+
+
+script src="/plugins/forms/bootstrap-tagsinput/bootstrap-tagsinput.js"
+script src="/js/libs/typeahead.bundle.js"
+
+javascript:
+	$(function(){
+    var users = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('full_name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      identify: function(obj) { console.log(obj); return obj.full_name;},
+      prefetch: {
+        url: '/users/user_json_request',
+        filter: function(users) {
+          return $.map(users, function(user) {
+            return {
+              full_name: user.full_name,
+              id: user.id
+            };
+          });
+        }
+      }
+    });
+    users.clearPrefetchCache();
+    users.initialize();
+    $('.json-user-tags').tagsinput({
+      freeInput: false,
+      itemValue: 'id',
+      itemText: 'full_name',
+      typeaheadjs: {
+        name: 'users',
+        displayKey: 'full_name',
+        source: users.ttAdapter()
+      }
+    });
+
+    // UPDATE ASSIGNEE LIST
+    $('.json-user-tags').on('itemAdded itemRemoved', function(event){
+      item_arr = $(this).tagsinput('items');
+      hiddenField = $("#checklist_assignee_ids");
+      if (!(typeof event.item === "undefined")) {
+        id_arr = [];
+        jQuery.each(item_arr, function(index, item) {
+          id_arr.push(item.id);
+        });
+        hiddenField.val(id_arr.toString());
+      }
+    });
+	});
+
+// DISPLAY EXISTING ASSIGNEES
+- assignees = @record.assignees.reverse
+- assignees.each do |assignee|
+	javascript:
+		$('#assignee_names').tagsinput('add', {"full_name": "#{assignee.full_name}", "id": parseInt("#{assignee.id}")});
+
+
+
