@@ -273,12 +273,21 @@ class UsersController < ApplicationController
   end
 
 
-
   def stop_simulation
     @user = User.find(params[:id])
     session.delete(:simulated_id)
     define_session_permissions
     redirect_to user_path(@user)
+  end
+
+
+  def user_json_request
+    respond_to do |format|
+      format.html
+      format.json {
+        render json: User.select('full_name, id').order(:full_name).uniq(&:full_name).collect{|u| u.attributes}
+      }
+    end
   end
 
   private

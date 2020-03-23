@@ -246,6 +246,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'get_json'   #Added by BP July 14 2017
       get 'submission_json'
       get "notices_json"    #added by BL OCT 10 2018
+      get 'user_json_request'
     end
   end
   resources :password_resets
