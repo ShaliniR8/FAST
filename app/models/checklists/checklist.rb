@@ -16,4 +16,8 @@ class Checklist < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def assignees
+    User.where(id: (self.assignee_ids || "").split(',').map(&:to_i))
+  end
+
 end
