@@ -123,16 +123,28 @@
             </div>
 
             <%if CONFIG.sr::GENERAL[:submission_description]%>
-              <div class="col-xs-12 col-sm-4 mb5">
-                <%=label_tag :description,
-                  "Event Title",
-                  :style => "color:red" %>
-                <%=f.text_field :description,
-                  {:class => "form-control required_field",
-                  :maxlength => "30",
-                  :placeholder => "please limit to 30 characters"}%>
-                <h6 id="countchar" class="pull-right">0/30</h6>
-              </div>
+              <%if CONFIG.sr::GENERAL[:submission_description_required]%>
+                <div class="col-xs-12 col-sm-4 mb5">
+                  <%=label_tag :description,
+                    "Event Title",
+                    :style => "color:red" %>
+                  <%=f.text_field :description,
+                    {:class => "form-control required_field",
+                    :maxlength => "30",
+                    :placeholder => "please limit to 30 characters"}%>
+                  <h6 id="countchar" class="pull-right">0/30</h6>
+                </div>
+              <% else %>
+                <div class="col-xs-12 col-sm-4 mb5">
+                  <%=label_tag :description,
+                    "Event Title"%>
+                  <%=f.text_field :description,
+                    {:class => "form-control",
+                    :maxlength => "30",
+                    :placeholder => "please limit to 30 characters"}%>
+                  <h6 id="countchar" class="pull-right">0/30</h6>
+                </div>
+              <% end %>
             <%end%>
 
             <div class="col-xs-12 col-sm-4 mb5">
