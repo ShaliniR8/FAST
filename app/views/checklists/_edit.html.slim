@@ -116,7 +116,7 @@ javascript:
 	});
 
 // DISPLAY EXISTING ASSIGNEES
-- assignees = @record.assignees.reverse
+- assignees = @record.assignees
 - assignees.each do |assignee|
 	javascript:
 		$('#assignee_names').tagsinput('add', {"full_name": "#{assignee.full_name}", "id": parseInt("#{assignee.id}")});

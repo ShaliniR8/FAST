@@ -34,6 +34,10 @@ ruby:
             - active = index == 0 ? 'active' : ''
             .tab-pane id="checklist-#{checklist.id}" class="#{active}"
 
+
+              b Assignees: 
+              = checklist.assignees.map(&:full_name).join(', ')
+
               - if owner.status != 'Completed' && (\
                 current_user.has_access(owner.class.table_name,'admin', admin: true) || \
                 owner.responsible_user_id == current_user.id)
