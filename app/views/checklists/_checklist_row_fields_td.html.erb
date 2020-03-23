@@ -1,6 +1,7 @@
 <%
   source ||= nil
   is_new = source.blank?
+  field_type = (checklist_cell.data_type || header_item.data_type) rescue header_item.data_type
 %>
 
 <td>
@@ -9,9 +10,19 @@
     <%=checklist_cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%else%>
 
+    <%if header_item.editable && action_name != 'start'%>
+      <%=f.select :data_type,
+        options_for_select(ChecklistHeaderItem.get_data_types, checklist_cell.data_type || header_item.data_type),
+        {}, class: "form-control mb5"%>
 
+      <%=f.text_area :options,
+        value: (f.object.options || header_item.options),
+        class: "form-control #{is_new ? 'changed' : ''}",
+        rows: 4%>
 
-    <%case header_item.data_type%>
+    <%else%>
+
+    <%case field_type%>
     <%when 'radio'%>
       <%if action_name == 'start'%>
         <div class="col-xs-12 ml5">
@@ -31,16 +42,13 @@
 
     <%when 'checkboxes'%>
       <%field_value = checklist_cell.value.split(';') rescue []%>
-      
       <%if action_name == 'start'%>
         <div class="col-xs-12 ml5">
           <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
-            <div class="checkbox">
-              <label class="radio radio-inline">
-                <%=f.check_box :value, {multiple: true, class: "checkbox #{is_new ? 'changed' : ''}", checked:(field_value.include?option)}, option, nil%>
-                <%=option%>
-              </label>
-            </div>
+            <label class="checkbox checkbox-inline">
+              <%=f.check_box :value, {multiple: true, class: "checkbox #{is_new ? 'changed' : ''}", checked:(field_value.include?option)}, option, nil%>
+              <%=option%>
+            </label><br>
           <%end%>
         </div>
       <%else%>
@@ -65,11 +73,15 @@
         %>
       <%end%>
     <%when 'text'%>
-      <%= f.text_area :value,
+      <%=f.text_area :value,
         class: "form-control #{is_new ? 'changed' : ''}",
         rows: 4
       %>
     <%end%>
+
+
+    <%end%>
+
     <%= f.hidden_field :checklist_header_item_id,
       value: header_item.id,
       class: "#{is_new ? 'changed' : ''}"

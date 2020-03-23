@@ -2,6 +2,7 @@
 
 <tr class='field_group to_delete <%= is_header ? 'header-row' : '' %>'>
 
+
   <%if source == 'Existing'%>
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
       <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
