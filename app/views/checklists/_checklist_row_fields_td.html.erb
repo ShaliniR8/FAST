@@ -8,6 +8,9 @@
         (action_name == 'start' && checklist_cell.checklist_row.is_header rescue true)%>
     <%=checklist_cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%else%>
+
+
+
     <%case header_item.data_type%>
     <%when 'radio'%>
       <%if action_name == 'start'%>
@@ -27,12 +30,14 @@
       <%end%>
 
     <%when 'checkboxes'%>
+      <%field_value = checklist_cell.value.split(';') rescue []%>
+      
       <%if action_name == 'start'%>
         <div class="col-xs-12 ml5">
           <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
             <div class="checkbox">
               <label class="radio radio-inline">
-                <%=f.check_box :value, {class: "checkbox #{is_new ? 'changed' : ''}", multiple: true}, option, nil%>
+                <%=f.check_box :value, {multiple: true, class: "checkbox #{is_new ? 'changed' : ''}", checked:(field_value.include?option)}, option, nil%>
                 <%=option%>
               </label>
             </div>

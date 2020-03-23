@@ -67,7 +67,12 @@
   <%end%>
 
 <%else%>
-  <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+  <%case item.data_type%>
+  <%when 'checkboxes', 'radio', 'dropdown'%>
+    <%=cell.value.split(';').join('<br>').html_safe rescue ''%>
+  <%else%>
+    <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+  <%end%>
 <%end%>
 
 
