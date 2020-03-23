@@ -5,11 +5,11 @@ $(function() {
   $(dirtyFormSelector).submit(function(event) {
     event.preventDefault()
 
-    var excludes = ['utf8', '_method', 'authenticity_token'].reduce(function(excludeString, name) {
-        return `${excludeString}:not([name='${name}'])`
-    }, '')
+    // var excludes = ['utf8', '_method', 'authenticity_token'].reduce(function(excludeString, name) {
+    //     return `${excludeString}:not([name='${name}'])`
+    // }, '')
 
-    $(`${dirtyFormSelector} :input:not(.changed)${excludes}`).prop('disabled', true)
+    // $(`${dirtyFormSelector} :input:not(.changed)${excludes}`).prop('disabled', true)
 
     this.submit()
   })
