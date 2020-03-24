@@ -9,7 +9,10 @@
 
 .panel.panel-primary
   .panel-body
-    = link_to "Advanced Search", '#', class: "btn btn-primary pull-right mr5 ml10", id: "adv", "data-toggle" => "modal", "data-target" => ".bs-example-modal-lg"
+    = link_to "Advanced Search", '#',
+      class: "btn btn-primary pull-right mr5 ml10", id: "adv",
+      "data-toggle" => "modal",
+      "data-target" => ".bs-example-modal-lg"
     h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
     ul class="nav nav-pills"
       - @object[:status].each do |status|
@@ -19,6 +22,7 @@
 
     .tab-content.mt20
       .tab-pane.fade.in.active id='table'
+        = render 'shared/loaders', loader_text: 'Loading'
         .records-table
 
 
@@ -49,9 +53,10 @@ javascript:
       data: {
         ids: "#{escape_javascript(raw @records_id)}"
       },
-      success: function(data){
-        $('.records-table').html(data);
-      }
-    })
+      beforeSend: function(){$(".records-table").css({'opacity':0.5}); $('#loader1').show();},
+      success: function(data){$('.records-table').html(data);},
+      complete: function(){$('#loader1').hide();$(".records-table").css({'opacity':1});},
+      error: function(response){console.log(response);}
+    });
 
   }
