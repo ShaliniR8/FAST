@@ -1,4 +1,4 @@
-class Im < ActiveRecord::Base
+class Im < ProsafetBase
   extend AnalyticsFilters
 
 #Concerns List
