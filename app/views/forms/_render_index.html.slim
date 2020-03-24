@@ -9,11 +9,11 @@
 
 .panel.panel-primary
   .panel-body
+    h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
     = link_to "Advanced Search", '#',
-      class: "btn btn-primary pull-right mr5 ml10", id: "adv",
+      class: "btn btn-default pull-right mr10 ml10", id: "adv",
       "data-toggle" => "modal",
       "data-target" => ".bs-example-modal-lg"
-    h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
     ul class="nav nav-pills"
       - @object[:status].each do |status|
         li class="nav-item status-#{status.parameterize}"
