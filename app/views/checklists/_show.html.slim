@@ -34,7 +34,6 @@ ruby:
             - active = index == 0 ? 'active' : ''
             .tab-pane id="checklist-#{checklist.id}" class="#{active}"
 
-
               b Assignees: 
               = checklist.assignees.map(&:full_name).join(', ')
 
@@ -60,6 +59,10 @@ ruby:
                   :confirm => 'Are you sure?',
                   :disable_with => 'Deleting...',
                   :class => 'btn btn-danger pull-right mr5'
+
+              = link_to "Export CSV", export_checklist_path(checklist, format: "csv"),
+                class: "btn btn-success pull-right mr5",
+                target: "_blank"
 
               = render '/checklists/checklist_table', checklist: checklist
 
