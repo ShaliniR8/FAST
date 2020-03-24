@@ -162,7 +162,7 @@ class ChecklistsController < ApplicationController
           checklist_row = ChecklistRow.create({
             checklist_id: owner.id,
             created_by_id: current_user.id,
-            is_header: has_header_col && is_header && is_header.upcase == 'Y'
+            is_header: has_header_col && is_header && (is_header.upcase == 'Y' || is_header.upcase == 'YES')
           })
 
           checklist_header_items.each_with_index do |header_item, index|
