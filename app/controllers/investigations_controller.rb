@@ -105,12 +105,6 @@ class InvestigationsController < SafetyAssuranceController
   end
 
   def index
-    # @table = Object.const_get("Investigation")
-    # @headers = @table.get_meta_fields('index')
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_investigations
-
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
@@ -122,7 +116,7 @@ class InvestigationsController < SafetyAssuranceController
     else
       @records = records
     end
-    filter_investigations
+    filter_records(object_name, controller_name)
     records = @records.to_a & records.to_a if @records.present?
 
     @records_hash = records.group_by(&:status)
@@ -193,30 +187,4 @@ class InvestigationsController < SafetyAssuranceController
       render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
-
-private
-
-  def filter_investigations
-    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-    if !current_user.has_access('investigations', 'admin', admin: true, strict: true)
-      cars = Investigation.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Investigation.where('approver_id = ?',  current_user.id)
-      if current_user.has_access('investigations','viewer')
-        Investigation.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.blank?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
-      end
-      cars += Investigation.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
-    end
-  end
-
 end

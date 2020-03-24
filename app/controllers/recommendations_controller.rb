@@ -35,12 +35,6 @@ class RecommendationsController < SafetyAssuranceController
   end
 
   def index
-    # @table = Object.const_get('Recommendation')
-    # @headers = Recommendation.get_meta_fields('index')
-    # @terms = Recommendation.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_recommendations
-
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
@@ -52,7 +46,7 @@ class RecommendationsController < SafetyAssuranceController
     else
       @records = records
     end
-    filter_recommendations
+    filter_records(object_name, controller_name)
     records = @records.to_a & records.to_a if @records.present?
 
     @records_hash = records.group_by(&:status)
@@ -145,17 +139,4 @@ class RecommendationsController < SafetyAssuranceController
     filename = "Recommendation_##{@recommendation.get_id}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
-
-private
-
-  def filter_recommendations
-    if !current_user.has_access('recommendations', 'admin', admin: true, strict: true)
-      cars = Recommendation.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Recommendation.where('approver_id = ?', current_user.id)
-      cars += Recommendation.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
-    end
-  end
-
 end

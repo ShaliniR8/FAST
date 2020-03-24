@@ -44,13 +44,6 @@ class AuditsController < SafetyAssuranceController
   def index
     respond_to do |format|
       format.html do
-        # @table = Object.const_get("Audit")
-        #   .preload(CONFIG.hierarchy[session[:mode]][:objects]['Audit'][:preload])
-        # @headers = @table.get_meta_fields('index')
-        # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-        # handle_search
-        # filter_audits
-
         object_name = controller_name.classify
         @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
         @table = Object.const_get(object_name).preload(@object[:preload])
@@ -62,7 +55,7 @@ class AuditsController < SafetyAssuranceController
         else
           @records = records
         end
-        filter_audits
+        filter_records(object_name, controller_name)
         records = @records.to_a & records.to_a if @records.present?
 
         @records_hash = records.group_by(&:status)
@@ -248,30 +241,4 @@ class AuditsController < SafetyAssuranceController
   def download_checklist
     @audit = Audit.find(params[:id])
   end
-
-
-private
-
-  def filter_audits
-    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-    if !current_user.has_access('audits','admin', admin: true, strict: true)
-      cars = Audit.where('(status in (:status) AND responsible_user_id = :id) OR approver_id = :id OR created_by_id = :id',
-        { status: ['Assigned', 'Pending Approval', 'Completed'], id: current_user[:id] }
-      )
-      if current_user.has_access('audits','viewer')
-        Audit.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.blank?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
-      end
-      @records = @records & cars
-    end
-  end
-
 end

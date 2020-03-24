@@ -60,13 +60,6 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def index
-    # @table = Object.const_get("SmsAction")
-    # @headers = @table.get_meta_fields('index')
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_sms_actions
-    # @title = 'Corrective Actions'
-
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
@@ -78,13 +71,12 @@ class SmsActionsController < SafetyAssuranceController
     else
       @records = records
     end
-    filter_sms_actions
+    filter_records(object_name, controller_name)
     records = @records.to_a & records.to_a if @records.present?
 
     @records_hash = records.group_by(&:status)
     @records_hash['All'] = records
     @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
-
   end
 
 
@@ -194,17 +186,4 @@ class SmsActionsController < SafetyAssuranceController
       render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
-
-private
-
-  def filter_sms_actions
-    if !current_user.has_access('sms_actions','admin', admin: true, strict: true)
-      cars = SmsAction.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += SmsAction.where('approver_id = ?',  current_user.id)
-      cars += SmsAction.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
-    end
-  end
-
 end

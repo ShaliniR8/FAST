@@ -758,6 +758,39 @@ class ApplicationController < ActionController::Base
     render :partial => 'forms/render_index_tab'
   end
 
+  def filter_records(object_name, controller_name)
+    if %w[Aduit Inspection Evaluation Investigation].include? object_name
+      @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
+      if !current_user.has_access(controller_name,'admin', admin: true, strict: true)
+        cars =  Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
+          ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+        cars +=  Object.const_get(object_name).where('approver_id = ?',  current_user.id)
+        if current_user.has_access(controller_name,'viewer')
+           Object.const_get(object_name).where('viewer_access = true').each do |viewable|
+            if viewable.privileges.blank?
+              cars += [viewable]
+            else
+              viewable.privileges.each do |privilege|
+                current_user.privileges.include? privilege
+                cars += [viewable]
+              end
+            end
+          end
+        end
+        cars +=  Object.const_get(object_name).where('created_by_id = ?', current_user.id)
+        @records = @records & cars
+      end
+    else # Findings, Corrective Actions, Recommendations
+      if !current_user.has_access(controller_name, 'admin', admin: true, strict: true)
+        cars = Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
+          ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+        cars += Object.const_get(object_name).where('approver_id = ?', current_user.id)
+        cars += Object.const_get(object_name).where('created_by_id = ?', current_user.id)
+        @records = @records & cars
+      end
+    end
+  end
+
 
   private
 

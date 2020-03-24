@@ -62,12 +62,6 @@ class FindingsController < SafetyAssuranceController
 
 
   def index
-    # @table = Object.const_get("Finding")
-    # @headers = @table.get_meta_fields('index')
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_findings
-
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
@@ -79,7 +73,7 @@ class FindingsController < SafetyAssuranceController
     else
       @records = records
     end
-    filter_findings
+    filter_records(object_name, controller_name)
     records = @records.to_a & records.to_a if @records.present?
 
     @records_hash = records.group_by(&:status)
@@ -186,18 +180,5 @@ class FindingsController < SafetyAssuranceController
       render :partial => "shared/#{AIRLINE_CODE}/baseline"
     end
   end
-
-private
-
-  def filter_findings
-    if !current_user.has_access('findings','admin', admin: true, strict: true)
-      cars = Finding.where('status in (?) AND responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Finding.where('approver_id = ?',  current_user.id)
-      cars += Finding.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
-    end
-  end
-
 end
 

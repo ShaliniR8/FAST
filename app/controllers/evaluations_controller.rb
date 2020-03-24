@@ -119,12 +119,6 @@ class EvaluationsController < SafetyAssuranceController
 
 
   def index
-    # @table = Object.const_get("Evaluation")
-    # @headers = @table.get_meta_fields('index')
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_evaluations
-
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
@@ -136,14 +130,12 @@ class EvaluationsController < SafetyAssuranceController
     else
       @records = records
     end
-    filter_evaluations
+    filter_records(object_name, controller_name)
     records = @records.to_a & records.to_a if @records.present?
 
     @records_hash = records.group_by(&:status)
     @records_hash['All'] = records
     @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
-
-
   end
 
 
@@ -210,30 +202,4 @@ class EvaluationsController < SafetyAssuranceController
   def download_checklist
     @evaluation = Evaluation.find(params[:id])
   end
-
-private
-
-  def filter_evaluations
-    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-    if !current_user.has_access('evaluations', 'admin', admin: true, strict: true)
-      cars = Evaluation.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Evaluation.where('approver_id = ?',  current_user.id)
-      if current_user.has_access('evaluations','viewer')
-        Evaluation.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.blank?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
-      end
-      cars += Evaluation.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
-    end
-  end
-
 end
