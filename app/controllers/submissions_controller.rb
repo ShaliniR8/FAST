@@ -45,7 +45,7 @@ class SubmissionsController < ApplicationController
   def index
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
+    @table = Object.const_get(object_name).preload(@object[:preload]).where("completed is true")
     @default_tab = params[:status]
 
     records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
@@ -229,11 +229,14 @@ class SubmissionsController < ApplicationController
 
     # Update event_date in database (store in UTC)
     time_zone = params[:submission]["event_time_zone"]
+    time = params[:submission]["event_date"].present?
 
     event_zone = time_zone.nil? ? time_zone : Time.zone.name
-    event_date = DateTime.parse(params[:submission]["event_date"])
+    event_date = time.present? ? DateTime.parse(time) : Time.zone.now
+
     utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
     params[:submission]["event_date"] = utc_time
+    params[:submission]["event_time_zone"] = 'UTC' unless time_zone.present?
 
     @record = Submission.new(params[:submission])
 
