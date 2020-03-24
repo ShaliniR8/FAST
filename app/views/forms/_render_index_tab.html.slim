@@ -28,11 +28,7 @@ table id='records_table' class='table table-hover table-striped table-bordered i
               - when 'date'
                 = date_to_string(field_value)
               - when 'datetime'
-                - tz = ' '
-                - if record.event_time_zone.present? && field_name == "event_date" && record.event_date.present?
-                  - tz += record.event_time_zone
-                  - field_value = field_value.in_time_zone(record.event_time_zone)
-                = datetime_to_string(field_value) + tz
+                = datetime_to_string(field_value.in_time_zone(Time.zone.name)) + " #{Time.zone.now.strftime("%Z")}"
               - when 'datetimez'
                 = datetimez_to_string(field_value)
               - when 'checkbox'
