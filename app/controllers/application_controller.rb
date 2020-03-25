@@ -723,7 +723,7 @@ class ApplicationController < ActionController::Base
   def notify(record, arg)
     if arg[:notice][:users_id].present? && record.present?
       notice = record.notices.create(arg[:notice])
-      byebug if notice.owner_type.nil?
+      puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
         NotifyMailer.notify(notice, arg[:subject])
       end

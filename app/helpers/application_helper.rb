@@ -252,7 +252,6 @@ module ApplicationHelper
     when 'VpIm', "JobAid", "FrameworkIm"
       entry_url = im_url(entry)
     else
-      byebug
       entry_url = "N/A"
     end
     "    <a style='font-weight:bold;text-decoration:underline' href='#{entry_url}'>View</a>"
