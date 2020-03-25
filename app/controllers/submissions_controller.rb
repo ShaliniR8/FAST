@@ -231,7 +231,7 @@ class SubmissionsController < ApplicationController
     time_zone = params[:submission]["event_time_zone"]
     time = params[:submission]["event_date"].present?
 
-    event_zone = time_zone.nil? ? time_zone : Time.zone.name
+    event_zone = time_zone.present? ? time_zone : Time.zone.name
     event_date = time.present? ? DateTime.parse(time) : Time.zone.now
 
     utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
