@@ -229,7 +229,7 @@ class SubmissionsController < ApplicationController
 
     # Update event_date in database (store in UTC)
     time_zone = params[:submission]["event_time_zone"]
-    time = params[:submission]["event_date"].present?
+    time = params[:submission]["event_date"]
 
     event_zone = time_zone.present? ? time_zone : Time.zone.name
     event_date = time.present? ? DateTime.parse(time) : Time.zone.now

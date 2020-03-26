@@ -13,6 +13,7 @@ class DefaultSafetyReportingConfig
     submission_time_zone:            false,
     template_nested_fields:          true,      # WIP nested smart forms functionality - default off
     enable_dual_report:              true,
+    matrix_carry_over:               false,
 
     # Airline-Specific Features:
     observation_phases_trend: false,     # Specific Feature for BSK - default off

@@ -5,6 +5,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
     show_submitter_name:      false,
     enable_dual_report:       false,
     submission_time_zone:     true,
+    matrix_carry_over:        true,
     # Airline-Specific Features:
   })
 

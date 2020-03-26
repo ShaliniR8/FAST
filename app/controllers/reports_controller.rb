@@ -511,10 +511,40 @@ class ReportsController < ApplicationController
 
   private
 
+  def carry_over_baseline(owner, record)
+    return unless CONFIG.sr::GENERAL[:matrix_carry_over]
+
+    baseline_risk_matrix = {
+      likelihood: owner.likelihood,
+      severity: owner.severity,
+      risk_factor: owner.risk_factor,
+      severity_extra: owner.severity_extra,
+      probability_extra: owner.probability_extra
+    }
+
+    record.update_attributes(baseline_risk_matrix)
+  end
+
+  def carry_over_mitigate(owner, record)
+    return unless CONFIG.sr::GENERAL[:matrix_carry_over]
+
+    mitigate_risk_matrix = {
+      likelihood_after: owner.likelihood_after,
+      severity_after: owner.severity_after,
+      risk_factor_after: owner.risk_factor_after,
+      mitigated_severity: owner.mitigated_severity,
+      mitigated_probability: owner.mitigated_probability
+    }
+
+    record.update_attributes(mitigate_risk_matrix)
+  end
+
   def close_records(owner)
     owner.records.each do |record|
       if record.status != 'Closed'
         record.close_date = Time.now
+        carry_over_baseline(owner, record)
+        carry_over_mitigate(owner, record)
         record.update_attributes(params[:report]) if record.is_asap
         record.status = 'Closed'
         record.save
