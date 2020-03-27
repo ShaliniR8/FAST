@@ -513,6 +513,7 @@ class ReportsController < ApplicationController
 
   def carry_over_baseline(owner, record)
     return unless CONFIG.sr::GENERAL[:matrix_carry_over]
+    return if record.risk_factor.present?
 
     baseline_risk_matrix = {
       likelihood: owner.likelihood,
@@ -527,6 +528,7 @@ class ReportsController < ApplicationController
 
   def carry_over_mitigate(owner, record)
     return unless CONFIG.sr::GENERAL[:matrix_carry_over]
+    return if record.risk_factor_after.present?
 
     mitigate_risk_matrix = {
       likelihood_after: owner.likelihood_after,
