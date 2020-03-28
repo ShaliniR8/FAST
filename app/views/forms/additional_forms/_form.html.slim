@@ -1,0 +1,12 @@
+= form_for @record do |f|
+  .panel-warning
+    .panel-heading
+      .panel-title
+        = "#{action_name.titleize} #{@title}"
+        button class="close pull-right" data-dismiss="modal" aria-label="Close"
+          span class="glyphicon glyphicon-remove"
+    .panel-body style="max-height: calc(100vh - 210px);overflow-y:auto"
+      .row
+        = render '/forms/form_fields', f: f, fields: @fields, record: @record
+
+      = f.submit 'Save', class: 'btn btn-success pull-right', disable_with: 'Saving...'

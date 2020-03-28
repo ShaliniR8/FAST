@@ -18,3 +18,21 @@
                   = render 'forms/show_fields',
                     record: contact,
                     fields: fields
+
+                  .col-xs-12
+                    = link_to 'Edit', '#',
+                      class: 'edit-contact-btn btn btn-warning pull-right mr5',
+                      'data-path' => edit_contact_path(contact),
+                      'data-toggle' => 'modal',
+                      'data-target' => '.bs-example-modal-lg'
+                    = link_to 'Delete', contact_path(contact),
+                      method: 'delete', confirm: 'Are you sure?',
+                      class: 'btn btn-danger pull-right mr5'
+
+javascript:
+  $('.edit-contact-btn').on('click', function(){
+    $.get($(this).data('path'), function(data){
+      $('.modal-content').html(data);
+      $(window).trigger('reszie');
+    });
+  });

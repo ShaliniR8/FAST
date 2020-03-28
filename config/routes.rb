@@ -45,6 +45,11 @@ PrdgSession::Application.routes.draw do |map|
   end
 
   # System Feature
+  resources :sms_tasks
+  resources :contacts
+  resources :costs
+  resources :viewer_comments
+
   resources :automated_notifications do
     collection do
       get 'retract_fields'
