@@ -62,7 +62,8 @@ class SmsActionsController < SafetyAssuranceController
   def index
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
+    params[:type].present? ? @table = Object.const_get(object_name).preload(@object[:preload]).where(owner_type: params[:type])
+                           : @table = Object.const_get(object_name).preload(@object[:preload])
     @default_tab = params[:status]
 
     records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
