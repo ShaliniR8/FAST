@@ -37,18 +37,19 @@
           @owner.status != "Pending Approval" &&
           current_user.has_access("sms_actions","edit")%>
 
-        <%= render 'shared/choose_show_matrix',
-          :owner => @owner,
-          :show_btn => true,
-          :type => "sms_actions",
-          :like => @like,
-          :color_matrix => @color_matrix,
-          :frequency => @frequency,
-          :allow_mitigate => true,
-          :can_change => can_change %>
+        <% unless ['BSK'].include? AIRLINE_CODE %>
+          <%= render 'shared/choose_show_matrix',
+            :owner => @owner,
+            :show_btn => true,
+            :type => "sms_actions",
+            :like => @like,
+            :color_matrix => @color_matrix,
+            :frequency => @frequency,
+            :allow_mitigate => true,
+            :can_change => can_change %>
+        <% end %>
 
         <%= render '/panels/show_panels', owner: @owner %>
-
       </div>
     </div>
   </div>

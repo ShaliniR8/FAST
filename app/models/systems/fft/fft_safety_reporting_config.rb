@@ -5,7 +5,7 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
     show_submitter_name:             true,
     enable_dual_report:              true,
     submission_time_zone:            true,
-    submission_description_required: false,
+    submission_description_required: true,
     # Airline-Specific Features:
   })
 

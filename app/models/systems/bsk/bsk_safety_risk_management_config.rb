@@ -25,6 +25,15 @@ class BSKSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
           },
         },
       },
+
+      'RiskControl' => {
+        fields: {
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 12,  type: 'boolean', visible: 'index,form,show',
+          },
+        }
+      }
     },
     menu_items: {
       'Sra' => {

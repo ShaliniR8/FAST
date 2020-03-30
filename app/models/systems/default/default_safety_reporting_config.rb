@@ -343,7 +343,7 @@ class DefaultSafetyReportingConfig
           },
           immediate_action: {
             field: 'immediate_action', title: 'Immediate Action Detail',
-            num_cols: 10, type: 'text', visible: 'form,show',
+            num_cols: 12, type: 'text', visible: 'form,show',
             required: false
           },
           bcomprehensive_action: {

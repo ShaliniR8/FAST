@@ -17,11 +17,23 @@ class BSKSafetyReportingConfig < DefaultSafetyReportingConfig
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
     objects: {
       'CorrectiveAction' => {
-          fields: {
-            recommendation: { visible: '' },
-            company: { visible: '' },
-            employee: { visible: '' }
-          }
+        fields: {
+          recommendation: { visible: '' },
+          company: { visible: '' },
+          employee: { visible: '' },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 12,  type: 'boolean', visible: 'index,form,show',
+          },
+        },
+        panels: {
+          occurrences: {
+            partial: '/occurrences/occurrences_panel',
+            visible: proc { |owner:,user:,**op| false },
+            show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+            data: proc { |owner:,user:,**op| { owner: owner } },
+          },
+        }
       }
     },
     menu_items: {

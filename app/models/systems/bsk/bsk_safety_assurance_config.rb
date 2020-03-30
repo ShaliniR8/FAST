@@ -40,7 +40,11 @@ class BSKSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           immediate_action_comment: { visible: '' },
           comprehensive_action: { visible: '' },
           comprehensive_action_comment: { visible: '' },
-          action_taken: { visible: '' }
+          action_taken: { visible: '' },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 12,  type: 'boolean', visible: 'index,form,show',
+          },
         }
       }
     },
