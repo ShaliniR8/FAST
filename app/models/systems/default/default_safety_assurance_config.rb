@@ -89,6 +89,12 @@ class DefaultSafetyAssuranceConfig
       'Inspection' => {
         title: 'Inspection',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :approver,
+          :responsible_user,
+          :created_by,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -153,6 +159,12 @@ class DefaultSafetyAssuranceConfig
       'Evaluation' => {
         title: 'Evaluation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :approver,
+          :responsible_user,
+          :created_by,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -221,6 +233,12 @@ class DefaultSafetyAssuranceConfig
       'Investigation' => {
         title: 'Investigation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :approver,
+          :responsible_user,
+          :created_by,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -309,6 +327,13 @@ class DefaultSafetyAssuranceConfig
       'Finding' => {
         title: 'Finding',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :approver,
+          :responsible_user,
+          :created_by,
+          :occurrences,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -454,8 +479,16 @@ class DefaultSafetyAssuranceConfig
       'SmsAction' => {
         title: 'Corrective Action',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :occurrences,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 12,  type: 'boolean_box', visible: '',
+          },
           title: { default: true },
           status: { default: true, field: 'get_status' },
           get_source: {
@@ -549,6 +582,9 @@ class DefaultSafetyAssuranceConfig
       'Recommendation' => {
         title: 'Recommendation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },

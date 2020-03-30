@@ -10,41 +10,47 @@ class BSKSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
     objects: {
       'Audit' => {
         fields: {
-          vendor: { visible: '' },
-          process: { visible: '' },
-          reference: { visible: '' },
-          supplier: { visible: '' }
+          vendor: { visible: 'none' },
+          process: { visible: 'none' },
+          reference: { visible: 'none' },
+          supplier: { visible: 'none' }
         }
       },
 
       'Finding' => {
         fields: {
-          authority: { visible: '' },
-          controls: { visible: '' },
-          interfaces: { visible: '' },
-          policy: { visible: '' },
-          procedures: { visible: '' },
-          process_measures: { visible: '' },
-          responsibility: { visible: '' },
-          action_taken: { visible: '' },
-          analysis_result: { visible: '' },
-          other: { visible: '' }
+          authority: { visible: 'none' },
+          controls: { visible: 'none' },
+          interfaces: { visible: 'none' },
+          policy: { visible: 'none' },
+          procedures: { visible: 'none' },
+          process_measures: { visible: 'none' },
+          responsibility: { visible: 'none' },
+          action_taken: { visible: 'none' },
+          analysis_result: { visible: 'none' },
+          other: { visible: 'none' }
         }
       },
 
       'SmsAction' => {
         fields: {
-          emp: { visible: '' },
-          dep: { visible: '' },
-          immediate_action: { visible: '' },
-          immediate_action_comment: { visible: '' },
-          comprehensive_action: { visible: '' },
-          comprehensive_action_comment: { visible: '' },
-          action_taken: { visible: '' },
+          emp: { visible: 'none' },
+          dep: { visible: 'none' },
+          immediate_action: { visible: 'none' },
+          immediate_action_comment: { visible: 'none' },
+          comprehensive_action: { visible: 'none' },
+          comprehensive_action_comment: { visible: 'none' },
+          action_taken: { visible: 'none' },
           faa_approval: {
             field: 'faa_approval', title: 'Requires FAA Approval',
-            num_cols: 12,  type: 'boolean', visible: 'index,form,show',
+            num_cols: 12,  type: 'boolean_box', visible: 'index,form,show',
           },
+          likelihood: { visible: 'none' },
+          severity: { visible: 'none' },
+          risk_factor: { visible: 'none' },
+          likelihood_after: { visible: 'none' },
+          severity_after: { visible: 'none' },
+          risk_factor_after: { visible: 'none' },
         }
       }
     },

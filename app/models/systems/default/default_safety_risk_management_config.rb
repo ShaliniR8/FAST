@@ -18,6 +18,9 @@ class DefaultSafetyRiskManagementConfig
       'Sra' => {
         title: 'SRA',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },
@@ -178,6 +181,14 @@ class DefaultSafetyRiskManagementConfig
       'Hazard' => {
         title: 'Hazard',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :sra,
+          :responsible_user,
+          :created_by,
+          :approver,
+          :occurrences,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true,
             field: 'get_id', title: 'Hazard ID'
@@ -254,10 +265,17 @@ class DefaultSafetyRiskManagementConfig
       'RiskControl' => {
         title: 'Risk Control',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        preload: [
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           status: { default: true },
           created_by: { default: true },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 12,  type: 'boolean', visible: 'none',
+          },
           title: { default: true },
           departments: {
             field: 'departments', title: 'Department',
