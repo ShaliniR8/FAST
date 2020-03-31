@@ -20,7 +20,7 @@
                     record: cost
 
                   .col-xs-12
-                    - if !['Pending Approval', 'Completed'].include? @owner.status
+                    - if !['Pending Approval', 'Completed'].include? cost.owner.status
                       = link_to 'Edit', '#',
                         class: 'edit-cost-btn btn btn-warning pull-right mr5',
                         'data-path' => edit_cost_path(cost),
