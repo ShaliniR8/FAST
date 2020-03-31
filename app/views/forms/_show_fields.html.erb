@@ -66,7 +66,7 @@
             <%=boolean_options[field_value]%>
 
           <%when "boolean_box"%>
-            <%=(field_value || field_value == '1') ? "Yes" : ""%>
+            <%=(field_value || field_value == '1') ? "Yes" : "No"%>
 
           <%when "date"%>
             <%=date_to_string(field_value)%>

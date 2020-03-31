@@ -272,10 +272,6 @@ class DefaultSafetyRiskManagementConfig
           id: { default: true },
           status: { default: true },
           created_by: { default: true },
-          faa_approval: {
-            field: 'faa_approval', title: 'Requires FAA Approval',
-            num_cols: 12,  type: 'boolean', visible: 'none',
-          },
           title: { default: true },
           departments: {
             field: 'departments', title: 'Department',
@@ -294,6 +290,10 @@ class DefaultSafetyRiskManagementConfig
           approver: { default: true,
             field: 'approver_id',
             visible: 'index,form,show'
+          },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'none',
           },
           control_type: {
             field: 'control_type', title: 'Type',
