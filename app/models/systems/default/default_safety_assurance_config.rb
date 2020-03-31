@@ -495,6 +495,10 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6, type: 'select', visible: 'form,show',
             required: false, options: "CONFIG.custom_options['Departments']"
           },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'none',
+          },
           emp: {
             field: 'emp', title: 'Employee Corrective Action',
             num_cols: 6, type: 'boolean_box', visible: 'form,show',

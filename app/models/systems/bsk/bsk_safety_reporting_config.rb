@@ -23,7 +23,7 @@ class BSKSafetyReportingConfig < DefaultSafetyReportingConfig
           employee: { visible: '' },
           faa_approval: {
             field: 'faa_approval', title: 'Requires FAA Approval',
-            num_cols: 12,  type: 'boolean', visible: 'index,form,show',
+            num_cols: 12,  type: 'boolean_box', visible: 'index,form,show',
           },
         },
         panels: {

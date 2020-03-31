@@ -327,6 +327,10 @@ class DefaultSafetyReportingConfig
           },
           responsible_user: { default: true, on_newline: true }, # for form and show
           approver: { default: true },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'none',
+          },
           company: {
             field: 'company', title: 'Company Corrective Action',
             num_cols: 6,  type: 'boolean', visible: 'form,show',

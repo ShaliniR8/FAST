@@ -262,7 +262,7 @@ class SrasController < ApplicationController
   def destroy
     sra = Sra.find(params[:id])
     sra.destroy
-    redirect_to sras_path, flash: {danger: "SRA ##{params[:id]} deleted."}
+    redirect_to sras_path(status: 'All'), flash: {danger: "SRA ##{params[:id]} deleted."}
   end
 
 

@@ -186,7 +186,7 @@ class SubmissionsController < ApplicationController
   def destroy
     @record=Submission.find(params[:id])
     @record.destroy
-    redirect_to submissions_path, flash: {danger: "Submission ##{params[:id]} deleted."}
+    redirect_to submissions_path(status: 'All'), flash: {danger: "Submission ##{params[:id]} deleted."}
   end
 
 

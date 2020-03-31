@@ -270,7 +270,7 @@ class RecordsController < ApplicationController
   def destroy
     @record = Record.find(params[:id])
     @record.destroy
-    redirect_to records_path, flash: {danger: "Report ##{params[:id]} deleted."}
+    redirect_to records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
   end
 
 

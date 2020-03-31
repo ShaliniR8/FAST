@@ -169,7 +169,7 @@ class CorrectiveActionsController < ApplicationController
   def destroy
     @corrective_action = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
     @corrective_action.destroy
-    redirect_to corrective_actions_path, flash: {danger: "Corrective Action ##{params[:id]} deleted."}
+    redirect_to corrective_actions_path(status: 'All'), flash: {danger: "Corrective Action ##{params[:id]} deleted."}
   end
 
 

@@ -171,7 +171,7 @@ class HazardsController < ApplicationController
   def destroy
     hazard=Hazard.find(params[:id])
     hazard.destroy
-    redirect_to hazards_path, flash: {danger: "Hazard ##{params[:id]} deleted."}
+    redirect_to hazards_path(status: 'All'), flash: {danger: "Hazard ##{params[:id]} deleted."}
     #redirect_to root_url
   end
 

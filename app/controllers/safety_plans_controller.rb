@@ -84,7 +84,7 @@ class SafetyPlansController < ApplicationController
   def destroy
     safety_plan = SafetyPlan.find(params[:id])
     safety_plan.destroy
-    redirect_to safety_plans_path, flash: {danger: "Safety Plan ##{params[:id]} deleted."}
+    redirect_to safety_plans_path(status: 'All'), flash: {danger: "Safety Plan ##{params[:id]} deleted."}
   end
 
 

@@ -87,7 +87,7 @@ class ReportsController < ApplicationController
       r.save
     end
     @report.destroy
-    redirect_to reports_path, flash: {danger: "Event ##{params[:id]} deleted."}
+    redirect_to reports_path(status: 'All'), flash: {danger: "Event ##{params[:id]} deleted."}
   end
 
 

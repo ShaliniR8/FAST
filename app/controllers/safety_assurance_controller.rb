@@ -25,7 +25,7 @@ class SafetyAssuranceController < ApplicationController
 
   def destroy #KEEP
     @owner.destroy
-    redirect_to eval("#{@class.name.underscore}s_path"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
+    redirect_to eval("#{@class.name.underscore}s_path(status: 'All')"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
   end
 
   def new_attachment #KEEP

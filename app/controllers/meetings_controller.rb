@@ -90,7 +90,7 @@ class MeetingsController < ApplicationController
       x.save
     end
     @meeting.destroy
-    redirect_to meetings_path, flash: {danger: "Meeting ##{params[:id]} deleted."}
+    redirect_to meetings_path(status: 'All'), flash: {danger: "Meeting ##{params[:id]} deleted."}
   end
 
 

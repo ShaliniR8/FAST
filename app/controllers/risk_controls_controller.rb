@@ -170,7 +170,7 @@ class RiskControlsController < ApplicationController
   def destroy
     risk_control = RiskControl.find(params[:id])
     risk_control.destroy
-    redirect_to risk_controls_path, flash: {danger: "Risk Control ##{params[:id]} deleted."}
+    redirect_to risk_controls_path(status: 'All'), flash: {danger: "Risk Control ##{params[:id]} deleted."}
   end
 
 
