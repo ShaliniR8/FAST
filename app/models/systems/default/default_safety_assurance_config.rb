@@ -19,9 +19,8 @@ class DefaultSafetyAssuranceConfig
         title: 'Audit',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         preload: [
-          :approver,
+          :findings,
           :responsible_user,
-          :created_by,
           :verifications,
           :extension_requests],
         fields: {
@@ -90,9 +89,7 @@ class DefaultSafetyAssuranceConfig
         title: 'Inspection',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         preload: [
-          :approver,
           :responsible_user,
-          :created_by,
           :verifications,
           :extension_requests],
         fields: {
@@ -160,9 +157,7 @@ class DefaultSafetyAssuranceConfig
         title: 'Evaluation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         preload: [
-          :approver,
           :responsible_user,
-          :created_by,
           :verifications,
           :extension_requests],
         fields: {
@@ -234,9 +229,7 @@ class DefaultSafetyAssuranceConfig
         title: 'Investigation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         preload: [
-          :approver,
           :responsible_user,
-          :created_by,
           :verifications,
           :extension_requests],
         fields: {
@@ -327,11 +320,10 @@ class DefaultSafetyAssuranceConfig
       'Finding' => {
         title: 'Finding',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
-        preload: [
-          :approver,
-          :responsible_user,
-          :created_by,
+         preload: [
           :occurrences,
+          :responsible_user,
+          :approver,
           :verifications,
           :extension_requests],
         fields: {
@@ -345,7 +337,7 @@ class DefaultSafetyAssuranceConfig
           },
           created_by: { default: true, on_newline: true },
           responsible_user: { default: true },
-          approver: { default: true, visible: 'index,form,show' },
+          approver: { default: true, visible: 'index,form,show'  },
           due_date: { field: 'due_date', default: true },
           reference: { default: true, title: 'Reference or Requirement' },
           classification: {
@@ -472,7 +464,7 @@ class DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[occurrences comments sms_actions recommendations extension_requests verifications attachments transaction_log
+        panels: %i[comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -480,7 +472,8 @@ class DefaultSafetyAssuranceConfig
         title: 'Corrective Action',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         preload: [
-          :occurrences,
+          :responsible_user,
+          :approver,
           :verifications,
           :extension_requests],
         fields: {
@@ -501,10 +494,6 @@ class DefaultSafetyAssuranceConfig
             field: 'responsible_department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'form,show',
             required: false, options: "CONFIG.custom_options['Departments']"
-          },
-          faa_approval: {
-            field: 'faa_approval', title: 'Requires FAA Approval',
-            num_cols: 6,  type: 'boolean_box', visible: 'none',
           },
           emp: {
             field: 'emp', title: 'Employee Corrective Action',
@@ -583,6 +572,8 @@ class DefaultSafetyAssuranceConfig
         title: 'Recommendation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
         preload: [
+          :responsible_user,
+          :approver,
           :verifications,
           :extension_requests],
         fields: {
@@ -601,7 +592,7 @@ class DefaultSafetyAssuranceConfig
             required: true, on_newline: true
           },
           close_date: { default: true, title: 'Actual Response Date' },
-          responsible_user: { default: true, on_newline: true },
+          responsible_user: { default: true, on_newline: true  },
           approver: { default: true },
           department: {
             field: 'department', title: 'Responsible Department',
@@ -738,9 +729,9 @@ class DefaultSafetyAssuranceConfig
         subMenu: [
           {title: 'All', path: 'recommendations_path(status: "New")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)}},
-          {title: 'For Findings', path: 'recommendations_path(:type=>"Finding")',
+          {title: 'For Findings', path: 'recommendations_path(status: "New", :type=>"Finding")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
-          {title: 'For Investigations', path: 'recommendations_path(:type=>"Investigation")',
+          {title: 'For Investigations', path: 'recommendations_path(status: "New", :type=>"Investigation")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
         ]
       },

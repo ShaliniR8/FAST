@@ -99,7 +99,7 @@ class Audit < Sa::SafetyAssuranceBase
 
   def included_findings
     result = ""
-    Finding.where(owner_type: self.type).where(owner_id: self.id).each do |finding|
+    self.findings.each do |finding|
       result += "
         <a style='font-weight:bold' href='/findings/#{finding.id}'>
           ##{finding.id}

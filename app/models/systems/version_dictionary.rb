@@ -1,8 +1,25 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.0',
+      title: 'Version 1.2.1',
       tag: 'New',
+      toggle: 'v1_2_1',
+      date: '3/31/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Tab view on all pages.',
+          'Added Advanced Search back on all pages.',
+          'Added configurable Max Character Count for Text Area field in Safety Reports Templates.',
+          'Added Edit/Delete functionalities for Costs, Contacts, Comments, and Tasks.'
+        ],
+        'Optimizations & Fixes' => [
+          'Updated list of Time Zone options and displaying time with time zone.',
+          'Fixed viewing privileges on access control rules page',
+        ]
+      }
+    },
+    {
+      title: 'Version 1.2.0',
       toggle: 'v1_2_0',
       date: '2/11/2020',
       sections: {

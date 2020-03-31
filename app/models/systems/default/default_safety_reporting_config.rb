@@ -293,6 +293,7 @@ class DefaultSafetyReportingConfig
       'CorrectiveAction' => {
         title: 'Corrective Action',
         status: ['New', 'Assigned', 'Completed', 'Pending Approval', 'All'],
+        preload: [:responsible_user],
         fields: {
           id: { default: true },
           status: { default: true, type: 'select', options: CorrectiveAction.getStatusOptions },

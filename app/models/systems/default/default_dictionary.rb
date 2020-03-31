@@ -454,12 +454,12 @@ class DefaultDictionary
     responsible_user: {
       field: 'responsible_user_id', title: 'Responsible User',
       num_cols: 6,  type: 'user', visible: 'index,form,show',
-      required: false
+      required: false, display: 'get_responsible_user_name'
     },
     approver: {
       field: 'approver_id', title: 'Final Approver',
       num_cols: 6,  type: 'user', visible: 'form,show',
-      required: false
+      required: false, display: 'get_approver_name'
     },
     location: {
       field: 'location', title: 'Location',

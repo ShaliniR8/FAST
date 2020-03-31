@@ -25,9 +25,6 @@ table id='records_table' class='table table-hover table-striped table-bordered i
               - when 'boolean'
                 - boolean_options = {true => 'Yes', false => 'No'}
                 = boolean_options[field_value]
-              - when 'boolean_box'
-                - boolean_options = {true => 'Yes', false => 'No'}
-                = boolean_options[field_value]
               - when 'date'
                 = date_to_string(field_value)
               - when 'datetime'
@@ -40,8 +37,10 @@ table id='records_table' class='table table-hover table-striped table-bordered i
               - when 'checkbox'
                 = field_value
               - when 'user'
-                - if field_value != nil && field_value != ''
-                  = User.find(field_value).full_name rescue field_value.to_s
+                - if field_display.present?
+                  = record.send(field_display)
+                - else
+                  = field_value
               - when 'textarea'
                 = (field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''
               - when 'list'
