@@ -629,6 +629,9 @@ class HomeController < ApplicationController
         .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
       @hazards = hazards.group_by{|x| x.status}
+      if (temp=hazards.select{|x| x.overdue}).present?
+        @hazards['Overdue'] = temp
+      end
       risk_controls = RiskControl.within_timerange(@start_date, @end_date)
         .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}

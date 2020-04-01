@@ -42,10 +42,7 @@ javascript:
 
   function loadContent(status) {
     $('li').removeClass('active');
-    $('.status-' + status.toLowerCase()).addClass('active');
-    // $.get('#{eval("load_records_#{controller_name}_path")}?status=' + status, function(data){
-    //   $('.records-table').html(data);
-    // });
+    $('.status-' + status.toLowerCase().replace(' ', '-')).addClass('active');
 
     $.ajax({
       type: "POST",

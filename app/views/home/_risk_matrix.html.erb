@@ -55,15 +55,15 @@
             <!-- Safety Assurance Module -->
             <%if session[:mode]=="SMS"%>
               <%@color_matrix[row].each_index do |cell|%>
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell finding_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>" href="<%=findings_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell finding_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>" href="<%=findings_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@finding_matrix[4-row][cell]%></b></center>
                 </td>
 
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell inv_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=investigations_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell inv_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=investigations_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@inv_matrix[4-row][cell]%></b></center>
                 </td>
 
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell car_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=sms_actions_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell car_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=sms_actions_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@car_matrix[4-row][cell]%></b></center>
                 </td>
               <%end%>
@@ -71,11 +71,11 @@
             <!-- Safety Risk Management Module -->
             <%elsif session[:mode]=="SRM"%>
               <%@color_matrix[row].each_index do |cell|%>
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell hazard_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>" href="<%=hazards_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell hazard_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>" href="<%=hazards_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@hazard_matrix[4-row][cell]%></b></center>
                 </td>
 
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell sra_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=sras_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell sra_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=sras_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@sra_matrix[4-row][cell]%></b></center>
                 </td>
               <%end%>
@@ -83,10 +83,10 @@
             <!-- Safety Reporting Module -->
             <%elsif session[:mode]=="ASAP"%>
               <%@color_matrix[row].each_index do |cell|%>
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell record_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>" href="<%=records_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell record_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>" background="<%=@color_matrix[row][cell]%>" href="<%=records_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@record_matrix[4-row][cell]%></b></center>
                 </td>
-                <td id="<%=4-row%>-<%=cell%>" class="colorcell report_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=reports_path(params.merge({:field_1=>(4-row),:field_2=>@like[cell]}))%>">
+                <td id="<%=4-row%>-<%=cell%>" class="colorcell report_cell" style="width:15%;background:<%=@color_matrix[row][cell]%>;display:none" background="<%=@color_matrix[row][cell]%>" href="<%=reports_path(params.merge({:status=>'All',:field_1=>(4-row),:field_2=>@like[cell]}))%>">
                   <center><b><%=@report_matrix[4-row][cell]%></b></center>
                 </td>
               <%end%>

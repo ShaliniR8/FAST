@@ -52,34 +52,34 @@
 
                 <%if session[:mode] == "SMS"%>
                   <td class="color_cell finding_cell"
-                    href="<%=findings_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"
+                    href="<%=findings_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"
                     style="background:<%=@risk_table[:rows][row_index][column_index]%>">
                     <center><b><%= @finding_matrix[row_index][column_index]%></b></center>
                   </td>
                   <td class="color_cell inv_cell"
-                    href="<%=investigations_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"
+                    href="<%=investigations_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"
                     style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none">
                     <center><b><%= @inv_matrix[row_index][column_index]%></b></center>
                   </td>
                 <%elsif session[:mode] == "SRM"%>
                   <td class="color_cell hazard_cell"
-                    href="<%=hazards_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"
+                    href="<%=hazards_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"
                     style="background:<%=@risk_table[:rows][row_index][column_index]%>">
                     <center><b><%= @hazard_matrix[row_index][column_index]%></b></center>
                   </td>
                   <td class="color_cell sra_cell"
-                    href="<%=sras_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"
+                    href="<%=sras_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"
                     style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none">
                     <center><b><%= @sra_matrix[row_index][column_index]%></b></center>
                   </td>
                 <%elsif session[:mode] == "ASAP"%>
                   <td class="color_cell record_cell"
-                    href="<%=records_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"
+                    href="<%=records_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"
                     style="background:<%=@risk_table[:rows][row_index][column_index]%>">
                     <center><b><%= @record_matrix[row_index][column_index]%></b></center>
                   </td>
                   <td class="color_cell report_cell"
-                    href="<%=reports_path(params.merge({:field_1=>row_index,:field_2=>column_index}))%>"
+                    href="<%=reports_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"
                     style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none">
                     <center><b><%= @report_matrix[row_index][column_index]%></b></center>
                   </td>

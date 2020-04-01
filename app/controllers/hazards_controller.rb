@@ -16,13 +16,6 @@ class HazardsController < ApplicationController
 
 
   def index
-    # @adv_only = true
-    # @table = Object.const_get("Hazard")
-    @title = "Hazards"
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_hazards
-
     object_name = controller_name.classify
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
@@ -39,6 +32,7 @@ class HazardsController < ApplicationController
 
     @records_hash = records.group_by(&:status)
     @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
     @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
@@ -322,10 +316,6 @@ class HazardsController < ApplicationController
 private
 
   def filter_hazards
-    if params[:status].present? && params[:advance_search].present?
-       @records = @records.select{|x| x.status == params[:status]}
-      @title += " : #{params[:status]}"
-    end
     @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
     @headers = @table.get_meta_fields('index')
     @table_name = "hazards"

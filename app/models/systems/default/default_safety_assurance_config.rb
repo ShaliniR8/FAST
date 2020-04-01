@@ -17,7 +17,7 @@ class DefaultSafetyAssuranceConfig
 
       'Audit' => {
         title: 'Audit',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :findings,
           :responsible_user,
@@ -87,7 +87,7 @@ class DefaultSafetyAssuranceConfig
 
       'Inspection' => {
         title: 'Inspection',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :verifications,
@@ -155,7 +155,7 @@ class DefaultSafetyAssuranceConfig
 
       'Evaluation' => {
         title: 'Evaluation',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :verifications,
@@ -227,7 +227,7 @@ class DefaultSafetyAssuranceConfig
 
       'Investigation' => {
         title: 'Investigation',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :verifications,
@@ -319,7 +319,7 @@ class DefaultSafetyAssuranceConfig
 
       'Finding' => {
         title: 'Finding',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
          preload: [
           :occurrences,
           :responsible_user,
@@ -470,7 +470,7 @@ class DefaultSafetyAssuranceConfig
 
       'SmsAction' => {
         title: 'Corrective Action',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :approver,
@@ -574,7 +574,7 @@ class DefaultSafetyAssuranceConfig
 
       'Recommendation' => {
         title: 'Recommendation',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :approver,

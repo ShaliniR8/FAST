@@ -79,6 +79,7 @@ class FindingsController < SafetyAssuranceController
 
     @records_hash = records.group_by(&:status)
     @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
     @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 

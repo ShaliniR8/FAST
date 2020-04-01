@@ -17,7 +17,7 @@ class DefaultSafetyRiskManagementConfig
 
       'Sra' => {
         title: 'SRA',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :verifications,
           :extension_requests],
@@ -180,7 +180,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'Hazard' => {
         title: 'Hazard',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :sra,
           :responsible_user,
@@ -264,7 +264,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'RiskControl' => {
         title: 'Risk Control',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :verifications,
           :extension_requests],
@@ -346,7 +346,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'SafetyPlan' => {
         title: 'Safety Plan',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         fields: {
           id: { default: true,
             required: true
