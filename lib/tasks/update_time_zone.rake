@@ -35,6 +35,7 @@
     "WETDST"=> "Amsterdam",
     "CCT"  => "Rangoon",
     "BRT"  => "Brasilia",
+    "NZT"  => "Auckland",
     "NZDT" => "Auckland",
     "NZST" => "Auckland",
     "CETDST"=> "Istanbul",
@@ -76,6 +77,7 @@ task :update_event_date => :environment do
       count_records_id_nil = 0
       log_event_date_nil = []
       log_records_id_nil = []
+      log_time_zone_missing =[]
       if answer == 'y'
         # Case Event Time Zone
         # 1) "Empty"          => use local Time Zone
@@ -98,6 +100,14 @@ task :update_event_date => :environment do
           elsif time_zones.include? time_zone
             event_zone = time_zone_map[time_zone]
           end
+
+          if event_zone.nil?
+            p "[info] ************************************************************************** "
+            p "[info] #{time_zone} is missing"
+            log_time_zone_missing << time_zone
+            next
+          end
+
           p " >> DEBUG:  \| #{event_zone} \| #{event_date}"
           utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
           p "  update > #{record.id} - #{utc_time} \| #{event_zone}"
@@ -115,6 +125,8 @@ task :update_event_date => :environment do
       p "  >> #{log_event_date_nil}"
       p "# of NULL (records_id): #{count_records_id_nil}"
       p "  >> #{log_records_id_nil}"
+      p "Missing Time Zones"
+      p "  >> #{log_time_zone_missing}"
 
     end
   end
