@@ -1,4 +1,4 @@
-class Im < ProsafetBase
+class Im < Sim::ImplementationManagementBase
   extend AnalyticsFilters
 
 #Concerns List

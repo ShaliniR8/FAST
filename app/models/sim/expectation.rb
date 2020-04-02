@@ -1,4 +1,4 @@
-class Expectation < ActiveRecord::Base
+class Expectation < Sim::ImplementationManagementBase
   belongs_to :user, foreign_key:"user_id", class_name:"User"
 
   def self.get_meta_fields(*args)
