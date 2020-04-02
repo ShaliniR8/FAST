@@ -43,17 +43,22 @@ class SubmissionsController < ApplicationController
 
 
   def index
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload]).where("completed is true")
-    @default_tab = params[:status]
+    respond_to do |format|
+      format.html do
+        object_name = controller_name.classify
+        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+        @table = Object.const_get(object_name).preload(@object[:preload]).where("completed is true")
+        @default_tab = params[:status]
 
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    handle_search if params[:advance_search].present?
-    records = @records.to_a & records.to_a if @records.present?
+        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+        handle_search if params[:advance_search].present?
+        records = @records.to_a & records.to_a if @records.present?
 
-    @records_hash = { 'All' => records }
-    @records_id   = { 'All' => records.map(&:id) }
+        @records_hash = { 'All' => records }
+        @records_id   = { 'All' => records.map(&:id) }
+      end
+      format.json { index_as_json }
+    end
 
     # respond_to do |format|
     #   format.html do
