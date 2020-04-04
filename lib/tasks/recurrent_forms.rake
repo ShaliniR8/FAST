@@ -6,7 +6,6 @@ namespace :recurring do
     puts 'BEGIN Generating Recurrent Forms:'
     active_recurring = Recurrence.where('(end_date > ? OR end_date IS NULL) AND next_date < ?',
         DateTime.now, DateTime.now)
-    byebug
     puts "Checking #{active_recurring.count} recurrences:"
     active_recurring.each do |recurrence|
       type = Object.const_get(recurrence.form_type)
