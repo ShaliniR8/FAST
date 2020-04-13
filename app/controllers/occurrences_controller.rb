@@ -35,7 +35,7 @@ class OccurrencesController < ApplicationController
 
   def update
     Occurrence.transaction do
-      params[:occurrences].each do |template_id, occurrence|
+      (params[:occurrences] || []).each do |template_id, occurrence|
         next unless occurrence[:value].present?
         Occurrence.create({
           template_id: template_id,
