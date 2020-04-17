@@ -6,7 +6,7 @@ ruby:
 .col-xs-12
   .panel.panel-lightskyblue
     .panel-heading.click-heading.collapsed
-      .panel-title 
+      .panel-title
         | Checklists
         span class="pull-right clickable"
           i class="mt5 glyphicon glyphicon-chevron-down"
@@ -34,7 +34,7 @@ ruby:
             - active = index == 0 ? 'active' : ''
             .tab-pane id="checklist-#{checklist.id}" class="#{active}"
 
-              b Assignees: 
+              b Assignees:
               = checklist.assignees.map(&:full_name).join(', ')
 
               - if owner.status != 'Completed' && (\
@@ -64,7 +64,7 @@ ruby:
                 class: "btn btn-success pull-right mr5",
                 target: "_blank"
 
-              = render '/checklists/checklist_table', checklist: checklist
+              = render '/checklists/checklist_table', checklist: checklist, owner: owner
 
 
 

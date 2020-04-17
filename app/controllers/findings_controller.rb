@@ -50,6 +50,8 @@ class FindingsController < SafetyAssuranceController
       @owner = Finding.new
     end
     choose_load_special_matrix_form(@owner, 'finding')
+
+    render :partial=>'modal_form' if params[:modal]
   end
 
 
@@ -101,6 +103,7 @@ class FindingsController < SafetyAssuranceController
     load_special_matrix(@owner)
     @type = @owner.get_owner
     @fields = Finding.get_meta_fields('show')
+    @true_owner = @owner.find_true_owner
   end
 
 

@@ -267,6 +267,33 @@ class DefaultDictionary
       print_partial: '/pdfs/print_source_of_input',
       visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
       show_btns: proc { |owner:,user:,**op| false },
+<<<<<<< HEAD
+=======
+      data: proc { |owner:,user:,**op| { sra: owner } },
+    },
+    attachments: {
+      partial: '/panels/attachments',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
+    },
+    checklists: {
+      partial: '/panels/checklists',
+      visible: proc { |owner:,user:,**op| owner.owner.class.name == "ChecklistRow" },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { checklist: owner.owner.checklist, checklist_row: owner.owner } },
+    },
+    comments: {
+      partial: '/panels/comments',
+      visible: proc { |owner:,user:,**op| owner.comments.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { comments: owner.comments.preload(:viewer) } },
+    },
+    contacts: {
+      partial: '/panels/contacts',
+      visible: proc { |owner:,user:,**op| owner.contacts.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+>>>>>>> Feat: add finding from checklist questions
       data: proc { |owner:,user:,**op| {
         owner: owner,
         parent: owner.get_parent.present? ? owner.get_parent : owner.owner

@@ -190,4 +190,11 @@ class AuditsController < SafetyAssuranceController
   def download_checklist
     @audit = Audit.find(params[:id])
   end
+
+  def show_finding
+    @findings =  ChecklistRow.find(params[:"checklist_row_id"]).findings
+
+    render :partial=>"show_finding"
+  end
+
 end

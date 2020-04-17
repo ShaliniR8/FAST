@@ -39,12 +39,6 @@ class Finding < Sa::SafetyAssuranceBase
     CONFIG.object['Finding'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
-
-  def get_source
-    "<b style='color:grey'>N/A</b>".html_safe
-  end
-
-
   def get_owner
     "#{self.owner_type.underscore}s"
   end
@@ -103,10 +97,27 @@ class Finding < Sa::SafetyAssuranceBase
       "<a style='font-weight:bold' href='/investigations/#{owner.id}'>
         Investigation ##{owner.id}
       </a>".html_safe
+    when 'ChecklistRow'
+      true_owner = self.find_true_owner
+      checklist_title = true_owner.checklists[0].title
+      checklist_num = @owner.checklist_cells[0].value
+
+      "<a style='font-weight:bold' href='/audits/#{true_owner.id}'>
+        Audit ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
+      </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end
   end
 
+  def find_true_owner
+    if self.owner.class.name == "ChecklistRow"
+      checklist_id = self.owner.checklist_id
+      checklist = Checklist.find(checklist_id)
+      Object.const_get(checklist.owner_type).find(checklist.owner_id)
+    else
+      nil
+    end
+  end
 
 end

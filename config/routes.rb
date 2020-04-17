@@ -474,6 +474,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'update_checklist'
       get 'update_checklist_records'
       get 'viewer_access'
+      get 'show_finding'
       post 'upload_checklist'
     end
     collection do

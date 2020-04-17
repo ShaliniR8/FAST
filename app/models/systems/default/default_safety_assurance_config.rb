@@ -465,11 +465,12 @@ class DefaultSafetyAssuranceConfig
           assign: {
             access: proc { |owner:,user:,**op|
               DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
+              owner.owner.class.name != "ChecklistRow" &&
               (owner.immediate_action || owner.owner.status == 'Completed')
             },
           },
         }),
-        panels: %i[comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
+        panels: %i[checklists comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 

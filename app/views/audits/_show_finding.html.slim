@@ -1,0 +1,26 @@
+.panel-info
+  .panel-heading
+    .panel-title
+      | Finding
+      button.close.pull-right data-dismiss="modal" aria-label="Close"
+        span.glyphicon.glyphicon-remove
+  .panel-body style="max-height:500px;overflow-y:auto;"
+    table.table.table-hover
+      thead
+        tr
+          th Id
+          th Title
+          th Status
+          th Scheduled Completion Date
+      tbody
+        - @findings.each do |finding|
+          tr onclick="go_to_finding(#{finding.id})"
+            td = finding.id
+            td = finding.title
+            td = finding.status
+            td = finding.schedule_date
+
+javascript:
+  function go_to_finding(id) {
+    window.location = ("#{findings_path}/"+id)
+  }

@@ -5,6 +5,7 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
         th style="#{header.size.present? ? "width: #{header.size}%" : ''}"
           = header.title
       th Attachments
+      th Findings
   tbody
     - checklist.checklist_rows.order(:id).each do |checklist_row|
       tr class="#{checklist_row.is_header ? 'header-row' : ''}"
@@ -17,3 +18,36 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
         td
           - unless checklist_row.is_header?
             = render 'forms/attachments_show_mini', owner: checklist_row
+        td
+          - unless checklist_row.is_header?
+            = link_to '',
+              '#',
+              class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
+              id: checklist_row.id,
+              "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add Finding",
+              "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
+            = link_to '',
+              '#',
+              class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',
+              id: checklist_row.id,
+              "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Show Findings",
+              "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
+
+javascript:
+  $('.show_finding_btn').on('click',function(){
+    $.get("#{show_finding_audit_path}?checklist_row_id="+$(this).attr("id"), function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });
+
+  $('.new_finding_btn').on('click',function(){
+    $.get("#{new_finding_path(checklist)}?owner_id="+$(this).attr("id")+"&owner_type=ChecklistRow&modal=true", function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });
+
+/new_finding_path(#{checklist_row})
+
+/new_finding_path( owner_id: checklist_row.id, owner_type: checklist_row.class.name )

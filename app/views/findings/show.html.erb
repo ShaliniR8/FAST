@@ -19,7 +19,7 @@
               <%="Finding ##{@owner.get_id}: #{@owner.title}"%>
             </div>
             <div class="top_buttons pull-right">
-              <%= render '/forms/render_buttons', owner: @owner, env: :top %>
+              <%= render '/forms/render_buttons', owner: @owner, true_owner: @true_owner, env: :top %>
             </div>
           </div>
         </div>
@@ -29,9 +29,10 @@
 
             <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
 
-            <%if @owner.status == "New" && !@owner.can_assign?(current_user)%>
+            <%if @owner.owner.class.name != 'ChecklistRow' && @owner.status == 'New' && !@owner.can_assign?(current_user)%>
               <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
             <%end%>
+
           </div>
 
           <%= render '/forms/show_fields', :fields => @fields, :record => @owner %>
