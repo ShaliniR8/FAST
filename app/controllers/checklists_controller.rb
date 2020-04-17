@@ -43,7 +43,7 @@ class ChecklistsController < ApplicationController
     if params[:checklist_upload].present?
       @upload = File.open(params[:checklist_upload].tempfile)
       case params[:checklist_upload].tempfile.content_type
-      when "application/xml"
+      when "application/xml", "text/xml"
         upload_xml(@upload, @record)
       else
         upload_csv(@upload, @record)
@@ -66,9 +66,9 @@ class ChecklistsController < ApplicationController
     @record = @table.find(params[:id])
 
     # TODO: refactor needed
-    params[:checklist][:checklist_rows_attributes].each do |x, y| 
-      y[:checklist_cells_attributes].each do |m, n| 
-        n.each do |key, value| 
+    params[:checklist][:checklist_rows_attributes].each do |x, y|
+      y[:checklist_cells_attributes].each do |m, n|
+        n.each do |key, value|
           if value.is_a?(Array)
             n[:value].delete("")
             n[:value] = n[:value].join(";")
@@ -201,6 +201,8 @@ class ChecklistsController < ApplicationController
       question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
       question_hash << ["DisplayOrder", question["DisplayOrder"]]
       question_hash << ["QuestionID", question["QuestionID"]]
+      question_hash << ["Rev", question["VersionNumber"] + " " + question["VersionDate"]]
+      question_hash << ["Status", question["Status"]]
       header_section = question.children.select{|x| x.name if x.name == "SectionHeaderMLF"}.first.attributes
 
       question_hash << ["MLFLabel", header_section["MLFLabel"].value]
@@ -237,8 +239,14 @@ class ChecklistsController < ApplicationController
           question_text = question["Text"]
           responses = question["QuestionResponses"].gsub("\t", "").split("\n").reject(&:empty?).join(";") rescue ''
           references = question["QuestionReferences"] +
-            "\n\nQID: #{question['QuestionID']}" +
-            "\nSafety Attribute: #{question['SafetyAttribute']}"
+            "\n\n<strong>Safety Attribute:</strong> #{question['SafetyAttribute']}".html_safe +
+            "\n<strong>Question Type:</strong> #{question['QuestionType']}".html_safe +
+            "\n\n<strong>Scoping Attribute:</strong> #{question['ScopingAttribute']}".html_safe +
+            "\n<strong>Rev.</strong> #{question['Rev']}".html_safe +
+            "\n\n<strong>QID:</strong> #{question['QuestionID']}".html_safe +
+            "\n<strong>Response Details:</strong> #{question['ResponseDetails']}".html_safe +
+            "\n<strong>Status:</strong> #{question['Status']}".html_safe
+
           question_bullets = question["QuestionBullets"]
             .split("\n\t\t\t\t")
             .reject(&:empty?)
