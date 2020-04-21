@@ -46,6 +46,7 @@ class SamlController < ApplicationController
         end
       end
     else
+      puts "======================================= #{response.errors}"
       Rails.logger.info "RESPONSE INVALID: #{response.errors}"
       redirect_to saml_config::SAML_DATA[:access_point]
     end
