@@ -50,8 +50,6 @@ class FindingsController < SafetyAssuranceController
       @owner = Finding.new
     end
     choose_load_special_matrix_form(@owner, 'finding')
-
-    render :partial=>'modal_form' if params[:modal]
   end
 
 

@@ -55,7 +55,7 @@
                     th Actions
                   - else
                     th Attachments
-              tbody.checklist_rows
+              tbody.checklist_rows#checklist_rows
                 - @record.checklist_rows.each do |checklist_row|
                   = f.fields_for :checklist_rows, checklist_row do |row_form|
                     = render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing'
@@ -95,7 +95,6 @@
                               td
                                 - unless is_header
                                   = render 'forms/attachments_show_mini', owner: checklist_row, edit: true, f: row_form
-
 
           .mr10.mt10
             = f.submit 'Save', class: 'btn btn-success pull-right', disable_with: 'Saving...'
