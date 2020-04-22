@@ -20,4 +20,21 @@ class Checklist < ActiveRecord::Base
     User.where(id: (self.assignee_ids || "").split(',').map(&:to_i))
   end
 
+  def get_headers
+    self.checklist_header.checklist_header_items.order('display_order')
+  end
+
+  def get_contents
+    contents = []
+    self.checklist_rows.order(:id).each do |checklist_row|
+      # next if checklist_row.is_header
+      content = {}
+      checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
+        content[checklist_cell[:checklist_header_item_id]] = checklist_cell.value
+      end
+      contents << content
+    end
+    contents
+  end
+
 end

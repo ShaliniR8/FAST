@@ -32,7 +32,11 @@ ruby:
         .tab-content.mt20
           - checklists.each_with_index do |checklist, index|
             - active = index == 0 ? 'active' : ''
+            - @headers = checklist.get_headers
+            - @contents = checklist.get_contents
+            - @record = checklist
             .tab-pane id="checklist-#{checklist.id}" class="#{active}"
+
 
               b Assignees:
               = checklist.assignees.map(&:full_name).join(', ')
@@ -61,11 +65,13 @@ ruby:
                   :class => 'btn btn-danger pull-right mr5'
 
               = link_to "Export CSV", export_checklist_path(checklist, format: "csv"),
-                class: "btn btn-success pull-right mr5",
+                class: "btn btn-success pull-right mr5 mb10",
                 target: "_blank"
 
-              = render '/checklists/checklist_table', checklist: checklist, owner: owner
-
+              - if checklist.table_view
+                = render '/checklists/checklist_table', checklist: checklist, owner: owner
+              - else
+                = render '/checklists/page_view', checklist: checklist
 
 
 javascript:

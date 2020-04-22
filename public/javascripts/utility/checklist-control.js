@@ -1,5 +1,5 @@
 $(function() {
-  $('#checklist_rows').on('click', '.header_toggle_btn', function(event) {
+  $('.checklist_rows').on('click', '.header_toggle_btn', function(event) {
     event.preventDefault()
     if ($(this).hasClass('btn-default')) {
       var hiddenHeaderInput = $(this).closest('td').find('#is_header')
@@ -15,7 +15,7 @@ $(function() {
     }
   })
 
-  $('#checklist_rows').on('click', '.remove_btn', function(event) {
+  $('.checklist_rows').on('click', '.remove_btn', function(event) {
     event.preventDefault()
     var hiddenDeleteInput = $(this).closest('td').find('#delete_row')
     hiddenDeleteInput.val(true)
