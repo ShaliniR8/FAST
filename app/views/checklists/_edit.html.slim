@@ -4,7 +4,7 @@
   'utility/dirty-form'
 
 
-= form_for @record, html: {class: 'dirty-submit', multipart: true} do |f|
+= form_for @record, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|
 
   .col-xs-12
     .panel.panel-warning
@@ -45,7 +45,7 @@
 
             = render '/checklists/edit_instructions'
 
-          - if @record.table_view
+          - if action_name == 'edit' || @record.table_view
             table class='table table-bordered table-striped mt10'
               thead
                 tr
@@ -109,11 +109,38 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
-     $("#page-view-update-#{@record.id}").DataTable({
-        "aaSorting": [],
-        "aLengthMenu": [[1, -1], [1, "All"]],
-        "iDisplayLength": 1,
-      })
+    var table = $("#page-view-update-#{@record.id}").DataTable({
+      "aaSorting": [],
+      "aLengthMenu": [[1, -1], [1, "All"]],
+      "iDisplayLength": 1,
+    })
+
+    $('#submit-form').on('submit', function (e) {
+      e.preventDefault();
+      var $form = $(this);
+      // console.log($form)
+       // Iterate over all checkboxes in the table
+       table.$('input[type="checkbox"]').each(function(){
+          // If checkbox doesn't exist in DOM
+          if(!$.contains(document, this)){
+             // If checkbox is checked
+             if(this.checked){
+                // Create a hidden element
+                console.log(this.name)
+                console.log(this.value)
+                alert('stop')
+                $form.append(
+                   $('<input>')
+                      .attr('type', 'hidden')
+                      .attr('name', this.name)
+                      .val(this.value)
+                );
+                console.log($form.serializeArray());
+                alert('before form')
+             }
+          }
+       });
+    })
 
     var users = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('full_name'),

@@ -11,20 +11,23 @@ table.table.table-bordered.table-striped.mt10 id="page-view-#{checklist.id}"
         - display_content = ''
         - @headers.each do |header|
           - if content[header.id].present?
-            - display_content +=  '<strong>' + header.title + '</strong>' + ': ' + content[header.id] +'<br><br>'
+            - if header.data_type == 'checkboxes'
+              - input = "\n\n" + content[header.id].gsub(/\;/, "\n\n")
+            - else
+              - input = content[header.id]
+            - display_content +=  '<strong>' + header.title + '</strong>' + ': ' + input +'<br><br>'
         td
-          = display_content.html_safe
+          = display_content.gsub(/\n/, '<br/>').html_safe rescue ''
         td
           - if checklist_row.present?
             = render 'forms/attachments_show_mini', owner: checklist_row
         td
           - if checklist_row.present?
             = link_to '',
-              '#',
+              new_finding_path( owner_id: checklist_row.id, owner_type: checklist_row.class.name ),
               class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
               id: checklist_row.id,
-              "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add Finding",
-              "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
+              "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add Finding"
             = link_to '',
               '#',
               class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',
