@@ -12,10 +12,10 @@ table.table.table-bordered.table-striped.mt10 id="page-view-#{checklist.id}"
         - @headers.each do |header|
           - if content[header.id].present?
             - if header.data_type == 'checkboxes'
-              - input = "\n\n" + content[header.id].gsub(/\;/, "\n\n")
+              - input = content[header.id].gsub(/\;/, "\n")
             - else
               - input = content[header.id]
-            - display_content +=  '<strong>' + header.title + '</strong>' + ': ' + input +'<br><br>'
+            - display_content +=  '<strong>' + header.title + '</strong>' + ':<br/>' + input +'<br><br>'
         td
           = display_content.gsub(/\n/, '<br/>').html_safe rescue ''
         td

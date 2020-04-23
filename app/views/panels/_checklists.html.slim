@@ -7,20 +7,44 @@
     .panel-body style='display:none'
       .row
         .col-xs-12
-          table.table.table-striped.table-bordered
-            thead
-              - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
-                th style="#{header.size.present? ? "width: #{header.size}%" : ''}"
-                  = header.title
-              th Attachments
-            tbody
-              tr class="#{checklist_row.is_header ? 'header-row' : ''}"
-                - checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
+          - if checklist.table_view
+            table.table.table-striped.table-bordered
+              thead
+                - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
+                  th style="#{header.size.present? ? "width: #{header.size}%" : ''}"
+                    = header.title
+                th Attachments
+              tbody
+                tr class="#{checklist_row.is_header ? 'header-row' : ''}"
+                  - checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
+                    td
+                      = render 'checklist_headers/preview_field',
+                        owner_type: checklist.owner_type,
+                        cell: checklist_cell,
+                        item: checklist_cell.checklist_header_item
                   td
-                    = render 'checklist_headers/preview_field',
-                      owner_type: checklist.owner_type,
-                      cell: checklist_cell,
-                      item: checklist_cell.checklist_header_item
+                    - unless checklist_row.is_header?
+                      = render 'forms/attachments_show_mini', owner: checklist_row
+          - else
+            table.table.table-striped.table-bordered
+              thead
+                th Page View
+                th Attachments
+              tbody
+                tr
+                  - contents = checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }
+                  - headers = checklist.checklist_header.checklist_header_items.order('display_order')
+                  - display_content = ''
+                  - contents.each_with_index do |content, index|
+                    - header = headers[index]
+
+                    - if content.data_type == 'checkboxes' && content.value.present?
+                      - input = content.value.gsub(/\;/, "\n")
+                    - else
+                      - input = content.value
+
+                    - display_content +=  '<strong>' + header.title + '</strong>' + ':<br/>' + input +'<br><br>' if input.present?
                 td
-                  - unless checklist_row.is_header?
-                    = render 'forms/attachments_show_mini', owner: checklist_row
+                  = display_content.gsub(/\n/, '<br/>').html_safe rescue ''
+                td
+                  = render 'forms/attachments_show_mini', owner: checklist_row
