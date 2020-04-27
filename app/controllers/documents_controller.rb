@@ -48,6 +48,7 @@ class DocumentsController < ApplicationController
   def user_guides
     @topic_name = params[:topic_name] || "Welcome!"
     @href = params[:href] || "summary"
+    @content = params[:content].present? ? [params[:content]] : nil
   end
 
   def load_content

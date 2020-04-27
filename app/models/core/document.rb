@@ -42,6 +42,7 @@ class Document < ActiveRecord::Base
       },
       {name: 'Safety Reporting', href: 'safety_reporting', class: 'doc title',
         topics: [
+          {name: 'Safety Reporting Demo',               href: 'standard_video',  class: 'tv',  content: ['sr_demo']},
           {name: 'Dashboard Walkthrough',               href: 'standard_video',  class: 'tv',  content: ['sr_dashboard']},
           {name: 'Filing a Safety Report',              href: 'standard_video',  class: 'tv',  content: ['file_report'],},
           {name: 'Continuing an In-Progress Report',    href: 'standard_video',  class: 'tv',  content: ['continue_report'],},
@@ -56,6 +57,7 @@ class Document < ActiveRecord::Base
       },
       {name: 'Safety Assurance', href: 'safety_assurance', class: 'doc title',
         topics: [
+          {name: 'Safety Assurance Demo', href: 'standard_video',  class: 'tv',  content: ['sa_demo']},
           {name: 'Dashboard Walkthrough', href: 'standard_video',  class: 'tv', content: ['sa_dashboard'],},
           {name: 'Audits',                href: 'standard_video',  class: 'tv', content: ['audit_new', 'audit_recurring', 'audit_edit'],},
           {name: 'Findings',              href: 'standard_video',  class: 'tv', content: ['finding_new'],},
@@ -69,6 +71,7 @@ class Document < ActiveRecord::Base
 
       {name: 'Safety Risk Assessment (SRA/SRM)', href: 'sra', class: 'doc title',
         topics: [
+          {name: 'Safety Risk Assessment Demo', href: 'standard_video',   class: 'tv', content: ['sra_demo']},
           {name: 'Dashboard Walkthrough',       href: 'standard_video',   class: 'tv', content: ['sra_dashboard'],  },
           {name: 'SRAs',                        href: 'standard_video',   class: 'tv', content: ['sra_new', 'sra_edit'],},
           {name: 'Hazards',                     href: 'standard_video',   class: 'tv', content: ['hazard_new'],},
