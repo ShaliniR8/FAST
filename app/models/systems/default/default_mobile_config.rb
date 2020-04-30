@@ -31,6 +31,7 @@ class DefaultMobileConfig
 
     #FFT portals
     fft_training_dir: { label: 'Training',                      subdomain: 'fft-training'},
+    fft_training_sso: { label: 'Training SSO',                  subdomain: 'fft-training',  sso: true},
 
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
@@ -89,6 +90,7 @@ class DefaultMobileConfig
       key_name: 'Frontier Airlines Mobile Beta',
       portals: %i[
         fft_training_dir
+        fft_training_sso
       ]
     },
 
