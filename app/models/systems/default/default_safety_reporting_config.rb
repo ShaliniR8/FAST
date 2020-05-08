@@ -209,7 +209,7 @@ class DefaultSafetyReportingConfig
           },
           minutes: {
             field: 'minutes', title: 'Meeting Minutes',
-            num_cols: 12, type: 'textarea', visible: 'show',
+            num_cols: 12, type: 'textarea', visible: 'show,form',
             required: false
           },
           eir: {

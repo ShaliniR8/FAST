@@ -78,7 +78,18 @@ class Report < Sr::SafetyReportingBase
 
   def additional_info
     if attachments.length > 0 || records.map(&:attachments).flatten.length > 0
-      "<i class='fa fa-paperclip view_attachments'></i>".html_safe
+
+      tooltip = ''
+      attachments.each_with_index do |attachment, index|
+        if attachment.caption == ""
+          tooltip += attachment[:name]
+        else
+          tooltip += attachment.caption + ' (' + attachment[:name] + ')'
+        end
+        tooltip += ', ' if index != attachments.length - 1
+      end
+
+      "<a href='#{report_path(self)}' data-toggle='tooltip' data-placement='top' title='#{tooltip}'><i class='fa fa-paperclip view_attachments'></i></a>".html_safe
     end
   end
 
