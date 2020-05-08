@@ -3,7 +3,7 @@
     Hello <%=@user.first_name%>,
     <br>
     <br>
-    <% if CONFIG.sr::GENERAL[:direct_content_message] %>
+    <% if CONFIG.sr::GENERAL[:direct_content_message] && @message.class.name == "Message" %>
       You have a new message in ProSafeT.
       <br>
       <br>
