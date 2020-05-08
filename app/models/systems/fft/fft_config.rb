@@ -14,6 +14,7 @@ class FFTConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     enable_sso:                         true,
+    login_option:                       'sso',
     has_mobile_app:                     true,
 
     # SYSTEM-WIDE FORM CONFIGS
@@ -173,6 +174,49 @@ class FFTConfig < DefaultConfig
       25 => 'High - 25',
       30 => 'High - 30',
     }
+  }
+
+  ULTIPRO_DATA = {
+    upload_path: '/var/sftp/fftftpuser/ProSafeT_User_List_04082020.XML',
+    expand_output: false, #Shows full account generation details
+    dry_run: false, #Prevents the saving of data to the database
+
+    #The following identifies what account type is associated with each employee-group
+    group_mapping: {
+      'dispatch'    => 'Analyst',
+      'fight-crew'  => 'Pilot',
+      'ground'      => 'Ground',
+      'maintenance' => 'Staff',
+      'other'       => 'Staff'
+    }, #Cabin
+    tracked_privileges: [
+      'Flight Operations: Incident Submitter',
+      'Flight Operations: ASAP Submitter',
+      'Flight Operations: Fatigue Submitter',
+      'Flight Operations: Medical Event Submitter',
+      'Flight Operations: Fume Event Submitter',
+      'Inflight: Incident Submitter',
+      'Inflight: ASAP Submitter',
+      'Inflight: Fatigue Submitter',
+      'Inflight: Medical Event Submitter',
+      'Inflight: Fume Event Submitter',
+
+      'Ground: Incident Submitter',
+      'Ground: General Submitter',
+      'Other: General Submitter',
+      'Flight Crew: ASAP Submitter',
+      'Flight Crew: Incident Submitter',
+      'Flight Crew: Fatigue Submitter',
+      'Dispatch: ASAP Submitter',
+      'Dispatch: Incident Submitter',
+      'Dispatch: Fatigue Submitter',
+      'Maintenance: ASAP Submitter',
+      'Maintenance: Incident Submitter',
+      'Maitnenance: Fatigue Submitter',
+      'Cabin: ASAP Submitter',
+      'Cabin: Incident Submitter',
+      'Cabin: Fatigue Submitter'
+    ],
   }
 
 

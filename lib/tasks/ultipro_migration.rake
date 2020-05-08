@@ -12,10 +12,10 @@ namespace :ultipro do
       logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
       assign_configs
-      fetch_file
+      # fetch_file
 
       begin
-        data_dump = File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
+        data_dump = File.read('lib/tasks/ultipro_data.xml')
       rescue
         logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
         next #Abort
@@ -111,7 +111,7 @@ namespace :ultipro do
           employee_number: user_hash['employee_number'],
           level: map_account_level(user_hash['employee_group'])
         })
-        user[:sso_id] = user_hash['email_address']
+        user[:sso_id] = user_hash['employee_number']
         user.save! if !@dry_run
         return user
       rescue
@@ -153,6 +153,10 @@ namespace :ultipro do
       if user.email != user_hash['email_address']
         @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
         user.email = user_hash['email_address']
+      end
+      if user.sso_id != user_hash['employee_number']
+        @log_entry << "\n     Update SSO ID: #{user.email} => #{user_hash['employee_number']}"
+        user.sso_id = user_hash['employee_number']
       end
       if user.first_name != user_hash['first_name']
         @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"

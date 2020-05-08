@@ -21,6 +21,9 @@ PrdgSession::Application.routes.draw do |map|
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
   map.login 'login', :controller => 'sessions', :action => 'new'
+  match 'direct_login', to: 'sessions#new', as: :new, direct: :true
+
+
   map.resources :sessions
 
 

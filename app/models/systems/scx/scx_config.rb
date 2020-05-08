@@ -14,6 +14,7 @@ class SCXConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     enable_sso:                         true,
+    login_option:                       'dual',
     has_mobile_app:                     true,
 
     # SYSTEM-WIDE FORM CONFIGS

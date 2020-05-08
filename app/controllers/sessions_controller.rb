@@ -5,7 +5,13 @@ class SessionsController < ApplicationController
   def new
     respond_to do |format|
       format.html do
-        @categories = Category.all
+        if !params[:direct]
+          case CONFIG::GENERAL[:login_option]
+          when 'dual', 'prosafet' # regular login
+          when 'sso' # use idp login
+            redirect_to init_path
+          end
+        end
       end
       format.json do
         render :json => { :error => 'Session expired. Log in again.' }.to_json, :status => 401
