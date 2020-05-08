@@ -175,7 +175,19 @@ class DefaultSafetyRiskManagementConfig
           *%i[delete override_status edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
-        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          approve_reject: {
+            btn: :approve_reject,
+            btn_loc: [:inline],
+            access: proc { |owner:,user:,**op|
+              form_confirmed = owner.status == 'Pending Approval' || op[:form_conds] || owner.status == 'Pending Review'
+              user_confirmed = [owner.created_by_id, owner.approver_id, owner.reviewer_id].include?(user.id) ||
+                priv_check.call(owner,user,'admin',true,true) ||
+                op[:user_conds]
+              form_confirmed && user_confirmed
+            },
+          },
+        }),
         panels: %i[agendas comments hazards extension_requests verifications records attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
