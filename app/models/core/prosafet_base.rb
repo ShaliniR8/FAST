@@ -95,4 +95,14 @@ class ProsafetBase < ActiveRecord::Base
     Rails.application.config.occurrence_templates[self.name] ||
       Rails.application.config.occurrence_templates['Default']
   end
+
+  def included_verifications
+    result = ""
+    counter = 1
+    self.verifications.each do |verification|
+      result  += "##{counter}: #{verification.status}<br>"
+      counter += 1
+    end
+    result.html_safe
+  end
 end

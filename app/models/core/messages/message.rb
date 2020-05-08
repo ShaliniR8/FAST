@@ -17,6 +17,8 @@ class Message < ActiveRecord::Base
   def getAll(att)
     if att == "send_from"
       self.send(att).getName
+    elsif att == "send_from_email"
+      self.send_from.user.email
     else
       self.send(att).map{|x| x.getName}.join(", ")
     end

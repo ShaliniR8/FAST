@@ -3,9 +3,28 @@
     Hello <%=@user.first_name%>,
     <br>
     <br>
-    <%=@notice.content.html_safe rescue ''%>
+    <% if CONFIG.sr::GENERAL[:direct_content_message] %>
+      You have a new message in ProSafeT.
+      <br>
+      <br>
+      --------------------------------------------
+      <br>
+      <%= "From #{@message.getAll('send_from').gsub("(Me)", '')}"%><br>
+      <%= "#{ @message.getAll('send_from_email')}"%><br>
+      <br>
+      <% message = @message.content.gsub("\n", "<br>") %>
+      <%=message.html_safe rescue ''%>
+      <br>
+      <br>
+      --------------------------------------------
+    <% else %>
+      <% notice = @notice.content.gsub("\n", "<br>") %>
+      <%=notice.html_safe rescue ''%>
+    <% end %>
+
     <br>
     <br>
+    To view/respond to the message, please login to the ProSafeT Portal.
     <%=@link.html_safe%>
     <br>
     <br>
@@ -14,7 +33,7 @@
     <%= image_tag(attachments["logo.png"].url, :size => "145x35")%>
     <br><br>
     NOTICE:<br>
-    This is an automated message. If you need assistance, please contact us at <a href='https://support.prosafet.com/home'>support.prosafet.com</a>.<br>
+    This is an automated message. Please do not respond to this message. If you need assistance, please contact us at <a href='https://support.prosafet.com/home'>support.prosafet.com</a>.<br>
     If you received this message in error, notify us through the support portal. Thank you.
   </body>
 </html>

@@ -547,6 +547,11 @@ class DefaultDictionary
       num_cols: 12, type: 'textarea', visible: 'show',
       required: false
     },
+    verifications: {
+      field: 'included_verifications', title: 'Verifications',
+      num_cols: 6,  type: 'text', visible: 'index',
+      required: false
+    },
     template: {
       field: 'get_template', title: 'Template Type',
       num_cols: 6, type: 'text', visible: 'index,show',

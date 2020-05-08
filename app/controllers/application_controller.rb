@@ -725,7 +725,7 @@ class ApplicationController < ActionController::Base
       notice = record.notices.create(arg[:notice])
       puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
-        NotifyMailer.notify(notice, arg[:subject])
+        NotifyMailer.notify(notice, arg[:subject], record)
       end
     end
   end

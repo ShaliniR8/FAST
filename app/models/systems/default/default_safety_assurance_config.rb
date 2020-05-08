@@ -71,6 +71,7 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6,  type: 'text', visible: 'index',
             required: false
           },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -140,6 +141,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -212,6 +214,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -298,6 +301,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -440,8 +444,9 @@ class DefaultSafetyAssuranceConfig
           occurrences: {default: true, title: (Finding.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
-            title: "Full #{Finding.find_top_level_section.label rescue nil}"},
-
+            title: "Full #{Finding.find_top_level_section.label rescue nil}"
+          },
+          verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -545,6 +550,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -624,6 +630,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

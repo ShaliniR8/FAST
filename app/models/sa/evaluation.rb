@@ -85,7 +85,6 @@ class Evaluation < Sa::SafetyAssuranceBase
     self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
 
-
   def type
     "Inspection"
   end

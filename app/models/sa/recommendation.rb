@@ -59,6 +59,4 @@ class Recommendation < Sa::SafetyAssuranceBase
       "<b style='color:grey'>N/A</b>".html_safe
     end
   end
-
-
 end

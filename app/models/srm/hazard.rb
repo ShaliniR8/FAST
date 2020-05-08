@@ -102,9 +102,7 @@ class Hazard < Srm::SafetyRiskManagementBase
     end
   end
 
-
   def get_due_date
     self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
-
 end

@@ -165,6 +165,7 @@ class DefaultSafetyRiskManagementConfig
           regulatory_compliances_panel_end: {
             num_cols: 12, type: 'panel_end', visible: 'form,show'
           },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -221,6 +222,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
           occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
@@ -311,6 +313,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

@@ -113,7 +113,6 @@ class Audit < Sa::SafetyAssuranceBase
     "Audit"
   end
 
-
   def self.get_headers
     [
       { field: "get_id",                              title: "ID"                         },

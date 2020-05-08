@@ -59,6 +59,4 @@ class RiskControl < Srm::SafetyRiskManagementBase
       "N/A"
     end
   end
-
-
 end

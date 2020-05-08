@@ -4,11 +4,12 @@ class NotifyMailer < ApplicationMailer
   default :from => "donotreply@prosafet.com"
 
 
-  def notify(notice, subject)
+  def notify(notice, subject, record)
     define_attachments
     @user = notice.user
     @notice = notice
     @link = g_link(notice.owner)
+    @message = record
     if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
       mail(**to_email(notice.user.email), subject: subject).deliver
     end

@@ -47,25 +47,50 @@ class MessagesController < ApplicationController
       end
     end
 
-    if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
-      params[:send_to].values.each do |v|
-        SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
-        notify(@message,
-          notice: {users_id: v, content: "You have a new message in ProSafeT."},
-          mailer: true,
-          subject: 'New Internal Message')
+
+    if CONFIG.sr::GENERAL[:direct_content_message]
+
+      if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
+        params[:send_to].values.each do |v|
+          SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
+          notify(@message,
+            notice: {users_id: v, content: "You have a new message in ProSafeT."},
+            mailer: true,
+            subject:  params[:message][:subject])
+        end
+      end
+
+      if params[:cc_to].present?
+        params[:cc_to].values.each do |v|
+          CC.create(:messages_id => @message.id, :users_id => v)
+          notify(@message,
+            notice: {users_id: v, content: "You have a new message in ProSafeT."},
+            mailer: true,
+            subject: params[:message][:subject])
+        end
+      end
+    else
+      if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
+        params[:send_to].values.each do |v|
+          SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
+          notify(@message,
+            notice: {users_id: v, content: "You have a new message in ProSafeT."},
+            mailer: true,
+            subject: 'New Internal Message')
+        end
+      end
+
+      if params[:cc_to].present?
+        params[:cc_to].values.each do |v|
+          CC.create(:messages_id => @message.id, :users_id => v)
+          notify(@message,
+            notice: {users_id: v, content: "You have a new message in ProSafeT."},
+            mailer: true,
+            subject: 'New Internal Message')
+        end
       end
     end
 
-    if params[:cc_to].present?
-      params[:cc_to].values.each do |v|
-        CC.create(:messages_id => @message.id, :users_id => v)
-        notify(@message,
-          notice: {users_id: v, content: "You have a new message in ProSafeT."},
-          mailer: true,
-          subject: 'New Internal Message')
-      end
-    end
     if @message.owner
       Transaction.build_for(
         @message.owner,
