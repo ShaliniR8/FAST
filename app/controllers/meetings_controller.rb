@@ -280,6 +280,23 @@ class MeetingsController < ApplicationController
       end
     end
 
+
+    # update included agendas
+    meetings_agendas = Meeting.find(params[:id]).agendas
+    agendas = params[:meeting][:agendas_attributes]
+
+    agendas.each do |agenda|
+      found = false
+      meetings_agendas.each do |meeting_agenda|
+        found = true if meeting_agenda.id == agenda[1][:id]
+      end
+
+      next if found
+
+      Meeting.find(params[:id]).agendas << Agenda.find(agenda[1][:id]) if agenda[1][:id].present?
+    end
+
+
     @owner.update_attributes(params[:meeting])
     if transaction
       Transaction.build_for(

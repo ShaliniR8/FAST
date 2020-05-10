@@ -62,7 +62,7 @@ class Report < Sr::SafetyReportingBase
 
 
   def get_minutes_agenda(meeting_id)
-    agenda = "<b>Agendas:</b><br>#{agendas.where(owner_id: meeting_id).map(&:get_content).join('<br>')}" if agendas.length > 0
+    agenda = "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" if agendas.length > 0
     meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
     "#{agenda || ''} #{meeting_minutes || ''}".html_safe
   end
