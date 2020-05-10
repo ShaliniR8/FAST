@@ -23,9 +23,9 @@
     google.visualization.events.addListener(chart, 'select', function() {
       var root_url;
       if (type)
-        root_url = rootUrl + "?type=" + type + "&status=";
+        root_url = rootUrl + "?advance_search=true&type=" + type + "&status=";
       else
-        root_url = rootUrl + "?status=";
+        root_url = rootUrl + "?advance_search=true&status=";
       var selection = chart.getSelection();
       var dateParams = params && params.startDate && params.endDate ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       var empGroupParams = params && params.employeeGroups ? "&" + $.param({emp_groups: params.employeeGroups}) : "";
