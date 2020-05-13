@@ -5,7 +5,16 @@
   <td><%=Time.now.strftime("%Y-%m-%d %H:%M")%></td>
   <td><%=Time.now.strftime("%Y-%m-%d %H:%M")%></td>
   <td><%=f.select :discussion,options_for_select(@tof),{:include_blank=>""},:class=>"form-control"%></td>
-  <td><%=f.select :accepted,options_for_select(@accept_deline),{:include_blank=>""},:class=>"form-control"%></td>
+
+  <td>
+    <%=f.select :accepted,
+      CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ?
+        CONFIG.custom_options['Dispositions'] :
+        options_for_select(@accept_deline),
+      {:include_blank=>""},
+      :class => "form-control"%>
+  </td>
+
   <%=f.hidden_field :event_id,:value=>@report.id%>
   <%=f.hidden_field :user_id,:value=>current_user.id%>
   <td><%=f.text_area :comment,:rows=>"2",:class=>"form-control"%></td>

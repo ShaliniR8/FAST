@@ -27,7 +27,17 @@
                       <td><%=a.get_created%></td>
                       <td><%=a.get_updated%></td>
                       <td><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
-                      <td><%=x.select :accepted,options_for_select(@accept_deline,a.accepted),{:include_blank=>""},:class=>"form-control"%></td>
+
+                      <td>
+                        <%=x.select :accepted,
+                          CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ?
+                            CONFIG.custom_options['Dispositions'] :
+                            options_for_select(@accept_deline,a.accepted),
+                          {:include_blank=>""},
+                          :class => "form-control"%>
+                      </td>
+
+
                       <td><%=x.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
                     </tr>
                   <%end%>
