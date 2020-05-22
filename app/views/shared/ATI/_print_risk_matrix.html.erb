@@ -4,17 +4,16 @@
     <div class="content">
       <%if owner.risk_factor.present? %>
         <div class="col-xs-6">
-          <!-- TODO: Swap severity and likelihood -->
-          <b>Severity: </b><%= CONFIG.print_severity(owner, owner.likelihood.to_i) %></br>
-          <b>Probability: </b><%= CONFIG.print_probability(owner, owner.severity.to_i) %></br>
-          <b>Risk: </b><%= owner.risk_factor %></br></br>
+          <b>Initial Severity: </b><%= CONFIG.print_severity(owner, owner.severity.to_i) %></br>
+          <b>Initial Probability: </b><%= CONFIG.print_probability(owner, owner.likelihood.to_i) %></br>
+          <b>Initial Risk: </b><%= owner.risk_factor %></br></br>
         </div>
       <%end%>
       <%if owner.risk_factor_after.present? %>
         <div class="col-xs-6">
-          <b>Severity after mitigation: </b><%= CONFIG.print_severity(owner, owner.likelihood_after.to_i) %></br>
-          <b>Probability after mitigation: </b><%= CONFIG.print_probability(owner, owner.severity_after.to_i) %></br>
-          <b>Risk after mitigation: </b><%= owner.risk_factor_after %></br>
+          <b>Residual Severity: </b><%= CONFIG.print_severity(owner, owner.severity_after.to_i) %></br>
+          <b>Residual Probability: </b><%= CONFIG.print_probability(owner, owner.likelihood_after.to_i) %></br>
+          <b>Residual Risk: </b><%= owner.risk_factor_after %></br>
         </div>
       <%end%>
       <%if owner.statement.present? %>
@@ -26,4 +25,3 @@
     </div>
   </div>
 <%end%>
-<!-- NOTICE! likelihood and severity are SWAPPED in the Database- this is a temporary fix -->

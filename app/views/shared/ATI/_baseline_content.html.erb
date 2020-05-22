@@ -1,16 +1,12 @@
 <%=render "shared/instructions", :instruction =>
-  "Select <b>Baseline Probability</b> and <b>Baseline Severity</b> from the table to assess risk."%>
+  "Select <b>Initial Severity</b> and <b>Initial Probability</b> from the table to assess risk."%>
 
-<div class="form-group col-xs-12">
-  <%=f.label :statement, "Notes"%>
-  <%=f.text_area :statement, {:class => "form-control ml5", :rows => "2"}%>
+<div class="col-xs-12 col-sm-12 col-md-6">
+  <%=render "shared/#{AIRLINE_CODE}/form_baseline_risk"%>
+  <%=render "shared/#{AIRLINE_CODE}/form_baseline_probability"%>
+  <%=render "shared/#{AIRLINE_CODE}/risk_rating"%>
 </div>
 
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
-  <%=render "shared/#{AIRLINE_CODE}/form_severity"%>
-</div>
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <%=render "shared/#{AIRLINE_CODE}/form_probability"%>
-  <%=render "shared/#{AIRLINE_CODE}/form_risk_table"%>
+<div class="col-xs-12 col-sm-12 col-md-6">
+  <%=render "shared/#{AIRLINE_CODE}/form_baseline_severity"%>
 </div>

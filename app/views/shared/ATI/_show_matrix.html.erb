@@ -1,10 +1,11 @@
 <div class="col-xs-12 col-lg-12">
   <div class="panel panel-lightskyblue">
-
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
         <b>Risk Assessment</b>
-        <span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
+        <span class="pull-right clickable">
+          <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+        </span>
       </div>
     </div>
 
@@ -12,59 +13,51 @@
       <div class="row">
         <div class="col-xs-12">
           <%if can_change && show_btns && allow_mitigate &&
-              !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
-            <span data-toggle="modal" data-target=".bs-example-modal-lg">
-              <%=link_to "Mitigate Risk","#",
-                :class => "btn btn-warning pull-right ml5",
-                :id => "mitigate_btn",
-                "data-toggle" => "tooltip", "data-placement" => "top", :title=>"Assess Mitigated Risk"%>
-            </span>
-          <%end%>
-         <%if can_change && show_btns && allow_baseline &&
             !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
             <span data-toggle="modal" data-target=".bs-example-modal-lg">
-              <%=link_to "Baseline Risk","#",
-                :class => "btn btn-info pull-right",:id=>"baseline_btn",
-                "data-toggle" => "tooltip", "data-placement" => "top", :title => "Assess Baseline Risk"%>
+              <%=link_to "Residual Risk","#",
+                :class=>"btn btn-warning pull-right ml5",
+                :id=>"mitigate_btn",
+                "data-toggle"=>"tooltip",
+                "data-placement"=>"top",
+                :title=>"Assess Residual Risk"%>
+            </span>
+          <%end%>
+          <%if can_change && show_btns && allow_mitigate &&
+            !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
+            <span data-toggle="modal" data-target=".bs-example-modal-lg">
+              <%=link_to "Initial Risk","#",
+                :class => "btn btn-info pull-right",
+                :id => "baseline_btn",
+                "data-toggle"=>"tooltip",
+                "data-placement"=>"top",
+                :title=>"Assess Initial Risk"%>
             </span>
           <%end%>
         </div>
 
-        <div class='col-xs-12 mb20'>
-          <b>Notes:</b>
-          <div class="col-xs-11 col-xs-offset-1">
-            <%if owner.statement.present?%>
-              <%=owner.statement.gsub(/\n/, '<br/>').html_safe%>
-            <%end%>
-          </div>
-        </div>
-
-        <div class="col-xs-12 mt20">
+        <div class="col-xs-12">
           <h4>
-            <span class="label label-baseline">Baseline</span>
-            <span class="label label-mitigated">Mitigated</span>
+            <span class="label label-baseline">Initial</span>
+            <span class="label label-mitigated">Residual</span>
             <span class="label label-overlapped">Overlapped</span>
           </h4>
-          <span class='glyphicon glyphicon-remove'></span><b> Baseline Risk Assessment</b>
-          <span class='glyphicon glyphicon-ok'></span><b> Mitigated Risk Assessment</b>
         </div>
 
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
-          <%=render "shared/#{AIRLINE_CODE}/show_risk_severity",         :owner => owner%>
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <%=render "shared/#{AIRLINE_CODE}/show_risk", :owner => owner %>
+          <%=render "shared/#{AIRLINE_CODE}/show_probability", :owner => owner %>
+          <%=render "shared/#{AIRLINE_CODE}/risk_rating"%>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <%=render "shared/#{AIRLINE_CODE}/show_risk_probability",      :owner => owner%>
-          <%=render "shared/#{AIRLINE_CODE}/show_risk_factor",           :owner => owner%>
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <%=render "shared/#{AIRLINE_CODE}/show_severity", :owner => owner %>
         </div>
-
 
       </div>
-
-
     </div>
   </div>
 </div>
+
 
 
 <style>
@@ -80,36 +73,17 @@
     background-color: #CABCF6;
     color: #404040;
   }
-  .table-centered td,th{
-    text-align: center;
-  }
-  .table-centered th{
-    font-size: 14px;
-  }
-  .table-cursor td:hover {
-    opacity: 0.8;
-    cursor: pointer;
-    background-color: #F0F8FF;
-  }
-  .table-small th{
-    font-size: 13px !important;
-  }
-  .table-small td{
-    text-align: left !important;
-    font-size: 12px !important;
-  }
 </style>
 
 
 
 <script>
-
   function load_data(){
     <%if owner.get_extra_severity.present? && owner.get_extra_probability.present?%>
       $(".severity_td<%=owner.class.name%>_<%=owner.id%>").each(function(){
-        <%(0..@severity_table[:row_header].size - 1).each do |i|%>
-          if ($(this).data('row') == <%=i%>){
-            if($(this).data('column') == <%=owner.get_extra_severity[i]%>){
+        <%(0..@severity_table[:column_header].size-1).each do |i|%>
+          if ($(this).data('column')==<%=i%>){
+            if($(this).data('row')==<%=owner.get_extra_severity[i]%>){
               $(this).data("status","checked");
               $(this).css('background','#AFEEFC');
             }
@@ -117,11 +91,11 @@
         <%end%>
       });
       $('.probability_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-        <%(0..@probability_table[:column_header].size - 1).each do |i|%>
-          if ($(this).data('column') == <%=i%>){
-            if($(this).data('row') == <%=owner.get_extra_probability[i]%>){
-              $(this).data("status", "checked");
-              $(this).css('background', '#AFEEFC');
+        <%(0..@probability_table[:column_header].size-1).each do |i|%>
+          if ($(this).data('column')==<%=i%>){
+            if($(this).data('row')==<%=owner.get_extra_probability[i]%>){
+              $(this).data("status","checked");
+              $(this).css('background','#AFEEFC');
             }
           }
         <%end%>
@@ -129,12 +103,12 @@
     <%end%>
     <%if owner.get_mitigated_severity.present? && owner.get_mitigated_probability.present?%>
       $('.severity_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-        <%(0..@severity_table[:row_header].size-1).each do |i|%>
-          if ($(this).data('row') == <%=i%>){
-            if($(this).data('column') == <%=owner.get_mitigated_severity[i]%>){
+        <%(0..@severity_table[:column_header].size-1).each do |i|%>
+          if ($(this).data('column')==<%=i%>){
+            if($(this).data('row')==<%=owner.get_mitigated_severity[i]%>){
               $(this).data("mitigated","checked");
               <%if owner.get_extra_severity.present?%>
-                if ($(this).data('column') == <%=owner.get_extra_severity[i]%>){
+                if ($(this).data('row')==<%=owner.get_extra_severity[i]%>){
                   $(this).css('background','#CABCF6');
                 }else{
                   $(this).css('background','#FCAFCB');
@@ -147,13 +121,13 @@
         <%end%>
       });
       $('.probability_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-        <%(0..@probability_table[:column_header].size - 1).each do |i|%>
-          if ($(this).data('column') == <%=i%>){
-            if($(this).data('row') == <%=owner.get_mitigated_probability[i]%>){
-              $(this).data("mitigated", "checked");
+        <%(0..@probability_table[:column_header].size-1).each do |i|%>
+          if ($(this).data('column')==<%=i%>){
+            if($(this).data('row')==<%=owner.get_mitigated_probability[i]%>){
+              $(this).data("mitigated","checked");
               <%if owner.get_extra_probability.present?%>
-                if ($(this).data('row') == <%=owner.get_extra_probability[i]%>){
-                  $(this).css('background', '#CABCF6');
+                if($(this).data('row')==<%=owner.get_extra_probability[i]%>){
+                  $(this).css('background','#CABCF6');
                 }else{
                   $(this).css('background','#FCAFCB');
                 }
@@ -174,56 +148,66 @@
     severity_checked = 0
     probability_checked = 0
     $('.severity_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if ($(this).data("status") === "checked"){
-        severities.push($(this).data("column"));
+      if ($(this).data("status")==="checked"){
+        severities.push($(this).data("row"));
         severity_checked++;
       }
     });
     $('.probability_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if ($(this).data("status") === "checked"){
+      if ($(this).data("status")==="checked"){
         probabilities.push($(this).data("row"));
         probability_checked++;
       }
     });
-    if (probability_checked > 0 && severity_checked > 0){
-      set_risk(Math.min(...probabilities), Math.min(...severities));
+    if (probability_checked>0 && severity_checked>0){
+      set_risk(Math.min.apply(null, probabilities), Math.min.apply(null, severities));
     }
     severities = []
     probabilities = []
     severity_checked = 0
     probability_checked = 0
     $('.severity_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if ($(this).data("mitigated") === "checked"){
-        severities.push($(this).data("column"));
+      if ($(this).data("mitigated")==="checked"){
+        severities.push($(this).data("row"));
         severity_checked++;
       }
     });
     $('.probability_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if ($(this).data("mitigated") === "checked"){
+      if ($(this).data("mitigated")==="checked"){
         probabilities.push($(this).data("row"));
         probability_checked++;
       }
     });
-    if (probability_checked > 0 && severity_checked > 0){
-      set_mitigated(Math.min(...probabilities), Math.min(...severities));
+    if (probability_checked>0 && severity_checked>0){
+      set_mitigated(Math.min.apply(null, probabilities), Math.min.apply(null, severities));
     }
   }
 
   function set_risk(row_index,column_index){
     $('.risk_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if($(this).data("row") == row_index && $(this).data("column") == column_index){
-        $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
+      if($(this).data("column") == column_index && $(this).data("row") == row_index){
+        $(this).find('.content').addClass('circle initial-circle');
+        handle_overlap($(this).find('.content'));
       }
     });
   }
 
   function set_mitigated(row_index,column_index){
     $('.risk_td<%=owner.class.name%>_<%=owner.id%>').each(function(){
-      if($(this).data("row") == row_index && $(this).data("column") == column_index){
-        $(this).append("<span class='glyphicon glyphicon-ok' style='color:black'></span>");
+      if($(this).data("column") == column_index && $(this).data("row") == row_index){
+        $(this).find('.content').addClass('circle mitigated-circle');
+        handle_overlap($(this).find('.content'));
       }
     });
   }
 
+  function handle_overlap(cell) {
+    console.log($(cell).hasClass('mitigated-circle'));
+    console.log($(cell).hasClass('initial-circle'));
+    if ($(cell).hasClass('mitigated-circle') && $(cell).hasClass('initial-circle'))
+      $(cell.addClass('overlap-circle'));
+  }
+
   load_data();
+
 </script>

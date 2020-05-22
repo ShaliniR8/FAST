@@ -29,202 +29,126 @@ class ATIConfig < DefaultConfig
   MATRIX_INFO = {
     severity_table: {
       starting_space: true,
-      column_header: ['1','2','3','4','5'],
-      row_header: [
-        'Accident or Incident',
-        'Employee/Customer Injury',
-        'Assets',
-        'Operational Events',
-        'Airworthiness',
-        'Brand',
-        'Customer',
-        'Environment',
-        'Security',
-        'Regulatory',
-        'System or Process',
-        'Audit Finding',
-        'OSHA'
-      ],
+      row_header: ['I','II','III','IV'],
+      column_header: ['Consequence','or','or','or','or'],
       rows: [
-        [ #Accident or Incident
-          'Accident with serious injuries or fatalities; or significant damage to aircraft or property',
-          'Serious incident with injuries and/or substantial damage to aircraft or property',
-          'Incident with minor injury and/or minor aircraft or property damage',
-          'incident with less than minor injury and/or less than minor damage',
-          'No relevant safety risk'
+        [ # I
+          "Event or circumstance with potentially disastrous impact on business or significant material impact on a key area",
+          "Long term damage to reputation. Sustained negative media attention, brand and/or image affected nationally and/or internationally",
+          "Huge financial loss - Significant budget overrun with no capacity to adjust within existing budget.",
+          "Major regulatory deviation, operating an aircraft in an unsafe and non-standard condition. Loss of company approvals, permits or certificates, resulting in suspension of all operation",
+          "Aircraft accident or other accidents with serious injuries, fatalities or significant damage, death or total disability of an employee."
         ],
-        [ #Employee/Customer Injury
-          'Fatality or serious injury with total disability/loss of capacity',
-          'Immediate admission to hospital as an inpatient and/or partial disability/loss of capacity',
-          'Injury requiring ongoing treatment, with no permanent disability/loss of capacity',
-          'Minor injury not resulting in an absence',
-          'No injury risk'
+        [ # II
+          "Critical event or circumstance that will have some impact on business",
+          "Sustained damage to brand / image or reputation nationally or locally - Adverse national or local media.",
+          "Major financial loss - Requires significant adjustment to approved / funded projects / programs",
+          "Moderate regulatory deviation, operating an aircraft in an unsafe and non-standard condition.",
+          "Aircraft incident or other incidents with serious injuries and/ or moderate damage"
         ],
-        [ #Assets
-          'Multiple Aircraft OTS > 24 hours',
-          'One aircraft OTS > 24 hours',
-          'Aircraft OTS 2 to 24 hours',
-          'Aircraft OTS < 2 hours',
-          'No Aircraft OTS'
+        [ # III
+          "Event that can be readily absorbed but requires management effort to minimize the impact",
+          "Deficiencies leading to poor dependability or disruption to schedules, some short term negative media coverage.",
+          "Some financial loss, requires monitoring & possible corrective action.",
+          "Minor regulatory deviation, returning an aircraft to service in an un-airworthy condition.",
+          "Incident with minor injury and/or minor aircraft damage."
         ],
-        [ #Operational Events
-          'Loss of aircraft; beyond crew capability, operating with no meaningful safety margins',
-          'Physical distress/high workload impairing the accuracy and completion of tasks',
-          'Large reduction in safety margins; reduction in ability of crew to cope with adverse operating conditions',
-          'Operation beyond operating limitations; Use of abnormal procedures',
-          'No effect on operational safety'
+        [ # IV
+          "Some loss but not material, existing controls and procedures should cope with the event or circumstance.",
+          "Negligible impact on delivery of service",
+          "Unlikely to impact budget or funded activities, minor or no damage to brand, image or reputation.",
+          "Policy and/or procedure deviation, affecting aircraft or systems reliability above established control limits.",
+          "Less than minor injury and/or less than minor system damage"
         ],
-        [ #Airworthiness
-          'Returning an aircraft to service and operating it in a non-standard, unairworthy, or unsafe condition',
-          'Returning an aircraft to service and operating it in a non-standard but not unsafe condition',
-          'Returning an aircraft to service in a non-standard condition, but not operating it',
-          'Affecting aircraft or systems reliability above established control limits but no affect on airworthiness or the safe operation of the aircraft',
-          'No effect on airworthiness'
-        ],
-        [ #Brand
-          'Extended negative national media coverage resulting in a substantial change in public opinion of Sun Country',
-          'Short term negative media/internet activity resulting in minor change in public opinion of Sun Country',
-          'Short term negative media/internet activity resulting in no change in public opinion of Sun Country',
-          'Isolated negative media/internet activity resulting in no change in public opinion of Sun Country',
-          'No negative media/internet activity',
-        ],
-        [ #Customer
-          "<b><center>Extreme Customer Dissatisfaction</b></center>More than 500 customers affected for 48 hours or more",
-          "<b><center>Customer Dissatisfaction</b></center>More than 500 customers affected for 3 to 48 hours",
-          "<b><center>Customer Annoyance</b></center>Less than 500 customers affected for 3 to 48 hours",
-          "<b><center>Isolated Customer Annoyance</b></center>Less than 500 customers affected for up to 3 hours",
-          'No customer disruptions'
-        ],
-        [ #Environment
-          "Severe Danger to Environment:<br />Large, significant waste of resources and emissions into water, air, or soil",
-          'Medium significance in waste of resources and emissions into water, air, or soil',
-          'Small significance in waste of resources and emissions into water, air, or soil',
-          'Small waste or emission, no relevant risk of pollution',
-          'No relevant risk of pollution, no spill but an undesirable situation'
-        ],
-        [ #Security
-          'Loss of aircraft or death of Sun Country employee due to successful attack, terrorist activity, or civil unrest',
-          'Security threat is genuine. Situation can only be resolved by handing control to outside agencies',
-          'Security threat is genuine. Situation is only mitigated/resolved with assistance of outside agencies',
-          'Security threat is genuine but can be mitigated or resolved by Sun Country',
-          'Security threat is a hoax'
-        ],
-        [ #Regulatory
-          "<center><b>Major Regulatory Deviation</b></center>Loss of company approvals, permits or certificates, resulting in the suspension of all operations",
-          "<center><b>Moderate Regulatory Deviation</b></center>Loss of company approvals, permits or certificates, resulting in suspension in part of Sun Country operations",
-          "<center><b>Minor Regulatory Deviation</b></center>Major breach of company policy or SOPs with no direct impact on approvals, permits or certificates, with a significant negative effect of ability to manage operations. Attitude of regulatory authority towards Sun Country has been negatively impacted",
-          "<center><b>Policy/Procedure Deviation</b></center>Breach of company policy or SOPs, with no direct impact on approvals, certificates, permits, with a minor effect of ability to manage operations. Falls below industry \"best practices\"",
-          "No breach of company requirements; No impact on approvals or permits"
-        ],
-        [ #System or Process
-          'Loss or breakdown of entire system, subsystem or process',
-          'Partial breakdown of a system, subsystem, or process',
-          'System deficiencies leading to poor reliability or disruption',
-          'Little to no effect on system, subsystem, or process',
-          'No impact on system, subsystem, or process'
-        ],
-        [ #Audit Finding
-          'Safety of Operations in Doubt',
-          'Non-Compliance with company policy or CFR',
-          'Non-conformance with company policy or CFR',
-          'Audit Observation',
-          'No findings or observations'
-        ],
-        [ #OSHA
-          'Willful',
-          'Repeat',
-          'Serious',
-          'General/Other',
-          'No breach of OSHA requirements'
-        ]
-      ] #End of rows
-    },
-
-    severity_table_dict: {
-      0 => '1',
-      1 => '2',
-      2 => '3',
-      3 => '4',
-      4 => '5'
-    },
-
-    probability_table: {
-      starting_space: true,
-      row_header: ['A', 'B', 'C', 'D'],
-      column_header: ['Reactive Assessment (Control Effectiveness)', 'Proactive Assessment (Likelihood)'],
-
-      rows: [
-        [ #A
-          "<center><b>Not Effective</b></center>Remaining controls were ineffective or no controls remained. The only thing preventing an accident were luck or exceptional skill, which is not trained or required",
-          "<center><b>Likely to Occur</b></center>(Will occur in most circumstances, not surprised if it happens) or occurs > 1 in 100"
-        ],
-        [ #B
-          "<center><b>Minimal</b></center>Some controls were left but their total effectiveness was minimal",
-          "<center><b>Possible to Occur</b></center>(Might occur in some circumstances) or occurs > 1 in 1,000"
-        ],
-        [ #C
-          "<center><b>Limited</b></center>An abnormal situation, more demanding to manage, but with still a considerable remaining safety margin",
-          "<center><b>Unlikely to Occur</b></center>(Could occur in some circumstances, surprised if it happens) or occurs in > 1 in 10,000"
-        ],
-        [ #D
-          "<center><b>Effective</b></center>Consisting of several good controls",
-          "<center><b>Rare to Occur</b></center>(May occur but only in exceptional circumstances, may happen but it would only be highly unexpected) or occurs > 1 in 1,000,000"
-        ]
-      ] #End of rows
-    },
-
-    probability_table_dict: {
-      0 => 'A',
-      1 => 'B',
-      2 => 'C',
-      3 => 'D'
-    },
-
-    risk_table: {
-      starting_space: true,
-      column_header: ['1','2','3','4','5'],
-      row_header: ['A', 'B', 'C', 'D'],
-      rows: [
-        ["crimson",     "crimson",      "coral",          "yellow",         "mediumseagreen"      ],
-        ["crimson",     "coral",        "yellow",         "steelblue",      "mediumseagreen"      ],
-        ["coral",       "yellow",       "steelblue",      "mediumseagreen", "mediumseagreen"      ],
-        ["yellow",      "steelblue",    "mediumseagreen", "mediumseagreen", "mediumseagreen"      ],
       ]
     },
 
-    risk_table_dict: {
-      crimson:        'Red (A/1, A/2, B/1) - High',
-      coral:          'Orange (A/3, B/2, C/1) - Serious',
-      yellow:         'Yellow (A/4 B/3, D/1) - Moderate',
-      steelblue:      'Blue (B/4, C/3, D/2) - Minor',
-      mediumseagreen: 'Green (A/5, B/5, C/4, C/5, D/3, D/4, D/5) - Low',
+    # severity_table_dict: {
+    #   0 => 'I',
+    #   1 => 'II',
+    #   2 => 'III',
+    #   3 => 'IV',
+    # },
+
+    probability_table: {
+      starting_space: true,
+      row_header: ['A - Frequent','B - Probable','C - Occasional','D - Remote'],
+      column_header: ['Fleet/System/Inventory','Specific Individual Item 1','Specific Individual Item 2'],
+
+      rows: [
+        [
+          "It is expected to occur in most circumstances.",
+          "There is a strong likelihood of the hazards reoccurring",
+          "Likely to occur often in the life of an item, with a probability of occurence 80\%+"
+        ],
+        [
+          "Similar hazards have been recorded on a regular basis",
+          "Considered that it is likely that the hazard could occur",
+          "Will occur several times in the life of an item, with a probability of occurrence less than 80\% but greater than 50\%."
+        ],
+        [
+          "Very few known incidents of occurrence / Unlikely, but can expect to occur",
+          "Has not occurred yet, but it could occur sometime.",
+          "Likely to occur some time in the life of an item, with a probability of occurrence less than 50\% but greater than 20\%."
+        ],
+        [
+          "No known or recorded incidents of occurrence",
+          "Remote chance, may only occur in exceptional circumstance",
+          "Unlikely but possible to occur in the life of an item, with a probability of occurrence less than 20\%"
+        ]
+      ]
+    },
+
+    # probability_table_dict: {
+    #   0 => 'A - Frequent',
+    #   1 => 'B - Probable',
+    #   2 => 'C - Occasional',
+    #   3 => 'D - Remote',
+    # },
+
+    risk_table: {
+      starting_space: true,
+      row_header: ['A','B','C','D'],
+      column_header: ['I','II','III','IV'],
+      rows: [
+        ["red",     "red",       "orange",      "yellow"      ],
+        ["red",     "orange",    "yellow",      "steelblue"   ],
+        ["orange",  "yellow",    "steelblue",   "limegreen"   ],
+        ["yellow",  "steelblue", "limegreen",   "limegreen"   ]
+      ],
+      rows_content: [
+        ['1',     '1',     '2',      '3' ],
+        ['1',     '2',     '3',      '4' ],
+        ['2',     '3',     '4',      '5' ],
+        ['3',     '4',     '5',      '5' ]
+      ]
+    },
+
+    risk_definitions: {
+      limegreen:        { rating: 'LOW',       cells: '3/5, 4/4, 4/5',       description: 'Review by appropriate authority to evaluate if corrective and/or preventive action is required.' },
+      steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3',       description: 'Review by appropriate authority. May require tracking and corrective and/or preventive action.' },
+      yellow:           { rating: 'MEDIUM',    cells: '1/5, 2/4, 3/3, 4/2',  description: 'Review by appropriate authority, requires tracking and probable corrective and/or preventive action.' },
+      orange:           { rating: 'SERIOUS',   cells: '1/4, 2/3, 3/2',       description: 'Unacceptable, requires investigation, resources and corrective and/or preventive action.' },
+      red:              { rating: 'HIGH',      cells: '1/2, 1/3, 2/2',       description: 'Unacceptable, requires the highest priority for investigation, resources and corrective and/or preventive action.' }
     },
 
     risk_table_index: {
-      "High" => 'crimson',
-      "Serious" => 'coral',
-      "Moderate" => 'yellow',
-      "Minor" => 'steelblue',
-      "Low" => 'mediumseagreen'
+      'Low - 5' => 'limegreen',
+      'Minor - 4' => 'steelblue',
+      'Medium - 3' => 'yellow',
+      'Serious - 2' => 'orange',
+      'High - 1' => 'red',
     },
 
     risk_table_dict: {
-      crimson:        "High",
-      coral:          "Serious",
-      yellow:         "Moderate",
-      steelblue:      "Minor",
-      mediumseagreen: "Low"
-    },
-
-
-    risk_definitions: {
-      crimson:          { rating: 'High',      cells: 'A/1, A/2, and B/1',                      description: '' },
-      coral:            { rating: 'Serious',   cells: 'A/3, B/2, and C/1',                      description: '' },
-      yellow:           { rating: 'Moderate',  cells: 'A/4, B/3, and D/1',                      description: '' },
-      steelblue:        { rating: 'Minor',     cells: 'B/4, C/3, and D/2',                      description: '' },
-      mediumseagreen:   { rating: 'Low',       cells: 'A/5, B/5, C/4, C/5, D/3, D/4, and D/5',  description: '' }
+      5 => 'Low - 5',
+      4 => 'Minor - 4',
+      3 => 'Medium - 3',
+      2 => 'Serious - 2',
+      1 => 'High - 1',
     }
   }
+
 
 
 

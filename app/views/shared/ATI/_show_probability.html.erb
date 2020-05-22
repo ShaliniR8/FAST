@@ -1,8 +1,8 @@
-<div class="col-xs-12 mb10">
+<div class="col-xs-12">
   <hr/>
   <h4 style="color:#DC7633"><b>PROBABILITY EXERCISE</b></h4>
   <font size="1">
-  <table class="table table-bordered table-left table-cursor">
+  <table class="table table-bordered table-left">
     <tr>
       <th bgcolor="#DC7633" bgcolor="grey" style="color:white"><h4>PROBABILITY</h4></th>
       <th colspan="3" bgcolor="#DC7633" style="color:white"><h4>CRITERIA</h4></th>
@@ -13,14 +13,16 @@
         <th bgcolor="#FEF5E7" width="15%"><h5><%=header.html_safe%></h5></th>
       <%end%>
     </tr>
+
     <tr>
       <%@probability_table[:row_header].each_with_index do |row_header,row_index|%>
         <tr>
           <th bgcolor="#FEF5E7" width="5%"><%=row_header%></th>
           <%@probability_table[:column_header].each_with_index do |column_header,column_index|%>
-            <td class="mitigate_probability_td"
+            <td class="probability_td<%=owner.class.name%>_<%=owner.id%>"
               data-row="<%=row_index%>"
               data-status=""
+              data-mitigated=""
               data-column="<%=column_index%>">
               <%=@probability_table[:rows][row_index][column_index].html_safe%>
             </td>
@@ -28,6 +30,7 @@
         </tr>
       <%end%>
     </tr>
+
   </table>
   </font>
 </div>
