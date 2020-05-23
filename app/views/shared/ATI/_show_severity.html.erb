@@ -10,7 +10,7 @@
     <tr>
       <th bgcolor="#EAFAF1" width="5%"></th>
       <%@severity_table[:column_header].each do |header|%>
-        <th bgcolor="#EAFAF1" width="15%"><h5><%=header.html_safe%></h5></th>
+        <th bgcolor="#EAFAF1" width="15%"><h5><b><%=header.html_safe%></b></h5></th>
       <%end%>
     </tr>
     <tr>
@@ -19,7 +19,7 @@
           <th style="text-align:left; vertical-align:middle"
             bgcolor="#EAFAF1"
             width="5%">
-            <h5><%=row_header.html_safe%></h5>
+            <h5><b><%=row_header.html_safe%></b></h5>
           </th>
           <%@severity_table[:column_header].each_with_index do |column_header,column_index|%>
             <td class="severity_td<%=owner.class.name%>_<%=owner.id%>"
@@ -27,7 +27,7 @@
               data-status=""
               data-mitigated=""
               data-column="<%=column_index%>">
-              <%=@severity_table[:rows][row_index][column_index].html_safe%>
+              <h6><%=@severity_table[:rows][row_index][column_index].html_safe%></h6>
             </td>
           <%end%>
         </tr>

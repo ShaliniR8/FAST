@@ -9,7 +9,7 @@
     <tr>
       <th bgcolor="#FFFFF0" width="15%"></th>
       <%@risk_table[:column_header].each do |header|%>
-        <th bgcolor="#FFFFF0" width="15%"><h5><%=header.html_safe%></h5></th>
+        <th bgcolor="#FFFFF0" width="15%"><h5><b><%=header.html_safe%></b></h5></th>
       <%end%>
     </tr>
     <tr>
@@ -18,7 +18,7 @@
           <th style="text-align:left"
             width="5%"
             bgcolor="#FFFFF0">
-            <h5><%=row_header.html_safe%></h5>
+            <h5><b><%=row_header.html_safe%></b></h5>
           </th>
           <%@risk_table[:column_header].each_with_index do |column_header,column_index|%>
             <td class="mitigate_risk_td"

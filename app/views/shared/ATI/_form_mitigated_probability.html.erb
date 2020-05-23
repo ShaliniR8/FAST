@@ -10,19 +10,19 @@
     <tr>
       <th bgcolor="#FEF5E7" width="5%"></th>
       <%@probability_table[:column_header].each do |header|%>
-        <th bgcolor="#FEF5E7" width="15%"><h5><%=header.html_safe%></h5></th>
+        <th bgcolor="#FEF5E7" width="15%"><h5><b><%=header.html_safe%></b></h5></th>
       <%end%>
     </tr>
     <tr>
       <%@probability_table[:row_header].each_with_index do |row_header,row_index|%>
         <tr>
-          <th bgcolor="#FEF5E7" width="5%"><%=row_header%></th>
+          <th bgcolor="#FEF5E7" width="5%"><h5><b><%=row_header%></h5></b></th>
           <%@probability_table[:column_header].each_with_index do |column_header,column_index|%>
             <td class="mitigate_probability_td"
               data-row="<%=row_index%>"
               data-status=""
               data-column="<%=column_index%>">
-              <%=@probability_table[:rows][row_index][column_index].html_safe%>
+              <h5><%=@probability_table[:rows][row_index][column_index].html_safe%></h5>
             </td>
           <%end%>
         </tr>

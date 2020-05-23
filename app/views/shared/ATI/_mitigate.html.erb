@@ -139,13 +139,13 @@
 
   function set_mitigate(row_index,column_index){
     clear_mitigate();
-    risk_table_def = <%=FFTConfig::MATRIX_INFO[:risk_table][:rows_content].to_json.html_safe%>
-    risk_table_dic = <%=FFTConfig::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
+    risk_table_def = <%=ATIConfig::MATRIX_INFO[:risk_table][:rows_content].to_json.html_safe%>
+    risk_table_dic = <%=ATIConfig::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
     $('.mitigate_risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).find('.content').addClass('circle mitigated-circle');
-        $('#sev').val(row_index);
-        $('#like').val(column_index);
+        $('#sev').val(column_index);
+        $('#like').val(row_index);
         $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
       }
     });

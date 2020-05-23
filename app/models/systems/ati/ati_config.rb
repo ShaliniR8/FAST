@@ -63,12 +63,12 @@ class ATIConfig < DefaultConfig
       ]
     },
 
-    # severity_table_dict: {
-    #   0 => 'I',
-    #   1 => 'II',
-    #   2 => 'III',
-    #   3 => 'IV',
-    # },
+    severity_table_dict: {
+      0 => 'I',
+      1 => 'II',
+      2 => 'III',
+      3 => 'IV',
+    },
 
     probability_table: {
       starting_space: true,
@@ -99,12 +99,12 @@ class ATIConfig < DefaultConfig
       ]
     },
 
-    # probability_table_dict: {
-    #   0 => 'A - Frequent',
-    #   1 => 'B - Probable',
-    #   2 => 'C - Occasional',
-    #   3 => 'D - Remote',
-    # },
+    probability_table_dict: {
+      0 => 'A - Frequent',
+      1 => 'B - Probable',
+      2 => 'C - Occasional',
+      3 => 'D - Remote',
+    },
 
     risk_table: {
       starting_space: true,
