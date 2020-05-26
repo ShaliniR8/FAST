@@ -3,14 +3,14 @@
   <h4><b>RISK RATING KEY</b></h4>
   <table class="table table-bordered table-fixed table-left">
     <tr>
-      <%ATIConfig::MATRIX_INFO[:risk_definitions].each do |k, v| %>
+      <%ATNConfig::MATRIX_INFO[:risk_definitions].each do |k, v| %>
         <th bgcolor="<%=v[:color].present? ? v[:color] : k%>" width="20%">
           <%=v[:rating]%>
         </th>
       <%end%>
     </tr>
     <tr>
-      <%ATIConfig::MATRIX_INFO[:risk_definitions].each do |k, v| %>
+      <%ATNConfig::MATRIX_INFO[:risk_definitions].each do |k, v| %>
         <td width="20%">
           <%=v[:description]%>
         </td>

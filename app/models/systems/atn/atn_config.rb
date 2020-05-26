@@ -1,4 +1,4 @@
-class ATIConfig < DefaultConfig
+class ATNConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[audit]
@@ -25,6 +25,12 @@ class ATIConfig < DefaultConfig
     'ASAP MOU Holder Name'=>'N/A',
     'ASAP MOU Holder FAA Designator'=>'SCNA'
   })
+
+  RISK_MATRIX = {
+    # :likelihood       => ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"],
+    # :severity         => (0..4).to_a.reverse,
+    :risk_factor      => {"LOW" => "limegreen", "MINOR" => "steelblue", "MEDIUM" => "yellow", "SERIOUS" => "orange", "HIGH" => "red"},
+  }
 
   MATRIX_INFO = {
     severity_table: {

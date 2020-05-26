@@ -139,8 +139,8 @@
 
   function set_mitigate(row_index,column_index){
     clear_mitigate();
-    risk_table_def = <%=ATIConfig::MATRIX_INFO[:risk_table][:rows_content].to_json.html_safe%>
-    risk_table_dic = <%=ATIConfig::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
+    risk_table_def = <%=ATNConfig::MATRIX_INFO[:risk_table][:rows_content].to_json.html_safe%>
+    risk_table_dic = <%=ATNConfig::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
     $('.mitigate_risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).find('.content').addClass('circle mitigated-circle');

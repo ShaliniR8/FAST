@@ -32,33 +32,32 @@
           h4: b RISK ASSESSMENT
           .col-xs-6
             h5: b BASELINE RISK
-            <b>Severity:</b> #{owner.severity}<br>
-            <b>Likelihood:</b> #{owner.likelihood}<br>
+            - severity = CONFIG.print_severity(owner, owner.severity.to_i) if owner.severity.present?
+            - likelibood = CONFIG.print_probability(owner, owner.likelihood.to_i) if owner.likelihood.present?
+            <b>Severity:</b> #{severity}<br>
+            <b>Likelihood:</b> #{likelibood}<br>
             <b>Risk Factor:</b> #{owner.risk_factor}<br>
           .col-xs-6
             h5: b MITIGATED RISK
-            <b>Severity:</b> #{owner.severity_after}<br>
-            <b>Likelihood:</b> #{owner.likelihood_after}<br>
+            - severity_after = CONFIG.print_severity(owner, owner.severity_after.to_i) if owner.severity_after.present?
+            - likelibood_after = CONFIG.print_probability(owner, owner.likelihood_after.to_i) if owner.likelihood_after.present?
+            <b>Severity:</b> #{severity_after}<br>
+            <b>Likelihood:</b> #{likelibood_after}<br>
             <b>Risk Factor:</b> #{owner.risk_factor_after}<br>
           /Risk Matrix Rating Key
           / render 'shared/bsk_risk_matrix_rating_key'
-          .col-xs-12
-            h4: b RISK RATING KEY
-            table.table.table-bordered.table-fixed.table-centered
-              tr
-                - CONFIG::RISK_MATRIX[:risk_factor].each do |k, v|
-                  <th bgcolor="#{v}">#{k}</th>
+        .col-xs-12.col-lg-6
+          hr/
+          h4: b RISK RATING KEY
+          table.table.table-bordered.table-fixed.table-centered
+            tr
+              - CONFIG::RISK_MATRIX[:risk_factor].each do |k, v|
+                <th bgcolor="#{v}">#{k}</th>
 
         /Risk Assessment Matrix
         / render 'shared/bsk_risk_matrix_show_matrix', owner: owner, type: type
         .col-xs-12.col-lg-6
-          hr/
-          h4: b RISK ASSESSMENT MATRIX
-          table.table.table-bordered.table-centered.mb10 id="#{type}#{owner.id}" cellspacing="0" width="100%"
-          tr
-            th rowspan="2" colspan="2" bgcolor="lightgray"
-            th colspan="5" bgcolor="grey" style="color:white" LIKELIHOOD
-          tr
+
 
 
 javascript:
