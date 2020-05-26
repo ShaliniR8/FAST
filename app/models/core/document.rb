@@ -48,6 +48,7 @@ class Document < ActiveRecord::Base
           {name: 'Corrective Actions',                  href: 'standard_video',  class: 'tv',  content: ['car_from_report', 'car_from_event', 'edit_car', 'car_advanced_search'],},
           {name: 'FAA Reports',                         href: 'standard_video',  class: 'tv',  content: ['new_faa_report', 'edit_faa_reports'],},
           {name: 'Meetings',                            href: 'standard_video',  class: 'tv',  content: ['new_meeting', 'process_meeting'],},
+          {name: 'Query Center',                        href: 'standard_video',  class: 'tv',  content: ['safety_reporting_query_center'],},
         ]
       },
       {name: 'Safety Assurance', href: 'safety_assurance', class: 'doc title',
