@@ -376,7 +376,7 @@ class HomeController < ApplicationController
             :textColor => "darkslategrey",
             :description => a.description,
             :color => group_to_color(a.template.emp_group)
-          })
+          }) if a.get_date.present?
         end
       end
 
