@@ -8,6 +8,9 @@ require "fileutils"
     # rename files to match SRA ID
     path = "#{Dir.pwd}/public/uploads/fft_sra_attachments"
     no_match = 0
+
+    Attachment.skip_callback(:create, :after, :create_transaction)
+
     Dir.open(path).each do |p|
 
       if p != "." && p != ".."
@@ -40,6 +43,7 @@ require "fileutils"
         end
       end
     end
+    Attachment.set_callback(:create, :after, :create_transaction)
     puts "total no match: #{no_match}"
   end
 
