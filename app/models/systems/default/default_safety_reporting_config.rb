@@ -177,6 +177,10 @@ class DefaultSafetyReportingConfig
             num_cols: 6, type: 'text', visible: 'index,form,meeting_form,show',
             required: true, on_newline: true
           },
+          event_station: {
+            field: 'event_station', title: 'Event Station',
+            num_cols: 4, type: 'text', visible: '',
+          },
           event_date: {
             default: true, title: 'Event Date',
             num_cols: 6, type: 'date', visible: 'index,form,meeting_form,show',
