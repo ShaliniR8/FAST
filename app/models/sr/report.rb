@@ -78,15 +78,19 @@ class Report < Sr::SafetyReportingBase
 
   def additional_info
     result = ""
+
     if attachments.length > 0
       attachments.each do |attachment|
-        result +="<a href='#{attachment.name.url}'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name]}</a><br>"
-      end
-    elsif records.map(&:attachments).flatten.length > 0
-      records.map(&:attachments).flatten.each do |attachment|
-        result +="<a href='#{attachment.name.url}'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name]}</a><br>"
+        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name]}</a><br>"
       end
     end
+
+    if records.map(&:attachments).flatten.length > 0
+      records.map(&:attachments).flatten.each do |attachment|
+        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name]}</a><br>"
+      end
+    end
+
     result.html_safe
   end
 
