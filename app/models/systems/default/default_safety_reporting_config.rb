@@ -44,7 +44,7 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },
-          submitter: { default: true, visible: "admin,index,show" },
+          submitter: { default: true, visible: "admin" },
           event_date: { default: true },
           description: { default: true },
         }.reduce({}) { |acc,(key,data)|
@@ -99,7 +99,7 @@ class DefaultSafetyReportingConfig
           id: { default: true, field: 'get_id' },
           status: { default: true },
           template: { default: true, title: 'Type' },
-          submitter: { default: true, visible: "admin,index,show" },
+          submitter: { default: true, visible: "admin" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },

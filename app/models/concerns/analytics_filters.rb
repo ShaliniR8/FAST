@@ -15,6 +15,11 @@ module AnalyticsFilters
       preload(:template)
         .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
           full_access_templates, viewer_access_templates)
+    elsif self.to_s == 'Report'
+      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer])
+      Record.preload(:template)
+        .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)", full_access_templates, viewer_access_templates)
+        .map(&:report).flatten.uniq.compact
     else
       all
     end

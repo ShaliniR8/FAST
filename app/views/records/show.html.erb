@@ -46,12 +46,15 @@
                     "data-target" => ".bs-example-modal-lg"%>
                 <%end%>
 
-                <%=link_to "PDF",
-                  print_record_path(
-                    @record,
-                    :deidentified => false,
-                    :format => :pdf),
-                  :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
+                <%if template_full_access%>
+                  <%=link_to "PDF",
+                    print_record_path(
+                      @record,
+                      :deidentified => false,
+                      :format => :pdf),
+                    :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
+                <%end%>
+
                 <%=link_to "De-ID PDF",
                   print_record_path(
                     @record,

@@ -90,6 +90,10 @@
                       "data-target" => ".bs-example-modal-lg",
                       :class => "btn btn-default mt5 view_btn"%>
                   <%elsif (current_user.has_template_access(record.template.name).include? 'viewer') && record.viewer_access%>
+                    <%=link_to "<i class='glyphicon glyphicon-eye-open'></i>".html_safe,
+                      record_path(record),
+                      :class => "btn btn-info mt5",
+                      :disable_with => "Redirecting..."%>
                     <%=link_to "<i class='glyphicon glyphicon-eye-close'></i>".html_safe,
                       '#',
                       "data-toggle" => "modal",
