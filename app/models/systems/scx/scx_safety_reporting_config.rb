@@ -49,7 +49,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
           },
           event_station: {
             field: 'event_station', title: 'Event Station',
-            num_cols: 4, type: 'select', options: "CONFIG.custom_options['Event Station']", visible: 'index,form,meeting_form,show',
+            num_cols: 4, type: 'select', options: "CONFIG.custom_options['Station Codes']", visible: 'index,form,meeting_form,show',
           },
           event_date: {
             default: true, title: 'Event Date',
