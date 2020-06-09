@@ -14,7 +14,7 @@ namespace :wbat_upload do
       #login
     Net::SFTP.start(host, username, :password => password) do |sftp|
       year = current.strftime("%Y")
-      month = current.strftime("%b").downcase
+      month = current.strftime("%b")
       begin
         path = File.join(Rails.root, "mitre", year, month)
         emp_groups = Dir.entries(path).select {|f| !File.directory? f}
