@@ -37,7 +37,8 @@
       <div class="input-group">
         <%=select_tag :value,
           options_for_select(field.getOptions),
-          {class: 'form-control tz atz timezone_field field_select ' + required,
+          { include_blank: true,
+            class: 'form-control tz atz timezone_field field_select ' + required,
           :id => "#{field.id}"}%>
         <span class="input-group-addon tc">All</span>
       </div>

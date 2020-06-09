@@ -76,7 +76,7 @@
             <div class="col-xs-12 col-sm-2 mb5">
               <%=label_tag :event_time_zone, "Time Zone"%>
               <div class="input-group">
-                <%=select_tag :event_time_zone, [], {class: 'form-control tz atz toplevel_timezone'}%>
+                <%=select_tag :event_time_zone, options_for_select(ActiveSupport::TimeZone.all.map(&:name)), {include_blank: true, class: 'form-control tz atz toplevel_timezone'}%>
                 <span class="input-group-addon tc">All</span>
               </div>
             </div>
