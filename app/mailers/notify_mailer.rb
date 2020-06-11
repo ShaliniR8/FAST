@@ -4,7 +4,7 @@ class NotifyMailer < ApplicationMailer
   default :from => "donotreply@prosafet.com"
 
 
-  def notify(notice, subject, record)
+  def notify(notice, subject, record, attachment = nil)
     define_attachments
     @user = notice.user
     @notice = notice
@@ -13,6 +13,9 @@ class NotifyMailer < ApplicationMailer
     if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
       mail(**to_email(notice.user.email), subject: subject).deliver
     end
+
+    filename = 'report'
+    attachments["#{filename}.pdf"] = attachment unless attachment.nil?
     mail(to: 'noc@prosafet.com', subject: subject).deliver
   end
 

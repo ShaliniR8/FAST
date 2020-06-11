@@ -47,49 +47,14 @@ class MessagesController < ApplicationController
       end
     end
 
-
-    if CONFIG.sr::GENERAL[:direct_content_message]
-
-      if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
-        params[:send_to].values.each do |v|
-          SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
-          notify(@message,
-            notice: {users_id: v, content: "You have a new message in ProSafeT."},
-            mailer: true,
-            subject:  params[:message][:subject])
-        end
-      end
-
-      if params[:cc_to].present?
-        params[:cc_to].values.each do |v|
-          CC.create(:messages_id => @message.id, :users_id => v)
-          notify(@message,
-            notice: {users_id: v, content: "You have a new message in ProSafeT."},
-            mailer: true,
-            subject: params[:message][:subject])
-        end
-      end
-    else
-      if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
-        params[:send_to].values.each do |v|
-          SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
-          notify(@message,
-            notice: {users_id: v, content: "You have a new message in ProSafeT."},
-            mailer: true,
-            subject: 'New Internal Message')
-        end
-      end
-
-      if params[:cc_to].present?
-        params[:cc_to].values.each do |v|
-          CC.create(:messages_id => @message.id, :users_id => v)
-          notify(@message,
-            notice: {users_id: v, content: "You have a new message in ProSafeT."},
-            mailer: true,
-            subject: 'New Internal Message')
-        end
-      end
-    end
+    # send messages
+    call_rake 'notify',
+       owner_type: params[:message][:owner_type],
+       owner_id: params[:message][:owner_id],
+       subject: params[:message][:subject],
+       send_to: params[:send_to],
+       cc_to: params[:cc_to],
+       to_anonymous: params[:to_anonymous]
 
     if @message.owner
       Transaction.build_for(

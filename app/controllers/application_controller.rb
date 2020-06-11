@@ -725,7 +725,7 @@ class ApplicationController < ActionController::Base
       notice = record.notices.create(arg[:notice])
       puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
-        NotifyMailer.notify(notice, arg[:subject], record)
+        NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment])
       end
     end
   end
@@ -791,6 +791,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # http://railscasts.com/episodes/127-rake-in-background
+  def call_rake(task, options={})
+    options[:rails_env] = Rails.env
+    args = options.map { |n, v| "#{n.to_s.upcase}='#{v}'"}
+    Rails.logger.info "running `rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &`"
+    system "rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
+  end
 
   private
 
