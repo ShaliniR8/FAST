@@ -14,7 +14,18 @@ class NotifyMailer < ApplicationMailer
       mail(**to_email(notice.user.email), subject: subject).deliver
     end
 
-    filename = 'report'
+    object_name = record.class.name
+    object_id   = record.id
+    title       = record.description
+
+    if object_name == 'Submission'
+      submission_type = record.template.name
+      filename = "#{object_name}_#{object_id}_#{submission_type}_#{title}"
+    else
+      object_name = 'Report' if object_name == 'Record'
+      filename = "#{object_name}_#{object_id}_#{title}"
+    end
+
     attachments["#{filename}.pdf"] = attachment unless attachment.nil?
     mail(to: 'noc@prosafet.com', subject: subject).deliver
   end
