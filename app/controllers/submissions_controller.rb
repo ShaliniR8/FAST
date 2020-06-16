@@ -497,13 +497,12 @@ class SubmissionsController < ApplicationController
 
       case commit
       when "Submit"
-        notifiers.each do |user|
-          notify(owner, notice: {
-            users_id: user.id,
-            content: "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
-            mailer: true, subject: "New #{owner.template.name} Submission"
-          )
-        end
+
+        call_rake 'submission_notify',
+            owner_type: owner.class.name,
+            owner_id: owner.id,
+            users: notifiers.map(&:id)
+
       when "Save for Later"
         notify(owner, notice: {
           users_id: owner.created_by.id,

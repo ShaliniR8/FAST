@@ -9,7 +9,7 @@
       </tr>
     </thead>
     <tbody>
-      <%User.includes(:invitations).where(id: @users.map(&:id)).each do |user|%>
+      <%User.includes(:invitations).where(id: @users.select(&:present?).map(&:id)).each do |user|%>
         <tr user="<%=user.id%>">
           <%User.invite_headers.each do |header|%>
             <td>
