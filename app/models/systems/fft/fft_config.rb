@@ -23,7 +23,16 @@ class FFTConfig < DefaultConfig
     has_root_causes:                   false,
   })
 
-
+  def self.getTimeFormat
+    {
+      :timepicker       => 'H:i',
+      :datepicker       => 'm/d/Y',
+      :datetimepicker   => 'm/d/Y H:i',
+      :dateformat       => '%m/%d/%Y',
+      :datetimeformat   => '%m/%d/%Y %H:%M',
+      :datetimezformat   => '%m/%d/%Y %H:%M %Z',
+    }
+  end
 
   FAA_INFO = {
     "CHDO"=>"XXX",
