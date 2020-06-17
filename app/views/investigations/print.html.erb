@@ -66,4 +66,25 @@
       %>
     </div>
   <%end%>
+
+  <% if @investigation.owner.class.name == 'Report'%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "reports/print",
+        :owner => @investigation.owner,
+        :deidentified => true
+      %>
+    </div>
+  <%end%>
+
+  <% if @investigation.owner.class.name == 'Record'%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "records/print",
+        :owner => @investigation.owner,
+        :deidentified => true
+      %>
+    </div>
+  <%end%>
+
 </div>

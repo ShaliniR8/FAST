@@ -188,7 +188,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[agendas comments hazards extension_requests verifications records attachments transaction_log
+        panels: %i[agendas comments hazards extension_requests verifications reports events attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {

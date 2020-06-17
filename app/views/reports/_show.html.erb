@@ -1,5 +1,8 @@
 <% @records = owner.records %>
 <% @report = owner %>
+<% @action_headers = CorrectiveAction.get_meta_fields('index') %>
+<% @corrective_actions = @report.corrective_actions %>
+
 <% @fields = Report.get_meta_fields(
       'show',
       CONFIG::GENERAL[:event_summary] ? 'event_summary' : '',
@@ -38,3 +41,26 @@
     </div>
   </div>
 <%end%>
+
+<%if @report.corrective_actions.present?%>
+  <div class="col-xs-12 col-md-12 col-lg-12"%>
+    <div class="panel panel-info">
+      <div class="panel-heading click-heading collapsed">
+        <div class="panel-title">
+          <b>Corrective Actions</b>
+          <span class="pull-right clickable">
+            <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+      <div class="panel-body" style="display:none">
+        <div class="row">
+          <%@no_footer = true%>
+          <%=render "/corrective_actions/actions"%>
+        </div>
+      </div>
+    </div>
+  </div>
+<%end%>
+
+<%=render "/forms/show_comment", :owner => owner%>
