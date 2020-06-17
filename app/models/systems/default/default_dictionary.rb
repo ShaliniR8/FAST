@@ -297,6 +297,18 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { findings: owner.findings } },
     },
+    reports: {
+      partial: '/panels/reports',
+      visible: proc { |owner:,user:,**op| owner.owner.class.name == 'Record' },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { record: owner.owner } },
+    },
+    events: {
+      partial: '/panels/events',
+      visible: proc { |owner:,user:,**op| owner.owner.class.name == 'Report' },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { report: owner.owner } },
+    },
     hazards: {
       partial: '/panels/hazards',
       visible: proc { |owner:,user:,**op| owner.hazards.present? },
