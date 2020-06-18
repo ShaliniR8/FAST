@@ -30,7 +30,8 @@ class FFTConfig < DefaultConfig
       :datetimepicker   => 'm/d/Y H:i',
       :dateformat       => '%m/%d/%Y',
       :datetimeformat   => '%m/%d/%Y %H:%M',
-      :datetimezformat   => '%m/%d/%Y %H:%M %Z',
+      :datetimezformat  => '%m/%d/%Y %H:%M %Z',
+      :faa_report       => true
     }
   end
 

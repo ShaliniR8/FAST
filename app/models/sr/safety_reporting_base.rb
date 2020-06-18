@@ -27,7 +27,7 @@ module Sr
     end
 
     def get_event_date
-      event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
+      event_date.strftime(CONFIG.getTimeFormat[:datetimeformat]) rescue ''
     end
 
 

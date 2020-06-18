@@ -15,7 +15,11 @@
       <%@reports.includes(:records).each do |report|%>
         <tr report="<%=report.id%>">
           <%@report_headers.each do |header|%>
-            <td><%=report.send(header[:field])%></td>
+            <% if header[:type] == "date" %>
+              <td><%=date_to_string(report.send(header[:field])) %></td>
+            <% else %>
+              <td><%=report.send(header[:field])%></td>
+            <% end %>
           <%end%>
           <%unless associated_reports.include? report.id%>
             <td><a class="btn btn-info add_btn">Add</a></td>

@@ -50,6 +50,6 @@ class Message < ActiveRecord::Base
 
 
   def get_time
-    self.time.in_time_zone(Time.zone).strftime("%Y-%m-%d %H:%M:%S") rescue ''
+    self.time.in_time_zone(Time.zone).strftime(CONFIG.getTimeFormat[:datetimeformat]) rescue ''
   end
 end

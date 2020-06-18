@@ -49,6 +49,12 @@
             <%=datetime_to_string(value)%>
           </div>
 
+        <%when 'datetimez'%>
+          <div class="col-xs-<%=field[:num_cols]%>">
+            <b><%=field[:title]%>: </b>
+            <%=datetimez_to_string(value)%>
+          </div>
+
         <!-- if deidentified is true then skip user fields -->
         <%when 'user'%>
           <%if !deidentified%>

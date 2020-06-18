@@ -59,12 +59,21 @@ class FaaReport < ActiveRecord::Base
 
 
   def statistics
+    if CONFIG.getTimeFormat[:faa_report]
+      start_date = Date.strptime(self.get_start_date, '%m/%d/%Y').to_time.strftime('%F')
+      end_date = Date.strptime(self.get_end_date, '%m/%d/%Y').to_time.strftime('%F')
+    else
+      start_date = self.get_start_date
+      end_date = self.get_end_date
+    end
+
     asap_reports = Record
       .where("event_date >= ? and event_date <= ?",
-        self.get_start_date, self.get_end_date)
+        start_date, end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}
+
     accepted_reports = asap_reports.select{|report| report.asap}
     result = {
       asap_submitted: asap_reports.map(&:id),
@@ -92,13 +101,13 @@ class FaaReport < ActiveRecord::Base
   def get_start_date
     case self.quarter
       when 1
-        "#{self.year-1}-10-01"
+        CONFIG.getTimeFormat[:faa_report] ? "10/01/#{self.year-1}" : "#{self.year-1}-10-01"
       when 2
-        "#{self.year}-01-01"
+        CONFIG.getTimeFormat[:faa_report] ? "01/01/#{self.year}"   : "#{self.year}-01-01"
       when 3
-        "#{self.year}-04-01"
+        CONFIG.getTimeFormat[:faa_report] ? "04/01/#{self.year}"   : "#{self.year}-04-01"
       when 4
-        "#{self.year}-07-01"
+        CONFIG.getTimeFormat[:faa_report] ? "07/01/#{self.year}"   : "#{self.year}-07-01"
     end
   end
 
@@ -113,13 +122,13 @@ class FaaReport < ActiveRecord::Base
   def get_end_date
     case self.quarter
       when 1
-        "#{self.year-1}-12-31"
+        CONFIG.getTimeFormat[:faa_report] ? "12/31/#{self.year-1}" : "#{self.year-1}-12-31"
       when 2
-        "#{self.year}-03-31"
+        CONFIG.getTimeFormat[:faa_report] ? "03/31/#{self.year}"   : "#{self.year}-03-31"
       when 3
-        "#{self.year}-06-30"
+        CONFIG.getTimeFormat[:faa_report] ? "06/30/#{self.year}"   : "#{self.year}-06-30"
       when 4
-        "#{self.year}-09-30"
+        CONFIG.getTimeFormat[:faa_report] ? "09/30/#{self.year}"   : "#{self.year}-09-30"
     end
   end
 
