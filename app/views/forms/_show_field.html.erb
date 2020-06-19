@@ -35,10 +35,10 @@
     <%when "boolean_box"%>
       <%=field_value ? "Yes" : ""%>
     <%when "date"%>
-      <% field_value = field_value.in_time_zone(record.event_time_zone) if record.event_time_zone.present? %>
+      <% field_value = field_value.in_time_zone(record.event_time_zone) if record.class.name == 'Record' && record.event_time_zone.present? %>
       <%=date_to_string(field_value)%>
     <%when "datetime"%>
-      <% field_value = field_value.in_time_zone(record.event_time_zone) if record.event_time_zone.present? %>
+      <% field_value = field_value.in_time_zone(record.event_time_zone) if record.class.name == 'Record' && record.event_time_zone.present? %>
       <%=datetime_to_string(field_value)%>
     <%when "user"%>
       <%=User.find(field_value).full_name rescue field_value.to_s%>
