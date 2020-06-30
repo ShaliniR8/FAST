@@ -34,6 +34,11 @@ class Template < ActiveRecord::Base
     target_template = Template.create(name: self.name + ' -- copy')
     target_template.update_attributes(users_id: self.users_id)
 
+    if source_template.map_template_id.present?
+      source_template.map_template_id = target_template.id
+      target_template.map_template_id = source_template.id
+    end
+
     target_template_id = target_template.id
     source_template_id = self.id
 
@@ -51,7 +56,9 @@ class Template < ActiveRecord::Base
 
       source_fields = Field.where(categories_id: source_category_id, deleted: 0)
       source_fields.each do |field|
-        target_field =
+
+        if field.map_id.present?
+          target_field =
           Field.create(categories_id: target_category_id,
                        data_type: field.data_type,
                        display_type: field.display_type,
@@ -63,13 +70,36 @@ class Template < ActiveRecord::Base
                        show_label: field.show_label,
                        print: field.print,
                        convert_id: field.convert_id,
-                       map_id: field.map_id,
+                       map_id: field.id,
                        element_id: field.element_id,
                        element_class: field.element_class,
                        field_order: field.field_order,
                        required: field.required,
                        nested_field_id: field.nested_field_id,
                        nested_field_value: field.nested_field_value)
+
+          field.map_id = target_field.id
+          field.save
+        else
+          target_field =
+          Field.create(categories_id: target_category_id,
+                       data_type: field.data_type,
+                       display_type: field.display_type,
+                       label: field.label,
+                       options: field.options,
+                       display_size: field.display_size,
+                       priority: field.priority,
+                       description: field.description,
+                       show_label: field.show_label,
+                       print: field.print,
+                       convert_id: field.convert_id,
+                       element_id: field.element_id,
+                       element_class: field.element_class,
+                       field_order: field.field_order,
+                       required: field.required,
+                       nested_field_id: field.nested_field_id,
+                       nested_field_value: field.nested_field_value)
+        end
       end
     end
 
