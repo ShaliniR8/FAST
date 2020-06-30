@@ -29,6 +29,53 @@ class Template < ActiveRecord::Base
     ]
   end
 
+  def make_copy
+    source_template = self
+    target_template = Template.create(name: self.name + ' -- copy')
+    target_template.update_attributes(users_id: self.users_id)
+
+    target_template_id = target_template.id
+    source_template_id = self.id
+
+    source_categories = Category.where(templates_id: source_template_id, deleted: 0)
+    source_categories.each do |category|
+      source_category_id = category.id
+      target_category =
+        Category.create(title: category.title,
+                        templates_id: target_template_id,
+                        panel: category.panel,
+                        print: category.print,
+                        category_order: category.category_order)
+
+      target_category_id = target_category.id
+
+      source_fields = Field.where(categories_id: source_category_id, deleted: 0)
+      source_fields.each do |field|
+        target_field =
+          Field.create(categories_id: target_category_id,
+                       data_type: field.data_type,
+                       display_type: field.display_type,
+                       label: field.label,
+                       options: field.options,
+                       display_size: field.display_size,
+                       priority: field.priority,
+                       description: field.description,
+                       show_label: field.show_label,
+                       print: field.print,
+                       convert_id: field.convert_id,
+                       map_id: field.map_id,
+                       element_id: field.element_id,
+                       element_class: field.element_class,
+                       field_order: field.field_order,
+                       required: field.required,
+                       nested_field_id: field.nested_field_id,
+                       nested_field_value: field.nested_field_value)
+      end
+    end
+
+    target_template
+  end
+
   def status
     archive ? "Archived" : "Active"
   end

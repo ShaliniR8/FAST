@@ -24,6 +24,11 @@
               <b>Preview: <%=@template.name%> <%=@template.archive ? "(Archived)" : ""%></b>
             </div>
             <div class="top_buttons pull-right">
+              <% if current_user.username == 'prosafet_admin' %>
+                <%=link_to "Make a Copy",
+                clone_template_path(@template),
+                :class => "btn btn-info"%>
+              <% end%>
               <%=link_to "Expand All",
                 "#",
                 :class => "btn btn-default expandall"%>

@@ -35,6 +35,12 @@ class TemplatesController < ApplicationController
     @action="new"
   end
 
+  def clone
+    @owner = Template.find(params[:id])
+    @template = @owner.make_copy
+    redirect_to edit_template_path(@template)
+  end
+
 
   def edit
     @all_templates=Template.find(:all)

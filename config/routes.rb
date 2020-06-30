@@ -421,6 +421,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'get_json'
       get "archive"
+      get 'clone'
     end
     collection do
       get "show_nested"
