@@ -49,12 +49,13 @@ class MessagesController < ApplicationController
 
     # send messages
     call_rake 'notify',
-       owner_type: params[:message][:owner_type],
-       owner_id: params[:message][:owner_id],
-       subject: params[:message][:subject],
-       send_to: params[:send_to],
-       cc_to: params[:cc_to],
-       to_anonymous: params[:to_anonymous]
+      messages_id: @message.id,
+      owner_type: params[:message][:owner_type],
+      owner_id: params[:message][:owner_id],
+      subject: params[:message][:subject],
+      send_to: params[:send_to],
+      cc_to: params[:cc_to],
+      to_anonymous: params[:to_anonymous]
 
     if @message.owner
       Transaction.build_for(
@@ -102,7 +103,7 @@ class MessagesController < ApplicationController
 
 
   def sent
-    @messages = current_user.sent_messages.select{|x| x.visible}.map{|x| x.message}
+    @messages = current_user.sent_messages.select{|x| x.visible && x.message.present?}.map{|x| x.message}
     @title = "Sent"
   end
 
