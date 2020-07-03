@@ -23,6 +23,7 @@ class FFTConfig < DefaultConfig
     has_root_causes:                   false,
   })
 
+<<<<<<< HEAD
   def self.getTimeFormat
     {
       :timepicker       => 'H:i',
@@ -34,6 +35,10 @@ class FFTConfig < DefaultConfig
       :faa_report       => true
     }
   end
+=======
+  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
+  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({})
+>>>>>>> 87cf49b... Feat send report to CISP
 
   FAA_INFO = {
     "CHDO"=>"XXX",

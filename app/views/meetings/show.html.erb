@@ -75,6 +75,12 @@
                   :id => "new_report_btn",
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
+                <%=link_to "Send CISP Reports",
+                  "#",
+                  :class => "btn btn-info mb5 pull-right mr5",
+                  :id => "send_cisp_btn",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
               <%elsif @meeting.status == "Closed"%>
                 <%=link_to "Reopen Meeting",
                   reopen_meeting_path(@meeting),
@@ -165,6 +171,12 @@
     });
     $("#new_report_btn").on("click",function(){
       $.get("<%=get_reports_meeting_path(@meeting)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#send_cisp_btn").on("click",function(){
+      $.get("<%=get_cisp_records_meeting_path()%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

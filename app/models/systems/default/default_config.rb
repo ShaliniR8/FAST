@@ -122,6 +122,27 @@ class DefaultConfig
     self.object[obj.class.name][:actions][action][:access].call(owner:obj,user:user,**op)
   end
 
+  ###################################
+  ###        CISP MAPPING         ###
+  ###################################
+  CISP_TITLE_PARSE = {
+    'Flight Crew ASAP'   => 'flightcrew',
+  }
+
+  CISP_FIELD_PARSE = {
+    'Flight Crew ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+        'flightPhase'   => 'Flight Phase at Start of Event'
+      },
+      'Narratives' => { # THIS IS THE FFT CONFIG
+        'eventDescription' => "Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved",
+      }
+    }
+  }
 
   ###################################
   ### DEFAULT RISK MATRIX CONFIGS ###

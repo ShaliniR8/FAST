@@ -132,6 +132,11 @@ class DefaultSafetyReportingConfig
             num_cols: 6, type: 'datalist', visible: 'close',
             required: false,  options: "CONFIG.custom_options['Company Dispositions']"
           },
+          cisp_ready: {
+            field: 'cisp_ready', title: 'CISP Report',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: false
+          },
           narrative: {
             field: 'narrative', title: 'Narrative',
             num_cols: 12, type: 'textarea', visible: 'close',
@@ -245,6 +250,11 @@ class DefaultSafetyReportingConfig
             field: 'company_disposition', title: 'Company Disposition',
             num_cols: 6, type: 'datalist', visible: 'asap',
             required: false,  options: Report.get_custom_options('Company Dispositions')
+          },
+          cisp_ready: {
+            field: 'cisp_ready', title: 'CISP Report',
+            num_cols: 6, type: 'boolean', visible: 'asap',
+            required: false
           },
           narrative: {
             field: 'narrative', title: 'Narrative',

@@ -335,6 +335,47 @@ class MeetingsController < ApplicationController
     render :partial => "reports"
   end
 
+  def get_cisp_records
+    report_name =  CONFIG::CISP_TITLE_PARSE.keys
+    @record_headers = Record.get_meta_fields('index')
+    @records = Record.includes(:template).where(cisp_ready: true, cisp_sent: false, templates:{name: report_name})
+    render :partial => "cisp_records", locals: {sent: false}
+  end
+
+  def send_cisp_records
+    report_name =  CONFIG::CISP_TITLE_PARSE.keys
+    @record_headers = Record.get_meta_fields('index')
+    @records = Record.includes(:template).where(cisp_ready: true, cisp_sent: false, templates:{name: report_name})
+    @submission_ids = @records.map(&:submission).map(&:id)
+
+    test_run = true
+    Submission.export_all_for_cisp(test_run: test_run, submission_ids: @submission_ids)
+
+    # remove extra line
+    path = File.join(Rails.root, "cisp")
+    file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    original = File.open(file_name, 'r') { |file| file.readlines }
+    blankless = original.reject{ |line| line.match(/^$/) }
+    File.open(file_name, 'w') do |file|
+      blankless.each { |line| file.puts line }
+    end
+
+    begin
+      unless test_run
+        system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+      end
+
+      @records.each do |record|
+        record.update_attributes(cisp_sent: true)
+      end
+
+      p 'SENT reports to CISP'
+    rescue
+      p 'FAILED to send reports to CISP'
+    end
+
+    render :partial => "cisp_records", locals: {sent: true}
+  end
 
   def message
     @meeting = Meeting.find(params[:id])
