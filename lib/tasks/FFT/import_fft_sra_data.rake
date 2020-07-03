@@ -1,5 +1,6 @@
 $user_count = 0
 
+
 desc "Check employee group"
 task :check_fft => :environment do
 
@@ -23,7 +24,6 @@ task :check_fft => :environment do
   end
 
 end
-
 
 
 desc "Import FFT SRA Data"
@@ -115,35 +115,19 @@ def create_sras(xlsx, start_row, end_row)
     puts "[Info] Create SRA - title: #{row[col_sra_title]}"
 
     # TODO: create hazards belongs to the SRA
-
-    # sra = Sra.find_by_title(title)
-
-    create_hazards(user, row, sra, row[col_department], created_at)
+    create_hazards(user, row, sra, row[col_department])
   end
 end
 
-def create_hazards(user, row, sra, department, created_at)
-  col_severity1                  = 125
-  col_severity2                  = 137
-  col_severity3                  = 149
-  col_severity4                  = 160
-
-  col_hazard1_approval = 38
-  col_hazard2_approval = 60
-  col_hazard3_approval = 78
-  col_hazard4_approval = 92
-
-  col_hazard1_approve_date = 40
-  col_hazard2_approve_date = 62
-
-
+def create_hazards(user, row, sra, department)
+>>>>>>> 9c4b9811... Frontier Historical SRA import scripts
 
   # HAZARD 1
   col_hazard1_risk_factor       = 27
   col_hazard1_risk_factor_after = 36
   col_hazard1_title             = 103
   col_hazard1_substitute_hazard = 108
-  # col_severity                  = 125
+  col_severity                  = 125
   col_hazard1_severity          = 126
   col_hazard1_likelihood        = 127
   col_hazard1_severity2         = 132
@@ -180,10 +164,10 @@ def create_hazards(user, row, sra, department, created_at)
   col_hazard4_likelihood2       = 166
 
   severity_type_map = {
-    'Regulatory'             => 0,
-    'Incident/Accident'      => 1,
-    'Operational'            => 2,
-    'Company Impact'         => 3
+    'Regulatory'                    => 0,
+    'Accident/Incident/Damage/OSHA' => 1,
+    'Operational Events'            => 2,
+    'Company Impact'                => 3
   }
 
   likelihood_map = {
@@ -236,19 +220,17 @@ def create_hazards(user, row, sra, department, created_at)
     likelihood_after  = likelihood_map[row[col_hazard1_likelihood2]]
     risk_factor_after = risk_factor_map[row[col_hazard1_risk_factor_after]]
 
-    approver = row[col_hazard1_approval]
-    approve_date = row[col_hazard1_approve_date]
 
-    hazard1 = create_hazard(created_at, approver, approve_date, user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
+    hazard1 = create_hazard(user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
     puts "  Create Hazard 1 - title: #{row[col_hazard1_title]}"
-    create_risk_controls1(created_at, row, hazard1)
+    create_risk_controls1(row, hazard1)
   else
     puts "  Hazard 1 Does Not Exist"
   end
 
   # Hazard 2
   if row[col_hazard2_title].present?
-    severity_type = severity_type_map[row[col_severity2]]
+    severity_type = severity_type_map[row[col_severity]]
     title         = row[col_hazard2_title].slice(0, 255)
     description   =  row[col_hazard2_title]
     final_comment = row[col_hazard2_substitute_hazard]
@@ -261,19 +243,16 @@ def create_hazards(user, row, sra, department, created_at)
     likelihood_after  = likelihood_map[row[col_hazard2_likelihood2]]
     risk_factor_after = risk_factor_map[row[col_hazard2_risk_factor_after]]
 
-    approver = row[col_hazard2_approval]
-    approve_date = row[col_hazard2_approve_date]
-
-    hazard2 = create_hazard(created_at, approver, approve_date, user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
+    hazard2 = create_hazard(user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
     puts "  Create Hazard 2 - title: #{row[col_hazard2_title]}"
-    create_risk_controls2(created_at, row, hazard2)
+    create_risk_controls2(row, hazard2)
   else
     puts "  Hazard 2 Does Not Exist"
   end
 
   # Hazard 3
   if row[col_hazard3_title].present?
-    severity_type = severity_type_map[row[col_severity3]]
+    severity_type = severity_type_map[row[col_severity]]
     title         = row[col_hazard3_title].slice(0, 255)
     description   =  row[col_hazard3_title]
     final_comment = row[col_hazard3_substitute_hazard]
@@ -286,19 +265,16 @@ def create_hazards(user, row, sra, department, created_at)
     likelihood_after  = likelihood_map[row[col_hazard3_likelihood2]]
     risk_factor_after = risk_factor_map[row[col_hazard3_risk_factor_after]]
 
-    approver = row[col_hazard3_approval]
-    approve_date = nil
-
-    hazard3 = create_hazard(created_at, approver, approve_date, user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
+    hazard3 = create_hazard(user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
     puts "  Create Hazard 3 - title: #{row[col_hazard3_title]}"
-    create_risk_controls3(created_at, row, hazard3)
+    create_risk_controls3(row, hazard3)
   else
     puts "  Hazard 3 Does Not Exist"
   end
 
   # Hazard 4
   if row[col_hazard4_title].present?
-    severity_type = severity_type_map[row[col_severity4]]
+    severity_type = severity_type_map[row[col_severity]]
     title         = row[col_hazard4_title].slice(0, 255)
     description   =  row[col_hazard4_title]
     final_comment = row[col_hazard4_substitute_hazard]
@@ -311,22 +287,19 @@ def create_hazards(user, row, sra, department, created_at)
     likelihood_after  = likelihood_map[row[col_hazard4_likelihood2]]
     risk_factor_after = risk_factor_map[row[col_hazard4_risk_factor_after]]
 
-    approver = row[col_hazard4_approval]
-    approve_date = nil
-
-    hazard4 = create_hazard(created_at, approver, approve_date, user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
+    hazard4 = create_hazard(user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
     puts "  Create Hazard 4 - title: #{row[col_hazard4_title]}"
-    create_risk_controls4(created_at, row, hazard4)
+    create_risk_controls4(row, hazard4)
   else
     puts "  Hazard 4 Does Not Exist"
   end
 end
 
-def create_hazard(created_at, approver, approve_date, user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
 
+def create_hazard(user, sra, severity_type, title, description, department, final_comment, severity, likelihood, risk_factor, severity_after, likelihood_after, risk_factor_after)
   severity_extra = []
-  (0..3).each do |type|
-    if severity_type == type
+  (0..3).each do |severity|
+    if severity_type == severity
       severity_extra << severity
     else
       severity_extra << "undefined"
@@ -334,8 +307,8 @@ def create_hazard(created_at, approver, approve_date, user, sra, severity_type, 
   end
 
   mitigated_severity = []
-  (0..3).each do |type|
-    if severity_type == type
+  (0..3).each do |severity|
+    if severity_type == severity
       mitigated_severity << severity_after
     else
       mitigated_severity << "undefined"
@@ -345,16 +318,9 @@ def create_hazard(created_at, approver, approve_date, user, sra, severity_type, 
   probability_extra = [likelihood],
   mitigated_probability = [likelihood_after]
 
-  ## TODO:
-  ## find Hazard
-  ## if exists, replace SEVERITY
-
-  approver_user = check_fullname(approver)
-
-  # byebug if hazard.id == 182
 
   if user.present?
-    hazard = Hazard.create(
+    Hazard.create(
       status: 'Completed',
       sra_id: sra.id,
       title: title,
@@ -376,11 +342,10 @@ def create_hazard(created_at, approver, approve_date, user, sra, severity_type, 
       probability_extra: probability_extra,
 
       mitigated_severity: mitigated_severity,
-      mitigated_probability: mitigated_probability,
-      created_at: created_at
+      mitigated_probability: mitigated_probability
     )
   else
-    hazard = Hazard.create(
+    Hazard.create(
       status: 'Completed',
       sra_id: sra.id,
       title: title,
@@ -401,24 +366,12 @@ def create_hazard(created_at, approver, approve_date, user, sra, severity_type, 
       probability_extra: probability_extra,
 
       mitigated_severity: mitigated_severity,
-      mitigated_probability: mitigated_probability,
-      created_at: created_at
+      mitigated_probability: mitigated_probability
     )
   end
-
-  if hazard.present?
-    hazard.severity_extra = severity_extra
-    hazard.mitigated_severity = mitigated_severity
-    hazard.approver_id = approver_user.id if approver_user.present?
-    hazard.due_date = approve_date if approve_date.present?
-    hazard.close_date = approve_date if approve_date.present?
-    hazard.save
-  end
-
-  return hazard
 end
 
-def create_risk_controls1(created_at, row, hazard)
+def create_risk_controls1(row, hazard)
 
   # *** HAZARD 1 ***
   # RISK CONTROL 1
@@ -453,7 +406,7 @@ def create_risk_controls1(created_at, row, hazard)
     department = row[col_risk1_department]
     responsible_user = check_fullname(row[col_risk1_responsible_user])
     puts "  Create RiskControl 1-1 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 1-1 Does Not Exist"
   end
@@ -466,7 +419,7 @@ def create_risk_controls1(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk2_responsible_user])
 
     puts "  Create RiskControl 1-2 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 1-2 Does Not Exist"
   end
@@ -479,7 +432,7 @@ def create_risk_controls1(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk3_responsible_user])
 
     puts "  Create RiskControl 1-3 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 1-3 Does Not Exist"
   end
@@ -492,13 +445,14 @@ def create_risk_controls1(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk4_responsible_user])
 
     puts "  Create RiskControl 1-4 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 1-4 Does Not Exist"
   end
 end
 
-def create_risk_controls2(created_at, row, hazard)
+
+def create_risk_controls2(row, hazard)
 
   # *** HAZARD 2 ***
   # RISK CONTROL 1
@@ -534,7 +488,7 @@ def create_risk_controls2(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk1_responsible_user])
 
     puts "  Create RiskControl 2-1 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 2-1 Does Not Exist"
   end
@@ -547,7 +501,7 @@ def create_risk_controls2(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk2_responsible_user])
 
     puts "  Create RiskControl 2-2 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 2-2 Does Not Exist"
   end
@@ -560,7 +514,7 @@ def create_risk_controls2(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk3_responsible_user])
 
     puts "  Create RiskControl 2-3 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 2-3 Does Not Exist"
   end
@@ -573,13 +527,14 @@ def create_risk_controls2(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk4_responsible_user])
 
     puts "  Create RiskControl 2-4 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 2-4 Does Not Exist"
   end
 end
 
-def create_risk_controls3(created_at, row, hazard)
+
+def create_risk_controls3(row, hazard)
 
   # *** HAZARD 3 ***
   # RISK CONTROL 1
@@ -609,7 +564,7 @@ def create_risk_controls3(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk1_responsible_user])
 
     puts "  Create RiskControl 3-1 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 3-1 Does Not Exist"
   end
@@ -622,7 +577,7 @@ def create_risk_controls3(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk2_responsible_user])
 
     puts "  Create RiskControl 3-2 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 3-2 Does Not Exist"
   end
@@ -635,13 +590,13 @@ def create_risk_controls3(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk3_responsible_user])
 
     puts "  Create RiskControl 3-3 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 3-3 Does Not Exist"
   end
 end
 
-def create_risk_controls4(created_at, row, hazard)
+def create_risk_controls4(row, hazard)
 
   # *** HAZARD 4 ***
   # RISK CONTROL 1
@@ -665,7 +620,7 @@ def create_risk_controls4(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk1_responsible_user])
 
     puts "  Create RiskControl 4-1 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 4-1 Does Not Exist"
   end
@@ -678,13 +633,14 @@ def create_risk_controls4(created_at, row, hazard)
     responsible_user = check_fullname(row[col_risk2_responsible_user])
 
     puts "  Create RiskControl 4-2 - title: #{title}"
-    create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+    create_risk_control(hazard, title, responsible_user, due_date, description, department)
   else
     puts "  RiskControl 4-2 Does Not Exist"
   end
 end
 
-def create_risk_control(created_at, hazard, title, responsible_user, due_date, description, department)
+
+def create_risk_control(hazard, title, responsible_user, due_date, description, department)
 
   if responsible_user.nil?
     RiskControl.create(
@@ -695,7 +651,6 @@ def create_risk_control(created_at, hazard, title, responsible_user, due_date, d
 
       description: description,
       departments: department,
-      created_at: created_at
     )
   else
     RiskControl.create(
@@ -707,7 +662,6 @@ def create_risk_control(created_at, hazard, title, responsible_user, due_date, d
 
       description: description,
       departments: department,
-      created_at: created_at
     )
   end
 end
