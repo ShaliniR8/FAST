@@ -203,84 +203,50 @@ class ChecklistsController < ApplicationController
     case file
     when "IOSA"
       questions_array = []
+      $lower_roman  = [ 'i',  'ii',  'iii',  'iv',  'v',  'vi',  'vii',  'viii',  'ix', 'x',
+                      'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx']
+      $alphabetical = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']
+
       questions.each_with_index do |question, index|
 
         question_hash = []
         question.children.each do |children|
 
-          # TODO: Refactor
-          child_text   = ''
-          lower_roman  = [ 'i',  'ii',  'iii',  'iv',  'v',  'vi',  'vii',  'viii',  'ix', 'x',
-                          'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx']
-          alphabetical = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-                          'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']
-          index_roman    = 0
-          index_alphabet = 0
-
           if children.name == 'Para'
+            child_text     = ''
+            $index_roman    = 0
+            $index_alphabet = 0
+
             children.children.each do |child|
-              if child.name == 'text' || child.name == 'XRef'
-                child_text += child.text unless child.text.nil?
-              elsif child.name == 'List'
+              child_text = parse_iosa(child, child_text)
+            end
 
-                if child.attributes["type"].value == "lower-roman"
-                  child.children.each do |item|
-                    if item.name == 'text'
-                      child_text += item.text
-                    elsif item.name == 'ListItem'
+            question_hash << [children.name, child_text] if children.elem?
+          elsif children.name == 'Guidance'
+            child_text     = ''
 
-                      # TODO: use some helper fuction
-                      if item.children.length == 1
-                        child_text += "&nbsp;&nbsp;" + lower_roman[index_roman] + '. ' + item.text
-                        index_roman += 1
-                      else
-                        item.children.each do |nested_item|
-                          if nested_item.name == 'text'
-                            if nested_item.text == " "
-                              child_text += nested_item.text
-                            else
-                              child_text +=  "&nbsp;&nbsp;" + lower_roman[index_roman] + '. ' + nested_item.text
-                              index_roman += 1
-                            end
-                          elsif nested_item.name == 'List'
+            children.children.each do |child|
+              child_text = parse_iosa(child, child_text) if child.elem?
+            end
+            question_hash << [children.name, child_text] if children.elem?
+          elsif children.name == 'Metadata'
+            child_text     = ''
 
-                            # TODO:
-                            nested_item.children.each do |nested_item2|
-                              if nested_item2.name == 'text'
-                                child_text += nested_item2.text
-                              elsif nested_item2.name == 'ListItem'
-                                child_text += "&nbsp;&nbsp;&nbsp;&nbsp;" + alphabetical[index_alphabet] + '. ' + nested_item2.text
-                                index_alphabet += 1
-                              end
-                            end
-
-                          end
-                        end
-                      end
-
-                    end
-                  end
-                elsif child.attributes["type"].value == "alphabetical"
-                  child.children.each do |item|
-                    if item.name == 'text'
-                      child_text += item.text
-                    elsif item.name == 'ListItem'
-                      child_text += "&nbsp;&nbsp;" + alphabetical[index_alphabet] + '. ' + item.text
-                      index_alphabet += 1
-                    end
-                  end
-                elsif child.attributes["type"].value == "bullet"
-                  child.children.each do |item|
-                    if item.name == 'text'
-                      child_text += item.text
-                    elsif item.name == 'ListItem'
-                      child_text += "&nbsp;&nbsp;- " + item.text
-                    end
+            children.children.each do |child|
+              if child.name == 'AuditorActions' && child.elem?
+                child.children.each do |aa_checkbox|
+                  if aa_checkbox.name == "AACheckbox"
+                    child_text += aa_checkbox.text.gsub(/\;/, ":") + ";"
                   end
                 end
-
               end
+
+              child_text = parse_iosa(child, child_text)
             end
+
+            end_str = child_text.rindex(/\;/)
+            child_text = child_text[0..(end_str-1)]
             question_hash << [children.name, child_text] if children.elem?
           else
             question_hash << [children.name, children.text] if children.elem?
@@ -308,12 +274,6 @@ class ChecklistsController < ApplicationController
             value = question_list['Para']
           when 'Auditor Actions'
             value = question_list['Metadata']
-            next if value.nil?
-
-            tmp = value.gsub(/[\n]/, "\;")
-            end_str = tmp =~ /Other Action/ if tmp.include? "\;Other Action" rescue -1
-            value = tmp[2..(end_str-1)] + 'Other Action (Specify)' # rescue byebug
-
           when 'Guidance'
             value = question_list['Guidance']
           else
