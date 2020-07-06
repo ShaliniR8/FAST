@@ -55,6 +55,7 @@ class Template < ActiveRecord::Base
       target_category_id = target_category.id
 
       source_fields = Field.where(categories_id: source_category_id, deleted: 0)
+      nested_field_ids_map = {}
       source_fields.each do |field|
 
         if field.map_id.present?
@@ -100,6 +101,13 @@ class Template < ActiveRecord::Base
                        nested_field_id: field.nested_field_id,
                        nested_field_value: field.nested_field_value)
         end
+
+        field.nested_fields.each do |nested_field|
+          nested_field_ids_map[nested_field.id] = target_field.id
+        end
+
+        target_field.update_attributes(nested_field_id: nested_field_ids_map[field.id])
+
       end
     end
 
