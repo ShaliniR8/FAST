@@ -16,6 +16,7 @@ class FFTConfig < DefaultConfig
     enable_sso:                         true,
     login_option:                       'sso',
     has_mobile_app:                     true,
+    cisp_integration:                   true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
@@ -23,7 +24,7 @@ class FFTConfig < DefaultConfig
     has_root_causes:                   false,
   })
 
-<<<<<<< HEAD
+
   def self.getTimeFormat
     {
       :timepicker       => 'H:i',
@@ -35,10 +36,11 @@ class FFTConfig < DefaultConfig
       :faa_report       => true
     }
   end
-=======
+
+
+  P_CODE = 'FFT671'
   CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
   CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({})
->>>>>>> 87cf49b... Feat send report to CISP
 
   FAA_INFO = {
     "CHDO"=>"XXX",

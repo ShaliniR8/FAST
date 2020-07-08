@@ -75,12 +75,14 @@
                   :id => "new_report_btn",
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
-                <%=link_to "Send CISP Reports",
-                  "#",
-                  :class => "btn btn-info mb5 pull-right mr5",
-                  :id => "send_cisp_btn",
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg"%>
+                <% if CONFIG::GENERAL[:cisp_integration] %>
+                  <%=link_to "Send CISP Reports",
+                    "#",
+                    :class => "btn btn-info mb5 pull-right mr5",
+                    :id => "send_cisp_btn",
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg"%>
+                <% end %>
               <%elsif @meeting.status == "Closed"%>
                 <%=link_to "Reopen Meeting",
                   reopen_meeting_path(@meeting),

@@ -346,10 +346,9 @@ class MeetingsController < ApplicationController
     report_name =  CONFIG::CISP_TITLE_PARSE.keys
     @record_headers = Record.get_meta_fields('index')
     @records = Record.includes(:template).where(cisp_ready: true, cisp_sent: false, templates:{name: report_name})
-    @submission_ids = @records.map(&:submission).map(&:id)
 
-    test_run = true
-    Submission.export_all_for_cisp(test_run: test_run, submission_ids: @submission_ids)
+    test_run = Rails.env.production? ? false : true
+    Record.export_all_for_cisp(test_run: test_run, records_ids: @records.map(&:id))
 
     # remove extra line
     path = File.join(Rails.root, "cisp")

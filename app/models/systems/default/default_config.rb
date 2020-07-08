@@ -29,6 +29,7 @@ class DefaultConfig
     login_option:                       'prosafet', # Login page UI config => available options: dual, prosafet, sso
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
+    cisp_integration:                   false,
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
@@ -143,6 +144,8 @@ class DefaultConfig
       }
     }
   }
+
+  CISP_TIMEZONES = {"UTC" => "UTC","AST" => "Atlantic Time (Canada)","ADT" => "Atlantic Time (Canada)","AKDT" => "Alaska","AKST" => "Alaska","CST" => "Central Time (US & Canada)","CDT" => "Central Time (US & Canada)","EST" => "Eastern Time (US & Canada)","EDT" => "Eastern Time (US & Canada)","EGST" => "Azores","EGT" => "Azores","HST" => "Hawaii","HAST" => "Hawaii","HADT" => "Hawaii","MST" => "Mountain Time (US & Canada)","MDT" => "Mountain Time (US & Canada)","NST" => "Newfoundland","NDT" => "Newfoundland","PST" => "Pacific Time (US & Canada)","PDT" => "Pacific Time (US & Canada)","PMST" => "Greenland","PMDT" => "Greenland","SST" => "Samoa","WST" => "Greenland","WGT" => "Greenland","WGST" => "Greenland"}
 
   ###################################
   ### DEFAULT RISK MATRIX CONFIGS ###

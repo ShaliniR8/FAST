@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wbat-asias version="2.29" report-id="<%=record.id%>" employee-group="<%=template.emp_group%>" report-type="<%=template.report_type%>" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="wbat-asias.xsd">
+  <event event-tag="0">
+    <aspect name="header">
+      <category name="analyst-asap-processing" instance-tag="0">
+        <attribute name="event-id" value="<%=record.getEventId%>"></attribute>
+        <attribute name="event-date" value="<%=record.get_event_date%>">
+        </attribute>
+      </category>
+    </aspect>
+    <aspect name="body">
+      <%template.categories.each do |c|%>
+        <%if c.print%>
+          <category name="<%=c.title%>">
+            <%c.fields.each do |f|%>
+              <%if f.print%>
+                <%result=record.record_fields.where('fields_id=?',f.id).first%>
+                <%if result.present?%>
+                  <attribute name="<%=f.export_label%>" value="<%=result.value%>"></attribute>
+                <%end%>
+              <%end%>
+            <%end%>
+          </category>
+        <%end%>
+      <%end%>
+    </aspect>
+  </event>
+</wbat-asias>

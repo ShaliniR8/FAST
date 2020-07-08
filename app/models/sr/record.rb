@@ -377,5 +377,52 @@ class Record < Sr::SafetyReportingBase
     end
   end
 
+  def self.export_all
+    self.includes(:template).where(templates:{report_type: 'asap'}).each do |s|
+      path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
+      dirname = File.join([Rails.root] + path)
+      temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
+      unless File.directory?(dirname)
+        FileUtils.mkdir_p(dirname)
+      end
+      File.open(temp_file, 'w') do |file|
+        file << ApplicationController.new.render_to_string(
+          template: 'records/export_component.xml.erb',
+          locals:   { template: s.template, records: s})
+      end
+    end
+  end
+
+  def self.export_all_for_cisp(test_run: false, records_ids:)
+    report_name =  CONFIG::CISP_TITLE_PARSE.keys
+    records = self.includes(:template).where(id: records_ids)
+    dirname = File.join([Rails.root] + ['cisp'])
+    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    unless File.directory?(dirname)
+      FileUtils.mkdir_p(dirname)
+    end
+
+    # CISP time zones
+    timezone = []
+    records.each do |record|
+      if record.event_time_zone.nil?
+        timezone << {"UTC" => "UTC"}
+      elsif CONFIG::CISP_TIMEZONES.keys.include? record.event_time_zone  # if record has old time zone
+        timezone << {record.event_time_zone => CONFIG::CISP_TIMEZONES[record.event_time_zone]}
+      elsif CONFIG::CISP_TIMEZONES.values.include? record.event_time_zone
+        timezone << {CONFIG::CISP_TIMEZONES.key(record.event_time_zone) => record.event_time_zone}
+      else
+        timezone << {"UTC" => "UTC"}
+        p "#{index+1}: record##{record.id} - event_time_zone is missing"
+      end
+    end
+
+    File.open(temp_file, 'w') do |file|
+      file << ApplicationController.new.render_to_string(
+        template: 'records/export_component_cisp.xml.erb',
+        locals:   { test_run: test_run, records: records, p_code: CONFIG::P_CODE, timezone: timezone })
+    end
+  end
+
 
 end

@@ -53,59 +53,6 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
-  def self.export_all #Used in Mitre Rake Task
-    self.includes(:template).where(completed: true, templates:{report_type: 'asap'}).each do |s|
-      path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
-      dirname = File.join([Rails.root] + path)
-      temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
-      unless File.directory?(dirname)
-        FileUtils.mkdir_p(dirname)
-      end
-      File.open(temp_file, 'w') do |file|
-        file << ApplicationController.new.render_to_string(
-          template: 'submissions/export_component.xml.erb',
-          locals:   { template: s.template, submission: s})
-      end
-    end
-  end
-
-  def self.export_all_for_cisp(test_run: false, submission_ids:) #Used in CISP Rake Task
-
-    report_name =  CONFIG::CISP_TITLE_PARSE.keys
-    submissions = self.includes(:template).where(id: submission_ids)
-    dirname = File.join([Rails.root] + ['cisp'])
-    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
-    unless File.directory?(dirname)
-      FileUtils.mkdir_p(dirname)
-    end
-
-    # Airline code + pCode
-    p_code = { 'FFT' => 'FFT671', 'ATN' => 'A9T2N7'}
-
-    # CISP time zones
-    cisp_timezones = {"UTC" => "UTC","AST" => "Atlantic Time (Canada)","ADT" => "Atlantic Time (Canada)","AKDT" => "Alaska","AKST" => "Alaska","CST" => "Central Time (US & Canada)","CDT" => "Central Time (US & Canada)","EST" => "Eastern Time (US & Canada)","EDT" => "Eastern Time (US & Canada)","EGST" => "Azores","EGT" => "Azores","HST" => "Hawaii","HAST" => "Hawaii","HADT" => "Hawaii","MST" => "Mountain Time (US & Canada)","MDT" => "Mountain Time (US & Canada)","NST" => "Newfoundland","NDT" => "Newfoundland","PST" => "Pacific Time (US & Canada)","PDT" => "Pacific Time (US & Canada)","PMST" => "Greenland","PMDT" => "Greenland","SST" => "Samoa","WST" => "Greenland","WGT" => "Greenland","WGST" => "Greenland"}
-    timezone = []
-    submissions.each do |submission|
-      if submission.event_time_zone.nil?
-        timezone << {"UTC" => "UTC"}
-      elsif cisp_timezones.keys.include? submission.event_time_zone  # if submission has old time zone
-        timezone << {submission.event_time_zone => cisp_timezones[submission.event_time_zone]}
-      elsif cisp_timezones.values.include? submission.event_time_zone
-        timezone << {cisp_timezones.key(submission.event_time_zone) => submission.event_time_zone}
-      else
-        timezone << {"UTC" => "UTC"}
-        p "#{index+1}: Submission##{submission.id} - event_time_zone is missing"
-      end
-    end
-
-    File.open(temp_file, 'w') do |file|
-      file << ApplicationController.new.render_to_string(
-        template: 'submissions/export_component_cisp.xml.erb',
-        locals:   { test_run: test_run, submissions: submissions, p_code: p_code[AIRLINE_CODE], timezone: timezone })
-    end
-  end
-
-
   def self.get_headers
       [
         {field: 'get_id',            title: 'ID'},

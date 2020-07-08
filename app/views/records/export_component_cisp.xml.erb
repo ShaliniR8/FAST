@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<cispReports xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cisp-data-exchange-schema.xsd" airlineId="<%=AIRLINE_CODE%>" pCode="<%=p_code%>">
+
+<% records.each_with_index do |record, index| %>
+  <% p "#{index+1}: record##{record.id}"%>
+
+  <%if record.event_date.nil?%>
+    <% p "#{index+1}: record##{record.id} - event_date is missing"%>
+    <% next %>
+  <%end%>
+
+    <cispReport eventId="<%=record.id%>">
+        <reportSourceType><%=CONFIG::CISP_TITLE_PARSE[record.template.name]%></reportSourceType>
+      <%if test_run%>
+        <synopsis><%="Test #{AIRLINE_CODE} Report #{index+1}: #{record.description}"%></synopsis>
+      <%else%>
+        <synopsis><%="#{AIRLINE_CODE} Report #{index+1}"%></synopsis>
+      <%end%>
+
+        <flightDateTime zone="<%=timezone[index].keys[0]%>">
+            <date><%=record.event_date.in_time_zone(timezone[index].values[0]).strftime("%F")%></date>
+            <hour><%=record.event_date.in_time_zone(timezone[index].values[0]).strftime("%H")%></hour>
+            <minute><%=record.event_date.in_time_zone(timezone[index].values[0]).strftime("%M")%></minute>
+        </flightDateTime>
+
+<%all_record_fields = record.record_fields.map{|sf| [sf.fields_id, sf]}.to_h%>
+
+<% CONFIG::CISP_FIELD_PARSE[record.template.name].each do |category| %>
+  <% category_name     = category[0] %>
+  <% category_contents = category[1] %>
+
+  <% template_category = record.categories.select { |category| category.title == category_name}[0] %>
+  <%if template_category.present?%>
+
+    <%template_category.fields.select{ |field| field.deleted == false }.each do |field|%>
+
+      <%if all_record_fields[field.id].nil?%>
+        <% p "field ##{field.id} is empty"%>
+        <% next %>
+      <%end%>
+
+      <% tag_name    = category_contents.invert[field.label] %>
+      <% field_value = all_record_fields[field.id].value %>
+
+      <%if field_value.present? && tag_name.present?%>
+        <%=raw "<#{tag_name}>"+ field_value.gsub("\r\n", ' ').gsub("\n\n", ' ') +"</#{tag_name}>"%>
+      <%end%>
+
+    <%end%>
+  <%end%>
+<%end%>
+
+      <%if test_run%>
+        <comment>Testing ATN Report Uploading</comment>
+      <%end%>
+
+    </cispReport>
+<%end%>
+
+</cispReports>
