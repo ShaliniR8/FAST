@@ -20,19 +20,11 @@
       :owner => owner %>
   <%end%>
 
-  <%if owner.descriptions.present?%>
-    <%=render "forms/print_descriptions",
-      :descriptions => owner.descriptions,
-      :title => "Descriptions"%>
+  <%if owner.occurrences.present?%>
+    <div class="col-xs-12">
+      <%=render "forms/print_occurrences", :owner => owner %>
+    </div>
   <%end%>
-
-  <%if owner.causes.present?%>
-    <%=render "forms/print_descriptions",
-      :descriptions => owner.causes,
-      :title => "Causes"%>
-  <%end%>
-
-
 
   <%owner.corrective_actions.each do |c|%>
     <div class="col-xs-12">

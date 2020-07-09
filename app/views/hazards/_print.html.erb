@@ -14,12 +14,11 @@
     <%=render "/shared/#{AIRLINE_CODE}/print_risk_matrix", :owner => owner%>
   <%end%>
 
-  <%=render "forms/print_root_causes", :owner => owner%>
-
-
-  <%=render "forms/print_descriptions",
-    :title => 'Descriptions',
-    :descriptions => owner.descriptions%>
+  <%if owner.occurrences.present?%>
+    <div class="col-xs-12">
+      <%=render "forms/print_occurrences", :owner => owner %>
+    </div>
+  <%end%>
 
 
   <%owner.risk_controls.each do |risk_control|%>

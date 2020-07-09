@@ -15,13 +15,11 @@
     <%= render "/shared/#{AIRLINE_CODE}/print_risk_matrix", :owner => owner %>
   <%end%>
 
-
-  <%=render "forms/print_descriptions", :title => 'Descriptions', :descriptions => owner.descriptions%>
-  <%=render "forms/print_descriptions", :title => 'Causes', :descriptions => owner.causes%>
-  <%=render "forms/print_descriptions", :title => 'Detections', :descriptions => owner.detections%>
-  <%=render "forms/print_descriptions", :title => 'Reactions', :descriptions => owner.reactions%>
-  <%=render "forms/print_descriptions", :title => 'Suggestions', :descriptions => owner.suggestions%>
-
+  <%if owner.occurrences.present?%>
+    <div class="col-xs-12">
+      <%=render "forms/print_occurrences", :owner => owner %>
+    </div>
+  <%end%>
 
   <%owner.records.each do |record|%>
     <div class="col-xs-12">

@@ -20,10 +20,5 @@
   %>
 <%end%>
 
-<%=render '/forms/print_descriptions',
-  :descriptions => @corrective_action.descriptions,
-  :title => "Descriptions"
-%>
-
 <%=render '/sras/print_cost', :owner => @corrective_action, :deidentified => @deidentified
 %>

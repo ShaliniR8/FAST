@@ -9,9 +9,6 @@
     :fields => RiskControl.get_meta_fields('show'),
     :owner => owner,
     :deidentified => deidentified%>
-  <%=render "forms/print_descriptions",
-    :title => 'Descriptions',
-    :descriptions => owner.descriptions%>
   <%=render '/sras/print_cost', :owner => owner, :deidentified => deidentified%>
 
 </div>

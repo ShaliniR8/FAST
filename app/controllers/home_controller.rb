@@ -365,12 +365,28 @@ class HomeController < ApplicationController
       end
 
       if current_user.has_access("submissions", "index")
-        submissions = Submission.preload(:template).where("completed = ? and event_date is not ?", true, nil)
+        submissions = Submission.preload(:template).where("completed = ? and event_date is not ? and user_id = ?", true, nil, current_user.id)
           .can_be_accessed(current_user)
           .by_emp_groups(params[:emp_groups])
         submissions.each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
+            :start => a.get_date,
+            :title => "#{a.template.name} ##{a.get_id}",
+            :textColor => "darkslategrey",
+            :description => a.description,
+            :color => group_to_color(a.template.emp_group)
+          }) if a.get_date.present?
+        end
+      end
+
+      if current_user.has_access("records", "index")
+        records = Record.preload(:template).where("event_date is not ?", nil)
+          .can_be_accessed(current_user)
+          .by_emp_groups(params[:emp_groups])
+        records.each do |a|
+          @calendar_entries.push({
+            :url => record_path(a),
             :start => a.get_date,
             :title => "#{a.template.name} ##{a.get_id}",
             :textColor => "darkslategrey",

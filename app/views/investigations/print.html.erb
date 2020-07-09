@@ -23,18 +23,6 @@
     %>
   <%end%>
 
-  <%if @investigation.descriptions.present?%>
-    <%=render "forms/print_descriptions",
-      :descriptions => @investigation.descriptions,
-      :title => "Descriptions"%>
-  <%end%>
-
-  <%if @investigation.causes.present?%>
-    <%=render "forms/print_descriptions",
-      :descriptions => @investigation.causes,
-      :title => "Causes"%>
-  <%end%>
-
   <%if @investigation.findings.present?%>
     <%@investigation.findings.each do |finding|%>
     <div class="col-xs-12">

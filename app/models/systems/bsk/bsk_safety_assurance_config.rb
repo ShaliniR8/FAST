@@ -91,9 +91,9 @@ class BSKSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)}},
           {title: 'New', path: 'new_evaluation_path',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'new', true, true)}},
-          {title: 'Recurring Inspections', path: "recurrences_path(form_type: 'Evaluation')",
+          {title: 'Recurring Evaluations', path: "recurrences_path(form_type: 'Evaluation')",
             display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Evaluation'), user, 'admin', true, true)}},
-          {title: 'New Recurring Inspections', path: "new_recurrence_path(form_type: 'Evaluation')",
+          {title: 'New Recurring Evaluations', path: "new_recurrence_path(form_type: 'Evaluation')",
             display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Evaluation'), user, 'admin', true, true)}},
         ]
       },

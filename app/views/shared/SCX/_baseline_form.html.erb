@@ -139,7 +139,7 @@
   function set_risk(row_index,column_index){
     clear_risk();
     risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
-    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_index].to_json.html_safe%>
+    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
     $('.risk_td').each(function(){
       if($(this).data("row") == row_index && $(this).data("column") == column_index){
         $(this).html("<span class='glyphicon glyphicon-remove' style='color:black'></span>");
@@ -177,12 +177,29 @@
       });
 
       for(i = 0; i < severity_result.length; i++){
-        $('form').append("<input name='<%=@target_name%>[<%=@severity_field%>][]' value=" + severity_result[i]+" hidden></input>");
+        $('form').append("<input name='<%=@target_name%>[<%=@severity_field%>][]' class='temp_element' value=" + severity_result[i]+" hidden></input>");
       }
 
       for (i = 0; i < probability_result.length; i++){
-        $('form').append("<input name='<%=@target_name%>[<%=@probability_field%>][]' value=" + probability_result[i]+" hidden></input>");
+        $('form').append("<input name='<%=@target_name%>[<%=@probability_field%>][]' class='temp_element' value=" + probability_result[i]+" hidden></input>");
       }
+
+      // remove temporary severity_extra & probablity extra elements from the form
+      var error = false;
+      $(this).find('.required_field').each(function(){
+        if ($(this).val() == ""){
+          error = true;
+          event.preventDefault();
+        }
+      });
+      if (error){
+        var temp_elements = $(".temp_element")
+        for(var i=0; i < temp_elements.length; i++) {
+          temp_elements[i].remove()
+        }
+      }
+
+
       return true;
     });
   });

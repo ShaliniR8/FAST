@@ -7,10 +7,6 @@
   :owner => owner,
   :deidentified => deidentified
 %>
-<%=render '/forms/print_descriptions',
-  :descriptions => owner.descriptions,
-  :title => "Descriptions"
-%>
 
 <!-- Print Risk Matrix -->
 <%if CONFIG::GENERAL[:base_risk_matrix]%>
