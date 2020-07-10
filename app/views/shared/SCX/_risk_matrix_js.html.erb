@@ -1,0 +1,186 @@
+<script type="text/javascript">
+  function load_data(){
+    if (risk_type === 'baseline') {
+      <%if @target.get_extra_severity.present? && @target.get_extra_probability.present?%>
+        $(`.${risk_type}_severity_td`).each(function(){
+          <%(0..@severity_table[:row_header].size - 1).each do |i|%>
+            if($(this).data('row') == <%=i%>){
+              if($(this).data('column') == <%=@target.get_extra_severity[i]%>){
+                $(this).data("status", "checked");
+                $(this).css('background', '#AFEEFC');
+              }
+            }
+          <%end%>
+        });
+        $(`.${risk_type}_probability_td`).each(function(){
+          <%(0..@probability_table[:column_header].size-1).each do |i|%>
+            if ($(this).data('column') == <%=i%>){
+              if($(this).data('row') == <%=@target.get_extra_probability[i]%>){
+                $(this).data("status","checked");
+                $(this).css('background','#AFEEFC');
+              }
+            }
+          <%end%>
+        });
+        calculate_risk(risk_type);
+      <%end%>
+    } else {
+      <%if @owner.get_mitigated_severity.present? && @owner.get_mitigated_probability.present?%>
+        $(`.${risk_type}_severity_td`).each(function(){
+          <%(0..@severity_table[:row_header].size-1).each do |i|%>
+            if ($(this).data('row') == <%=i%>){
+              if($(this).data('column') == <%=@owner.get_mitigated_severity[i]%>){
+                $(this).data("status","checked");
+                $(this).css('background','#FCAFCB');
+              }
+            }
+          <%end%>
+        });
+        $(`.${risk_type}_probability_td`).each(function(){
+          <%(0..@probability_table[:column_header].size-1).each do |i|%>
+            if ($(this).data('column') == <%=i%>){
+              if($(this).data('row') == <%=@owner.get_mitigated_probability[i]%>){
+                $(this).data("status","checked");
+                $(this).css('background','#FCAFCB');
+              }
+            }
+          <%end%>
+        });
+        calculate_risk(risk_type);
+      <%end%>
+    }
+  }
+
+  function initialize() {
+
+    matrix_cell_bg_color = risk_type === "baseline" ? '#AFEEFC' : '#FCAFCB'
+
+    $(`.${risk_type}_severity_td`).on('click',function(){
+      if ($(this).data("status") === "checked"){
+        $(this).data("status", "");
+        $(this).css('background', 'none');
+      }else{
+        $(this).data("status", "checked");
+        $(this).css('background', matrix_cell_bg_color);
+        row_id = $(this).data("row");
+        column_id = $(this).data("column");
+        $(`.${risk_type}_severity_td`).each(function(){
+          if ($(this).data("row") == row_id && $(this).data("column") != column_id){
+            $(this).data("status", "");
+            $(this).css('background', 'none');
+          }
+        });
+      }
+      calculate_risk(risk_type);
+    });
+
+    $(`.${risk_type}_probability_td`).on('click',function(){
+      if ($(this).data("status") === "checked"){
+        $(this).data("status", "");
+        $(this).css('background', 'none');
+      }else{
+        $(this).data("status", "checked");
+        $(this).css('background', matrix_cell_bg_color);
+        row_id = $(this).data("row");
+        column_id = $(this).data("column");
+        $(`.${risk_type}_probability_td`).each(function(){
+          if ($(this).data("row") != row_id && $(this).data("column") == column_id){
+            $(this).data("status", "");
+            $(this).css('background', 'none');
+          }
+        });
+      }
+      calculate_risk(risk_type);
+    });
+  }
+
+  function calculate_risk(){
+    severities = []
+    probabilities = []
+    severity_checked = 0
+    probability_checked = 0
+
+    $(`.${risk_type}_severity_td`).each(function(){
+      if ($(this).data("status") === "checked"){
+        severities.push($(this).data("column"));
+        severity_checked++;
+      }
+    });
+
+    $(`.${risk_type}_probability_td`).each(function(){
+      if ($(this).data("status") === "checked"){
+        probabilities.push($(this).data("row"));
+        probability_checked++;
+      }
+    });
+    if (probability_checked > 0 && severity_checked > 0){
+      set_risk(Math.min(...probabilities), Math.min(...severities));
+    }else{
+      clear_risk();
+    }
+  }
+
+
+  function set_risk(row_index,column_index){
+    clear_risk();
+    risk_table_def = <%=CONFIG::MATRIX_INFO[:risk_table][:rows].to_json.html_safe%>
+    risk_table_dic = <%=CONFIG::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
+
+    matrix_cell_marked_icon = risk_type === "baseline"
+     ? "<span class='glyphicon glyphicon-remove' style='color:black'></span>"
+     : "<span class='glyphicon glyphicon-ok style='color:black'></span>"
+
+    $(`.${risk_type}_risk_td`).each(function(){
+      if($(this).data("row") == row_index && $(this).data("column") == column_index){
+        $(this).html(matrix_cell_marked_icon);
+        $('#sev').val(column_index);
+        $('#like').val(row_index);
+        $('#risk_fact').val(risk_table_dic[risk_table_def[row_index][column_index]]);
+      }
+    });
+  }
+
+
+  function clear_risk(){
+    $(`.${risk_type}_risk_td`).each(function(){
+      $(this).text("");
+    });
+  }
+
+
+  $(document).ready(function(){
+    risk_type = "<%= params[:action]%>" // baseline or mitigate
+
+    if (risk_type === "new") {
+      risk_type = "baseline"
+    }
+
+    initialize();
+    load_data();
+    $('form').on('submit',function(){
+      var severity_result = new Array(<%= @severity_table[:row_header].size %>);
+      var probability_result = new Array(<%= @probability_table[:column_header].size %>);
+      $(`.${risk_type}_severity_td`).each(function(){
+        if ($(this).data('status') === "checked"){
+          severity_result[$(this).data("row")] = $(this).data("column");
+        }
+      });
+
+      $(`.${risk_type}_probability_td`).each(function(){
+        if ($(this).data('status') === "checked"){
+          probability_result[$(this).data("column")] = $(this).data("row");
+        }
+      });
+
+      for(i = 0; i < severity_result.length; i++){
+        $('form').append("<input class='temp_element' name='<%=@target_name%>[<%=@severity_field%>][]' value=" + severity_result[i]+" hidden></input>");
+      }
+
+      for (i = 0; i < probability_result.length; i++){
+        $('form').append("<input class='temp_element' name='<%=@target_name%>[<%=@probability_field%>][]' value=" + probability_result[i]+" hidden></input>");
+      }
+      return true;
+    });
+  });
+
+</script>

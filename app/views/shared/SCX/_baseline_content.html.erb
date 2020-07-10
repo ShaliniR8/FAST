@@ -8,9 +8,9 @@
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
-  <%=render "shared/#{AIRLINE_CODE}/form_severity"%>
+  <%=render "shared/#{AIRLINE_CODE}/form_severity", locals: {risk_type: 'baseline'}%>
 </div>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <%=render "shared/#{AIRLINE_CODE}/form_probability"%>
-  <%=render "shared/#{AIRLINE_CODE}/form_risk_table"%>
+  <%=render "shared/#{AIRLINE_CODE}/form_probability", locals: {risk_type: 'baseline'}%>
+  <%=render "shared/#{AIRLINE_CODE}/form_risk_table", locals: {risk_type: 'baseline'}%>
 </div>
