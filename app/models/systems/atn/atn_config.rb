@@ -13,11 +13,21 @@ class ATNConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:                     true,
+    cisp_integration:                   true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,
   })
 
+  P_CODE = 'A9T2N7'
+  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
+  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({
+    'Flight Crew ASAP' => {
+      'Narratives' => {
+        'eventDescription' => "Describe the Event",
+      }
+    }
+  })
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({ #CORRECT/REVISE
     'CHDO'=>'Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450',
