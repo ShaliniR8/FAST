@@ -57,6 +57,9 @@ class SrasController < ApplicationController
 
 
   def new
+    @parent_type = params[:parent_type]
+    @parent_id   = params[:parent_id]
+
     load_options
     @fields = Sra.get_meta_fields('form')
     @risk_groups = RiskMatrixGroup.find(:all)
@@ -74,6 +77,13 @@ class SrasController < ApplicationController
 
 
   def create
+    if params[:sra][:parent_type].present? && params[:sra][:parent_id].present?
+      @parent = Object.const_get(params[:sra][:parent_type].singularize.capitalize).find(params[:sra][:parent_id])
+
+      params[:sra].except!(:parent_type)
+      params[:sra].except!(:parent_id)
+    end
+
     sra = Sra.create(params[:sra])
     sra.status = 'New'
     if params[:matrix_id].present?
@@ -83,6 +93,9 @@ class SrasController < ApplicationController
       connection.save
     end
     if sra.save
+      Child.create(child: sra, owner: @parent) if @parent.present?
+      Parent.create(parent: @parent, owner: sra) if @parent.present?
+
       redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
     end
   end

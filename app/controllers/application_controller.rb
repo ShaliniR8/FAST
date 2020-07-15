@@ -183,6 +183,20 @@ class ApplicationController < ActionController::Base
   ####    SHARED FORMS     ####
   #############################
 
+  def launch
+    @objects = (CONFIG.sa::HIERARCHY[:objects].keys + CONFIG.srm::HIERARCHY[:objects].keys).map { |object| [object, object.underscore] }
+
+    render :partial => '/forms/workflow_forms/launch'
+  end
+
+  def launch_new_object
+    parent_type = params[:controller]
+    parent_id = params[:id]
+    child = params[:child]
+
+    redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+  end
+
   # Handles permissions and ability to execute button actions
   def interpret
     begin

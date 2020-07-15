@@ -116,6 +116,14 @@ ruby:
       class: 'btn btn-success pull-right mr5 mb5',
       disable_with: 'Adding...'
 
+  - when :launch
+    = link_to 'Launch',
+      '#',
+      class: 'btn btn-warning pull-right mr5 mb5',
+      id: 'launch_btn',
+      'data-toggle' => 'modal',
+      'data-target' => '.bs-example-modal-lg'
+
   - when :hazard
     = link_to 'Add Hazard',
       new_hazard_path( owner_id: owner.id, owner_type: owner.class.name ),
@@ -334,6 +342,15 @@ ruby:
         $.get('#{eval("interpret_#{owner_class}_path(owner, act: :cost)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
+        });
+      });
+
+  - when :launch
+    javascript:
+      $('#launch_btn').on('click',function(){
+        $.get('#{eval("launch_#{owner_class}_path(owner)")}', function(data){
+            $(".modal-content").html(data);
+            $(window).trigger('resize');
         });
       });
 

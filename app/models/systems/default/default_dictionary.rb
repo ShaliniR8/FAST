@@ -92,6 +92,11 @@ class DefaultDictionary
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
     },
+    launch: {
+      btn: :launch,
+      btn_loc: [:top],
+      access: proc { |owner:,user:,**op| true },
+    },
     hazard: {
       btn: :hazard,
       btn_loc: [:inline],

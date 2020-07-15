@@ -27,6 +27,7 @@ class AuditsController < SafetyAssuranceController
     :interpret,
     :new_attachment,
     :override_status,
+    :launch,
     :show,
     :update,
     :update_checklist_records,

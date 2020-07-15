@@ -1,0 +1,47 @@
+<div class="panel-warning">
+  <div class="panel-heading">
+    <div class="panel-title">
+      Launch from <%=@owner.class.name.titleize%>
+      <button type="button"
+        class="close pull-right"
+        data-dismiss="modal"
+        aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="panel-body" style="max-height:500px;overflow-y:auto">
+    <div class="row">
+      <div class="form-group form-inline col-xs-6">
+        <div class="form-group col-xs-12">
+
+          <label for="objects">Select an item to launch: </label>
+
+          <select name="objects" id="objects" class="field_select form-control">
+            <%= options_for_select(@objects) %>
+          </select>
+
+        </div>
+      </div>
+    </div>
+
+    <%= link_to 'Launch',
+        eval("launch_new_object_#{@owner.class.name.underscore}_path(@owner)"),
+        id: "launch_btn",
+        class: "btn btn-warning pull-right mt5" %>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $('#objects').on('change',function(){
+      let object = document.querySelector('#objects option:checked').value
+
+      var url = $('#launch_btn').attr('href') + '?child=' + object;
+      $('#launch_btn').attr('href', url);
+
+    });
+  });
+</script>

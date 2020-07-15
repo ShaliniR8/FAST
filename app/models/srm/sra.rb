@@ -12,6 +12,9 @@ class Sra < Srm::SafetyRiskManagementBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
+
 #Association List
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy

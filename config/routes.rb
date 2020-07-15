@@ -456,6 +456,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_checklist'
       get 'new_requirement'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'update_checklist'
       get 'update_checklist_records'
