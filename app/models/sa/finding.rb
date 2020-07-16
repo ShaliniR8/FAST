@@ -99,11 +99,13 @@ class Finding < Sa::SafetyAssuranceBase
       </a>".html_safe
     when 'ChecklistRow'
       true_owner = self.find_true_owner
+      true_owner_table_name = true_owner.class.name.underscore.pluralize
       checklist_title = true_owner.checklists[0].title
       checklist_num = @owner.checklist_cells[0].value
 
-      "<a style='font-weight:bold' href='/audits/#{true_owner.id}'>
-        Audit ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
+
+      "<a style='font-weight:bold' href='/#{true_owner_table_name}/#{true_owner.id}'>
+        #{true_owner.class.name} ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
       </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
