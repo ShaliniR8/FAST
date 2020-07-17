@@ -24,6 +24,11 @@
       </div>
       <div class="panel-body">
         <%=form_for @safety_plan, :html => {:multipart => true} do |f|%>
+          <%if action_name == "new"%>
+            <%=f.hidden_field :parent_type, :value => @parent_type%>
+            <%=f.hidden_field :parent_id,   :value => @parent_id%>
+          <%end%>
+
           <%=f.hidden_field :status, :value => params[:evaluate] ? 'Evaluated' : 'New'%>
 
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @safety_plan%>

@@ -30,6 +30,10 @@ class InspectionsController < SafetyAssuranceController
     :viewer_access
   ]
 
+  before_filter(only: [:new])    {set_parent_type_id(:inspection)}
+  before_filter(only: [:create]) {set_parent(:inspection)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @inspection)}
+
   def define_owner
     @class = Object.const_get('Inspection')
     @owner = Inspection.find(params[:id])
@@ -112,9 +116,9 @@ class InspectionsController < SafetyAssuranceController
 
 
   def create
-    inspection = Inspection.new(params[:inspection])
-    if inspection.save
-      redirect_to inspection_path(inspection),  flash: {success: "Inspection created."}
+    @inspection = Inspection.new(params[:inspection])
+    if @inspection.save
+      redirect_to inspection_path(@inspection),  flash: {success: "Inspection created."}
     end
   end
 

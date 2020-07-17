@@ -184,8 +184,7 @@ class ApplicationController < ActionController::Base
   #############################
 
   def launch
-    @objects = (CONFIG.sa::HIERARCHY[:objects].keys + CONFIG.srm::HIERARCHY[:objects].keys).map { |object| [object, object.underscore] }
-
+    @objects =  CONFIG::LAUNCH_OBJECTS[params[:controller].to_sym].map { |object| [object, object.underscore] }
     render :partial => '/forms/workflow_forms/launch'
   end
 
@@ -195,6 +194,28 @@ class ApplicationController < ActionController::Base
     child = params[:child]
 
     redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+  end
+
+  def set_parent_type_id(object)
+    # if parent exists, set parent type and id
+    @parent_type = params[:parent_type]
+    @parent_id   = params[:parent_id]
+  end
+
+  def set_parent(object)
+    if params[object][:parent_type].present? && params[object][:parent_id].present?
+      @parent = Object.const_get(params[object][:parent_type].camelize.singularize).find(params[object][:parent_id])
+    end
+
+    params[object].except!(:parent_type)
+    params[object].except!(:parent_id)
+  end
+
+  def create_parent_and_child(parent: parent, child: child)
+    if parent.present?
+      Child.create(child: child, owner:@parent)
+      Parent.create(parent: parent, owner: child)
+    end
   end
 
   # Handles permissions and ability to execute button actions

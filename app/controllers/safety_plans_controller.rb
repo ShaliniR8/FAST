@@ -2,6 +2,10 @@ class SafetyPlansController < ApplicationController
   before_filter :login_required
   before_filter :define_owner, only: [:interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:safety_plan)}
+  before_filter(only: [:create]) {set_parent(:safety_plan)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @safety_plan)}
+
   def define_owner
     @class = Object.const_get('SafetyPlan')
     @owner = SafetyPlan.find(params[:id])
@@ -42,8 +46,8 @@ class SafetyPlansController < ApplicationController
 
 
   def create
-    safety_plan = SafetyPlan.create(params[:safety_plan])
-    redirect_to safety_plan, flash: {success: "Safety Plan created."}
+    @safety_plan = SafetyPlan.create(params[:safety_plan])
+    redirect_to @safety_plan, flash: {success: "Safety Plan created."}
   end
 
 

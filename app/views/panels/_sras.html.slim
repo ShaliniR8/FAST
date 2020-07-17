@@ -1,0 +1,19 @@
+.col-xs-12
+  .panel.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b Sras
+        span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+    .panel-body style='display:none'
+      .row
+        - sras.each do |sra|
+          .col-xs-12
+            .panel.panel-info
+              .panel-heading.click-heading.collapsed
+                .panel-title
+                  = link_to "Sra ##{sra.id}: #{sra.title}", sra
+                  span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+              .panel-body style='display:none'
+                = render 'sras/show',
+                  owner: sra,
+                  show_btn: show_btns

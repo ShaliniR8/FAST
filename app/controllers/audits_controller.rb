@@ -34,6 +34,11 @@ class AuditsController < SafetyAssuranceController
     :upload_checklist,
     :viewer_access
   ]
+
+  before_filter(only: [:new])    {set_parent_type_id(:audit)}
+  before_filter(only: [:create]) {set_parent(:audit)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @audit)}
+
   include Concerns::Mobile # used for [method]_as_json
 
   def define_owner
@@ -77,8 +82,8 @@ class AuditsController < SafetyAssuranceController
 
 
   def create
-    audit = Audit.create(params[:audit])
-    redirect_to audit_path(audit), flash: {success: "Audit created."}
+    @audit = Audit.create(params[:audit])
+    redirect_to audit_path(@audit), flash: {success: "Audit created."}
   end
 
 

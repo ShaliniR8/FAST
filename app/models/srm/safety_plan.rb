@@ -8,6 +8,8 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
   include Occurrenceable
   include Transactionable
   include Noticeable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to :created_by, foreign_key: "created_by_id", class_name: "User"

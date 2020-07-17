@@ -95,7 +95,7 @@ class DefaultDictionary
     launch: {
       btn: :launch,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| true },
+      access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? },
     },
     hazard: {
       btn: :hazard,
@@ -225,7 +225,7 @@ class DefaultDictionary
     view_parent: {
       btn: :view_parent,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| owner.owner.present? },
+      access: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
     },
     view_sra: {
       btn: :view_sra,
@@ -396,6 +396,12 @@ class DefaultDictionary
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    sras: {
+      partial: '/panels/sras',
+      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Sra').present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { sras: owner.get_children(child_type: 'Sra') } },
     },
     tasks: { # WIP
       partial: '/ims/show_task',

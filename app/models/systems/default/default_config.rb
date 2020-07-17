@@ -44,7 +44,12 @@ class DefaultConfig
     has_verification:                   true,   # Allows forms to be verified (additional step)
   }
 
-
+  LAUNCH_OBJECTS = {
+    audits: ['Sra'],
+    inspections: ['Sra'],
+    evaluations: ['Sra'],
+    investigations: ['Sra'],
+  }
 
   def self.getTimeFormat
     {

@@ -259,11 +259,18 @@ ruby:
       disable_with: 'Redirecting...'
 
   - when :view_parent
-    - parent_class = owner.owner.class.name
-    = link_to "View #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
-      eval("#{parent_class.underscore}_path(owner.owner)"),
-      class: 'btn btn-info pull-right mr5 mb5',
-      disable_with: 'Redirecting...'
+    - if owner.parents.present?
+      - parent_class = owner.get_parent.class.name
+      = link_to "View #{parent_class.titleize}",
+        eval("#{parent_class.underscore}_path(owner.get_parent)"),
+        class: 'btn btn-info pull-right mr5 mb5',
+        disable_with: 'Redirecting...'
+    - else
+      - parent_class = owner.owner.class.name
+      = link_to "View #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
+        eval("#{parent_class.underscore}_path(owner.owner)"),
+        class: 'btn btn-info pull-right mr5 mb5',
+        disable_with: 'Redirecting...'
 
   - when :view_report
     = link_to 'View Report',

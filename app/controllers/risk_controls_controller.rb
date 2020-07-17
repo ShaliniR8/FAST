@@ -24,6 +24,10 @@ class RiskControlsController < ApplicationController
   before_filter :login_required
   before_filter :define_owner, only: [:interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:risk_control)}
+  before_filter(only: [:create]) {set_parent(:risk_control)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @risk_control)}
+
   def define_owner
     @class = Object.const_get('RiskControl')
     @owner = RiskControl.find(params[:id])
@@ -60,7 +64,12 @@ class RiskControlsController < ApplicationController
 
 
   def new
-    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    if params[:owner_type].present?
+      @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    else # from Launch Object
+      @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id])
+    end
+
     @risk_control = RiskControl.new
     @fields = RiskControl.get_meta_fields('form')
   end

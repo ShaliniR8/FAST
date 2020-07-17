@@ -25,6 +25,8 @@
           <%if params[:owner_id].present? && params[:owner_type].present? %>
             <%=f.hidden_field :owner_id,   :value => params[:owner_id] %>
             <%=f.hidden_field :owner_type, :value => params[:owner_type] %>
+            <%=f.hidden_field :parent_type, :value => @parent_type%>
+            <%=f.hidden_field :parent_id,   :value => @parent_id%>
           <%end%>
           <%=render "/shared/privilege_form", :target => "investigation[privileges][]", :owner => @owner, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>

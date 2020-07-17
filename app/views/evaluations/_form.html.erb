@@ -24,6 +24,8 @@
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
+            <%=f.hidden_field :parent_type, :value => @parent_type%>
+            <%=f.hidden_field :parent_id,   :value => @parent_id%>
           <%end%>
           <div class="mt10 mr10">
             <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",

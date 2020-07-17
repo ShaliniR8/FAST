@@ -12,6 +12,8 @@ class Recommendation < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to :responsible_user,    foreign_key: 'responsible_user_id', class_name: 'User'

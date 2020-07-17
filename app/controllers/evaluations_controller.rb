@@ -30,6 +30,10 @@ class EvaluationsController < SafetyAssuranceController
     :viewer_access
   ]
 
+  before_filter(only: [:new])    {set_parent_type_id(:evaluation)}
+  before_filter(only: [:create]) {set_parent(:evaluation)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @evaluation)}
+
   def define_owner
     @class = Object.const_get('Evaluation')
     @owner = Evaluation.find(params[:id])
@@ -111,9 +115,9 @@ class EvaluationsController < SafetyAssuranceController
 
 
   def create
-    evaluation = Evaluation.new(params[:evaluation])
-    if evaluation.save
-      redirect_to evaluation_path(evaluation), flash: {success: "Evaluation created."}
+    @evaluation = Evaluation.new(params[:evaluation])
+    if @evaluation.save
+      redirect_to evaluation_path(@evaluation), flash: {success: "Evaluation created."}
     end
   end
 

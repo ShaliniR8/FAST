@@ -17,6 +17,8 @@ class Evaluation < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to  :approver,          foreign_key: 'approver_id',             class_name: 'User'

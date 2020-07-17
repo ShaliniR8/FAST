@@ -29,6 +29,10 @@ class RecommendationsController < SafetyAssuranceController
     :update
   ]
 
+  before_filter(only: [:new])    {set_parent_type_id(:recommendation)}
+  before_filter(only: [:create]) {set_parent(:recommendation)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @recommendation)}
+
   def define_owner
     @class = Object.const_get('Recommendation')
     @owner = @class.find(params[:id])
@@ -59,18 +63,29 @@ class RecommendationsController < SafetyAssuranceController
 
   def new
     @privileges = Privilege.find(:all)
-    @parent = Object.const_get(params[:owner_type])
-      .find(params[:owner_id])
-      .becomes(Object.const_get(params[:owner_type])) rescue nil
-    @owner = @parent.recommendations.new
+
+    if params[:owner_type].present?
+      @parent_old = Object.const_get(params[:owner_type])
+        .find(params[:owner_id])
+        .becomes(Object.const_get(params[:owner_type])) rescue nil
+      @owner = @parent_old.recommendations.new
+    else # from Launch Object
+      @owner = Finding.new
+    end
+
     @fields = Recommendation.get_meta_fields('form')
   end
 
 
   def create
-    @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @owner = @parent.recommendations.create(params[:recommendation])
-    redirect_to @owner, flash: {success: "Recommendation created."}
+    if params[:owner_type].present?
+      @parent_old = Object.const_get(params[:owner_type]).find(params[:owner_id])
+      @recommendation = @parent_old.recommendations.create(params[:recommendation])
+    else # from Launch Object
+      @recommendation = @parent.recommendations.create(params[:recommendation])
+    end
+
+    redirect_to @recommendation, flash: {success: "Recommendation created."}
   end
 
 

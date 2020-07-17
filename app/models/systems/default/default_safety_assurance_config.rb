@@ -82,7 +82,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -147,11 +147,11 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
+          *%i[delete launch override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -220,11 +220,11 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
+          *%i[delete launch override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -313,11 +313,11 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
+          *%i[delete launch override_status edit sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments reports events findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras reports events findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -458,7 +458,7 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
+          *%i[delete launch override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification recommendation sms_action approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
@@ -562,7 +562,7 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
+          *%i[delete launch override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
             #TODO: Complete Notices<=Notifications Update and add set_alert after view_parent
           #INLINE
           *%i[assign complete request_extension schedule_verification cost approve_reject reopen comment],
@@ -636,7 +636,7 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
+          *%i[delete launch override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen comment]
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({

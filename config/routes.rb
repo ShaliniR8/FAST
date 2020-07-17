@@ -477,6 +477,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_checklist'
       get 'new_requirement'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'update_checklist'
       get 'viewer_access'
@@ -493,6 +495,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_attachment'
       get 'new_checklist'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'update_checklist'
       get 'viewer_access'
@@ -512,6 +516,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_desc'
       get 'new_attachment'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'viewer_access'
       post 'add_causes'
@@ -535,6 +541,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get 'reopen'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
     end
     collection do
       post 'load_records'
@@ -553,6 +561,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'mitigate'
       get 'new_attachment'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'reassign'
     end
@@ -563,6 +573,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'interpret'
       get 'new_attachment'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
     end
     collection do
@@ -594,6 +606,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'get_agenda'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
       get 'viewer_access'
     end
@@ -620,6 +634,8 @@ PrdgSession::Application.routes.draw do |map|
       get "new_root_cause"
       get "reload_root_causes"
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
     end
     collection do
@@ -649,6 +665,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'reopen'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
     end
   end
@@ -664,6 +682,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'reopen'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
     end
   end

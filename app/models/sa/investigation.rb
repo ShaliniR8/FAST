@@ -20,6 +20,8 @@ class Investigation < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to :owner,                    polymorphic: true

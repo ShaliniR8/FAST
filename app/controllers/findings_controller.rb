@@ -29,6 +29,10 @@ class FindingsController < SafetyAssuranceController
     :update,
   ]
 
+  before_filter(only: [:new])    {set_parent_type_id(:finding)}
+  before_filter(only: [:create]) {set_parent(:finding)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @finding)}
+
   def define_owner
     @class = Object.const_get('Finding')
     @owner = @class.find(params[:id])
@@ -39,16 +43,25 @@ class FindingsController < SafetyAssuranceController
   def new
     load_options
     @fields = Finding.get_meta_fields('form')
-    @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @owner = @parent.findings.new
+    if params[:owner_type].present?
+      @parent_old = Object.const_get(params[:owner_type]).find(params[:owner_id])
+      @owner = @parent_old.findings.new
+    else # from Launch Object
+      @owner = Finding.new
+    end
     choose_load_special_matrix_form(@owner, 'finding')
   end
 
 
   def create
-    @parent = Object.const_get(params[:owner_type]).find(params[:owner_id])
-    @owner = @parent.findings.create(params[:finding])
-    redirect_to @owner, flash: {success: 'Finding created.'}
+    if params[:owner_type].present?
+      @parent_old = Object.const_get(params[:owner_type]).find(params[:owner_id])
+      @finding = @parent_old.findings.create(params[:finding])
+    else # from Launch Object
+      @finding = @parent.findings.create(params[:finding])
+    end
+
+    redirect_to @finding, flash: {success: 'Finding created.'}
   end
 
 

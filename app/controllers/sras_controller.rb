@@ -22,6 +22,10 @@ class SrasController < ApplicationController
   before_filter :load_options
   before_filter :define_owner, only: [:show, :interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:sra)}
+  before_filter(only: [:create]) {set_parent(:sra)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @sra)}
+
   def define_owner
     @class = Object.const_get('Sra')
     @owner = Sra.find(params[:id])
@@ -57,9 +61,6 @@ class SrasController < ApplicationController
 
 
   def new
-    @parent_type = params[:parent_type]
-    @parent_id   = params[:parent_id]
-
     load_options
     @fields = Sra.get_meta_fields('form')
     @risk_groups = RiskMatrixGroup.find(:all)
@@ -77,26 +78,16 @@ class SrasController < ApplicationController
 
 
   def create
-    if params[:sra][:parent_type].present? && params[:sra][:parent_id].present?
-      @parent = Object.const_get(params[:sra][:parent_type].singularize.capitalize).find(params[:sra][:parent_id])
-
-      params[:sra].except!(:parent_type)
-      params[:sra].except!(:parent_id)
-    end
-
-    sra = Sra.create(params[:sra])
-    sra.status = 'New'
+    @sra = Sra.create(params[:sra])
+    @sra.status = 'New'
     if params[:matrix_id].present?
       connection = SraMatrixConnection.create(
         :matrix_id => params[:matrix_id],
-        :owner_id => sra.id)
+        :owner_id => @sra.id)
       connection.save
     end
-    if sra.save
-      Child.create(child: sra, owner: @parent) if @parent.present?
-      Parent.create(parent: @parent, owner: sra) if @parent.present?
-
-      redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
+    if @sra.save
+      redirect_to sra_path(@sra), flash: {success: "SRA (SRM) created."}
     end
   end
 
