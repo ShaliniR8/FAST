@@ -22,7 +22,7 @@ task :submission_notify => [:environment] do |t|
   users.each do |user_id|
     if CONFIG.sr::GENERAL[:direct_content_message]
 
-      html = controller.render_to_string(:template => "/submissions/_print.html.erb",  locals: {owner: owner, deidentified: true}, layout: false)
+      html = controller.render_to_string(:template => "/submissions/_print.html.erb",  locals: {owner: owner, deidentified: false}, layout: false)
       pdf = PDFKit.new(html)
       pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
       pdf.stylesheets << ("#{Rails.root}/public/css/print.css")

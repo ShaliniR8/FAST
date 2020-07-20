@@ -17,7 +17,7 @@ class Meeting < ProsafetBase
 
   accepts_nested_attributes_for :invitations
   accepts_nested_attributes_for :host
-  accepts_nested_attributes_for :agendas
+  accepts_nested_attributes_for :agendas, allow_destroy: true
   accepts_nested_attributes_for :reports
 
   before_create :init_status

@@ -14,13 +14,14 @@
                   <th><%=h[:title]%></th>
                 <%end%>
                 <th>Comment</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="agendas">
               <%@report.agendas.each do |a|%>
                 <%if a.user_id==current_user.id%>
                   <%=f.fields_for :agendas,a do |x|%>
-                    <tr>
+                    <tr id="agends_<%= a.id %>">
                       <td><%=x.text_field :title,:class=>"form-control"%></td>
                       <td><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
                       <td><%=a.get_user%></td>
@@ -37,8 +38,9 @@
                           :class => "form-control"%>
                       </td>
 
-
                       <td><%=x.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
+                      <td><button type="button" class="close close_btn" aria-label="Close"><i class="mt5 glyphicon glyphicon-remove close_icon"></i></button></td>
+                       <%= x.hidden_field(:_destroy) %>
                     </tr>
                   <%end%>
                 <%else%>
@@ -66,3 +68,46 @@
     </div>
   </div>
 </div>
+
+<style>
+  .close_btn {
+    color: red;
+    font-size: 23px;
+  }
+
+  .close_icon {
+    top: 10px;
+    right: 10px;
+  }
+
+  .removed {
+    opacity: 0.4;
+  }
+</style>
+
+<script type="text/javascript">
+  document.querySelectorAll('.close_btn').forEach( close_btn => {
+    close_btn.addEventListener("click", function(event) {
+      const row = event.srcElement.closest("tr")
+      let result = row.classList.toggle("removed");
+
+      if (result) {
+        row.classList.add('removed')
+        row.querySelectorAll(".form-control").forEach( input_field => {
+          input_field.disabled = true
+        })
+      } else {
+        row.classList.remove('removed')
+        row.querySelectorAll(".form-control").forEach( input_field => {
+          input_field.disabled = false
+        })
+      }
+    });
+  })
+
+  document.querySelector('form').addEventListener('submit', function() {
+    document.querySelectorAll('.removed').forEach( element => {
+      element.querySelector("[type='hidden']").value = true
+    })
+  })
+</script>
