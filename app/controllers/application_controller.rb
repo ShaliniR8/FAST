@@ -796,7 +796,11 @@ class ApplicationController < ActionController::Base
     options[:rails_env] = Rails.env
     args = options.map { |n, v| "#{n.to_s.upcase}='#{v}'"}
     Rails.logger.info "running `rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &`"
-    system "rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
+    if Rails.env.production?
+      system "/usr/local/bin/bundle exec /usr/local/bin/rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
+    else
+      system "rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
+    end
   end
 
   private
