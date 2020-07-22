@@ -1,3 +1,26 @@
+desc 'Update SRA module baseline Risk Factor'
+task :update_risk_factor_in_sra => :environment do
+
+  Hazard.all.select{|x| x.risk_factor == ""}.each do |hazard|
+    if hazard.likelihood.present? && hazard.severity.present?
+
+      risk_table_def = CONFIG::MATRIX_INFO[:risk_table][:rows]
+      risk_table_dic = CONFIG::MATRIX_INFO[:risk_table_dict]
+
+      row_index      = hazard.severity.to_i
+      column_index   = hazard.likelihood.to_i
+
+      risk_factor = risk_table_dic[risk_table_def[row_index][column_index].to_sym]
+
+      # SCX severity and likelihood is swapped
+      p "#{hazard.id}: sev(#{hazard.likelihood}), like(#{hazard.severity}) >> #{risk_factor}"
+
+      hazard.update_attributes(risk_factor: risk_factor)
+    end
+  end
+
+end
+
 desc 'Update Safety Assurrance module baseline Risk Factor'
 task :update_risk_factor_in_sa => :environment do
 
