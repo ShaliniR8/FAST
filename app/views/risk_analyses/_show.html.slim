@@ -25,9 +25,7 @@
                 'data-placement' => 'top',
                 title: 'Assess Baseline Risk'
       .row
-        /Risk Assessment Statistics
-        / render 'shared/bsk_risk_matrix_show_assessment', owner: owner
-        .col-xs-12.col-lg-6
+        .col-xs-12.col-lg-12
           hr/
           h4: b RISK ASSESSMENT
           .col-xs-6
@@ -44,21 +42,6 @@
             <b>Severity:</b> #{severity_after}<br>
             <b>Likelihood:</b> #{likelibood_after}<br>
             <b>Risk Factor:</b> #{owner.risk_factor_after}<br>
-          /Risk Matrix Rating Key
-          / render 'shared/bsk_risk_matrix_rating_key'
-        .col-xs-12.col-lg-6
-          hr/
-          h4: b RISK RATING KEY
-          table.table.table-bordered.table-fixed.table-centered
-            tr
-              - CONFIG::RISK_MATRIX[:risk_factor].each do |k, v|
-                <th bgcolor="#{v}">#{k}</th>
-
-        /Risk Assessment Matrix
-        / render 'shared/bsk_risk_matrix_show_matrix', owner: owner, type: type
-        .col-xs-12.col-lg-6
-
-
 
 javascript:
   $(document).ready(function(){

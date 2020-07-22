@@ -2,17 +2,11 @@
 
 <%can_change = owner.status != "Pending Approval" && owner.status != "Completed"%>
 
-<%= render 'shared/choose_show_matrix',
-            :owner => @owner,
-            :show_btn => true,
-            :type => "sms_actions",
-            :like => @like,
-            :color_matrix => @color_matrix,
-            :frequency => @frequency,
-            :allow_mitigate => true,
-            :can_change => false %>
-
-
-
+<%=render 'risk_analyses/show',
+  :owner => owner,
+  :show_btn => false,
+  :type => 'sms_actions',
+  :allow_mitigate => true,
+  :can_change => false%>
 
 <%=render "/forms/cost", :owner => owner%>
