@@ -53,8 +53,13 @@ module Concerns
         json[:recent_submissions] = submissions_as_json(recent_submissions.flatten)
 
         # Get timezone data for timezone fields
-        timezoneField = Field.where(data_type: 'timezone').first
-        json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
+        # timezoneField = Field.where(data_type: 'timezone').first
+        # json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
+        json[:timezones] = {
+          all: ActiveSupport::TimeZone.all.map(&:name),
+          us: ["Hawaii", "Alaska", "Pacific Time (US & Canada)", "Arizona", "Mountain Time (US & Canada)", "Central Time (US & Canada)", "Eastern Time (US & Canada)", "Indiana (East)"]
+        }
+
 
         # Get id map of all users
         json[:users] = array_to_id_map User.all.as_json(only: [:id, :full_name, :email])

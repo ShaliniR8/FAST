@@ -16,7 +16,7 @@ class NotifyMailer < ApplicationMailer
 
     object_name = record.class.name
     object_id   = record.id
-    title       = record.description
+    title       = record.description rescue ''
 
     if object_name == 'Submission'
       submission_type = record.template.name
