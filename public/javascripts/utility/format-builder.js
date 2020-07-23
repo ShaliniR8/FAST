@@ -1,5 +1,10 @@
 $(document).ready(function(){
 
+  let datetime_format = $('.field-datetime')[0].dataset["format"]
+  if (datetime_format == undefined) {
+    datetime_format = 'Y-m-d H:i'
+  }
+
   $('.field-date').flatpickr({
     dateFormat: 'Y-m-d',
   });
@@ -13,7 +18,7 @@ $(document).ready(function(){
 
   $('.field-datetime').flatpickr({
     enableTime: true,
-    dateFormat: 'Y-m-d H:i',
+    dateFormat: datetime_format,
     time_24hr: true,
   });
 

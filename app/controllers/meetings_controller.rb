@@ -298,6 +298,12 @@ class MeetingsController < ApplicationController
       end
     end
 
+    # update meeting times
+    params[:meeting][:review_start] = DateTime.strptime(params[:meeting][:review_start], CONFIG.getTimeFormat[:datetimeformat])
+    params[:meeting][:review_end] = DateTime.strptime(params[:meeting][:review_end], CONFIG.getTimeFormat[:datetimeformat])
+    params[:meeting][:meeting_start] = DateTime.strptime(params[:meeting][:meeting_start], CONFIG.getTimeFormat[:datetimeformat])
+    params[:meeting][:meeting_end] = DateTime.strptime(params[:meeting][:meeting_end], CONFIG.getTimeFormat[:datetimeformat])
+
     @owner.update_attributes(params[:meeting])
     if transaction
       Transaction.build_for(
