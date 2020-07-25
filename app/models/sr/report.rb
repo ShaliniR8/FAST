@@ -166,13 +166,13 @@ class Report < Sr::SafetyReportingBase
 
   def self.get_headers
     [
-      {:field => :get_id,                             :title => "ID"                                                                      },
-      {:field => :name,                               :title => "Title"                                                                   },
-      {:field => :num_records,                        :title => "Reports Included"                                                        },
-      {:field => :get_event_date,                     :title => "Event Date"                                                              },
-      {:field => :display_before_risk_factor,         :title => "Baseline Risk",                    :html_class => :get_before_risk_color },
-      {:field => :display_after_risk_factor,          :title => "Mitigated Risk",                   :html_class => :get_after_risk_color  },
-      {:field => :status,                             :title => "Status"                                                                  },
+      {:field => :get_id,                      :title => "ID"                                                     },
+      {:field => :name,                        :title => "Title"                                                  },
+      {:field => :num_records,                 :title => "Reports Included"                                       },
+      {:field => :get_event_date,              :title => "Event Date",      :type => "date"                       },
+      {:field => :display_before_risk_factor,  :title => "Baseline Risk",   :html_class => :get_before_risk_color },
+      {:field => :display_after_risk_factor,   :title => "Mitigated Risk",  :html_class => :get_after_risk_color  },
+      {:field => :status,                      :title => "Status"                                                 },
     ]
   end
 

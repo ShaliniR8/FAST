@@ -18,7 +18,11 @@
         <%=value%>
       <%end%>
     <%else%>
-      <%=value%>
+      <%if field.data_type == "datetime"%>
+        <%=datetime_to_string(DateTime.parse value)%>
+      <%else%>
+        <%=value%>
+      <%end%>
     <%end%>
   </div>
 <%end%>

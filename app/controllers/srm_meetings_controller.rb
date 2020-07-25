@@ -80,6 +80,8 @@ class SrmMeetingsController < ApplicationController
       end
     end
     if @meeting.save
+      @meeting.set_datetimez
+      @meeting.save
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       @meeting.invitations.each do |inv|
         notify(@meeting, notice: {
@@ -217,6 +219,8 @@ class SrmMeetingsController < ApplicationController
       @owner.status = status
       @owner.save
     end
+    @owner.set_datetimez
+    @owner.save
     redirect_to srm_meeting_path(@owner)
   end
 

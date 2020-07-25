@@ -31,7 +31,11 @@
                   <%@records.each do |record|%>
                     <tr>
                       <%@headers.each do |header|%>
-                        <td><%=record.send(header[:field])%></td>
+                        <% if header[:type] == "date" %>
+                          <td><%=date_to_string(Date.parse record.send(header[:field]))%></td>
+                        <% else %>
+                          <td><%=record.send(header[:field])%></td>
+                        <% end %>
                       <%end%>
                       <td>
                         <div class="btn-group">

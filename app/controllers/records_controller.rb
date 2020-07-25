@@ -483,6 +483,7 @@ class RecordsController < ApplicationController
         transaction_content
       )
     end
+    @owner.event_date=@owner.covert_time(@owner.event_date)
     @owner.save
     redirect_to record_path(@owner)
   end

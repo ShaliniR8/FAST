@@ -22,7 +22,7 @@
                 <%owner.comments.preload(:viewer).each do |c|%>
                   <tr>
                     <td><%=c.viewer.full_name rescue "<b>External</b> #{c.alt_user}".html_safe%></td>
-                    <td><%=c.get_subnmission_time%></td>
+                    <td><%=date_to_string(Date.parse c.get_subnmission_time)%></td>
                     <td><%=c.get_content%></td>
                   </tr>
                 <%end%>

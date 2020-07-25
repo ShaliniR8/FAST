@@ -118,15 +118,19 @@
 
         <%when "date"%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
+          <%val=record.send(field_name) rescue ''%>
           <%=f.text_field field_name,
-            :class => "form-control field-date "  + field_required_field%>
+            :class => "form-control field-date "  + field_required_field,
+            value: val,
+            'data-format' => CONFIG.getTimeFormat[:datepicker]%>
 
         <%when 'datetime', 'datetimez'%>
           <%=f.label(field_name, field_description, class: field_required_label)%>
+          <%val=record.send(field_name).in_time_zone(CONFIG::GENERAL[:time_zone]) rescue ''%>
           <%=f.text_field field_name,
-            value: datetimez_to_string(record.send(field_name)),
+            value: val,
             class: "form-control field-datetime #{field_required_field}",
-              'data-format' => CONFIG.getTimeFormat[:datetimepicker]%>
+            'data-format' => CONFIG.getTimeFormat[:datetimepicker]%>
 
         <%when "select"%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
