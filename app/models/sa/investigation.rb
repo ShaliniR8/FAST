@@ -62,6 +62,10 @@ class Investigation < Sa::SafetyAssuranceBase
       "<a style='font-weight:bold' href='/#{owner_type.downcase.pluralize}/#{self.owner_id}'>
         #{owner_titleize} ##{self.owner_id}
       </a>".html_safe
+    elsif self.get_parent.present?
+      "<a style='font-weight:bold' href='/#{self.get_parent.class.name.underscore.pluralize}/#{self.get_parent.id}'>
+        #{self.get_parent.class.name} ##{self.get_parent.id}
+      </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end

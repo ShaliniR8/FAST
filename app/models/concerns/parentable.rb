@@ -5,6 +5,6 @@ module Parentable
   end
 
   def get_parent
-    self.parents[0].parent
+    self.parents[0].parent rescue ''
   end
 end

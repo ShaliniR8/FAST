@@ -1,0 +1,9 @@
+=render '/forms/show_fields', fields: Investigation.get_meta_fields('show'), record: owner
+=render 'risk_analyses/show',
+        :owner => owner,
+        :show_btn => false,
+        :type => 'investigations',
+        :allow_mitigate => true,
+        :can_change => !%w[Rejected Completed].include?(owner.status)
+=render '/forms/show_comment', owner: owner
+=render '/forms/attachments_show', owner: owner, show_btn: false

@@ -9,6 +9,9 @@ class Report < Sr::SafetyReportingBase
   include RootCausable
   include Sraable
   include Transactionable
+  include Childable
+  include Parentable
+
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy

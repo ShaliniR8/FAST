@@ -184,7 +184,15 @@ class ApplicationController < ActionController::Base
   #############################
 
   def launch
-    @objects =  CONFIG::LAUNCH_OBJECTS[params[:controller].to_sym].map { |object| [object, object.underscore] }
+    current_object = params[:controller].to_sym
+    # @objects: list of object names that can be launched from the current object
+    @objects =  CONFIG::LAUNCH_OBJECTS[current_object].map { |object|
+      if CONFIG::OBJECT_NAME_MAP[object].present?
+        [CONFIG::OBJECT_NAME_MAP[object], object.underscore]
+      else
+        [object, object.underscore]
+      end
+    }
     render :partial => '/forms/workflow_forms/launch'
   end
 

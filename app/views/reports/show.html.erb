@@ -35,6 +35,15 @@
                   "data-target" => ".bs-example-modal-lg"%>
               <%end%>
 
+              <%=link_to 'Launch',
+                '#',
+                :id => "launch_btn",
+                :class => "btn btn-warning pull-right mr5 mb5",
+                :disable_with => "Launching...",
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg'%>
+
+
               <%if @report.status != "Closed" &&
                 current_user.has_access('reports', 'edit', admin: true)%>
                 <%=link_to 'Edit',
@@ -135,24 +144,6 @@
               :id => 'comment_btn',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>
-
-            <%if current_user.has_access('Safety Risk Management','module', admin: true, strict: true) &&
-              @report.status != "Closed" &&
-              !@report.sra.present?%>
-              <%=link_to "Launch SRA(SRM)",
-                new_sra_path(owner_id:@report.id, owner_type:@report.class),
-                :class=>"btn btn-warning pull-right ml5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
-
-            <%if current_user.has_access('Safety Assurance', 'module', admin: true, strict: true) &&
-              @report.status != "Closed" &&
-              !@report.investigation.present?%>
-              <%=link_to "Launch Investigation",
-                new_investigation_path(owner_id:@report.id, owner_type:@report.class),
-                :class=>"btn btn-warning pull-right ml5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
           </div>
 
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
@@ -233,6 +224,13 @@
 
 <script>
   $(document).ready(function(){
+    $('#launch_btn').on('click',function(){
+      $.get("<%= eval("launch_report_path(@report)")%>", function(data){
+          $(".modal-content").html(data);
+          $(window).trigger('resize');
+      });
+    })
+
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity%>-<%=Finding.get_likelihood.index(@report.likelihood)%>").append("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity_after%>-<%=Finding.get_likelihood.index(@report.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
     $('#att_btn').on('click',function(){

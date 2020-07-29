@@ -95,7 +95,7 @@ class DefaultDictionary
     launch: {
       btn: :launch,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? },
+      access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? && priv_check.call(owner,user,'edit',true,true) },
     },
     hazard: {
       btn: :hazard,
@@ -302,6 +302,12 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { findings: owner.findings } },
     },
+    investigations: {
+      partial: '/panels/investigations',
+      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Investigation').present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { investigations: owner.get_children(child_type: 'Investigation') } },
+    },
     reports: {
       partial: '/panels/reports',
       visible: proc { |owner:,user:,**op| owner.owner.class.name == 'Record' },
@@ -396,6 +402,15 @@ class DefaultDictionary
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    source_of_input: {
+      partial: '/panels/source_of_input',
+      visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        parent: owner.get_parent.present? ? owner.get_parent : owner.owner
+      }},
     },
     sras: {
       partial: '/panels/sras',

@@ -172,7 +172,7 @@ class DefaultSafetyRiskManagementConfig
 
         actions: [
           #TOP
-          *%i[delete launch override_status edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
+          *%i[delete override_status launch edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
@@ -188,7 +188,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[agendas comments hazards extension_requests verifications reports events attachments transaction_log
+        panels: %i[agendas comments source_of_input hazards extension_requests verifications reports events attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
@@ -252,7 +252,7 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete launch override_status edit deid_pdf pdf view_sra attach_in_message expand_all],
+          *%i[delete override_status launch edit deid_pdf pdf view_sra attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject risk_control reopen comment],
           #*%i[assign complete approve_reject reject complete_hazard risk_control reopen comment],
@@ -331,7 +331,7 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete launch override_status edit deid_pdf pdf view_hazard attach_in_message expand_all],
+          *%i[delete override_status launch edit deid_pdf pdf view_hazard attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen cost comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
@@ -427,7 +427,7 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete launch override_status edit pdf attach_in_message expand_all],
+          *%i[delete override_status edit pdf attach_in_message expand_all],
           #INLINE
           *%i[complete_safety_plan evaluate reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({

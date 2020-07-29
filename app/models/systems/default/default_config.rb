@@ -45,10 +45,18 @@ class DefaultConfig
   }
 
   LAUNCH_OBJECTS = {
+    reports: ['Sra', 'Investigation'],
     audits: ['Sra'],
     inspections: ['Sra'],
     evaluations: ['Sra'],
     investigations: ['Sra'],
+  }
+
+  OBJECT_NAME_MAP = {
+    'Sra'       => 'SRA',
+    'SmsAction' => 'Corrective Action (SA)',
+    'Record'    => 'Report',
+    'Report'    => 'Event'
   }
 
   def self.getTimeFormat

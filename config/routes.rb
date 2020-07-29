@@ -351,6 +351,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'load_records'
     end
     member do
+      get 'launch'
+      get 'launch_new_object'
       get 'mitigate'
       get 'baseline'
       get "print"

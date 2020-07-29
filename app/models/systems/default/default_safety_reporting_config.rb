@@ -303,7 +303,7 @@ class DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[occurrences
+        panels: %i[occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'CorrectiveAction' => {
