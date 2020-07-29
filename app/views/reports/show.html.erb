@@ -35,15 +35,6 @@
                   "data-target" => ".bs-example-modal-lg"%>
               <%end%>
 
-              <%=link_to 'Launch',
-                '#',
-                :id => "launch_btn",
-                :class => "btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Launching...",
-                'data-toggle' => 'modal',
-                'data-target' => '.bs-example-modal-lg'%>
-
-
               <%if @report.status != "Closed" &&
                 current_user.has_access('reports', 'edit', admin: true)%>
                 <%=link_to 'Edit',
@@ -52,6 +43,13 @@
                   :class => "btn btn-warning pull-right mr5 mb5",
                   :disable_with => "Editing..."%>
               <%end%>
+
+              <%=link_to 'Launch',
+                '#',
+                :id => "launch_btn",
+                :class => "btn btn-warning pull-right mr5 mb5",
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg'%>
 
               <%if @report.investigation.present? &&
                 current_user.has_access('Safety Assurance','module', admin: true, strict: true) %>

@@ -45,6 +45,7 @@ class DefaultConfig
   }
 
   LAUNCH_OBJECTS = {
+    records: ['Sra', 'Investigation'],
     reports: ['Sra', 'Investigation'],
     audits: ['Sra'],
     inspections: ['Sra'],

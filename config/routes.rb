@@ -304,6 +304,8 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :records do
     member do
+      get 'launch'
+      get 'launch_new_object'
       get "close"
       get 'convert'
       get 'mitigate'

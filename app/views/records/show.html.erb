@@ -75,6 +75,13 @@
                   <%end%>
                 <%end%>
 
+                <%=link_to 'Launch',
+                  '#',
+                  :id => "launch_btn",
+                  :class => "btn btn-warning pull-right mr5 mb5",
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg'%>
+
                 <%if @record.submission.present? && submission_show_access%>
                   <%=link_to "View Submission",
                     submission_path(@record.submission),
@@ -187,26 +194,6 @@
           </div>
 
           <div class="col-xs-12 mb20">
-            <%if sra_module_access &&
-              @record.status != "Closed" &&
-              @record.status != "New" &&
-              !@record.sra.present?%>
-              <%=link_to "Launch SRA(SRM)",
-                new_sra_path(owner_id:@record.id, owner_type:@record.class),
-                :class=>"btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
-
-            <%if sa_module_access &&
-              @record.status != "Closed" &&
-              @record.status != "New" &&
-              !@record.investigation.present?%>
-              <%=link_to "Launch Investigation",
-                new_investigation_path(owner_id:@record.id, owner_type:@record.class),
-                :class=>"btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
-
             <%if @record.template.map_template_id.present? &&
               record_edit_access &&
               @record.status == "Open"%>
@@ -308,6 +295,13 @@
 
 <script>
   $(document).ready(function(){
+    $('#launch_btn').on('click',function(){
+      $.get("<%= eval("launch_record_path(@record)")%>", function(data){
+          $(".modal-content").html(data);
+          $(window).trigger('resize');
+      });
+    })
+
     $('.close_btn').on('click',function(){
       var commit = $(this).attr('id');
       $.get("<%=close_record_path(@record)%>?commit="+commit, function(data){

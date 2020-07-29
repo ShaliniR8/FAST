@@ -10,6 +10,8 @@ class Record < Sr::SafetyReportingBase
   include RootCausable
   include Sraable
   include Transactionable
+  include Childable
+  include Parentable
 
 #Associations List
   has_one     :submission,          foreign_key: 'records_id',   class_name: 'Submission'
