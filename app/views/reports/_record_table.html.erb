@@ -42,6 +42,7 @@
                   <%=header[:title]%>
                 </th>
               <%end%>
+              <th>Additional Info</th>
               <th width="15%">Action</th>
             </tr>
           </thead>
@@ -60,6 +61,14 @@
                       "<font color='green'>Active User</font>").html_safe%></td>
                   <%end%>
                 <%end%>
+                <td>
+                  <%additional_info = record.get_additional_info%>
+                  <%additional_info.each do |field|%>
+                    <% if field[:value].present? %>
+                      <p><b><%=field[:label]%></b>: <%=field[:value]%></p>
+                    <%end%>
+                  <%end%>
+                </td>
                 <td>
                   <%if @report.status != "Closed" &&
                     record.status != "Closed" &&

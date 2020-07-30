@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
 <script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
@@ -49,6 +50,7 @@
                         <%@report_fields.each do |header|%>
                           <th><%=header[:title]%></th>
                         <%end%>
+                        <th>Additional Info</th>
                         <th width="10%">Action</th>
                       </tr>
                     </thead>
@@ -60,6 +62,14 @@
                               <%=render 'forms/show_field', :record => record, :field_hash => header%>
                             </td>
                           <%end%>
+                          <td>
+                            <%additional_info = record.get_additional_info%>
+                            <%additional_info.each do |field|%>
+                              <% if field[:value].present? %>
+                                <p><b><%=field[:label]%></b>: <%=field[:value]%></p>
+                              <%end%>
+                            <%end%>
+                          </td>
                           <td>
                             <div class="btn-group">
                               <a class="btn btn-info view_btn mr5">
@@ -169,8 +179,14 @@
   $(document).ready(function(){
 
 
-    $("#included").dataTable();
-    $("#candidates").dataTable();
+    $("#included").dataTable({
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+    });
+    $("#candidates").dataTable({
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+    });
 
     $(".view_btn").on('click',function(){
       window.open("/records/" + $(this).closest("tr").children("td").eq(0).html());

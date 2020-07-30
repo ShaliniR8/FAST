@@ -424,5 +424,16 @@ class Record < Sr::SafetyReportingBase
     end
   end
 
+  def get_additional_info
+    additional_info = []
+    all_record_fields = self.record_fields.map{|sf| [sf.fields_id, sf] }.to_h
+    additional_info_fields = self.template.fields.select { |field| field.additional_info }
+
+    additional_info_fields.each do |field|
+      additional_info << { label: field.label, value: all_record_fields[field.id].value }
+    end
+
+    additional_info
+  end
 
 end

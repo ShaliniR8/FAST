@@ -34,6 +34,7 @@
   <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
   <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
   <td>
     <%if source == 'Existing'%>
