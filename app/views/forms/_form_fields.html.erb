@@ -74,16 +74,31 @@
         <%when "checkbox"%>
           <div class="col-xs-12">
             <%=f.label(field_name, field_description, :class => field_required_label)%></br>
-            <%field_options.each do |option|%>
-              <div class="col-sm-6 col-md-6 col-lg-6">
-                <label class="checkbox">
-                  <%=f.check_box field_name,
-                    {:multiple => true, :class => "checkbox"},
-                    option, nil%>
-                  <%=option%>
-                </label>
-              </div>
-            <%end%>
+            <%option_groups = field_options.in_groups(2)%>
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <%option_groups[0].each do |option|%>
+                <div class="col-xs-12">
+                  <label class="checkbox">
+                    <%=f.check_box field_name,
+                      {:multiple => true, :class => "checkbox"},
+                      option, nil%>
+                    <%=option%>
+                  </label>
+                </div>
+              <%end%>
+            </div>
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <%option_groups[1].each do |option|%>
+                <div class="col-xs-12">
+                  <label class="checkbox">
+                    <%=f.check_box field_name,
+                      {:multiple => true, :class => "checkbox"},
+                      option, nil%>
+                    <%=option%>
+                  </label>
+                </div>
+              <%end%>
+            </div>
           </div>
 
         <%when "datalist"%>
