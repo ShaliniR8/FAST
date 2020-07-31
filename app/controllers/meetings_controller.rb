@@ -282,7 +282,7 @@ class MeetingsController < ApplicationController
 
 
     # update included agendas
-    if params[:meeting][:agendas_attributes].present?
+    if params[:meeting].present? && params[:meeting][:agendas_attributes].present?
       meetings_agendas = Meeting.find(params[:id]).agendas
 
       agendas = params[:meeting][:agendas_attributes]

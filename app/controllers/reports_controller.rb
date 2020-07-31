@@ -116,9 +116,9 @@ class ReportsController < ApplicationController
   def carryover
     report = Report.find(params[:id])
     meeting = Meeting.find(params[:meeting_id])
-    report.agendas.where(owner_id: params[:meeting_id]).map(&:destroy) rescue
-      Rails.logger.warning "Report ##{report.id} Carryover failed to delete proper agendas
-        from Meeting ##{params[:meeting_id]}"
+    # report.agendas.where(owner_id: params[:meeting_id]).map(&:destroy) rescue
+    #   Rails.logger.warning "Report ##{report.id} Carryover failed to delete proper agendas
+    #     from Meeting ##{params[:meeting_id]}"
     connection = Connection.get(meeting, report).update_attributes(archive: true)
     Transaction.build_for(
       meeting,
