@@ -194,7 +194,7 @@ class FFTConfig < DefaultConfig
   }
 
   ULTIPRO_DATA = {
-    upload_path: '/var/sftp/fftftpuser/ProSafeT_User_List_04082020.XML',
+    upload_path: '/var/sftp/fftsftpuser/ProSafeT_User_List.XML',
     expand_output: false, #Shows full account generation details
     dry_run: false, #Prevents the saving of data to the database
 
