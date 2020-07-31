@@ -88,7 +88,7 @@
               <%end%>
             </div>
             <div class="col-sm-6 col-md-6 col-lg-6">
-              <%option_groups[1].each do |option|%>
+              <%option_groups[1].select(&:present?).each do |option|%>
                 <div class="col-xs-12">
                   <label class="checkbox">
                     <%=f.check_box field_name,
