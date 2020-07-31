@@ -44,6 +44,8 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password
   def access_validation(strict=false)
 
+    expire_after = 180 # minutes
+
     if session[:digest].present?
       if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
         return
@@ -65,7 +67,7 @@ class ApplicationController < ActionController::Base
 
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100 && !CONFIG::GENERAL[:enable_sso] && !current_token.present?
+    elsif (Time.now - session[:last_active])/60 > expire_after && !CONFIG::GENERAL[:enable_sso] && !current_token.present?
        redirect_to logout_path
        return false
     else
