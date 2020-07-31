@@ -12,10 +12,15 @@ namespace :ultipro do
       logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
       assign_configs
-      # fetch_file
+      fetch_file
 
       begin
-        data_dump = File.read('lib/tasks/ultipro_data.xml')
+        data_dump = case AIRLINE_CODE
+          when 'SCX'
+            File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
+          when 'FFT'
+            File.read('lib/tasks/ultipro_data.xml').sub(/\<\/xml\>/, '')
+        end
       rescue
         logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
         next #Abort
@@ -37,7 +42,9 @@ namespace :ultipro do
               @err_username = username #Used for error logging
               @err_user_hash = user_hash  #Used for error logging
               @log_entry = ""
-              if @users.key?(username)
+              if @users.key?(username.downcase)
+                user = @users[username.downcase]
+              elsif @users.key?(username)
                 user = @users[username]
               else
                 user = generate_user user_hash
@@ -100,6 +107,7 @@ namespace :ultipro do
 
 
     def generate_user user_hash
+
       begin
         user = User.new({
           username: user_hash['user_name'],
@@ -130,7 +138,7 @@ namespace :ultipro do
 
       privileges.each do |priv| #First check user has all privileges expected
         if user.level.nil?
-          user[:level] = map_account_level(pr['employee_group'])
+          user[:level] = map_account_level(priv['employee_group'])
           user.save!
         end
         generate_privilege priv unless @privilege_list.key?(priv) #Ensure privilege exists
@@ -150,13 +158,27 @@ namespace :ultipro do
 
 
     def update_account_detail user, user_hash
+
+      case AIRLINE_CODE
+      when 'SCX'
+        if user.sso_id != user_hash['email_address']
+          @log_entry << "\n     Update SSO ID: to #{user_hash['email_address']}"
+          user.sso_id = user_hash['email_address']
+        end
+      when 'FFT'
+        if user.sso_id != user_hash['employee_number']
+          @log_entry << "\n     Update SSO ID: #{user.email} => #{user_hash['employee_number']}"
+          user.sso_id = user_hash['employee_number']
+        end
+      end
+
       if user.email != user_hash['email_address']
         @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
         user.email = user_hash['email_address']
       end
-      if user.sso_id != user_hash['employee_number']
-        @log_entry << "\n     Update SSO ID: #{user.email} => #{user_hash['employee_number']}"
-        user.sso_id = user_hash['employee_number']
+      if user.employee_number != user_hash['employee_number']
+        @log_entry << "\n     Update Employee #: #{user.employee_number} => #{user_hash['employee_number']}"
+        user.employee_number = user_hash['employee_number']
       end
       if user.first_name != user_hash['first_name']
         @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"
