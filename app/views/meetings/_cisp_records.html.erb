@@ -1,74 +1,210 @@
-<div class="panel panel-warning">
-  <div class="panel-heading">
-    <div class="panel-title">CISP Reports
-      <button type="button"
-        class="close pull-right"
-        data-dismiss="modal"
-        aria-label="Close">
-        <span class="glyphicon glyphicon-remove"></span>
-      </button>
+<%=form_for @owner do |f|%>
+  <div class="panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">CISP Reports
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+          <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="panel-body">
-    <div class="row col-xs-12 table-responsive">
-      <table id="cisp_reports" class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <%@record_headers.each do |h|%>
-              <th><%=h[:title]%></th>
-            <%end%>
-          </tr>
-        </thead>
-        <tbody>
+    <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
 
-          <%@records.each do |u|%>
-            <tr uid="<%=u.id%>">
-              <%@record_headers.each do |h|%>
-                <td class="<%=h[:html_class].present? ? u.send(h[:html_class]) : ''%>">
-                  <%case h[:type]%>
-                  <%when 'date'%>
-                    <%=u.send(h[:field]).strftime("%Y-%m-%d") rescue ''%>
-                  <%when 'datetime'%>
-                    <%=u.send(h[:field]).strftime("%Y-%m-%d %H:%M") rescue ''%>
-                  <%when 'textarea'%>
-                    <%=u.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue ''%>
-                  <%else%>
-                    <%if sent && h[:field] == "get_status"%>
-                      <b style="color:red;"">Sent</b>
-                    <%else%>
-                      <%=u.send(h[:field])%>
-                    <%end%>
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <div class="panel-title"><b>CISP Ready Reports</b></div>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table id="cisp_ready_reports" class="table table-bordered">
+              <thead>
+                <tr>
+                  <%@record_headers.each do |header|%>
+                    <th><%=header[:title]%></th>
                   <%end%>
-                </td>
-              <%end%>
-            </tr>
-          <%end%>
+                  <th>Additional Info</th>
+                  <th width="10%">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%@cisp_ready_records.each do |record|%>
+                  <% record_class = 'disable_row' if record.cisp_sent %>
+                  <tr record="<%=record.id%>" class="<%=record_class%>">
+                    <%@record_headers.each do |header|%>
+                      <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                        <%=render 'forms/show_field', :record => record, :field_hash => header%>
+                      </td>
+                    <%end%>
+                    <td>
+                      <%additional_info = record.get_additional_info%>
+                      <%additional_info.each do |field|%>
+                        <% if field[:value].present? %>
+                          <p><b><%=field[:label]%></b>: <%=field[:value]%></p>
+                        <%end%>
+                      <%end%>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+                        <a class="btn btn-info view_btn mr5">
+                          <span class="glyphicon glyphicon-search"></span>
+                        </a>
+                        <% if record_class != 'disable_row'%>
+                          <a class="btn btn-danger action-btn">
+                            <span class="glyphicon glyphicon-remove"></span>
+                          </a>
+                        <%end%>
+                      </div>
+                    </td>
+                  </tr>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-        </tbody>
-      </table>
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <div class="panel-title"><b>All Reports in Meeting #<%=@owner.id%></b></div>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table id="all_reports" class="table table-bordered">
+              <thead>
+                <tr>
+                  <%@record_headers.each do |header|%>
+                    <th><%=header[:title]%></th>
+                  <%end%>
+                  <th>Additional Info</th>
+                  <th width="10%">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%@all_records.each do |record|%>
+                  <% record_class = 'disable_row' if CONFIG::CISP_TITLE_PARSE[record.template.name].nil? %>
+                  <tr record="<%=record.id%>" class="<%=record_class%>">
+                    <%@record_headers.each do |header|%>
+                      <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
+                        <%=render 'forms/show_field', :record => record, :field_hash => header%>
+                      </td>
+                    <%end%>
+                    <td>
+                      <%additional_info = record.get_additional_info%>
+                      <%additional_info.each do |field|%>
+                        <% if field[:value].present? %>
+                          <p><b><%=field[:label]%></b>: <%=field[:value]%></p>
+                        <%end%>
+                      <%end%>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+                        <a class="btn btn-info view_btn mr5">
+                          <span class="glyphicon glyphicon-search"></span>
+                        </a>
+                        <% if record_class != 'disable_row'%>
+                          <a class="btn btn-warning action-btn">
+                            <span class="glyphicon glyphicon-plus"></span>
+                          </a>
+                        <%end%>
+                      </div>
+                    </td>
+                  </tr>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <%=f.submit "Save",:class=>"btn btn-success pull-right mt5", :disable_with => "Saving..."%>
+      <button type="button" id="send_to_cisp" class="btn btn-warning pull-right mt5 mr5">Sent to CISP</button>
     </div>
-    <%if not sent%>
-      <button type="button" id="send_to_cisp" class="btn btn-warning pull-right mt10">Sent to CISP</button>
-    <%end%>
   </div>
-</div>
+<%end%>
 
-<script>
+<style>
+  .disable_row {
+    opacity: 0.4;
+  }
+</style>
+
+<script type="text/javascript">
   $(document).ready(function(){
 
-    $('#cisp_reports').DataTable({
-      destroy: true,
-      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-      "iDisplayLength": 5
+    $("#cisp_ready_reports").dataTable({
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
     });
+
+    $("#all_reports").dataTable({
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+    });
+
+    $(".view_btn").on('click',function(){
+      window.open("/records/" + $(this).closest("tr").children("td").eq(0).html());
+    });
+
+    $(".action-btn").on("click",function(){
+      var action_table=$(this).closest("table");
+      if (action_table.attr('id')=="cisp_ready_reports"){
+        $(this).removeClass("btn-danger").addClass("btn-warning");
+        row=$(this).closest("tr").detach();
+        $(this).find("span").removeClass("glyphicon-remove").addClass("glyphicon-plus");
+        row.appendTo("#all_reports tbody");
+      }else{
+        $(this).removeClass("btn-warning").addClass("btn-danger");
+        row=$(this).closest("tr").detach();
+        $(this).find("span").removeClass("glyphicon-plus").addClass("glyphicon-remove");
+        row.appendTo("#cisp_ready_reports tbody");
+      }
+    });
+
+    function update_cisp_ready() {
+      var count = 0;
+      var form = $('form');
+      var set_cisp_ready = []
+      var unset_cisp_ready = []
+
+      $("#cisp_ready_reports tbody tr").each(function(){
+        if(typeof($(this).attr("record")) !== "undefined"){
+          form.append('<input type="hidden" name=set_cisp_ready['+count+ '] value='+$(this).attr("record")+'>');
+          count++;
+          set_cisp_ready.push($(this).attr("record"))
+        }
+      });
+      $("#all_reports tbody tr").each(function(){
+        if(typeof($(this).attr("record")) !== "undefined"){
+          form.append('<input type="hidden" name=unset_cisp_ready['+count+ '] value='+$(this).attr("record")+'>');
+          count++;
+          unset_cisp_ready.push($(this).attr("record"))
+        }
+      });
+
+      return [set_cisp_ready, unset_cisp_ready];
+    }
+
+    $('form').on('submit', update_cisp_ready);
 
     $('#send_to_cisp').on('click',function(){
-      console.log('here')
-      $.get("<%=send_cisp_records_meeting_path(@meeting)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
+      $(this).attr("disabled", "disabled");
+
+      cisp_reports = update_cisp_ready()
+      $.ajax({
+        url: "<%=send_cisp_records_meeting_path(@meeting)%>",
+        type: 'POST',
+        dataType: 'html',
+        data: {
+          set_cisp_ready: cisp_reports[0],
+          unset_cisp_ready: cisp_reports[1],
+        },
+        success: function (response) {
+         $(".modal-content").html(response);
+          $(window).trigger('resize');
+        }
       });
+
     });
 
-  });
+  })
 </script>

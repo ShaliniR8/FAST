@@ -3,11 +3,15 @@ table id='records_table' class='table table-hover table-striped table-bordered i
   thead
     - @fields.each do |field|
       th = field[:title]
+    - if params[:controller] == "records" # if Report index page, show additional info column
+      th Additional Info
     th width="20%" Action
 
   tfoot
     - @fields.each do |field|
       th = field[:title]
+    - if params[:controller] == "records" # if Report index page, show additional info column
+      th Additional Info
     th Action
 
   tbody
@@ -55,6 +59,12 @@ table id='records_table' class='table table-hover table-striped table-bordered i
                   = field_value
               - else
                 = field_value
+          - if params[:controller] == "records" # if Report index page, show additional info column
+            td
+              - additional_info = record.get_additional_info
+              - additional_info.each do |field|
+                - if field[:value].present?
+                  p <b>#{field[:label]}:</b> #{field[:value]}
           td
             = link_to 'Open', "/#{@table.table_name}/#{record.id}", class: 'btn btn-lightblue mr5 mb5', target: nil
             = link_to 'Open in New Tab', "/#{@table.table_name}/#{record.id}", class: 'btn btn-lightblue mr5 mb5', target: :_blank

@@ -212,6 +212,22 @@ class MeetingsController < ApplicationController
 
 
   def update
+    #update cisp_ready
+    if params[:set_cisp_ready].present?
+      params[:set_cisp_ready].each_pair do |index, value|
+        record = Record.find(value)
+        record.cisp_ready = true
+        record.save
+      end
+    end
+    if params[:unset_cisp_ready].present?
+      params[:unset_cisp_ready].each_pair do |index, value|
+        record = Record.find(value)
+        record.cisp_ready = false
+        record.save
+      end
+    end
+
     transaction = true
     @owner = Meeting.find(params[:id])
 
@@ -336,16 +352,34 @@ class MeetingsController < ApplicationController
   end
 
   def get_cisp_records
-    report_name =  CONFIG::CISP_TITLE_PARSE.keys
+    @owner = Meeting.find(params[:id])
+    @records = @owner.reports.map(&:records).flatten
+    @all_records = @records.select { |record| not record.cisp_ready }
+    @cisp_ready_records = @records.select { |record| record.cisp_ready }
     @record_headers = Record.get_meta_fields('index')
-    @records = Record.includes(:template).where(cisp_ready: true, cisp_sent: false, templates:{name: report_name})
-    render :partial => "cisp_records", locals: {sent: false}
+    render :partial => "cisp_records"
   end
 
   def send_cisp_records
+    #update cisp_ready
+    if params[:set_cisp_ready].present?
+      params[:set_cisp_ready].each do |value|
+        record = Record.find(value)
+        record.cisp_ready = true
+        record.save
+      end
+    end
+    if params[:unset_cisp_ready].present?
+      params[:unset_cisp_ready].each do |value|
+        record = Record.find(value)
+        record.cisp_ready = false
+        record.save
+      end
+    end
+
     report_name =  CONFIG::CISP_TITLE_PARSE.keys
     @record_headers = Record.get_meta_fields('index')
-    @records = Record.includes(:template).where(cisp_ready: true, cisp_sent: false, templates:{name: report_name})
+    @records = params[:set_cisp_ready].map { |index| Record.find(index) }.select { |record| not record.cisp_sent }
 
     test_run = Rails.env.production? ? false : true
     Record.export_all_for_cisp(test_run: test_run, records_ids: @records.map(&:id))
@@ -373,7 +407,7 @@ class MeetingsController < ApplicationController
       p 'FAILED to send reports to CISP'
     end
 
-    render :partial => "cisp_records", locals: {sent: true}
+    render :partial => "cisp_records_result"
   end
 
   def message
