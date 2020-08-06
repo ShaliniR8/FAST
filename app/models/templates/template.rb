@@ -58,49 +58,28 @@ class Template < ActiveRecord::Base
       nested_field_ids_map = {}
       source_fields.each do |field|
 
-        if field.map_id.present?
-          target_field =
-          Field.create(categories_id: target_category_id,
-                       data_type: field.data_type,
-                       display_type: field.display_type,
-                       label: field.label,
-                       options: field.options,
-                       display_size: field.display_size,
-                       priority: field.priority,
-                       description: field.description,
-                       show_label: field.show_label,
-                       print: field.print,
-                       convert_id: field.convert_id,
-                       map_id: field.id,
-                       element_id: field.element_id,
-                       element_class: field.element_class,
-                       field_order: field.field_order,
-                       required: field.required,
-                       nested_field_id: field.nested_field_id,
-                       nested_field_value: field.nested_field_value)
+        target_field =
+        Field.create(categories_id: target_category_id,
+                     data_type: field.data_type,
+                     display_type: field.display_type,
+                     label: field.label,
+                     options: field.options,
+                     display_size: field.display_size,
+                     priority: field.priority,
+                     description: field.description,
+                     show_label: field.show_label,
+                     print: field.print,
+                     convert_id: field.convert_id,
+                     map_id: field.id,
+                     element_id: field.element_id,
+                     element_class: field.element_class,
+                     field_order: field.field_order,
+                     required: field.required,
+                     nested_field_id: field.nested_field_id,
+                     nested_field_value: field.nested_field_value)
 
-          field.map_id = target_field.id
-          field.save
-        else
-          target_field =
-          Field.create(categories_id: target_category_id,
-                       data_type: field.data_type,
-                       display_type: field.display_type,
-                       label: field.label,
-                       options: field.options,
-                       display_size: field.display_size,
-                       priority: field.priority,
-                       description: field.description,
-                       show_label: field.show_label,
-                       print: field.print,
-                       convert_id: field.convert_id,
-                       element_id: field.element_id,
-                       element_class: field.element_class,
-                       field_order: field.field_order,
-                       required: field.required,
-                       nested_field_id: field.nested_field_id,
-                       nested_field_value: field.nested_field_value)
-        end
+        field.map_id = target_field.id
+        field.save
 
         field.nested_fields.each do |nested_field|
           nested_field_ids_map[nested_field.id] = target_field.id
