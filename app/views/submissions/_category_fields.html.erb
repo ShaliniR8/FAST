@@ -25,7 +25,7 @@
               <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
                 <div class="nested_field
                   nested_field_<%=field.id%>
-                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
                   style="display:none;">
                   <%=render "/submissions/field", :field => nested_field, :f => f%>
                 </div>
@@ -53,7 +53,7 @@
 
   function update_nested_fields(field) {
     var field_id = $(field).attr("data-id");
-    var field_value = $(field).val();
+    var field_value = $(field).find('option:selected').attr("data-option");
     $(".nested_field_" + field_id).hide();
     $(".nested_field_" + field_id + "_" + field_value).show();
   }

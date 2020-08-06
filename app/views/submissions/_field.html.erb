@@ -61,7 +61,7 @@
               { :class => 'form-control'+" "+field.element_class, :id => field.element_id}%>
           <%else%>
             <%=rf.select :value,
-              options_for_select(field.getOptions),
+              options_for_select(field.getOptions.map { |option| [option, {'data-option' => option.parameterize}]}),
               {:include_blank => ""},
               {"data-id" => field.id,
               :class => required + ' field_select form-control ' + field.element_class,
@@ -177,7 +177,7 @@
           </div>
         <%else%>
           <%=rf.select :value,
-            field.getOptions,
+            field.getOptions.map { |option| [option, {'data-option' => option.parameterize}] },
             {:include_blank => ""},
             {:class => 'field_select form-control ' + required + " " + field.element_class,
             :selected => @record_field.value,
