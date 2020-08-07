@@ -100,7 +100,7 @@ class ProsafetBase < ActiveRecord::Base
     result = ""
     counter = 1
     self.verifications.each do |verification|
-      result  += "##{counter}: #{verification.status}<br>"
+      result  += "##{counter}: #{verification.status}, <b>#{verification.verify_date}</b><br><br>"
       counter += 1
     end
     result.html_safe

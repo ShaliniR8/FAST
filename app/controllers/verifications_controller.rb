@@ -49,11 +49,14 @@ class VerificationsController < ApplicationController
 
   def send_notification(commit, verification)
     commit = 'Addresse' if commit == 'Address'
-    notify(verification.owner, notice: {
-      users_id: verification.validator.id,
+
+    verification.get_all_validators.each do |validator|
+      notify(verification.owner, notice: {
+      users_id: validator.id,
       content: "Verification for #{verification.owner.class.name.titleize} ##{verification.owner.id} has been #{commit}d."},
       mailer: true,
-      subject: "Verification #{commit}d") if verification.validator.present?
+      subject: "Verification #{commit}d") if validator.present?
+    end
   end
 
 end

@@ -59,6 +59,13 @@
                       <%else%>
                         <%=field_value%>
                       <%end%>
+                    <%when "select_multiple"%>
+                      <% if field_value.nil? %>
+                        <%=record.validator.full_name%>
+                      <% else %>
+                        <%valiators = field_value.map { |validator| User.find(validator).full_name }%>
+                        <%=valiators.join(', ')%>
+                      <% end%>
                     <%else%>
                       <%=field_value%>
                     <%end%>

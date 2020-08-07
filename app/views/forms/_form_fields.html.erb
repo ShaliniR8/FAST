@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="/javascripts/utility/select2.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/select2.min.js"></script>
+
 <%if !defined?(@base_defined) #for embedding multiple _form_fields renders%>
   <div class="modal fade emp_modal"
     tabindex="-1"
@@ -139,6 +142,23 @@
             {:include_blank => ""},
             {:class => "field_select form-control " + field_required_field}%>
 
+        <%when "select_multiple"%>
+          <%=f.label(field_name, field_description, :class => field_required_label)%>
+          <%if field_name == "additional_validators"%>
+          <%default_option = @owner.present? ? @owner.responsible_user.id : record.get_all_validators.map(&:id)%>
+            <%=f.select field_name,
+              options_for_select(field_options, default_option),
+              {:include_blank => ""},
+              {:class => "select-multiple field_select form-control " + field_required_field,
+              :multiple => "multiple"}%>
+          <%else%>
+            <%=f.select field_name,
+              options_for_select(field_options, record.send(field_name)),
+              {:include_blank => ""},
+              {:class => "select-multiple field_select form-control " + field_required_field,
+              :multiple => "multiple"}%>
+          <%end%>
+
         <%when 'select_map'%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
           <%=f.select field_name,
@@ -211,7 +231,9 @@
 
 <%if !defined?(@base_defined) %>
   <script>
-
+    $(document).ready(function() {
+      $('.select-multiple').select2();
+    });
     var employee_table;
 
     function build_user_table(){
@@ -226,6 +248,7 @@
     }
 
     $(function() {
+      $('.select-multiple').select2();
 
       $(window).resize();
       build_user_table();
