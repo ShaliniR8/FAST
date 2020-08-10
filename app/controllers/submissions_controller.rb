@@ -233,15 +233,17 @@ class SubmissionsController < ApplicationController
     end
 
     # Update event_date in database (store in UTC)
-    time_zone = params[:submission]["event_time_zone"]
-    time = params[:submission]["event_date"]
+    if CONFIG.sr::GENERAL[:submission_time_zone]
+      time_zone = params[:submission]["event_time_zone"]
+      time = params[:submission]["event_date"]
 
-    event_zone = time_zone.present? ? time_zone : Time.zone.name
-    event_date = time.present? ? DateTime.parse(time) : Time.zone.now
+      event_zone = time_zone.present? ? time_zone : Time.zone.name
+      event_date = time.present? ? DateTime.parse(time) : Time.zone.now
 
-    utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
-    params[:submission]["event_date"] = utc_time
-    params[:submission]["event_time_zone"] = 'UTC' unless time_zone.present?
+      utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
+      params[:submission]["event_date"] = utc_time
+      params[:submission]["event_time_zone"] = 'UTC' unless time_zone.present?
+    end
 
     @record = Submission.new(params[:submission])
 

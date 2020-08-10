@@ -72,12 +72,16 @@
             <%=date_to_string(field_value)%>
 
           <%when "datetime"%>
-            <% if field_name == "event_date" && record.event_time_zone.present? %>
-              <%=datetime_to_string(field_value.in_time_zone(record.event_time_zone)) + " #{record.event_time_zone}"%>
-            <% elsif field_value.present? && field_name == "event_date" %>
-              <%=datetime_to_string(field_value.in_time_zone(Time.zone.name)) + " #{Time.zone.name}"%>
+            <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
+              <% if field_name == "event_date" && record.event_time_zone.present? %>
+                <%=datetime_to_string(field_value.in_time_zone(record.event_time_zone)) + " #{record.event_time_zone}"%>
+              <% elsif field_value.present? && field_name == "event_date" %>
+                <%=datetime_to_string(field_value.in_time_zone(Time.zone.name)) + " #{Time.zone.name}"%>
+              <% else %>
+                <%=datetime_to_string(field_value)%>
+              <% end %>
             <% else %>
-              <%=datetime_to_string(field_value)%>
+              <%=datetime_to_string(field_value) + " #{record.event_time_zone}"%>
             <% end %>
 
           <%when 'datetimez'%>

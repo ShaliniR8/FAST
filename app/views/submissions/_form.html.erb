@@ -152,9 +152,9 @@
               <%=f.text_field :event_date, {:class => 'field-datetime form-control required_field', :id => "event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker]}%>
             </div>
 
-            <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
-              <div class="col-xs-12 col-sm-2 mb5">
-                <%=label_tag :event_time_zone, "Time Zone"%>
+            <div class="col-xs-12 col-sm-2 mb5">
+              <%=label_tag :event_time_zone, "Time Zone"%>
+              <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
                 <div class="input-group">
                   <%=f.select :event_time_zone,
                      ActiveSupport::TimeZone.all.map(&:name),
@@ -162,8 +162,13 @@
                     {:class => 'form-control tz atz toplevel_timezone'}%>
                   <span class="input-group-addon tc">All</span>
                 </div>
-              </div>
-            <%end%>
+              <%else%>
+                <%=f.hidden_field :event_time_zone, :value => 'Local'%>
+                <button id="time-zone-toggle-btn" type="button" class="input-group btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+                  Local
+                </button>
+              <%end%>
+            </div>
           </div>
 
           <div class="col-xs-12 mt20">
@@ -300,6 +305,19 @@
   var airport_table;
 
   $(document).ready(function(){
+    //time-zone-toggle-btn
+    timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
+    timeZoneToggleBtn.innerHTML = 'Local'
+
+    $('#time-zone-toggle-btn').on('click', function() {
+      if (timeZoneToggleBtn.innerHTML == 'Local') {
+        timeZoneToggleBtn.innerHTML = 'UTC'
+        $('#submission_event_time_zone').val('UTC')
+      } else {
+        timeZoneToggleBtn.innerHTML = 'Local'
+        $('#submission_event_time_zone').val('Local')
+      }
+    })
 
     // Count the characters limit
     $('#submission_description, textarea').keyup(function(){
