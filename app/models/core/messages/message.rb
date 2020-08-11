@@ -24,6 +24,10 @@ class Message < ActiveRecord::Base
     end
   end
 
+  def get_send_from_name
+    self.send_from.user.full_name
+  end
+
 
   def getDialogs
     result=[self]

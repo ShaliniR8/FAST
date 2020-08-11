@@ -9,7 +9,7 @@
       <br>
       --------------------------------------------
       <br>
-      <%= "From #{@message.getAll('send_from').gsub("(Me)", '')}"%><br>
+      <%= "From #{@message.get_send_from_name}"%><br>
       <%= "#{ @message.getAll('send_from_email')}"%><br>
       <br>
       <% message = @message.content.gsub("\n", "<br>") %>
