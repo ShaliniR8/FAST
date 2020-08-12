@@ -51,6 +51,10 @@ module Sr
       anonymous ? 'Anonymous' : created_by.full_name
     end
 
+    def get_submitter_id
+      created_by.id
+    end
+
     def get_template
       template.name
     end
