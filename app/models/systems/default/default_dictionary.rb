@@ -596,7 +596,7 @@ class DefaultDictionary
       required: false
     },
     submitter: {
-      field: 'get_submitter_id', title: 'Submitted By',
+      field: 'get_submitter_name', title: 'Submitted By',
       num_cols: 6, type: 'user', visible: 'admin', #should include show+form w/ sr::CONFIG[:show_submitter_name]
       required: false, censor_deid: true
     },

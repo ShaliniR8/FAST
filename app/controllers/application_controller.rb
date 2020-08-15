@@ -610,6 +610,8 @@ class ApplicationController < ActionController::Base
         if params[:field_1].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_1]}.first
           if field[:type] == 'user'
+            params[:searchterm_1] = "get_submitter_id" if params[:searchterm_1] == "get_submitter_name"
+
             params[:field_1] = User.where('full_name LIKE ?', '%' + params[:field_1] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_1].include? r.send(params[:searchterm_1])}
           elsif field[:type] == 'boolean_box'
@@ -627,6 +629,7 @@ class ApplicationController < ActionController::Base
         if params[:field_2].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_2]}.first
           if field[:type] == 'user'
+            params[:searchterm_2] = "get_submitter_id" if params[:searchterm_2] == "get_submitter_name"
             params[:field_2] = User.where('full_name LIKE ?', '%' + params[:field_2] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_2].include? r.send(params[:searchterm_2])}
           else
@@ -643,6 +646,7 @@ class ApplicationController < ActionController::Base
         if params[:field_3].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_3]}.first
           if field[:type] == 'user'
+            params[:searchterm_3] = "get_submitter_id" if params[:searchterm_3] == "get_submitter_name"
             params[:field_3] = User.where('full_name LIKE ?', '%' + params[:field_3] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_3].include? r.send(params[:searchterm_3])}
           else
@@ -659,6 +663,7 @@ class ApplicationController < ActionController::Base
         if params[:field_4].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_4]}.first
           if field[:type] == 'user'
+            params[:searchterm_4] = "get_submitter_id" if params[:searchterm_4] == "get_submitter_name"
             params[:field_4] = User.where('full_name LIKE ?', '%' + params[:field_4] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_4].include? r.send(params[:searchterm_4])}
           else
