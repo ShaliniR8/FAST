@@ -1,4 +1,4 @@
-class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
+class RVFSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     # General Module Features:

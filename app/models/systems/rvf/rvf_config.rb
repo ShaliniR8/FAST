@@ -1,4 +1,4 @@
-class FFTConfig < DefaultConfig
+class RVFConfig < DefaultConfig
 
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
@@ -9,12 +9,12 @@ class FFTConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    name:                               'Frontier Airlines',
-    time_zone:                          'Mountain Time (US & Canada)',
+    name:                               'Raven Airlines',
+    time_zone:                          'Alaska',
 
     # SYSTEM CONFIGS
-    enable_sso:                         true,
-    login_option:                       'sso',
+    # enable_sso:                         true,
+    # login_option:                       'sso',
     has_mobile_app:                     true,
     cisp_integration:                   true,
 
@@ -44,7 +44,7 @@ class FFTConfig < DefaultConfig
 
   FAA_INFO = {
     "CHDO"=>"XXX",
-    "Region"=>"Mountain",
+    "Region"=>"Anchorage",
     "ASAP MOU Holder Name"=>"Frontier",
     "ASAP MOU Holder FAA Designator"=>"BASE"
   }

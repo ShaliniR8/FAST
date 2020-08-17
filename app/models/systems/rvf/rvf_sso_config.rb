@@ -1,4 +1,4 @@
-class FFTSsoConfig
+class RVFSsoConfig
 
   SAML_DATA = {
     metadata_link: '',

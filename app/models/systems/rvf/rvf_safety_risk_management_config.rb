@@ -1,4 +1,4 @@
-class FFTSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
+class RVFSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
     objects: {
