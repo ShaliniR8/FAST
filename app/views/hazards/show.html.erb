@@ -49,6 +49,10 @@
 
 <script>
   $(document).ready(function(){
+    $(".modal").on("hidden.bs.modal", function(){
+      $(".modal-content").html("");
+    });
+
     $('#mitigate_btn').on('click',function(){
       $.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
         $(".modal-content").html(data);

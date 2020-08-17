@@ -92,7 +92,7 @@ class DefaultSafetyReportingConfig
       'Record' => {
         title: 'Report',
         status: ['New', 'Open', 'Linked', 'Closed', 'All'],
-        preload: [:created_by, :template, :occurrences],
+        preload: [:created_by, :template, :occurrences, :record_fields],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },

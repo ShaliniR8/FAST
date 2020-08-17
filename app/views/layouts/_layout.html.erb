@@ -528,9 +528,6 @@
 
 
     <script>
-      $(".modal").on("hidden.bs.modal", function(){
-        $(".modal-content").html("");
-      });
       $(".basic-datepicker").datepicker({format: "YYYY-MM-DD"}).on('focus', function() {$(this).trigger('blur');});
       $(".basic-datetimepicker")
         .datetimepicker({

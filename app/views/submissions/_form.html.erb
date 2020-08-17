@@ -307,17 +307,19 @@
   $(document).ready(function(){
     //time-zone-toggle-btn
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
-    timeZoneToggleBtn.innerHTML = 'Local'
+    if (timeZoneToggleBtn != null) {
+      timeZoneToggleBtn.innerHTML = 'Local'
 
-    $('#time-zone-toggle-btn').on('click', function() {
-      if (timeZoneToggleBtn.innerHTML == 'Local') {
-        timeZoneToggleBtn.innerHTML = 'UTC'
-        $('#submission_event_time_zone').val('UTC')
-      } else {
-        timeZoneToggleBtn.innerHTML = 'Local'
-        $('#submission_event_time_zone').val('Local')
-      }
-    })
+      $('#time-zone-toggle-btn').on('click', function() {
+        if (timeZoneToggleBtn.innerHTML == 'Local') {
+          timeZoneToggleBtn.innerHTML = 'UTC'
+          $('#submission_event_time_zone').val('UTC')
+        } else {
+          timeZoneToggleBtn.innerHTML = 'Local'
+          $('#submission_event_time_zone').val('Local')
+        }
+      })
+    }
 
     // Count the characters limit
     $('#submission_description, textarea').keyup(function(){
