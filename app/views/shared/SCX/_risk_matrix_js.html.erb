@@ -151,7 +151,7 @@
   $(document).ready(function(){
     risk_type = "<%= params[:action]%>" // baseline or mitigate
 
-    if (risk_type === "new") {
+    if (risk_type === "new" || risk_type === "edit") {
       risk_type = "baseline"
     }
 
