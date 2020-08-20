@@ -1,5 +1,5 @@
-<div class="col-xs-12 col-lg-12">
-  <div class="panel panel-lightskyblue">
+<div class="col-xs-12 col-lg-12"%>
+  <div class="panel panel-info">
 
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
@@ -9,35 +9,29 @@
     </div>
 
     <div class="panel-body" style="display:none">
+
       <div class="row">
+
         <div class="col-xs-12">
-          <%if can_change && show_btns && allow_mitigate &&
-              !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
+          <%if !local_assigns.has_key?(:allow_mitigate) || allow_mitigate && !["Pending Approval", "Completed", "Rejected"].include?(owner.status) %>
             <span data-toggle="modal" data-target=".bs-example-modal-lg">
               <%=link_to "Mitigate Risk","#",
-                :class => "btn btn-warning pull-right ml5",
-                :id => "mitigate_btn",
-                "data-toggle" => "tooltip", "data-placement" => "top", :title=>"Assess Mitigated Risk"%>
+                      :class => "btn btn-warning pull-right ml5",
+                      :id => "mitigate_btn",
+                      "data-toggle" => "tooltip", "data-placement" => "top", :title=>"Assess Mitigated Risk"%>
             </span>
           <%end%>
-         <%if can_change && show_btns && allow_baseline &&
-            !["Pending Approval", "Completed", "Rejected"].include?(owner.status)%>
+          <%if !local_assigns.has_key?(:allow_baseline) || allow_baseline && !["Pending Approval", "Completed", "Rejected"].include?(owner.status) %>
             <span data-toggle="modal" data-target=".bs-example-modal-lg">
               <%=link_to "Baseline Risk","#",
-                :class => "btn btn-info pull-right",:id=>"baseline_btn",
-                "data-toggle" => "tooltip", "data-placement" => "top", :title => "Assess Baseline Risk"%>
+                      :class => "btn btn-info pull-right",:id=>"baseline_btn",
+                      "data-toggle" => "tooltip", "data-placement" => "top", :title => "Assess Baseline Risk"%>
             </span>
           <%end%>
         </div>
 
-        <div class='col-xs-12 mb20'>
-          <b>Notes:</b>
-          <div class="col-xs-11 col-xs-offset-1">
-            <%if owner.statement.present?%>
-              <%=owner.statement.gsub(/\n/, '<br/>').html_safe%>
-            <%end%>
-          </div>
-        </div>
+
+        <%=render "/hazards/risk_reasoning", :owner => owner %>
 
         <div class="col-xs-12 mt20">
           <h4>
@@ -49,15 +43,14 @@
           <span class='glyphicon glyphicon-ok'></span><b> Mitigated Risk Assessment</b>
         </div>
 
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_factor",           :owner => owner%>
+          <%=render "shared/#{AIRLINE_CODE}/show_risk_probability",      :owner => owner%>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6">
           <%=render "shared/#{AIRLINE_CODE}/show_risk_severity",         :owner => owner%>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <%=render "shared/#{AIRLINE_CODE}/show_risk_probability",      :owner => owner%>
-          <%=render "shared/#{AIRLINE_CODE}/show_risk_factor",           :owner => owner%>
-        </div>
-
+        <%=render "shared/#{AIRLINE_CODE}/risk_definitions"%>
 
       </div>
 
@@ -186,7 +179,7 @@
       }
     });
     if (probability_checked > 0 && severity_checked > 0){
-      set_risk(Math.min(...probabilities), Math.min(...severities));
+      set_risk(Math.min(...severities), Math.min(...probabilities));
     }
     severities = []
     probabilities = []
@@ -204,8 +197,8 @@
         probability_checked++;
       }
     });
-    if (probability_checked > 0 && severity_checked > 0){
-      set_mitigated(Math.min(...probabilities), Math.min(...severities));
+    if (probability_checked>0 && severity_checked>0){
+      set_mitigated(Math.min(...severities),Math.min(...probabilities));
     }
   }
 
