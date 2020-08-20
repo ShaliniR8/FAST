@@ -54,145 +54,195 @@ class RVFConfig < DefaultConfig
   MATRIX_INFO = {
     severity_table: {
       starting_space: true,
-      row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
-      column_header: ['Regulatory',"Accident/Incident/</br>Damage/OSHA",'Operational Events','Company Impact'],
+      row_header: [
+        'Accident or Incident',
+        'Employee or Customer Injury',
+        'Corporate Image / Brand',
+        'Operational Events',
+        'Systems or Processes',
+        'Regulatory Deviation / Financial',
+        'OSHA',
+        'Airworthiness',
+        'Audit Finding'
+      ],      
+      column_header: ['I','II','III','IV','V'],
       rows: [
-        [ # Negligible
-          "No Finding(s)",
-          "No incident or damage, injury with no medical treatment",
-          "Normal Operations; no effect on safety of flight or maintenance",
-          "No implication to the system</br>No public relations impact"
+        [ #Accident or Incident
+          'Accident with serious damage to aircraft and/or property',
+          'Serious incident with substantial damage to aircraft or property',
+          'Incident with minor aircraft or property damage',
+          'Incident with less than minor system or property damage',
+          'No damage</br>(Informational Report)'
         ],
-        [ # Minor
-          "General safety concern that may lead to non-compliance with Frontier policy or procedure(s)",
-          "Incident with minor injury requiring minor medical treatment and/or minor damage <$50k (direct costs)",
-          "Condition resulting in normal procedures with potential to impact safe operation or maintenance of an aircraft (i.e. downgrade in landing category capability); Safety margin degraded",
-          "Limited/localized implication of system, occasional delays, minor loss of revenue <$50k</br>Possible public relations impact, limited resources required"
+        [ #Employee/Customer Injury
+          'Fatality or serious injury with total disability/loss of capacity',
+          'Immediate admission to hospital as an inpatient and/or partial disability/loss of capacity',
+          'Injury requiring ongoing treatment with no permanent disability/loss of capacity',
+          ' Minor injury with or with out first aid treatment; no follow-up required',
+          'No injury or no treatment required</br>(Informational Report)'
         ],
-        [ # Moderate
-          "Finding which results from an non-compliance with Frontier Airlines policy and/or procedures that reference regulations applicable to Frontier (i.e. a requirement derived from a directly applicable rule)",
-          "Incident with injury requiring hospitalization and/or substantial aircraft/property damage <$250k (direct costs)",
-          "Condition resulting in abnormal procedures with potential to impact safe operation or maintenance of an aircraft (i.e. slat disagreement, single source of electrical power, AMM deviation, parts substitution); safety incident potential",
-          "Reduction of system capabilities, frequent delays or cancellations, substantial loss of revenue <$250k</br>Additional public relations efforts and resources required"
+        [ #Corporate Image / Brand
+          'Potential for Corporate failure, permanent impact on business system wide',
+          'Adverse effect on corporate image, significant impact on a region',
+          'Major effect on corporate image, isolated to a single location',
+          'Minor effect on Corporate image, isolated effect that is easily reversible',
+          'Negligible effect on corporate image, little to no potential for negative impact on the brand</br>(Informational Report)',
         ],
-        [ # Critical
-          "Finding resulting from a direct non-compliance with regulations applicable to Frontier",
-          "Serious incident with serious injuries requiring hospitalization stays up to 48 hours and/or major damage to aircraft/property <$2M (direct costs)",
-          "Condition resulting in abnormal procedures, impacting the continued safe operation of an aircraft (i.e. single engine operation), serious incident potential; maintenance operations suspended until resolved",
-          "Partial break-down of system, schedule impact, major loss of revenue <$1M</br>Very large public relations impact requiring resources to manage information"
+        [ #Operational Events
+          'State of emergency for an operational condition impacting the immediate safe operation of an aircraft (e.g. declared emergency, immediate air interrupt, high speed abort)',
+          'Condition resulting in abnormal procedures impacting the continued safe operation of an aircraft (e.g. special handling without declared emergency, en route diversion, low speed abort)',
+          'Condition resulting in abnormal procedures with potential to impact safe operation of an aircraft (e.g. battery charger failure, single source of electrical power)',
+          'Condition resulting in normal procedures with potential to impact safe operation of an aircraft (e.g false indications)',
+          'No equipment damage, returned to service same day or next day, no reduction in safety margins</br>(Informational Report)'
         ],
-        [ # Catastrophic
-          "Serious safety concern attributable to a direct non-compliance with regulations",
-          "Accident with serious injuries requiring hospitalization over 48 hours/fatalities and/or catastrophic damage to aircraft/property >$2M (direct costs)",
-          "State of emergency for an operational condition, impacting the immediate safe operation of an aircraft (i.e. dual engine failure); accident potential; maintenance operations immediately ceased",
-          "Break-down of entire system for prolonged period, system-wide impact on schedules, massive loss of revenue >$1M</br>Potential for uncontrollable public relations event(s)"
-        ]
+        [ #Systems or Processes
+          'Loss or breakdown of entire system, subsystem, or process',
+          'Partial breakdown of a subsystem, or process',
+          'System deficiencies leading to poor dependability or disruption',
+          'Little or no effect on system, subsystem, or process',
+          'No measurable effect; continue monitoring</br>(Informational Report)'
+        ],
+        [ #Regulatory Deviation / Financial
+          'Major Regulatory </br>Deviation</br>&gt;$1M',
+          'Moderate Regulatory </br>Deviation</br>&gt;$250K',
+          'Minor Regulatory </br>Deviation</br>&gt;$50K',
+          'Company Policy and/or Procedure Deviation</br>&lt;$50K</center',          
+          'No deviation; continue monitoring</br>(Informational Report)'
+        ],   
+        [ #OSHA
+          'Willful',
+          'Repeat',
+          'Serious',
+          'General/Other',
+          'No deviation; continue monitoring</br>(Informational Report)'
+        ],       
+        [ #Airworthiness
+          'Returning an aircraft to service and operating it in a nonstandard, unairworthy, or unsafe condition',
+          'Returning an aircraft to service and operating it in a nonstandard or unairworthy, but not unsafe condition',
+          'Returning an aircraft to service in a nonstandard, unairworthy, or unsafe condition, not operated',
+          'Affecting aircraft or systems reliability above established control limits but no effect on airworthiness or safety of operation of an aircraft',
+          'No safety implication</br>(Informational Report)'
+        ],  
+        [ #Audit Finding
+          'Willful violation of any safety regulation that could result in serious injury or death',
+          'A noncompliance finding resulting in major system, process, or operational degradation',
+          'Nonconformance to Company policy and procedures',
+          'Finding presents limited opportunities for improvement',
+          'Finding presents little to no risk to organization'
+        ],
       ]
     },
 
     severity_table_dict: {
-      0 => '1 - Negligible',
-      1 => '2 - Minor',
-      2 => '3 - Moderate',
-      3 => '4 - Critical',
-      4 => '5 - Catastrophic'
+      0 => 'I',
+      1 => 'II',
+      2 => 'III',
+      3 => 'IV',
+      4 => 'V'
     },
 
     probability_table: {
       starting_space: true,
-      row_header: [''],
-      column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
+      row_header: ['A - Frequent (Not Effective)', 'B - Likely (Not Effective)', 'C - Repeatable (Minimal Effectiveness)', 'D - Isolated (Limited Effectiveness)', 'E - Improbable (Effective)'],
+      column_header: ['Reactive Assessment (Control Effectiveness) Audit Findings', 'Reactive Assessment (Control Effectiveness) Known Occurrences', 'Proactive Assessment (Likelihood)'],
+
       rows: [
-        [
-          "A remote likelihood, being almost inconceivable that event will occur</br>1 in 1,000,000",
-          "Very unlikely to occur</br>An activity or event that occurs intermittently</br>Regulator/Auditor have low likelihood of issue identification during any general review</br>1 in 100,000",
-          "Unlikely, but possible to occur</br>Potential for infrequent occurrence. Events are sporadic in nature</br>Regulator/Auditor have low likelihood of issue identification during any general review</br>1 in 10,000",
-          "Likely to occur sometimes</br>Will occur often if events follow normal patterns of process or procedure. The event is repeatable and less sporadic</br>Auditor/Regulator likely to identify issue with minimal audit activity</br>1 in 1,000",
-          "Likely to occur many times and or has already been discovered (may include regulatory action already taken) by Auditor/Regulator</br>Will be continuously experienced unless action is taken to change events</br>1 in 100"
+        [ #A
+          'Multiple findings during audit and/or found on previous audit',
+          'Multiple continuous occurrences across system and/or subsystem',
+          '<b>Definitiely will occur</b> (i.e., will occur in most circumstances, not surprised if it happens, etc.).</br>Occurs ≥ 1 in 100; 80 to 100 percent chance of occurrence.'
+        ],
+        [ #B
+          'Finding on this audit and/or previous audit',
+          'Several occurrences across system or subsystemt',
+          '<b>Likely to occur</b> (i.e., will occur in some circumstances, etc.).</br>Occurs 1 in 100 to 1,000; 60 to 80 percent chance of occurrence.'
+        ],
+        [ #C
+          'Multiple findings during audit',
+          ' Repeatable occurrences across system or subsystem',
+          '<b>Occasionally will occur</b> (i.e., might occur in some circumstances, surprised if it happens, etc.).</br>Occurs 1 in 1,000 to 10,000; 40 to 60 percent chance of occurrence.'
+        ],
+        [ #D
+          'Single finding during audit',
+          'Uncommon occurrence across system; however has occurred before',
+          '<b>Seldom to occur</b> (i.e., may occur but only in exceptional circumstances, may happen but it would be highly unexpected, etc.).</br>Occurs 1 in 10,000 to 1,000,000; 20 to 40 percent chance of occurrence.'
+        ],
+        [ #E
+          'No Audit Findings',
+          'First occurrence within the operation',
+          '<b>Unlikely to occur.</b></br>Less than 20 percent chance of occurrence.'
         ]
-      ]
+      ] #End of rows
     },
 
     probability_table_dict: {
-      0 => '2 - Remote',
-      1 => '3 - Seldom',
-      2 => '4 - Occasional',
-      3 => '5 - Probable',
-      4 => '6 - Frequent'
+      0 => 'A',
+      1 => 'B',
+      2 => 'C',
+      3 => 'D',
+      4 => 'E'
     },
 
     risk_table: {
       starting_space: true,
-      row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
-      column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
+      column_header: ['I','II','III','IV','V'],
+      row_header: ['A', 'B', 'C', 'D', 'E'],
       rows: [
-        ["limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
-        ["limegreen",     "limegreen",    "steelblue",      "steelblue",    "yellow"     ],
-        ["limegreen",     "steelblue",    "yellow",         "yellow",       "orange"     ],
-        ["steelblue",     "yellow",       "yellow",         "orange",       "red"        ],
-        ["steelblue",     "yellow",       "orange",         "red",          "red"        ]
+        ["crimson",     "crimson",      "coral",          "coral",          "yellow"         ],
+        ["crimson",     "coral",        "coral",          "yellow",         "steelblue"      ],
+        ["coral",       "coral",        "yellow",         "yellow",         "steelblue"      ],
+        ["coral",       "yellow",       "yellow",         "steelblue",      "mediumseagreen" ],
+        ["yellow",      "steelblue",    "steelblue",      "mediumseagreen", "mediumseagreen" ],
       ],
       rows_content: [
-        ['2',     '3',    '4',      '5',    '6'  ],
-        ['4',     '6',    '8',      '10',   '12' ],
-        ['6',     '9',    '12',     '15',   '18' ],
-        ['8',     '12',   '16',     '20',   '24' ],
-        ['10',    '15',   '20',     '25',   '30' ]
+        ['High',        'High',       'Serious',      'Serious',    'Moderate'],
+        ['High',        'Serious',    'Serious',      'Moderate',   'Minor'   ],
+        ['Serious',     'Serious',    'Moderate',     'Moderate',   'Minor'   ],
+        ['Serious',     'Moderate',   'Moderate',     'Minor',      'Low'     ],
+        ['Moderate',    'Minor',      'Minor',        'Low',        'Low'     ]
       ]
     },
 
     risk_definitions: {
       limegreen:        { rating: 'LOW',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
       steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
-      yellow:           { rating: 'MEDIUM',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
+      yellow:           { rating: 'MODERATE',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
       orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
       red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
     },
 
     risk_table_index: {
-      'Low - 2' => 'limegreen',
-      'Low - 3' => 'limegreen',
-      'Low - 4' => 'limegreen',
-      'Low - 5' => 'limegreen',
-      'Low - 6' => 'limegreen',
-      'Low' =>  'limegreen',
-      'Minor - 8' => 'steelblue',
-      'Minor - 9' => 'steelblue',
-      'Minor - 10' => 'steelblue',
+      'Low' => 'mediumseagreen',
       'Minor' => 'steelblue',
-      'Medium - 12' => 'yellow',
-      'Medium - 15' => 'yellow',
-      'Medium - 16' => 'yellow',
-      'Medium' => 'yellow',
-      'Serious - 18' => 'orange',
-      'Serious - 20' => 'orange',
-      'Serious' => 'orange',
-      'High - 24' => 'red',
-      'High - 25' => 'red',
-      'High - 30' => 'red',
-      'High' => 'red',
+      'Moderate' => 'yellow',
+      'Serious' => 'coral',
+      'High' => 'crimson',
     },
 
     risk_table_dict: {
-      2 => 'Low - 2',
-      3 => 'Low - 3',
-      4 => 'Low - 4',
-      5 => 'Low - 5',
-      6 => 'Low - 6',
-      8 => 'Minor - 8',
-      9 => 'Minor - 9',
-      10 => 'Minor - 10',
-      12 => 'Medium - 12',
-      15 => 'Medium - 15',
-      16 => 'Medium - 16',
-      18 => 'Serious - 18',
-      20 => 'Serious - 20',
-      24 => 'High - 24',
-      25 => 'High - 25',
-      30 => 'High - 30',
+      'mediumseagreen' => 'Low',
+      'steelblue' => 'Minor',
+      'yellow' => 'Moderate',
+      'coral' => 'Serious',
+      'crimson' => 'High',
     }
   }
 
+  def self.print_severity(owner, severity_score)
+    self::MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
+  end
+
+  def self.print_probability(owner, probability_score)
+    self::MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
+  end
+
+  def self.print_risk(probability_score, severity_score)
+    if !probability_score.nil? && !severity_score.nil?
+      lookup_table = MATRIX_INFO[:risk_table][:rows]
+      return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
+    end
+  end
+  
   ULTIPRO_DATA = {
     upload_path: '/var/sftp/fftsftpuser/ProSafeT_User_List.XML',
     expand_output: false, #Shows full account generation details
