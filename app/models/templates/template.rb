@@ -10,9 +10,10 @@ class Template < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     return [
+      { field: "id",                 title: "ID",          num_cols: 12, type: "text", visible: 'index,show',   required: false},
       { field: "name",               title: "Name",        num_cols: 12, type: "text", visible: 'index,show',   required: false},
-      { field: "num_of_categories",  title: "Categories",  num_cols: 10, type: "text", visible: 'index,show',   required: true    },
-      { field: "num_of_fields",      title: "Fields",      num_cols: 12, type: "text", visible: 'index,show',   required: false   },
+      { field: "num_of_categories",  title: "Categories",  num_cols: 10, type: "text", visible: 'index,show',   required: true},
+      { field: "num_of_fields",      title: "Fields",      num_cols: 12, type: "text", visible: 'index,show',   required: false},
       { field: "num_of_records",     title: "Records",     num_cols: 10, type: "text", visible: 'index,show',   required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
