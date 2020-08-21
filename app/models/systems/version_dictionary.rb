@@ -1,8 +1,31 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.1',
+      title: 'Version 1.2.2',
       tag: 'New',
+      toggle: 'v1_2_2',
+      date: '08/21/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Additional Info column to Report table.',
+          'Added Launch functionalities from SA to SRM module.',
+          'Added due date to Verifications column in Corrective Action table.',
+          'Added assigning multiple Verification Validators.',
+          'Added message content to email notifications.',
+          'Added Category/Root Cause to Report/Event PDF.',
+          'Added Meeting Type to Meeting and Meeting table.',
+          'Added Delete functionality for Meeting Agenda.'
+        ],
+        'Optimizations & Fixes' => [
+          'Fixed Advanced Search for Submitted By in Report table.',
+          'Fixed nested panels display.',
+          'Improved date and time accuracy.',
+          'Updated Meeting Minutes and Agenda to show in all Meetings.'
+          ]
+      }
+    },    
+    {
+      title: 'Version 1.2.1',
       toggle: 'v1_2_1',
       date: '3/31/2020',
       sections: {
