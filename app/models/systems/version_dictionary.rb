@@ -4,7 +4,7 @@ class VersionDictionary
       title: 'Version 1.2.2',
       tag: 'New',
       toggle: 'v1_2_2',
-      date: '08/21/2020',
+      date: '8/21/2020',
       sections: {
         'What\'s New' => [
           'Added Additional Info column to Report table.',
