@@ -9,7 +9,7 @@ class RVFConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    name:                               'Raven Airlines',
+    name:                               'Ravn Alaska',
     time_zone:                          'Alaska',
 
     # SYSTEM CONFIGS
