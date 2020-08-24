@@ -4,6 +4,18 @@ class NotifyMailer < ApplicationMailer
   default :from => "donotreply@prosafet.com"
 
 
+  def notify_rake_errors(subject, error, location)
+	    emails = ['blair.li@prodigiq.com', 'taeho.kim@prodigiq.com', 'trevor.ryles@prodigiq.com', 'engineering@prosafet.com']
+	    default = 'noc@prodigiq.com'
+	    @error = error
+	    @location = location
+  	if Rails.env.production?
+	    mail(to: emails, subject: subject).deliver
+	  else
+	    mail(to: default, subject: subject).deliver
+	  end
+  end
+
   def notify(notice, subject, record, attachment = nil)
     define_attachments
     @user = notice.user
