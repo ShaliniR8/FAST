@@ -34,11 +34,11 @@ $(document).ready(function(){
       }
 
       if ($(this).find('.cc_btn').hasClass('btn-danger')){
-        form.append("<input type='hidden' name=cc_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
+        form.append("<input type='hidden' name=cc_to[" + cc_count++ + "] value=" + $(this).attr('user') + ">")
       }
     })
 
-    if (send_count + cc_count === 0) {
+    if (send_count === 0) {
       event.preventDefault()
       swal({
         title:  'Message has no recipient.',

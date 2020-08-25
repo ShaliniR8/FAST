@@ -5,7 +5,6 @@
     'utility/nested_fields'
 
 = hidden_field_tag(:reply_to, @reply_to.id) if @reply_to.present?
-= hidden_field_tag('send_to[0]', @send_to) if defined? @send_to
 
 ruby:
   subject = ''
