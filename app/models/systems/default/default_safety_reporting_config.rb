@@ -38,7 +38,7 @@ class DefaultSafetyReportingConfig
       'Submission' => {
         title: 'Submission',
         status: ['All'],
-        preload: [:created_by, :template],
+        preload: [:created_by, :template, :submission_fields],
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },

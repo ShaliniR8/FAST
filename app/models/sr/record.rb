@@ -383,6 +383,10 @@ class Record < Sr::SafetyReportingBase
     end
   end
 
+  def getEventId
+    self.report.id rescue nil
+  end
+
   def self.export_all
     self.includes(:template).where(templates:{report_type: 'asap'}).each do |s|
       path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
@@ -394,7 +398,7 @@ class Record < Sr::SafetyReportingBase
       File.open(temp_file, 'w') do |file|
         file << ApplicationController.new.render_to_string(
           template: 'records/export_component.xml.erb',
-          locals:   { template: s.template, records: s})
+          locals:   { template: s.template, record: s})
       end
     end
   end

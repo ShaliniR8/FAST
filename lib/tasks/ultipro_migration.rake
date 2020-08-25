@@ -7,7 +7,7 @@ namespace :ultipro do
 
     task :update_userbase => [:environment] do |t, args|
       begin
-        
+
         logger.info '##############################'
         logger.info '### UPDATING USER DATABASE ###'
         logger.info '##############################'
@@ -127,7 +127,14 @@ namespace :ultipro do
           employee_number: user_hash['employee_number'],
           level: map_account_level(user_hash['employee_group'])
         })
-        user[:sso_id] = user_hash['employee_number']
+
+        case AIRLINE_CODE
+        when 'SCX'
+          user[:sso_id] = user_hash['email_address']
+         when 'FFT'
+          user[:sso_id] = user_hash['employee_number']
+        end
+
         user.save! if !@dry_run
         return user
       rescue
