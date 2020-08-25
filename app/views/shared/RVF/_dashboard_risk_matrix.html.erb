@@ -44,13 +44,13 @@
               <%@risk_table[:column_header].each_with_index do |column_header,column_index|%>
 
                 <%if session[:mode]=="SMS"%>
-                  <td class="color_cell finding_cell" href="<%=findings_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][column_index][row_index]%>"><center><b><%= @finding_matrix[column_index][row_index]%></b></center></td>
-                  <td class="color_cell inv_cell" href="<%=investigations_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>"  style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @inv_matrix[column_index][row_index]%></b></center></td>
+                  <td class="color_cell finding_cell" href="<%=findings_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>"><center><b><%= @finding_matrix[column_index][row_index]%></b></center></td>
+                  <td class="color_cell inv_cell" href="<%=investigations_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>"  style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @inv_matrix[column_index][row_index]%></b></center></td>
                 <%elsif session[:mode]=="SRM"%>
-                  <td class="color_cell hazard_cell"  href="<%=hazards_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][column_index][row_index]%>"><center><b><%= @hazard_matrix[column_index][row_index]%></b></center></td>
+                  <td class="color_cell hazard_cell"  href="<%=hazards_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>"><center><b><%= @hazard_matrix[column_index][row_index]%></b></center></td>
                 <%elsif session[:mode]=="ASAP"%>
-                  <td class="color_cell record_cell"  href="<%=records_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][column_index][row_index]%>"><center><b><%= @record_matrix[column_index][row_index]%></b></center></td>
-                  <td class="color_cell report_cell"  href="<%=reports_path(params.merge({:status=>'All',:field_1=>row_index,:field_2=>column_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @report_matrix[column_index][row_index]%></b></center></td>
+                  <td class="color_cell record_cell"  href="<%=records_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>"><center><b><%= @record_matrix[column_index][row_index]%></b></center></td>
+                  <td class="color_cell report_cell"  href="<%=reports_path(params.merge({:status=>'All',:field_1=>column_index,:field_2=>row_index}))%>" style="background:<%=@risk_table[:rows][row_index][column_index]%>;display:none"><center><b><%= @report_matrix[column_index][row_index]%></b></center></td>
                 <%end%>
               <%end%>
             </tr>
