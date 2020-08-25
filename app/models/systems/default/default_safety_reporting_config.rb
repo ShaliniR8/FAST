@@ -14,7 +14,7 @@ class DefaultSafetyReportingConfig
     template_nested_fields:          true,      # WIP nested smart forms functionality - default off
     enable_dual_report:              true,
     matrix_carry_over:               false,
-    direct_content_message:          false,
+    attach_pdf_submission:           false,
     configurable_agenda_dispositions: false,
 
     # Airline-Specific Features:

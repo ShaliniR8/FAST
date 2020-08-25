@@ -7,7 +7,6 @@ class RVFSafetyReportingConfig < DefaultSafetyReportingConfig
     submission_time_zone:             true,
     submission_description_required:  true,
     configurable_agenda_dispositions: true,
-    direct_content_message:           true,
     # Airline-Specific Features:
   })
 
