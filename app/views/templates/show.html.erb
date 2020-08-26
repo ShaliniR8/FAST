@@ -28,6 +28,13 @@
                 <%=link_to "Make a Copy",
                 clone_template_path(@template),
                 :class => "btn btn-info"%>
+
+                <%=link_to 'Delete',
+                template_path(@template),
+                :method => "delete",
+                :disable_with => "Deleting...",
+                :confirm => "Are you sure?",
+                :class => "btn btn-danger"%>
               <% end%>
               <%=link_to "Expand All",
                 "#",
@@ -42,12 +49,6 @@
                 :id => "edit-btn",
                 :class => "btn btn-warning",
                 :disable_with => "Editing..."%>
-              <%=link_to 'Delete',
-                template_path(@template),
-                :method => "delete",
-                :disable_with => "Deleting...",
-                :confirm => "Are you sure?",
-                :class => "btn btn-danger"%>
             </div>
           </div>
         </div>

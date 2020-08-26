@@ -258,7 +258,7 @@ class Record < Sr::SafetyReportingBase
 
   def self.get_avg_complete(current_user)
     candidates = self.preload(:template).where("status = ? and close_date is not ?", "Closed", nil)
-    candidates.keep_if{|r| current_user.has_access(r.template.name, "full" ) }
+    candidates.keep_if{|r| (current_user.has_access(r.template.name, "full" ) rescue false) }
     if candidates.present?
       sum = 0
       candidates.map{|x| sum += (x.close_date.to_date - x.created_at.to_date).to_i}

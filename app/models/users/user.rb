@@ -76,7 +76,13 @@ class User < ActiveRecord::Base
 
 
   def get_all_submitter_templates
-    result = privileges.map(&:access_controls).flatten.select{|x| x[:action] == "full" || x[:action] == "submitter"}.map{|x| x[:entry]}.uniq
+    result = privileges.map(&:access_controls).flatten.select{ |x|
+      if CONFIG::GENERAL[:hide_asap_submissions_in_dashboard] && (x[:entry].include? 'ASAP')
+        false
+      else
+        x[:action] == "full" || x[:action] == "submitter"
+      end
+    }.map{|x| x[:entry]}.uniq
   end
 
 

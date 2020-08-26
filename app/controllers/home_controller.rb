@@ -370,6 +370,7 @@ class HomeController < ApplicationController
         submissions = Submission.preload(:template).where("completed = ? and event_date is not ? and user_id = ?", true, nil, current_user.id)
           .can_be_accessed(current_user)
           .by_emp_groups(params[:emp_groups])
+          .select { |x| x.template.present? }
         submissions.each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
@@ -562,6 +563,7 @@ class HomeController < ApplicationController
           .can_be_accessed(current_user)
           .within_timerange(@start_date, @end_date)
           .by_emp_groups(params[:emp_groups])
+          .select { |x| x.template.present? }
           .group_by{|x| x.template.name}
       end
       if current_user.has_access('records','index')

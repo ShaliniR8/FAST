@@ -56,7 +56,7 @@ module Sr
     end
 
     def get_template
-      template.name
+      template.name rescue ''
     end
 
 
