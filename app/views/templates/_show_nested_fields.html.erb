@@ -23,6 +23,7 @@
                 <th>Show Label</th>
                 <th>Required</th>
                 <th>Print in De-ID</th>
+                <th>Max Character Count</th>
                 <th width="30%">Options</th>
                 <th>Action</th>
               </tr>
@@ -41,6 +42,7 @@
                     <td><%=f.select       :display_size,  Field.getDisplay_size, {},            {:class => "form-control"}%>                    </td>
                     <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
                     <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
                     <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
                     <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
                     <td>
