@@ -130,6 +130,25 @@
 </style>
 
 <script type="text/javascript">
+  function view_clicked_record(record) {
+    window.open("/records/" + $(record).closest("tr").attr('record'));
+  }
+
+  function add_or_remove_record(record) {
+    var action_table=$(record).closest("table");
+    if (action_table.attr('id')=="cisp_ready_reports"){
+      $(record).removeClass("btn-danger").addClass("btn-warning");
+      row=$(record).closest("tr").detach();
+      $(record).find("span").removeClass("glyphicon-remove").addClass("glyphicon-plus");
+      row.appendTo("#all_reports tbody");
+    }else{
+      $(record).removeClass("btn-warning").addClass("btn-danger");
+      row=$(record).closest("tr").detach();
+      $(record).find("span").removeClass("glyphicon-plus").addClass("glyphicon-remove");
+      row.appendTo("#cisp_ready_reports tbody");
+    }
+  }
+
   $(document).ready(function(){
 
     $("#cisp_ready_reports").dataTable({
@@ -142,23 +161,20 @@
       "columnDefs": [{ type: 'natural', targets: 0 }],
     });
 
-    $(".view_btn").on('click',function(){
-      window.open("/records/" + $(this).closest("tr").attr('record'));
+    $("#cisp_ready_reports").on('click',".view_btn",function(){
+      view_clicked_record(this);
     });
 
-    $(".action-btn").on("click",function(){
-      var action_table=$(this).closest("table");
-      if (action_table.attr('id')=="cisp_ready_reports"){
-        $(this).removeClass("btn-danger").addClass("btn-warning");
-        row=$(this).closest("tr").detach();
-        $(this).find("span").removeClass("glyphicon-remove").addClass("glyphicon-plus");
-        row.appendTo("#all_reports tbody");
-      }else{
-        $(this).removeClass("btn-warning").addClass("btn-danger");
-        row=$(this).closest("tr").detach();
-        $(this).find("span").removeClass("glyphicon-plus").addClass("glyphicon-remove");
-        row.appendTo("#cisp_ready_reports tbody");
-      }
+    $("#all_reports").on('click',".view_btn",function(){
+      view_clicked_record(this);
+    });
+
+    $("#cisp_ready_reports").on("click",".action-btn",function(){
+      add_or_remove_record(this);
+    });
+
+    $("#all_reports").on("click",".action-btn",function(){
+      add_or_remove_record(this);
     });
 
     function update_cisp_ready() {
