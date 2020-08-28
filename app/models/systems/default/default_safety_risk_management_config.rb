@@ -497,12 +497,12 @@ class DefaultSafetyRiskManagementConfig
       },
       'Meetings' => {
         title: 'Meetings', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', true, true)},
         subMenu: [
           {title: 'All', path: 'srm_meetings_path(status: "All")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', true, true)}},
           {title: 'New', path: 'new_srm_meeting_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'new', true, true)}},
         ]
       },
       'Query Center' => {
