@@ -123,7 +123,6 @@ class RecommendationsController < SafetyAssuranceController
       end
     when 'Reject'
     when 'Approve'
-      @owner.complete_date = Time.now
       @owner.close_date = Time.now
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
