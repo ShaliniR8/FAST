@@ -10,21 +10,7 @@
     :owner => @audit,
     :deidentified => @deidentified%>
 
-  <%@audit.tasks.each do |task|%>
-    <div class="col-xs-12">
-      <hr>
-      <%=render "ims/print_task", :owner => task,
-        :deidentified => @deidentified%>
-    </div>
-  <%end%>
 
-  <%@audit.contacts.each do |contact|%>
-    <div class="col-xs-12">
-      <hr>
-      <%=render "ims/print_contact", :owner => contact,
-        :deidentified => @deidentified%>
-    </div>
-  <%end%>
 
   <div class="col-xs-12">
     <%
@@ -42,6 +28,30 @@
       <%= render '/checklists/checklist_table', checklist: checklist %>
     <%end%>
   </div>
+
+  <%@audit.contacts.each do |contact|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "ims/print_contact", :owner => contact,
+        :deidentified => @deidentified%>
+    </div>
+  <%end%>
+
+  <%@audit.costs.each do |cost|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "ims/print_cost", :owner => cost,
+        :deidentified => @deidentified%>
+    </div>
+  <%end%>
+
+  <%@audit.tasks.each do |task|%>
+    <div class="col-xs-12">
+      <hr>
+      <%=render "ims/print_task", :owner => task,
+        :deidentified => @deidentified%>
+    </div>
+  <%end%>
 
   <%@audit.findings.each do |finding|%>
     <div class="col-xs-12">
