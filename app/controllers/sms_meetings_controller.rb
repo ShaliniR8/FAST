@@ -35,17 +35,19 @@ class SmsMeetingsController < ApplicationController
       "Meeting ##{@meeting.get_id} Canceled")
 
     @meeting.invitations.each do |p|
-      notify(
-        p.user,
-        "Cancellation of Invitation from Meeting ##{@meeting.get_id}" + g_link(@meeting),
-        true,
-        "Cancellation of Meeting ##{@meeting.get_id}")
+      notify(@meeting,
+        notice: {
+          users_id: p.user.id,
+          content: "Cancellation of Invitation from Meeting ##{@meeting.get_id}" + g_link(@meeting)},
+        mailer: true,
+        subject: "Cancellation of Meeting ##{@meeting.get_id}")
     end
-    notify(
-      @meeting.host.user,
-      "Cancellation of Invitation from Meeting ##{@meeting.get_id}" + g_link(@meeting),
-      true,
-      "Cancellation of Meeting ##{@meeting.get_id}")
+      notify(@meeting,
+        notice: {
+          users_id: @meeting.host.user.id,
+          content: "Cancellation of Invitation from Meeting ##{@meeting.get_id}" + g_link(@meeting)},
+        mailer: true,
+        subject: "Cancellation of Meeting ##{@meeting.get_id}")
     @meeting.packages.each do |x|
       Transaction.build_for(
         x,
@@ -96,17 +98,19 @@ class SmsMeetingsController < ApplicationController
         "You are invited to meeting ##{@meeting.get_id}")
 
       @meeting.invitations.each do |p|
-      notify(
-        p.user,
-        "New Meeting ##{@meeting.get_id} Notification" + g_link(@meeting),
-        true,
-        "New Meeting ##{@meeting.get_id} Notification")
+        notify(@meeting,
+          notice: {
+            users_id: p.user.id,
+            content: "New Meeting ##{@meeting.get_id} Notification" + g_link(@meeting)},
+          mailer: true,
+          subject: "New Meeting ##{@meeting.get_id} Notification")
       end
-      notify(
-        @meeting.host.user,
-        "New Meeting ##{@meeting.get_id} Notification" + g_link(@meeting),
-        true,
-        "New Meeting ##{@meeting.get_id} Notification")
+        notify(@meeting,
+          notice: {
+            users_id: @meeting.host.user.id,
+            content: "New Meeting ##{@meeting.get_id} Notification" + g_link(@meeting)},
+          mailer: true,
+          subject: "New Meeting ##{@meeting.get_id} Notification")
       redirect_to sms_meeting_path(@meeting)
     else
       redirect_to new_sms_meeting_path(:type=>params[:type])
@@ -221,11 +225,12 @@ class SmsMeetingsController < ApplicationController
             "You are invited to a meeting.  " + g_link(@meeting),
             true,
             "You are invited to a meeting")
-          notify(
-            new_inv.user,
-            "New Meeting ##{@meeting.get_id} Notification" + g_link(@meeting),
-            true,
-            "New Meeting ##{@meeting.get_id} Notification")
+          notify(@meeting,
+            notice: {
+              users_id: new_inv.user.id,
+              content: "New Meeting ##{@meeting.get_id} Notification" + g_link(@meeting)},
+            mailer: true,
+            subject: "New Meeting ##{@meeting.get_id} Notification")
         end
       end
     end
@@ -236,11 +241,12 @@ class SmsMeetingsController < ApplicationController
         inv=@meeting.invitations.where("users_id=?",val)
         if inv.present?
           Rails.logger.debug("Deleting")
-          notify(
-            inv.first.user,
-            "Cancellation of Meeting ##{@meeting.get_id}" + g_link(@meeting),
-            true,
-            "Cancellation of Meeting ##{@meeting.get_id}")
+          notify(@meeting,
+            notice: {
+              users_id: inv.first.user.id,
+              content: "Cancellation of Meeting ##{@meeting.get_id}" + g_link(@meeting)},
+            mailer: true,
+            subject: "Cancellation of Meeting ##{@meeting.get_id}")
           inv.first.destroy
         end
       end
@@ -285,11 +291,12 @@ class SmsMeetingsController < ApplicationController
     end
   end
   def send_notice(participant, message, mailer, subject)
-    notify(
-      participant.user,
-      message,
-      mailer,
-      subject)
+    notify(participant,
+    notice: {
+      users_id: participant.user.id,
+      content: message},
+    mailer: mailer,
+    subject: subject)
     #notify(p.user,expire,message)
   end
 
@@ -336,11 +343,12 @@ class SmsMeetingsController < ApplicationController
     end
     host_header="From "+@meeting.host.user.full_name+":<br>"
     users.each do |u|
-      notify(
-        u,
-        "You have a message sent from Meeting ##{@meeting.get_id}" + g_link(@meeting),
-        true,
-        "Message Received from Meeting ##{@meeting.get_id}")
+      notify(@meeting,
+        notice: {
+          users_id: u.id,
+          content: "You have a message sent from Meeting ##{@meeting.get_id}" + g_link(@meeting)},
+        mailer: true,
+        subject: "Message Received from Meeting ##{@meeting.get_id}")
     end
     redirect_to send_success_sms_meetings_path
   end
