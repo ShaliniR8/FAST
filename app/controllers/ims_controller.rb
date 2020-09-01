@@ -205,26 +205,32 @@ class ImsController < ApplicationController
   end
 
   def upload_checklist
-      im=Im.find(params[:id])
-      if !params[:append].present?
-        im.clear_checklist
-      end
-      if params[:checklist].present?
-        upload=File.open(params[:checklist].tempfile)
-        CSV.foreach(upload,{
-          :headers=>:true,
-          :header_converters => lambda { |h| h.downcase.gsub(' ', '_') }
-          }) do |row|
-          #Rails.logger.info (row.inspect)
-          Object.const_get(im.type+'Item').create(row.to_hash.merge({:owner_id=>im.id}))
+    im=Im.find(params[:id])
+    if !params[:append].present?
+      im.clear_checklist
+    end
+    if params[:checklist].present?
+      upload=File.open(params[:checklist].tempfile)
+      begin
+        Checklist.transaction do
+          CSV.foreach(upload,{
+            :headers=>:true,
+            :header_converters => lambda { |h| h.downcase.gsub(' ', '_') }
+            }) do |row|
+            #Rails.logger.info (row.inspect)
+            Object.const_get(im.type+'Item').create(row.to_hash.merge({:owner_id=>im.id}))
+          end
+          Transaction.build_for(
+            im,
+            'Upload Checklist',
+            current_user.id
+          )
         end
+      rescue Exception => e
+        Rails.logger.info e
       end
-      Transaction.build_for(
-        im,
-        'Upload Checklist',
-        current_user.id
-      )
-      redirect_to im_path(im)
+    end
+    redirect_to im_path(im)
   end
 
   def download_checklist
