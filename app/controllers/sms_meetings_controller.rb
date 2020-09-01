@@ -254,7 +254,7 @@ class SmsMeetingsController < ApplicationController
 
     if @meeting.previous_changes.present?
       Transaction.build_for(
-        meeting,
+        @meeting,
         'Edit',
         current_user.id
       )
