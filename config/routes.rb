@@ -406,6 +406,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'approve'
       get 'comment'
+      get 'schedule_verification'
+      get 'request_extension'
     end
   end
   resources :query_statements do

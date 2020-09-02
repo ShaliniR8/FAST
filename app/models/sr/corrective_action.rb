@@ -6,6 +6,8 @@ class CorrectiveAction < ProsafetBase
   include Attachmentable
   include Commentable
   include Transactionable
+  include Verifiable
+  include ExtensionRequestable
 
 #Associations List
   belongs_to  :report,                foreign_key: 'reports_id',          class_name: 'Report'

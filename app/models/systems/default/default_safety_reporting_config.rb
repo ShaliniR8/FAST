@@ -309,7 +309,10 @@ class DefaultSafetyReportingConfig
       'CorrectiveAction' => {
         title: 'Corrective Action',
         status: ['New', 'Assigned', 'Completed', 'Pending Approval', 'All'],
-        preload: [:responsible_user],
+        preload: [
+          :responsible_user,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           status: { default: true, type: 'select', options: CorrectiveAction.getStatusOptions },
@@ -389,6 +392,7 @@ class DefaultSafetyReportingConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

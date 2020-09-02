@@ -95,6 +95,11 @@
                   :id => 'complete',
                   'data-toggle' => 'modal',
                   'data-target' => '.bs-example-modal-lg'%>
+                <%=link_to 'Request Extension', '#',
+                  :class => 'btn btn-info pull-right mr5 mb5',
+                  :id => 'extension_btn',
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg'%>
               <%end%>
 
             <%elsif @corrective_action.status == "Pending Approval"%>
@@ -111,6 +116,12 @@
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
               <%end%>
+            <%elsif @corrective_action.status == "Completed"%>
+              <%=link_to 'Schedule Verification', '#',
+                :class => 'btn btn-info pull-right mr5',
+                :id => 'verification_btn',
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg'%>
             <%end%>
             <%=link_to "Add Comment", "#",
               :class => "btn btn-success pull-right mr5 mb5",
@@ -123,6 +134,8 @@
         <%=render "/forms/show_fields", :fields => @fields, :record => @corrective_action%>
 
         <%= render '/panels/show_panels', owner: @corrective_action%>
+        <%=render '/verifications/show_verifications', :records => @corrective_action.verifications%>
+        <%=render '/extension_requests/show_requests', :records => @corrective_action.extension_requests%>
         <%=render "/forms/show_comment", :owner => @corrective_action%>
         <%=render "/forms/attachments_show", :owner => @corrective_action%>
         <%=render "records/transactions", :owner => @corrective_action%>
@@ -180,6 +193,26 @@
       $.get("<%=approve_corrective_action_path(@corrective_action)%>?commit=" + commit,
         function(data){
         $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $("#extension_btn").on("click", function(){
+      var commit=$(this).attr('id');
+      $.get("<%=request_extension_corrective_action_path(@corrective_action)%>?commit=" +
+        commit,
+        function(data){
+        $('.modal-content').html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $("#verification_btn").on("click", function(){
+      var commit=$(this).attr('id');
+      $.get("<%=schedule_verification_corrective_action_path(@corrective_action)%>?commit=" +
+        commit,
+        function(data){
+        $('.modal-content').html(data);
         $(window).trigger('resize');
       });
     });

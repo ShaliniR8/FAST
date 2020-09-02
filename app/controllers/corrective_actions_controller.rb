@@ -22,8 +22,12 @@ end
 class CorrectiveActionsController < ApplicationController
 
   before_filter :set_table_name, :login_required
+  before_filter :define_owner, only: [:request_extension, :schedule_verification]
 
-
+  def define_owner
+    @class = Object.const_get('CorrectiveAction')
+    @owner = @class.find(params[:id])
+  end
 
   def set_table_name
     @table_name = "Corrective Actions"
@@ -195,6 +199,20 @@ class CorrectiveActionsController < ApplicationController
     @owner = CorrectiveAction.find(params[:id])
     @comment = @owner.comments.new
     render :partial => "forms/viewer_comment"
+  end
+
+  def request_extension
+    @extension_request = @owner.extension_requests.new
+    @extension_request.requester = current_user
+    @extension_request.approver = @owner.approver
+    @extension_request.request_date = Time.now
+    render :partial => 'extension_requests/new'
+  end
+
+  def schedule_verification
+      @verification = @owner.verifications.new
+      @verification.validator = @owner.responsible_user
+      render :partial => 'verifications/new'
   end
 
   def print
