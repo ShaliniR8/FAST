@@ -32,6 +32,10 @@ class SmsActionsController < SafetyAssuranceController
     :update
   ]
 
+  before_filter(only: [:new])    {set_parent_type_id(:sms_action)}
+  before_filter(only: [:create]) {set_parent(:sms_action)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @owner)}
+
   def define_owner
     @class = Object.const_get('SmsAction')
     @owner = @class.find(params[:id])
@@ -54,8 +58,8 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def create
-    owner = SmsAction.create(params[:sms_action])
-    redirect_to owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
+    @owner = SmsAction.create(params[:sms_action])
+    redirect_to @owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
   end
 
 
