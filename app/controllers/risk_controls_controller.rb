@@ -123,7 +123,7 @@ class RiskControlsController < ApplicationController
     case params[:commit]
     when 'Assign'
       @owner.update_attributes(params[:risk_control])
-      @owner.date_open = Time.now
+      @owner.open_date = Time.now
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,
         content: "Risk Control ##{@owner.id} has been assigned to you."},
@@ -135,7 +135,6 @@ class RiskControlsController < ApplicationController
           content: "Risk Control ##{@owner.id} needs your Approval."},
           mailer: true, subject: 'Risk Control Pending Approval')
       else
-        @owner.date_complete = Time.now
         @owner.close_date = Time.now
       end
     when 'Reject'
@@ -144,7 +143,6 @@ class RiskControlsController < ApplicationController
         content: "Risk Control ##{@owner.id} was Rejected by the Final Approver."},
         mailer: true, subject: 'Risk Control Reject') if @owner.responsible_user
     when 'Approve'
-      @owner.date_complete = Time.now
       @owner.close_date = Time.now
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,

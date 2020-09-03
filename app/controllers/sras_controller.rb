@@ -126,7 +126,6 @@ class SrasController < ApplicationController
           mailer: true,
           subject: 'SRA Pending Approval')
       else
-        @owner.date_complete = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
@@ -153,6 +152,7 @@ class SrasController < ApplicationController
     when 'Approve'
       if !@owner.approver #Approved by reviewer with absent approver case
         update_status = 'Completed'
+        @owner.close_date = Time.now
         notify(@owner,
           notice: {
             users_id: @owner.responsible_user.id,
@@ -170,7 +170,6 @@ class SrasController < ApplicationController
           subject: 'SRA Pending Approval') if @owner.responsible_user
         transaction_content = 'Approved by the Quality Reviewer'
       else
-        @owner.date_complete = Time.now
         @owner.close_date = Time.now
         notify(@owner,
           notice: {
