@@ -21,32 +21,16 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
     CONFIG.object['SafetyPlan'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
-
   def self.progress
-  {
-    'New'               => { :score => 33,  :color => 'default'},
-    'Evaluated'         => { :score => 66,  :color => 'warning'},
-    'Completed'         => { :score => 100, :color => 'success'},
-  }
-end
-
+    {
+      'New'               => { :score => 33,  :color => 'default'},
+      'Evaluated'         => { :score => 66,  :color => 'warning'},
+      'Completed'         => { :score => 100, :color => 'success'},
+    }
+  end
 
   def self.results
     ['Satisfactory','Unsatisfactory']
   end
-
-
-  def self.get_avg_complete
-    candidates=self.where("status=? and date_completed is not ?","Completed",nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.date_completed-x.created_at.to_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
 
 end

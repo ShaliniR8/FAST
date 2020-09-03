@@ -95,20 +95,6 @@ end
     self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
 
-
-  def self.get_avg_complete
-    candidates = self.where("status=? and date_complete is not ? ", "Completed", nil)
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.date_complete - x.created_at.to_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
-
   def can_approve?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) || (
       self.status == 'Pending Review' && ( self.reviewer_id == user.id || has_admin_rights?(user) )

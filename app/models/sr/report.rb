@@ -350,38 +350,38 @@ class Report < Sr::SafetyReportingBase
 
   def self.getFormHeaders
     if CONFIG.sr::GENERAL[:submission_description]
-        [
-          {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
-          {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
-          {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
-          {:field=>"get_description" ,:size=>"col-xs-3 col-lg-3",:title=>"Description"},
-          {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
-        ]
-      else
-        [
-          {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
-          {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
-          {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
-          {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
-        ]
-      end
-  end
-
-    def self.dispositions
       [
-        'Delegate for General Safety Review',
-        'Electronic Response',
-        'Informal Action',
-        'Letter of Correction',
-        'Letter of No Action',
-        'No Action',
-        'Open Investigation',
-        'Voluntary Self-Disclosure',
-        'Warning Notice'
+        {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
+        {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
+        {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
+        {:field=>"get_description" ,:size=>"col-xs-3 col-lg-3",:title=>"Description"},
+        {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
+      ]
+    else
+      [
+        {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
+        {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
+        {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
+        {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
       ]
     end
+  end
 
-    def self.get_terms
+  def self.dispositions
+    [
+      'Delegate for General Safety Review',
+      'Electronic Response',
+      'Informal Action',
+      'Letter of Correction',
+      'Letter of No Action',
+      'No Action',
+      'Open Investigation',
+      'Voluntary Self-Disclosure',
+      'Warning Notice'
+    ]
+  end
+
+  def self.get_terms
     {
       "Title"                   => "name",
       "Status"                  => "status",
@@ -395,28 +395,18 @@ class Report < Sr::SafetyReportingBase
     }
   end
 
-    def self.company_dis
-      [
-        'No Action',
-        'Voluntary Self-Disclosure'
-      ]
-    end
-
-
-    def get_privileges
-      self.privileges.present? ?  self.privileges : []
-    end
-  def self.get_avg_complete
-    candidates = self.where("status=? and close_date is not ?","Closed",nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.close_date.to_date - x.created_at.to_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
+  def self.company_dis
+    [
+      'No Action',
+      'Voluntary Self-Disclosure'
+    ]
   end
+
+
+  def get_privileges
+    self.privileges.present? ?  self.privileges : []
+  end
+
 
   def can_meeting_ready?(user, form_conds: false, user_conds: false)
     form_confirmed = self.status == 'New' || form_conds

@@ -1,6 +1,7 @@
 class Record < Sr::SafetyReportingBase
   extend AnalyticsFilters
   include RiskHandling
+  include ModelHelpers
 
 #Concerns List
   include Attachmentable
@@ -254,21 +255,6 @@ class Record < Sr::SafetyReportingBase
       end
     end
   end
-
-
-  def self.get_avg_complete(current_user)
-    candidates = self.preload(:template).where("status = ? and close_date is not ?", "Closed", nil)
-    candidates.keep_if{|r| (current_user.has_access(r.template.name, "full" ) rescue false) }
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.close_date.to_date - x.created_at.to_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
 
   def satisfy(conditions)
 
