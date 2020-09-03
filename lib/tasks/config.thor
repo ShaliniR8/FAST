@@ -53,6 +53,7 @@ class Config < Thor
       checklist_templates
       checklists
       contacts
+      children
       corrective_actions
       costs
       documents
@@ -70,10 +71,11 @@ class Config < Thor
       message_accesses
       messages
       notices
-      notifications
+      occurrences
       orm_submission_fields
       orm_submissions
       packages
+      parents
       participations
       private_links
       query_conditions
@@ -84,7 +86,6 @@ class Config < Thor
       recurrences
       report_meetings
       reports
-      responsible_users
       risk_controls
       root_causes
       safety_plans
