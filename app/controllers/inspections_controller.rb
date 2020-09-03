@@ -66,46 +66,6 @@ class InspectionsController < SafetyAssuranceController
   end
 
 
-  def update
-    transaction = true
-    @owner.update_attributes(params[:inspection])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
-      params[:inspection][:close_date] = params[:inspection][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:inspection])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to inspection_path(@owner)
-  end
-
-
   def new_requirement
     @audit = Inspection.find(params[:id])
     @requirement = InspectionRequirement.new

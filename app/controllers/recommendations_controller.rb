@@ -106,45 +106,6 @@ class RecommendationsController < SafetyAssuranceController
   end
 
 
-  def update
-    transaction = true
-    @owner.update_attributes(params[:recommendation])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:recommendation][:status]}"
-      params[:recommendation][:close_date] = params[:recommendation][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:recommendation])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to recommendation_path(@owner)
-  end
-
-
   def print
     @deidentified = params[:deidentified]
     @recommendation = Recommendation.find(params[:id])

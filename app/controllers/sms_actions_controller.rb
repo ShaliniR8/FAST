@@ -121,42 +121,6 @@ class SmsActionsController < SafetyAssuranceController
     render :partial => "reassign"
   end
 
-  def update
-    transaction = true
-    @owner.update_attributes(params[:sms_action])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Reassign'
-    when 'Assign'
-    when 'Complete'
-      if @owner.approver
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
-      params[:sms_action][:close_date] = params[:sms_action][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:sms_action])
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to sms_action_path(@owner)
-  end
-
 
   def print
     @deidentified = params[:deidentified]

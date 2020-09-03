@@ -60,47 +60,6 @@ class InvestigationsController < SafetyAssuranceController
     load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
-
-  def update
-    transaction = true
-    @owner.update_attributes(params[:investigation])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:investigation][:status]}"
-      params[:investigation][:close_date] = params[:investigation][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:investigation])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to investigation_path(@owner)
-  end
-
-
   def create
     @investigation = Investigation.new(params[:investigation])
     if @investigation.save

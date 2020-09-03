@@ -64,47 +64,6 @@ class EvaluationsController < SafetyAssuranceController
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
-
-  def update
-    transaction = true
-    @owner.update_attributes(params[:evaluation])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:evaluation][:status]}"
-      params[:evaluation][:close_date] = params[:evaluation][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:evaluation])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to evaluation_path(@owner)
-  end
-
-
   def new_requirement
     @audit = Evaluation.find(params[:id])
     @fields = EvaluationRequirement.get_meta_fields('form')

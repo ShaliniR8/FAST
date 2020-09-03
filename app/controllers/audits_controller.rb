@@ -148,52 +148,6 @@ class AuditsController < SafetyAssuranceController
   end
 
 
-  def update
-    transaction = true
-    @owner.update_attributes(params[:audit])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
-      params[:audit][:close_date] = params[:audit][:status] == 'Completed' ? Time.now : nil
-    when 'Add Cost', 'Add Contact', 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:audit])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content,
-        nil,
-        current_user,
-        session[:platform]
-      )
-    end
-    @owner.save
-    respond_to do |format|
-      format.html { redirect_to audit_path(@owner) }
-      format.json { update_as_json }
-    end
-  end
-
-
   def show
     respond_to do |format|
       format.html do

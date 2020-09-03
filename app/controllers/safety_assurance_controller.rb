@@ -17,6 +17,51 @@ end
 
 class SafetyAssuranceController < ApplicationController
 
+  def update
+    object_name = self.class.name.gsub('Controller', '').underscore.singularize
+
+    transaction = true
+
+    current_status = @owner.status
+    @owner.update_attributes(params[object_name.to_sym])
+    send_notification(@owner, params[:commit])
+    case params[:commit]
+    when 'Assign'
+      @owner.open_date = Time.now
+    when 'Complete'
+      if @owner.approver
+        transaction_content ='Pending Approval'
+      else
+        @owner.close_date = Time.now
+      end
+    when 'Reject'
+    when 'Approve'
+      @owner.close_date = Time.now
+    when 'Override Status'
+      transaction_content = "Status overridden from #{current_status} to #{@owner.status}"
+      @owner.close_date = params[object_name.to_sym][:status] == 'Completed' ? Time.now : nil
+    when 'Add Cost', 'Add Contact', 'Add Attachment'
+      transaction = false
+    end
+
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content,
+        nil,
+        current_user,
+        session[:platform]
+      )
+    end
+    @owner.save
+    respond_to do |format|
+      format.html { redirect_to eval "#{object_name}_path(@owner)" }
+      format.json { update_as_json }
+    end
+  end
+
   #############################
   ####    SHARED FORMS     ####
   #############################
