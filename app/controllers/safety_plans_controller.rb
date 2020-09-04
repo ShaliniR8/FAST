@@ -132,7 +132,6 @@ class SafetyPlansController < ApplicationController
       current_user.id
     )
     safety_plan.status="Completed"
-    safety_plan.date_completed = Time.now
     safety_plan.close_date = Time.now
     if safety_plan.save
       redirect_to safety_plan_path(safety_plan)

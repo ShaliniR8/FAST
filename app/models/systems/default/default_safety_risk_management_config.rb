@@ -404,8 +404,8 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 6, type: 'date', visible: 'show,eval',
             required: false
           },
-          date_completed: {
-            field: 'date_completed', title: 'Date Completed',
+          date_closed: {
+            field: 'close_date', title: 'Date Completed',
             num_cols: 6, type: 'date', visible: 'show,eval',
             required: false
           },
