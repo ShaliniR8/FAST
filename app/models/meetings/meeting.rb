@@ -100,8 +100,10 @@ class Meeting < ProsafetBase
 
 
   def has_user(user)
-    if self.host.present?
-      self.host.users_id == user.id || self.invited?(user)
+    if user.global_admin?
+      true
+    elsif self.host.present? && (self.host.users_id == user.id)
+      true
     else
       self.invited?(user)
     end
