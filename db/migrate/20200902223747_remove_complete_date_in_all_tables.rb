@@ -10,7 +10,7 @@ class RemoveCompleteDateInAllTables < ActiveRecord::Migration
     remove_column :sras, :date_complete
     remove_column :risk_controls, :date_complete
     rename_column :risk_controls, :date_open, :open_date
-    remove_column :safety_plans, :date_complete
+    remove_column :safety_plans, :date_completed
   end
 
   def self.down
@@ -24,6 +24,6 @@ class RemoveCompleteDateInAllTables < ActiveRecord::Migration
     add_column :sras, :date_complete, :date
     add_column :risk_controls, :date_complete, :date
     rename_column :risk_controls, :open_date, :date_open
-    add_column :safety_plans, :date_complete, :date
+    add_column :safety_plans, :date_completed, :date
   end
 end
