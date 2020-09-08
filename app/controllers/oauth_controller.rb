@@ -15,7 +15,8 @@ class OauthController < ApplicationController
   # This example should work with most Authlogic or Devise. Uncomment it
   def authenticate_user(username,password)
     Rails.logger.info "authenticate_user"
-    user = User.authenticate(username, password)
+    #user = User.authenticate(username, password)
+    user = User.find_by_username(username) || User.find_by_employee_number(username)
     if user
       Rails.logger.info user.inspect
       session[:user_id] = user.id
