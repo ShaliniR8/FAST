@@ -214,7 +214,11 @@
 
           <%
             meta_field_args = ['show']
-            meta_field_args.push('admin') if current_user.global_admin?
+            # show_submitter_name is FALSE and current_user is global admin
+            cond1 = !CONFIG.sr::GENERAL[:show_submitter_name] && current_user.global_admin?
+            # show_submitter_name is TRUE and current_user had full access
+            cond2 = CONFIG.sr::GENERAL[:show_submitter_name] && template_full_access
+            meta_field_args.push('admin') if cond1 || cond2
             meta_field_args.push('close') if @record.status == 'Closed' && @record.is_asap
           %>
           <%=render "forms/show_fields", :fields => Record.get_meta_fields(*meta_field_args), :record => @record%>
@@ -241,7 +245,7 @@
             <%end%>
           <%end%>
 
-          <%=render "/records/show_template_fields", :record => @record%>
+          <%=render "/records/show_template_fields", :record => @record, deid:!template_full_access%>
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 

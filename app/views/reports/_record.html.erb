@@ -12,7 +12,8 @@
   <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
     <div class="row" id="fields">
       <div class="col-xs-12">
-        <%=render "/records/show_template_fields", :record => @record%>
+        <%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
+        <%=render "/records/show_template_fields", :record => @record, deid:!template_full_access%>
 
         <% if false %>
           comment out for v1.2

@@ -3,6 +3,8 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
 
+<%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
+
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
 
@@ -69,11 +71,13 @@
 
           <%@template.categories.order(:category_order).each do |c|%>
             <%@cat = c%>
-            <%if @cat.id == 338%>
-              <%=render "show_observation_phases_category"%>
-            <%elsif @cat.not_empty_for(@record)%>
-              <%=render "category"%>
-            <%end%>
+
+              <%if @cat.id == 338%>
+                <%=render "show_observation_phases_category", deid:!template_full_access%>
+              <%elsif @cat.not_empty_for(@record)%>
+                <%=render "category", deid:!template_full_access%>
+              <%end%>
+
           <%end%>
 
           <%=render "/forms/attachments_show", :owner => @record, :show_btn => false%>
