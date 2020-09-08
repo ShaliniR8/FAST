@@ -12,7 +12,7 @@ class SmsTasksController < ApplicationController
     @record.update_attributes(params[:sms_task])
 
 
-    if @record.owner.class.name == 'FrameworkIm'
+    if %w[FrameworkIm VpIm JobAid].include? @record.owner.class.name
       redirect_to @record.owner.becomes(Im), flash: {success: 'Task updated.'}
     else
       redirect_to @record.owner, flash: {success: 'Task updated.'}
@@ -24,7 +24,7 @@ class SmsTasksController < ApplicationController
     owner = record.owner
     record.destroy
 
-    if @record.owner.class.name == 'FrameworkIm'
+    if %w[FrameworkIm VpIm JobAid].include? owner.class.name
       redirect_to owner.becomes(Im), flash: {success: 'Task deleted.'}
     else
       redirect_to owner, flash: {success: 'Task deleted.'}
