@@ -1,10 +1,9 @@
 require 'net/sftp'
 namespace :wbat_upload do
   task :sftp_mitre => :environment do
-    # error_notification_emails = []
     begin
       #prepare files
-      Submission.export_all
+      Record.export_all
       host = "ftp.mitrecaasd.org"
       username = "dkhtb964"
       password = "AiPa7uuC"
