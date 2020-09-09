@@ -448,7 +448,6 @@ class QueriesController < ApplicationController
             xor ^ (record.send(field[:field]).split("\;").reject(&:empty?).join("").to_s.downcase.include? search_value.downcase)
           end
         }
-
       when 'user'
         if search_value.downcase == "Anonymous".downcase
           return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.downcase)}
