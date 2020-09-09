@@ -33,3 +33,4 @@ table{
 table, tr, td, th, tbody, thead, tfoot {
   page-break-inside: avoid !important;
 }
+thead { display: table-row-group; }
