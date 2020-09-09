@@ -845,7 +845,9 @@ class ApplicationController < ActionController::Base
 
   # sample arg => notice: {users_id: 1, content: 'Audit is assigned'}, mailer: true, subject: 'Audit Assigned'
   def notify(record, arg)
-    if arg[:notice][:users_id].present? && record.present? && record.respond_to?(:notices)
+    if arg[:notice][:users_id].present? &&
+        User.find(arg[:notice][:users_id]).present? &&
+        record.present? && record.respond_to?(:notices)
       notice = record.notices.create(arg[:notice])
       puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
@@ -920,6 +922,7 @@ class ApplicationController < ActionController::Base
     options[:rails_env] = Rails.env
     args = options.map { |n, v| "#{n.to_s.upcase}='#{v}'"}
     Rails.logger.info "running `rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &`"
+
     if Rails.env.production?
       system "/usr/local/bin/bundle exec /usr/local/bin/rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
     else
