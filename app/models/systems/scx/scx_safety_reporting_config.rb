@@ -7,6 +7,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
     submission_time_zone:     true,
     matrix_carry_over:        true,
     attach_pdf_submission:    true,
+    share_meeting_agendas:    false,
     # Airline-Specific Features:
   })
 

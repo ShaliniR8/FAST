@@ -63,9 +63,16 @@ class Report < Sr::SafetyReportingBase
     }
   end
 
+  def get_agendas(meeting)
+    if CONFIG.sr::GENERAL[:share_meeting_agendas]
+      agendas
+    else # SCX do not shared agendas outside their specific ASAP meetings
+      agendas.select { |agenda| meeting.id == agenda.owner_id }
+    end
+  end
 
-  def get_minutes_agenda(meeting_id)
-    agenda = "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" if agendas.length > 0
+  def get_minutes_agenda(meeting)
+    agenda = "<b>Agendas:</b><br>#{get_agendas(meeting).map(&:get_content).join('<br>')}" if get_agendas(meeting).length > 0
     meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
     "#{agenda || ''} #{meeting_minutes || ''}".html_safe
   end

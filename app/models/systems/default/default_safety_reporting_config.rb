@@ -6,16 +6,17 @@ class DefaultSafetyReportingConfig
 
   GENERAL = {
     # General Module Features:
-    enable_orm:                      false,     # Enables ORM Reports - default off
-    show_submitter_name:             true,      # Displays submitter names when access to show (admins will always see it)- default on
-    submission_description:          true,      # Changes Character Limit or adds General Description - default on
-    submission_description_required: true,
-    submission_time_zone:            false,
-    template_nested_fields:          true,      # WIP nested smart forms functionality - default off
-    enable_dual_report:              true,
-    matrix_carry_over:               false,
-    attach_pdf_submission:           false,
+    enable_orm:                       false,     # Enables ORM Reports - default off
+    show_submitter_name:              true,      # Displays submitter names when access to show (admins will always see it)- default on
+    submission_description:           true,      # Changes Character Limit or adds General Description - default on
+    submission_description_required:  true,
+    submission_time_zone:             false,
+    template_nested_fields:           true,      # WIP nested smart forms functionality - default off
+    enable_dual_report:               true,
+    matrix_carry_over:                false,
+    attach_pdf_submission:            false,
     configurable_agenda_dispositions: false,
+    share_meeting_agendas:            true,
 
     # Airline-Specific Features:
     observation_phases_trend: false,     # Specific Feature for BSK - default off

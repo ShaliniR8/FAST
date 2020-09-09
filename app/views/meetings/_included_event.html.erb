@@ -3,7 +3,7 @@
     <%@report_headers.each do |h|%>
       <td class="<%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
         <% if h[:field] == 'get_minutes_agenda' %>
-          <%= event.get_minutes_agenda(meeting.id) %>
+          <%= event.get_minutes_agenda(meeting) %>
         <% else %>
           <%=render "forms/show_field", :record => event, :field_hash => h%>
         <% end %>

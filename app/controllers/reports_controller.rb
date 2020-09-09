@@ -433,12 +433,10 @@ class ReportsController < ApplicationController
     end
   end
 
-
-
-
   def get_agenda
     @report = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
+    @agendas = @report.get_agendas(@meeting)
     @headers = AsapAgenda.get_headers
     @status = AsapAgenda.get_status
     @tof = {"Yes" => true,"No" => false}
