@@ -38,24 +38,27 @@ class Config < Thor
     spec['database'] = target_db
     ActiveRecord::Base.establish_connection(spec)
     %w[
-      access_levels
+      activity_trackers
       agendas
       attachments
       audits
       automated_notifications
-      causes
       checklist_cells
+      checklist_header_items
       checklist_headers
       checklist_items
       checklist_questions
       checklist_records
       checklist_rows
-      checklist_templates
       checklists
+      causes
+      connections
       contacts
       children
       corrective_actions
       costs
+      distribution_list_connections
+      distribution_lists
       documents
       evaluations
       expectations
@@ -67,27 +70,35 @@ class Config < Thor
       inspections
       investigations
       issues
+      matrix_connections
       meetings
       message_accesses
       messages
       notices
       occurrences
+      orm_fields
       orm_submission_fields
       orm_submissions
+      orm_templates
       packages
       parents
       participations
       private_links
+      queries
       query_conditions
       query_statements
+      query_visualizations
       recommendations
       record_fields
       records
       recurrences
       report_meetings
       reports
+      risk_analyses
       risk_controls
-      root_causes
+      risk_matrix_cells
+      risk_matrix_groups
+      risk_matrix_tables
       safety_plans
       section_fields
       sections
@@ -97,6 +108,8 @@ class Config < Thor
       sras
       submission_fields
       submissions
+      root_causes
+      tax_attributes
       trackings
       transactions
       verifications
