@@ -494,7 +494,11 @@ class RecordsController < ApplicationController
         transaction_content
       )
     end
-    @owner.event_date=@owner.covert_time(@owner.event_date)
+
+    if CONFIG.sr::GENERAL[:submission_time_zone]
+      @owner.event_date=@owner.covert_time(time: @owner.event_date, timezone: @owner.event_time_zone)
+    end
+
     @owner.save
     redirect_to record_path(@owner)
   end
