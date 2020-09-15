@@ -184,6 +184,120 @@ class ChecklistsController < ApplicationController
     end
   end
 
+# TODO: move helper methods ####################
+  def parse_iosa(child, result)
+    case child.name
+    when 'text'
+      result = parse_iosa_text(child, result)
+    when 'Emphasis'
+      result = parse_iosa_emphasis(child, result)
+    when 'nbsp'
+      # add new space?
+    when 'List'
+      result = parse_iosa_list(child, result)
+    when 'Para'
+      result = parse_iosa_para(child, result)
+    end
+
+    return result
+  end
+
+  def parse_iosa_para(element, result)
+    element.children.each do |child|
+      case child.name
+      when 'text', 'XRef'
+        result = parse_iosa_text(child, result) if child.text != '\n'
+      when 'List'
+        result = parse_iosa_list(child, result)
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_text(element, result)
+    result += element.text
+  end
+
+  def parse_iosa_emphasis(element, result)
+    result += "<b>" + element.children[0].text + "</b>"
+  end
+
+  def parse_iosa_list(element, result)
+    list_type = element.attributes["type"].value
+
+    case list_type
+    when 'lower-roman'
+      element.children.each do |item|
+        result = parse_iosa_list_item_roman(item, result)
+      end
+    when 'alphabetical'
+      element.children.each do |item|
+        result = parse_iosa_list_item_alphabet(item, result)
+      end
+    when 'bullet'
+      element.children.each do |item|
+        result = parse_iosa_list_item_bullet(item, result)
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_roman(element, result)
+    case element.name
+    when 'ListItem'
+      if element.children.length == 1
+
+        result += "<br>" if $lower_roman[$index_roman] == 'i'
+
+        result += "&nbsp;&nbsp;" + $lower_roman[$index_roman] + '.&nbsp;&nbsp;' + element.text.to_s + '<br>'
+        $index_roman += 1
+      else
+        temp_str = ''
+
+        element.children.each do |child|
+          case child.name
+          when 'text'
+            temp_str = parse_iosa_text(child, temp_str)
+          when 'Emphasis'
+            temp_str = parse_iosa_emphasis(child, temp_str)
+          when 'List'
+            temp_str = parse_iosa_list(child, temp_str)
+          end
+        end
+
+        result += "&nbsp;&nbsp;" + $lower_roman[$index_roman] + '.&nbsp;&nbsp;' + temp_str + '<br>'
+        $index_roman += 1
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_alphabet(element, result)
+    case element.name
+    when 'List'
+      # result = parse_iosa_list(element, result)
+    when 'ListItem'
+      result += "&nbsp;&nbsp;&nbsp;&nbsp;" + $alphabetical[$index_alphabet] + '.&nbsp;&nbsp;' + element.text.to_s + '<br>'
+      $index_alphabet += 1
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_bullet(element, result)
+    case element.name
+    when 'ListItem'
+      result += "&nbsp;&nbsp;" + "- " + element.text.to_s + '<br>'
+    end
+
+    return result
+  end
+###############################################
+
+
   def upload_xml(upload, owner)
     begin
       xml = Nokogiri::XML(upload)
@@ -209,6 +323,8 @@ class ChecklistsController < ApplicationController
                       'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']
 
       questions.each_with_index do |question, index|
+
+        break if index == 15
 
         question_hash = []
         question.children.each do |children|
@@ -246,7 +362,7 @@ class ChecklistsController < ApplicationController
             end
 
             end_str = child_text.rindex(/\;/)
-            child_text = child_text[0..(end_str-1)]
+            child_text = child_text[0..(end_str-1)] # remove last ';'
             question_hash << [children.name, child_text] if children.elem?
           else
             question_hash << [children.name, children.text] if children.elem?
