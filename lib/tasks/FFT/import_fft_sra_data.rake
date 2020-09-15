@@ -120,7 +120,6 @@ def create_sras(xlsx, start_row, end_row)
 end
 
 def create_hazards(user, row, sra, department)
->>>>>>> 9c4b9811... Frontier Historical SRA import scripts
 
   # HAZARD 1
   col_hazard1_risk_factor       = 27
