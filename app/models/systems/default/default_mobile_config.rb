@@ -37,6 +37,7 @@ class DefaultMobileConfig
 
     #ATN portals
     atn_training_dir: { label: 'Training',                      subdomain: 'atn-training'},
+    atn_dir:          { label: 'General',                       subdomain: 'atn'},
     #atn_training_sso: { label: 'Training SSO',                  subdomain: 'fft-training',  sso: true},
     #atn_dir:          { label: 'Login with ProSafeT',           subdomain: 'fft'},
     #atn_sso:          { label: 'SSO',                           subdomain: 'fft',           sso: true},
@@ -87,22 +88,19 @@ class DefaultMobileConfig
     'SCX Beta Key'=>{ # 35E1-98A2-2C8F-A912
       key_name: 'Sun Country Airlines Mobile Beta',
       portals: %i[
-        scx_training_sso
         scx_training_dir
-        scx_shrtrain_sso
-        scx_shrtrain_dir
+        scx_training_sso
       ]
     },
 
 
     'FFT Beta Key' =>{ # EE6C-D7FB-19B0-8377
-      key_name: 'Frontier Airlines Mobile Beta',
+      key_name: 'Frontier Airlines Mobile',
       portals: %i[
-        fft_sso
         fft_dir
       ]
     },
-    
+
     'FFT Key' =>{ # 4D25-BE28-93CA-8088
       key_name: 'Frontier Airlines',
       portals: %i[
@@ -117,12 +115,12 @@ class DefaultMobileConfig
         atn_training_dir
       ]
     },
-    # 'ATN Key' =>{ # EF23-C9BC-C96D-1417
-    #   key_name: 'Air Transport International',
-    #   portals: %i[
-    #     atn_sso
-    #   ]
-    # },
+    'ATN Key' =>{ # EF23-C9BC-C96D-1417
+      key_name: 'Air Transport International',
+      portals: %i[
+        atn_dir
+      ]
+    },
 
     'Trial Key' => { # 6158-BC31-0338-233B
       key_name: 'Trial',
