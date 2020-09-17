@@ -409,7 +409,6 @@ class Record < Sr::SafetyReportingBase
         timezone << {CONFIG::CISP_TIMEZONES.key(record.event_time_zone) => record.event_time_zone}
       else
         timezone << {"UTC" => "UTC"}
-        p "#{index+1}: record##{record.id} - event_time_zone is missing"
       end
     end
 
