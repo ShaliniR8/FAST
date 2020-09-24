@@ -22,11 +22,9 @@ class NotifyMailer < ApplicationMailer
     @notice = notice
     @link = g_link(notice.owner)
     @message = record
-
     object_name = record.class.name
     object_id   = record.id
     title       = record.description rescue ''
-
     if object_name == 'Submission'
       submission_type = record.template.name
       filename = "#{object_name}_#{object_id}_#{submission_type}_#{title}"
@@ -67,6 +65,7 @@ class NotifyMailer < ApplicationMailer
     @submission_id = submission.id
     @submission_description = submission.get_description
     @submission_url = g_link(submission)
+    @submitter_message = submission.template.submitter_message.gsub("\n", '<br>') rescue nil
     define_attachments
     subject = "ProSafeT: Submission ##{submission.id} Received"
     mail(**to_email(user.email), subject: subject).deliver

@@ -70,6 +70,20 @@
                   {:class => "form-control"}%>
               </div>
             </div>
+            <div class='col-xs-12 mt20'>
+              <div class="form-inline col-xs-6">
+                <%=f.label :submitter_message, "Submitter Confirmation Message"%>
+                <%=f.text_area :submitter_message,
+                :class => "form-control ",
+                :rows => 4%>
+              </div>
+              <div class="form-inline col-xs-6">
+                <%=f.label :notifier_message, "Notifier Notification Message"%>
+                <%=f.text_area :notifier_message,
+                :class => "form-control ",
+                :rows => 4%>
+              </div>
+            </div>
 
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style="margin-top:10px; margin-bottom:10px">
               <div class="col-xs-12">
