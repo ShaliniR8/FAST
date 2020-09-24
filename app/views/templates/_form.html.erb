@@ -63,9 +63,10 @@
                   {:class => "form-control"}%>
               </div>
               <div class="form-inline col-xs-3">
+                <%default_status = @template.default_status || 'New'%>
                 <%=f.label :default_status, "Default Status"%>
                 <%=f.select :default_status,
-                  options_for_select(Record.progress.keys, @template.default_status),
+                  options_for_select(Record.progress.keys, default_status),
                   {},
                   {:class => "form-control"}%>
               </div>

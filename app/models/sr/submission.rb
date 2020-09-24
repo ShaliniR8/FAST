@@ -101,7 +101,7 @@ class Submission < Sr::SafetyReportingBase
         description:        description,
         event_date:         event_date,
         users_id:           user_id,
-        status:             (self.template.default_status rescue 'New'),
+        status:             (self.template.default_status || 'New'),
         anonymous:          anonymous,
         event_time_zone:    event_time_zone,
       )
