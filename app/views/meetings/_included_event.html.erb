@@ -1,7 +1,8 @@
 <% events.each do |event| %>
   <tr data-id="<%=event.id%>">
     <%@report_headers.each do |h|%>
-      <td class="<%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
+      <%formatting = h[:title] == 'Attachments' ? 'attachments' : ''%>
+      <td class="<%=formatting%> width-cap <%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
         <% if h[:field] == 'get_minutes_agenda' %>
           <%= event.get_minutes_agenda(meeting) %>
         <% else %>
