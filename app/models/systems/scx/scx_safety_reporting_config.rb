@@ -152,7 +152,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
             required: false
           }, #Gets overridden in view- see included_events.html.erb
           additional_info: {
-            field: 'additional_info', title: 'Has Attachments',
+            field: 'additional_info', title: 'Attachments',
             num_cols: 12, type: 'text', visible: 'meeting_form,meeting',
             required: false
           },
