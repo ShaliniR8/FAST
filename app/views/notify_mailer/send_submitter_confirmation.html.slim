@@ -6,7 +6,7 @@ html
     br = "You have received the following confirmation message for your Submission ##{@submission_id}, #{@submission_description} :"
     br
     br
-    - if @submitter_message
+    - if @submitter_message.present?
       = @submitter_message.html_safe
       br = @submission_url.html_safe
     - else

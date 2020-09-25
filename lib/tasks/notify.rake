@@ -32,7 +32,7 @@ task :submission_notify => [:environment] do |t|
 
       controller.notify(owner, notice: {
         users_id: user_id,
-        content: content ? content : "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
+        content: content.present? ? content : "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
         mailer: true, subject: "New #{owner.template.name} Submission",
         attachment: attachment
       )
