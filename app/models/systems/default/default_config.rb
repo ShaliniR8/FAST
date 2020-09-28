@@ -35,10 +35,11 @@ class DefaultConfig
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
-    base_risk_matrix:                   true,    # Indicates the use of the default risk matrix - default on
+    base_risk_matrix:                   false,    # Indicates the use of the default risk matrix - default on
     configurable_risk_matrices:         false,   # Enables the use of varied risk matrices - default off
     has_root_causes:                    true,    # Enables the use of root causes - default on
     shared_links:                       false,   # Enables shareable links to be created for forms - default off
+    drop_down_risk_selection:           false,
 
     # TO BE REMOVED:
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)
@@ -175,8 +176,19 @@ class DefaultConfig
 
   MATRIX_INFO = {
     severity_table: {
-      starting_space: true,
-      row_header: ['5','4','3','2','1'],
+      title: 'SEVERTIY EXERCISE',
+
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      row_header_name: 'CLASS',
+      row_header: ['4', '3', '2', '1', '0'],
+      column_header_name: 'SEVERITY',
       column_header: [
         'Safety (Impact)',
         'People (Injury)',
@@ -201,9 +213,20 @@ class DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: '',
       row_header: [''],
-      column_header: ['A','B','C','D','E'],
+      column_header_name: 'PROBABILITY',
+      column_header: ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent'],
       rows: [
         [
           'Improbable (10 Years)',
@@ -224,23 +247,32 @@ class DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
-      row_header: ['5','4','3','2','1'],
-      column_header: ['A','B','C','D','E'],
-      rows: [
-        ['yellow','red','red','red','red'],
-        ['yellow','yellow','red','red','red'],
-        ['limegreen','yellow','yellow','yellow','red'],
-        ['limegreen','limegreen','yellow','yellow','yellow'],
-        ['limegreen','limegreen','limegreen','yellow','yellow']
+      title: 'RISK ASSESSMENT MATRIX',
 
-      ]
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+
+      row_header_name: 'SEVERITY',
+      row_header: ['4', '3', '2', '1', '0'],
+      column_header_name: 'PROBABILITY',
+      column_header: ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent'],
+      rows_color: [
+        ['yellow',    'yellow',     'orange',     'orange',     'orange' ],
+        ['yellow',    'yellow',     'yellow',     'orange',     'orange' ],
+        ['#60FF60',   '#60FF60',    'yellow',     'yellow',     'orange' ],
+        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60'],
+        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60']
+
+      ],
     },
 
     risk_definitions: {
-      red:       {rating: "HIGH",     cells: "A4, A3, B4",     description: "Unacceptable"                 },
-      yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
-      limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
+      '#60FF60' => {rating: 'Green - Acceptable',      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
+      yellow:      {rating: 'Yellow - Acceptable with mitigation', cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
+      orange:      {rating: 'Orange - Unacceptable',     cells: "A4, A3, B4",     description: "Unacceptable"                 },
     },
 
     risk_table_index: {
@@ -248,12 +280,6 @@ class DefaultConfig
       "Moderate"  => 'yellow',
       "Low"       => 'limegreen'
     },
-
-    risk_table_dict: {
-      red:        "High",
-      yellow:     "Moderate",
-      limegreen:  "Low"
-    }
   }
 
   # Calculate the severity based on the airlines's risk matrix

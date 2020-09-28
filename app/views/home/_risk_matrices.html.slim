@@ -1,0 +1,25 @@
+ruby:
+  has_access = case session[:mode]
+    when 'ASAP'
+      current_user.has_access("records", "show") &&
+      current_user.has_access("reports", "show")
+    when 'SMS'
+      true
+    when 'SRM'
+      current_user.has_access('hazards','index') &&
+      AIRLINE_CODE != 'Demo'
+    when 'SMS IM'
+      true
+    end
+
+- if has_access
+  #risk-matrix-parent.col-xs-12.col-sm-12
+    - if CONFIG::GENERAL[:base_risk_matrix]
+      .col-xs-6
+        = render 'risk_matrices/dashboard_matrix/baseline/matrix'
+      = render 'after_matrix'
+    - else
+      .col-xs-6
+        = render 'risk_matrices/dashboard_matrix/baseline/matrix'
+      .col-xs-6
+        = render 'risk_matrices/dashboard_matrix/mitigate/matrix'

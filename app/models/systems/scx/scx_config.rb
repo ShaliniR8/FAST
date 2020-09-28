@@ -32,8 +32,19 @@ class SCXConfig < DefaultConfig
 
   MATRIX_INFO = {
     severity_table: {
-      starting_space: true,
+      title: 'SEVERTIY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :left,
+      size: 'col-xs-8',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      column_header_name: 'SEVERITY',
       column_header: ['1','2','3','4','5'],
+      row_header_name: 'CLASS',
       row_header: [
         'Accident or Incident',
         'Employee/Customer Injury',
@@ -153,10 +164,20 @@ class SCXConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
-      row_header: ['A', 'B', 'C', 'D'],
-      column_header: ['Reactive Assessment (Control Effectiveness)', 'Proactive Assessment (Likelihood)'],
+      title: 'PROBABILITY EXERCISE',
 
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-4',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: 'PROBABILITY',
+      row_header: ['A', 'B', 'C', 'D'],
+      column_header_name: 'CRITERIA',
+      column_header: ['Reactive Assessment (Control Effectiveness)', 'Proactive Assessment (Likelihood)'],
       rows: [
         [ #A
           "<center><b>Not Effective</b></center>Remaining controls were ineffective or no controls remained. The only thing preventing an accident were luck or exceptional skill, which is not trained or required",
@@ -185,41 +206,26 @@ class SCXConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
+      title: 'RISK ASSESSMENT MATRIX',
+
+      size: 'col-xs-8',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+
+      column_header_name: 'SEVERITY',
       column_header: ['1','2','3','4','5'],
+      row_header_name: 'PROBABILITY',
       row_header: ['A', 'B', 'C', 'D'],
-      rows: [
+
+      rows_color: [
         ["crimson",     "crimson",      "coral",          "yellow",         "mediumseagreen"      ],
         ["crimson",     "coral",        "yellow",         "steelblue",      "mediumseagreen"      ],
         ["coral",       "yellow",       "steelblue",      "mediumseagreen", "mediumseagreen"      ],
         ["yellow",      "steelblue",    "mediumseagreen", "mediumseagreen", "mediumseagreen"      ],
-      ]
+      ],
     },
-
-    risk_table_dict: {
-      crimson:        'Red (A/1, A/2, B/1) - High',
-      coral:          'Orange (A/3, B/2, C/1) - Serious',
-      yellow:         'Yellow (A/4 B/3, D/1) - Moderate',
-      steelblue:      'Blue (B/4, C/3, D/2) - Minor',
-      mediumseagreen: 'Green (A/5, B/5, C/4, C/5, D/3, D/4, D/5) - Low',
-    },
-
-    risk_table_index: {
-      "High" => 'crimson',
-      "Serious" => 'coral',
-      "Moderate" => 'yellow',
-      "Minor" => 'steelblue',
-      "Low" => 'mediumseagreen'
-    },
-
-    risk_table_dict: {
-      crimson:        "High",
-      coral:          "Serious",
-      yellow:         "Moderate",
-      steelblue:      "Minor",
-      mediumseagreen: "Low"
-    },
-
 
     risk_definitions: {
       crimson:          { rating: 'High',      cells: 'A/1, A/2, and B/1',                      description: '' },

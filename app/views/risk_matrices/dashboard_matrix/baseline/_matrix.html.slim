@@ -1,0 +1,144 @@
+.panel.panel-success
+  .panel-heading
+    .panel-title
+      .top_text
+        = @matrix_title
+      / switch btns
+      - case session[:mode]
+      - when 'ASAP'
+        .top_buttons.pull-right
+          b = link_to 'Events', '#', class: 'btn btn-info show_record', id: 'matrix_switch'
+      - when 'SMS'
+        .top_buttons.pull-right
+          b = link_to 'Investigations', '#', class: 'btn btn-info show_finding', id: 'matrix_switch'
+  .panel-body
+    table.table.table-bordered.table-centered.table-hover id='risk_matrix'
+      thead
+        tr
+          /ROW_HEADER
+          th.header
+            = @risk_table[:row_header_name]
+          /COLUMN_HEADER
+          th.header colspan="#{@risk_table[:column_header].size}"
+            = @risk_table[:column_header_name]
+        tr
+          th.col-header
+          - @risk_table[:column_header].each do |col_header|
+            th.col-header = col_header.html_safe
+      tbody
+        - @risk_table[:row_header].each_with_index do |row_header, row_index|
+          tr
+            th.row-header = row_header.html_safe
+            - @risk_table[:column_header].each_with_index do |_, col_index|
+              - @row = row_index
+              - @col = col_index
+              - @cell_bg_color = @risk_table[:rows_color][@row][@col]
+              - case session[:mode]
+              - when 'ASAP'
+                = render 'risk_matrices/dashboard_matrix/baseline/asap_td'
+              - when 'SMS'
+                = render 'risk_matrices/dashboard_matrix/baseline/sms_td'
+              - when 'SRM'
+                = render 'risk_matrices/dashboard_matrix/baseline/srm_td'
+
+  .mr10 align='right'
+    a href="#" id="export"
+      u = 'Download Table'
+
+css:
+  .header {
+    background-color: #BDB76B;
+    color: white;
+  }
+
+  .col-header {
+    background-color: #FFFFF0;
+    width: 15%;
+  }
+
+  .row-header {
+    background-color: #FFFFF0;
+  }
+
+javascript:
+  $(document).ready(function() {
+
+    // var cw = $('.color_cell').width();
+    // $('.color_cell').css({'height':cw+'px'});
+
+    $('#export').on('click', function(){
+      html2canvas($('#risk_matrix'),{
+        onrendered: function(canvas){
+          var saveAs = function(uri, filename){
+            var link = document.createElement('a');
+            if(typeof link.download === 'string'){
+              document.body.appendChild(link); // Firefox requires the link to be in the body
+              link.download = filename;
+              link.href = uri;
+              link.click();
+              document.body.removeChild(link); // remove the link when done
+            }else{
+              location.replace(uri);
+            }
+          };
+
+          var img = canvas.toDataURL("image/png"),
+              uri = img.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+
+          if ($("#matrix_switch").hasClass('show_finding')){
+            saveAs(uri, 'Baseline Risk Analysis-Findings.png');
+          }else if($("#matrix_switch").hasClass('show_inv')){
+            saveAs(uri, 'Baseline Risk Analysis-Investigations.png');
+          }else if($("#matrix_switch").hasClass('show_record')){
+            saveAs(uri, 'Baseline Risk Analysis-Reports.png');
+          }else if($("#matrix_switch").hasClass('show_report')){
+            saveAs(uri, 'Baseline Risk Analysis-Events.png');
+          }
+        }
+      });
+    });
+
+    $("#matrix_switch").on('click',function(){
+      // Safety Assurance Module
+      if ($(this).hasClass('show_finding')) {
+        $(this).removeClass("show_finding").addClass("show_inv").text("Corrective Actions");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Investigations</b>");
+        $('.finding_cell').hide();
+        $('.inv_cell').show();
+      }
+      else if($(this).hasClass("show_car")){
+        $(this).removeClass("show_car").addClass("show_finding").text("Investigations");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Findings</b>");
+        $('.car_cell').hide();
+        $('.finding_cell').show();
+      }
+      else if($(this).hasClass("show_inv")) {
+        $(this).removeClass("show_inv").addClass("show_car").text("Findings");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Corrective Actions</b>");
+        $('.inv_cell').hide();
+        $('.car_cell').show();
+
+      // Safety Reporting Module
+      }
+      else if($(this).hasClass("show_record")) {
+        $(this).removeClass("show_record").addClass("show_report").text("Reports");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Events</b>");
+        $('.record_cell').hide();
+        $('.report_cell').show();
+      }
+      else if($(this).hasClass("show_report")) {
+        $(this).removeClass("show_report").addClass("show_record").text("Events");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Reports</b>");
+        $('.report_cell').hide();
+        $('.record_cell').show();
+
+      }
+    });
+
+    // $('.color_cell').on('click',function(){
+    //   console.log("!!");
+    //   window.location=$(this).attr('href');
+    // });
+
+
+  })

@@ -30,10 +30,10 @@
 
         <tr>
           <th style="width:18%"></th>
-          <th colspan="5"><center>Likelihood</center></th>
+          <th colspan="5"><center><%= @risk_table[:row_header_name]%></center></th>
         </tr>
         <tr>
-          <th style="width:18%"><center>Severity</center></th>
+          <th style="width:18%"><center><%= @risk_table[:column_header_name]%></center></th>
           <%@like.each do |header| %>
             <th style="width:15%"><center><%=header%></center></th>
           <%end%>
