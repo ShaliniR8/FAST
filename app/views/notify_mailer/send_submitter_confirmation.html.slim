@@ -3,15 +3,15 @@ html
     = "Hello #{@user.full_name},"
     br
     br
-    br = "You have received the following confirmation message for your Submission ##{@submission_id}, #{@submission_description} :"
+    br = "You have received the following confirmation message for your submission ##{@submission_id}, #{@submission_description}:"
     br
     br
     - if @submitter_message.present?
       = @submitter_message.html_safe
-      br = @submission_url.html_safe
     - else
-      ="This message is to confirm that your Submission ##{@submission_id}, #{@submission_description}, has been successfully submitted." " #{@submission_url.html_safe}".html_safe
-      br
+      ="This message is to confirm that your submission ##{@submission_id}, #{@submission_description}, has been successfully submitted."
+    = @submission_url.html_safe
+    br
     br Thank you,
     | ProSafeT System
     br = image_tag(attachments['logo.png'].url, :size => '145x35')

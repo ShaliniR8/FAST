@@ -75,12 +75,14 @@
               <div class="form-inline col-xs-6">
                 <%=f.label :submitter_message, "Submitter Confirmation Message"%>
                 <%=f.text_area :submitter_message,
+                :placeholder => ('This message is to confirm that your submission #ID, Title, has been successfully submitted.' if @template.submitter_message.blank?),
                 :class => "form-control ",
                 :rows => 4%>
               </div>
               <div class="form-inline col-xs-6">
                 <%=f.label :notifier_message, "Notifier Notification Message"%>
                 <%=f.text_area :notifier_message,
+                :placeholder => ('A new Template Name submission is submitted. (#ID  Title)' if @template.notifier_message.blank?),
                 :class => "form-control ",
                 :rows => 4%>
               </div>
