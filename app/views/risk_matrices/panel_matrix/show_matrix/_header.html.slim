@@ -1,0 +1,33 @@
+.col-xs-12
+  span data-toggle="modal" data-target=".bs-example-modal-lg"
+    = link_to 'Mitigate Risk', '#', class: 'btn btn-warning pull-right ml5', id: 'mitigate_btn', 'data-toggle' => 'tooltip', 'data-placement' => 'top', title: 'Assess Mitigated Risk'
+
+  span data-toggle="modal" data-target=".bs-example-modal-lg"
+    = link_to 'Baseline Risk', '#', class: 'btn btn-info pull-right', id: 'baseline_btn', 'data-toggle' => 'tooltip', 'data-placement' => 'top', title: 'Assess Baseline Risk'
+
+- unless CONFIG::GENERAL[:drop_down_risk_selection]
+  .col-xs-12.mb20
+    b = 'Notes: '
+    .col-xs-11.col-xs-offset-1
+      - if @owner.statement.present?
+        = @owner.statement.gsub(/\n/, '<br/>').html_safe
+
+.col-xs-12.mt20
+  h4
+    span.label.label-baseline = 'Baseline'
+    span.label.label-mitigated = 'Mitigated'
+    span.label.label-overlapped = 'Overlapped'
+
+css:
+  .label-baseline{
+    background-color: #AFEEFC;
+    color: #404040;
+  }
+  .label-mitigated{
+    background-color: #FCAFCB;
+    color: #404040;
+  }
+  .label-overlapped{
+    background-color: #CABCF6;
+    color: #404040;
+  }

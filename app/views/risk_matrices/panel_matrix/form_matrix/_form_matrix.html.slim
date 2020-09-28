@@ -1,0 +1,12 @@
+- case risk_type
+- when 'Baseline'
+  = f.hidden_field :severity,          value: '',  id: 'sev'
+  = f.hidden_field :likelihood,        value: '',  id: 'like'
+  = f.hidden_field :risk_factor,       value: '',  id: 'risk_fact'
+- when 'Mitigate'
+  = f.hidden_field :severity_after,    value: '',  id: 'sev'
+  = f.hidden_field :likelihood_after,  value: '',  id: 'like'
+  = f.hidden_field :risk_factor_after, value: '',  id: 'risk_fact'
+
+= render 'risk_matrices/panel_matrix/form_matrix/header', f: f, risk_type: risk_type
+= render 'risk_matrices/panel_matrix/risk_content', action: 'form', f: f

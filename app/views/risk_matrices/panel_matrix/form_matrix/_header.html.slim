@@ -1,0 +1,12 @@
+=render 'shared/instructions', instruction: "Select <b>#{risk_type} Probability</b> and <b>#{risk_type} Severity</b> from the table to assess risk."
+
+- unless CONFIG::GENERAL[:drop_down_risk_selection]
+  .form-group.col-xs-12
+    =f.label :statement, 'Notes'
+    =f.text_area :statement, {class: 'form-control ml5', rows: '2'}
+
+.col-xs-12.mt20
+  h4
+    span.label.label-baseline = 'Baseline'
+    span.label.label-mitigated = 'Mitigated'
+    span.label.label-overlapped = 'Overlapped'

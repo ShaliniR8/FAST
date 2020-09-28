@@ -1,0 +1,37 @@
+.col-xs-6
+  hr
+  h4
+    b = 'RISK ASSESSMENT'
+  .col-xs-6
+    h5
+      b = 'BASELINE RISK'
+      br
+      br
+    P
+      b = 'Severity: '
+      = @owner.severity
+    p
+      b = 'Likelihood: '
+      = @owner.likelihood
+    p
+      b = 'Risk Factor: '
+      = @owner.risk_factor
+  .col-xs-6
+    h5
+      b = 'MITIGATED RISK'
+      br
+      br
+    P
+      b = 'Severity: '
+      = @owner.severity_after
+    p
+      b = 'Likelihood: '
+      = @owner.likelihood_after
+    p
+      b = 'Risk Factor: '
+      = @owner.risk_factor_after
+  .col-xs-10.mt10.mb10
+    b = 'Notes:'
+    br
+    - if @owner.statement.present?
+      = @owner.statement.gsub(/\n/, '<br/>').html_safe
