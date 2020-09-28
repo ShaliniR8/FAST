@@ -22,6 +22,7 @@ class DefaultSafetyReportingConfig
     observation_phases_trend: false,     # Specific Feature for BSK - default off
     event_summary:            false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
     event_tabulation:         false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
+    allow_event_reuse:        true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
   }
 
   OBSERVATION_PHASES = [

@@ -160,7 +160,7 @@ class MeetingsController < ApplicationController
     @users = User.find(:all) - [current_user]
     @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
     @report_headers = Report.get_meta_fields('meeting_form')
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.reports_for_meeting
   end
 
 
@@ -339,14 +339,14 @@ class MeetingsController < ApplicationController
     @timezones = Meeting.get_timezones
     @report_headers = Report.get_headers
     @associated_reports = @meeting.reports.map(&:id)
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.reports_for_meeting
   end
 
 
   def get_reports
     @report_headers = Report.get_meta_fields('index')
     @meeting = Meeting.find(params[:id])
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.reports_for_meeting
     @reports = @reports.where('id NOT IN (?)', @meeting.reports.map(&:id)) if @meeting.reports.present?
     render :partial => "reports"
   end

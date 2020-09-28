@@ -49,6 +49,15 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+  def self.reports_for_meeting
+    if CONFIG.sr::GENERAL[:allow_event_reuse]
+      where(status: ['Meeting Ready', 'Under Review'])
+    else
+      where(status: ['Meeting Ready'])
+    end
+  end
+
+
   def title
     name
   end
