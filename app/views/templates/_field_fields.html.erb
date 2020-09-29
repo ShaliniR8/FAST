@@ -25,7 +25,6 @@
       <%= f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
     <%end%>
   </td>
-
   <td><%=f.text_field   :label,                                               {:class => "form-control"}%>                    </td>
   <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {:class => "form-control date-type-select"}%>   </td>
   <td><%=f.select       :data_type,     Field.getData_type, {},               {:class => "form-control"}%>                    </td>
@@ -33,10 +32,10 @@
   <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-  <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
-  <%if defined?(locals).nil?%>
+  <% if params[:action] == 'edit' %>
+    <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
     <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
-  <%end%>
+  <% end %>
   <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
   <td>
     <%if source == 'Existing'%>
