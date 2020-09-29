@@ -30,7 +30,7 @@
 
           <%=render "/forms/form_fields", :f => f, :fields => @fields, :record => @hazard%>
 
-          <%=render "shared/choose_form_matrix", :f => f, :type => 'hazards'%>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', f: f, risk_type: 'Baseline'%>
 
           <%=render '/forms/attachments_form', :f => f, :owner => @hazard%>
 

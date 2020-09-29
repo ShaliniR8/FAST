@@ -121,21 +121,17 @@ class InvestigationsController < SafetyAssuranceController
     @owner = Investigation.find(params[:id])
     load_special_matrix_form("investigation", "mitigate", @owner)
     load_options
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/mitigate"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
-    end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
   def baseline
     @owner = Investigation.find(params[:id])
     load_options
     load_special_matrix_form("investigation", "baseline", @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/baseline"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 end

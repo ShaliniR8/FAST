@@ -38,15 +38,7 @@
           current_user.has_access("sms_actions","edit")%>
 
         <% unless ['BSK'].include? AIRLINE_CODE %>
-          <%= render 'shared/choose_show_matrix',
-            :owner => @owner,
-            :show_btn => true,
-            :type => "sms_actions",
-            :like => @like,
-            :color_matrix => @color_matrix,
-            :frequency => @frequency,
-            :allow_mitigate => true,
-            :can_change => can_change %>
+          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
         <% end %>
 
         <%= render '/panels/show_panels', owner: @owner %>

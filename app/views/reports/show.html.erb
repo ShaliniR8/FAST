@@ -146,17 +146,8 @@
 
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
 
-          <%=render "closing_note"%>
-          <%=render "record_table"%>
-          <%=render 'shared/choose_show_matrix',
-            :owner => @report,
-            :show_btn => true,
-            :type => 'reports',
-            :allow_mitigate => true,
-            # :color_matrix => @color_matrix,
-            # :frequency => @frequency,
-            # :like => @like,
-            :can_change => can_change%>
+          <% @owner = @report %>
+          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
 
           <%= render '/panels/show_panels', owner: @report%>
 

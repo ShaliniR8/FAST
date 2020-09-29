@@ -242,15 +242,9 @@
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
-          <%=render 'shared/choose_show_matrix',
-            :owner => @record,
-            :show_btn => true,
-            :type => 'records',
-            :allow_mitigate => true,
-            :like => @like,
-            :color_matrix => @color_matrix,
-            :frequency => @frequency,
-            :can_change => can_change%>
+
+          <% @owner = @record %>
+          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
 
           <%if @record.corrective_actions.present?%>
             <div class="col-xs-12 col-lg-12">

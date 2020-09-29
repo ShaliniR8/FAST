@@ -36,7 +36,7 @@
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
 
           <% unless ['BSK'].include? AIRLINE_CODE %>
-            <%=render "shared/choose_form_matrix", :f => f, :type => 'sms_actions'%>
+            <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', f: f, risk_type: 'Baseline'%>
           <% end %>
 
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
