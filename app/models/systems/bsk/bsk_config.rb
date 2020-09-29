@@ -15,8 +15,10 @@ class BSKConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:               true,
+    drop_down_risk_selection:     true,
 
     # TO BE REMOVED
+    base_risk_matrix:             true,
     has_verification:             true,
     hazard_root_cause_lock:       true
   })

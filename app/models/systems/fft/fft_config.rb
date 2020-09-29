@@ -53,8 +53,19 @@ class FFTConfig < DefaultConfig
 
   MATRIX_INFO = {
     severity_table: {
-      starting_space: true,
+      title: 'SEVERTIY EXERCISE',
+
+      orientation: :vertical,
+      direction: :down,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
+      column_header_name: 'CATEGORY',
       column_header: ['Regulatory',"Accident/Incident/</br>Damage/OSHA",'Operational Events','Company Impact'],
       rows: [
         [ # Negligible
@@ -99,8 +110,19 @@ class FFTConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: '',
       row_header: [''],
+      column_header_name: 'PROBABILITY',
       column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
         [
@@ -122,22 +144,32 @@ class FFTConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
+      title: 'RISK ASSESSMENT MATRIX',
+
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+
+      row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
+      column_header_name: 'PROBABILITY',
       column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
-        ["limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
-        ["limegreen",     "limegreen",    "steelblue",      "steelblue",    "yellow"     ],
-        ["limegreen",     "steelblue",    "yellow",         "yellow",       "orange"     ],
-        ["steelblue",     "yellow",       "yellow",         "orange",       "red"        ],
-        ["steelblue",     "yellow",       "orange",         "red",          "red"        ]
-      ],
-      rows_content: [
         ['2',     '3',    '4',      '5',    '6'  ],
         ['4',     '6',    '8',      '10',   '12' ],
         ['6',     '9',    '12',     '15',   '18' ],
         ['8',     '12',   '16',     '20',   '24' ],
         ['10',    '15',   '20',     '25',   '30' ]
+      ],
+
+      rows_color: [
+        ["limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
+        ["limegreen",     "limegreen",    "steelblue",      "steelblue",    "yellow"     ],
+        ["limegreen",     "steelblue",    "yellow",         "yellow",       "orange"     ],
+        ["steelblue",     "yellow",       "yellow",         "orange",       "red"        ],
+        ["steelblue",     "yellow",       "orange",         "red",          "red"        ]
       ]
     },
 

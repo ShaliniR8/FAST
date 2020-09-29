@@ -44,8 +44,19 @@ class ATNConfig < DefaultConfig
 
   MATRIX_INFO = {
     severity_table: {
-      starting_space: true,
+      title: 'SEVERTIY EXERCISE',
+
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      row_header_name: 'SEVERITY',
       row_header: ['I','II','III','IV'],
+      column_header_name: 'CATEGORY',
       column_header: ['Consequence','or','or','or','or'],
       rows: [
         [ # I
@@ -87,8 +98,19 @@ class ATNConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: 'PROBABILITY',
       row_header: ['A - Frequent','B - Probable','C - Occasional','D - Remote'],
+      column_header_name: 'CRITERIA',
       column_header: ['Fleet/System/Inventory','Specific Individual Item 1','Specific Individual Item 2'],
 
       rows: [
@@ -123,16 +145,27 @@ class ATNConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
+      title: 'RISK ASSESSMENT MATRIX',
+
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+
+      row_header_name: 'PROBABILITY',
       row_header: ['A','B','C','D'],
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV'],
-      rows: [
+
+      rows_color: [
         ["red",     "red",       "orange",      "yellow"      ],
         ["red",     "orange",    "yellow",      "steelblue"   ],
         ["orange",  "yellow",    "steelblue",   "limegreen"   ],
         ["yellow",  "steelblue", "limegreen",   "limegreen"   ]
       ],
-      rows_content: [
+
+      rows: [
         ['1',     '1',     '2',      '3' ],
         ['1',     '2',     '3',      '4' ],
         ['2',     '3',     '4',      '5' ],

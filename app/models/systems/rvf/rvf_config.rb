@@ -64,7 +64,7 @@ class RVFConfig < DefaultConfig
         'OSHA',
         'Airworthiness',
         'Audit Finding'
-      ],      
+      ],
       column_header: ['I','II','III','IV','V'],
       rows: [
         [ #Accident or Incident
@@ -106,23 +106,23 @@ class RVFConfig < DefaultConfig
           'Major Regulatory </br>Deviation</br>&gt;$1M',
           'Moderate Regulatory </br>Deviation</br>&gt;$250K',
           'Minor Regulatory </br>Deviation</br>&gt;$50K',
-          'Company Policy and/or Procedure Deviation</br>&lt;$50K</center',          
+          'Company Policy and/or Procedure Deviation</br>&lt;$50K</center',
           'No deviation; continue monitoring</br>(Informational Report)'
-        ],   
+        ],
         [ #OSHA
           'Willful',
           'Repeat',
           'Serious',
           'General/Other',
           'No deviation; continue monitoring</br>(Informational Report)'
-        ],       
+        ],
         [ #Airworthiness
           'Returning an aircraft to service and operating it in a nonstandard, unairworthy, or unsafe condition',
           'Returning an aircraft to service and operating it in a nonstandard or unairworthy, but not unsafe condition',
           'Returning an aircraft to service in a nonstandard, unairworthy, or unsafe condition, not operated',
           'Affecting aircraft or systems reliability above established control limits but no effect on airworthiness or safety of operation of an aircraft',
           'No safety implication</br>(Informational Report)'
-        ],  
+        ],
         [ #Audit Finding
           'Willful violation of any safety regulation that could result in serious injury or death',
           'A noncompliance finding resulting in major system, process, or operational degradation',
@@ -185,7 +185,9 @@ class RVFConfig < DefaultConfig
 
     risk_table: {
       starting_space: true,
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV','V'],
+      row_header_name: 'PROBABILITY',
       row_header: ['A', 'B', 'C', 'D', 'E'],
       rows: [
         ["crimson",     "crimson",      "coral",          "coral",          "yellow"         ],
@@ -242,7 +244,7 @@ class RVFConfig < DefaultConfig
       return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
     end
   end
-  
+
   ULTIPRO_DATA = {
     upload_path: '/var/sftp/fftsftpuser/ProSafeT_User_List.XML',
     expand_output: false, #Shows full account generation details
