@@ -424,8 +424,19 @@ class RecordsController < ApplicationController
     @record = Record.find(params[:id])
     @meta_field_args = ['show']
     @meta_field_args << 'admin' if current_user.global_admin?
-    html = render_to_string(:template => "/records/print.html.erb")
-    pdf = PDFKit.new(html)
+    html = render_to_string(:template => "/pdfs/print_record.html.erb")
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Report_##{@record.get_id}" + (@deidentified ? '(de-identified)' : '')

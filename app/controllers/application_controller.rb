@@ -285,17 +285,78 @@ class ApplicationController < ActionController::Base
 
     # :edit handled safely by link_to in render_buttons
 
-    #TODO- properly make the print functionality class ambiguous (applies for pdf and deid_pdf)
-    # when :print
-    #   # Add to filter_before for defining @owner and class
-    #   @deidentified = params[:deidentified]
-    #   html = render_to_string(:template=>"/audits/print.html.erb")
-    #   pdf = PDFKit.new(html)
-    #   pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    #   pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    #   filename = "Audit_#{@audit.get_id}" + (@deidentified ? '(de-identified)' : '')
-    #   send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+    # TODO - properly make the print functionality class ambiguous (applies for pdf and deid_pdf)
+    when :pdf
+      mod = session[:mode]
+      # TODO - refactor SR and SMS IM printing
+      owner_class_name = @owner.class.name
+      name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
+      owner_name = name_mapping.present? ? name_mapping : owner_class_name
+      # Only for SA and SRM
+      if mod != 'ASAP' && mod != 'SMS IM'
+        # begin action specific behavior
+        print_special_matrix(@owner) if owner_class_name == 'Hazard'
+        # end
+        @deidentified = params[:deidentified]
+        @meta_field_args = ['show']
+        @meta_field_args << 'admin' if current_user.global_admin?
+        html = render_to_string(:template=>"/pdfs/print.html.slim")
+        pdf_options = {
+          header_html:  'app/views/pdfs/print_header.html',
+          header_spacing:  2,
+          header_right: '[page] of [topage]'
+        }
+        if CONFIG::GENERAL[:has_pdf_footer]
+          pdf_options.merge!({
+            footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+            footer_spacing:  3,
+          })
+        end
+        pdf = PDFKit.new(html, pdf_options)
+        pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+        pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+        filename = "#{owner_name}_#{@owner.get_id}" + (@deidentified ? '(de-identified)' : '')
+        send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+      else
+        redirect_to eval("print_#{owner_class_name.downcase}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
+        return false
+      end
 
+    when :deid_pdf
+      mod = session[:mode]
+      # TODO - refactor SR and SMS IM printing
+      owner_class_name = @owner.class.name
+      name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
+      owner_name = name_mapping.present? ? name_mapping : owner_class_name
+      # Only for SA and SRM
+      if mod != 'ASAP' && mod != 'SMS IM'
+        # begin action specific behavior
+        print_special_matrix(@owner) if owner_class_name == 'Hazard'
+        # end
+        @deidentified = params[:deidentified]
+        @meta_field_args = ['show']
+        @meta_field_args << 'admin' if current_user.global_admin?
+        html = render_to_string(:template=>"/pdfs/print.html.slim")
+        pdf_options = {
+          header_html:  'app/views/pdfs/print_header.html',
+          header_spacing:  2,
+          header_right: '[page] of [topage]'
+        }
+        if CONFIG::GENERAL[:has_pdf_footer]
+          pdf_options.merge!({
+            footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+            footer_spacing:  3,
+          })
+        end
+        pdf = PDFKit.new(html, pdf_options)
+        pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+        pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+        filename = "#{owner_name}_#{@owner.get_id}" + (@deidentified ? '(de-identified)' : '')
+        send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+      else
+        redirect_to eval("print_#{owner_class_name.downcase}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
+        return false
+      end
     # :finding redirect handled in render_buttons
 
     # :hazard redirect handled in render_buttons
@@ -771,7 +832,7 @@ class ApplicationController < ActionController::Base
 
   # sample arg => notice: {users_id: 1, content: 'Audit is assigned'}, mailer: true, subject: 'Audit Assigned'
   def notify(record, arg)
-    if arg[:notice][:users_id].present? && record.present?
+    if arg[:notice][:users_id].present? && record.present? && record.respond_to?(:notices)
       notice = record.notices.create(arg[:notice])
       puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]

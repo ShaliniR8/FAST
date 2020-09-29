@@ -1,0 +1,4 @@
+- owner.recommendations.each do |r|
+	= render '/pdfs/print',
+		owner: r,
+		deidentified: deidentified

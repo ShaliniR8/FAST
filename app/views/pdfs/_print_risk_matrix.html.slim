@@ -1,0 +1,32 @@
+- if (owner.has_attribute?(:risk_factor) && owner.has_attribute?(:risk_factor_after) && owner.has_attribute?(:statement))
+  .col-xs-12
+    .sub_sub_title Risk Assessment
+    .content
+      - if owner.risk_factor.present?
+        .col-xs-6
+          b Baseline Severity:
+          =< owner.severity
+          br
+          b Baseline Likelihood:
+          =< owner.likelihood
+          br
+          b Baseline Risk:
+          =< owner.risk_factor
+          br
+          br
+      - if owner.risk_factor_after.present?
+        .col-xs-6
+          b Mitigated Severity:
+          =< owner.severity_after
+          br
+          b Mitigated Likelihood:
+          =< owner.likelihood_after
+          br
+          b Mitigated Risk:
+          =< owner.risk_factor_after
+          br
+      - if owner.statement.present?
+        .col-xs-12
+          b Risk Assessment Notes:
+          br
+          =< simple_format(owner.statement)

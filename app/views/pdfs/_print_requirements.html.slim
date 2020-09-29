@@ -1,0 +1,27 @@
+- if owner.requirements.present?
+  .col-xs-12
+    hr
+    .title Requirement Checklist
+    .content
+      table.table.table-bordered.table-striped
+        thead
+          tr
+            - fields.each do |h|
+              th= h[:title]
+        tbody
+          - owner.requirements.each do |requirement|
+            tr
+              - fields.each do |h|
+                td class=("#{h[:html_class].present? ? requirement.send(h[:html_class]) : ''}")
+                  - case h[:type]
+                  - when 'date'
+                    = requirement.send(h[:field]).strftime("%Y-%m-%d") rescue ''
+                  - when 'datetime'
+                    = requirement.send(h[:field]).strftime("%Y-%m-%d %H:%M") rescue ''
+                  - when 'textarea'
+                    = requirement.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue ''
+                  - when 'user'
+                    - if !deidentified
+                      = User.find(requirement.send(h[:field])).full_name
+                  - else
+                    = requirement.send(h[:field])

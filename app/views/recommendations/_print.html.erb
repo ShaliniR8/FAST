@@ -1,8 +1,0 @@
-<div class="title">
-  Recommendation #<%=owner.get_id%>: <%=owner.title%>
-</div>
-
-<%=render "/forms/print_fields",
-  :fields => Recommendation.get_meta_fields('show'),
-  :owner => owner,
-  :deidentified => deidentified%>

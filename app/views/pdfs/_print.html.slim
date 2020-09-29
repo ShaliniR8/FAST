@@ -1,0 +1,27 @@
+.col-xs-12.wrap
+  - if !(defined?(first_print) && first_print)
+    hr
+  - owner_class_name = owner.class.name
+  - name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
+  - owner_name = name_mapping.present? ? name_mapping : owner_class_name
+  - source_of_input = defined?(source_of_input) && source_of_input
+  - if source_of_input
+    .title Source of Input:
+    .col-xs-12.sub_title = "#{owner_name} ##{owner.get_id}: #{owner.title}"
+  - else
+    .title
+      =< "#{owner_name} ##{owner.get_id}: #{owner.title}"
+  .content
+    - fields = Object.const_get(owner.class.to_s).get_meta_fields('show')
+    = render '/pdfs/print_fields',
+      fields: fields,
+      owner: owner,
+      deidentified: deidentified
+      / print just fields for source of input panel
+    - if !source_of_input
+      = render '/pdfs/choose_print_risk_matrix', owner: owner
+      = render '/pdfs/print_checklists', owner: owner
+      / skip source of input for launch item panels (sra, investigation)
+      - launch_item = defined?(launch_item) ? launch_item : false
+      - options = {launch_item: launch_item}
+      = render '/pdfs/print_panels', owner: owner, deidentified: deidentified, options: options

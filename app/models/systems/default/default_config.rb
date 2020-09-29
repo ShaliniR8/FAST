@@ -31,6 +31,7 @@ class DefaultConfig
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
     cisp_integration:                   false,
     hide_asap_submissions_in_dashboard: false,
+    has_pdf_footer:                     false,    # Enables custom airline footer
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
@@ -40,7 +41,7 @@ class DefaultConfig
     shared_links:                       false,   # Enables shareable links to be created for forms - default off
 
     # TO BE REMOVED:
-    allow_set_alert:                    false,   # Allows forms to use alerts (notifications to users/self)
+    allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)
     has_extension:                      true,   # Allows forms to request extensions
     has_verification:                   true,   # Allows forms to be verified (additional step)
   }
@@ -56,7 +57,7 @@ class DefaultConfig
 
   OBJECT_NAME_MAP = {
     'Sra'       => 'SRA',
-    'SmsAction' => 'Corrective Action (SA)',
+    'SmsAction' => 'Corrective Action',
     'Record'    => 'Report',
     'Report'    => 'Event'
   }

@@ -1,0 +1,6 @@
+- if CONFIG::GENERAL[:base_risk_matrix]
+	= render '/pdfs/print_risk_matrix',
+		owner: owner
+- else
+	= render "/pdfs/#{AIRLINE_CODE}/print_risk_matrix",
+		owner: owner

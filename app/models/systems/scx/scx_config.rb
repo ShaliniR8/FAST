@@ -11,6 +11,7 @@ class SCXConfig < DefaultConfig
     # AIRLINE-SPECIFIC CONFIGS
     name:                               'Sun Country Airlines',
     time_zone:                          'Central Time (US & Canada)',
+    has_pdf_footer:                      true,
 
     # SYSTEM CONFIGS
     enable_sso:                         true,

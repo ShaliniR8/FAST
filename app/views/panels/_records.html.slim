@@ -1,25 +1,10 @@
 .col-xs-12
-  .panel.clickable.panel-info
+  .panel.panel-info
     .panel-heading.click-heading.collapsed
       .panel-title
-        = title || records.first.class.name
+        = link_to "Report ##{record.id}: #{record.title}", record
         span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
     .panel-body style='display:none'
-      table.table.table-bordered.table-striped
-        thead
-          - records.first.class.get_meta_fields('index').each do |header|
-            th #{header[:title]}
-          th Action
-        tbody
-          - records.each do |record|
-            tr
-              - records.first.class.get_meta_fields('index').each do |header|
-                td
-                  = render '/forms/show_field',
-                    record: record,
-                    field_hash: header
-              td
-                = link_to 'View',
-                  record,
-                  :class => 'btn btn-info',
-                  :disable_with => 'Redirecting...'
+      = render 'records/show',
+                owner: record,
+                show_btn: show_btns

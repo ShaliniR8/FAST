@@ -29,7 +29,7 @@ class SmsActionsController < SafetyAssuranceController
     :new_attachment,
     :override_status,
     :show,
-    :update
+    :update,
   ]
 
   before_filter(only: [:new])    {set_parent_type_id(:sms_action)}
@@ -119,18 +119,6 @@ class SmsActionsController < SafetyAssuranceController
   def reassign
     @owner = SmsAction.find(params[:id])
     render :partial => "reassign"
-  end
-
-
-  def print
-    @deidentified = params[:deidentified]
-    @corrective_action = SmsAction.find(params[:id])
-    html = render_to_string(:template => "/sms_actions/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Corrective Action##{@corrective_action.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
 

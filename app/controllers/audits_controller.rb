@@ -32,7 +32,7 @@ class AuditsController < SafetyAssuranceController
     :update,
     :update_checklist_records,
     :upload_checklist,
-    :viewer_access
+    :viewer_access,
   ]
 
   before_filter(only: [:new])    {set_parent_type_id(:audit)}
@@ -184,18 +184,6 @@ class AuditsController < SafetyAssuranceController
 
   def update_checklist_records
     render :partial => "checklist_templates/update_checklist_records"
-  end
-
-
-  def print
-    @deidentified = params[:deidentified]
-    @audit = Audit.find(params[:id])
-    html = render_to_string(:template=>"/audits/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Audit_#{@audit.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
 

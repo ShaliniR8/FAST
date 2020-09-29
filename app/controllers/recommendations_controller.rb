@@ -26,7 +26,7 @@ class RecommendationsController < SafetyAssuranceController
     :new_attachment,
     :override_status,
     :show,
-    :update
+    :update,
   ]
 
   before_filter(only: [:new])    {set_parent_type_id(:recommendation)}
@@ -106,14 +106,4 @@ class RecommendationsController < SafetyAssuranceController
   end
 
 
-  def print
-    @deidentified = params[:deidentified]
-    @recommendation = Recommendation.find(params[:id])
-    html = render_to_string(:template => "/recommendations/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Recommendation_##{@recommendation.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
 end

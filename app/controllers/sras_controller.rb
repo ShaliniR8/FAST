@@ -301,16 +301,6 @@ class SrasController < ApplicationController
     render :partial => '/forms/workflow_forms/override_status'
   end
 
-  def print
-    @deidentified = params[:deidentified]
-    @sra = Sra.find(params[:id])
-    html = render_to_string(:template => "/sras/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "SRA_##{@sra.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
 
   def comment
     @owner = Sra.find(params[:id])

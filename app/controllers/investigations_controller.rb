@@ -26,7 +26,7 @@ class InvestigationsController < SafetyAssuranceController
     :new_attachment,
     :show,
     :update,
-    :viewer_access
+    :viewer_access,
   ]
 
   before_filter(only: [:new])    {set_parent_type_id(:investigation)}
@@ -114,18 +114,6 @@ class InvestigationsController < SafetyAssuranceController
     @fields = Investigation.get_meta_fields('show')
     @recommendation_fields = Recommendation.get_meta_fields('show')
     load_special_matrix(@investigation)
-  end
-
-
-  def print
-    @deidentified = params[:deidentified]
-    @investigation = Investigation.find(params[:id])
-    html = render_to_string(:template => "/investigations/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Investigation_##{@investigation.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
 

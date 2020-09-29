@@ -27,7 +27,7 @@ class EvaluationsController < SafetyAssuranceController
     :show,
     :update,
     :upload_checklist,
-    :viewer_access
+    :viewer_access,
   ]
 
   before_filter(only: [:new])    {set_parent_type_id(:evaluation)}
@@ -51,18 +51,6 @@ class EvaluationsController < SafetyAssuranceController
     @fields = Evaluation.get_meta_fields('form')
   end
 
-
-  def print
-    @deidentified = params[:deidentified]
-    @evaluation = Evaluation.find(params[:id])
-    @requirement_headers = EvaluationRequirement.get_meta_fields('show')
-    html = render_to_string(:template=>"/evaluations/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Evaluation_##{@evaluation.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
 
   def new_requirement
     @audit = Evaluation.find(params[:id])

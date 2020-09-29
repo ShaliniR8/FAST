@@ -1,0 +1,16 @@
+- case parent.class.name
+- when 'Record'
+  = render '/pdfs/print_record',
+    deidentified: deidentified,
+    owner: parent,
+    source_of_input: true
+- when 'Report'
+  = render '/pdfs/print_report',
+    deidentified: deidentified,
+    owner: parent,
+    source_of_input: true
+-else
+  = render '/pdfs/print',
+    owner: parent,
+    deidentified: deidentified,
+    source_of_input: true

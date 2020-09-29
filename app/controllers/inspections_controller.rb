@@ -27,7 +27,7 @@ class InspectionsController < SafetyAssuranceController
     :show,
     :update,
     :upload_checklist,
-    :viewer_access
+    :viewer_access,
   ]
 
   before_filter(only: [:new])    {set_parent_type_id(:inspection)}
@@ -50,19 +50,6 @@ class InspectionsController < SafetyAssuranceController
   def edit
     load_options
     @fields = Inspection.get_meta_fields('form')
-  end
-
-
-  def print
-    @deidentified = params[:deidentified]
-    @inspection = Inspection.find(params[:id])
-    @requirement_headers = InspectionRequirement.get_meta_fields('show')
-    html = render_to_string(:template=>"/inspections/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Inspection_##{@inspection.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
 

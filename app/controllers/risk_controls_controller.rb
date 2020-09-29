@@ -208,19 +208,6 @@ class RiskControlsController < ApplicationController
   end
 
 
-
-  def print
-    @deidentified = params[:deidentified]
-    @risk_control = RiskControl.find(params[:id])
-    html = render_to_string(:template => "/risk_controls/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Risk_Control_##{@risk_control.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
   def reopen
     @risk_control = RiskControl.find(params[:id])
     reopen_report(@risk_control)

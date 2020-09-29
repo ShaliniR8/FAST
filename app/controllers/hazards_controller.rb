@@ -270,19 +270,6 @@ class HazardsController < ApplicationController
   end
 
 
-
-  def print
-    @deidentified = params[:deidentified]
-    @hazard = Hazard.find(params[:id])
-    print_special_matrix(@hazard)
-    html = render_to_string(:template => "/hazards/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Hazard_##{@hazard.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
   def comment
     @owner = Hazard.find(params[:id])
     @comment = @owner.comments.new

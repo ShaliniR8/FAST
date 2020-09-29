@@ -56,7 +56,18 @@ class FaaReportsController < ApplicationController
         (x.template.name.include? "#{@report.employee_group}")}
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     html = render_to_string(:template=>"/faa_reports/print.html.erb")
-    pdf = PDFKit.new(html)
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     send_data pdf.to_pdf, :filename => "FAA_Quarterly_Report_#{@report.year}_Quarter#{@report.quarter}.pdf"

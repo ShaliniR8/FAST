@@ -27,7 +27,7 @@
               <%=link_to "Edit", edit_srm_meeting_path(@meeting), :id=>"edit-btn", :class=>"btn btn-warning pull-right mr5", :disable_with => "Editing..."%>
             <%end%>
             <%=link_to "PDF",
-              print_srm_meeting_path(@meeting, format: :pdf),
+              interpret_srm_meeting_path(@meeting, act: :pdf, format: :pdf, deidentified: false),
               :class => "btn btn-darkturquoise pull-right mr5"%>
             <%=link_to "Expand All","#",:class=>"btn btn-default mr5 expandall pull-right"%>
           </div>

@@ -1,5 +1,5 @@
 module ApplicationHelper
-  include ShowFormHelper
+  include ShowDataHelper
 
   def getAlltemplates
     return Template.find(:all)

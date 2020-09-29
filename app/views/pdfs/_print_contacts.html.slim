@@ -1,0 +1,12 @@
+- contacts.each do |contact|
+  .col-xs-12
+    hr
+    .title
+      = "Contact ##{contact.id}"
+      = contact.contact_name
+    .content
+      - fields = Contact.get_meta_fields('show')
+      = render '/pdfs/print_fields',
+        fields: fields,
+        owner: contact,
+        deidentified: deidentified

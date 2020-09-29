@@ -1,0 +1,53 @@
+<div class='col-xs-12 wrap'>
+  <%if !(defined?(first_print) && first_print)%>
+    <hr>
+  <%end%>
+  <%owner_class_name = owner.class.name%>
+  <%name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]%>
+  <%owner_name = name_mapping.present? ? name_mapping : owner_class_name%>
+  <%if defined?(source_of_input) && source_of_input%>
+    <div class='title'> Source of Input: </div>
+    <div class='col-xs-12 sub_title'>
+      <%="#{owner_name} ##{owner.get_id}: #{owner.title}"%>
+    </div>
+  <%else%>
+    <div class='title'>
+      <%="#{owner_name} ##{owner.get_id}: #{owner.title}"%>
+    </div>
+  <%end%>
+  <div class="content">
+    <%=render "/pdfs/print_fields",
+      :fields => Report.get_meta_fields('show', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : ''),
+      :owner => owner,
+      :deidentified => deidentified%>
+
+    <%if !(defined?(source_of_input) && source_of_input)%>
+      <%if CONFIG::GENERAL[:base_risk_matrix]%>
+        <%= render "/pdfs/print_risk_matrix", :owner => owner %>
+      <%else%>
+        <%= render "/pdfs/#{AIRLINE_CODE}/print_risk_matrix", :owner => owner %>
+      <%end%>
+
+      <%=render '/pdfs/print_records_table', :owner => owner, :deidentified => deidentified%>
+      <%=render "/pdfs/print_occurrences", :owner => owner %>
+      <%if !(defined?(skip_launch_item) && skip_launch_item == 'sras')%>
+        <%=render 'pdfs/print_sras',
+          sras: owner.get_children(child_type: 'Sra'),
+          deidentified: deidentified%>
+      <%end%>
+      <%if !(defined?(skip_launch_item) && skip_launch_item == 'investigations')%>
+        <%=render 'pdfs/print_investigations',
+        investigations: owner.get_children(child_type: 'Investigation'),
+        deidentified: deidentified%>
+      <%end%>
+      <%if !(defined?(skip_meetings) && skip_meetings)%>
+        <%=render '/pdfs/print_meetings', owner: owner, deidentified: deidentified%>
+      <%end%>
+      <%=render '/pdfs/print_agendas', owner: owner, deidentified: deidentified%>
+      <%=render '/pdfs/print_corrective_actions', :owner => owner, :deidentified => deidentified%>
+      <%=render "pdfs/print_comments",
+        comments: owner.comments%>
+    <%end%>
+  </div>
+</div>
+

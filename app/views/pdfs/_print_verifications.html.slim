@@ -1,0 +1,11 @@
+- records.each do |record|
+  .col-xs-12
+    hr
+    .title
+      = "Verification ##{record.id}"
+    .content
+      - fields = Verification.get_meta_fields('show')
+      = render '/pdfs/print_fields',
+        fields: fields,
+        owner: record,
+        deidentified: deidentified

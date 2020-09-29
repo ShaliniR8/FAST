@@ -1,0 +1,16 @@
+- users = owner.invitations.map{|x| x.user}
+- if users.present?
+  .col-xs-12
+    hr
+    .title Participants
+    ul.content
+      - headers = User.invite_headers.map{ |h| h[:title] }
+      - invitees = User.includes(:invitations).where(id: users.select(&:present?).map(&:id))
+      - invitees.each do |user|
+        - header_index = 0
+        li
+          - User.invite_headers.each do |header|
+            b = "#{headers[header_index]}: "
+            => " #{user.send(header[:field])}"
+            - header_index = header_index + 1
+            br

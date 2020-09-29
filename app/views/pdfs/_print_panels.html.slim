@@ -1,0 +1,2 @@
+- print_panels(owner, options).each do |panel|
+	= render panel[:print_partial], **(panel.merge(deidentified: deidentified, owner: owner)).except(:print_partial, :partial) if panel[:print_partial]

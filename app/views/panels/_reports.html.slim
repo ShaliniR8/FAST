@@ -2,9 +2,9 @@
   .panel.panel-info
     .panel-heading.click-heading.collapsed
       .panel-title
-        = link_to "Report ##{record.id}: #{record.title}", record
+        = link_to "Event ##{report.id}: #{report.title}", report
         span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
     .panel-body style='display:none'
-      = render 'records/show',
-                owner: record,
+      = render 'reports/show',
+                owner: report,
                 show_btn: show_btns

@@ -317,7 +317,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments source_of_input sras reports events findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments source_of_input sras findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 

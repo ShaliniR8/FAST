@@ -1,7 +1,0 @@
-.title
-  = "Cost ##{owner.id}"
-.content
-  - fields = Cost.get_meta_fields('show')
-  = render "forms/print_fields",
-    :fields => fields,
-    :owner => owner

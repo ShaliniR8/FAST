@@ -20,6 +20,12 @@ end
 
 class SrmMeetingsController < ApplicationController
   before_filter :set_table_name,:login_required
+  before_filter :define_owner, only: [:interpret]
+
+  def define_owner
+    @class = Object.const_get('Meeting')
+    @owner = Meeting.find(params[:id]).becomes(Meeting)
+  end
 
   def destroy
     @meeting = Meeting.find(params[:id])
@@ -344,12 +350,4 @@ class SrmMeetingsController < ApplicationController
   end
 
 
-  def print
-    @meeting = Meeting.find(params[:id])
-    html = render_to_string(:template=>"/srm_meetings/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    send_data pdf.to_pdf, :filename => "Meeting_##{@meeting.get_id}.pdf"
-  end
 end

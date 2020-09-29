@@ -83,7 +83,7 @@ ruby:
 
   - when :deid_pdf
     = link_to 'De-ID PDF',
-      eval("print_#{owner_class}_path(@audit, format: :pdf, deidentified: true)"),
+      eval("interpret_#{owner_class}_path(owner, act: :deid_pdf, format: :pdf, deidentified: true)"),
       class: 'btn btn-darkturquoise pull-right mr5 mb5'
 
   - when :delete
@@ -148,7 +148,7 @@ ruby:
 
   - when :pdf
     = link_to 'PDF',
-      eval("print_#{owner_class}_path(@audit, format: :pdf, deidentified: false)"),
+      eval("interpret_#{owner_class}_path(owner, act: :pdf, format: :pdf, deidentified: false)"),
       class: 'btn btn-darkturquoise pull-right mr5 mb5'
 
   - when :private_link

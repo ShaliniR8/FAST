@@ -1,0 +1,121 @@
+<%content_present = false%>
+<%skip_panel = false%>
+<%fields.each_with_index do |field, i|%>
+  <%if !skip_panel%>
+    <%next if (field[:censor_deid] && @deidentified)%>
+    <%if field[:type] == 'newline'%>
+      </br>
+    <%elsif field[:type] == 'panel_start'%>
+      <%content_present = false%>
+      <%j = 1%>
+      <%next_field = fields[i + 1]%>
+      <!-- keep looking for content in the panel until it reaches the panel end or content is found -->
+      <%while !content_present && next_field && next_field[:type] != 'panel_end'%>
+        <%if next_field[:field]%>
+          <%value = owner.send(next_field[:field])%>
+          <%content_present = true if (value.any?(&:present?) rescue value.present?)%>
+        <%end%>
+        <%j = j + 1%>
+        <%next_field = fields[i + j]%>
+      <%end%>
+      <!-- if the panel has content display the panel title -->
+      <%if content_present%>
+        <div class="col-xs-12">
+          <div class="sub_sub_title">
+            <%=field[:title]%>
+          </div>
+      <%else%>
+        <%skip_panel = true%>
+      <%end%>
+    <%elsif field[:type] == 'panel_end'%>
+      </div>
+    <%elsif field[:type] == 'select_multiple'%>
+      <%print_field = field[:print_field]%>
+      <%value = print_field ? owner.send(print_field) : nil%>
+      <%if value.present?%>
+        <div class="col-xs-<%=field[:num_cols]%>">
+          <b><%=field[:title]%>: </b>
+          <%if field[:display].present?%>
+            <%=field[:display][value]%>
+          <%else%>
+            <%=value%>
+          <%end%>
+        </div>
+      <%end%>
+    <%else%>
+      <%value = owner.send(field[:field])%>
+      <%if value.present?%>
+        <%case field[:type]%>
+          <%when 'textarea'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b></br>
+              <%=value.gsub(/\n/, '<br/>').html_safe%>
+            </div>
+          <%when 'checkbox'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=value.reject(&:empty?).join(", ")%>
+            </div>
+
+          <%when 'boolean'%>
+            <%boolean_options = {true => "Yes", false => "No"}%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=boolean_options[value]%>
+            </div>
+
+          <%when 'boolean_box'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=value ? 'Yes' : 'No'%>
+            </div>
+
+          <%when 'date'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=date_to_string(value)%>
+            </div>
+
+          <%when 'datetime'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=datetime_to_string(value)%>
+            </div>
+
+          <%when 'datetimez'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=datetimez_to_string(value)%>
+            </div>
+
+          <!-- if deidentified is true then skip user fields -->
+          <%when 'user'%>
+            <%if !deidentified%>
+              <div class="col-xs-<%=field[:num_cols]%>">
+                <b><%=field[:title]%>: </b>
+                <%=User.find(value).full_name rescue value.to_s%>
+              </div>
+            <%end%>
+
+          <%when 'select'%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%if field[:display].present?%>
+                <%=field[:display][value]%>
+              <%else%>
+                <%=value%>
+              <%end%>
+            </div>
+          <%else%>
+            <div class="col-xs-<%=field[:num_cols]%>">
+              <b><%=field[:title]%>: </b>
+              <%=value%>
+            </div>
+        <%end%>
+      <%end%>
+    <%end%>
+  <%else%>
+    <%field = field[i]%>
+    <%skip_panel = false if field == 'panel_end' || field.nil?%>
+  <%end%>
+<%end%>

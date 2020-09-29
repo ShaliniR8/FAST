@@ -1,0 +1,19 @@
+-if owner.agendas.present?
+  .col-xs-12
+    .title Meeting Agenda
+    - owner.agendas.each do |agenda|
+      .col-xs-12
+        b> User:
+        => agenda.get_user
+        b> Date/Time:
+        => agenda.get_created
+        b> Discuss:
+        => agenda.discussion ? "Yes" : "No"
+        b> Disposition:
+        => agenda.accepted ? "Accepted" : "Declined"
+        b> Comment:
+        => agenda.comment
+
+
+
+

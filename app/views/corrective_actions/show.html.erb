@@ -131,13 +131,13 @@
         </div>
 
 
-        <%=render "/forms/show_fields", 								:record 	=> @corrective_action, :fields => @fields%>
-        <%=render '/panels/show_panels', 								:owner   	=> @corrective_action%>
-        <%=render('/extension_requests/show_requests', 	:records 	=> @corrective_action.extension_requests) if @corrective_action.extension_requests.present?%>
-        <%=render('/verifications/show_verifications', 	:records 	=> @corrective_action.verifications) if @corrective_action.verifications.present?%>
-        <%=render "/forms/show_comment", 								:owner 		=> @corrective_action%>
-        <%=render "/forms/attachments_show", 						:owner 		=> @corrective_action%>
-        <%=render "records/transactions", 							:owner 		=> @corrective_action%>
+        <%=render "/forms/show_fields",                           :record   => @corrective_action, :fields => @fields%>
+        <%=render '/panels/show_panels',                          :owner    => @corrective_action%>
+        <%=render('/extension_requests/show_extension_requests',  :records  => @corrective_action.extension_requests) if @corrective_action.extension_requests.present?%>
+        <%=render('/verifications/show_verifications',            :records  => @corrective_action.verifications) if @corrective_action.verifications.present?%>
+        <%=render "/forms/show_comment",                          :owner    => @corrective_action%>
+        <%=render "/forms/attachments_show",                      :owner    => @corrective_action%>
+        <%=render "records/transactions",                         :owner    => @corrective_action%>
 
       </div>
     </div>

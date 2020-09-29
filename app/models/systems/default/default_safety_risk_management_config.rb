@@ -188,7 +188,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[agendas comments source_of_input hazards extension_requests verifications reports events attachments transaction_log
+        panels: %i[agendas comments source_of_input hazards extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
@@ -273,7 +273,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[risk_assessment occurrences risk_controls comments extension_requests verifications attachments transaction_log
+        panels: %i[risk_assessment risk_controls occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'RiskControl' => {
@@ -460,7 +460,7 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[],
           #INLINE
-          *%i[],
+          *%i[pdf],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[included_sras participants attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },

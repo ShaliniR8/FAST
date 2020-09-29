@@ -1,0 +1,13 @@
+- if owner.present? && owner.comments.present?
+  .col-xs-12
+    hr
+    .title Submitter Notes
+    ul.content
+    - owner.comments.each do |c|
+      li
+        b> Content:
+        = c.get_content
+        br
+        b> Submit Date:
+        = date_to_string(Date.parse c.get_subnmission_time)
+        br

@@ -108,16 +108,6 @@ class SafetyPlansController < ApplicationController
   end
 
 
-
-  def print
-    @fields = SafetyPlan.get_meta_fields('show')
-    @safety_plan = SafetyPlan.find(params[:id])
-    html = render_to_string(:template => "/safety_plans/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    send_data pdf.to_pdf, :filename => "Safety_Plan_##{@safety_plan.get_id}.pdf"
-  end
-
   def comment
     @owner = SafetyPlan.find(params[:id])
     @comment = @owner.comments.new

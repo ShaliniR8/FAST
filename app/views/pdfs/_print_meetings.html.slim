@@ -1,0 +1,6 @@
+- skip_events = owner.class.name == 'Report' ? true : false
+- owner.meetings.each do |meeting|
+  = render '/pdfs/print_meeting',
+    owner: meeting,
+    deidentified: deidentified,
+    skip_events: skip_events
