@@ -69,8 +69,7 @@
           <%end%>
         <%end%>
       <%elsif field.display_type == "checkbox"%>
-        </br>
-        <div class="<%=field.display_size == 12 && field.show_label ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">
@@ -85,7 +84,7 @@
           </div>
         </div>
       <%elsif field.display_type == "radio"%>
-        <div  class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> <%=field.show_label ? 'mt5' : ''%>">
+        <div  class="<%=field.display_size == 12%> <%=field.show_label ? 'mt5' : ''%>">
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">
@@ -186,7 +185,7 @@
         <%end%>
       <%elsif field.display_type == "checkbox"%>
         </br>
-        <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">
           <%current_options = @record_field.value.split(";") rescue ''%>
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
@@ -209,7 +208,7 @@
 
       <!-- Render Radio button groups -->
       <%elsif field.display_type == "radio"%>
-        <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">  <div class="col-xs-12">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">  <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <label class="radio">
                 <div class="col-xs-6">

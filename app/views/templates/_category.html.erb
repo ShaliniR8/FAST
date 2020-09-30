@@ -10,35 +10,57 @@
     </div>
     <div class="panel-body" style="display:none">
 
-      <div class="row">
+      <div class="row" id="fields">
         <div class="col-xs-12">
           <font style="color:blue;font-weight:bold"><%=cat.description%></font>
         </div>
 
-        <%cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order).each do |field|%>
-          <%=render "field", :field => field%>
-          <%if field.nested_fields.where(:deleted => false).present?%>
-            <div class='col-xs-12'>
-              <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-                <div class="nested_field
-                  nested_field_<%=field.id%>
-                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
-                  style="display:none;">
-                  <%=render "field", :field => nested_field%>
+        <%fields = cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order)%>
+        <%category_fields_by_rows = group_by_column_size_and_nested_fields(fields: fields)%>
+
+        <%category_fields_by_rows.each do |row| %>
+          <div class="row is-flex">
+            <%row.each do |field| %>
+
+              <%=render "field", :field => field%>
+
+              <%if field.nested_fields.where(:deleted => false).present?%>
+                <div class='col-xs-12'>
+                  <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+                    <div class="nested_field
+                      nested_field_<%=field.id%>
+                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                      style="display:none;">
+                      <%=render "field", :field => nested_field%>
+                    </div>
+                  <%end%>
                 </div>
               <%end%>
-            </div>
-          <%end%>
+
+            <%end%>
+          </div>
+          <hr>
         <%end%>
+
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .smallselect {
-    position: relative;
-    top: 50%;
+  #fields {
+    margin: 0 15px;
+  }
+
+  .row.is-flex {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .row.is-flex > [class*='col-'] {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
   }
 </style>
 

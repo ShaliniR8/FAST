@@ -355,6 +355,38 @@ module ApplicationHelper
   end
 
 
+  def group_by_column_size_and_nested_fields(fields:)
+
+    arr_group_by_column_size = []
+    arr_temp = []
+    column_size = 0
+
+    fields.each do |field|
+
+      # make new row when column size exceed 12
+      if field.display_size + column_size > 12
+        column_size = 0
+        arr_group_by_column_size << arr_temp
+        arr_temp = []
+      end
+
+      # add field in the row
+      column_size += field.display_size
+      arr_temp << field
+
+      # make new row when there is nested_fields
+      if field.nested_fields.present?
+        column_size = 0
+        arr_group_by_column_size << arr_temp
+        arr_temp = []
+      end
+
+    end
+
+    arr_group_by_column_size << arr_temp
+
+    arr_group_by_column_size
+  end
 
 
   def image_spitter(value)
