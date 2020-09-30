@@ -21,9 +21,17 @@ class BSKConfig < DefaultConfig
     base_risk_matrix:             true,
     has_verification:             true,
     hazard_root_cause_lock:       true
+
   })
 
     # SMS IM Module
+
+  MATRIX_INFO = DefaultConfig::MATRIX_INFO.deep_merge({
+    risk_table: {
+      column_header_name: 'LIKELIHOOD',
+    },
+  })
+
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({
     'CHDO'                            => 'ACE-FSDO-09',

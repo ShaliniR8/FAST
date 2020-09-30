@@ -33,7 +33,16 @@ class NAMSConfig < DefaultConfig
 
   MATRIX_INFO = {
     severity_table: {
-      starting_space: true,
+      title: 'SEVERTIY EXERCISE',
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+      row_header_name: 'CLASS',
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV'],
       row_header: [
         'Accident or Incident',
@@ -106,7 +115,16 @@ class NAMSConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+      row_header_name: 'PROBABILITY',
+      column_header_name: 'CRITERIA',
       row_header: ['A', 'B', 'C', 'D'],
       column_header: ['Audit Findings', 'Events'],
 
@@ -138,10 +156,18 @@ class NAMSConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
+      title: 'RISK ASSESSMENT MATRIX',
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+      row_header_name: 'PROBABILITY',
+      row_header: ['4', '3', '2', '1', '0'],
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV'],
       row_header: ['A', 'B', 'C', 'D'],
-      rows: [
+      rows_color: [
         ['crimson',     'crimson',          'coral',              'yellow'              ],
         ['crimson',     'coral',            'yellow',             'mediumseagreen'    ],
         ['coral',       'yellow',           'yellow',             'mediumseagreen'    ],

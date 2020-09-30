@@ -53,7 +53,16 @@ class RVFConfig < DefaultConfig
 
   MATRIX_INFO = {
     severity_table: {
-      starting_space: true,
+      title: 'SEVERTIY EXERCISE',
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      row_header_name: 'CLASS',
       row_header: [
         'Accident or Incident',
         'Employee or Customer Injury',
@@ -65,6 +74,7 @@ class RVFConfig < DefaultConfig
         'Airworthiness',
         'Audit Finding'
       ],
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV','V'],
       rows: [
         [ #Accident or Incident
@@ -142,8 +152,18 @@ class RVFConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+      row_header_name: 'PROBABILITY',
       row_header: ['A - Frequent (Not Effective)', 'B - Likely (Not Effective)', 'C - Repeatable (Minimal Effectiveness)', 'D - Isolated (Limited Effectiveness)', 'E - Improbable (Effective)'],
+      column_header_name: 'CRITERIA',
       column_header: ['Reactive Assessment (Control Effectiveness) Audit Findings', 'Reactive Assessment (Control Effectiveness) Known Occurrences', 'Proactive Assessment (Likelihood)'],
 
       rows: [
@@ -184,12 +204,18 @@ class RVFConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
-      column_header_name: 'SEVERITY',
-      column_header: ['I','II','III','IV','V'],
+      title: 'RISK ASSESSMENT MATRIX',
+
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
       row_header_name: 'PROBABILITY',
       row_header: ['A', 'B', 'C', 'D', 'E'],
-      rows: [
+      column_header_name: 'SEVERITY',
+      column_header: ['I','II','III','IV','V'],
+      rows_color: [
         ["crimson",     "crimson",      "coral",          "coral",          "yellow"         ],
         ["crimson",     "coral",        "coral",          "yellow",         "steelblue"      ],
         ["coral",       "coral",        "yellow",         "yellow",         "steelblue"      ],
@@ -206,11 +232,19 @@ class RVFConfig < DefaultConfig
     },
 
     risk_definitions: {
-      limegreen:        { rating: 'LOW',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
-      steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
-      yellow:           { rating: 'MODERATE',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
-      orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
-      red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
+
+      # limegreen:        { rating: 'LOW',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
+      # steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
+      # yellow:           { rating: 'MODERATE',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
+      # orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
+      # red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
+
+      limegreen:        { rating: 'LOW',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   },
+      steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  },
+      yellow:           { rating: 'MODERATE',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             },
+      orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            },
+      red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            }
+
     },
 
     risk_table_index: {

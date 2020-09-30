@@ -186,9 +186,9 @@ class DefaultConfig
       header_style: 'sevHeader',
       cell_name: 'severity_td',
 
-      row_header_name: 'CLASS',
+      row_header_name: 'SEVERITY',
       row_header: ['4', '3', '2', '1', '0'],
-      column_header_name: 'SEVERITY',
+      column_header_name: 'CLASS',
       column_header: [
         'Safety (Impact)',
         'People (Injury)',

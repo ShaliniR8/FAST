@@ -19,6 +19,7 @@ class DemoConfig < DefaultConfig
     allow_reopen_report:          false,
     configurable_risk_matrices:   true,
     shared_links:                 true,
+    drop_down_risk_selection:     true,
 
     # TO BE REMOVED:
     allow_set_alert:              true,
