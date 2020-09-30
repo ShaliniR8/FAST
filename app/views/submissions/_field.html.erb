@@ -1,11 +1,4 @@
-<%xs_val = field.display_size.to_s%>
-<%if xs_val.to_i < 6 %>
-  <%xs_val = "6"%>
-<%end%>
-<%size = "col-md-" + field.display_size.to_s +
-  " col-xs-" + xs_val + " col-sm-" +
-  field.display_size.to_s + " col-lg-" +
-  field.display_size.to_s%>
+<%size = is_nested_field ? 'col-xs-12' : calculate_column_size(field: field)%>
 
 <div class="<%=size%> form-group">
 

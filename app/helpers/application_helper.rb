@@ -355,6 +355,19 @@ module ApplicationHelper
   end
 
 
+  def calculate_column_size(field:)
+    xs_val = field.display_size.to_s
+    xs_val = '6' if xs_val.to_i < 6
+
+    size = " col-md-" + field.display_size.to_s +
+           " col-xs-" + xs_val +
+           " col-sm-" + field.display_size.to_s +
+           " col-lg-" + field.display_size.to_s
+
+    return size
+  end
+
+
   def group_by_column_size_and_nested_fields(fields:)
 
     arr_group_by_column_size = []

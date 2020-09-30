@@ -22,16 +22,16 @@
           <div class="row is-flex">
             <%row.each do |field| %>
 
-              <%=render "field", :field => field%>
+              <%=render "field", is_nested_field: false, field: field%>
 
               <%if field.nested_fields.where(:deleted => false).present?%>
-                <div class='col-xs-12'>
+                <div class='col-xs-12 nested_field_row'>
                   <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
                     <div class="nested_field
                       nested_field_<%=field.id%>
-                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>"
+                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
                       style="display:none;">
-                      <%=render "field", :field => nested_field%>
+                      <%=render "field", is_nested_field: true, field: nested_field%>
                     </div>
                   <%end%>
                 </div>
@@ -62,6 +62,24 @@
       flex-direction: column;
       justify-content: space-between;
   }
+
+  .row.is-flex > .nested_field_row {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .graybox {
+    padding: 15px 0;
+    background-color: rgb(211,211,211, 0.15);
+    border-radius: 5px;
+  }
+
+  .row.is-flex > .nested_field_row > .nested_field > .form-group {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 </style>
 
 <script>
@@ -71,11 +89,17 @@
     $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
     $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
 
+    string_parameterize = function (str) {
+      return str.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    };
+
     $(".field_select").on("change", function(){
       var field_id = $(this).attr("data-id");
-      var field_value = $(this).val();
+      var field_value = string_parameterize($(this).val())
       $(".nested_field_" + field_id).hide();
+      $(".nested_field_" + field_id).parent().removeClass("graybox")
       $(".nested_field_" + field_id + "_" + field_value).show();
+      $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox")
     });
   });
 </script>
