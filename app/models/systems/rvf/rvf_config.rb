@@ -54,8 +54,8 @@ class RVFConfig < DefaultConfig
   MATRIX_INFO = {
     severity_table: {
       title: 'SEVERTIY EXERCISE',
-      orientation: :vertical,
-      direction: :up,
+      orientation: :horizontal,
+      direction: :left,
       size: 'col-xs-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
@@ -154,8 +154,8 @@ class RVFConfig < DefaultConfig
     probability_table: {
       title: 'PROBABILITY EXERCISE',
 
-      orientation: :horizontal,
-      direction: :right,
+      orientation: :vertical,
+      direction: :up,
       size: 'col-xs-6',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',

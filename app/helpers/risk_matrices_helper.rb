@@ -47,10 +47,11 @@ module RiskMatricesHelper
       create_risk_matrix_with_num_of_occurrences(object: 'Sra')
   end
 
-  # TODO REFACTOR!
+
   def is_row_probability?
     CONFIG::MATRIX_INFO[:risk_table][:row_header_name] == 'PROBABILITY'
   end
+
 
   def get_option_for_orientation(table_type:)
     case CONFIG::MATRIX_INFO[table_type][:orientation]

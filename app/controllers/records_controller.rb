@@ -451,6 +451,8 @@ class RecordsController < ApplicationController
 
 
   def update
+    convert_from_risk_value_to_risk_index
+
     transaction = true
     @owner = Record.find(params[:id])
 

@@ -215,6 +215,8 @@ class ReportsController < ApplicationController
 
 
   def update
+    convert_from_risk_value_to_risk_index
+
     transaction = true
     @owner = Report.find(params[:id])
 

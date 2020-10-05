@@ -81,17 +81,17 @@ class WAAConfig < DefaultConfig
     probability_table: {
       title: 'PROBABILITY EXERCISE',
 
-      orientation: :horizontal,
-      direction: :right,
+      orientation: :vertical,
+      direction: :up,
       size: 'col-xs-6',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',
       header_style: 'probHeader',
       cell_name: 'probability_td',
 
-      row_header_name: '',
+      row_header_name: 'PROBABILITY',
       row_header: ['Frequent', 'Probable', 'Occasional', 'Remote'],
-      column_header_name: 'PROBABILITY',
+      column_header_name: '',
       column_header: [''],
       rows: [
         [
@@ -110,10 +110,10 @@ class WAAConfig < DefaultConfig
     },
 
     probability_table_dict: {
-      0 => 'Likely to occur within 7 Days',
-      1 => 'Likely to occur within 30 Days',
-      2 => 'Likely to occur within 90 Days',
-      3 => 'Likely to occur outside of 90 Days'
+      0 => 'Frequent',
+      1 => 'Probable',
+      2 => 'Occasional',
+      3 => 'Remote'
     },
 
     risk_table: {
@@ -138,10 +138,7 @@ class WAAConfig < DefaultConfig
     },
 
     risk_definitions: {
-      #   '#60FF60' => {rating: 'Green - Acceptable',      cells: "A1, B2, C3, D4", description: "Acceptable", description_approval: 'here'                },
-      #   yellow:      {rating: 'Yellow - Acceptable with mitigation', cells: "A2, B2, C4",     description: "Acceptable with Mitigation", description_approval: 'here'   },
-      #   orange:      {rating: 'Orange - Unacceptable',     cells: "A4, A3, B4",     description: "Unacceptable", description_approval: 'here'                 },
-      red: {
+      crimson: {
         rating: 'Accountable Executive',
         cells: "A1, A2, A3, B1, B2, C1",
         description: "High - (Red) Imminent and Unacceptable Danger requiring the highest priority of investigations, resources and corrective action. Requires tracking and review by appropriate authority. (Department Heads in Conjunction with DOS).",
@@ -151,7 +148,7 @@ class WAAConfig < DefaultConfig
         cells: "A4, B3, C2, D1",
         description: "Medium - (Yellow) - May be acceptable with review by appropriate authority (Department VP in conjunction with DOS), requires tracking and possible action. There may be acceptable policies and procedures in place",
       },
-      '#60FF60' => {
+      mediumseagreen: {
         rating: 'Managers & Supervisors',
         cells: "B4, C3, C4, D2, D3, D4",
         description: "Low - (Green) - Requires tracking and possible action. There may be acceptable policies and procedures in place; and it may be acceptable without further action.",
@@ -159,9 +156,9 @@ class WAAConfig < DefaultConfig
     },
 
     risk_table_index: {
-      "High"      => 'crimson',
-      "Moderate"  => 'yellow',
-      "Low"       => 'mediumseagreen'
+      'Accountable Executive'   => 'crimson',
+      'Top Management'          => 'yellow',
+      'Managers & Supervisors'  => 'mediumseagreen'
     },
   }
 

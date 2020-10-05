@@ -18,7 +18,7 @@ class BSKConfig < DefaultConfig
     drop_down_risk_selection:     true,
 
     # TO BE REMOVED
-    base_risk_matrix:             true,
+    base_risk_matrix:             false,
     has_verification:             true,
     hazard_root_cause_lock:       true
 

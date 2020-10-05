@@ -1,3 +1,7 @@
+ruby:
+  is_row_header_col_empty = table[:row_header].size == 1 && table[:row_header][0] == ''
+  is_col_header_row_empty = table[:column_header].size == 1 && table[:column_header][0] == ''
+
 div class="#{table[:size]}"
   hr
   h4 class="#{table[:title_style]}"
@@ -5,22 +9,26 @@ div class="#{table[:size]}"
   table.table.table-bordered.table-centered
     / Header
     tr
-      th class="#{table[:main_header_style]}"
-        = table[:row_header_name]
+      - unless is_row_header_col_empty
+        th class="#{table[:main_header_style]}"
+          = table[:row_header_name]
       th class="#{table[:main_header_style]}" colspan="#{table[:column_header].length}"
         = table[:column_header_name]
     / column header
-    tr
-      th class="#{table[:header_style]}"
-      - table[:column_header].each do |col_header|
-        th class="#{table[:header_style]}" width="15%" = col_header.html_safe
+    - unless is_col_header_row_empty
+      tr
+        - unless is_row_header_col_empty
+          th class="#{table[:header_style]}"
+        - table[:column_header].each do |col_header|
+          th class="#{table[:header_style]}" width="#{100 / (table[:column_header].length + 1)}%" = col_header.html_safe
     / Body
     / row header + rows
     - table[:row_header].each_with_index do |row_header, row_index|
-      tr
-        th class="#{table[:header_style]}" = row_header.html_safe
+      tr height="60px"
+        - unless is_row_header_col_empty
+          th class="#{table[:header_style]}" = row_header.html_safe
         - table[:column_header].each_with_index do |col_header, col_index|
-          td class="#{table[:cell_name]}_#{owner.class.name}_#{owner.id}" data-row="#{row_index}" data-baseline-status="" data-mitigate-status="" data-column="#{col_index}" style="background: #{table[:rows_color][row_index][col_index] if table[:rows_color].present?}" width="15%"
+          td class="#{table[:cell_name]}_#{owner.class.name}_#{owner.id}" data-row="#{row_index}" data-baseline-status="" data-mitigate-status="" data-column="#{col_index}" style="background: #{table[:rows_color][row_index][col_index] if table[:rows_color].present?}"
             .content
               = table[:rows][row_index][col_index].html_safe if table[:rows].present?
 

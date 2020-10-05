@@ -270,15 +270,15 @@ class DefaultConfig
     },
 
     risk_definitions: {
-      '#60FF60' => {rating: 'Green - Acceptable',      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
-      yellow:      {rating: 'Yellow - Acceptable with mitigation', cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
-      orange:      {rating: 'Orange - Unacceptable',     cells: "A4, A3, B4",     description: "Unacceptable"                 },
+      '#60FF60' => { rating: 'Green - Acceptable'                   },
+      yellow:      { rating: 'Yellow - Acceptable with mitigation'  },
+      orange:      { rating: 'Orange - Unacceptable'                },
     },
 
     risk_table_index: {
-      "High"      => 'red',
-      "Moderate"  => 'yellow',
-      "Low"       => 'limegreen'
+      'Orange - Unacceptable'                => 'orange',
+      'Yellow - Acceptable with mitigation'  => 'yellow',
+      'Green - Acceptable'                   => 'limegreen'
     },
   }
 

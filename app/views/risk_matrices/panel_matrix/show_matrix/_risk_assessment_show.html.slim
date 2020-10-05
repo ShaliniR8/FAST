@@ -1,3 +1,8 @@
+ruby:
+  risk_table    = CONFIG::MATRIX_INFO[:risk_table]
+  column_header = risk_table[:column_header]
+  row_header  = risk_table[:row_header]
+
 .col-xs-6
   hr
   h4
@@ -9,10 +14,10 @@
       br
     P
       b = 'Severity: '
-      = @owner.severity
+      = row_header[@owner.severity.to_i]
     p
       b = 'Likelihood: '
-      = @owner.likelihood
+      = column_header[@owner.likelihood.to_i]
     p
       b = 'Risk Factor: '
       = @owner.risk_factor
@@ -23,10 +28,10 @@
       br
     P
       b = 'Severity: '
-      = @owner.severity_after
+      = row_header[@owner.severity_after.to_i]
     p
       b = 'Likelihood: '
-      = @owner.likelihood_after
+      = column_header[@owner.likelihood_after.to_i]
     p
       b = 'Risk Factor: '
       = @owner.risk_factor_after

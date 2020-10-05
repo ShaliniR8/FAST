@@ -18,6 +18,8 @@ end
 class SafetyAssuranceController < ApplicationController
 
   def update
+    convert_from_risk_value_to_risk_index
+
     object_name = self.class.name.gsub('Controller', '').underscore.singularize
 
     transaction = true

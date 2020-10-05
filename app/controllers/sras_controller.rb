@@ -348,11 +348,9 @@ class SrasController < ApplicationController
     @risk_group = @owner.matrix_connection.matrix_group
     load_options
     mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial=>"shared/mitigate"
-    else
-      render :partial => "/risk_matrix_groups/form_mitigated"
-    end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -362,11 +360,9 @@ class SrasController < ApplicationController
     @risk_group = @owner.matrix_connection.matrix_group
     form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
     load_options
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial=>"shared/baseline"
-    else
-      render :partial => "/risk_matrix_groups/form_baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 

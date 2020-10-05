@@ -612,11 +612,7 @@ class HomeController < ApplicationController
     @departments = params[:departments] ? params[:departments] : nil
     prepare_analytics
     prepare_calendar
-    if CONFIG::GENERAL[:base_risk_matrix]
-      prepare_risk_matrix
-    else
-      prepare_special_risk_matrix
-    end
+    prepare_risk_matrix
   end
 
 

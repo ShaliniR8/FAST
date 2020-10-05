@@ -227,13 +227,21 @@ class SCXConfig < DefaultConfig
       ],
     },
 
+    risk_table_index: {
+      "High" => 'crimson',
+      "Serious" => 'coral',
+      "Moderate" => 'yellow',
+      "Minor" => 'steelblue',
+      "Low" => 'mediumseagreen'
+    },
+
     risk_definitions: {
       crimson:          { rating: 'High',      cells: 'A/1, A/2, and B/1',                      description: '' },
       coral:            { rating: 'Serious',   cells: 'A/3, B/2, and C/1',                      description: '' },
       yellow:           { rating: 'Moderate',  cells: 'A/4, B/3, and D/1',                      description: '' },
       steelblue:        { rating: 'Minor',     cells: 'B/4, C/3, and D/2',                      description: '' },
       mediumseagreen:   { rating: 'Low',       cells: 'A/5, B/5, C/4, C/5, D/3, D/4, and D/5',  description: '' }
-    }
+    },
   }
 
 

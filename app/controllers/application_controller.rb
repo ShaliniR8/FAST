@@ -914,6 +914,31 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
+  def convert_from_risk_value_to_risk_index
+    if CONFIG::GENERAL[:drop_down_risk_selection]
+      risk_table    = CONFIG::MATRIX_INFO[:risk_table]
+      column_header = risk_table[:column_header]
+      row_header  = risk_table[:row_header]
+      object_name = self.class.name.gsub('Controller', '').underscore.singularize
+
+      if params[object_name][:risk_factor].present?
+        severity_value    = params[object_name][:severity]
+        probability_value = params[object_name][:likelihood]
+        params[object_name][:severity]   = row_header.find_index(severity_value)
+        params[object_name][:likelihood] = column_header.find_index(probability_value)
+      end
+
+      if params[object_name][:risk_factor_after].present?
+        severity_after_value    = params[object_name][:severity_after]
+        probability_after_value = params[object_name][:likelihood_after]
+        params[object_name][:severity_after]   = row_header.find_index(severity_after_value)
+        params[object_name][:likelihood_after] = column_header.find_index(probability_after_value)
+      end
+    end
+  end
+
+
   private
 
   def set_last_seen_at
