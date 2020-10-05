@@ -145,7 +145,8 @@
         <%when "select_multiple"%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
           <%if field_name == "additional_validators"%>
-          <%default_option = @owner.present? ? @owner.responsible_user.id : record.get_all_validators.map(&:id)%>
+            <%alt_option = record.get_all_validators%>
+            <%default_option = (@owner.present? && @owner.responsible_user.present?) ? @owner.responsible_user.id : (alt_option.map(&:id) if alt_option.any?)%>
             <%=f.select field_name,
               options_for_select(field_options, default_option),
               {:include_blank => ""},
