@@ -19,7 +19,7 @@
       deidentified: deidentified
       / print just fields for source of input panel
     - if !source_of_input
-      = render '/pdfs/choose_print_risk_matrix', owner: owner
+      = render '/pdfs/print_risk_matrix', owner: owner
       = render '/pdfs/print_checklists', owner: owner
       / skip source of input for launch item panels (sra, investigation)
       - launch_item = defined?(launch_item) ? launch_item : false

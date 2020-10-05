@@ -5,10 +5,10 @@
       - if owner.risk_factor.present?
         .col-xs-6
           b Baseline Severity:
-          =< owner.severity
+          =< CONFIG.print_severity(owner, owner.severity.to_i)
           br
           b Baseline Likelihood:
-          =< owner.likelihood
+          =< CONFIG.print_probability(owner, owner.likelihood.to_i)
           br
           b Baseline Risk:
           =< owner.risk_factor
@@ -17,10 +17,10 @@
       - if owner.risk_factor_after.present?
         .col-xs-6
           b Mitigated Severity:
-          =< owner.severity_after
+          =< CONFIG.print_severity(owner, owner.severity_after.to_i)
           br
           b Mitigated Likelihood:
-          =< owner.likelihood_after
+          =< CONFIG.print_probability(owner, owner.likelihood_after.to_i)
           br
           b Mitigated Risk:
           =< owner.risk_factor_after

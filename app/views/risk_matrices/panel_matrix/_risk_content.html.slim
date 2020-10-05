@@ -11,13 +11,13 @@
     .col-xs-12.col-sm-12.col-md-12
       = render 'risk_matrices/panel_matrix/risk_definitions'
       = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:severity_table], owner: @owner
-    .col-xs-12.col-sm-12.col-md-12
+    .col-xs-12.col-sm-12.col-md-12.mb15
       = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:probability_table], owner: @owner
       = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:risk_table], owner: @owner
   - else # row is severity
     .col-xs-12.col-sm-12.col-md-12
       = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:risk_table], owner: @owner
       = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:severity_table], owner: @owner
-    .col-xs-12.col-sm-12.col-md-12
+    .col-xs-12.col-sm-12.col-md-12.mb15
       = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:probability_table], owner: @owner
       = render 'risk_matrices/panel_matrix/risk_definitions'

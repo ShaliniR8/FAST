@@ -94,13 +94,7 @@
         <%end%>
       </div>
 
-      <%if CONFIG::GENERAL[:base_risk_matrix]%>
-        <%= render "/pdfs/print_risk_matrix", :owner => owner %>
-      <%else%>
-        <%= render "/pdfs/#{AIRLINE_CODE}/print_risk_matrix", :owner => owner %>
-      <%end%>
-
-
+      <%=render "/pdfs/print_risk_matrix", :owner => owner%>
       <%=render '/pdfs/print_notes',
         owner: owner.submission%>
       <%=render 'pdfs/print_corrective_actions',

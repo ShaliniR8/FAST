@@ -30,6 +30,7 @@
         if ( severity_value != "" && probability_value != "") {
           update_risk_factor(severity_value, probability_value)
         } else {
+          clear_risk_factor()
           if ("<%= risk_type %>" == "Baseline") {
             clear_baseline_risk()
           } else { // "Mitigate"
@@ -43,6 +44,7 @@
         if ( probability_value != "" && severity_value != "" ) {
           update_risk_factor(severity_value, probability_value)
         } else {
+          clear_risk_factor()
           if ("<%= risk_type %>" == "Baseline") {
             clear_baseline_risk()
           } else { // "Mitigate"
@@ -53,12 +55,13 @@
     <%end%>
   })
 
+  function clear_risk_factor() {
+    $("input#risk_fact").val('');
+  }
+
   function update_risk_factor(severity_value, probability_value) {
     severity_value    = $('select#sev').children('option:selected').val()
     probability_value = $('select#like').children('option:selected').val()
-
-    console.log(severity_value)
-    console.log(probability_value)
 
     risk_table = <%=CONFIG::MATRIX_INFO[:risk_table].to_json.html_safe%>
     risk_definitions = <%=CONFIG::MATRIX_INFO[:risk_definitions].to_json.html_safe%>
@@ -294,7 +297,7 @@
 
           $(this).data("mitigate-status","checked")
           <%if @owner.get_extra_severity.present?%>
-            if ($(this).data("<%= severity_option[:access_order][1] %>") == <%=@owner.get_extra_severity[i]%>){
+            if ($(this).data("<%= severity_option[:access_order][1] %>") == <%=@owner.get_extra_severity[i].nil? ? -1 : @owner.get_extra_severity[i] rescue -1%>){
               $(this).css('background','#CABCF6')
             }else{
               $(this).css('background','#FCAFCB')
@@ -314,7 +317,7 @@
         if($(this).data("<%= probability_option[:access_order][1] %>") == <%=@owner.get_mitigated_probability[i].nil? ? -1 : @owner.get_mitigated_probability[i] rescue -1%>){
           $(this).data("mitigate-status", "checked")
           <%if @owner.get_extra_probability.present?%>
-            if ($(this).data("<%= probability_option[:access_order][1] %>") == <%=@owner.get_extra_probability[i]%>){
+            if ($(this).data("<%= probability_option[:access_order][1] %>") == <%=@owner.get_extra_probability[i].nil? ? -1 : @owner.get_extra_probability[i] rescue -1%>){
               $(this).css('background', '#CABCF6')
             }else{
               $(this).css('background','#FCAFCB')
@@ -333,14 +336,14 @@
 
       <% if is_row_probability? %>
         <% if @owner.likelihood.present? && @owner.severity.present? %>
-          row_index = <%= CONFIG::MATRIX_INFO[:probability_table][:row_header].index(@owner.likelihood) %>
-          col_index = <%= CONFIG::MATRIX_INFO[:severity_table][:column_header].index(@owner.severity) %>
+          row_index = <%=@owner.likelihood%>
+          col_index = <%=@owner.severity%>
           set_baseline_risk(row_index, col_index)
         <% end %>
       <% else # row is severity %>
         <% if @owner.likelihood.present? && @owner.severity.present? %>
-          row_index = <%= CONFIG::MATRIX_INFO[:severity_table][:row_header].index(@owner.severity) %>
-          col_index = <%= CONFIG::MATRIX_INFO[:probability_table][:column_header].index(@owner.likelihood) %>
+          row_index = <%=@owner.severity%>
+          col_index = <%=@owner.likelihood%>
           set_baseline_risk(row_index, col_index)
         <% end %>
       <% end %>
@@ -381,14 +384,14 @@
 
       <% if is_row_probability? %>
         <% if @owner.likelihood_after.present? && @owner.severity_after.present? %>
-          row_index = <%= CONFIG::MATRIX_INFO[:probability_table][:row_header].index(@owner.likelihood_after) %>
-          col_index = <%= CONFIG::MATRIX_INFO[:severity_table][:column_header].index(@owner.severity_after) %>
+          row_index = <%=@owner.likelihood_after%>
+          col_index = <%=@owner.severity_after%>
           set_mitigate_risk(row_index, col_index)
         <% end %>
       <% else # row is severity %>
         <% if @owner.likelihood_after.present? && @owner.severity_after.present? %>
-          row_index = <%= CONFIG::MATRIX_INFO[:severity_table][:row_header].index(@owner.severity_after) %>
-          col_index = <%= CONFIG::MATRIX_INFO[:probability_table][:column_header].index(@owner.likelihood_after) %>
+          row_index = <%=@owner.severity_after%>
+          col_index = <%=@owner.likelihood_after%>
           set_mitigate_risk(row_index, col_index)
         <% end %>
       <% end %>
@@ -509,6 +512,9 @@
     probability = <%=is_row_probability?%> ? row_index    : column_index
     severity    = <%=is_row_probability?%> ? column_index : row_index
 
+    console.log(severity)
+    console.log(probability)
+    console.log(risk_factor)
 
     $('#sev').val(severity)
     $('#like').val(probability)

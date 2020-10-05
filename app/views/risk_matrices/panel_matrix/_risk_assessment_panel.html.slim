@@ -10,7 +10,7 @@
         / Baseline, Migate Risk btns, Notes
         - if risk_type == 'All'
           = render 'risk_matrices/panel_matrix/show_matrix/show_matrix'
-          = render 'risk_matrices/panel_matrix/show_matrix/risk_matrix_js', risk_type: @risk_type
+          = render 'risk_matrices/panel_matrix/risk_matrix_js', risk_type: @risk_type
         - else
           = render 'risk_matrices/panel_matrix/form_matrix/form_matrix', f: f, risk_type: 'Baseline'
-          = render 'risk_matrices/panel_matrix/show_matrix/risk_matrix_js', risk_type: 'Baseline'
+          = render 'risk_matrices/panel_matrix/risk_matrix_js', risk_type: 'Baseline'
