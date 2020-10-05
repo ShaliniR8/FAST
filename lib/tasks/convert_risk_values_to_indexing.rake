@@ -18,6 +18,8 @@ task :convert_risk_values_to_indexing, [:airline_code] => :environment do |task,
     update_risk = true
   when 'WAA'
     update_risk = true
+  when 'TRIAL'
+    update_risk = true
   end
 
   if update_risk
@@ -29,7 +31,6 @@ task :convert_risk_values_to_indexing, [:airline_code] => :environment do |task,
         # baseline risk
         if r.severity.present?
           ROW_HEADERS.each_with_index do |h, i|
-            puts "rec severity: #{r.severity} header: #{h} index: #{i} equal?: #{r.severity == h}" if r.id == 2522
             r.severity = i if r.severity == h
           end
         end
@@ -53,8 +54,8 @@ task :convert_risk_values_to_indexing, [:airline_code] => :environment do |task,
       record.transaction do
         records.each(&:save!)
       end
-      puts "UPDATING #{record.name.pluralize}"
+      puts "UPDATED #{record.name.pluralize}"
     end
   end
-  puts "FINISHING CONVERSION TASK"
+  puts "FINISHED CONVERSION TASK"
 end
