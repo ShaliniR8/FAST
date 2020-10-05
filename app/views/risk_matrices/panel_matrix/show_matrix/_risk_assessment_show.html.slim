@@ -14,10 +14,10 @@ ruby:
       br
     P
       b = 'Severity: '
-      = row_header[@owner.severity.to_i]
+      = row_header[@owner.severity.to_i] if @owner.severity.present?
     p
       b = 'Likelihood: '
-      = column_header[@owner.likelihood.to_i]
+      = column_header[@owner.likelihood.to_i] if @owner.likelihood.present?
     p
       b = 'Risk Factor: '
       = @owner.risk_factor
@@ -28,10 +28,10 @@ ruby:
       br
     P
       b = 'Severity: '
-      = row_header[@owner.severity_after.to_i]
+      = row_header[@owner.severity_after.to_i] if @owner.severity_after.present?
     p
       b = 'Likelihood: '
-      = column_header[@owner.likelihood_after.to_i]
+      = column_header[@owner.likelihood_after.to_i] if @owner.likelihood_after.present?
     p
       b = 'Risk Factor: '
       = @owner.risk_factor_after

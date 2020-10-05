@@ -5,17 +5,21 @@
   .form-group.form-inline.col-sm-4
     - if @risk_type == 'Baseline'
       = f.label :severity, 'Baseline Severity'
-      = f.select :severity, options_for_select(@frequency, @frequency[@owner.severity.to_i]), {include_blank: ''}, {id: 'sev', class: 'form-control ml5'}
+      - selected_sev = @owner.severity.present? ? @frequency[@owner.severity.to_i] : ''
+      = f.select :severity, options_for_select(@frequency, selected_sev), {include_blank: ''}, {id: 'sev', class: 'form-control ml5'}
     - else # 'Mitigate'
       = f.label :severity_after, 'Mitigated Severity'
-      = f.select :severity_after, options_for_select(@frequency, @frequency[@owner.severity_after.to_i]), {include_blank: ''}, {id: 'sev', class: 'form-control ml5'}
+      - selected_sev_after = @owner.severity_after.present? ? @frequency[@owner.severity_after.to_i] : ''
+      = f.select :severity_after, options_for_select(@frequency, selected_sev_after), {include_blank: ''}, {id: 'sev', class: 'form-control ml5'}
   .form-group.form-inline.col-sm-4
     - if @risk_type == 'Baseline'
       = f.label :likelihood, 'Baseline Likelihood'
-      = f.select :likelihood, options_for_select(@like, @like[@owner.likelihood.to_i]), {include_blank: ''}, {id: 'like', class: 'form-control ml5'}
+      - selected_like = @owner.likelihood.present? ? @like[@owner.likelihood.to_i] : ''
+      = f.select :likelihood, options_for_select(@like, selected_like), {include_blank: ''}, {id: 'like', class: 'form-control ml5'}
     - else # 'Mitigate'
       = f.label :likelihood_after, 'Mitigated Likelihood'
-      = f.select :likelihood_after, options_for_select(@like, @like[@owner.likelihood_after.to_i]), {include_blank: ''}, {id: 'like', class: 'form-control ml5'}
+      - selected_like_after = @owner.likelihood_after.present? ? @like[@owner.likelihood_after.to_i] : ''
+      = f.select :likelihood_after, options_for_select(@like, selected_like_after), {include_blank: ''}, {id: 'like', class: 'form-control ml5'}
   .form-group.form-inline.col-sm-4
     - if @risk_type == 'Baseline'
       = f.label :risk_factor, 'Baseline Risk Factor'
