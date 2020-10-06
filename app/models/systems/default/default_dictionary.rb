@@ -267,8 +267,6 @@ class DefaultDictionary
       print_partial: '/pdfs/print_source_of_input',
       visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
       show_btns: proc { |owner:,user:,**op| false },
-<<<<<<< HEAD
-=======
       data: proc { |owner:,user:,**op| { sra: owner } },
     },
     attachments: {
@@ -293,7 +291,6 @@ class DefaultDictionary
       partial: '/panels/contacts',
       visible: proc { |owner:,user:,**op| owner.contacts.present? },
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
->>>>>>> Feat: add finding from checklist questions
       data: proc { |owner:,user:,**op| {
         owner: owner,
         parent: owner.get_parent.present? ? owner.get_parent : owner.owner
