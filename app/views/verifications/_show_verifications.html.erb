@@ -86,6 +86,11 @@
                       "data-toggle"=>"modal",
                       "data-target"=>".bs-example-modal-lg"%>
                   <%end%>
+                  <%=link_to "Delete",
+                    verification_path(record),
+                    :method => :delete,
+                    :confirm=>'Are you sure?',
+                    :class => "btn btn-danger mr5 mb5"%>
                 </td>
               </tr>
             <%end%>

@@ -47,6 +47,13 @@ class VerificationsController < ApplicationController
   end
 
 
+  def destroy
+    @verification = Verification.find(params[:id])
+    @verification.destroy
+    redirect_to @verification.owner, flash: {success: 'Verification deleted.'}
+  end
+
+
   def send_notification(commit, verification)
     commit = 'Addresse' if commit == 'Address'
 
