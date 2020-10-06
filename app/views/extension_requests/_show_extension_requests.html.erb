@@ -65,7 +65,7 @@
                   </td>
                 <%end%>
                 <td>
-                  <%if record.status != 'Completed'%>
+                  <%if record.owner.status != 'Completed' && record.status == 'New'%>
                     <%=link_to "Edit",
                       '#',
                       :route => edit_extension_request_path(record),
