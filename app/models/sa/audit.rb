@@ -107,6 +107,18 @@ class Audit < Sa::SafetyAssuranceBase
           ##{finding.id}
         </a><br>"
     end
+
+    self.checklists.each do |checklist|
+      checklist.checklist_rows.each do |checklist_row|
+        checklist_row.findings. each do |finding|
+          result += "
+            <a style='font-weight:bold' href='/findings/#{finding.id}'>
+              ##{finding.id}
+            </a><br>"
+        end
+      end
+    end
+
     result.html_safe
   end
 
