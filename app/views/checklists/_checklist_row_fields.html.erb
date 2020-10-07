@@ -2,6 +2,9 @@
 
 <tr class='field_group to_delete <%= is_header ? 'header-row' : '' %>'>
 
+  <%unless action_name == 'edit'%>
+    <%=f.hidden_field :id, value: checklist_row.id, class: 'row-id'%>
+  <%end%>
 
   <%if source == 'Existing'%>
     <%checklist_row.checklist_cells.each do |checklist_cell|%>

@@ -5,36 +5,21 @@ $(function() {
   $(dirtyFormSelector).submit(function(event) {
     event.preventDefault()
 
-    // var excludes = ['utf8', '_method', 'authenticity_token'].reduce(function(excludeString, name) {
-    //     return `${excludeString}:not([name='${name}'])`
-    // }, '')
+    var excludes = ['utf8', '_method', 'authenticity_token'].reduce(function(excludeString, name) {
+        return `${excludeString}:not([name='${name}'])`
+    }, '')
 
-    // $(`${dirtyFormSelector} :input:not(.changed)${excludes}`).prop('disabled', true)
+    $(`${dirtyFormSelector} :input:not(.changed)${excludes}`).prop('disabled', true)
 
     this.submit()
   })
 })
 
+
 function markAsDirty() {
   $(this).addClass('changed')
-  
   var changedHiddenInput = $(this).next(':hidden')
-  while (changedHiddenInput.length) {
-    changedHiddenInput.addClass('changed')
-    changedHiddenInput = changedHiddenInput.next(':hidden')
-  }
-
-  var nestedData = $(this).attr('name').split(/[[\]]{1,2}/).slice(0, -2)
-  while (nestedData.length > 1) {
-    parentSelector = `#${nestedData.join('_')}_id`
-    $(parentSelector).addClass('changed')
-
-    var changedHiddenInput = $(parentSelector).next(':hidden')
-    while (changedHiddenInput.length) {
-      changedHiddenInput.addClass('changed')
-      changedHiddenInput = changedHiddenInput.next(':hidden')
-    }
-
-    nestedData = nestedData.slice(0, -2)
-  }
+  changedHiddenInput.addClass('changed');
+  $(this).closest('td').find('.cell-id').addClass('changed');
+  $(this).closest('tr').find('.row-id').addClass('changed');
 }

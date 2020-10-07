@@ -46,7 +46,7 @@
             = render '/checklists/edit_instructions'
 
           - if action_name == 'edit' || @record.table_view
-            table class='table table-bordered table-striped mt10'
+            table class='table table-bordered table-striped mt10' id="table-view-#{@record.id}"
               thead
                 tr
                   - @record.checklist_header.checklist_header_items.each do |item|
@@ -109,6 +109,15 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
+    $("#table-view-#{@record.id}").DataTable({
+      /* Disable initial sort */
+      "order": [],
+      autoWidth: false,
+    })
+
+    /* Disable sort buttons (table headers) */
+    $("#table-view-#{@record.id}").find("th").off("click")
+
     var table = $("#page-view-update-#{@record.id}").DataTable({
       "aaSorting": [],
       "aLengthMenu": [[1, -1], [1, "All"]],

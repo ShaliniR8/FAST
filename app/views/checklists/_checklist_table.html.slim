@@ -1,9 +1,17 @@
+ruby:
+  header_index = -1
+  column_widths = checklist.checklist_header.checklist_header_items.order('display_order').map { |header|
+    header_index += 1
+    if header.size.present?
+      "{ 'width': '#{header.size}%', 'targets': #{header_index} }"
+    end
+  }
+
 table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.id}"
   thead
     tr
       - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
-        th style="#{header.size.present? ? "width: #{header.size}%" : ''}"
-          = header.title
+        th = header.title
       th Attachments
       th Findings
   tbody
@@ -34,6 +42,24 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
               "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
 
 javascript:
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replaceAll('"', "'")
+      .replaceAll("&quot;",'')
+      .replaceAll("&#39;",'"')
+  }
+
+  columnWidths = JSON.parse(escapeHtml("#{column_widths}"))
+
+  $("#checklist_records_#{checklist.id}").DataTable({
+    /* Disable initial sort */
+    "order": [],
+    autoWidth: false,
+    "columnDefs": columnWidths
+  })
+  /* Disable sort buttons (table headers) */
+  $("#checklist_records_#{checklist.id}").find("th").off("click")
+
   $('.show_finding_btn').on('click',function(){
     $.get("#{show_finding_audit_path}?checklist_row_id="+$(this).attr("id"), function(data){
       $(".modal-content").html(data);
