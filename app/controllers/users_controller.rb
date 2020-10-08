@@ -48,6 +48,7 @@ class UsersController < ApplicationController
     @user = User.new
     @user.airport = current_user.airport
     @authorized = current_user.global_admin?
+    @departments = CONFIG.custom_options['Departments']
   end
 
 
@@ -134,12 +135,13 @@ class UsersController < ApplicationController
 
 
   def edit
-    @levels=User.get_levels
+    @levels = User.get_levels
     @authorized = current_user.global_admin?
     @action = 'edit'
     @users = User.find(:all, :conditions => {:airport => current_user.airport})
     match_id = params[:id]
     @user = User.find(params[:id])
+    @departments = CONFIG.custom_options['Departments']
   end
 
 

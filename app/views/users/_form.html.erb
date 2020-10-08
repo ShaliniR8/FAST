@@ -121,6 +121,22 @@
                       </div>
                     <%end%>
 
+
+                    <div class='form-group row'>
+                      <%=f.label :departments, :class => 'col-xs-12 col-form-label'%>
+                      <div class="col-xs-12">
+                        <%@departments.each do |dep|%>
+                          <div class='col-xs-6'>
+                            <label class='checkbox'>
+                              <%=f.check_box :departments, {multiple: true, :class => '
+                                '}, dep, nil%>
+                              <%=dep%>
+                            </label>
+                          </div>
+                        <%end%>
+                      </div>
+                    </div>
+
                   <%end%>
 
                 </div>
