@@ -67,6 +67,7 @@ class ChecklistsController < ApplicationController
 
     # TODO: refactor needed
     params[:checklist][:checklist_rows_attributes].each do |x, y|
+      next if y[:checklist_cells_attributes].nil? # when update only attachments
       y[:checklist_cells_attributes].each do |m, n|
         n.each do |key, value|
           if value.is_a?(Array)
