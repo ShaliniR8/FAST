@@ -76,7 +76,7 @@
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
                 <% if CONFIG::GENERAL[:cisp_integration] %>
-                  <%=link_to "Send CISP Reports",
+                  <%=link_to "Send CISP Events",
                     "#",
                     :class => "btn btn-info mb5 pull-right mr5",
                     :id => "send_cisp_btn",
@@ -178,7 +178,7 @@
       });
     });
     $("#send_cisp_btn").on("click",function(){
-      $.get("<%=get_cisp_records_meeting_path()%>",function(data){
+      $.get("<%=get_cisp_reports_meeting_path(@meeting)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

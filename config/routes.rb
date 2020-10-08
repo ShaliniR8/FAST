@@ -382,8 +382,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get "reopen"
       get "get_reports"
-      get "get_cisp_records"
-      post "send_cisp_records"
+      get 'get_cisp_reports'
+      post 'send_cisp_reports'
       get 'override_status'
     end
     collection do

@@ -212,23 +212,8 @@ class MeetingsController < ApplicationController
 
 
   def update
-    #update cisp_ready
-    if params[:set_cisp_ready].present?
-      params[:set_cisp_ready].each_pair do |index, value|
-        record = Record.find(value)
-        record.cisp_ready = true
-        record.save
-      end
-    end
-    if params[:unset_cisp_ready].present?
-      params[:unset_cisp_ready].each_pair do |index, value|
-        record = Record.find(value)
-        record.cisp_ready = false
-        record.save
-      end
-    end
-
     transaction = true
+    flash_message = nil
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
@@ -266,6 +251,9 @@ class MeetingsController < ApplicationController
       transaction = false
     when 'Save Agenda'
       transaction_content = "Event ##{params[:event_id]}"
+    when 'Send to CISP'
+      send_cisp_reports
+      flash_message = {success: "Event(s) Sent To CISP."}
     end
 
     if params[:invitations].present?
@@ -325,7 +313,7 @@ class MeetingsController < ApplicationController
     end
     @owner.set_datetimez
     @owner.save
-    redirect_to meeting_path(@owner)
+    redirect_to meeting_path(@owner), flash: flash_message
   end
 
 
@@ -351,64 +339,24 @@ class MeetingsController < ApplicationController
     render :partial => "reports"
   end
 
-  def get_cisp_records
+  def get_cisp_reports
     @owner = Meeting.find(params[:id])
-    @records = @owner.reports.map(&:records).flatten
-    @all_records = @records.select { |record| not record.cisp_ready }
-    @cisp_ready_records = @records.select { |record| record.cisp_ready }
-    @record_headers = Record.get_meta_fields('index')
-    render :partial => "cisp_records"
+    keys = CONFIG::CISP_TITLE_PARSE.keys
+    @reports = @owner.reports.includes(:records)
+    asap_reports = []
+    @reports.each do |rep|
+      asap_found = false
+      rep.records.each do |rec|
+        asap_found = true if CONFIG::CISP_TITLE_PARSE[rec.template.name]
+        break if asap_found
+      end
+      asap_reports << rep if asap_found
+    end
+    @available_reports = asap_reports.select { |report| not report.cisp_sent }
+    @report_headers = Report.get_meta_fields('index')
+    render :partial => "cisp_reports"
   end
 
-  def send_cisp_records
-    #update cisp_ready
-    if params[:set_cisp_ready].present?
-      params[:set_cisp_ready].each do |value|
-        record = Record.find(value)
-        record.cisp_ready = true
-        record.save
-      end
-    end
-    if params[:unset_cisp_ready].present?
-      params[:unset_cisp_ready].each do |value|
-        record = Record.find(value)
-        record.cisp_ready = false
-        record.save
-      end
-    end
-
-    report_name =  CONFIG::CISP_TITLE_PARSE.keys
-    @record_headers = Record.get_meta_fields('index')
-    @records = params[:set_cisp_ready].map { |index| Record.find(index) }.select { |record| not record.cisp_sent }
-
-    test_run = Rails.env.production? ? false : true
-    Record.export_all_for_cisp(test_run: test_run, records_ids: @records.map(&:id))
-
-    # remove extra line
-    path = File.join(Rails.root, "cisp")
-    file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
-    original = File.open(file_name, 'r') { |file| file.readlines }
-    blankless = original.reject{ |line| line.match(/^$/) }
-    File.open(file_name, 'w') do |file|
-      blankless.each { |line| file.puts line }
-    end
-
-    begin
-      unless test_run
-        system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
-      end
-
-      @records.each do |record|
-        record.update_attributes(cisp_sent: true)
-      end
-
-      p 'SENT reports to CISP'
-    rescue
-      p 'FAILED to send reports to CISP'
-    end
-
-    render :partial => "cisp_records_result"
-  end
 
   def message
     @meeting = Meeting.find(params[:id])
@@ -483,4 +431,31 @@ class MeetingsController < ApplicationController
   end
 
 
+  private
+
+  def send_cisp_reports
+    # ex params: "meeting"=>{"reports_attributes"=>{"11"=>{"cisp_sent"=>"0", "id"=>"670"}
+    reports_ids = params[:meeting][:reports_attributes].map { |key, val| val[:id] if val[:cisp_sent] == '1' }
+    test_run = Rails.env.production? ? false : true
+    Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids)
+    # remove extra line
+    path = File.join(Rails.root, "cisp")
+    file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    original = File.open(file_name, 'r') { |file| file.readlines }
+    blankless = original.reject{ |line| line.match(/^$/) }
+    File.open(file_name, 'w') do |file|
+      blankless.each { |line| file.puts line }
+    end
+
+    begin
+      unless test_run
+        system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+      end
+
+      p 'SENT events to CISP'
+    rescue
+      p 'FAILED to send events to CISP'
+    end
+    # render :partial => "cisp_reports_result"
+  end
 end

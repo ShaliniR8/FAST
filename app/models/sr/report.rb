@@ -424,6 +424,22 @@ class Report < Sr::SafetyReportingBase
   end
 
 
+  def self.export_all_for_cisp(test_run: false, reports_ids:)
+    reports = Report.where(id: reports_ids)
+    dirname = File.join([Rails.root] + ['cisp'])
+    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    unless File.directory?(dirname)
+      FileUtils.mkdir_p(dirname)
+    end
+
+    File.open(temp_file, 'w') do |file|
+      file << ApplicationController.new.render_to_string(
+        template: 'reports/export_component_cisp.xml.erb',
+        locals:   { test_run: test_run, reports: reports, p_code: CONFIG::P_CODE })
+    end
+  end
+
+
   def can_meeting_ready?(user, form_conds: false, user_conds: false)
     form_confirmed = self.status == 'New' || form_conds
     user_confirmed = true

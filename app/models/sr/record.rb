@@ -152,6 +152,16 @@ class Record < Sr::SafetyReportingBase
     ["New", "In Progress", "Closed"]
   end
 
+  def get_cisp_timezone
+    timezone = {"UTC" => "UTC"}
+    # if record has old time zone
+    if CONFIG::CISP_TIMEZONES.keys.include? self.event_time_zone
+      timezone = {self.event_time_zone => CONFIG::CISP_TIMEZONES[self.event_time_zone]}
+    elsif CONFIG::CISP_TIMEZONES.values.include? self.event_time_zone
+      timezone = {CONFIG::CISP_TIMEZONES.key(self.event_time_zone) => self.event_time_zone}
+    end
+    timezone
+  end
 
   def title
     description
@@ -388,35 +398,6 @@ class Record < Sr::SafetyReportingBase
     end
   end
 
-  def self.export_all_for_cisp(test_run: false, records_ids:)
-    report_name =  CONFIG::CISP_TITLE_PARSE.keys
-    records = self.includes(:template).where(id: records_ids)
-    dirname = File.join([Rails.root] + ['cisp'])
-    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
-    unless File.directory?(dirname)
-      FileUtils.mkdir_p(dirname)
-    end
-
-    # CISP time zones
-    timezone = []
-    records.each do |record|
-      if record.event_time_zone.nil?
-        timezone << {"UTC" => "UTC"}
-      elsif CONFIG::CISP_TIMEZONES.keys.include? record.event_time_zone  # if record has old time zone
-        timezone << {record.event_time_zone => CONFIG::CISP_TIMEZONES[record.event_time_zone]}
-      elsif CONFIG::CISP_TIMEZONES.values.include? record.event_time_zone
-        timezone << {CONFIG::CISP_TIMEZONES.key(record.event_time_zone) => record.event_time_zone}
-      else
-        timezone << {"UTC" => "UTC"}
-      end
-    end
-
-    File.open(temp_file, 'w') do |file|
-      file << ApplicationController.new.render_to_string(
-        template: 'records/export_component_cisp.xml.erb',
-        locals:   { test_run: test_run, records: records, p_code: CONFIG::P_CODE, timezone: timezone })
-    end
-  end
 
   def get_additional_info
     additional_info = []

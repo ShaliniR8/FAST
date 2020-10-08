@@ -39,8 +39,61 @@ class FFTConfig < DefaultConfig
 
 
   P_CODE = 'FFT671'
-  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
-  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({})
+  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({
+    'Maintenance ASAP'   => 'maintenance',
+    'Inflight ASAP'      => 'inflight',
+    'Dispatch ASAP'      => 'dispatch',
+  })
+  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({
+    'Flight Crew ASAP' => {
+      'Altitude/Navigation/Speed Deviation' => {
+        'altitude'  => 'Altitude (Ft) MSL',
+      },
+      'ATC Information' => {
+        'ATCFacility' => 'Name of ATC Facility',
+      },
+    },
+    'Maintenance ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+      },
+      'Location of Event' => {
+        'location'  => 'Location',
+      },
+      'Narratives' => {
+        'eventDescription' => 'Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved',
+      },
+    },
+    'Inflight ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+      },
+      'Event Information'  => {
+        'flightPhase' => 'Flight Phase at Start of Event',
+      },
+      'Narratives' => {
+        'eventDescription' => 'Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved',
+      },
+    },
+    'Dispatch ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+        'altitude'      => 'Filed Altitude (MSL)',
+      },
+      'Narratives' => {
+        'eventDescription' => 'Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved',
+      },
+    },
+  })
 
   FAA_INFO = {
     "CHDO"=>"XXX",
