@@ -20,6 +20,7 @@ class User < ActiveRecord::Base
   has_many :access_levels
   accepts_nested_attributes_for :access_levels, reject_if: :all_blank, allow_destroy: true
 
+  serialize :departments
 
   # new columns need to be added here to be writable through mass assignment
   attr_accessible :username, :email,
@@ -28,7 +29,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable, :sso_id, :updated_at
+    :android_version, :disable, :sso_id, :updated_at, :departments
 
 
 
