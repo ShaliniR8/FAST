@@ -30,6 +30,7 @@
             <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
 
             <%if @owner.owner.class.name != 'ChecklistRow' && @owner.status == 'New' && !@owner.can_assign?(current_user)%>
+
               <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
             <%end%>
 
