@@ -37,9 +37,8 @@
         </div>
 
         <%= render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => @hazard%>
-
-        <% @owner = @hazard %>
         <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+        <%=render '/panels/show_panels', owner: @hazard%>
 
       </div>
     </div>

@@ -19,6 +19,9 @@ task :submission_notify => [:environment] do |t|
   owner_id   = ENV['OWNER_ID']
   owner = Object.const_get(owner_type).find(owner_id)
 
+  content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
+  content = ("A new #{owner.template.name} submission is submitted."
+              + "(##{owner.id} #{owner.description})") if !content.present?
   users.each do |user_id|
     if CONFIG.sr::GENERAL[:attach_pdf_submission]
 
@@ -28,18 +31,17 @@ task :submission_notify => [:environment] do |t|
       pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
       attachment = pdf.to_pdf
 
-      content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
 
       controller.notify(owner, notice: {
         users_id: user_id,
-        content: content.present? ? content : "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
+        content: content},
         mailer: true, subject: "New #{owner.template.name} Submission",
         attachment: attachment
       )
     else
       controller.notify(owner, notice: {
         users_id: user_id,
-        content: content ? content : "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
+        content: content},
         mailer: true, subject: "New #{owner.template.name} Submission",
       )
     end

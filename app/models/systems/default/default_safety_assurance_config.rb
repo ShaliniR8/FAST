@@ -498,7 +498,7 @@ class DefaultSafetyAssuranceConfig
           due_date: { default: true, field: 'due_date', on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true },
-          approver: { default: true, visible: 'index,form,show', required: true },
+          approver: { default: true, visible: 'index,form,show', required: false },
           responsible_department: {
             field: 'responsible_department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'form,show',

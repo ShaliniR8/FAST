@@ -16,9 +16,10 @@
   :allow_mitigate => true,
   :can_change => can_change%>
 
-<%= render '/occurrences/occurrences_panel',
+<%=render '/occurrences/occurrences_panel',
   owner: owner,
-  show_only_table: false %>
+  show_only_table: false,
+  show_btns: show_btn%>
 
 
 <%=render '/sms_actions/show_all', :owner => owner, :show_btns => false%>

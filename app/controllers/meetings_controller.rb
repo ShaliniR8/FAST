@@ -213,7 +213,7 @@ class MeetingsController < ApplicationController
 
   def update
     transaction = true
-    flash_message = nil
+    @flash_message = nil
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
@@ -253,7 +253,6 @@ class MeetingsController < ApplicationController
       transaction_content = "Event ##{params[:event_id]}"
     when 'Send to CISP'
       send_cisp_reports
-      flash_message = {success: "Event(s) Sent To CISP."}
     end
 
     if params[:invitations].present?
@@ -313,7 +312,7 @@ class MeetingsController < ApplicationController
     end
     @owner.set_datetimez
     @owner.save
-    redirect_to meeting_path(@owner), flash: flash_message
+    redirect_to meeting_path(@owner), flash: @flash_message
   end
 
 
@@ -435,26 +434,31 @@ class MeetingsController < ApplicationController
 
   def send_cisp_reports
     # ex params: "meeting"=>{"reports_attributes"=>{"11"=>{"cisp_sent"=>"0", "id"=>"670"}
-    reports_ids = params[:meeting][:reports_attributes].map { |key, val| val[:id] if val[:cisp_sent] == '1' }
-    test_run = Rails.env.production? ? false : true
-    Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids)
-    # remove extra line
-    path = File.join(Rails.root, "cisp")
-    file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
-    original = File.open(file_name, 'r') { |file| file.readlines }
-    blankless = original.reject{ |line| line.match(/^$/) }
-    File.open(file_name, 'w') do |file|
-      blankless.each { |line| file.puts line }
-    end
-
-    begin
-      unless test_run
-        system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+    reports_ids = params[:meeting][:reports_attributes].map { |key, val| val[:id] if val[:cisp_sent] == '1' }.compact rescue nil
+    if reports_ids.present?
+      test_run = Rails.env.production? ? false : true
+      Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids)
+      # remove extra line
+      path = File.join(Rails.root, "cisp")
+      file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+      original = File.open(file_name, 'r') { |file| file.readlines }
+      blankless = original.reject{ |line| line.match(/^$/) }
+      File.open(file_name, 'w') do |file|
+        blankless.each { |line| file.puts line }
       end
 
-      p 'SENT events to CISP'
-    rescue
-      p 'FAILED to send events to CISP'
+      begin
+        unless test_run
+          system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+        end
+        puts 'SENT events to CISP'
+        @flash_message = { success: 'Event(s) Sent To CISP.' }
+      rescue
+        puts 'FAILED to send events to CISP'
+      end
+    else
+      puts 'NO events sent to CISP'
+      @flash_message = { danger:  'No Events Sent To CISP.' }
     end
     # render :partial => "cisp_reports_result"
   end

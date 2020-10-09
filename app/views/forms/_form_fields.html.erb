@@ -282,7 +282,7 @@
         var result = true;
         $(".required_field").css('border-color', '');
         $(this).find('.required_field').each(function(){
-          if ($(this).val() == ""){
+          if ($(this).val() == "" || $(this).val() == null){
             error = true;
             result = false;
             $(this).css('border-color', 'red');

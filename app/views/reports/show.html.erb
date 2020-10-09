@@ -146,10 +146,10 @@
 
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
 
-          <% @owner = @report %>
-          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
-
-          <%= render '/panels/show_panels', owner: @report%>
+          <%=render "closing_note"%>
+          <%=render "record_table"%>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+          <%=render '/panels/show_panels', owner: @report%>
 
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>

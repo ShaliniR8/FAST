@@ -273,7 +273,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[risk_assessment risk_controls occurrences comments extension_requests verifications attachments transaction_log
+        panels: %i[risk_controls occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'RiskControl' => {

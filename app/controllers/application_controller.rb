@@ -236,8 +236,9 @@ class ApplicationController < ActionController::Base
 
   # Handles permissions and ability to execute button actions
   def interpret
+    op = params[:op].present? ? params[:op].symbolize_keys : {}
     begin
-      unless CONFIG.check_action(current_user, params[:act].to_sym, @owner)
+      unless CONFIG.check_action(current_user, params[:act].to_sym, @owner, **op)
         redirect_to eval("#{@class.name.underscore}_path(@owner)"),
           flash: {danger: "Unable to #{params[:commit] || params[:act]} #{@owner.class.titleize}."}
         return false
@@ -821,19 +822,23 @@ class ApplicationController < ActionController::Base
         mailer: true,
         subject: "#{object_name} Pending Approval") if owner.approver.present?
     when 'Reject'
-      notify(owner,
-        notice: {
-          users_id: owner.responsible_user.id,
-          content: "#{object_name} ##{owner.id} was Rejected by the Final Approver."},
-        mailer: true,
-        subject: "#{object_name} Rejected") if owner.approver.present?
+      if owner.responsible_user.present?
+        notify(owner,
+          notice: {
+            users_id: owner.responsible_user.id,
+            content: "#{object_name} ##{owner.id} was Rejected by the Final Approver."},
+          mailer: true,
+          subject: "#{object_name} Rejected") if owner.approver.present?
+      end
     when 'Approve'
-      notify(owner,
+      if owner.responsible_user.present?
+        notify(owner,
         notice: {
           users_id: owner.responsible_user.id,
           content: "#{object_name} ##{owner.id} was Approved by the Final Approver."},
         mailer: true,
         subject: "#{object_name} Approved") if owner.approver.present?
+      end
     end
   end
 

@@ -44,6 +44,7 @@ class HazardsController < ApplicationController
 
   def show
     @hazard = Hazard.find(params[:id])
+    @owner = @hazard
     @i18nbase = 'srm.hazard'
     @root_cause_headers = HazardRootCause.get_headers
     load_options

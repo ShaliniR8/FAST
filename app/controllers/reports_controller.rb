@@ -299,6 +299,7 @@ class ReportsController < ApplicationController
       'show',
       CONFIG::GENERAL[:event_summary] ? 'event_summary' : '',
       @report.status == 'Closed' ? 'close' : '')
+    @owner = @report
   end
 
 
