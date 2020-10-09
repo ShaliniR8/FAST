@@ -267,8 +267,13 @@ ruby:
         disable_with: 'Redirecting...'
     - else
       - parent_class = owner.owner.class.name
+      - if parent_class == 'ChecklistRow'
+        - parent_path = "#{owner.owner.checklist.owner.class.name.underscore}_path(owner.owner.checklist.owner)"
+      - else
+        - parent_path = "#{parent_class.underscore}_path(owner.owner)"
+
       = link_to "View #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
-        eval("#{parent_class.underscore}_path(owner.owner)"),
+        eval(parent_path),
         class: 'btn btn-info pull-right mr5 mb5',
         disable_with: 'Redirecting...'
 

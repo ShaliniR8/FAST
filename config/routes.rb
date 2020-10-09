@@ -208,7 +208,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :checklists do
     member do
-      get 'start'
+      get 'address'
       get 'export'
     end
     collection do

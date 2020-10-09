@@ -1,7 +1,6 @@
 = javascript_include_tag \
   'utility/nested_fields',
-  'utility/checklist-control',
-  'utility/dirty-form'
+  'utility/checklist-control'
 
 
 = form_for @record, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|
@@ -109,91 +108,14 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
-    $("#table-view-#{@record.id}").DataTable({
-      /* Disable initial sort */
-      "order": [],
-      autoWidth: false,
-    })
-
-    /* Disable sort buttons (table headers) */
-    $("#table-view-#{@record.id}").find("th").off("click")
-
-    var table = $("#page-view-update-#{@record.id}").DataTable({
+    $("#page-view-update-#{@record.id}").DataTable({
       "aaSorting": [],
       "aLengthMenu": [[1, -1], [1, "All"]],
       "iDisplayLength": -1,
     })
 
     $('#submit-form').on('submit', function (e) {
-      e.preventDefault();
-      var $form = $(this);
-      // console.log($form)
-       // Iterate over all checkboxes in the table
-       table.$('input[type="checkbox"]').each(function(){
-          // If checkbox doesn't exist in DOM
-          if(!$.contains(document, this)){
-             // If checkbox is checked
-             if(this.checked){
-                // Create a hidden element
-                $form.append(
-                   $('<input>')
-                      .attr('type', 'hidden')
-                      .attr('name', this.name)
-                      .val(this.value)
-                );
-             }
-          }
-       });
+      // e.preventDefault();
     })
-
-    var users = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('full_name'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      identify: function(obj) { console.log(obj); return obj.full_name;},
-      prefetch: {
-        url: '/users/user_json_request',
-        filter: function(users) {
-          return $.map(users, function(user) {
-            return {
-              full_name: user.full_name,
-              id: user.id
-            };
-          });
-        }
-      }
-    });
-    users.clearPrefetchCache();
-    users.initialize();
-    $('.json-user-tags').tagsinput({
-      freeInput: false,
-      itemValue: 'id',
-      itemText: 'full_name',
-      typeaheadjs: {
-        name: 'users',
-        displayKey: 'full_name',
-        source: users.ttAdapter()
-      }
-    });
-
-    // UPDATE ASSIGNEE LIST
-    $('.json-user-tags').on('itemAdded itemRemoved', function(event){
-      item_arr = $(this).tagsinput('items');
-      hiddenField = $("#checklist_assignee_ids");
-      if (!(typeof event.item === "undefined")) {
-        id_arr = [];
-        jQuery.each(item_arr, function(index, item) {
-          id_arr.push(item.id);
-        });
-        hiddenField.val(id_arr.toString());
-      }
-    });
-  });
-
-// DISPLAY EXISTING ASSIGNEES
-- assignees = @record.assignees
-- assignees.each do |assignee|
-  javascript:
-    $('#assignee_names').tagsinput('add', {"full_name": "#{assignee.full_name}", "id": parseInt("#{assignee.id}")});
-
-
+  })
 

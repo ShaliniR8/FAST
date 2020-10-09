@@ -66,13 +66,15 @@ class ChecklistsController < ApplicationController
     @record = @table.find(params[:id])
 
     # TODO: refactor needed
-    params[:checklist][:checklist_rows_attributes].each do |x, y|
-      next if y[:checklist_cells_attributes].nil? # when update only attachments
-      y[:checklist_cells_attributes].each do |m, n|
-        n.each do |key, value|
-          if value.is_a?(Array)
-            n[:value].delete("")
-            n[:value] = n[:value].join(";")
+    if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+      params[:checklist][:checklist_rows_attributes].each do |x, y|
+        next if y[:checklist_cells_attributes].nil? # when update only attachments
+        y[:checklist_cells_attributes].each do |m, n|
+          n.each do |key, value|
+            if value.is_a?(Array)
+              n[:value].delete("")
+              n[:value] = n[:value].join(";")
+            end
           end
         end
       end
@@ -92,7 +94,7 @@ class ChecklistsController < ApplicationController
   end
 
 
-  def start
+  def address
     @record = @table.includes(
       checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
       checklist_header: :checklist_header_items,
