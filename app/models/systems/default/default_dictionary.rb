@@ -264,10 +264,12 @@ class DefaultDictionary
     # },
     source_of_input: {
       partial: '/panels/source_of_input',
-      print_partial: '/pdfs/print_source_of_input',
       visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
       show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { sra: owner } },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        parent: owner.get_parent.present? ? owner.get_parent : owner.owner
+      }},
     },
     attachments: {
       partial: '/panels/attachments',

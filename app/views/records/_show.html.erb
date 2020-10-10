@@ -2,12 +2,7 @@
 
 <%=render "/records/show_template_fields", :record => owner%>
 
-<%=render 'shared/choose_show_matrix',
-            :owner => owner,
-            :show_btn => true,
-            :type => 'reports',
-            :allow_mitigate => true,
-            :can_change => false%>
+<%=render '/risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
 
 <%=render '/panels/show_panels', :owner => owner%>
 

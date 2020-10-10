@@ -19,11 +19,11 @@
                 <th>Content</th>
               </thead>
               <tbody>
-                <%owner.comments.preload(:viewer).each do |c|%>
+                <%owner.comments.preload(:viewer).each do |comment|%>
                   <tr>
-                    <td><%=c.viewer.full_name rescue "<b>External</b> #{c.alt_user}".html_safe%></td>
-                    <td><%=date_to_string(Date.parse c.get_subnmission_time)%></td>
-                    <td><%=c.get_content%></td>
+                    <td><%=comment.viewer.full_name rescue "<b>External</b> #{comment.alt_user}".html_safe%></td>
+                    <td><%=date_to_string(Date.parse comment.get_submission_time)%></td>
+                    <td><%=comment.get_content%></td>
                   </tr>
                 <%end%>
               </tbody>

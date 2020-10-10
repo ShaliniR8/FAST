@@ -228,6 +228,9 @@ class HomeController < ApplicationController
       Verification.where(:status => 'New').each do |x|
         x.get_all_validators.each do |validator|
           if validator == current_user
+
+            next if x.owner.class.name == 'CorrectiveAction'
+
             owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
             @calendar_entries.push({
               :url => "#{x.owner.class.table_name}/#{x.owner_id}",
@@ -236,6 +239,7 @@ class HomeController < ApplicationController
               :textColor => "darkslategrey",
               :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
             })
+
           end
         end
       end
@@ -373,13 +377,15 @@ class HomeController < ApplicationController
       Verification.where(:status => 'New').each do |x|
         x.get_all_validators.each do |validator|
           if validator == current_user
-            owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
+
+            next if ['SmsAction', 'CorrectiveAction'].include? x.owner.class.name
+
             @calendar_entries.push({
               :url => "#{x.owner.class.table_name}/#{x.owner_id}",
               :start => x.verify_date,
               :color => 'skyblue',
               :textColor => "darkslategrey",
-              :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
+              :title => "#{x.owner.class.name.titleize} ##{x.owner.id}: Verification required"
             })
           end
         end
