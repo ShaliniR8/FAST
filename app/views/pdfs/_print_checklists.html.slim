@@ -2,4 +2,4 @@
     - owner.checklists.includes( \
       checklist_rows: { checklist_cells: :checklist_header_item },
       checklist_header: :checklist_header_items).each do |checklist|
-      = render '/pdfs/print_checklist', checklist: checklist
+      = render '/pdfs/print_checklist', checklist: checklist, owner: owner
