@@ -1,4 +1,5 @@
-- if (owner.has_attribute?(:risk_factor) && owner.has_attribute?(:risk_factor_after) && owner.has_attribute?(:statement))
+- if (owner.has_attribute?(:risk_factor) && owner.has_attribute?(:risk_factor_after) && owner.has_attribute?(:statement)) \
+  && (owner.risk_factor.present? || owner.risk_factor_after.present? || owner.statement.present?)
   .col-xs-12
     .sub_sub_title Risk Assessment
     .content
