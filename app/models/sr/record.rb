@@ -383,13 +383,16 @@ class Record < Sr::SafetyReportingBase
   end
 
   def self.export_all
-    self.includes(:template).where(templates:{report_type: 'asap'}).each do |s|
+    date_from = Time.now - 1.month - 9.days
+
+    self.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).select { |record| record.event_date > date_from rescue false }.each do |s|
       path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
       dirname = File.join([Rails.root] + path)
       temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
       unless File.directory?(dirname)
         FileUtils.mkdir_p(dirname)
       end
+
       File.open(temp_file, 'w') do |file|
         file << ApplicationController.new.render_to_string(
           template: 'records/export_component.xml.erb',
