@@ -383,20 +383,25 @@ class Record < Sr::SafetyReportingBase
   end
 
   def self.export_all
-    date_from = Time.now - 1.month - 9.days
+    date_from = Time.now.at_beginning_of_month
 
-    self.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).select { |record| record.event_date > date_from rescue false }.each do |s|
+    all_record_fields = []
+    all_records = self.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).select { |record| record.event_date > date_from rescue false }
+    all_records.each { |record| all_record_fields << record.record_fields.map{|sf| [sf.fields_id, sf]} }
+    all_record_fields = all_record_fields.flatten(1).to_h
+
+    all_records.each do |s|
+
       path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
       dirname = File.join([Rails.root] + path)
       temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
       unless File.directory?(dirname)
         FileUtils.mkdir_p(dirname)
       end
-
       File.open(temp_file, 'w') do |file|
         file << ApplicationController.new.render_to_string(
           template: 'records/export_component.xml.erb',
-          locals:   { template: s.template, record: s})
+          locals:   { template: s.template, record: s, all_record_fields: all_record_fields})
       end
     end
   end
