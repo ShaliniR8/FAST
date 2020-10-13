@@ -14,7 +14,7 @@ module QueriesHelper
       end
     else
       field_type = field[:type]
-      value = record.send(field[:field])
+      value = strip_html_tag(record.send(field[:field]))
     end
     format_val(value, field_type, field_arr[1])
   end
