@@ -34,7 +34,9 @@
                   = f.label :assignee_ids, 'Assignees', class: 'pull-right'
                 .col-xs-8
                   = f.hidden_field :assignee_ids
-                  = text_field_tag :assignee_names, '', class: 'form-control pull-left json-user-tags', id: 'assignee_names'
+                  = text_field_tag :assignee_names, User.find(@record.assignee_ids).full_name, class: 'form-control pull-left json-user-tags', list: 'assignee_ids'
+                  datalist#assignee_ids
+                    = options_for_select(User.all.map(&:full_name))
 
             .col-xs-12.form-group.mb10
               .col-xs-2.mt5

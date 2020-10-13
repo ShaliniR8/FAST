@@ -65,6 +65,12 @@ class ChecklistsController < ApplicationController
   def update
     @record = @table.find(params[:id])
 
+    # Assignee update
+    if params[:assignee_names].present?
+      user = User.find_by_full_name(params[:assignee_names])
+      params[:checklist][:assignee_ids] = user.id if user.present?
+    end
+
     # TODO: refactor needed
     if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
       params[:checklist][:checklist_rows_attributes].each do |x, y|
