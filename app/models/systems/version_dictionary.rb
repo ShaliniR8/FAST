@@ -1,8 +1,33 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.2',
+      title: 'Version 1.2.3',
       tag: 'New',
+      toggle: 'v1_2_3',
+      date: '10/14/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Series visualization and drill down to Query Center.',
+          'Revised Checklist formatting and added table/page view.',
+          'Attach Findings to checklist rows.',
+          'Auto save on address checklist.',
+          'Added more content + page numbering and new look to PDF.',
+          'Added auto-close/default status feature to Reports/Templates.',
+          'Custom Options for Event Title.',
+          'Extension Request and Verification delete buttons.',
+        ],
+        'Optimizations & Fixes' => [
+          'Fixed Submission/Template nested fields related issue.',
+          'Improved Submission/Template layout.',
+          'Simplified user account types.',
+          'Fixed some FAA Report information not showing correctly.',
+          'Improved formatting on FAA Reports.',
+          'New look for Risk Matrix.',
+          ]
+      }
+    },
+    {
+      title: 'Version 1.2.2',
       toggle: 'v1_2_2',
       date: '8/21/2020',
       sections: {
@@ -23,7 +48,7 @@ class VersionDictionary
           'Updated Meeting Minutes and Agenda to show in all Meetings.'
           ]
       }
-    },    
+    },
     {
       title: 'Version 1.2.1',
       toggle: 'v1_2_1',
