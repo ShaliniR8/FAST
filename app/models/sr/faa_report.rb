@@ -52,7 +52,7 @@ class FaaReport < ActiveRecord::Base
         link: true, mode: 4, value: 'statistics', value_key: 'asap_accepted_closed'},
       {title: 'Number of accepted reports present quarter (both sole source & non-sole source) closed with corrective action under ASAP for the employee',
         link: true, mode: 5, value: 'statistics', value_key: 'asap_accepted_employee_car'},
-      {title: 'Number of reports present quarter, which resulted in recommendations to the company for corrective action',
+      {title: 'Number of accepted reports present quarter, which resulted in recommendations to the company for corrective action',
         link: true, mode: 6, value: 'statistics', value_key: 'asap_aceepted_company_car'},
     ]
   end
