@@ -8,7 +8,7 @@
       <%owner.comments.each do |c|%>
         <tr>
           <td><%=c.get_content%></td>
-          <td><%=date_to_string(Date.parse c.get_subnmission_time)%></td>
+          <td><%=date_to_string(Date.parse c.get_submission_time)%></td>
         </tr>
       <%end%>
     </tbody>

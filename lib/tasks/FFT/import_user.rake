@@ -138,7 +138,7 @@ task :import_fft_distribution_list => :environment do
 
     user.save!
 
-    inflight_prev = Privilege.find_by_name("Inflight Incident: Analyst")
+    inflight_prev = Privilege.find_by_name("Inflight: Incident Analyst")
     flight_crew_prev = Privilege.find_by_name("Flight Operations: Incident Analyst")
 
     #user.privileges << flight_crew_prev

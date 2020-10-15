@@ -2,7 +2,7 @@ table id='records_table' class='table table-hover table-striped table-bordered i
 
   thead
     - @fields.each do |field|
-      th = field[:title]
+      th = eval(field[:title]) rescue field[:title]
     - if params[:controller] == "records" # if Report index page, show additional info column
       th Additional Info
     th width="20%" Action

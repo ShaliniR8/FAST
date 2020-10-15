@@ -118,7 +118,7 @@ class DefaultDictionary
     pdf: {
       btn: :pdf,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| true },
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',true,true) },
     },
     private_link: {
       btn: :private_link,
