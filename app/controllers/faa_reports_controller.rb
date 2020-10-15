@@ -141,8 +141,7 @@ class FaaReportsController < ApplicationController
   def show
     @report = FaaReport.find(params[:id])
     asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        @report.get_start_date, @report.get_end_date)
+    .where("event_date >= ? and event_date <= ?", Date.strptime(@report.get_start_date, '%m/%d/%Y'), Date.strptime(@report.get_end_date, '%m/%d/%Y'))
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
