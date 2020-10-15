@@ -76,6 +76,7 @@ javascript:
   $(function(){
     $('#upload_btn').on('click',function(){
       $.get("#{new_checklist_path(owner_type: owner.class.name, owner_id: owner.id)}", function(data){
+        $(".modal-content").html('');
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
