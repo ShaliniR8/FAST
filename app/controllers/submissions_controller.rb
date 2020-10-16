@@ -509,7 +509,6 @@ class SubmissionsController < ApplicationController
   private
 
     def notify_notifiers(owner, commit)
-
       mailer_privileges = AccessControl.where(
         :action => 'notifier',
         :entry => owner.template.name)
@@ -524,7 +523,8 @@ class SubmissionsController < ApplicationController
         call_rake 'submission_notify',
             owner_type: owner.class.name,
             owner_id: owner.id,
-            users: notifiers.map(&:id)
+            users: notifiers.map(&:id),
+            attach_pdf: CONFIG.sr::GENERAL[:attach_pdf_submission]
 
       when "Save for Later"
         notify(owner, notice: {
