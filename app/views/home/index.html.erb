@@ -9,7 +9,7 @@
 
       <%if session[:mode] == "ASAP" && !@templates.empty?%>
         <%=render "new_submission"%>
-        <%=render "new_orms" if CONFIG::GENERAL[:enable_orm]%>
+        <%=render "new_orms" if CONFIG.sr::GENERAL[:enable_orm]%>
       <%end%>
 
       <%=render "news"%>

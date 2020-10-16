@@ -408,11 +408,11 @@ class DefaultSafetyReportingConfig
           {title: 'New', path: 'new_submission_path',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', true, true)}},
           {title: 'ORMs', path: '#',  header: true,
-            display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
           {title: 'All', path: 'orm_submissions_path',
-            display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
           {title: 'New', path: 'new_orm_submission_path',
-            display: proc{|user:,**op| GENERAL[:enable_orm]}},
+            display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
         ]
       },
       'Reports' => {
