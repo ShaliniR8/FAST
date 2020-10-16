@@ -460,7 +460,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           assign: {
             access: proc { |owner:,user:,**op|
               DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
-              (owner.immediate_action || owner.owner.status == 'Completed')
+              (owner.immediate_action || (%w[Completed].include? owner.owner.status rescue true))
             },
           },
         }),
