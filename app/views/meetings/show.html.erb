@@ -95,9 +95,6 @@
         </div>
 
         <div class="col-xs-12">
-          <%if @current_inv.present?%>
-            <%=render "invitation_form"%>
-          <%end%>
 
           <div class="panel panel-lightskyblue">
             <div class="panel-heading">
@@ -140,7 +137,7 @@
                     "data-target" => ".bs-example-modal-lg"%>
                 <%end%>
               </div>
-              <%=render "invite"%>
+              <%=render "invite", hide_btns:true%>
             </div>
           </div>
         </div>

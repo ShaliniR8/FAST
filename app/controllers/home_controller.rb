@@ -249,15 +249,15 @@ class HomeController < ApplicationController
       if current_user.has_access("meeting", "index")
         meetings = Meeting.where("status != ? and type is null", "Closed")
         meetings = meetings.select{|x| x.has_user(current_user)}
-        meetings.each do |a|
+        meetings.each do |meeting|
           @calendar_entries.push({
-            :url => meeting_path(a),
-            :start => a.get_time("meeting_start"),
-            :end => a.get_time("meeting_end"),
-            :title => "Meeting \##{a.id}",
+            :url => meeting_path(meeting),
+            :start => meeting.get_time("meeting_start"),
+            :end => meeting.get_time("meeting_end"),
+            :title => "Meeting \##{meeting.id}",
             :color => "khaki",
             :textColor => "darkslategrey",
-            :description => a.get_tooltip
+            :description => meeting.get_tooltip
           })
         end
       end

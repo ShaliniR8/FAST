@@ -113,7 +113,7 @@ class Meeting < ProsafetBase
   def invited?(user)
     result = false
     self.invitations.each do |f|
-      result = result || (f.users_id==user.id && f.status == "Accepted")
+      result = result || f.users_id == user.id
     end
     result
   end
@@ -199,10 +199,10 @@ class Meeting < ProsafetBase
   def self.getMessageOptions
     {
       "All Invitees"=>"All",
-      "All Participants (Exclude Rejected Invitations)"=>"Par",
-      "Accepted Invitees"=>"Acp",
-      "Pending Invitees"=>"Pen",
-      "Rejected Invitees"=>"Rej"
+      # "All Participants (Exclude Rejected Invitations)"=>"Par",
+      # "Accepted Invitees"=>"Acp",
+      # "Pending Invitees"=>"Pen",
+      # "Rejected Invitees"=>"Rej"
     }
   end
 

@@ -14,9 +14,7 @@
       <%User.includes(:invitations).where(id: @users.select(&:present?).map(&:id)).each do |user|%>
         <tr user="<%=user.id%>">
           <%User.invite_headers.each do |header|%>
-            <td>
-              <%=user.send(header[:field])%>
-            </td>
+            <td><%=user.send(header[:field])%></td>
           <%end%>
           <%if !(defined?(hide_btns) && hide_btns)%>
             <% invite_status = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.status rescue
