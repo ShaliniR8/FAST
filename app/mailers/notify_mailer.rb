@@ -17,7 +17,6 @@ class NotifyMailer < ApplicationMailer
   end
 
   def notify(notice, subject, record, attachment = nil)
-    define_attachments
     @user = notice.user
     @notice = notice
     @link = g_link(notice.owner)
@@ -41,7 +40,6 @@ class NotifyMailer < ApplicationMailer
   def share_private_link(shared_by, private_link)
     @private_link = private_link
     @email = private_link.email
-    define_attachments
     @subject = 'New shared link on ProSafeT'
     link = "<a style='font-weight:bold;text-decoration:underline' href='#{private_links_url(digest: private_link.digest)}'>View</a>"
     @message = "#{shared_by.full_name} has shared a link with you on ProSafeT. #{link}"
@@ -55,7 +53,6 @@ class NotifyMailer < ApplicationMailer
     @message = message.gsub('\n', '<br>') rescue ''
     @record = record
     @record_url = g_link(record)
-    define_attachments
     subject = "ProSafeT: #{subject}"
     mail(**to_email(user.email), subject: subject).deliver
   end
@@ -66,7 +63,6 @@ class NotifyMailer < ApplicationMailer
     @submission_description = submission.get_description
     @submission_url = g_link(submission)
     @submitter_message = submission.template.submitter_message.gsub("\n", '<br>') rescue nil
-    define_attachments
     subject = "ProSafeT: Submission ##{submission.id} Received"
     mail(**to_email(user.email), subject: subject).deliver
   end
