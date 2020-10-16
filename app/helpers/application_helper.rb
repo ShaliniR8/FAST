@@ -603,6 +603,6 @@ module ApplicationHelper
 
 
   def strip_html_tag(text)
-    text.gsub(/<\/?[^>]+>/, '')
+    text.gsub(/<\/?[^>]+>/, '') rescue ''
   end
 end
