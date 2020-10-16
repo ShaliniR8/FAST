@@ -38,8 +38,8 @@ class Verification < ActiveRecord::Base
     validators = self.additional_validators.map { |validator|
       User.find(validator).full_name
     }
-    # all additional valiators + responsible user(validator)
-    (validators + [self.validator.full_name]).uniq.join(', ')
+    # all additional valiators
+    validators.uniq.join
   end
 
   def self.get_user_list
