@@ -42,6 +42,9 @@ class DefaultMobileConfig
     #atn_dir:          { label: 'Login with ProSafeT',           subdomain: 'fft'},
     #atn_sso:          { label: 'SSO',                           subdomain: 'fft',           sso: true},
 
+    # RVF portals
+    rvf_training_dir: { label: 'Training',                      subdomain: 'rvf-training'},
+    rvf_dir:          { label: 'General',                       subdomain: 'rvf'},
 
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
@@ -121,6 +124,21 @@ class DefaultMobileConfig
         atn_dir
       ]
     },
+
+
+    'RVF Beta Key' =>{ # 5F85-7FC8-D717-84E8
+      key_name: 'Ravn Alaska',
+      portals: %i[
+        rvf_training_dir
+      ]
+    },
+    'RVF Key' =>{ # 0447-31ED-DF24-ABF9
+      key_name: 'Ravn Alaska',
+      portals: %i[
+        rvf_dir
+      ]
+    },
+
 
     'Trial Key' => { # 6158-BC31-0338-233B
       key_name: 'Trial',
