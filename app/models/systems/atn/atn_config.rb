@@ -44,6 +44,13 @@ class ATNConfig < DefaultConfig
   }
 
   MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Initial Risk',
+      mitigate_btn: 'Residual Risk',
+      'Baseline' => 'Initial',
+      'Mitigate' => 'Residual'
+    },
+
     severity_table: {
       title: 'SEVERTIY EXERCISE',
 

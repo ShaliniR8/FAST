@@ -27,3 +27,5 @@ div class="#{definition_size} "
         - description_approvals.each do |description_approval|
           td
             = description_approval.html_safe
+
+  h5 = CONFIG::MATRIX_INFO[:risk_definitions_additional_info]

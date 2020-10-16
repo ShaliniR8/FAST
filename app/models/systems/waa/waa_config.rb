@@ -18,6 +18,13 @@ class WAAConfig < DefaultConfig
   })
 
   MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Baseline Risk',
+      mitigate_btn: 'Mitigate Risk',
+      'Baseline' => 'Baseline',
+      'Mitigate' => 'Mitigated'
+    },
+
     severity_table: {
       title: 'SEVERTIY EXERCISE',
       orientation: :vertical,

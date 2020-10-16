@@ -1,4 +1,4 @@
-=render 'shared/instructions', instruction: "Select <b>#{risk_type} Probability</b> and <b>#{risk_type} Severity</b> from the table to assess risk."
+=render 'shared/instructions', instruction: "Select <b>#{CONFIG::MATRIX_INFO[:terminology][risk_type]} Probability</b> and <b>#{CONFIG::MATRIX_INFO[:terminology][risk_type]} Severity</b> from the table to assess risk."
 
 - unless CONFIG::GENERAL[:drop_down_risk_selection]
   .form-group.col-xs-12
@@ -7,6 +7,6 @@
 
 .col-xs-12.mt20
   h4
-    span.label.label-baseline = 'Baseline'
-    span.label.label-mitigated = 'Mitigated'
+    span.label.label-baseline = CONFIG::MATRIX_INFO[:terminology]['Baseline']
+    span.label.label-mitigated = CONFIG::MATRIX_INFO[:terminology]['Mitigate']
     span.label.label-overlapped = 'Overlapped'

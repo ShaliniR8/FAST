@@ -105,6 +105,13 @@ class FFTConfig < DefaultConfig
 
 
   MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Initial Risk',
+      mitigate_btn: 'Residual Risk',
+      'Baseline' => 'Initial',
+      'Mitigate' => 'Residual'
+    },
+
     severity_table: {
       title: 'SEVERTIY EXERCISE',
 
@@ -233,6 +240,8 @@ class FFTConfig < DefaultConfig
       orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
       red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
     },
+
+    risk_definitions_additional_info: '* Risk Acceptance authority can be delegated on a temporary basis',
 
     risk_table_index: {
       'Low - 2' => 'limegreen',

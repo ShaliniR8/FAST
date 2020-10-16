@@ -1,12 +1,12 @@
 .panel.panel-info
   .panel-heading
     .panel-title
-      b = "#{@risk_type} Risk Assessment"
+      b = "#{CONFIG::MATRIX_INFO[:terminology][@risk_type]} Risk Assessment"
       button.close.pull-right type="button" data-dismiss="modal" arial-label="Close"
         span.glyphicon.glyphicon-remove
   .panel-body style="max-height: calc(100vh - 210px);overflow-y:auto;"
     = form_for @owner do |f|
       = render 'risk_matrices/panel_matrix/form_matrix/form_matrix', f: f, risk_type: @risk_type
-      = f.submit "Save #{@risk_type} Risk", class: 'btn btn-success pull-right', disable_with: 'Saving...'
+      = f.submit "Save #{CONFIG::MATRIX_INFO[:terminology][@risk_type]} Risk", class: 'btn btn-success pull-right', disable_with: 'Saving...'
 
 = render 'risk_matrices/panel_matrix/risk_matrix_js', risk_type: @risk_type
