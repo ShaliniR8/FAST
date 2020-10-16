@@ -1,9 +1,7 @@
 html
   body
-    = "Hello #{@user.full_name},"
+    = "Hello #{@user.first_name},"
     br
-    br
-    br = "You have received the following confirmation message for your submission ##{@submission_id}, #{@submission_description}:"
     br
     br
     - if @submitter_message.present?
@@ -12,10 +10,13 @@ html
       = "This message is to confirm that your submission ##{@submission_id}, #{@submission_description}, has been successfully submitted."
     = @submission_url.html_safe
     br
+    br
+    br
     br Thank you,
     | ProSafeT System
-    br = image_tag(attachments['logo.png'].url, :size => '145x35')
-    br NOTICE:
+    br
+    br
+    br: b NOTICE:
     | This is an automated message. If you need assistance, please contact us at
     a< href='https://support.prosafet.com/home' support.prosafet.com.
     br If you received this message in error, notify us through the support portal. Thank you.
