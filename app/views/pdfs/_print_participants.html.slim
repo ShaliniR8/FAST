@@ -9,12 +9,8 @@
           tr
             - User.invite_headers.each do |header|
               th = header[:title]
-            th Action
         tbody
           - User.includes(:invitations).where(id: users.select(&:present?).map(&:id)).each do |user|
             tr
               - User.invite_headers.each do |header|
                 td = user.send(header[:field])
-              - invite_status = user.invitations.detect{ |inv| inv.meetings_id == owner.id }.status rescue 'Not Invited'
-              - msg = invite_status == 'Not Invited' ? 'Invite' : 'Invited'
-              td = msg
