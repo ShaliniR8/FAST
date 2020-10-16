@@ -1,5 +1,6 @@
 - if owner.records.present?
   .col-xs-12
+    hr
     .title Linked Reports
     .content
       table.table.table-bordered.table-striped
@@ -26,7 +27,7 @@
                 - additional_info.each do |field|
                   - if field[:value].present?
                     p
-                      b >= "#{field[:label]}: "
+                      b> = "#{field[:label]}: "
                       = field[:value]
 css:
   .table tbody tr > td.red {
