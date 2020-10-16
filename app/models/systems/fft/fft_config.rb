@@ -22,6 +22,7 @@ class FFTConfig < DefaultConfig
     base_risk_matrix:                  false,
     allow_reopen_forms:                false,
     has_root_causes:                   false,
+    attach_pdf_submission:             true
   })
 
 
