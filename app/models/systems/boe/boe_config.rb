@@ -38,9 +38,9 @@ class BOEConfig < DefaultConfig
     },
   }).merge({ # replace default risk_definitions with boe custom definitions
     risk_definitions: {
-      red:       {rating: "HIGH",     cells: "A4, A3, B4",     description: "Unacceptable"                 },
-      yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
-      limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
+      red:       {rating: "High",     cells: "A4, A3, B4",     description: "Unacceptable"                 },
+      yellow:    {rating: "Moderate", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
+      limegreen: {rating: "Low",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
     },
   })
 

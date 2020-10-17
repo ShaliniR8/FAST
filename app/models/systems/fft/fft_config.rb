@@ -235,11 +235,11 @@ class FFTConfig < DefaultConfig
     },
 
     risk_definitions: {
-      limegreen:        { rating: 'LOW',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
-      steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
-      yellow:           { rating: 'MEDIUM',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
-      orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
-      red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
+      limegreen:        { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
+      steelblue:        { rating: 'Minor',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
+      yellow:           { rating: 'Medium',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
+      orange:           { rating: 'Serious',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
+      red:              { rating: 'High',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
     },
 
     risk_definitions_additional_info: '* Risk Acceptance authority can be delegated on a temporary basis',
@@ -251,21 +251,26 @@ class FFTConfig < DefaultConfig
       'Low - 5' => 'limegreen',
       'Low - 6' => 'limegreen',
       'Low' =>  'limegreen',
+      'LOW' =>  'limegreen',
       'Minor - 8' => 'steelblue',
       'Minor - 9' => 'steelblue',
       'Minor - 10' => 'steelblue',
       'Minor' => 'steelblue',
+      'MINOR' => 'steelblue',
       'Medium - 12' => 'yellow',
       'Medium - 15' => 'yellow',
       'Medium - 16' => 'yellow',
       'Medium' => 'yellow',
+      'MEDIUM' => 'yellow',
       'Serious - 18' => 'orange',
       'Serious - 20' => 'orange',
       'Serious' => 'orange',
+      'SERIOUS' => 'orange',
       'High - 24' => 'red',
       'High - 25' => 'red',
       'High - 30' => 'red',
       'High' => 'red',
+      'HIGH' => 'red',
     },
 
     risk_table_dict: {

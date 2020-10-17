@@ -285,7 +285,11 @@ class DefaultConfig
     risk_table_index: {
       'Orange - Unacceptable'                => 'orange',
       'Yellow - Acceptable with mitigation'  => 'yellow',
-      'Green - Acceptable'                   => 'limegreen'
+      'Green - Acceptable'                   => 'limegreen',
+
+      'Moderate' => 'yellow',
+      'Low'      => 'limegreen',
+      'High'     => 'red',
     },
   }
 

@@ -182,11 +182,11 @@ class ATNConfig < DefaultConfig
     },
 
     risk_definitions: {
-      limegreen:        { rating: 'LOW',       cells: '3/5, 4/4, 4/5',       description: 'Review by appropriate authority to evaluate if corrective and/or preventive action is required.' },
-      steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3',       description: 'Review by appropriate authority. May require tracking and corrective and/or preventive action.' },
-      yellow:           { rating: 'MEDIUM',    cells: '1/5, 2/4, 3/3, 4/2',  description: 'Review by appropriate authority, requires tracking and probable corrective and/or preventive action.' },
-      orange:           { rating: 'SERIOUS',   cells: '1/4, 2/3, 3/2',       description: 'Unacceptable, requires investigation, resources and corrective and/or preventive action.' },
-      red:              { rating: 'HIGH',      cells: '1/2, 1/3, 2/2',       description: 'Unacceptable, requires the highest priority for investigation, resources and corrective and/or preventive action.' }
+      limegreen:        { rating: 'Low',       cells: '3/5, 4/4, 4/5',       description: 'Review by appropriate authority to evaluate if corrective and/or preventive action is required.' },
+      steelblue:        { rating: 'Minor',     cells: '2/4, 2/5, 3/3',       description: 'Review by appropriate authority. May require tracking and corrective and/or preventive action.' },
+      yellow:           { rating: 'Medium',    cells: '1/5, 2/4, 3/3, 4/2',  description: 'Review by appropriate authority, requires tracking and probable corrective and/or preventive action.' },
+      orange:           { rating: 'Serious',   cells: '1/4, 2/3, 3/2',       description: 'Unacceptable, requires investigation, resources and corrective and/or preventive action.' },
+      red:              { rating: 'High',      cells: '1/2, 1/3, 2/2',       description: 'Unacceptable, requires the highest priority for investigation, resources and corrective and/or preventive action.' }
     },
 
     risk_table_index: {
@@ -195,6 +195,16 @@ class ATNConfig < DefaultConfig
       'Medium - 3' => 'yellow',
       'Serious - 2' => 'orange',
       'High - 1' => 'red',
+      'LOW' => 'limegreen',
+      'MINOR' => 'steelblue',
+      'MEDIUM' => 'yellow',
+      'SERIOUS' => 'orange',
+      'HIGH' => 'red',
+      'Low' => 'limegreen',
+      'Minor' => 'steelblue',
+      'Medium' => 'yellow',
+      'Serious' => 'orange',
+      'High' => 'red',
     },
 
     risk_table_dict: {
