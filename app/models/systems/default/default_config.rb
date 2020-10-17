@@ -290,6 +290,10 @@ class DefaultConfig
       'Moderate' => 'yellow',
       'Low'      => 'limegreen',
       'High'     => 'red',
+
+      'MODERATE' => 'yellow',
+      'LOW'      => 'limegreen',
+      'HIGH'     => 'red',
     },
   }
 
