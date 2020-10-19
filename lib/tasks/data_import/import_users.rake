@@ -1,7 +1,5 @@
 require 'roo'
 
-AIRLINE_CODE = 'RVF'
-
 desc "Import #{AIRLINE_CODE} user account information"
 task :import_users => :environment do
 
