@@ -217,38 +217,4 @@ class ATNConfig < DefaultConfig
   }
 
 
-
-
-  ULTIPRO_DATA = {
-    upload_path: '/var/sftp/scxsftpuser/Suncountry_POC.xml',
-    expand_output: false, #Shows full account generation details
-    dry_run: false, #Prevents the saving of data to the database
-
-    #The following identifies what account type is associated with each employee-group
-    group_mapping: {
-      'dispatch'    => 'Analyst',
-      'fight-crew'  => 'Pilot',
-      'ground'      => 'Ground',
-      'maintenance' => 'Staff',
-      'other'       => 'Staff'
-    }, #Cabin
-    tracked_privileges: [
-      'Ground: Incident Submitter',
-      'Ground: General Submitter',
-      'Other: General Submitter',
-      'Flight Crew: ASAP Submitter',
-      'Flight Crew: Incident Submitter',
-      'Flight Crew: Fatigue Submitter',
-      'Dispatch: ASAP Submitter',
-      'Dispatch: Incident Submitter',
-      'Dispatch: Fatigue Submitter',
-      'Maintenance: ASAP Submitter',
-      'Maintenance: Incident Submitter',
-      'Maitnenance: Fatigue Submitter',
-      'Cabin: ASAP Submitter',
-      'Cabin: Incident Submitter',
-      'Cabin: Fatigue Submitter'
-    ],
-  }
-
 end

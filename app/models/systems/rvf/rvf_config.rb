@@ -291,48 +291,5 @@ class RVFConfig < DefaultConfig
     end
   end
 
-  ULTIPRO_DATA = {
-    upload_path: '/var/sftp/fftsftpuser/ProSafeT_User_List.XML',
-    expand_output: false, #Shows full account generation details
-    dry_run: false, #Prevents the saving of data to the database
-
-    #The following identifies what account type is associated with each employee-group
-    group_mapping: {
-      'dispatch'    => 'Analyst',
-      'fight-crew'  => 'Pilot',
-      'ground'      => 'Ground',
-      'maintenance' => 'Staff',
-      'other'       => 'Staff'
-    }, #Cabin
-    tracked_privileges: [
-      'Flight Operations: Incident Submitter',
-      'Flight Operations: ASAP Submitter',
-      'Flight Operations: Fatigue Submitter',
-      'Flight Operations: Medical Event Submitter',
-      'Flight Operations: Fume Event Submitter',
-      'Inflight: Incident Submitter',
-      'Inflight: ASAP Submitter',
-      'Inflight: Fatigue Submitter',
-      'Inflight: Medical Event Submitter',
-      'Inflight: Fume Event Submitter',
-
-      'Ground: Incident Submitter',
-      'Ground: General Submitter',
-      'Other: General Submitter',
-      'Flight Crew: ASAP Submitter',
-      'Flight Crew: Incident Submitter',
-      'Flight Crew: Fatigue Submitter',
-      'Dispatch: ASAP Submitter',
-      'Dispatch: Incident Submitter',
-      'Dispatch: Fatigue Submitter',
-      'Maintenance: ASAP Submitter',
-      'Maintenance: Incident Submitter',
-      'Maitnenance: Fatigue Submitter',
-      'Cabin: ASAP Submitter',
-      'Cabin: Incident Submitter',
-      'Cabin: Fatigue Submitter'
-    ],
-  }
-
 
 end
