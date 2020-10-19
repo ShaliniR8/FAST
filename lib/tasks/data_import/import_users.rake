@@ -1,8 +1,8 @@
 require 'roo'
 
-desc "Import #{AIRLINE_CODE} user account information"
+desc "Import user account information"
 task :import_users => :environment do
-
+  puts "Import #{AIRLINE_CODE} user account information"
   # select module to assign privileges for
   # MODULE_NAME = 'ASAP'
   # MODULE_NAME = 'SMS IM'
@@ -29,7 +29,6 @@ task :import_users => :environment do
   filepath = "./lib/tasks/#{AIRLINE_CODE}/" + filename
   workbook = Roo::Spreadsheet.open(filepath)
 
-  puts "Import #{AIRLINE_CODE} user account information"
 
   # Spreadsheet infromation
   USERNAME_COL      = 0
