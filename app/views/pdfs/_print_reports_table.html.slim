@@ -11,7 +11,7 @@
               th = eval(h[:title]) rescue h[:title]
 
         tbody
-          - owner.reports.each do |event|
+          - owner.reports.sort_by{|x| x.id}.each do |event|
             tr
               - report_headers.each do |h|
                 td class=("#{h[:html_class].present? ? event.send(h[:html_class]) : ''}" + "")
