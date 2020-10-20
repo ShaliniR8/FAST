@@ -49,11 +49,14 @@ class FindingsController < SafetyAssuranceController
     else # from Launch Object
       @owner = Finding.new
     end
+    @risk_type = 'Baseline'
     choose_load_special_matrix_form(@owner, 'finding')
   end
 
 
   def create
+    convert_from_risk_value_to_risk_index
+
     if params[:owner_type].present?
       @parent_old = Object.const_get(params[:owner_type]).find(params[:owner_id])
       @finding = @parent_old.findings.create(params[:finding])

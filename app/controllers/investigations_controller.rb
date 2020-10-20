@@ -50,6 +50,8 @@ class InvestigationsController < SafetyAssuranceController
     end
     load_options
     @fields = Investigation.get_meta_fields('form')
+
+    @risk_type = 'Baseline'
     load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
@@ -61,6 +63,8 @@ class InvestigationsController < SafetyAssuranceController
   end
 
   def create
+    convert_from_risk_value_to_risk_index
+
     @investigation = Investigation.new(params[:investigation])
     if @investigation.save
       redirect_to investigation_path(@investigation), flash: {success: "Investigation created."}

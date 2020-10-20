@@ -63,12 +63,14 @@ class HazardsController < ApplicationController
     end
     load_options
     @fields = Hazard.get_meta_fields('form')
+    @risk_type = 'Baseline'
     load_special_matrix_form("hazard", "baseline", @hazard)
   end
 
 
 
   def create
+    convert_from_risk_value_to_risk_index
     @hazard = Hazard.create(params[:hazard])
     @hazard.status = 'New'
     @hazard.save
