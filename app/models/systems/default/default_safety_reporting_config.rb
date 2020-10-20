@@ -297,6 +297,7 @@ class DefaultSafetyReportingConfig
         },
         panels: %i[occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        print_panels: %w[risk_matrix occurrences corrective_actions records]
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',

@@ -1,0 +1,51 @@
+.col-xs-12.wrap
+  - if !(defined?(first_print) && first_print)
+    hr
+  - owner_class_name = owner.class.name
+  - name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
+  - owner_name = name_mapping.present? ? name_mapping : owner_class_name
+  - source_of_input = defined?(source_of_input) && source_of_input
+  - if source_of_input
+    .title Source of Input:
+    .col-xs-12.sub_title
+      = "#{owner_name} ##{owner.get_id}: #{owner.title}"
+  - else
+    .title
+      = "#{owner_name} ##{owner.get_id}: #{owner.title}"
+  .col-xs-12
+    .content
+      = render "/pdfs/print_fields",
+        fields: Report.get_meta_fields('show', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : ''),
+        owner: owner,
+        deidentified: deidentified
+
+      - if !(source_of_input)
+
+        - hierarchy_object    = CONFIG.object[owner_class_name]
+        - panels_to_print     = hierarchy_object[:print_panels]
+
+        - skip_launch_item    = defined?(skip_launch_item)
+        - skip_meetings       = defined?(skip_meetings) && skip_meetings
+        - skip_investigations = skip_launch_item && skip_launch_item == 'investigations'
+        - skip_sras           = skip_launch_item && skip_launch_item == 'sras'
+
+        - panels_to_print.each do |panel|
+          - case panel
+          // TODO: refactor comments, sras, investigations to reference owner
+          - when 'meetings'
+            - if !skip_meetings
+              = render '/pdfs/print_meetings', owner: owner, deidentified: deidentified
+          - when 'comments'
+            = render "pdfs/print_comments", comments: owner.comments, deidentified: deidentified
+          - when 'sras'
+            - if !skip_sras
+              = render 'pdfs/print_sras',
+                sras: owner.get_children(child_type: 'Sra'),
+                deidentified: deidentified
+          - when 'investigations'
+            - if !skip_investigations
+              = render 'pdfs/print_investigations',
+                investigations: owner.get_children(child_type: 'Investigation'),
+                deidentified: deidentified
+          - else
+            = render "/pdfs/print_#{panel}", owner: owner, deidentified: deidentified
