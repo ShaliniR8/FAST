@@ -70,6 +70,7 @@ module RiskMatricesHelper
 
 
   def create_risk_matrix_with_num_of_occurrences(object:)
+    @risk_table = CONFIG::MATRIX_INFO[:risk_table]
     row = @risk_table[:row_header]
     col = @risk_table[:column_header]
 

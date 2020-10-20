@@ -42,7 +42,7 @@
                 = render 'risk_matrices/dashboard_matrix/mitigate/srm_td'
 
   .mr10 align='right'
-    a href="#" id="export"
+    a href="#" id="after_export"
       u = 'Download Table'
 
 css:
@@ -64,6 +64,8 @@ javascript:
   $(document).ready(function() {
 
     $('#after_export').on('click', function() {
+      event.preventDefault();
+
       html2canvas($('#after_matrix'), {
         onrendered: function(canvas) {
           var saveAs = function(uri, filename) {
@@ -129,5 +131,7 @@ javascript:
         $('.report_after_cell').hide();
         $('.record_after_cell').show();
       }
+
+      event.preventDefault();
     });
   })

@@ -616,6 +616,16 @@ class HomeController < ApplicationController
     end
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
     @departments = params[:departments] ? params[:departments] : nil
+
+    @params = {
+      advance_search: true,
+      status: 'All',
+      start_date: @start_date,
+      end_date: @end_date,
+      emp_groups: @emp_groups,
+      departments: @departments,
+    }
+
     prepare_analytics
     prepare_calendar
     prepare_risk_matrix

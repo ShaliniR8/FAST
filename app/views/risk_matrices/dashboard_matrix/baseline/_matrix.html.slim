@@ -63,10 +63,9 @@ css:
 javascript:
   $(document).ready(function() {
 
-    // var cw = $('.color_cell').width();
-    // $('.color_cell').css({'height':cw+'px'});
-
     $('#export').on('click', function(){
+      event.preventDefault();
+
       html2canvas($('#risk_matrix'),{
         onrendered: function(canvas){
           var saveAs = function(uri, filename){
@@ -131,14 +130,14 @@ javascript:
         $(this).closest('.panel-title').find('.top_text').html("<b>Baseline Risk Analysis: Reports</b>");
         $('.report_cell').hide();
         $('.record_cell').show();
-
       }
+
+      event.preventDefault();
     });
 
-    // $('.color_cell').on('click',function(){
-    //   console.log("!!");
-    //   window.location=$(this).attr('href');
-    // });
+    $('.color_cell').on('click',function(){
+      window.location=$(this).attr('href');
+    });
 
 
   })
