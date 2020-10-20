@@ -20,7 +20,8 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
             num_cols: 6, type: 'datalist', visible: 'index,form,meeting_form,show',
             required: true, on_newline: true, options: CONFIG.custom_options['Event Titles']
           }
-        }
+        },
+        print_panels: %w[risk_matrix occurrences records ]
       }
     }
   })
