@@ -153,13 +153,13 @@
             </div>
 
             <div class="col-xs-12 col-sm-2 mb5">
-              <%=label_tag :event_time_zone, "Time Zone"%>
+              <%=label_tag :event_time_zone, "Time Zone", :style => "color:red"%>
               <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
                 <div class="input-group">
                   <%=f.select :event_time_zone,
                      ActiveSupport::TimeZone.all.map(&:name),
-                    {:include_blank => ""},
-                    {:class => 'form-control tz atz toplevel_timezone'}%>
+                    {:selected => CONFIG::GENERAL[:time_zone]},
+                    {:class => 'form-control tz atz toplevel_timezone required_field'}%>
                   <span class="input-group-addon tc">All</span>
                 </div>
               <%else%>
