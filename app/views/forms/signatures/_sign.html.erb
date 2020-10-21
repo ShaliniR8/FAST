@@ -72,7 +72,7 @@
     createCanvas();
 
     window.addEventListener('resize', resizeCanvas);
-    // $('.bs-example-modal-lg').on('shown.bs.modal',function(){createCanvas();});
+    $('.bs-example-modal-lg').on('shown.bs.modal',function(){createCanvas();});
 
     document.getElementById('submit_signature').addEventListener('click', function(){
       var dataUrl = signaturePad.toDataURL();
