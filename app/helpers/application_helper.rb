@@ -5,6 +5,25 @@ module ApplicationHelper
     return Template.find(:all)
   end
 
+
+  def convert_to_utc(date_time:, time_zone:)
+    time_zone = 'UTC' if time_zone.blank?
+    time_zone = ActiveSupport::TimeZone.new(time_zone)
+    date_time = date_time.present? ? DateTime.parse(date_time) : time_zone.at(Time.now)
+    time_zone.local_to_utc(date_time)
+  end
+
+
+  def display_date_time_in_zone(date_time:, time_zone:, display_zone: time_zone)
+    datetime_to_string(date_time.in_time_zone(time_zone)) + " #{display_zone}"
+  end
+
+
+  def display_local_time_zone
+    Time.now.in_time_zone(CONFIG::GENERAL[:time_zone]).strftime('%Z')
+  end
+
+
   # Calculate the severity based on airport's risk matrix
   def calculate_severity(list)
     return CONFIG.calculate_severity(list)
