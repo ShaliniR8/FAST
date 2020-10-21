@@ -174,6 +174,7 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:id])
+    @departments = CONFIG.custom_options['Departments']
 
     # User entered wrong password, only works for the self edit page right now
     if !@user.matching_password?(params[:pw])
