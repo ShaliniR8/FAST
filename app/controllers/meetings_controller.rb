@@ -401,7 +401,7 @@ class MeetingsController < ApplicationController
     users.each do |user|
       SendTo.create(messages_id: message.id, users_id: user.id)
       notify(message, notice: {
-        users_id: user,
+        users_id: user.id,
         content: "You have a new internal message sent from Meeting ##{@meeting.id}."},
         mailer: true, subject: 'New Internal Meeting Message')
     end
