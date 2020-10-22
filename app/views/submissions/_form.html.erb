@@ -156,7 +156,7 @@
             </div>
 
             <div class="col-xs-12 col-sm-2 mb5">
-              <%time_zone_value = @record.event_time_zone.present? ? @record.event_time_zone : CONFIG::GENERAL[:time_zone]%>
+              <%time_zone_value = @record.event_time_zone.present? ? @record.event_time_zone : 'UTC'%>
               <%=label_tag :event_time_zone, "Time Zone", :style => "color:red"%>
               <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
                 <div class="input-group">

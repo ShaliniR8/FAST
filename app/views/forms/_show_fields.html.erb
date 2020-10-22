@@ -76,7 +76,7 @@
               <%if field_name == "event_date" && record.event_time_zone.present?%>
                 <%=display_date_time_in_zone(date_time: field_value, time_zone: record.event_time_zone)%>
               <%elsif field_value.present? && field_name == "event_date"%>
-                <%=display_date_time_in_zone(date_time: field_value, time_zone: CONFIG::GENERAL[:time_zone])%>
+                <%=display_date_time_in_zone(date_time: field_value, time_zone: 'UTC')%>
               <% else %>
                 <%=datetime_to_string(field_value)%>
               <% end %>

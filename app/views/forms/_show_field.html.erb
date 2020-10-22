@@ -40,12 +40,10 @@
     <%when "datetime"%>
       <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
         <%record_class = record.class.name%>
-        <%if record_class == 'Record' && field_name == 'event_date' && record.event_time_zone.present?%>
-          <%=datetime_to_string(field_value.in_time_zone(record.event_time_zone)) + " #{record.event_time_zone}"%>
-        <%elsif field_name == 'event_date' && record_class == 'Submission'%>
-          <%=display_date_time_in_zone(date_time: field_value, time_zone: CONFIG::GENERAL[:time_zone], display_zone: display_local_time_zone)%>
-        <%elsif field_value.present? && field_name == "event_date"%>
-          <%=datetime_to_string(field_value) + " #{Time.zone.now.strftime("%Z")}"%>
+        <%if field_name == 'event_date' && record.event_time_zone.present?%>
+          <%=display_date_time_in_zone(date_time: field_value, time_zone: record.event_time_zone)%>
+        <%elsif field_name == 'event_date' && field_value.present?%>
+          <%=display_date_time_in_zone(date_time: field_value, time_zone: 'UTC')%>
         <%else%>
           <%=datetime_to_string(field_value) + " #{record.event_time_zone}"%>
         <%end%>
