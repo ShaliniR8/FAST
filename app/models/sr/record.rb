@@ -179,9 +179,6 @@ class Record < Sr::SafetyReportingBase
     self.suggestions + self.descriptions + self.causes + self.detections + self.reactions
   end
 
-  def covert_time(time:, timezone: CONFIG::GENERAL[:time_zone])
-    (time.in_time_zone(timezone) - time.in_time_zone(timezone).utc_offset).utc
-  end
 
   def convert(copy=true)
     if copy

@@ -59,7 +59,7 @@ class Submission < Sr::SafetyReportingBase
        ({field: 'get_description',   title: 'Title'} if CONFIG.sr::GENERAL[:submission_description]),
         {field: 'get_template',      title: 'Type'},
         {field: 'submit_name',       title: 'Submitted By'},
-        {field: 'get_event_date',    title: 'Event Date'},
+        {field: 'event_date',        title: 'Event Date/Time', type: 'datetime'},
       ].compact
   end
 

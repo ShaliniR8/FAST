@@ -237,18 +237,7 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    # Update event_date in database (store in UTC)
-    if CONFIG.sr::GENERAL[:submission_time_zone]
-      time_zone = params[:submission]["event_time_zone"]
-      time = params[:submission]["event_date"]
-
-      event_zone = time_zone.present? ? time_zone : Time.zone.name
-      event_date = time.present? ? DateTime.parse(time) : Time.zone.now
-
-      utc_time = ActiveSupport::TimeZone.new(event_zone).local_to_utc(event_date)
-      params[:submission]["event_date"] = utc_time
-      params[:submission]["event_time_zone"] = 'UTC' unless time_zone.present?
-    end
+    event_date_to_utc
 
     @record = Submission.new(params[:submission])
 
@@ -392,6 +381,7 @@ class SubmissionsController < ApplicationController
       params[:submission][:anonymous] = params[:anonymous] == '1'
     end
 
+    event_date_to_utc
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
@@ -507,6 +497,16 @@ class SubmissionsController < ApplicationController
 
 
   private
+
+    def event_date_to_utc
+      # Store event_date as UTC
+      if CONFIG.sr::GENERAL[:submission_time_zone]
+        time_zone = params[:submission]["event_time_zone"]
+        date_time = params[:submission]["event_date"]
+        utc_time  = convert_to_utc(date_time: date_time, time_zone: time_zone)
+        params[:submission]["event_date"] = utc_time
+      end
+    end
 
     def notify_notifiers(owner, commit)
       mailer_privileges = AccessControl.where(

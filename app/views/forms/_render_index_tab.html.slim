@@ -37,7 +37,7 @@ table id='records_table' class='table table-hover table-striped table-bordered i
               - when 'datetime'
                 - if CONFIG.sr::GENERAL[:submission_time_zone]
                   - if field_value.present? && field_name == "event_date"
-                    = datetime_to_string(field_value.in_time_zone(Time.zone.name)) + " #{Time.zone.now.strftime("%Z")}"
+                    = display_date_time_in_zone(date_time: field_value, time_zone: CONFIG::GENERAL[:time_zone], display_zone: display_local_time_zone)
                   - else
                     = datetime_to_string(field_value)
                 - else

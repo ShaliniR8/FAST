@@ -148,17 +148,21 @@
             <%end%>
 
             <div class="col-xs-12 col-sm-4 mb5">
+              <%date_value = @record.event_date.present? ? @record.event_date.in_time_zone(@record.event_time_zone) : nil%>
               <%=label_tag :event_date, "Date and Time of Event", :style => "color:red"%>
-              <%=f.text_field :event_date, {:class => 'field-datetime form-control required_field', :id => "event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker]}%>
+              <%=f.text_field :event_date,
+                {:class => 'field-datetime form-control required_field', :id => "event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker],
+                  value: date_value}%>
             </div>
 
             <div class="col-xs-12 col-sm-2 mb5">
+              <%time_zone_value = @record.event_time_zone.present? ? @record.event_time_zone : CONFIG::GENERAL[:time_zone]%>
               <%=label_tag :event_time_zone, "Time Zone", :style => "color:red"%>
               <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
                 <div class="input-group">
                   <%=f.select :event_time_zone,
                      ActiveSupport::TimeZone.all.map(&:name),
-                    {:selected => CONFIG::GENERAL[:time_zone]},
+                    {:selected => time_zone_value},
                     {:class => 'form-control tz atz toplevel_timezone required_field'}%>
                   <span class="input-group-addon tc">All</span>
                 </div>

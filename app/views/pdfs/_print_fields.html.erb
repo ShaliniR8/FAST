@@ -77,9 +77,24 @@
             </div>
 
           <%when 'datetime'%>
+            <%field_name = field[:field]%>
             <div class="col-xs-<%=field[:num_cols]%>">
               <b><%=field[:title]%>: </b>
-              <%=datetime_to_string(value)%>
+              <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
+                <%if field_name == "event_date" && owner.event_time_zone.present?%>
+                  <%=display_date_time_in_zone(date_time: value, time_zone: owner.event_time_zone)%>
+                <%elsif value.present? && field_name == "event_date"%>
+                  <%=display_date_time_in_zone(date_time: value, time_zone: CONFIG::GENERAL[:time_zone])%>
+                <%else%>
+                  <%=datetime_to_string(value)%>
+                <%end%>
+              <%else%>
+                <%if field[:field] == "event_date" && owner.event_time_zone.present?%>
+                  <%=datetime_to_string(value) + " #{owner.event_time_zone}"%>
+                <%else%>
+                  <%=datetime_to_string(value)%>
+                <%end%>
+              <%end%>
             </div>
 
           <%when 'datetimez'%>

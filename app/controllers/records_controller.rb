@@ -488,6 +488,8 @@ class RecordsController < ApplicationController
     end
 
     @owner.update_attributes(params[:record])
+
+
     if transaction
       Transaction.build_for(
         @owner,
@@ -498,7 +500,8 @@ class RecordsController < ApplicationController
     end
 
     if CONFIG.sr::GENERAL[:submission_time_zone]
-      @owner.event_date=@owner.covert_time(time: @owner.event_date, timezone: @owner.event_time_zone)
+      date_time = params[:record][:event_date]
+      @owner.event_date = convert_to_utc(date_time: date_time, time_zone: @owner.event_time_zone)
     end
 
     @owner.save
