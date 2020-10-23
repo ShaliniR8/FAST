@@ -30,9 +30,20 @@ div class="#{table[:size]}"
         - table[:column_header].each_with_index do |col_header, col_index|
           td class="#{table[:cell_name]}_#{owner.class.name}_#{owner.id}" data-row="#{row_index}" data-baseline-status="" data-mitigate-status="" data-column="#{col_index}" style="background: #{table[:rows_color][row_index][col_index] if table[:rows_color].present?}"
             .content
-              = table[:rows][row_index][col_index].html_safe if table[:rows].present?
+              b = table[:rows][row_index][col_index].html_safe if table[:rows].present?
 
 css:
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: middle;
+    border-top: 1px solid #e3e3e3;
+  }
   .matrixTitle {
     color: #BDB76B;
   }
