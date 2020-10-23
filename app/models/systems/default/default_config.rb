@@ -183,7 +183,7 @@ class DefaultConfig
     },
 
     severity_table: {
-      title: 'SEVERTIY EXERCISE',
+      title: 'SEVERITY EXERCISE',
 
       orientation: :vertical,
       direction: :up,

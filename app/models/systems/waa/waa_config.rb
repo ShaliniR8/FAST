@@ -26,7 +26,7 @@ class WAAConfig < DefaultConfig
     },
 
     severity_table: {
-      title: 'SEVERTIY EXERCISE',
+      title: 'SEVERITY EXERCISE',
       orientation: :vertical,
       direction: :up,
       size: 'col-xs-6',

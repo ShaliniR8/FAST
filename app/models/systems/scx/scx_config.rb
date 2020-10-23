@@ -39,7 +39,7 @@ class SCXConfig < DefaultConfig
     },
 
     severity_table: {
-      title: 'SEVERTIY EXERCISE',
+      title: 'SEVERITY EXERCISE',
 
       orientation: :horizontal,
       direction: :left,

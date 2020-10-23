@@ -40,7 +40,7 @@ class NAMSConfig < DefaultConfig
     },
 
     severity_table: {
-      title: 'SEVERTIY EXERCISE',
+      title: 'SEVERITY EXERCISE',
       orientation: :horizontal,
       direction: :left,
       size: 'col-xs-6',
