@@ -37,14 +37,14 @@ table.table.table-bordered.table-striped.mt10 id="page-view-#{checklist.id}"
               "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
 
 javascript:
-  $('.show_finding_btn').on('click',function(){
+  $(document).on('click', '.show_finding_btn', function(e) {
     $.get("#{show_finding_audit_path}?checklist_row_id="+$(this).attr("id"), function(data){
       $(".modal-content").html(data);
       $(window).trigger('resize');
     });
   });
 
-  $('.new_finding_btn').on('click',function(){
+  $(document).on('click', '.new_finding_btn', function(e) {
     $.get("#{new_finding_path(@record)}?owner_id="+$(this).attr("id")+"&owner_type=ChecklistRow&modal=true", function(data){
       $(".modal-content").html(data);
       $(window).trigger('resize');

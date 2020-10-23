@@ -60,9 +60,10 @@ javascript:
   /* Disable sort buttons (table headers) */
   $("#checklist_records_#{checklist.id}").find("th").off("click")
 
-  $('.show_finding_btn').on('click',function(){
+  $(document).on('click', '.show_finding_btn', function(e) {
     $.get("#{show_finding_audit_path}?checklist_row_id="+$(this).attr("id"), function(data){
       $(".modal-content").html(data);
       $(window).trigger('resize');
     });
   });
+
