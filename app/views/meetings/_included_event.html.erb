@@ -53,15 +53,15 @@
               title: 'Add Meeting Minutes',
               :route => new_minutes_report_path(event, :meeting => meeting) %>
           <%end%>
-          <!-- Add Agenda -->
-          <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
-            :class => "btn btn-warning agenda_btn mb5",
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg",
-            'hover' => 'tooltip',
-            title: 'View/Add Meeting Agenda',
-            :route => get_agenda_report_path(event, :meeting => meeting.id)%>
         <%end%>
+        <!-- Add Agenda -->
+        <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
+          :class => "btn btn-warning agenda_btn mb5",
+          "data-toggle" => "modal",
+          "data-target" => ".bs-example-modal-lg",
+          'hover' => 'tooltip',
+          title: 'View/Add Meeting Agenda',
+          :route => get_agenda_report_path(event, :meeting => meeting.id)%>
       <%end%>
     </td>
   </tr>
