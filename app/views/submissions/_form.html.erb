@@ -149,6 +149,9 @@
 
             <div class="col-xs-12 col-sm-4 mb5">
               <%date_value = @record.event_date.present? ? @record.event_date.in_time_zone(@record.event_time_zone) : nil%>
+              <%if !CONFIG.sr::GENERAL[:submission_time_zone]%>
+                <%date_value = @record.event_date%>
+              <%end%>
               <%=label_tag :event_date, "Date and Time of Event", :style => "color:red"%>
               <%=f.text_field :event_date,
                 {:class => 'field-datetime form-control required_field', :id => "event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker],
