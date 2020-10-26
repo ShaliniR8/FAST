@@ -283,15 +283,18 @@ class ReportsController < ApplicationController
 
 
   def show
-    load_options
-    @i18nbase = 'sr.event'
-    @report = Report.find(params[:id])
-    @records = @report.records
+    #load_options
     @action = "show"
-    @headers = Record.get_headers
-    @agenda_headers = AsapAgenda.get_headers
     @title = "Included Reports"
     @table_name = "reports"
+
+    @i18nbase = 'sr.event'
+    @report = Report.preload(records: [:attachments, :occurrences]).find(params[:id])
+    @headers = Record.get_headers
+
+    @records = @report.records
+
+    @agenda_headers = AsapAgenda.get_headers
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
@@ -388,7 +391,7 @@ class ReportsController < ApplicationController
       else
         @records=@records.select{|x| x.status==params[:status]}
       end
-      @title+=" : #{params[:status]}"
+      @title += " : #{params[:status]}"
     end
     handle_search
     #@records.keep_if{|r|(current_user.has_template_access(r.template.name).include? "full")|| ((current_user.has_template_access(r.template.name).include? "viewer")&&r.viewer_access)}
@@ -475,8 +478,11 @@ class ReportsController < ApplicationController
 
 
   def mitigate
-    @owner=Report.find(params[:id])
-    load_options
+    @owner = Report.find(params[:id])
+
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
     load_special_matrix_form('report', 'mitigate', @owner)
 
     @risk_type = 'Mitigate'
@@ -485,8 +491,11 @@ class ReportsController < ApplicationController
 
 
   def baseline
-    @owner=Report.find(params[:id])
-    load_options
+    @owner = Report.find(params[:id])
+
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
     load_special_matrix_form('report', 'baseline', @owner)
 
     @risk_type = 'Baseline'

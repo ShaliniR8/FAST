@@ -200,7 +200,7 @@
           <%end%>
 
           <%=render "/forms/show_comment", :owner => @report%>
-          <%=render "/forms/attachments_show", :owner => @report, :attachments => @report.attachments + @report.records.map(&:attachments).flatten%>
+          <%=render "/forms/attachments_show", owner: @report, attachments: @report.attachments + @report.records.map(&:attachments).flatten%>
           <%=render "/records/transactions", :owner => @report%>
 
         </div>
@@ -214,45 +214,52 @@
 <script>
   $(document).ready(function(){
     $('#launch_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%= eval("launch_report_path(@report)")%>", function(data){
-          $(".modal-content").html(data);
-          $(window).trigger('resize');
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
       });
     })
 
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity%>-<%=Finding.get_likelihood.index(@report.likelihood)%>").append("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity_after%>-<%=Finding.get_likelihood.index(@report.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
     $('#att_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%=new_attachment_report_path(@report)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#comment_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%=comment_report_path(@report)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#mitigate_btn').on('click',function(){
-      $.get("<%=mitigate_report_path(@report)%>",function(data){
+      $(".modal-content").html('');
+      $.get("<%=mitigate_report_path(@report)%>", function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#baseline_btn').on('click',function(){
-      $.get("<%=baseline_report_path(@report)%>",function(data){
+      $(".modal-content").html('');
+      $.get("<%=baseline_report_path(@report)%>", function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#override_status_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%=override_status_report_path(@report)%>", function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $(".close_event_btn").on('click',function(){
+      $(".modal-content").html('');
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
