@@ -187,7 +187,7 @@ class User < ActiveRecord::Base
         { field: "full_name",              title: 'Name',             type: 'text',      visible: 'index', required: false},
         { field: "email",                  title: "Email",            type: 'text',      visible: 'index', required: false},
         { field: "account_status",         title: "Account Status",   type: 'text',      visible: 'index', required: false},
-        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: 'index', required: false},
+        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: '', required: false},
       ].select{|f| (f[:visible].split(',') & visible_fields).any?}
     if (CONFIG::GENERAL[:has_mobile_app])
       headers_table.push({ field: 'android_version', title: 'Android Version', type: 'text', visible: 'index', required: false})

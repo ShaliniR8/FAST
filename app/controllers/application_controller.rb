@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   before_filter :send_session
   before_filter :adjust_session
   before_filter :track_activity
-  before_filter :set_last_seen_at
+  #before_filter :set_last_seen_at
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
   helper :all # include all helpers, all the time
