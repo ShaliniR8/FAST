@@ -24,6 +24,42 @@ class SafetyAssuranceController < ApplicationController
 
     transaction = true
 
+    if params[object_name][:checklists_attributes].present?
+      params[object_name][:checklists_attributes].each do |key, checklist|
+
+        checklist[:checklist_rows_attributes].each do |row_key, row_attributes|
+
+          if row_attributes[:attachments_attributes].present?
+
+            row_attributes[:attachments_attributes].each do |att_key, attachment|
+
+              # File is a base64 string
+              if attachment[:name].present? && attachment[:name].is_a?(Hash)
+                file_params = attachment[:name]
+
+                temp_file = Tempfile.new('file_upload')
+                temp_file.binmode
+                temp_file.write(Base64.decode64(file_params[:base64]))
+                temp_file.rewind()
+
+                file_name = file_params[:fileName]
+                mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+                uploaded_file = ActionDispatch::Http::UploadedFile.new(
+                  :tempfile => temp_file,
+                  :filename => file_name,
+                  :type     => mime_type)
+
+                # Replace attachment parameter with the created file
+                params[object_name][:checklists_attributes][key][:checklist_rows_attributes][row_key][:attachments_attributes][att_key][:name] = uploaded_file
+              end
+            end
+          end
+        end
+      end
+    end
+
+
     current_status = @owner.status
     @owner.update_attributes(params[object_name.to_sym])
     send_notification(@owner, params[:commit])
