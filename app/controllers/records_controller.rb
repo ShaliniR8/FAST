@@ -417,8 +417,9 @@ class RecordsController < ApplicationController
 
 
     # category and field hash
-    @template_hash = @template.fields.group_by(&:category).sort_by{|k, v| k.category_order}
-    @record_fields_hash = @record.record_fields.nonempty.group_by(&:field)
+    @template_hash = @template.categories.sort_by(&:category_order).map{|cat| [cat, cat.fields]}.to_h
+    #@record_fields_hash = @record.record_fields.nonempty.group_by(&:field)
+    @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
 
     load_special_matrix(@record)
   end
@@ -577,20 +578,30 @@ class RecordsController < ApplicationController
 
   def mitigate
     @owner = Record.find(params[:id])
-    load_special_matrix_form('record', 'mitigate', @owner)
-    load_options
-
     @risk_type = 'Mitigate'
+
+    # base matrix
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
+    # premium matrix
+    load_special_matrix_form('record', 'mitigate', @owner)
+
     render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
   def baseline
     @owner = Record.find(params[:id])
-    load_options
+    @risk_type = 'Baseline'
+
+    # base matrix
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
+    # premium matrix
     load_special_matrix_form('record', 'baseline', @owner)
 
-    @risk_type = 'Baseline'
     render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
