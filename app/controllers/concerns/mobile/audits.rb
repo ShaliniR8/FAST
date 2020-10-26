@@ -13,12 +13,14 @@ module Concerns
         fetch_months = current_user.mobile_fetch_months
         @records = fetch_months > 0 ? Audit.where('created_at > ?', Time.now - fetch_months.months)
           : Audit.all
-        filter_audits
+
+        # filter_audits
+        filter_records('Audit', 'audits')
 
         json = {}
 
         # Convert to id map for fast audit lookup
-        json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :completion])
+        json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :due_date])
 
         # Get ids of the 3 most recent assigned audits
         recent_audits = @records.keep_if{ |audit| audit[:status] == 'Assigned' }
@@ -46,7 +48,10 @@ module Concerns
           .select{ |field| field[:field].present? }
 
         # Array of fields to whitelist for the JSON
-        json_fields = @fields.map{ |field| field[:field].to_sym }
+
+        # json_fields = @fields.map{ |field| field[:field].to_sym }
+        json_fields = Audit.column_names.map(&:to_sym)
+
 
         # Include other fields that should always be whitelisted
         whitelisted_fields = [:id, *json_fields]
