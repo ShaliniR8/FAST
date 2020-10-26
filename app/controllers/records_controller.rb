@@ -499,9 +499,10 @@ class RecordsController < ApplicationController
       )
     end
 
-    if CONFIG.sr::GENERAL[:submission_time_zone]
-      date_time = params[:record][:event_date]
-      @owner.event_date = convert_to_utc(date_time: date_time, time_zone: @owner.event_time_zone)
+    event_date = params[:record][:event_date]
+
+    if CONFIG.sr::GENERAL[:submission_time_zone] && event_date.present?
+      @owner.event_date = convert_to_utc(date_time: event_date, time_zone: @owner.event_time_zone)
     end
 
     @owner.save

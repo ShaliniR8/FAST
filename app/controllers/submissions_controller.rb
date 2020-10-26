@@ -500,9 +500,10 @@ class SubmissionsController < ApplicationController
 
     def event_date_to_utc
       # Store event_date as UTC
-      if CONFIG.sr::GENERAL[:submission_time_zone]
+      date_time = params[:submission]["event_date"]
+
+      if CONFIG.sr::GENERAL[:submission_time_zone] && date_time.present?
         time_zone = params[:submission]["event_time_zone"]
-        date_time = params[:submission]["event_date"]
         utc_time  = convert_to_utc(date_time: date_time, time_zone: time_zone)
         params[:submission]["event_date"] = utc_time
       end
