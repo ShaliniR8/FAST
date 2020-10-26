@@ -110,12 +110,12 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
           disposition: {
             field: 'disposition', title: 'Disposition',
             num_cols: 6, type: 'datalist', visible: 'asap',
-            required: false,  options: Report.get_custom_options('Dispositions')
+            required: false,  options: "CONFIG.custom_options['Dispositions']"
           },
           company_disposition: {
             field: 'company_disposition', title: 'Company Disposition',
             num_cols: 6, type: 'datalist', visible: 'asap',
-            required: false,  options: Report.get_custom_options('Company Dispositions')
+            required: false,  options: "CONFIG.custom_options['Company Dispositions']"
           },
           narrative: {
             field: 'narrative', title: 'Narrative',
