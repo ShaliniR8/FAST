@@ -218,6 +218,7 @@ class RVFConfig < DefaultConfig
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',
       cell_name: 'risk_td',
+      cell_style: 'bold',
       row_header_name: 'PROBABILITY',
       row_header: ['A', 'B', 'C', 'D', 'E'],
       column_header_name: 'SEVERITY',

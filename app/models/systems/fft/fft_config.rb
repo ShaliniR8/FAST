@@ -212,6 +212,7 @@ class FFTConfig < DefaultConfig
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',
       cell_name: 'risk_td',
+      cell_style: 'bold',
 
       row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],

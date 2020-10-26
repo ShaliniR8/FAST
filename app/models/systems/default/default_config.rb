@@ -261,6 +261,7 @@ class DefaultConfig
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',
       cell_name: 'risk_td',
+      cell_style: 'bold',
 
       row_header_name: 'SEVERITY',
       row_header: ['4', '3', '2', '1', '0'],

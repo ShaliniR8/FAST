@@ -220,6 +220,7 @@ class SCXConfig < DefaultConfig
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',
       cell_name: 'risk_td',
+      cell_style: 'bold',
 
       column_header_name: 'SEVERITY',
       column_header: ['1','2','3','4','5'],
