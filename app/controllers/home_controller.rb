@@ -204,6 +204,8 @@ class HomeController < ApplicationController
   def prepare_calendar
     @calendar_entries = []
     current_user_id = session[:simulated_id] || session[:user_id]
+
+
     if session[:mode] == "SMS"
 
       objects = ['Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation']
@@ -247,7 +249,7 @@ class HomeController < ApplicationController
 
     elsif session[:mode] == "ASAP"
       if current_user.has_access("meeting", "index")
-        meetings = Meeting.where("status != ? and type is null", "Closed")
+        meetings = Meeting.preload(:host, :invitations).where("status != ? and type is null", "Closed")
         meetings = meetings.select{|x| x.has_user(current_user)}
         meetings.each do |meeting|
           @calendar_entries.push({
@@ -263,10 +265,12 @@ class HomeController < ApplicationController
       end
 
       if current_user.has_access("submissions", "index")
-        submissions = Submission.preload(:template).where("completed = ? and event_date is not ? and user_id = ?", true, nil, current_user.id)
-          .can_be_accessed(current_user)
-          .by_emp_groups(params[:emp_groups])
-          .select { |x| x.template.present? }
+        submissions = Submission.preload(:template)
+                      .where("completed = ? and event_date is not ? and user_id = ?",
+                              true, nil, current_user.id)
+                      .can_be_accessed(current_user)
+                      .by_emp_groups(params[:emp_groups])
+                      .select { |x| x.template.present? }
         submissions.each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
@@ -280,9 +284,10 @@ class HomeController < ApplicationController
       end
 
       if current_user.has_access("records", "index")
-        records = Record.preload(:template).where("event_date is not ?", nil)
-          .can_be_accessed(current_user)
-          .by_emp_groups(params[:emp_groups])
+        records = Record.preload(:template)
+                        .where("event_date is not ?", nil)
+                        .can_be_accessed(current_user)
+                        .by_emp_groups(params[:emp_groups])
         records.each do |a|
           @calendar_entries.push({
             :url => record_path(a),
