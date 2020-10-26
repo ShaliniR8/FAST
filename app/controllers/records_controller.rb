@@ -402,19 +402,18 @@ class RecordsController < ApplicationController
 
 
   def show
-    load_options
     @i18nbase = 'sr.report'
     @record = Record.preload(:record_fields).find(params[:id])
-    @corrective_actions = @record.corrective_actions
-    if @record.report.present?
-      @corrective_actions << @record.report.corrective_actions
-    end
     @template = Template.preload(categories: [:fields]).find(@record.templates_id)
+
     access_level = current_user.has_template_access(@template.name)
     redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
                               access_level.split(';').include?('full') ||
                               (access_level.split(';').include?('viewer') && @record.viewer_access)
 
+
+    @corrective_actions = @record.corrective_actions
+    @corrective_actions << @record.report.corrective_actions if @record.report.present?
 
     # category and field hash
     @template_hash = @template.categories.sort_by(&:category_order).map{|cat| [cat, cat.fields]}.to_h

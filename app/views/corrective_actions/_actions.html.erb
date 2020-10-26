@@ -9,7 +9,7 @@
 		<table class="table table-bordered table-striped" id="dt">
 			<thead>
 				<tr>
-					<%@action_headers.each do |header|%>
+					<%CorrectiveAction.get_meta_fields('index').each do |header|%>
 						<th class="<%=header[:size]%>">
 							<%=header[:title]%>
 						</th>
@@ -20,7 +20,7 @@
 			<tbody>
 				<%@corrective_actions.each do |c|%>
 					<tr class="atr" action="<%=corrective_action_path(c)%>">
-						<%@action_headers.each do |h|%>
+						<%CorrectiveAction.get_meta_fields('index').each do |h|%>
 							<td>
 								<%if h[:type] == 'user'%>
 									<%=User.find(c.send(h[:field])).full_name rescue ''%>
