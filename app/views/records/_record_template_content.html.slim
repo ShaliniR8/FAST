@@ -1,0 +1,56 @@
+ruby:
+  deid = defined?(deid) ? deid : false
+
+- @template_hash.each do |category, fields|
+  - @cat = category
+  - if category.print || !deid
+    - if @cat.id == 338
+      - if @cat.not_empty_for(@record)
+        = render 'records/show_observation_phases_category', deid: deid
+
+
+    - else
+      - record_fields = @record_fields_hash.select{|field, records| fields.include?(field)}.values.flatten
+      - if record_fields.length > 0
+
+        .col-xs-12
+          div class="panel #{category.panel}"
+            .panel-heading.click-heading
+              .panel-title
+                = category.title
+                = " (##{category.id})" if Rails.env.development?
+                span.pull-right.clickable
+                  i.mt5.glyphicon.glyphicon-chevron-up
+            .panel-body
+              .row style="word-wrap: break-word"
+                - fields.each do |field|
+                  - record_field = @record_fields_hash[field].first rescue nil
+                  - if record_field.present? && record_field.value.present?
+                    - size = "col-xs-#{field.display_size.to_s}"
+                    div class="#{size}"
+                      = "(##{field.id}, ##{record_field.id})<br>".html_safe if Rails.env.development?
+                      b = "#{field.label.html_safe}: "
+                      - value = record_field.value.present? ? record_field.value : ""
+
+                      - case field.display_type
+                      - when 'checkbox', 'radio'
+                        - value.split(';').each do |val|
+                          .col-xs-12
+                            span.glyphicon.glyphicon-check aria-hidden='true' = value
+                      - when 'textarea'
+                        br
+                        = value.gsub(/\n/, '<br/>').html_safe
+                      - when 'employee'
+                        - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
+                          = User.find(value).full_name
+                        - else
+                          = value
+                      - else
+                        - case field.data_type
+                        - when 'datetime'
+                          = datetime_to_string(DateTime.parse value) rescue ''
+                        - else
+                          = value
+
+
+

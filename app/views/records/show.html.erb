@@ -221,7 +221,7 @@
             meta_field_args.push('admin') if cond1 || cond2
             meta_field_args.push('close') if @record.status == 'Closed' && @record.is_asap
           %>
-          <%=render "forms/show_fields", :fields => Record.get_meta_fields(*meta_field_args), :record => @record%>
+          <%=render "forms/show_fields", fields: Record.get_meta_fields(*meta_field_args), record: @record%>
 
           <%if @record.submission.present?%>
             <%if @record.submission.comments.present?%>
@@ -245,7 +245,8 @@
             <%end%>
           <%end%>
 
-          <%=render "/records/show_template_fields", :record => @record, deid:!template_full_access%>
+          <%=render '/records/record_template_content', deid: !template_full_access%>
+          <%#=render "/records/show_template_fields", record: @record, deid: !template_full_access%>
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
