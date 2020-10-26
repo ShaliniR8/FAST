@@ -38,7 +38,7 @@ class Record < Sr::SafetyReportingBase
   accepts_nested_attributes_for :record_fields
   accepts_nested_attributes_for :descriptions
 
-  after_create -> { create_transaction(context: 'Generated Report From User Submission.') if !self.description.include?('-- copy')}
+  after_create -> { create_transaction(context: 'Generated Report From User Submission.') if self.description.present? && !self.description.include?('-- copy')}
 
 
   def handle_anonymous_reports
