@@ -310,7 +310,8 @@ class MeetingsController < ApplicationController
         transaction_content
       )
     end
-    @owner.set_datetimez
+
+    @owner.set_datetimez if params[:commit] == 'Update'
     @owner.save
     redirect_to meeting_path(@owner), flash: @flash_message
   end
