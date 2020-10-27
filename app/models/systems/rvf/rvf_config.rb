@@ -219,6 +219,11 @@ class RVFConfig < DefaultConfig
       header_style: 'matrixHeader',
       cell_name: 'risk_td',
       cell_style: 'bold',
+
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'column',
+      likelihood_pos: 'row',
+
       row_header_name: 'PROBABILITY',
       row_header: ['A', 'B', 'C', 'D', 'E'],
       column_header_name: 'SEVERITY',

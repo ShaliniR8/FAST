@@ -3,13 +3,17 @@
   .col-xs-12
     .sub_sub_title Risk Assessment
     .content
+      - risk_table = CONFIG::MATRIX_INFO[:risk_table]
+      - severity_pos = risk_table[:severity_pos]
+      - likelihood_pos = risk_table[:likelihood_pos]
+
       - if owner.risk_factor.present?
         .col-xs-6
           b Baseline Severity:
-          =< CONFIG::MATRIX_INFO[:risk_table][:row_header][owner.severity.to_i]
+          =< risk_table["#{severity_pos}_header".to_sym][owner.severity.to_i]
           br
           b Baseline Likelihood:
-          =< CONFIG::MATRIX_INFO[:risk_table][:column_header][owner.likelihood.to_i]
+          =< risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood.to_i]
           br
           b Baseline Risk:
           =< owner.risk_factor
@@ -18,10 +22,10 @@
       - if owner.risk_factor_after.present?
         .col-xs-6
           b Mitigated Severity:
-          =< CONFIG::MATRIX_INFO[:risk_table][:row_header][owner.severity_after.to_i]
+          =< risk_table["#{severity_pos}_header".to_sym][owner.severity_after.to_i]
           br
           b Mitigated Likelihood:
-          =< CONFIG::MATRIX_INFO[:risk_table][:column_header][owner.likelihood_after.to_i]
+          =< risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood_after.to_i]
           br
           b Mitigated Risk:
           =< owner.risk_factor_after

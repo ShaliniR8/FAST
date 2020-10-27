@@ -263,6 +263,10 @@ class DefaultConfig
       cell_name: 'risk_td',
       cell_style: 'bold',
 
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
       row_header_name: 'SEVERITY',
       row_header: ['4', '3', '2', '1', '0'],
       column_header_name: 'PROBABILITY',

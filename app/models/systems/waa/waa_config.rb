@@ -34,6 +34,11 @@ class WAAConfig < DefaultConfig
       main_header_style: 'sevMainHeader',
       header_style: 'sevHeader',
       cell_name: 'severity_td',
+
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
       row_header_name: 'SEVERITY',
       row_header: ['I', 'II', 'III', 'IV'],
       column_header_name: 'CLASS',

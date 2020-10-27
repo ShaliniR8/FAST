@@ -222,6 +222,10 @@ class SCXConfig < DefaultConfig
       cell_name: 'risk_td',
       cell_style: 'bold',
 
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'column',
+      likelihood_pos: 'row',
+
       column_header_name: 'SEVERITY',
       column_header: ['1','2','3','4','5'],
       row_header_name: 'PROBABILITY',

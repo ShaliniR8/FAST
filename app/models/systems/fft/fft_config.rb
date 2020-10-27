@@ -214,6 +214,10 @@ class FFTConfig < DefaultConfig
       cell_name: 'risk_td',
       cell_style: 'bold',
 
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
       row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
       column_header_name: 'PROBABILITY',
