@@ -68,7 +68,7 @@
                         <%end%>
                       <%else%>
                         <%if field.data_type == "datetime"%>
-                          <%=datetime_to_string(DateTime.parse value)%>
+                          <%=datetime_to_string(DateTime.parse value) rescue ''%>
                         <%else%>
                           <%=value%>
                         <%end%>
