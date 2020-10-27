@@ -127,6 +127,7 @@ class UsersController < ApplicationController
       @authorized = true
       @action = 'new'
       @levels = User.get_levels
+      @departments = CONFIG.custom_options['Departments']
       flash[:error] = @user.errors.full_messages
       render :action => 'new'
     end
