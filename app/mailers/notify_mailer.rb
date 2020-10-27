@@ -31,8 +31,7 @@ class NotifyMailer < ApplicationMailer
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?
     end
 
-
-    if CONFIG::GENERAL[:enable_mailer] && Rails.env.production?
+    if CONFIG::GENERAL[:enable_mailer]
       mail(**to_email(notice.user.email), subject: subject).deliver if notice.user.present?
     end
   end
