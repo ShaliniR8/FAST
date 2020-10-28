@@ -333,13 +333,17 @@ class QueriesController < ApplicationController
       else
         case condition.logic
         when "Equals To"
-          if field[:type] == 'checkbox' || field[:field_type] == 'checkbox'
+          if field[:type] == 'checkbox'
+            results = records.select{|record| record.send(field[:field]).reject(&:empty?).join("").to_s == '' || record.send(field[:field]) == nil rescue true}
+          elsif field[:field_type] == 'checkbox'
             results = emit_helper(condition.value, records, field, false, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) == "" || record.send(field[:field]) == nil) rescue true}
           end
         when "Not Equal To"
-          if field[:type] == 'checkbox' || field[:field_type] == 'checkbox'
+          if field[:type] == 'checkbox'
+            results = records.select{|record| record.send(field[:field] && record.send(field[:field]).reject(&:empty?).join("").to_s != '') != nil rescue true}
+          elsif field[:field_type] == 'checkbox'
             results = emit_helper(condition.value, records, field, true, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) != "" && record.send(field[:field]) != nil) rescue true}
