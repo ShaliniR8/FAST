@@ -60,11 +60,11 @@ class FaaReport < ActiveRecord::Base
 
   def statistics
     if CONFIG.getTimeFormat[:faa_report]
-      start_date = Date.strptime(self.get_start_date, '%m/%d/%Y').to_time.strftime('%F')
-      end_date = Date.strptime(self.get_end_date, '%m/%d/%Y').to_time.strftime('%F')
+      start_date = Date.strptime(self.get_start_date, '%m/%d/%Y').to_time
+      end_date = Date.strptime(self.get_end_date, '%m/%d/%Y').to_time.end_of_day
     else
-      start_date = self.get_start_date
-      end_date = self.get_end_date
+      start_date = Date.strptime(self.get_start_date, "%Y-%m-%d").to_time
+      end_date = Date.strptime(self.get_end_date, "%Y-%m-%d").to_time.end_of_day
     end
 
     asap_reports = Record
