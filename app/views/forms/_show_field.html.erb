@@ -38,16 +38,21 @@
       <% field_value = field_value.in_time_zone(record.event_time_zone) if record.class.name == 'Record' && record.event_time_zone.present? %>
       <%=date_to_string(field_value)%>
     <%when "datetime"%>
+      <%event_date_field = field_name == 'event_date'%>
       <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
-        <%if field_name == 'event_date' && record.event_time_zone.present?%>
+        <%if event_date_field && record.event_time_zone.present?%>
           <%=display_date_time_in_zone(date_time: field_value, time_zone: record.event_time_zone)%>
-        <%elsif field_name == 'event_date' && field_value.present?%>
+        <%elsif event_date_field%>
           <%=display_date_time_in_zone(date_time: field_value, time_zone: 'UTC')%>
         <%else%>
           <%=datetime_to_string(field_value)%>
         <%end%>
       <%else%>
-        <%=datetime_to_string(field_value)%>
+        <%if event_date_field%>
+          <%=datetime_to_string(field_value) + " #{record.event_time_zone}"%>
+        <%else%>
+          <%=datetime_to_string(field_value)%>
+        <%end%>
       <%end%>
     <%when "user"%>
       <%=User.find(field_value).full_name rescue field_value.to_s%>
