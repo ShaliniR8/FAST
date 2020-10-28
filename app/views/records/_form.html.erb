@@ -93,12 +93,12 @@
 
 
             <%event_time_zone = @record.event_time_zone%>
+
             <div class="col-xs-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
               <%=label_tag :event_date, "Date and Time of Event", :style=>"color:red"%>
-              <%if CONFIG.sr::GENERAL[:submission_time_zone] && @record.event_time_zone.present?%>
-                <%event_date = @record.event_date.in_time_zone(event_time_zone)%>
-              <%else%>
-                <%event_date = @record.event_date%>
+              <%event_date = @record.event_date%>
+              <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
+                <%event_date = event_date.in_time_zone(event_time_zone) if event_time_zone.present?%>
               <%end%>
               <%=f.text_field :event_date,
               {:class=>'field-datetime form-control required_field', value: event_date, :id=>"event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker]}%>
@@ -110,12 +110,12 @@
                 <div class="input-group">
                   <%=f.select :event_time_zone,
                      ActiveSupport::TimeZone.all.map(&:name),
-                    {selected: @record.event_time_zone},
+                    {selected: event_time_zone},
                     {:class => 'form-control tz atz toplevel_timezone required_field'}%>
                   <span class="input-group-addon tc">All</span>
                 </div>
               <%else%>
-                <%=f.hidden_field :event_time_zone, :value => 'Local'%>
+                <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
                 <button id="time-zone-toggle-btn" type="button" class="input-group btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
                   <%=event_time_zone%>
                 </button>
@@ -161,11 +161,8 @@
   var airport_table;
 
   $(document).ready(function(){
-    //time-zone-toggle-btn
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
     if (timeZoneToggleBtn != null) {
-      // timeZoneToggleBtn.innerHTML = 'Local'
-
       $('#time-zone-toggle-btn').on('click', function() {
         if (timeZoneToggleBtn.innerHTML == 'Local') {
           timeZoneToggleBtn.innerHTML = 'UTC'
