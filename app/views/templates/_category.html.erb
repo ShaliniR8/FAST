@@ -2,7 +2,8 @@
   <div class="panel <%=cat.panel%> category-panel">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
-        <b><%=cat.title%> <font color="grey">(#<%=cat.id%>)</font></b>
+        <b><%=cat.title%></b>
+        <%=" (##{cat.id})" if Rails.env.development?%>
         <span class="pull-right clickable">
           <i class="mt5 glyphicon glyphicon-chevron-down"></i>
         </span>
