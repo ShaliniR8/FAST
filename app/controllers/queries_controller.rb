@@ -333,13 +333,13 @@ class QueriesController < ApplicationController
       else
         case condition.logic
         when "Equals To"
-          if field[:type] == 'checkbox'
+          if field[:type] == 'checkbox' || field[:field_type] == 'checkbox'
             results = emit_helper(condition.value, records, field, false, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) == "" || record.send(field[:field]) == nil) rescue true}
           end
         when "Not Equal To"
-          if field[:type] == 'checkbox'
+          if field[:type] == 'checkbox' || field[:field_type] == 'checkbox'
             results = emit_helper(condition.value, records, field, true, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) != "" && record.send(field[:field]) != nil) rescue true}
@@ -435,9 +435,10 @@ class QueriesController < ApplicationController
 
 
   def emit_helper_basic(search_value, records, field, xor, logic_type)
+    field_type = field[:type] || field[:field_type]
     case logic_type
     when "equals"
-      case field[:type]
+      case field_type
       when 'boolean_box', 'boolean'
         return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
       when 'checkbox'
@@ -463,7 +464,7 @@ class QueriesController < ApplicationController
         return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.to_s.downcase)}
       end
     when "contains"
-      case field[:type]
+      case field_type
       when 'boolean_box', 'boolean'
         return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
       when 'user'
@@ -477,7 +478,7 @@ class QueriesController < ApplicationController
         return records.select{|record| xor ^ ((record.send(field[:field]).to_s.downcase.include? search_value.downcase) rescue false)}
       end
     when "numeric"
-      case field[:type]
+      case field_type
       when 'date', 'datetime'
         dates = search_value.split("to")
         if dates.length > 1
