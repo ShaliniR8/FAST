@@ -59,21 +59,12 @@ class FaaReport < ActiveRecord::Base
 
 
   def statistics
-    if CONFIG.getTimeFormat[:faa_report]
-      start_date = Date.strptime(self.get_start_date, '%m/%d/%Y').to_time
-      end_date = Date.strptime(self.get_end_date, '%m/%d/%Y').to_time.end_of_day
-    else
-      start_date = Date.strptime(self.get_start_date, "%Y-%m-%d").to_time
-      end_date = Date.strptime(self.get_end_date, "%Y-%m-%d").to_time.end_of_day
-    end
-
     asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        start_date, end_date)
+      .where("event_date >= ? AND event_date <= ?",
+        self.get_start_date, self.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}
-
     accepted_reports = asap_reports.select{|report| report.asap}
     result = {
       asap_submitted: asap_reports.map(&:id),
@@ -99,16 +90,20 @@ class FaaReport < ActiveRecord::Base
 
 
   def get_start_date
+    start_date = nil
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
     case self.quarter
       when 1
-        CONFIG.getTimeFormat[:faa_report] ? "10/01/#{self.year-1}" : "#{self.year-1}-10-01"
+        start_date = faa_report_format ? "10/01/#{self.year-1}" : "#{self.year-1}-10-01"
       when 2
-        CONFIG.getTimeFormat[:faa_report] ? "01/01/#{self.year}"   : "#{self.year}-01-01"
+        start_date = faa_report_format ? "01/01/#{self.year}"   : "#{self.year}-01-01"
       when 3
-        CONFIG.getTimeFormat[:faa_report] ? "04/01/#{self.year}"   : "#{self.year}-04-01"
+        start_date = faa_report_format ? "04/01/#{self.year}"   : "#{self.year}-04-01"
       when 4
-        CONFIG.getTimeFormat[:faa_report] ? "07/01/#{self.year}"   : "#{self.year}-07-01"
+        start_date = faa_report_format ? "07/01/#{self.year}"   : "#{self.year}-07-01"
     end
+    start_date = faa_report_format ? DateTime.strptime(start_date, '%m/%d/%Y') : DateTime.strptime(start_date, "%Y-%m-%d")
+    start_date.beginning_of_day
   end
 
 
@@ -120,22 +115,31 @@ class FaaReport < ActiveRecord::Base
 
 
   def get_end_date
+    end_date = nil
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
     case self.quarter
       when 1
-        CONFIG.getTimeFormat[:faa_report] ? "12/31/#{self.year-1}" : "#{self.year-1}-12-31"
+        end_date = faa_report_format ? "12/31/#{self.year-1}" : "#{self.year-1}-12-31"
       when 2
-        CONFIG.getTimeFormat[:faa_report] ? "03/31/#{self.year}"   : "#{self.year}-03-31"
+        end_date = faa_report_format ? "03/31/#{self.year}"   : "#{self.year}-03-31"
       when 3
-        CONFIG.getTimeFormat[:faa_report] ? "06/30/#{self.year}"   : "#{self.year}-06-30"
+        end_date = faa_report_format ? "06/30/#{self.year}"   : "#{self.year}-06-30"
       when 4
-        CONFIG.getTimeFormat[:faa_report] ? "09/30/#{self.year}"   : "#{self.year}-09-30"
+        end_date = faa_report_format ? "09/30/#{self.year}"   : "#{self.year}-09-30"
     end
+    end_date = faa_report_format ? DateTime.strptime(end_date, '%m/%d/%Y') : DateTime.strptime(end_date, "%Y-%m-%d")
+    end_date.end_of_day
   end
 
 
 
   def get_range
-    "#{self.get_start_date} To #{self.get_end_date}"
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    start_date = self.get_start_date
+    end_date = self.get_end_date
+    start_date = faa_report_format ? start_date.strftime('%m/%d/%Y') : start_date.strftime('%Y-%m-%d')
+    end_date = faa_report_format ? end_date.strftime('%m/%d/%Y') : end_date.strftime('%Y-%m-%d')
+    "#{start_date} To #{end_date}"
   end
 
 

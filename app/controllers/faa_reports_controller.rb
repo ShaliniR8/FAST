@@ -140,11 +140,9 @@ class FaaReportsController < ApplicationController
 
   def show
     @report = FaaReport.find(params[:id])
-    # get_start_date and get_end_date has two different date formattings that need to be accounted for
     asap_reports = Record
-    .where("event_date >= ? and event_date <= ?",
-      (Date.strptime(@report.get_start_date, "%Y-%m-%d") rescue Date.strptime(@report.get_start_date, '%m/%d/%Y')).to_time,
-      (Date.strptime(@report.get_end_date, "%Y-%m-%d") rescue Date.strptime(@report.get_end_date, '%m/%d/%Y')).to_time.end_of_day)
+    .where("event_date >= ? AND event_date <= ?",
+      @report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
