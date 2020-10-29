@@ -205,11 +205,27 @@ class RecordsController < ApplicationController
 
   def edit
     start_time = Time.now
-    load_options
+
+    # @users = User.find(:all)
+    # @headers = User.get_headers
+    # @frequency = (0..4).to_a.reverse
+    # @like = Record.get_likelihood
+    # risk_matrix_initializer
+    # load_special_matrix_form("record", "baseline", @record)
+
     @action = "edit"
     @record = Record.find(params[:id])
-    load_special_matrix_form("record", "baseline", @record)
-    @template = @record.template
+    @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).group_by(&:fields_id)
+
+    @template = Template.preload(categories: [fields: :nested_fields]).find(@record.templates_id)
+
+    @categories = Category.preload(:fields).where(templates_id: @template.id).active
+    fields = Field.preload(:nested_fields).where(categories_id: @categories.map(&:id)).active
+
+    @fields_hash = fields.non_nested.group_by(&:categories_id)
+    @nested_fields_hash = fields.nested.group_by(&:nested_field_id)
+
+
     access_level = current_user.has_template_access(@template.name)
     if !(access_level.include? "full")
       redirect_to root_url
@@ -217,18 +233,13 @@ class RecordsController < ApplicationController
     end
     if @record.status == "New"
       @record.status = "Open"
-      Transaction.build_for(
-        @record,
-        'Open',
-        current_user.id
-      )
+      Transaction.build_for(@record, 'Open', current_user.id)
       if @record.submission.present?
         Transaction.build_for(
           @record.submission,
           'Open',
           current_user.id,
-          'Report has been opened.'
-        )
+          'Report has been opened.')
         notify(@record.submission, notice: {
           users_id: @record.created_by.id,
           content: "Your submission ##{@record.submission.id} has been opened by analyst."},
@@ -417,7 +428,6 @@ class RecordsController < ApplicationController
 
     # category and field hash
     @template_hash = @template.categories.sort_by(&:category_order).map{|cat| [cat, cat.fields]}.to_h
-    #@record_fields_hash = @record.record_fields.nonempty.group_by(&:field)
     @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
 
     load_special_matrix(@record)

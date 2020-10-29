@@ -4,6 +4,8 @@ class Category < ActiveRecord::Base
 	accepts_nested_attributes_for :fields
 
 
+  scope :active, -> {where(deleted: 0).order(category_order: :asc)}
+
 	def updated
 		result = fields.map(&:updated_at) << updated_at
 		result = result.sort.last
@@ -22,7 +24,7 @@ class Category < ActiveRecord::Base
 		# does not trend text area and time zone, and archived fields
 		if !self.deleted
 			self.fields
-				.where('deleted = 0 and display_type != ? and !(label like ?)', 
+				.where('deleted = 0 and display_type != ? and !(label like ?)',
 				"textarea",
 				"\%Time Zone%")
 		else
@@ -60,15 +62,15 @@ class Category < ActiveRecord::Base
 		fields_id = fields.map(&:id)
 		if record.class.name.demodulize == 'Record'
 			field_values = RecordField
-				.where("records_id = ? and fields_id in (?) and value <> ?", 
-				record.id, 
-				fields_id, 
+				.where("records_id = ? and fields_id in (?) and value <> ?",
+				record.id,
+				fields_id,
 				'')
 		elsif record.class.name.demodulize == 'Submission'
 			field_values = SubmissionField
-				.where("submissions_id = ? and fields_id in (?) and value <> ?", 
-				record.id, 
-				fields_id, 
+				.where("submissions_id = ? and fields_id in (?) and value <> ?",
+				record.id,
+				fields_id,
 				'')
 		else
 			false
@@ -79,7 +81,7 @@ class Category < ActiveRecord::Base
 
 
 	def record_fields(record)
-		fields_id = fields.map(&:id) 
+		fields_id = fields.map(&:id)
 		if record.class.name.demodulize == 'Record'
 			table = Object.const_get('RecordField')
 		elsif record.class.name.demodulize == 'Submission'
@@ -88,9 +90,9 @@ class Category < ActiveRecord::Base
 			false
 		end
 		field_values = table
-			.where("records_id = ? and fields_id in (?) and value <> ?", 
-			record.id, 
-			fields_id, 
+			.where("records_id = ? and fields_id in (?) and value <> ?",
+			record.id,
+			fields_id,
 			'')
 		field_values
 	end
