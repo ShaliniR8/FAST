@@ -24,7 +24,8 @@
       height:450,
       colors:['blue'],
       bars: 'horizontal' ,
-      chartArea: {left:250}// Required for Material Bar Charts.
+      isStacked: true,
+      chartArea: {left: 400}// Required for Material Bar Charts.
     };
     var subs_chart = new google.visualization.BarChart(document.getElementById('subs'));
     google.visualization.events.addListener(subs_chart, 'onmouseover', cursor_pointer);

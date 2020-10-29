@@ -467,8 +467,9 @@ class HomeController < ApplicationController
                         .within_timerange(@start_date, @end_date)
                         .can_be_accessed(current_user)
                         .by_emp_groups(params[:emp_groups])
-                        .select { |x| x.template.present? }
+                        .select{|x| x.template.present?}
                         .group_by{|x| x.template.name}
+                        .sort_by{|k, v| k}.to_h
       end
       if current_user.has_access('records','index')
         @records = Record.preload(:template)

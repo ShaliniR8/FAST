@@ -210,17 +210,17 @@ module ApplicationHelper
   def group_to_color(group_name)
     case group_name
     when "flight-crew"
-      "LIGHTSKYBLUE"
+      "lightskyblue"
     when "cabin", 'inflight'
-      "CORAL"
+      "coral"
     when "dispatch"
-      "GOLDENROD"
+      "goldenrod"
     when "maintenance"
-      "lightsalmon"
+      "thistle"
     when "general"
-      "MEDIUMAQUAMARINE"
+      'mediumaquamarine'
     when "ground"
-      "DARKTURQUOISE"
+      'peru'
     else
       "lightgray"
     end
