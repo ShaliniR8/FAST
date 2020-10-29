@@ -125,7 +125,9 @@ class Meeting < ProsafetBase
 
 
   def get_tooltip
-    "Review Period is " + self.get_time("review_start") + " to "+self.get_time("review_end")
+    "<b>Meeting Title</b>: #{title} <br>" +
+    "<b>Meeting Period</b>: #{get_time('meeting_start')} - #{get_time('meeting_end')}<br>" +
+    "<b>Review Period</b>: #{get_time('review_start')} - #{get_time('review_end')}"
   end
 
 

@@ -256,7 +256,7 @@ class HomeController < ApplicationController
             :url => meeting_path(meeting),
             :start => meeting.get_time("meeting_start"),
             :end => meeting.get_time("meeting_end"),
-            :title => "Meeting \##{meeting.id}",
+            :title => "#{meeting.meeting_type} Meeting \##{meeting.id}",
             :color => "khaki",
             :textColor => "darkslategrey",
             :description => meeting.get_tooltip
@@ -277,7 +277,7 @@ class HomeController < ApplicationController
             :start => a.get_date,
             :title => "#{a.template.name} ##{a.get_id}",
             :textColor => "darkslategrey",
-            :description => a.description,
+            :description => "<b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
             :color => group_to_color(a.template.emp_group)
           }) if a.get_date.present?
         end
@@ -294,7 +294,7 @@ class HomeController < ApplicationController
             :start => a.get_date,
             :title => "#{a.template.name} ##{a.get_id}",
             :textColor => "darkslategrey",
-            :description => a.description,
+            :description => "<b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
             :color => group_to_color(a.template.emp_group)
           }) if a.get_date.present?
         end
