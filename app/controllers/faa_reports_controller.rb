@@ -173,6 +173,7 @@ class FaaReportsController < ApplicationController
   def export_word
     require "docx"
     @report = FaaReport.find(params[:id])
+    @report.set_statistics
     doc = Docx::Document.open("#{Rails.root}/public/test.docx")
     doc.paragraphs.each do |p|
 

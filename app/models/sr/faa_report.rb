@@ -78,6 +78,18 @@ class FaaReport < ActiveRecord::Base
   end
 
 
+  # set statistics for FAA Report Print Word
+  def set_statistics
+    result           = self.statistics
+    self.asap_submit = result[:asap_submitted].size
+    self.asap_accept = result[:asap_accepted].size
+    self.sole        = result[:asap_accepted_sole_source].size
+    self.asap_close  = result[:asap_accepted_closed].size
+    self.asap_emp    = result[:asap_accepted_employee_car].size
+    self.asap_com    = result[:asap_aceepted_company_car].size
+    self.save
+  end
+
 
   def self.get_new(y,q)
     result = FaaReport.new
