@@ -16,8 +16,13 @@ module ModelHelpers
 
       case self.name
       when 'Record'
-        completed_objects = self.where('status = ? and close_date is not ?', 'Closed', nil)
-        completed_objects.keep_if{|r| (current_user.has_access(r.template.name, "full" ) rescue false) }
+        # completed_objects = self.where('status = ? and close_date is not ?', 'Closed', nil)
+        # completed_objects.keep_if{|r| (current_user.has_access(r.template.name, "full" ) rescue false) }
+
+        completed_objects = self.preload(:template)
+                            .where('status = ? and close_date is not ?', 'Closed', nil)
+                            .can_be_accessed(current_user)
+
       when 'Report'
         completed_objects = self.where('status = ? and close_date is not ?', 'Closed', nil)
       end

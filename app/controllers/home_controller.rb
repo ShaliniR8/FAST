@@ -9,6 +9,7 @@ class HomeController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
+
     @action = "home"
     @notices = current_user.notices.where(status: 1).reverse.first(6)
 
@@ -462,18 +463,20 @@ class HomeController < ApplicationController
 
     if session[:mode] == "ASAP"
       if current_user.has_access('submissions','index')
-        @submissions = Submission.where(:completed => 1)
-          .can_be_accessed(current_user)
-          .within_timerange(@start_date, @end_date)
-          .by_emp_groups(params[:emp_groups])
-          .select { |x| x.template.present? }
-          .group_by{|x| x.template.name}
+        @submissions = Submission.preload(:template).where(completed: 1)
+                        .within_timerange(@start_date, @end_date)
+                        .can_be_accessed(current_user)
+                        .by_emp_groups(params[:emp_groups])
+                        .select { |x| x.template.present? }
+                        .group_by{|x| x.template.name}
       end
       if current_user.has_access('records','index')
-        @records = Record.can_be_accessed(current_user)
-          .within_timerange(@start_date, @end_date)
-          .by_emp_groups(params[:emp_groups])
-          .group_by(&:status)
+        @records = Record.preload(:template)
+                    .within_timerange(@start_date, @end_date)
+                    .can_be_accessed(current_user)
+                    .by_emp_groups(params[:emp_groups])
+                    .select { |x| x.template.present? }
+                    .group_by(&:status)
       end
       if current_user.has_access('reports','index')
         @reports = Report.within_timerange(@start_date, @end_date)

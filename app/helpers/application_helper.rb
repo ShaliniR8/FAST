@@ -211,7 +211,7 @@ module ApplicationHelper
     case group_name
     when "flight-crew"
       "LIGHTSKYBLUE"
-    when "cabin"
+    when "cabin", 'inflight'
       "CORAL"
     when "dispatch"
       "GOLDENROD"

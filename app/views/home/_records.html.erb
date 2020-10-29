@@ -16,10 +16,14 @@
     </div>
   </div>
 </div>
+
+
+
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :record} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
   google.charts.setOnLoadCallback(function() {drawChartrecs(recordData); });
+
   function drawChartrecs(data, params) {
     var recs_options = {
       chart: {
@@ -29,7 +33,7 @@
       height:230,
       colors:['blue'],
       bars: 'horizontal' ,
-      chartArea: {left:100}// Required for Material Bar Charts.
+      chartArea: {left: 100}// Required for Material Bar Charts.
     };
 
     var records_chart = new google.visualization.BarChart(document.getElementById('records'));
@@ -42,9 +46,11 @@
     var dataTable = google.visualization.arrayToDataTable(data);
     records_chart.draw(dataTable, recs_options);
     google.visualization.events.addListener(records_chart, 'select', function(){
-      var all_status=<%=raw @records.keys%>
-      var root_url="<%=records_path%>?status="
-      var dateParams = params && params.startDate && params.endDate? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
+      var all_status = <%=raw @records.keys%>
+      var root_url = "<%=records_path%>?status="
+      var dateParams = params &&
+                        params.startDate &&
+                        params.endDate? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       var empGroupParams = params && params.employeeGroups ? "&emp_groups=" + params.employeeGroups.join(",") : "";
       var feederOperators = params && params.feederOperators ? "&feeder_operators=" + params.feederOperators.join(",") : "";
       var selection = records_chart.getSelection();

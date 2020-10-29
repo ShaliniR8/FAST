@@ -34,7 +34,6 @@ module AnalyticsFilters
       Rails.logger.debug "within timemrange failed"
       return scoped
     end
-    Rails.logger.debug "start=#{start_date}, end=#{end_date}"
     return scoped if start_date.nil? || end_date.nil?
     if self.to_s == "Submission" || self.to_s == "Record"
       return where("#{table_name}.event_date >= ? && #{table_name}.event_date <= ?", start_date.utc, end_date.utc)
@@ -52,10 +51,11 @@ module AnalyticsFilters
   end
 
   def by_emp_groups(groups)
+    templates = Template.where(emp_group: groups)
     unless groups
       return scoped
     else
-      return includes(:template).where("templates.emp_group in (?)", groups)
+      return where("templates_id", templates.map(&:id))
     end
   end
 

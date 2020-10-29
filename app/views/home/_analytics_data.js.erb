@@ -23,6 +23,7 @@
     safety_plan: "safetyPlan",
   }
 %>
+
 <% if type == :all %>
   <% types.each do |type, js_name| %>
     <% array = instance_variable_get("@#{type}".pluralize) %>
@@ -46,7 +47,7 @@
     ['Status','Number', { role: 'style' }, {role: 'annotation'}]
     <% array = instance_variable_get("@#{type}".pluralize) %>
     <% if array.present? %>
-      <% array.each_with_index do |(k,v),index| %>
+      <% array.each_with_index do |(k,v), index| %>
         <% if type == :submission %>
           <%=",['#{escape_javascript(k)}',#{v.length},'color:#{group_to_color(v.first.template.emp_group)}', #{v.length}]" %>
         <% else %>
