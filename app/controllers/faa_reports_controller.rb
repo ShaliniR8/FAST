@@ -157,10 +157,11 @@ class FaaReportsController < ApplicationController
 
 
   def reports_table
-    @headers = Record.get_headers
-    @report = FaaReport.find(params[:id])
+    object_name = controller_name.classify
+    @table = Object.const_get('Record')
+    @fields = Record.get_meta_fields('index')
     @title = params[:title]
-    @result = Record.where(:id => params[:reports].split)
+    @records = Record.where(:id => params[:reports].split)
     render :partial => "table"
   end
 
