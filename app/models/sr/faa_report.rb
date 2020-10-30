@@ -58,11 +58,7 @@ class FaaReport < ActiveRecord::Base
   end
 
 
-  def statistics
-    asap_reports = select_records_in_date_range(self.get_start_date, self.get_end_date)
-      .select{|x|
-        (x.template.name.include? "ASAP") &&
-        (x.template.name.include? "#{self.employee_group}")}
+  def statistics(asap_reports)
     accepted_reports = asap_reports.select{|report| report.asap}
     result = {
       asap_submitted: asap_reports.map(&:id),
@@ -139,7 +135,7 @@ class FaaReport < ActiveRecord::Base
     faa_report_format = CONFIG.getTimeFormat[:faa_report]
     start_date = faa_format_date(start_date)
     end_date = faa_format_date(end_date)
-    asap_reports = Record.all.select do |r|
+    asap_reports = Record.preload(:corrective_actions, :template, report: :corrective_actions).all.select do |r|
       selected = false
       if r.event_date.present?
         r_date = r.event_date

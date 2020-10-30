@@ -142,6 +142,7 @@ class FaaReportsController < ApplicationController
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
+    @statistics = @report.statistics(asap_reports)
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     @identification = CONFIG::FAA_INFO
   end
