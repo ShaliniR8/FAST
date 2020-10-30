@@ -10,10 +10,10 @@
       - if owner.risk_factor.present?
         .col-xs-6
           b Baseline Severity:
-          =< risk_table["#{severity_pos}_header".to_sym][owner.severity.to_i]
+          =< risk_table["#{severity_pos}_header".to_sym][owner.severity.to_i].html_safe
           br
           b Baseline Likelihood:
-          =< risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood.to_i]
+          =< risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood.to_i].html_safe
           br
           b Baseline Risk:
           =< owner.risk_factor
@@ -22,10 +22,10 @@
       - if owner.risk_factor_after.present?
         .col-xs-6
           b Mitigated Severity:
-          =< risk_table["#{severity_pos}_header".to_sym][owner.severity_after.to_i]
+          =< risk_table["#{severity_pos}_header".to_sym][owner.severity_after.to_i].html_safe
           br
           b Mitigated Likelihood:
-          =< risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood_after.to_i]
+          =< risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood_after.to_i].html_safe
           br
           b Mitigated Risk:
           =< owner.risk_factor_after
