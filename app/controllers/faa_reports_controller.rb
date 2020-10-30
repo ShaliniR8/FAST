@@ -52,6 +52,7 @@ class FaaReportsController < ApplicationController
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
+    @statistics = @report.statistics(asap_reports)
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     html = render_to_string(:template=>"/faa_reports/print.html.erb")
     pdf_options = {

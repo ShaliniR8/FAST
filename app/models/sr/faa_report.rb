@@ -74,13 +74,17 @@ class FaaReport < ActiveRecord::Base
 
   # set statistics for FAA Report Print Word
   def set_statistics
-    result           = self.statistics
-    self.asap_submit = result[:asap_submitted].size
-    self.asap_accept = result[:asap_accepted].size
-    self.sole        = result[:asap_accepted_sole_source].size
-    self.asap_close  = result[:asap_accepted_closed].size
-    self.asap_emp    = result[:asap_accepted_employee_car].size
-    self.asap_com    = result[:asap_aceepted_company_car].size
+    asap_reports = self.select_records_in_date_range(self.get_start_date, self.get_end_date)
+      .select{|x|
+        (x.template.name.include? "ASAP") &&
+        (x.template.name.include? "#{self.employee_group}")}
+    stats = self.statistics(asap_reports)
+    self.asap_submit = stats[:asap_submitted].size
+    self.asap_accept = stats[:asap_accepted].size
+    self.sole        = stats[:asap_accepted_sole_source].size
+    self.asap_close  = stats[:asap_accepted_closed].size
+    self.asap_emp    = stats[:asap_accepted_employee_car].size
+    self.asap_com    = stats[:asap_aceepted_company_car].size
     self.save
   end
 
