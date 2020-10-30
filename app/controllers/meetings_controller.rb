@@ -157,8 +157,12 @@ class MeetingsController < ApplicationController
     @action = "new"
     @timezones = Meeting.get_timezones
     @headers = User.invite_headers
-    @users = User.find(:all) - [current_user]
-    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+
     @report_headers = Report.get_meta_fields('meeting_form')
     @reports = Report.reports_for_meeting
   end
@@ -176,11 +180,12 @@ class MeetingsController < ApplicationController
         return
       end
     end
+
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
     @report_headers = Report.get_meta_fields('index', 'meeting')
     @reports = @meeting.reports.sort_by{|x| x.id}
-    @users = @meeting.invitations.map{|x| x.user}
+    @available_participants = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user == current_user && x.status == "Pending"}.first
   end
 
@@ -322,8 +327,10 @@ class MeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id])
     @action = 'edit'
     @headers = User.invite_headers
-    @users = User.find(:all) - [@meeting.host.user]
-    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
     @timezones = Meeting.get_timezones
     @report_headers = Report.get_headers
     @associated_reports = @meeting.reports.map(&:id)

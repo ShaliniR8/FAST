@@ -6,7 +6,7 @@ require "fileutils"
   task :upload_attachments => :environment do
 
     # rename files to match SRA ID
-    path = "#{Dir.pwd}/public/uploads/fft_sra_attachments"
+    path = "#{Dir.pwd}/public/uploads/fft_sra_attachments/fft_sra_attachments"
     no_match = 0
 
     Attachment.skip_callback(:create, :after, :create_transaction)

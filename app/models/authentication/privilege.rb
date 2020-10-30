@@ -4,7 +4,7 @@ class Privilege < ActiveRecord::Base
   has_many :roles, foreign_key: "privileges_id", class_name: "Role", :dependent => :destroy
 
   has_many :access_controls, through: :assignments
-
+  has_many :users, :through => :roles
 
 
   def self.get_meta_fields(*args)

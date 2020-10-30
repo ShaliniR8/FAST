@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
 
   has_many :privileges, :through => :roles
 
+
   #Kaushik Mahorker OAuth
   has_many :client_applications
   has_many :tokens, :class_name => "Oauth2Token", :order => "authorized_at desc", :include => [:client_application]
@@ -46,6 +47,15 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password, :message => " must match."
   validates_length_of :password, :minimum => 4, :allow_blank => true, :message => " needs to be at least 4 characters long."
 
+
+  scope :active, where('disable = 0 or disable is null')
+
+
+  def search_content
+    content = "#{full_name} (##{employee_number})"
+    content += " (##{id})" if Rails.env.development?
+    content
+  end
 
 
   def get_all_access
