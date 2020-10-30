@@ -59,9 +59,7 @@ class FaaReport < ActiveRecord::Base
 
 
   def statistics
-    asap_reports = Record
-      .where("event_date >= ? AND event_date <= ?",
-        self.get_start_date, self.get_end_date)
+    asap_reports = select_records_in_date_range(self.get_start_date, self.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}
@@ -102,22 +100,57 @@ class FaaReport < ActiveRecord::Base
 
 
   def get_start_date
-    start_date = nil
     faa_report_format = CONFIG.getTimeFormat[:faa_report]
     case self.quarter
       when 1
-        start_date = faa_report_format ? "10/01/#{self.year-1}" : "#{self.year-1}-10-01"
+        faa_report_format ? "10/01/#{self.year-1}" : "#{self.year-1}-10-01"
       when 2
-        start_date = faa_report_format ? "01/01/#{self.year}"   : "#{self.year}-01-01"
+        faa_report_format ? "01/01/#{self.year}"   : "#{self.year}-01-01"
       when 3
-        start_date = faa_report_format ? "04/01/#{self.year}"   : "#{self.year}-04-01"
+        faa_report_format ? "04/01/#{self.year}"   : "#{self.year}-04-01"
       when 4
-        start_date = faa_report_format ? "07/01/#{self.year}"   : "#{self.year}-07-01"
+        faa_report_format ? "07/01/#{self.year}"   : "#{self.year}-07-01"
     end
-    start_date = faa_report_format ? DateTime.strptime(start_date, '%m/%d/%Y') : DateTime.strptime(start_date, "%Y-%m-%d")
-    start_date.beginning_of_day
   end
 
+
+  def get_end_date
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    case self.quarter
+      when 1
+        faa_report_format ? "12/31/#{self.year-1}" : "#{self.year-1}-12-31"
+      when 2
+        faa_report_format ? "03/31/#{self.year}"   : "#{self.year}-03-31"
+      when 3
+        faa_report_format ? "06/30/#{self.year}"   : "#{self.year}-06-30"
+      when 4
+        faa_report_format ? "09/30/#{self.year}"   : "#{self.year}-09-30"
+    end
+  end
+
+
+  def faa_format_date(date)
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    faa_report_format ? Date.strptime(date, '%m/%d/%Y') : Date.strptime(date, '%Y-%m-%d')
+  end
+
+
+  def select_records_in_date_range(start_date, end_date)
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    start_date = faa_format_date(start_date)
+    end_date = faa_format_date(end_date)
+    asap_reports = Record.all.select do |r|
+      selected = false
+      if r.event_date.present?
+        r_date = r.event_date
+        r_time_zone = r.event_time_zone
+        r_date = r_date.in_time_zone(r_time_zone) if CONFIG.sr::GENERAL[:submission_time_zone]
+        r_date = r_date.to_date
+        selected = true if r_date >= start_date && r_date <= end_date
+      end
+      selected
+    end
+  end
 
 
   def self.getEmployeeGroup
@@ -125,32 +158,10 @@ class FaaReport < ActiveRecord::Base
   end
 
 
-
-  def get_end_date
-    end_date = nil
-    faa_report_format = CONFIG.getTimeFormat[:faa_report]
-    case self.quarter
-      when 1
-        end_date = faa_report_format ? "12/31/#{self.year-1}" : "#{self.year-1}-12-31"
-      when 2
-        end_date = faa_report_format ? "03/31/#{self.year}"   : "#{self.year}-03-31"
-      when 3
-        end_date = faa_report_format ? "06/30/#{self.year}"   : "#{self.year}-06-30"
-      when 4
-        end_date = faa_report_format ? "09/30/#{self.year}"   : "#{self.year}-09-30"
-    end
-    end_date = faa_report_format ? DateTime.strptime(end_date, '%m/%d/%Y') : DateTime.strptime(end_date, "%Y-%m-%d")
-    end_date.end_of_day
-  end
-
-
-
   def get_range
     faa_report_format = CONFIG.getTimeFormat[:faa_report]
     start_date = self.get_start_date
     end_date = self.get_end_date
-    start_date = faa_report_format ? start_date.strftime('%m/%d/%Y') : start_date.strftime('%Y-%m-%d')
-    end_date = faa_report_format ? end_date.strftime('%m/%d/%Y') : end_date.strftime('%Y-%m-%d')
     "#{start_date} To #{end_date}"
   end
 
@@ -189,9 +200,7 @@ class FaaReport < ActiveRecord::Base
 
   def car_docx
     result = ""
-    asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        self.get_start_date, self.get_end_date)
+    asap_reports = select_records_in_date_range(self.get_start_date, self.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}

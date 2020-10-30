@@ -48,9 +48,7 @@ class FaaReportsController < ApplicationController
   def print
     @report = FaaReport.find(params[:id])
     @identification = CONFIG::FAA_INFO
-    asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        @report.get_start_date, @report.get_end_date)
+    asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
@@ -140,9 +138,7 @@ class FaaReportsController < ApplicationController
 
   def show
     @report = FaaReport.find(params[:id])
-    asap_reports = Record
-    .where("event_date >= ? AND event_date <= ?",
-      @report.get_start_date, @report.get_end_date)
+    asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
