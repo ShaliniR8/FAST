@@ -66,11 +66,11 @@ javascript:
   $(function() {
     $('[hover="tooltip"]').tooltip({ placement: 'bottom', trigger: 'hover' })
 
-    $('.show_preview_btn_mini').click(function() {
+    $(document).on('click', '.show_preview_btn_mini', function(e) {
       var attachment_id = $(this).data('id')
       $('.modal-content').html($(`#preview_attachment_${attachment_id}`).html())
       $(window).trigger('resize')
-    })
+    });
 
     $("##{owner.id}_attachments").on('change', '.hidden-file-input', function(event) {
       var fileName = event.target.value ? event.target.value.split('\\').pop() : ''
