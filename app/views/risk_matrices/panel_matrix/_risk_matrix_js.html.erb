@@ -11,7 +11,7 @@
 
     $('form').on('submit', function() {
       status = <%=risk_type == 'Baseline'%> ? "baseline-status" : "mitigate-status"
-
+      $(document).find('.temp_element').remove();
       submit_severity_result(status)
       submit_probability_result(status)
       return true
@@ -92,7 +92,8 @@
 
     $('.severity_td_<%=@owner.class.name%>_<%=@owner.id%>').each(function(){
       if ($(this).data(status) === "checked"){
-        severity_result[$(this).data("<%= severity_option[:access_order][0] %>")] = $(this).data("<%= severity_option[:access_order][1] %>")
+        severity_result[$(this).data("<%= severity_option[:access_order][0] %>")] =
+          $(this).data("<%= severity_option[:access_order][1] %>")
       }
     })
 
@@ -113,7 +114,8 @@
     })
 
     for (i = 0; i < probability_result.length; i++){
-      $('form').append("<input class='temp_element' name='<%=@target_name%>[<%=@probability_field%>][]' value=" + probability_result[i]+" hidden></input>");
+      $('form').append("<input class='temp_element' name='<%=@target_name%>[<%=@probability_field%>][]' value=" +
+        probability_result[i] + " hidden></input>");
     }
   }
 
