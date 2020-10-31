@@ -146,7 +146,11 @@ class FaaReport < ActiveRecord::Base
         r_time_zone = r.event_time_zone
         r_time_zone = 'UTC' if r_time_zone.blank?
         r_date = r_date.in_time_zone(r_time_zone) if CONFIG.sr::GENERAL[:submission_time_zone]
-        r_date = r_date.to_date
+        begin
+          r_date = r_date.to_date
+        rescue
+          r_date = r.event_date.in_time_zone('UTC').to_date
+        end
         selected = true if r_date >= start_date && r_date <= end_date
       end
       selected
