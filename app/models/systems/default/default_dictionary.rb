@@ -321,9 +321,22 @@ class DefaultDictionary
     findings: {
       partial: '/panels/findings',
       print_partial: '/pdfs/print_findings',
-      visible: proc { |owner:,user:,**op| owner.findings.present? },
-      show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { findings: owner.findings } },
+      visible: proc { |owner:, user:, **op| owner.findings.present? },
+      show_btns: proc { |owner:, user:, **op| false },
+      data: proc do |owner:, user:, **op|
+        has_checklists = owner.class.method_defined?(:checklists)
+        findings = owner.findings
+        if has_checklists
+          owner.checklists.each do |checklist|
+            checklist.checklist_rows.each do |checklist_row|
+              checklist_row.findings.each do |finding|
+                findings << finding
+              end
+            end
+          end
+        end
+        { findings: findings }
+      end
     },
     sms_actions: { # WIP
       partial: '/sms_actions/show_all',
