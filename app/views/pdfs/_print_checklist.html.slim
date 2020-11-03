@@ -30,6 +30,4 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
               br
         td
           - unless checklist_row.is_header? || owner.nil?
-            - checklist_row.findings.each do |f|
-              = link_to "Finding ##{f.id}"
-              br
+            = checklist_row.display_findings
