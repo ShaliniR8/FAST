@@ -105,15 +105,32 @@ class Report < Sr::SafetyReportingBase
 
     if attachments.length > 0
       attachments.each do |attachment|
-        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name]}</a><br>"
+        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name].truncate(20)}</a><br>"
       end
     end
 
     if records.map(&:attachments).flatten.length > 0
       records.map(&:attachments).flatten.each do |attachment|
-        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name]}</a><br>"
+        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name].truncate(20)}</a><br>"
       end
     end
+
+    invs = self.get_children(child_type: 'Investigation')
+    if invs.present?
+      invs.each do |inv|
+        title = "Investigation ##{inv.id} #{inv.title}".truncate(20)
+        result += "<a href='#{investigation_path(inv)}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{title}</a><br>"
+      end
+    end
+
+    sras = self.get_children(child_type: 'Sra')
+    if sras.present?
+      sras.each do |sra|
+        title = "SRA ##{sra.id} #{sra.title}".truncate(20)
+        result += "<a href='#{sra_path(sra)}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{title}</a><br>"
+      end
+    end
+
 
     result.html_safe
   end
