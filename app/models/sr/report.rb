@@ -121,10 +121,10 @@ class Report < Sr::SafetyReportingBase
 
   def included_reports
     result = ""
-    self.records.each do |record|
+    self.records.includes(:template).each do |record|
       result += "
         <a style='font-weight:bold' href='/records/#{record.id}'>
-          ##{record.id} -
+          ##{record.id} (#{record.template.name}) -
           #{record.created_by.disable ?
           '<font color="red">Inactive User</font>' :
           '<font color="green">Active User</font>'}
