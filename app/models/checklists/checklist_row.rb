@@ -13,4 +13,17 @@ class ChecklistRow < ActiveRecord::Base
     checklist_cells.includes(:checklist_header_item).order('checklist_header_items.display_order')
   end
 
+
+  def display_findings
+    result = ""
+    self.findings.each do |finding|
+      result += "
+        <a style='font-weight:bold' href='/findings/#{finding.id}'>
+          ##{finding.id} - #{ActionController::Base.helpers.truncate(finding.title, length: 20)}
+        </a><br><br>"
+    end
+    result.html_safe
+  end
+
+
 end
