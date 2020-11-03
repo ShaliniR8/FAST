@@ -327,7 +327,8 @@ class DefaultDictionary
         has_checklists = owner.class.method_defined?(:checklists)
         findings = owner.findings
         if has_checklists
-          owner.checklists.each do |checklist|
+          checklists = owner.checklists.includes(checklist_rows: :findings)
+          checklists.each do |checklist|
             checklist.checklist_rows.each do |checklist_row|
               checklist_row.findings.each do |finding|
                 findings << finding
