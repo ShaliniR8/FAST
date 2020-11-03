@@ -1,13 +1,18 @@
-<% events.each do |event| %>
+<%events.each do |event|%>
   <tr data-id="<%=event.id%>">
     <%@report_headers.each do |h|%>
       <%formatting = h[:title] == 'Attachments' ? 'attachments' : ''%>
       <td class="<%=formatting%> width-cap <%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
-        <% if h[:field] == 'get_minutes_agenda' %>
-          <%= event.get_minutes_agenda(meeting) %>
-        <% else %>
+        <%if h[:field] == 'get_minutes_agenda'%>
+          <%agendas = event.get_agendas(meeting)%>
+          <%agendas.each do |a|%>
+            <span style='cursor: pointer' type='button' hover='tooltip' data-html='true' data-placement='left' title="<%=a.preview%>">
+              <%=event.get_minutes_agenda(meeting).html_safe%>
+            </span>
+          <%end%>
+        <%else %>
           <%=render "forms/show_field", :record => event, :field_hash => h%>
-        <% end %>
+        <%end%>
       </td>
     <%end%>
     <td>

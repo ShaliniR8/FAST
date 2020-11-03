@@ -85,8 +85,9 @@ class Report < Sr::SafetyReportingBase
   end
 
   def get_minutes_agenda(meeting)
-    agenda = "<b>Agendas:</b><br>#{get_agendas(meeting).map(&:get_content).join('<br>')}" if get_agendas(meeting).length > 0
-    meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
+    agendas = get_agendas(meeting)
+    agenda = "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" if agendas.present?
+    meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if minutes.present?
     "#{agenda || ''} #{meeting_minutes || ''}".html_safe
   end
 
