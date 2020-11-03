@@ -18,8 +18,8 @@ class Agenda < ActiveRecord::Base
     status      = "Status: #{self.status}"                 + '<br>' if self.status.present?
     user        = "User: #{self.user.full_name}"           + '<br>'
     discuss     = "Discuss: #{self.discuss}"               + '<br>' if self.discuss.present?
-    disposition = "Disposition: #{self.disposition}"       + '<br>' if self.disposition.present?
     comment     = 'Comment: ' + '<br>' + "#{self.comment}" + '<br>' if self.comment.present?
+    disposition = "Disposition: #{self.disposition ? 'Accepted' : 'Declined'}" + '<br>' if self.disposition.present?
     ''.html_safe + title  + status + user + discuss + disposition + comment
   end
 
