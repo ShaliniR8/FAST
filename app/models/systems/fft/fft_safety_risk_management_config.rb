@@ -39,7 +39,8 @@ class FFTSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
       'RiskControl' => {
         fields: {
-          approver: { title: 'Lead Analyst' },
+          responsible_user: { title: 'Lead Analyst' },
+          approver: { title: 'Responsible User' },
           control_type: { visible: '' },
           notes: { visible: '' }
         }

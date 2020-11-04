@@ -24,7 +24,11 @@
           <%=f.hidden_field :status, :value => 'Assigned'%>
 
           <b style="color:red">*</b>
-          <%=label_tag :res, 'Responsible User'%>
+          <%resp_user_title = 'Responsible User'%>
+          <%if @owner.class.name == 'RiskControl'%>
+            <%resp_user_title = CONFIG.hierarchy['SRM'][:objects]['RiskControl'][:fields][:responsible_user][:title] rescue resp_user_title%>
+          <%end%>
+          <%=label_tag :res, resp_user_title%>
           <div class="input-group">
             <%=text_field_tag :res,
               "",
