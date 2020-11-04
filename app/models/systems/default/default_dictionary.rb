@@ -321,7 +321,25 @@ class DefaultDictionary
     findings: {
       partial: '/panels/findings',
       print_partial: '/pdfs/print_findings',
-      visible: proc { |owner:, user:, **op| owner.findings.present? },
+      visible: proc do |owner:, user:, **op|
+        visible = owner.findings.present?
+        unless visible
+          has_checklists = owner.class.method_defined?(:checklists)
+          checklists = has_checklists ? owner.checklists : nil
+          if has_checklists
+          # search checklist rows for findings unless owner has findings
+            checklists = owner.checklists.includes(checklist_rows: :findings)
+            checklists.each do |checklist|
+              checklist.checklist_rows.each do |checklist_row|
+                visible = true if checklist_row.findings.present?
+                break if visible
+              end
+              break if visible
+            end
+          end
+        end
+        visible
+      end,
       show_btns: proc { |owner:, user:, **op| false },
       data: proc do |owner:, user:, **op|
         has_checklists = owner.class.method_defined?(:checklists)
