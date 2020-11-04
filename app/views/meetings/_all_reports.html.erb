@@ -64,6 +64,8 @@
 
 <script>
   $(document).ready(function(){
+    reports_table = $('#reports_table').DataTable({
+    });
     $("#reports_table").on('click', ".view_narrative_btn", function(){
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);

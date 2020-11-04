@@ -76,6 +76,7 @@ class Report < Sr::SafetyReportingBase
     }
   end
 
+
   def get_agendas(meeting)
     if CONFIG.sr::GENERAL[:share_meeting_agendas]
       agendas
@@ -86,9 +87,13 @@ class Report < Sr::SafetyReportingBase
 
   def get_minutes_agenda(meeting)
     agendas = get_agendas(meeting)
-    agenda = "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" if agendas.present?
-    meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if minutes.present?
-    "#{agenda || ''} #{meeting_minutes || ''}".html_safe
+    agendas_present = agendas.present?
+    agendas_result = agendas_present ? "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" : ''
+
+    minutes_present = minutes.present?
+    minutes_result =  minutes_present ? "<b>Minutes:</b> <br>#{minutes}" : ''
+    minutes_result = '<hr>' + minutes_result if agendas_present && minutes_present
+    "#{agendas_result} #{minutes_result}".html_safe
   end
 
 
@@ -101,38 +106,50 @@ class Report < Sr::SafetyReportingBase
   end
 
   def additional_info
-    result = ""
+    atts = ""
 
     if attachments.length > 0
       attachments.each do |attachment|
-        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name].truncate(20)}</a><br>"
+        att_name = attachment[:name]
+        att_name = att_name.truncate(23) if att_name.present?
+        atts +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{att_name}</a><br>"
       end
     end
 
     if records.map(&:attachments).flatten.length > 0
       records.map(&:attachments).flatten.each do |attachment|
-        result +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{attachment[:name].truncate(20)}</a><br>"
+        att_name = attachment[:name]
+        att_name = att_name.truncate(23) if att_name.present?
+        atts +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{att_name}</a><br>"
       end
     end
+
+    atts_present = atts.present?
+    atts = '<div><b>Attachments:</b><br>' + atts + '</div>' if atts_present
+    launches = ''
 
     invs = self.get_children(child_type: 'Investigation')
     if invs.present?
       invs.each do |inv|
-        title = "Investigation ##{inv.id} #{inv.title}".truncate(20)
-        result += "<a href='#{investigation_path(inv)}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{title}</a><br>"
+        title = "Investigation ##{inv.id} #{inv.title}".truncate(23)
+        launches += "<a href='#{investigation_path(inv)}' target='_blank'>#{title}</a><br>"
       end
     end
 
     sras = self.get_children(child_type: 'Sra')
     if sras.present?
       sras.each do |sra|
-        title = "SRA ##{sra.id} #{sra.title}".truncate(20)
-        result += "<a href='#{sra_path(sra)}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{title}</a><br>"
+        title = "SRA ##{sra.id} #{sra.title}".truncate(23)
+        launches += "<a href='#{sra_path(sra)}' target='_blank'>#{title}</a><br>"
       end
     end
 
+    if launches.present?
+      separating =  atts_present ? '<hr>' : ''
+      launches = "#{separating}<div><b>Launch Items:</b><br>" + launches + '</div>'
+    end
 
-    result.html_safe
+    (atts + launches).html_safe
   end
 
 

@@ -5,12 +5,23 @@
       <td class="<%=formatting%> width-cap <%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
         <%if h[:field] == 'get_minutes_agenda'%>
           <%agendas = event.get_agendas(meeting)%>
-          <%agendas.each do |a|%>
-            <span style='cursor: pointer' type='button' hover='tooltip' data-html='true' data-placement='left' title="<%=a.preview%>">
-              <%=event.get_minutes_agenda(meeting).html_safe%>
-            </span>
+          <%agendas_present = agendas.present?%>
+          <%if agendas_present%>
+            <div><b>Agendas:</b></div>
+              <%agendas.each do |a|%>
+                <div style='cursor: pointer' type='button' hover='tooltip' data-html='true' data-placement='right' title="<%=a.preview%>">
+                  <%=a.get_content%>
+                </div>
+              <%end%>
           <%end%>
-        <%else %>
+          <%if event.minutes.present?%>
+            <%if agendas_present%>
+              <hr>
+            <%end%>
+            <div><b>Minutes:</b></div>
+            <%=event.minutes%>
+          <%end%>
+        <%else%>
           <%=render "forms/show_field", :record => event, :field_hash => h%>
         <%end%>
       </td>
@@ -78,3 +89,8 @@
 <script>
   $('[hover="tooltip"]').tooltip();
 </script>
+<style>
+  .tooltip-inner{
+    text-align: left;
+  }
+</style>

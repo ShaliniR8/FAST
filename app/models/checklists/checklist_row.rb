@@ -19,8 +19,8 @@ class ChecklistRow < ActiveRecord::Base
     self.findings.each do |finding|
       result += "
         <a style='font-weight:bold' href='/findings/#{finding.id}'>
-          ##{finding.id} - #{ActionController::Base.helpers.truncate(finding.title, length: 20)}
-        </a><br><br>"
+          ##{finding.id} - #{finding.title}
+        </a><br>"
     end
     result.html_safe
   end
