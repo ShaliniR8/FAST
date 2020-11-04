@@ -16,33 +16,34 @@
           <font style="color:blue;font-weight:bold"><%=cat.description%></font>
         </div>
 
-        <%fields = cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order)%>
-        <%category_fields_by_rows = group_by_column_size_and_nested_fields(fields: fields)%>
+        <div class="col-xs-12">
+          <%fields = cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order)%>
+          <%category_fields_by_rows = group_by_column_size_and_nested_fields(fields: fields)%>
 
-        <%category_fields_by_rows.each do |row| %>
-          <div class="row is-flex">
-            <%row.each do |field| %>
+          <%category_fields_by_rows.each do |row| %>
+            <div class="row is-flex">
+              <%row.each do |field| %>
 
-              <%=render "field", is_nested_field: false, field: field%>
+                <%=render "field", is_nested_field: false, field: field%>
 
-              <%if field.nested_fields.where(:deleted => false).present?%>
-                <div class='col-xs-12 nested_field_row'>
-                  <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-                    <div class="nested_field
-                      nested_field_<%=field.id%>
-                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                      style="display:none;">
-                      <%=render "field", is_nested_field: true, field: nested_field%>
-                    </div>
-                  <%end%>
-                </div>
+                <%if field.nested_fields.where(:deleted => false).present?%>
+                  <div class='col-xs-12 nested_field_row'>
+                    <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+                      <div class="nested_field
+                        nested_field_<%=field.id%>
+                        nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
+                        style="display:none;">
+                        <%=render "field", is_nested_field: true, field: nested_field%>
+                      </div>
+                    <%end%>
+                  </div>
+                <%end%>
+
               <%end%>
-
-            <%end%>
-          </div>
-          <hr>
-        <%end%>
-
+            </div>
+            <hr>
+          <%end%>
+        </div>
       </div>
     </div>
   </div>

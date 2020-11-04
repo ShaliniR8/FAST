@@ -410,7 +410,9 @@ class Record < Sr::SafetyReportingBase
     additional_info_fields = self.template.fields.select { |field| field.additional_info && !field.deleted }
 
     additional_info_fields.each do |field|
-      additional_info << { label: field.label, value: all_record_fields[field.id].value }
+      if all_record_fields[field.id].present?
+        additional_info << { label: field.label, value: all_record_fields[field.id].value }
+      end
     end
 
     additional_info
