@@ -290,6 +290,7 @@ class ReportsController < ApplicationController
 
     @i18nbase = 'sr.event'
     @report = Report.preload(records: [:attachments, :occurrences]).find(params[:id])
+    @owner = @report
     @headers = Record.get_headers
 
     @records = @report.records

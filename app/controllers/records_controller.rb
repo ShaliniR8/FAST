@@ -610,7 +610,6 @@ class RecordsController < ApplicationController
     risk_matrix_initializer
     # premium matrix
     load_special_matrix_form('record', 'baseline', @owner)
-
     render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 

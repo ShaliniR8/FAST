@@ -20,7 +20,8 @@ div class="#{table[:size]}"
         - unless is_row_header_col_empty
           th class="#{table[:header_style]}"
         - table[:column_header].each do |col_header|
-          th class="#{table[:header_style]}" width="#{100 / (table[:column_header].length + 1)}%" = col_header.html_safe
+          th class="#{table[:header_style]}" width="#{100 / (table[:column_header].length + 1)}%"
+            = col_header.html_safe
     / Body
     / row header + rows
     - table[:row_header].each_with_index do |row_header, row_index|
@@ -28,7 +29,13 @@ div class="#{table[:size]}"
         - unless is_row_header_col_empty
           th class="#{table[:header_style]}" = row_header.html_safe
         - table[:column_header].each_with_index do |col_header, col_index|
-          td class="#{table[:cell_name]}_#{owner.class.name}_#{owner.id} #{table[:cell_style]}" data-row="#{row_index}" data-baseline-status="" data-mitigate-status="" data-column="#{col_index}" style="background: #{table[:rows_color][row_index][col_index] if table[:rows_color].present?}"
+          td[
+            class="#{table[:cell_name]} #{table[:cell_name]}_#{owner.class.name}_#{owner.id} #{table[:cell_style]}"
+            data-row="#{row_index}"
+            data-baseline-status=""
+            data-mitigate-status=""
+            data-column="#{col_index}"
+            style="background: #{table[:rows_color][row_index][col_index] if table[:rows_color].present?}"]
             .content
               = table[:rows][row_index][col_index].html_safe if table[:rows].present?
 
@@ -47,6 +54,13 @@ css:
   .bold{
     font-weight: bold;
   }
+  .content {
+    font-size: 12px;
+  }
+  .probability_td:hover, .severity_td:hover {
+    cursor: pointer;
+    opacity: 0.8;
+
   .matrixTitle {
     color: #BDB76B;
   }

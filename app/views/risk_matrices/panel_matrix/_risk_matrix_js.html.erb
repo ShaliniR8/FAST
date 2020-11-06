@@ -1,6 +1,9 @@
 <script type="text/javascript">
 
   $(document).ready(function() {
+
+    var loader_partial = "<%=escape_javascript(render partial: 'shared/loader')%>";
+
     <%
       severity_option    = get_option_for_orientation(table_type: :severity_table)
       probability_option = get_option_for_orientation(table_type: :probability_table)
@@ -10,12 +13,30 @@
     load_data()
 
     $('form').on('submit', function() {
-      status = <%=risk_type == 'Baseline'%> ? "baseline-status" : "mitigate-status"
+      console.log('submit risk form');
+      status = <%=risk_type == 'Baseline'%> ? "baseline-status" : "mitigate-status";
       $(document).find('.temp_element').remove();
-      submit_severity_result(status)
-      submit_probability_result(status)
-      return true
-    })
+      submit_severity_result(status);
+      submit_probability_result(status);
+      var content_area = $(this).closest('.panel-body').find('.risk-matrix-content');
+      $.ajax({
+        url: $(this).attr('action'),
+        data: $(this).serialize(),
+        type: 'PUT',
+        beforeSend: function() {
+          $(content_area).css({'opacity': 0.5});
+        },
+        success: function(data) {
+          $(content_area).css({'opacity': 1});
+          $(content_area).html(data);
+        },
+        error: function(error) {
+          console.log('error: ' + error);
+        }
+      });
+      return false;
+    });
+
 
     $('.close').on('click', function() {
       uninitialize()
