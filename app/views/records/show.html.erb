@@ -246,7 +246,6 @@
           <%end%>
 
           <%=render '/records/record_template_content', deid: !template_full_access%>
-          <%#=render "/records/show_template_fields", record: @record, deid: !template_full_access%>
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
@@ -320,18 +319,6 @@
     });
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_record_path(@record)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#mitigate_btn').on('click',function(){
-      $.get("<%=mitigate_record_path(@record)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#baseline_btn').on('click',function(){
-      $.get("<%=baseline_record_path(@record)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

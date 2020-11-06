@@ -74,21 +74,5 @@
       });
     });
 
-    $('#mitigate_btn').on('click', function(){
-      $.get("<%=mitigate_sms_action_path(@owner)%>",
-        function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
-    $('#baseline_btn').on('click', function(){
-      $.get("<%=baseline_sms_action_path(@owner)%>",
-        function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-
   });
 </script>

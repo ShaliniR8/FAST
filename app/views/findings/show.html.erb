@@ -72,17 +72,5 @@
         $(window).trigger('resize');
       });
     });
-    $('#mitigate_btn').on('click',function(){
-        $.get("<%=mitigate_finding_path(@owner)%>",function(data){
-          $(".modal-content").html(data);
-          $(window).trigger('resize');
-        });
-    });
-    $('#baseline_btn').on('click',function(){
-        $.get("<%=baseline_finding_path(@owner)%>",function(data){
-          $(".modal-content").html(data);
-          $(window).trigger('resize');
-        });
-    });
   });
 </script>

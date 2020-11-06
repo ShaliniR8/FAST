@@ -237,20 +237,6 @@
         $(window).trigger('resize');
       });
     });
-    $('#mitigate_btn').on('click',function(){
-      $(".modal-content").html('');
-      $.get("<%=mitigate_report_path(@report)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#baseline_btn').on('click',function(){
-      $(".modal-content").html('');
-      $.get("<%=baseline_report_path(@report)%>", function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#override_status_btn').on('click',function(){
       $(".modal-content").html('');
       $.get("<%=override_status_report_path(@report)%>", function(data){
