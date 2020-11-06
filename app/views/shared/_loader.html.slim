@@ -1,0 +1,31 @@
+div class='mt20 mb20 loader'
+  .centered.spinner
+  .loading-text Loading
+
+css:
+  .centered {
+    margin: auto;
+    width: 50%;
+    border: 3px solid white;
+    padding: 10px;
+  }
+  .loading-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .loader {
+    display: none;
+  }
+  .spinner {
+    text-align: center;
+    animation: spin 1s ease-in-out infinite;
+    width: 50px;
+    height: 50px;
+    -webkit-animation: spin .8s ease-in-out infinite;
+  }
+  .spinner {
+    border: 5px solid rgba(255, 255, 255, .5);
+    border-radius: 80%;
+    border-top-color: #33b5e5;
+  }
