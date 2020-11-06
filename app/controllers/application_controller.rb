@@ -955,6 +955,25 @@ class ApplicationController < ActionController::Base
   end
 
 
+  # save records through ajax call
+  def ajax_update
+    object_name = self.class.name.gsub('Controller', '').underscore.singularize
+    class_name = self.class.name.gsub('Controller', '').singularize
+    @owner = Object.const_get(class_name).find(params[:id])
+
+
+    case params[:commit]
+    when 'Update Risk Matrix'
+      convert_from_risk_value_to_risk_index
+      @owner.update_attributes(params[object_name.to_sym])
+      load_special_matrix(@owner)
+      render partial: 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+    else
+    end
+
+  end
+
+
   private
 
   def set_last_seen_at

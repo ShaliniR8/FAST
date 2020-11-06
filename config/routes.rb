@@ -324,6 +324,7 @@ PrdgSession::Application.routes.draw do |map|
       get "display"
       get 'open'
       get 'override_status'
+      put 'ajax_update'
     end
     collection do
       post 'load_records'
@@ -375,6 +376,7 @@ PrdgSession::Application.routes.draw do |map|
       get "reopen"
       get 'override_status'
       get 'comment'
+      put 'ajax_update'
     end
   end
   resources :meetings do
@@ -535,6 +537,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'viewer_access'
       post 'add_causes'
       post 'add_desc'
+      put 'ajax_update'
     end
     collection do
       get 'retract_cause_attributes'
@@ -556,6 +559,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
       get 'launch'
       get 'launch_new_object'
+      put 'ajax_update'
     end
     collection do
       post 'load_records'
@@ -578,6 +582,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'launch_new_object'
       get 'print'
       get 'reassign'
+      put 'ajax_update'
     end
   end
 
@@ -650,6 +655,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'launch'
       get 'launch_new_object'
       get 'comment'
+      put 'ajax_update'
     end
     collection do
       post 'load_records'
@@ -681,6 +687,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'launch'
       get 'launch_new_object'
       get 'comment'
+      put 'ajax_update'
     end
   end
   resources :safety_plans do
