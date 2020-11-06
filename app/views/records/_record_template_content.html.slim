@@ -36,7 +36,8 @@ ruby:
                       - when 'checkbox', 'radio'
                         - value.split(';').each do |val|
                           .col-xs-12
-                            span.glyphicon.glyphicon-check aria-hidden='true' = value
+                            span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
+                            = val
                       - when 'textarea'
                         br
                         = value.gsub(/\n/, '<br/>').html_safe
