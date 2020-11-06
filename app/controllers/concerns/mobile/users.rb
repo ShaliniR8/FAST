@@ -47,6 +47,8 @@ module Concerns
 
         permissions = { :submissions => [], :audits => [] }
         permissions[:submissions].push('new') if current_user.has_access('submissions', 'new', admin: true, strict: true)
+        permissions[:submissions].push('index') if current_user.has_access('submissions', 'index', admin: true, strict: true)
+        permissions[:submissions].push('show') if current_user.has_access('submissions', 'show', admin: true, strict: true)
         mobile_user_info[:permissions] = permissions
 
         # change when configs are updated to v1.2
