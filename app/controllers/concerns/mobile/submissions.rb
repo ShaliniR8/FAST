@@ -55,10 +55,24 @@ module Concerns
         # Get timezone data for timezone fields
         # timezoneField = Field.where(data_type: 'timezone').first
         # json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
-        json[:timezones] = {
-          all: ActiveSupport::TimeZone.all.map(&:name),
-          us: ["Hawaii", "Alaska", "Pacific Time (US & Canada)", "Arizona", "Mountain Time (US & Canada)", "Central Time (US & Canada)", "Eastern Time (US & Canada)", "Indiana (East)"]
-        }
+        if CONFIG.sr::GENERAL[:submission_time_zone]
+          json[:timezones] = {
+            all: ActiveSupport::TimeZone.all.map(&:name),
+            us: [
+              "Hawaii",
+              "Alaska",
+              "Pacific Time (US & Canada)",
+              "Arizona", "Mountain Time (US & Canada)",
+              "Central Time (US & Canada)",
+              "Eastern Time (US & Canada)",
+              "Indiana (East)"]
+          }
+        else
+          json[:timezones] = {
+            all: ['UTC', 'Local'],
+            us: ['Local']
+          }
+        end
 
 
         # Get id map of all users
