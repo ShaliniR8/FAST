@@ -62,7 +62,7 @@ module Concerns
 
 
         # Get id map of all users
-        json[:users] = array_to_id_map User.all.as_json(only: [:id, :full_name, :email])
+        json[:users] = array_to_id_map User.active.as_json(only: [:id, :full_name, :email])
 
         render :json => json
       end
