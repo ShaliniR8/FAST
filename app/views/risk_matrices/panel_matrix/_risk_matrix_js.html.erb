@@ -13,29 +13,34 @@
     load_data()
 
     $('form').on('submit', function() {
-      console.log('submit risk form');
-      status = <%=risk_type == 'Baseline'%> ? "baseline-status" : "mitigate-status";
+      status = <%=risk_type == 'Baseline'%> ? "baseline-status" : "mitigate-status"
       $(document).find('.temp_element').remove();
-      submit_severity_result(status);
-      submit_probability_result(status);
-      var content_area = $(this).closest('.panel-body').find('.risk-matrix-content');
-      $.ajax({
-        url: $(this).attr('action'),
-        data: $(this).serialize(),
-        type: 'PUT',
-        beforeSend: function() {
-          $(content_area).css({'opacity': 0.5});
-        },
-        success: function(data) {
-          $(content_area).css({'opacity': 1});
-          $(content_area).html(data);
-        },
-        error: function(error) {
-          console.log('error: ' + error);
-        }
-      });
-      return false;
-    });
+      submit_severity_result(status)
+      submit_probability_result(status)
+      commit = $(document).find('#commit');
+      // use ajax on show page
+      if(commit.val() == 'Update Risk Matrix'){
+        console.log('submit risk form');
+        var content_area = $(this).closest('.panel-body').find('.risk-matrix-content');
+        $.ajax({
+          url: $(this).attr('action'),
+          data: $(this).serialize(),
+          type: 'PUT',
+          beforeSend: function() {
+            $(content_area).css({'opacity': 0.5});
+          },
+          success: function(data) {
+            $(content_area).css({'opacity': 1});
+            $(content_area).html(data);
+          },
+          error: function(error) {
+            console.log('error: ' + error);
+          }
+        });
+        return false;
+      }
+      return true
+    })
 
 
     $('.close').on('click', function() {
@@ -249,16 +254,17 @@
     <% when 'Baseline' %>
       load_baseline()
       calculate_baseline_risk()
-    <% when 'Mitigate' %>
+    <%when 'Mitigate'%>
       load_mitigate()
       calculate_mitigate_risk()
-    <% else %>
+    <%else%>
       // show panel page
       // TODO: Edit or New page?
       load_baseline()
       load_mitigate()
+      load_overlap()
       calculate_risk()
-    <% end %>
+    <%end%>
   }
 
 
@@ -313,28 +319,52 @@
   }
 
 
+  function load_overlap() {
+    <%if @owner.get_mitigated_severity.present? && @owner.get_mitigated_probability.present?%>
+    $(".severity_td_<%=@owner.class.name%>_<%=@owner.id%>").each(load_severity_overlap)
+    $('.probability_td_<%=@owner.class.name%>_<%=@owner.id%>').each(load_probability_overlap)
+  <%end%>
+  }
+
   function load_severity_after() {
     <%(0..CONFIG::MATRIX_INFO[:severity_table][severity_option[:header]].size - 1).each do |i|%>
       if ($(this).data("<%= severity_option[:access_order][0] %>") == <%=i%>){
         if($(this).data("<%= severity_option[:access_order][1] %>") == <%=@owner.get_mitigated_severity[i].nil? ? -1 : @owner.get_mitigated_severity[i] rescue -1%>){
+          $(this).data("mitigate-status","checked")
+          $(this).css('background','#FCAFCB')
+        }
+      }
+    <%end%>
+  }
 
+  function load_severity_overlap() {
+    <%(0..CONFIG::MATRIX_INFO[:severity_table][severity_option[:header]].size - 1).each do |i|%>
+      if ($(this).data("<%= severity_option[:access_order][0] %>") == <%=i%>){
+        if($(this).data("<%= severity_option[:access_order][1] %>") == <%=@owner.get_mitigated_severity[i].nil? ? -1 : @owner.get_mitigated_severity[i] rescue -1%>){
           $(this).data("mitigate-status","checked")
           <%if @owner.get_extra_severity.present?%>
             if ($(this).data("<%= severity_option[:access_order][1] %>") == <%=@owner.get_extra_severity[i].nil? ? -1 : @owner.get_extra_severity[i] rescue -1%>){
               $(this).css('background','#CABCF6')
-            }else{
-              $(this).css('background','#FCAFCB')
             }
-          <%else%>
-            $(this).css('background','#FCAFCB')
           <%end%>
         }
       }
     <%end%>
   }
 
-
   function load_probability_after() {
+    <%(0..CONFIG::MATRIX_INFO[:probability_table][probability_option[:header]].size - 1).each do |i|%>
+      if ($(this).data("<%= probability_option[:access_order][0] %>") == <%=i%>){
+        if($(this).data("<%= probability_option[:access_order][1] %>") == <%=@owner.get_mitigated_probability[i].nil? ? -1 : @owner.get_mitigated_probability[i] rescue -1%>){
+          $(this).data("mitigate-status", "checked")
+          $(this).css('background','#FCAFCB')
+        }
+      }
+    <%end%>
+  }
+
+
+  function load_probability_overlap() {
     <%(0..CONFIG::MATRIX_INFO[:probability_table][probability_option[:header]].size - 1).each do |i|%>
       if ($(this).data("<%= probability_option[:access_order][0] %>") == <%=i%>){
         if($(this).data("<%= probability_option[:access_order][1] %>") == <%=@owner.get_mitigated_probability[i].nil? ? -1 : @owner.get_mitigated_probability[i] rescue -1%>){
@@ -342,11 +372,7 @@
           <%if @owner.get_extra_probability.present?%>
             if ($(this).data("<%= probability_option[:access_order][1] %>") == <%=@owner.get_extra_probability[i].nil? ? -1 : @owner.get_extra_probability[i] rescue -1%>){
               $(this).css('background', '#CABCF6')
-            }else{
-              $(this).css('background','#FCAFCB')
             }
-          <%else%>
-            $(this).css('background','#FCAFCB')
           <%end%>
         }
       }
@@ -526,11 +552,12 @@
   }
 
   function update_hidden_fields(row_index, column_index) {
-    risk_table_colors = <%=CONFIG::MATRIX_INFO[:risk_table][:rows_color].to_json.html_safe%>
-    risk_definitions = <%=CONFIG::MATRIX_INFO[:risk_definitions].to_json.html_safe%>
+    <%risk_table = CONFIG::MATRIX_INFO[:risk_table]%>
+    risk_table_colors = <%=(risk_table[:rows] || risk_table[:rows_color]).to_json.html_safe%>
+    risk_definitions = <%=CONFIG::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
 
     risk_color = risk_table_colors[row_index][column_index]
-    risk_factor = risk_definitions[risk_color]['rating']
+    risk_factor = risk_definitions[risk_color]
 
     probability = <%=is_row_probability?%> ? row_index    : column_index
     severity    = <%=is_row_probability?%> ? column_index : row_index
