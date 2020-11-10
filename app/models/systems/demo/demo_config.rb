@@ -32,9 +32,23 @@ class DemoConfig < DefaultConfig
   MATRIX_INFO = DefaultConfig::MATRIX_INFO.deep_merge({
     severity_table: {
       row_header: ['5','4','3','2','1'],
+      severity_table_dict: {
+        0 => "5",
+        1 => "4",
+        2 => "3",
+        3 => "2",
+        4 => "1",
+      },
     },
     probability_table: {
       column_header: ['A','B','C','D','E'],
+      probability_table_dict: {
+        0 => "A",
+        1 => "B",
+        2 => "C",
+        3 => "D",
+        4 => "E",
+      },
     },
     risk_table: {
       row_header: ['5','4','3','2','1'],

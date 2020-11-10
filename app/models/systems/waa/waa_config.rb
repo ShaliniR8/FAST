@@ -35,10 +35,6 @@ class WAAConfig < DefaultConfig
       header_style: 'sevHeader',
       cell_name: 'severity_td',
 
-      # maps severity / likelihood attribute to position on table
-      severity_pos: 'row',
-      likelihood_pos: 'column',
-
       row_header_name: 'SEVERITY',
       row_header: ['I', 'II', 'III', 'IV'],
       column_header_name: 'CLASS',
@@ -138,6 +134,10 @@ class WAAConfig < DefaultConfig
       cell_name: 'risk_td',
       cell_style: 'bold',
 
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'column',
+      likelihood_pos: 'row',
+
       row_header_name: 'PROBABILITY',
       row_header: ['Frequent', 'Probable', 'Occasional', 'Remote'],
       column_header_name: 'SEVERITY',
@@ -173,6 +173,13 @@ class WAAConfig < DefaultConfig
       'Top Management'          => 'yellow',
       'Managers & Supervisors'  => 'mediumseagreen'
     },
+
+    risk_table_dict: {
+      crimson:        'Accountable Executive',
+      yellow:         'Top Management',
+      mediumseagreen: 'Managers & Supervisors',
+    },
+
   }
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({

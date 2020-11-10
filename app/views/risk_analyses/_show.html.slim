@@ -26,22 +26,7 @@
                 title: 'Assess Baseline Risk'
       .row
         .col-xs-12.col-lg-12
-          hr/
-          h4: b RISK ASSESSMENT
-          .col-xs-6
-            h5: b BASELINE RISK
-            - severity = CONFIG.print_severity(owner, owner.severity.to_i) if owner.severity.present?
-            - likelibood = CONFIG.print_probability(owner, owner.likelihood.to_i) if owner.likelihood.present?
-            <b>Severity:</b> #{severity}<br>
-            <b>Likelihood:</b> #{likelibood}<br>
-            <b>Risk Factor:</b> #{owner.risk_factor}<br>
-          .col-xs-6
-            h5: b MITIGATED RISK
-            - severity_after = CONFIG.print_severity(owner, owner.severity_after.to_i) if owner.severity_after.present?
-            - likelibood_after = CONFIG.print_probability(owner, owner.likelihood_after.to_i) if owner.likelihood_after.present?
-            <b>Severity:</b> #{severity_after}<br>
-            <b>Likelihood:</b> #{likelibood_after}<br>
-            <b>Risk Factor:</b> #{owner.risk_factor_after}<br>
+          = render 'risk_matrices/panel_matrix/show_matrix/risk_assessment_show', owner: owner
 
 javascript:
   $(document).ready(function(){

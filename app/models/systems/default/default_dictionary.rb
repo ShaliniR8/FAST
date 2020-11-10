@@ -639,7 +639,7 @@ class DefaultDictionary
       required: false
     },
     risk_factor: {
-      field: 'get_risk_classification', title: 'Baseline Risk',
+      field: 'risk_factor', title: 'Baseline Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_before_risk_color'
     },
@@ -659,7 +659,7 @@ class DefaultDictionary
       required: false
     },
     risk_factor_after: {
-      field: 'get_risk_classification_after', title: 'Mitigated Risk',
+      field: 'risk_factor_after', title: 'Mitigated Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_after_risk_color'
     },

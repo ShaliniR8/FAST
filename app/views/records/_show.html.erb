@@ -2,7 +2,11 @@
 
 <%=render "/records/show_template_fields", :record => owner%>
 
-<%=render '/risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+<%=render 'risk_analyses/show',
+        :owner => owner,
+        :show_btn => false,
+        :type => 'records',
+        can_change: false%>
 
 <%=render '/panels/show_panels', :owner => owner%>
 

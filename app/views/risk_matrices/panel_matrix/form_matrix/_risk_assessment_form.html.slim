@@ -1,7 +1,7 @@
 .col-xs-6
   hr
   h4
-    b = 'RISK ASSESSMENT'
+    b = "#{risk_type.upcase} RISK ASSESSMENT"
   .form-group.form-inline.col-sm-4
     - if @risk_type == 'Baseline'
       = f.label :severity, 'Baseline Severity'

@@ -12,12 +12,11 @@
 
 <%=render '/reports/record_table'%>
 
-<%=render 'risk_matrices/panel_matrix/show_matrix/show_matrix',
-            :owner => owner,
-            :show_btn => true,
-            :type => 'records',
-            :allow_mitigate => true,
-            :can_change => false%>
+<%=render 'risk_analyses/show',
+        :owner => owner,
+        :show_btn => false,
+        :type => 'reports',
+        can_change: false%>
 
 <%= render '/panels/show_panels', owner: owner%>
 

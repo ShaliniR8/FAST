@@ -212,11 +212,11 @@ class DefaultConfig
     },
 
     severity_table_dict: {
-      0 => "5",
-      1 => "4",
-      2 => "3",
-      3 => "2",
-      4 => "1"
+      0 => "4",
+      1 => "3",
+      2 => "2",
+      3 => "1",
+      4 => "0",
     },
 
     probability_table: {
@@ -246,11 +246,11 @@ class DefaultConfig
     },
 
     probability_table_dict: {
-      0 => 'Improbable (10 Years)',
-      1 => 'Remote (5 Years)',
-      2 => 'Occasional (1 Year)',
-      3 => 'Probable (6 Months)',
-      4 => 'Frequent (30 Days)'
+      0 => 'A - Improbable',
+      1 => 'B - Unlikely',
+      2 => 'C - Remote',
+      3 => 'D - Probable',
+      4 => 'E - Frequent',
     },
 
     risk_table: {
@@ -277,7 +277,6 @@ class DefaultConfig
         ['#60FF60',   '#60FF60',    'yellow',     'yellow',     'orange' ],
         ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60'],
         ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60']
-
       ],
     },
 
@@ -291,6 +290,7 @@ class DefaultConfig
       'Orange - Unacceptable'                => 'orange',
       'Yellow - Acceptable with mitigation'  => 'yellow',
       'Green - Acceptable'                   => 'limegreen',
+      'Red - Unacceptable'                   => 'red',
 
       'Moderate' => 'yellow',
       'Low'      => 'limegreen',
@@ -300,6 +300,15 @@ class DefaultConfig
       'LOW'      => 'limegreen',
       'HIGH'     => 'red',
     },
+
+    risk_table_dict: {
+      '#60FF60'   => 'Green - Acceptable',
+      'limegreen' => 'Green - Acceptable',
+      'red'       => 'Red - Unacceptable',
+      yellow:        'Yellow - Acceptable with mitigation',
+      orange:        'Orange - Unacceptable',
+
+    }
   }
 
   # Calculate the severity based on the airlines's risk matrix
@@ -319,15 +328,15 @@ class DefaultConfig
   end
 
   def self.print_severity(owner, severity_score)
-    self::MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
+    self::MATRIX_INFO[:severity_table_dict][severity_score] if severity_score.present?
   end
 
   def self.print_probability(owner, probability_score)
-    self::MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
+    self::MATRIX_INFO[:probability_table_dict][probability_score] if probability_score.present?
   end
 
   def self.print_risk(probability_score, severity_score)
-    if !probability_score.nil? && !severity_score.nil?
+    if probability_score.present? && severity_score.present?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
       return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
     end

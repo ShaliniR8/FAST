@@ -1,42 +1,41 @@
 ruby:
-  risk_table    = CONFIG::MATRIX_INFO[:risk_table]
-  column_header = risk_table[:column_header]
-  row_header  = risk_table[:row_header]
+  risk_table     = CONFIG::MATRIX_INFO[:risk_table]
+  severity_pos   = risk_table[:severity_pos]
+  likelihood_pos = risk_table[:likelihood_pos]
 
+hr
+h4
+  b = 'RISK ASSESSMENT'
 .col-xs-6
-  hr
-  h4
-    b = 'RISK ASSESSMENT'
-  .col-xs-6
-    h5
-      b = 'BASELINE RISK'
-      br
-      br
-    P
-      b = 'Severity: '
-      = row_header[@owner.severity.to_i] if @owner.severity.present?
-    p
-      b = 'Likelihood: '
-      = column_header[@owner.likelihood.to_i] if @owner.likelihood.present?
-    p
-      b = 'Risk Factor: '
-      = @owner.risk_factor
-  .col-xs-6
-    h5
-      b = 'MITIGATED RISK'
-      br
-      br
-    P
-      b = 'Severity: '
-      = row_header[@owner.severity_after.to_i] if @owner.severity_after.present?
-    p
-      b = 'Likelihood: '
-      = column_header[@owner.likelihood_after.to_i] if @owner.likelihood_after.present?
-    p
-      b = 'Risk Factor: '
-      = @owner.risk_factor_after
-  .col-xs-10.mt10.mb10
-    b = 'Notes:'
+  h5
+    b = 'BASELINE RISK'
     br
-    - if @owner.statement.present?
-      = @owner.statement.gsub(/\n/, '<br/>').html_safe
+    br
+  P
+    b = 'Severity: '
+    = risk_table["#{severity_pos}_header".to_sym][owner.severity.to_i].html_safe if owner.severity.present?
+  p
+    b = 'Likelihood: '
+    = risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood.to_i].html_safe if owner.likelihood.present?
+  p
+    b = 'Risk Factor: '
+    = owner.risk_factor
+.col-xs-6
+  h5
+    b = 'MITIGATED RISK'
+    br
+    br
+  P
+    b = 'Severity: '
+    = risk_table["#{severity_pos}_header".to_sym][owner.severity_after.to_i].html_safe if owner.severity_after.present?
+  p
+    b = 'Likelihood: '
+    = risk_table["#{likelihood_pos}_header".to_sym][owner.likelihood_after.to_i].html_safe if owner.likelihood_after.present?
+  p
+    b = 'Risk Factor: '
+    = owner.risk_factor_after
+.col-xs-10.mt10.mb10
+  b = 'Notes:'
+  br
+  - if owner.statement.present?
+    = owner.statement.gsub(/\n/, '<br/>').html_safe

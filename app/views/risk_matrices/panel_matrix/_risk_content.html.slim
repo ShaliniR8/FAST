@@ -1,9 +1,10 @@
 - if CONFIG::GENERAL[:drop_down_risk_selection]
   .col-xs-12.col-sm-12.col-md-12
     - if action == 'show'
-      = render 'risk_matrices/panel_matrix/show_matrix/risk_assessment_show', owner: @owner
+      .col-xs-6
+        = render 'risk_matrices/panel_matrix/show_matrix/risk_assessment_show', owner: @owner
     - else # 'form'
-      = render 'risk_matrices/panel_matrix/form_matrix/risk_assessment_form', owner: @owner, f: f
+      = render 'risk_matrices/panel_matrix/form_matrix/risk_assessment_form', owner: @owner, f: f, risk_type: risk_type
     = render 'risk_matrices/panel_matrix/table', table: CONFIG::MATRIX_INFO[:risk_table], owner: @owner
     = render 'risk_matrices/panel_matrix/risk_definitions'
 - else # table_risk_selection
