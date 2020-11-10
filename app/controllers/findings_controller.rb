@@ -70,6 +70,7 @@ class FindingsController < SafetyAssuranceController
 
   def edit
     load_options
+    @risk_type = 'Baseline'
     @fields = Finding.get_meta_fields('form')
     choose_load_special_matrix_form(@owner, 'finding')
     @type = @owner.get_owner

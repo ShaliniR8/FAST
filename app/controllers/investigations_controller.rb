@@ -57,6 +57,7 @@ class InvestigationsController < SafetyAssuranceController
 
 
   def edit
+    @risk_type = 'Baseline'
     load_options
     @fields = Investigation.get_meta_fields('form')
     load_special_matrix_form('investigation', 'baseline', @owner)

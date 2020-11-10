@@ -9,4 +9,4 @@
   = f.hidden_field :risk_factor_after, value: '',  id: 'risk_fact'
 
 = render 'risk_matrices/panel_matrix/form_matrix/header', f: f, risk_type: risk_type
-= render 'risk_matrices/panel_matrix/risk_content', action: 'form', f: f
+= render 'risk_matrices/panel_matrix/risk_content', action: 'form', f: f, risk_type: risk_type || @risk_type

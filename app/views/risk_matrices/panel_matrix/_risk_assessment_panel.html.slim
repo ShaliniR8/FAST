@@ -9,23 +9,29 @@
     .panel-body style="display:none"
 
       .col-xs-12
-        // risk assessment btns
-        - if not ['Pending Approval', 'Completed', 'Rejected', 'Closed'].include? (@owner.status)
+        / Baseline, Migate Risk btns, Notes
+        - if risk_type == 'All'
+          / risk assessment btns
+          - if not ['Pending Approval', 'Completed', 'Rejected', 'Closed'].include? (@owner.status)
 
-          = link_to CONFIG::MATRIX_INFO[:terminology][:mitigate_btn], '#',
-            class: 'btn btn-warning pull-right ml5 assess-risk-btn',
-            id: 'mitigate_btn',
-            title: 'Assess Mitigated Risk',
-            'data-path' => eval("mitigate_#{@owner.class.name.underscore}_path(@owner)")
+            = link_to CONFIG::MATRIX_INFO[:terminology][:mitigate_btn], '#',
+              class: 'btn btn-warning pull-right ml5 assess-risk-btn',
+              id: 'mitigate_btn',
+              title: 'Assess Mitigated Risk',
+              'data-path' => eval("mitigate_#{@owner.class.name.underscore}_path(@owner)")
 
-          = link_to CONFIG::MATRIX_INFO[:terminology][:baseline_btn], '#',
-            class: 'btn btn-info pull-right assess-risk-btn',
-            id: 'baseline_btn',
-            title: 'Assess Baseline Risk',
-            'data-path' => eval("baseline_#{@owner.class.name.underscore}_path(@owner)")
+            = link_to CONFIG::MATRIX_INFO[:terminology][:baseline_btn], '#',
+              class: 'btn btn-info pull-right assess-risk-btn',
+              id: 'baseline_btn',
+              title: 'Assess Baseline Risk',
+              'data-path' => eval("baseline_#{@owner.class.name.underscore}_path(@owner)")
+          .col-xs-12.mt10.risk-matrix-content
+            = render 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+        - else
+          = render 'risk_matrices/panel_matrix/form_matrix/form_matrix', f: f, risk_type: @risk_type
+          = render 'risk_matrices/panel_matrix/risk_matrix_js', risk_type: @risk_type
 
-      .col-xs-12.mt10.risk-matrix-content
-        = render 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+
 
 
 

@@ -54,6 +54,7 @@ class SmsActionsController < SafetyAssuranceController
     load_options
     @fields = SmsAction.get_meta_fields('form')
     choose_load_special_matrix_form(@owner, 'sms_action')
+    @risk_type = 'Baseline'
   end
 
 
@@ -101,6 +102,7 @@ class SmsActionsController < SafetyAssuranceController
     choose_load_special_matrix_form(@owner, 'sms_action')
     @type = get_car_owner(@owner)
     @users.keep_if{|u| u.has_access(@type, 'edit')}
+    @risk_type = 'Baseline'
   end
 
 

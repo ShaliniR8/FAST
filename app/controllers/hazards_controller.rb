@@ -80,6 +80,7 @@ class HazardsController < ApplicationController
 
 
   def edit
+    @risk_type = 'Baseline'
     @hazard = Hazard.find(params[:id])
     @owner = @hazard
     load_options
