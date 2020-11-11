@@ -1,3 +1,7 @@
+= javascript_include_tag "/javascripts/utility/format-builder.js"
+= javascript_include_tag "/javascripts/utility/timezone-control.js"
+
+
 = form_for record do |f|
   = hidden_field_tag :commit, 'Save Fields'
   = hidden_field_tag :category_id, category.id
