@@ -51,9 +51,9 @@ class Report < Sr::SafetyReportingBase
 
   def self.reports_for_meeting
     if CONFIG.sr::GENERAL[:allow_event_reuse]
-      where(status: ['Meeting Ready', 'Under Review'])
+      Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready', 'Under Review'])
     else
-      where(status: ['Meeting Ready'])
+      Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready'])
     end
   end
 
@@ -155,7 +155,7 @@ class Report < Sr::SafetyReportingBase
 
   def included_reports
     result = ""
-    self.records.includes(:template).each do |record|
+    records.each do |record|
       result += "
         <a style='font-weight:bold' href='/records/#{record.id}'>
           ##{record.id} (#{record.template.name}) -
