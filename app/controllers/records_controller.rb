@@ -75,7 +75,11 @@ class RecordsController < ApplicationController
       "#{(record.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
       current_user.id)
     record.save
-    redirect_to record_path(record)
+    # redirect_to record_path(record)
+    render json: {
+        btn: "#{(record.viewer_access ? 'Disable' : 'Enable')} Viewer Access",
+        html: "<b>Viewer Access:</b> #{record.viewer_access ? 'Yes' : 'No'}"
+      }
   end
 
 

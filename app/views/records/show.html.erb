@@ -120,15 +120,13 @@
 
                 <%if record_edit_access %>
                   <%if !@record.viewer_access%>
-                    <%=link_to "Enable Viewer Access",
-                      enable_record_path(@record),
-                      :class=>"btn btn-warning pull-right mr5 mb5",
-                      :disable_with => "Updating..."%>
+                    <%=link_to "Enable Viewer Access", '#',
+                      :class=>"btn btn-warning pull-right mr5 mb5 viewer-access-btn",
+                      'data-path' => enable_record_path(@record)%>
                   <%else%>
-                    <%=link_to "Disable Viewer Access",
-                      enable_record_path(@record),
-                      :class=>"btn btn-warning pull-right mr5 mb5",
-                      :disable_with => "Updating..."%>
+                    <%=link_to "Disable Viewer Access", '#',
+                      :class=>"btn btn-warning pull-right mr5 mb5 viewer-access-btn",
+                      'data-path' => enable_record_path(@record)%>
                   <%end%>
                 <%end%>
               <%end%>
@@ -333,5 +331,25 @@
         $(window).trigger('resize');
       });
     });
+
+
+    $(document).on('click', '.viewer-access-btn', function(e) {
+      console.log('viewer-access-btn clicked!');
+      var btn = $(this);
+      e.preventDefault();
+      $.ajax({
+        url: $(this).data('path'),
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          $(btn).text(data['btn']);
+          $('.viewer_access').html(data['html']);
+        }
+      });
+    });
+
+
+
+
   });
 </script>
