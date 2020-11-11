@@ -12,7 +12,7 @@
       </span>
     </div>
   </div>
-  <div class="panel-body">
+  <div class="panel-body" style="overflow-x:scroll">
     <table>
       <tr>
         <td>
@@ -45,7 +45,8 @@
         </td>
       </tr>
     </table>
-    <table class="table table-bordered table-striped" id="reports_table">
+
+    <table class="table table-bordered table-striped" id="reports_table" style='font-size: 13px !important;'>
       <thead>
         <tr>
           <%@report_headers.each do |h|%>
@@ -62,9 +63,17 @@
 </div>
 
 
+<style>
+  table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td {
+    padding: 5px !important;
+
+  }
+</style>
+
 <script>
   $(document).ready(function(){
-    reports_table = $('#reports_table').DataTable({
+    reports_table = $('#reports_table').dataTable({
+      "paging": false
     });
     $("#reports_table").on('click', ".view_narrative_btn", function(){
       $.get($(this).attr('route'),function(data){

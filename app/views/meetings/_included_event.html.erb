@@ -36,7 +36,7 @@
       <!-- View Narrative -->
       <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
         '#',
-        :class => "btn btn-info mb5 view_narrative_btn",
+        :class => "btn btn-sm btn-info mb5 view_narrative_btn",
         "data-toggle" => "modal",
         "data-target" => ".bs-example-modal-lg",
         'hover' => 'tooltip',
@@ -48,14 +48,14 @@
         target: :_blank,
         'hover' => 'tooltip',
         title: 'View Event',
-        :class => "btn btn-info mb5"%>
+        :class => "btn btn-sm btn-info mb5"%>
       <%if meeting.has_user(current_user) || meeting.host.users_id == current_user.id%>
         <%if meeting.status != "Closed"%>
           <%if current_user.has_access('meetings','edit', admin: true)%>
             <%if event.status != "Closed"%>
               <!-- Close Event -->
               <%=link_to "<i class='glyphicon glyphicon-ok-circle'></i>".html_safe, '#',
-                :class => 'btn btn-danger close_event_btn mb5',
+                :class => 'btn btn-sm btn-danger close_event_btn mb5',
                 'data-toggle' => 'modal',
                 'data-target' => '.bs-example-modal-lg',
                 'hover' => 'tooltip',
@@ -63,7 +63,7 @@
                 :route => close_report_path(event, :redirect_path => meeting_path(meeting))%>
               <!-- Meeting Minutes -->
               <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
-                :class => "btn btn-success minutes_btn mb5",
+                :class => "btn btn-sm btn-success minutes_btn mb5",
                 "data-toggle" => "modal",
                 "data-target" => ".bs-example-modal-lg",
                 'hover' => 'tooltip',
@@ -72,7 +72,7 @@
             <%end%>
             <!-- Carryover Event -->
             <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
-              :class=>"btn btn-danger mb5",
+              :class=>"btn btn-sm btn-danger mb5",
               :onclick=>"delete_report(#{event.id}, #{meeting.id},this)",
               'hover' => 'tooltip',
               title: 'Carryover Event'%>
@@ -80,7 +80,7 @@
         <%end%>
         <!-- Add Agenda -->
         <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
-          :class => "btn btn-warning agenda_btn mb5",
+          :class => "btn btn-sm btn-warning agenda_btn mb5",
           "data-toggle" => "modal",
           "data-target" => ".bs-example-modal-lg",
           'hover' => 'tooltip',
