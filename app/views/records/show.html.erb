@@ -71,9 +71,9 @@
 
                 <%if record_edit_access%>
                   <%if @record.status == "New"%>
-                    <%=link_to  "Open Report",
-                      open_record_path(@record),
-                      :class => "btn btn-warning pull-right mr5 mb5",
+                    <%=link_to  "Open Report", '#',
+                      'data-path' => open_record_path(@record),
+                      :class => "open-btn btn btn-warning pull-right mr5 mb5",
                       :confirm => "Are you sure?",
                       :disable_with => "Opening..."%>
                   <%elsif @record.status != "Closed"%>
@@ -164,17 +164,19 @@
               <%end%>
 
 
-              <%if record_edit_access && @record.status == "Open"%>
+              <%if record_edit_access #&& @record.status == "Open"%>
                 <%=link_to "Create Event",
                   new_report_path(:template=>@record.template,:base_record=>@record),
                   :id => "report-btn",
-                  :class => "btn btn-success mr5 mb5 pull-right",
-                  :disable_with => "Creating..."%>
+                  :class => "event-btn btn btn-success mr5 mb5 pull-right",
+                  :disable_with => "Creating...",
+                  style: "display:#{@record.status == "Open" ? 'block' : 'none'}"%>
                 <%=link_to "Add to Event",
-                  add_reports_path(:template=>@record.template,:record=>@record),
+                  add_reports_path(template: @record.template, record: @record),
                   :id => "report-btn",
-                  :class => "btn btn-success mr5 mb5 pull-right",
-                  :disable_with => "Adding..."%>
+                  :class => "event-btn btn btn-success mr5 mb5 pull-right",
+                  :disable_with => "Adding...",
+                  style: "display:#{@record.status == "Open" ? 'block' : 'none'}"%>
               <%end%>
 
               <%if @record.status != "Closed" &&
@@ -349,10 +351,32 @@
           $('.viewer_access').html(data['html']);
           Swal.fire({
             icon: 'success',
-            title: 'Viewer Access Updated',
+            title: data['message'],
             showConfirmButton: false,
             timer: 1500
           });
+        }
+      });
+    });
+
+    $(document).on('click', '.open-btn', function(e) {
+      console.log('open-btn clicked!');
+      var btn = $(this);
+      e.preventDefault();
+      $.ajax({
+        url: $(this).data('path'),
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          $(btn).remove();
+          $('.get_status').html(data['html']);
+          Swal.fire({
+            icon: 'success',
+            title: data['message'],
+            showConfirmButton: false,
+            timer: 1500
+          });
+          $('.event-btn').show();
         }
       });
     });

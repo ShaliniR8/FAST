@@ -77,6 +77,7 @@ class RecordsController < ApplicationController
     record.save
     # redirect_to record_path(record)
     render json: {
+        message: 'Viewer Access Updated',
         btn: "#{(record.viewer_access ? 'Disable' : 'Enable')} Viewer Access",
         html: "<b>Viewer Access:</b> #{record.viewer_access ? 'Yes' : 'No'}"
       }
@@ -116,7 +117,13 @@ class RecordsController < ApplicationController
     rescue
     end
     @record.save
-    redirect_to @record, flash: {success: "Report Opened."}
+
+    render json: {
+        message: 'Report Opened',
+        html: "<b>Status:</b> #{@record.status}"
+      }
+
+    #redirect_to @record, flash: {success: "Report Opened."}
   end
 
 
