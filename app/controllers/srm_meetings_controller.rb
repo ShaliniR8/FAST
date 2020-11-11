@@ -108,8 +108,14 @@ class SrmMeetingsController < ApplicationController
     @action = "new"
     @timezones = Meeting.get_timezones
     @headers = User.invite_headers
-    @users = User.find(:all) - [current_user]
-    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+    # @users = User.find(:all) - [current_user]
+    # @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+
     @sra_headers = Sra.get_meta_fields('index')
     @sras = Sra.where('meeting_id is ?', nil)
   end
@@ -124,7 +130,7 @@ class SrmMeetingsController < ApplicationController
     end
     @action = "show"
     @headers = User.invite_headers
-    @users = @meeting.invitations.map{|x| x.user}
+    @available_participants = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
     @sra_headers = Sra.get_meta_fields('index')
     @fields = SrmMeeting.get_meta_fields('show')

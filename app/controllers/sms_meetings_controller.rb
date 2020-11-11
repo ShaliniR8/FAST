@@ -118,14 +118,16 @@ class SmsMeetingsController < ApplicationController
   end
 
   def new
-    #@meeting=Meeting.new
-    @meeting=Object.const_get(params[:type]).new
-    @action="new"
-    @timezones=Meeting.get_timezones
-    @headers=User.invite_headers
-    @users=User.find(:all) - [current_user]
-    @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
-    @package_headers=Package.get_headers
+    @meeting = Object.const_get(params[:type]).new
+    @action = "new"
+    @timezones = Meeting.get_timezones
+    @headers = User.invite_headers
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+
+    @package_headers = Package.get_headers
     @package_type = ''
     if params[:type] == 'JobMeeting'
       @package_type = 'JobAidPackage'
@@ -134,7 +136,7 @@ class SmsMeetingsController < ApplicationController
     elsif params[:type] == 'FrameworkMeeting'
       @package_type = 'FrameworkImPackage'
     end
-    @packages=Package.where('meeting_id is ? and status = ? and type = ?',nil, 'Open', @package_type)
+    @packages = Package.where('meeting_id is ? and status = ? and type = ?',nil, 'Open', @package_type)
   end
 
   def show
@@ -154,7 +156,9 @@ class SmsMeetingsController < ApplicationController
     end
     @action="show"
     @headers=User.invite_headers
-    @users=@meeting.invitations.map{|x| x.user}
+
+    @available_participants = @meeting.invitations.map{|x| x.user}
+
     @current_inv=@meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
     @package_type=@meeting.class.package_type
     @package_headers=Package.get_headers
