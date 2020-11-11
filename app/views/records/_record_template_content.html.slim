@@ -33,7 +33,7 @@ ruby:
             .panel-heading.click-heading
               .panel-title
                 = category.title
-                = " (##{category.id})" if Rails.env.development?
+                //= " (##{category.id})" if Rails.env.development?
                 span.pull-right.clickable
                   i.mt5.glyphicon.glyphicon-chevron-up
             .panel-body
@@ -69,7 +69,7 @@ ruby:
                         - else
                           = value
 
-                .col-xs-12
+                .col-xs-12.mt10
                   = link_to 'Edit', '#',
                     class: 'btn btn-sm btn-warning pull-right edit-category-btn',
                     'data-path' => edit_field_record_path(@record, category_id: category.id)

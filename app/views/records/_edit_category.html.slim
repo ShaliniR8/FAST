@@ -8,7 +8,7 @@
       - row.each do |field|
         - record_field = (record_fields_hash[field.id] || []).first
         - record_field = RecordField.new(value: '') if !record_field.present?
-        = render "records/field", field: field, f: f, record_field: record_field
+        = render "records/field", field: field, f: f, record_field: record_field, is_nested_field: false
 
         // nested fields
         - if nested_fields.length > 0
@@ -17,8 +17,12 @@
               - record_field = (record_fields_hash[nested_field.id] || []).first
               - record_field = RecordField.new(value: '') if !record_field.present?
               - if record_field.present? && record_field.value != ''
-                div
-                  = render "records/field", field: nested_field, f: f, record_field: record_field
+                div.nested_field.graybox
+                  = render "records/field",
+                    field: nested_field,
+                    f: f,
+                    record_field: record_field,
+                    is_nested_field: true
     hr
 
   = link_to 'Save Fields', '#',
