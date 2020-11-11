@@ -1,0 +1,42 @@
+= form_for record do |f|
+  = hidden_field_tag :commit, 'Save Fields'
+  = hidden_field_tag :category_id, category.id
+
+  - category_fields_by_rows = group_by_column_size_and_nested_fields(fields: parent_fields)
+  - category_fields_by_rows.each do |row|
+    .row.is-flex
+      - row.each do |field|
+        - record_field = (record_fields_hash[field.id] || []).first
+        - record_field = RecordField.new(value: '') if !record_field.present?
+        = render "records/field", field: field, f: f, record_field: record_field
+
+        // nested fields
+        - if nested_fields.length > 0
+          .col-xs-12.nested_field_row
+            - nested_fields.each do |nested_field|
+              - record_field = (record_fields_hash[nested_field.id] || []).first
+              - record_field = RecordField.new(value: '') if !record_field.present?
+              - if record_field.present? && record_field.value != ''
+                div
+                  = render "records/field", field: nested_field, f: f, record_field: record_field
+    hr
+
+  = link_to 'Save Fields', '#',
+    class: 'btn btn-sm btn-success pull-right save-field-btn',
+    'data-path' => eval("ajax_update_#{record.class.name.underscore}_path(record)")
+
+
+javascript:
+  // Get listing of all the airport buttons
+  var field_id;
+  $(document).find(".airport_button").each(function(index, item){
+    // Get the button that's being clicked
+    $(item).on("click", function(){
+      console.log('airport btn clicked!');
+      // Get the selected airport's field id
+      field_id = $(this).prop("id");
+      resetModal(field_id);
+      $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+      $("#search_btn_" + field_id).on("click", {field_id: field_id}, handleSearch);
+    });
+  });

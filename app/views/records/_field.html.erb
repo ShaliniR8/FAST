@@ -5,7 +5,6 @@
 
     <label>
       <%=field.get_label.present? ? field.get_label.html_safe : nil%>
-      <%=" (##{field.id})" if Rails.env.development?%>
     </label>
 
 
@@ -141,6 +140,9 @@
     <%else%>
        No!
     <%end%>
+
+
+    <%#=" (##{field.id})" if Rails.env.development?%>
 
   <%end%>
 </div>

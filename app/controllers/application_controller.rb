@@ -968,6 +968,23 @@ class ApplicationController < ActionController::Base
       @owner.update_attributes(params[object_name.to_sym])
       load_special_matrix(@owner)
       render partial: 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+
+    when 'Save Fields'
+      if params[:record][:record_fields_attributes].present?
+        params[:record][:record_fields_attributes].each_value do |field|
+          if field[:value].is_a?(Array)
+            field[:value].delete("")
+            field[:value] = field[:value].join(";")
+          end
+        end
+      end
+
+      @owner.update_attributes(params[object_name.to_sym])
+      @record = @owner
+      category = Category.find(params[:category_id])
+      fields = category.fields
+      @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
+      render partial: 'records/show_category', locals: {category: category, fields: fields}
     else
     end
 

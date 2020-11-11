@@ -614,6 +614,24 @@ class RecordsController < ApplicationController
   end
 
 
+  def edit_field
+    record = Record.find(params[:id])
+    category = Category.find(params[:category_id])
+    fields = category.fields.active
+    parent_fields = fields.non_nested
+    nested_fields = fields.nested
+    record_fields_hash = RecordField.preload(:field).where(records_id: record.id).group_by(&:fields_id)
+    render partial: 'records/edit_category', locals: {
+      record: record,
+      category: category,
+      fields: fields,
+      parent_fields: parent_fields,
+      nested_fields: nested_fields,
+      record_fields_hash: record_fields_hash
+    }
+  end
+
+
 
   def close
     @fields = Record.get_meta_fields('close')

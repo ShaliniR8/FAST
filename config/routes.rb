@@ -325,6 +325,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'open'
       get 'override_status'
       put 'ajax_update'
+      get 'edit_field'
     end
     collection do
       post 'load_records'
