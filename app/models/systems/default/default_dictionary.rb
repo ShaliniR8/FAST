@@ -343,18 +343,13 @@ class DefaultDictionary
       show_btns: proc { |owner:, user:, **op| false },
       data: proc do |owner:, user:, **op|
         has_checklists = owner.class.method_defined?(:checklists)
-        findings = owner.findings
+        findings = []
+        findings << owner.findings
         if has_checklists
-          checklists = owner.checklists.includes(checklist_rows: :findings)
-          checklists.each do |checklist|
-            checklist.checklist_rows.each do |checklist_row|
-              checklist_row.findings.each do |finding|
-                findings << finding
-              end
-            end
-          end
+          findings << owner.checklists.includes(checklist_rows: :findings)
+                                      .map{|checklist| checklist.checklist_rows.map(&:findings)}
         end
-        { findings: findings }
+        { findings: findings.flatten }
       end
     },
     sms_actions: { # WIP
