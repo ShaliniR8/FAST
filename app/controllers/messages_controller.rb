@@ -65,12 +65,17 @@ class MessagesController < ApplicationController
         g_link(@message)
       )
     end
-    redirect_to @message.owner || message_path(@message), flash: { success: 'Message sent.' }
+
+    respond_to do |format|
+      format.json {render json: {message: 'Message sent.'}}
+      format.html {redirect_to @message.owner || message_path(@message), flash: { success: 'Message Sent' }}
+    end
+
   end
 
 
   def destroy
-    @message=Message.find(params[:id])
+    @message = Message.find(params[:id])
     if params[:source]=="Sent"
       s=@message.send_from
       s.visible=false

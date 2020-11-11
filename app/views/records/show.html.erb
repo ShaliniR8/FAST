@@ -8,6 +8,9 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
 <%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
 <%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer'%>
 <%submission_show_access = current_user.has_access('submissions','show', admin: true)%>
@@ -344,6 +347,12 @@
         success: function(data) {
           $(btn).text(data['btn']);
           $('.viewer_access').html(data['html']);
+          Swal.fire({
+            icon: 'success',
+            title: 'Viewer Access Updated',
+            showConfirmButton: false,
+            timer: 1500
+          });
         }
       });
     });
