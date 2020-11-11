@@ -28,7 +28,7 @@
             <%row.each do |field|%>
               <%record_field = (@record_fields_hash[field.id] || []).first%>
               <%record_field = RecordField.new(value: '') if !record_field.present?%>
-              <%=render "records/field", field: field, f: f, record_field: record_field%>
+              <%=render "records/field", field: field, f: f, record_field: record_field, is_nested_field:false%>
 
               <%nested_fields = @nested_fields_hash[field.id]%>
               <%if nested_fields.present?%>

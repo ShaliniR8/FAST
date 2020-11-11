@@ -253,7 +253,9 @@
             <%end%>
           <%end%>
 
-          <%=render '/records/record_template_content', deid: !template_full_access%>
+          <%=render '/records/record_template_content',
+            deid: !template_full_access,
+            record_edit_access:record_edit_access%>
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 

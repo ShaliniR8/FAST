@@ -70,9 +70,10 @@ ruby:
                           = value
 
                 .col-xs-12.mt10
-                  = link_to 'Edit', '#',
-                    class: 'btn btn-sm btn-warning pull-right edit-category-btn',
-                    'data-path' => edit_field_record_path(@record, category_id: category.id)
+                  - if record_edit_access
+                    = link_to 'Edit', '#',
+                      class: 'btn btn-sm btn-warning pull-right edit-category-btn',
+                      'data-path' => edit_field_record_path(@record, category_id: category.id)
 
 css:
   .row.is-flex {
