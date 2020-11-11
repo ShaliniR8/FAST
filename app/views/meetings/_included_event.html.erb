@@ -9,7 +9,13 @@
           <%if agendas_present%>
             <div><b>Agendas:</b></div>
               <%agendas.each do |a|%>
-                <div style='cursor: pointer' type='button' hover='tooltip' data-html='true' data-placement='right' title="<%=a.preview%>">
+                <div
+                  style='cursor: pointer'
+                  type='button'
+                  hover='tooltip'
+                  data-html='true'
+                  data-placement='right'
+                  title="<%=a.preview%>">
                   <%=a.get_content%>
                 </div>
               <%end%>
@@ -89,8 +95,3 @@
 <script>
   $('[hover="tooltip"]').tooltip();
 </script>
-<style>
-  .tooltip-inner{
-    text-align: left;
-  }
-</style>
