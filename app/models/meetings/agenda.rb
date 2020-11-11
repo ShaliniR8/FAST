@@ -8,19 +8,14 @@ class Agenda < ActiveRecord::Base
 
 
   def preview
-    title       = ''
-    status      = ''
-    user        = ''
-    discuss     = ''
-    disposition = ''
-    comment     = ''
-    title       = "Title: #{self.title}"                   + '<br>' if self.title.present?
-    status      = "Status: #{self.status}"                 + '<br>' if self.status.present?
-    user        = "User: #{self.user.full_name}"           + '<br>'
-    discuss     = "Discuss: #{self.discuss}"               + '<br>' if self.discuss.present?
-    comment     = 'Comment: ' + '<br>' + "#{self.comment}" + '<br>' if self.comment.present?
-    disposition = "Disposition: #{self.disposition ? 'Accepted' : 'Declined'}" + '<br>' if self.disposition.present?
-    ''.html_safe + title  + status + user + discuss + disposition + comment
+    result = []
+    result << "<b>Title:</b> #{title}" if title.present?
+    result << "<b>Status:</b> #{status}" if status.present?
+    result << "<b>User:</b> #{user.full_name}" if user.present?
+    result << "<b>Discuss:</b> #{discuss}" if discuss.present?
+    result << "<b>Dispositions:</b> #{disposition ? 'Accepted' : 'Declined'}" if disposition.present?
+    result << "<b>Comment:</b><br> #{comment}" if comment.present?
+    result.join('<br>').html_safe
   end
 
 
