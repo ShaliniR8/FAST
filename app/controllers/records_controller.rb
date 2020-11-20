@@ -35,11 +35,9 @@ class RecordsController < ApplicationController
   end
 
 
-
   def set_table_name
     @table_name = "records"
   end
-
 
 
   def load_options
@@ -58,13 +56,11 @@ class RecordsController < ApplicationController
   helper_method :load_options
 
 
-
   def comment
     @owner = Record.find(params[:id])
     @comment = @owner.comments.new
     render :partial => "forms/viewer_comment"
   end
-
 
 
   def enable
@@ -84,15 +80,12 @@ class RecordsController < ApplicationController
   end
 
 
-
   def reopen
     record = Record.find(params[:id])
     new_status = record.report.present? ? "Linked" : "Open"
     record.reopen(new_status)
     redirect_to record_path(record), flash: {danger: "Report ##{params[:id]} reopened."}
   end
-
-
 
 
   def open
@@ -127,21 +120,17 @@ class RecordsController < ApplicationController
   end
 
 
-
-  def index
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
-    @default_tab = params[:status]
-
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    handle_search if params[:advance_search].present?
-    records = @records.to_a & records.to_a if @records.present?
-
-    @records_hash = records.group_by(&:status)
-    @records_hash['All'] = records
-    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
-  end
+  # def index
+  #   @object_name = controller_name.classify
+  #   @table_name = Object.const_get(@object_name).table_name
+  #   @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+  #   @default_tab = params[:status]
+  #   @counts_for_each_status = {}
+  #   @object[:status].each do |status|
+  #     @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
+  #   end
+  #   @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).count
+  # end
 
 
   # def index_old

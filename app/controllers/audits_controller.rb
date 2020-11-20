@@ -35,6 +35,8 @@ class AuditsController < SafetyAssuranceController
     :viewer_access,
   ]
 
+  before_filter :set_table_name
+
   before_filter(only: [:new])    {set_parent_type_id(:audit)}
   before_filter(only: [:create]) {set_parent(:audit)}
   after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @audit)}
@@ -47,27 +49,35 @@ class AuditsController < SafetyAssuranceController
   end
 
 
+  def set_table_name
+    @table_name = "audits"
+  end
+
+
   def index
     respond_to do |format|
       format.html do
-        object_name = controller_name.classify
-        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-        @table = Object.const_get(object_name).preload(@object[:preload])
+        @object_name = controller_name.classify
+        @table_name = Object.const_get(@object_name).table_name
+        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
         @default_tab = params[:status]
+        @counts_for_each_status = {}
 
-        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-        if params[:advance_search].present?
-          handle_search
-        else
-          @records = records
+        begin
+          @object[:status].each do |status|
+            @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
+          end
+        rescue
+          p '[info] There is a missing status'
         end
-        filter_records(object_name, controller_name)
-        records = @records.to_a & records.to_a if @records.present?
 
-        @records_hash = records.group_by(&:status)
-        @records_hash['All'] = records
-        @records_hash['Overdue'] = records.select{|x| x.overdue}
-        @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+        audit_count = Object.const_get(@object_name).can_be_accessed(current_user).count
+        audit_count = Object.const_get(@object_name).filter_array_by_emp_groups(audit_count, params[:emp_groups])
+
+        @counts_for_each_status['Overdue'] = Object.const_get(@object_name).select{|x| x.overdue}.count
+        @counts_for_each_status['All'] = params[:advance_search] ?  nil : audit_count
+
+        render 'forms/index'
       end
       format.json { index_as_json }
     end

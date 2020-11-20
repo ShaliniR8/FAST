@@ -1,5 +1,5 @@
 class SafetyPlansController < ApplicationController
-  before_filter :login_required
+  before_filter :set_table_name, :login_required
   before_filter :define_owner, only: [:interpret]
 
   before_filter(only: [:new])    {set_parent_type_id(:safety_plan)}
@@ -11,27 +11,30 @@ class SafetyPlansController < ApplicationController
     @owner = SafetyPlan.find(params[:id])
   end
 
-
-  def index
-    # @table = Object.const_get("SafetyPlan")
-    # @headers = @table.get_meta_fields('index')
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
-    @default_tab = params[:status]
-
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    handle_search if params[:advance_search].present?
-    records = @records.to_a & records.to_a if @records.present?
-
-    @records_hash = records.group_by(&:status)
-    @records_hash['All'] = records
-    @records_hash['Overdue'] = records.select{|x| x.overdue}
-    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  def set_table_name
+    @table_name = "safety_palns"
   end
+
+  # def index
+  #   # @table = Object.const_get("SafetyPlan")
+  #   # @headers = @table.get_meta_fields('index')
+  #   # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+  #   # handle_search
+
+  #   object_name = controller_name.classify
+  #   @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+  #   @table = Object.const_get(object_name).preload(@object[:preload])
+  #   @default_tab = params[:status]
+
+  #   records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+  #   handle_search if params[:advance_search].present?
+  #   records = @records.to_a & records.to_a if @records.present?
+
+  #   @records_hash = records.group_by(&:status)
+  #   @records_hash['All'] = records
+  #   @records_hash['Overdue'] = records.select{|x| x.overdue}
+  #   @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  # end
 
 
 

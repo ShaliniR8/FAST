@@ -45,20 +45,20 @@ class SubmissionsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        object_name = controller_name.classify
-        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-        @table = Object.const_get(object_name).preload(@object[:preload]).where("completed is true")
+        @object_name = controller_name.classify
+        @table_name = Object.const_get(@object_name).table_name
+        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
         @default_tab = params[:status]
+        @counts_for_each_status = {}
+        submission_count = Object.const_get(@object_name).where(:completed => 1).can_be_accessed(current_user).count
 
-        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-        handle_search if params[:advance_search].present?
-        records = @records.to_a & records.to_a if @records.present?
+        @counts_for_each_status['All'] = params[:advance_search] ?  nil : submission_count
 
-        @records_hash = { 'All' => records }
-        @records_id   = { 'All' => records.map(&:id) }
+        render 'forms/index'
       end
       format.json { index_as_json }
     end
+  end
 
     # respond_to do |format|
     #   format.html do
@@ -102,7 +102,7 @@ class SubmissionsController < ApplicationController
     #   end
     #   format.json { index_as_json }
     # end
-  end
+  # end
 
 
   def handle_detailed_search

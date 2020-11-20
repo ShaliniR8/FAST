@@ -402,20 +402,20 @@ class ReportsController < ApplicationController
   end
 
 
-  def index
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
-    @default_tab = params[:status]
+  # def index
+  #   object_name = controller_name.classify
+  #   @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+  #   @table = Object.const_get(object_name).preload(@object[:preload])
+  #   @default_tab = params[:status]
 
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    handle_search if params[:advance_search].present?
-    records = @records.to_a & records.to_a if @records.present?
+  #   records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+  #   handle_search if params[:advance_search].present?
+  #   records = @records.to_a & records.to_a if @records.present?
 
-    @records_hash = records.group_by(&:status)
-    @records_hash['All'] = records
-    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
-  end
+  #   @records_hash = records.group_by(&:status)
+  #   @records_hash['All'] = records
+  #   @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  # end
 
 
   # def index_old
