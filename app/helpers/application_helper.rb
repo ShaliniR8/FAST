@@ -1,6 +1,298 @@
 module ApplicationHelper
   include ShowDataHelper
 
+  def get_filtered_data(params)
+    use_advanced_search = params[:advance_search].present? && params[:advance_search]["advance_search"]
+    has_owner = params[:advance_search].present? && params[:advance_search][:type].present?
+
+    object_info = CONFIG.hierarchy[session[:mode]][:objects][params[:object_name]]
+    object = Object.const_get(params[:object_name]) #.preload(object_info[:preload])
+
+    # filter by status & handle advanced search + overdue
+    if use_advanced_search
+      if has_owner
+        data, params[:columns] = handle_advance_search(object.where(owner_type: params[:advance_search][:type]).can_be_accessed(current_user), params[:advance_search], params[:columns])
+      else
+        data, params[:columns] = handle_advance_search(object.can_be_accessed(current_user), params[:advance_search], params[:columns])
+      end
+    else
+      data = params[:status] == 'All' || params[:status] == 'Overdue' ? object.can_be_accessed(current_user) : object.where(status: params[:status]).can_be_accessed(current_user)
+      # data = params[:status] == 'All' || params[:status] == 'Overdue' ? object : object.where(status: params[:status])
+    end
+
+    if params[:object_name] == 'Submission'
+      data = data.where(:completed => 1)
+    end
+
+    if params[:status] == 'Overdue'
+      data = data.select{|x| x.overdue}
+    end
+
+
+    # filter by individual column search value
+    params[:columns].each do |key, value|
+      column_search_value = value["search"]["value"].downcase
+
+      if column_search_value.present?
+        data = data.select { |record|
+          column_name = value["data"]
+          column_value = handle_format_data(column_name, record.send(column_name)).to_s.downcase
+          (column_value.include? column_search_value).present?
+        }
+      end
+    end
+
+    data
+  end
+
+
+  def handle_search_term(term, search_value, columns)
+    value = 1
+
+    columns = columns.each { |column|
+      column[value][:search][:value] = search_value if column[value][:data] == term
+    }
+  end
+
+
+  def handle_search_date(term, start_date, end_date, data)
+    data.keep_if { |record|
+      # start_date = start_date.to_datetime
+      # end_date = end_date.to_datetime
+      record.send(term).to_datetime.between?(start_date.beginning_of_day, end_date.end_of_day) rescue false
+    }
+  end
+
+
+  def handle_advance_search(data, params, columns)
+
+    # TODO: Refactor
+    # risk matrix number from dashboard
+    if (["severity", "likelihood"].include? params["searchterm_1"]) || (["severity", "likelihood"].include? params["searchterm_2"])
+
+      field_1 = params["field_1"].to_i
+      field_2 = params["field_2"].to_i
+
+      risk_color = CONFIG::MATRIX_INFO[:risk_table][:rows_color][field_1][field_2]
+
+      params["field_1"] = CONFIG::MATRIX_INFO[:risk_definitions][risk_color.to_sym][:rating]
+      params["searchterm_1"] = "get_risk_classification"
+
+      params.delete("field_2")
+      params.delete("searchterm_2")
+
+    elsif (["severity_after", "likelihood_after"].include? params["searchterm_1"]) || (["severity_after", "likelihood_after"].include? params["searchterm_2"])
+
+      field_1 = params["field_1"].to_i
+      field_2 = params["field_2"].to_i
+
+      risk_color = CONFIG::MATRIX_INFO[:risk_table][:rows_color][field_1][field_2]
+
+      params["field_1"] = CONFIG::MATRIX_INFO[:risk_definitions][risk_color.to_sym][:rating]
+      params["searchterm_1"] = "get_risk_classification_after"
+
+      params.delete("field_2")
+      params.delete("searchterm_2")
+    end
+
+    search_fields = [
+      {
+        term: params[:searchterm_1],
+        field: params[:field_1],
+        start_date: params[:start_date_1],
+        end_date: params[:end_date_1]
+      },
+      {
+        term: params[:searchterm_2],
+        field: params[:field_2],
+        start_date: params[:start_date_2],
+        end_date: params[:end_date_2]
+      },
+      {
+        term: params[:searchterm_3],
+        field: params[:field_3],
+        start_date: params[:start_date_3],
+        end_date: params[:end_date_3]
+      },
+      {
+        term: params[:searchterm_4],
+        field: params[:field_4],
+        start_date: params[:start_date_4],
+        end_date: params[:end_date_4]
+      }
+    ]
+
+    if params[:advance_search].present?
+
+      object = Object.const_get(data[0].class.name)
+
+      # date range from dashboard
+      if params[:start_date].present? && params[:end_date].present?
+        start_date = Time.zone.parse(params[:start_date]) if params[:start_date].is_a?(String)
+        end_date = Time.zone.parse(params[:end_date])     if params[:end_date].is_a?(String)
+
+        if params[:emp_groups].present?
+          data = object.by_emp_groups(params[:emp_groups]).can_be_accessed(current_user).within_timerange(start_date, end_date)
+        else
+          data = object.can_be_accessed(current_user).within_timerange(start_date, end_date)
+        end
+
+        # status from dashboard
+        data = data.select { |x| x.status == params[:status] } if params[:status].present?
+      elsif params[:emp_groups].present?
+        data = object.by_emp_groups(params[:emp_groups]).can_be_accessed(current_user)
+
+        # status from dashboard
+        data = data.select { |x| x.status == params[:status] } if params[:status].present?
+      end
+
+      search_fields.each do |field|
+        if field[:term].present?
+          if field[:field].present?
+            columns = handle_search_term(field[:term], field[:field], columns)
+          elsif field[:start_date].present? && field[:end_date].present?
+            start_date = field[:start_date].to_date
+            end_date = field[:end_date].to_date
+            data = handle_search_date(field[:term], start_date, end_date, data)
+          end
+        end
+      end
+    end
+
+    return [data, columns]
+  end
+
+
+  def handle_format_data(column_name, data)
+    columns_to_format = %w[viewer_access event_date]
+    return data unless columns_to_format.include? column_name
+
+    case column_name
+    when 'viewer_access'
+      boolean_options = {true => 'Yes', false => 'No'}
+      return boolean_options[data]
+    when 'event_date'
+      return datetime_to_string(data)
+    end
+  end
+
+
+  def get_ordered_data(data, order, object_name)
+    columns = get_data_table_columns(object_name).map { |col| col[:data] } #.reject { |x| x == 'actions' || x == 'get_additional_info' || x == 'get_occurrences' }
+    order_by = columns[order['0']['column'].to_i]
+
+    if order['0']['dir'] == "asc"
+      data = data.sort_by { |record| [record.send(order_by) ?  1 : 0, record.send(order_by)] }
+    else
+      data = data.sort_by { |record| [record.send(order_by) ?  1 : 0, record.send(order_by)] }.reverse
+    end
+  end
+
+
+  def get_data_table_columns(object_name)
+    fields = Object.const_get(object_name).get_meta_fields('index')
+    fields.map! { |field| { data: field[:field], title:field[:title] } }
+
+    # add additional columns
+    if false #object_name == 'Record'
+      fields << { data: 'get_additional_info', title: 'Additional Info'}
+    end
+    fields << { data: 'actions', title: 'Action'}
+
+    fields
+  end
+
+  # TODO: replace Record
+  def format_index_column_data(records:, object_name:)
+    fields =  Object.const_get(object_name).get_meta_fields('index')
+    boolean_options = {true => 'Yes', false => 'No'}
+
+    data = []
+    records.each do |record|
+      record_hash = {}
+
+      fields.each do |field|
+        field_name = field[:field]
+        field_value = record.send(field_name)
+        field_type = field[:type]
+        field_display = field[:display]
+
+        field_value = case field_type
+          when 'boolean', 'boolean_box'
+            boolean_options[field_value]
+          when 'date'
+            date_to_string(field_value)
+          when 'datetime'
+            if CONFIG.sr::GENERAL[:submission_time_zone]
+              if field_value.present? && field_name == "event_date"
+                display_date_time_in_zone(date_time: field_value, time_zone: CONFIG::GENERAL[:time_zone], display_zone: display_local_time_zone)
+              end
+            else
+              datetime_to_string(field_value)
+            end
+          when 'datetimez'
+            datetimez_to_string(field_value)
+          when 'user'
+            if field_display.present?
+              record.send(field_display)
+            else
+              field_value
+            end
+          when 'textarea'
+            (field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''
+          when 'list'
+            field_value.gsub('<br>',', <br>')
+          when 'select'
+            if field_display.present?
+              field_display[field_value]
+            else
+              field_value
+            end
+          else
+            field_value
+          end
+
+        record_hash[field_name] = field_value
+      end
+
+
+      # TODO: Refactor here
+
+      # actions
+      open_link = "<a href="+"/#{@table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5'>Open</a>"
+      open_in_new_tab_link = "<a href="+"/#{@table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5' target='_blank'>Open in New Tab</a>"
+
+      # risk matrix color
+      risk_color = CONFIG::MATRIX_INFO[:risk_table_index][record_hash['get_risk_classification']]
+      if record_hash['get_risk_classification'].present?
+        record_hash['get_risk_classification'] =
+          "<span class='risk_color #{risk_color}'>#{record_hash['get_risk_classification']}</span>"
+      end
+
+      risk_color = CONFIG::MATRIX_INFO[:risk_table_index][record_hash['get_risk_classification_after']]
+      if record_hash['get_risk_classification_after'].present?
+        record_hash['get_risk_classification_after'] =
+          "<span class='risk_color #{risk_color}'>#{record_hash['get_risk_classification_after']}</span>"
+      end
+
+      if false # object_name == 'Record'
+        # additional_info
+        additional_info = record.get_additional_info
+        additional_info.map! do |field|
+          "<b>#{field[:label]}</b>: #{field[:value]}<br><br>" if field[:value].present?
+        end
+        record_hash['get_additional_info'] = additional_info
+      end
+
+      record_hash['actions'] = open_link + open_in_new_tab_link
+
+      data << record_hash
+    end
+
+    data
+  end
+
+
   def getAlltemplates
     return Template.find(:all)
   end

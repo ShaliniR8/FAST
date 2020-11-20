@@ -171,7 +171,7 @@ class DefaultSafetyReportingConfig
       'Report' => {
         title: 'Event',
         status: ['New', 'Meeting Ready', 'Under Review', 'Closed', 'All'],
-        preload: [ :attachments, :occurrences, :records => [:created_by]],
+        preload: [ :attachments, :occurrences, :records => [:created_by, :report] ],
         fields: {
           id: { default: true, visible: 'index,meeting_form,show' },
           status: { default: true, visible: 'index,meeting_form,show' },

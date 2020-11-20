@@ -294,6 +294,10 @@ class DefaultConfig
       'Green - Acceptable'                   => 'limegreen',
       'Red - Unacceptable'                   => 'red',
 
+      'Orange'   => 'orange',
+      'Yellow'   => 'yellow',
+      'Green'    => 'limegreen',
+
       'Moderate' => 'yellow',
       'Low'      => 'limegreen',
       'High'     => 'red',

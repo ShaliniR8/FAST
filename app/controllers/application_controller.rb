@@ -17,6 +17,27 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
+  def index
+    @object_name = controller_name.classify
+    @table_name = Object.const_get(@object_name).table_name
+    @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+    @default_tab = params[:status]
+    @counts_for_each_status = {}
+
+    begin
+      @object[:status].each do |status|
+        @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).can_be_accessed(current_user).count
+      end
+    rescue
+      p 'errors'
+    end
+
+    @counts_for_each_status['Overdue'] = Object.const_get(@object_name).can_be_accessed(current_user).select{|x| x.overdue}.count if ['SMS', 'SRM'].include? session[:mode]
+    @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).can_be_accessed(current_user).count
+
+    render 'forms/index'
+  end
+
   def track_activity
     #if Trial or Demo and user is not prosafet_admin then track log
     track_airline_log = CONFIG::GENERAL[:track_log]
@@ -883,24 +904,49 @@ class ApplicationController < ActionController::Base
   helper_method :airport_admin, :airport_has_access?, :current_airport_admin
 
 
-
   # load records on index page
   def load_records
-    object = CONFIG.hierarchy[session[:mode]][:objects][controller_name.classify]
-    @table = Object.const_get(controller_name.classify).preload(object[:preload])
+    @columns = get_data_table_columns(controller_name.classify)
+    @advance_search_params = params["advance_search"]
+    #  if owner_type exists, use advanced search
+    @advance_search_params["advance_search"] = 'true' if params[:advance_search][:type].present?
 
-    ids = JSON.parse params["ids"].gsub('=>', ':')
-    if ids[params["status"]].present?
-      @records = @table.select { |record| ids[params["status"]].include? record.id }
-    else
-      @records = nil
-    end
-
-    # records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    # @records = @records.to_a & records.to_a
-    @fields = @table.get_meta_fields('index')
     render :partial => 'forms/render_index_tab'
   end
+
+
+  def get_dataset
+    object_name = controller_name.classify
+    data_by_status_count = params['count']
+
+    params_for_filter = {
+      object_name: object_name,
+      status: params['status'],
+      search_value: params['search']['value'],
+      columns: params["columns"],
+      advance_search:  params["advance_search"]
+    }
+
+    # filter (by status and search values)
+    filtered_data = get_filtered_data(params_for_filter)
+
+    # order by column and direction
+    ordered_data = get_ordered_data(filtered_data, params['order'], object_name)
+
+    # (pagenation) get data only for the current page
+    data = ordered_data[params['start'].to_i, params['length'].to_i]
+
+    # format
+    data = format_index_column_data(records: data, object_name: object_name)
+
+    render json: {
+      data: data,
+      draw: params['draw'].to_i,
+      recordsTotal: data_by_status_count,
+      recordsFiltered: filtered_data.count
+    }
+  end
+
 
   def filter_records(object_name, controller_name)
     if %w[Aduit Inspection Evaluation Investigation].include? object_name
