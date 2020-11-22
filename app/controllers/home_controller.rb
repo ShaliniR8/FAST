@@ -5,6 +5,14 @@ class HomeController < ApplicationController
 
 
   def index
+
+    module_name = case session[:mode]
+    when "ASAP" then 'Safety Reporting'
+    when "SMS IM" then 'SMS IM'
+    when "SMS" then 'Safety Assurance'
+    when "SRM" then 'SRA (SRM)' end
+    @title = "#{module_name} Dashboard"
+
     if session[:mode].blank?
       redirect_to choose_module_home_index_path
       return

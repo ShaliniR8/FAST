@@ -71,27 +71,29 @@
                   :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
 
                 <%if record_edit_access%>
-                  <%if @record.status == "New"%>
-                    <%=link_to  "Open Report", '#',
-                      'data-path' => open_record_path(@record),
-                      :class => "open-btn btn btn-warning pull-right mr5 mb5",
-                      :confirm => "Are you sure?",
-                      :disable_with => "Opening..."%>
-                  <%elsif @record.status != "Closed"%>
-                    <%=link_to  "Edit",
-                      edit_record_path(@record),
-                      :id=>"edit-btn",
-                      :class=>"btn btn-warning pull-right mr5 mb5",
-                      :disable_with => "Editing..."%>
-                  <%end%>
+                  <%record_status = @record.status%>
+                  <%=link_to  'Open Report', '#',
+                    'data-path' => open_record_path(@record),
+                    :class => 'open-btn btn btn-warning pull-right mr5 mb5',
+                    confirm: 'Are you sure?',
+                    disable_with: 'Opening...',
+                    style: "display: #{record_status == 'New' ? 'block' : 'none'}"%>
+                  <%=link_to  'Edit',
+                    edit_record_path(@record),
+                    id: 'edit-btn',
+                    :class => 'btn btn-warning pull-right mr5 mb5',
+                    disable_with: 'Editing...',
+                    style: "display: #{record_status != 'Closed' ? 'block' : 'none'}"%>
                 <%end%>
 
+              <%if record_edit_access%>
                 <%=link_to 'Launch',
                   '#',
                   :id => "launch_btn",
                   :class => "btn btn-warning pull-right mr5 mb5",
                   'data-toggle' => 'modal',
                   'data-target' => '.bs-example-modal-lg'%>
+              <%end%>
 
                 <%if @record.submission.present? && submission_show_access%>
                   <%=link_to "View Submission",
@@ -180,18 +182,22 @@
                   style: "display:#{@record.status == "Open" ? 'block' : 'none'}"%>
               <%end%>
 
-              <%if @record.status != "Closed" &&
-                  @record.status != "New" &&
-                  record_edit_access%>
+              <%if record_edit_access%>
+                <%record_status = @record.status%>
+                <%show_ca_btn = record_status != 'Closed' && record_status != 'New'%>
                 <%if @record.report.present?%>
-                  <%=link_to "Add Corrective Action",
-                    new_corrective_action_path(:record=>@record.id, :report=>@record.report.id),
-                    :class=>"btn btn-success pull-right mr5 mb5",
-                    :disable_with => "Redirecting..."%>
+                  <%=link_to 'Add Corrective Action',
+                    new_corrective_action_path(record: @record.id, report: @record.report.id),
+                    id: 'ca-btn',
+                    :class => 'btn btn-success pull-right mr5 mb5',
+                    disable_with: 'Redirecting...',
+                    style: "display: #{show_ca_btn ? 'block' : 'none'}"%>
                 <%else%>
-                  <%=link_to "Add Corrective Action",
-                    new_corrective_action_path(:record=>@record.id),
-                    :class=>"btn btn-success pull-right mr5 mb5 "%>
+                  <%=link_to 'Add Corrective Action',
+                    new_corrective_action_path(record: @record.id),
+                    id: 'ca-btn',
+                    :class => 'btn btn-success pull-right mr5 mb5',
+                    style: "display: #{show_ca_btn ? 'block' : 'none'}"%>
                 <%end%>
               <%end%>
             <%end%>
@@ -260,8 +266,8 @@
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
 
-          <% @owner = @record %>
-          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+          <%@owner = @record %>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
 
           <%if @record.corrective_actions.present?%>
             <div class="col-xs-12 col-lg-12">
@@ -285,10 +291,10 @@
           <%end%>
 
 
-          <%=render '/panels/show_panels', :owner => @record%>
-          <%=render "/forms/show_comment",:owner => @record%>
-          <%=render "/forms/attachments_show", :owner => @record%>
-          <%=render "/records/transactions", :owner => @record%>
+          <%=render '/panels/show_panels',     owner: @record%>
+          <%=render '/forms/show_comment',     owner: @record%>
+          <%=render '/forms/attachments_show', owner: @record, show_btn: record_edit_access%>
+          <%=render '/records/transactions',   owner: @record%>
 
         </div>
       </div>
@@ -380,6 +386,8 @@
             timer: 1500
           });
           $('.event-btn').show();
+          $('#edit-btn').show();
+          $('#ca-btn').show();
         }
       });
     });

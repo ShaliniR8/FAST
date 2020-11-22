@@ -117,6 +117,7 @@ class SmsMeetingsController < ApplicationController
     end
   end
 
+
   def new
     @meeting = Object.const_get(params[:type]).new
     @action = "new"
@@ -138,6 +139,7 @@ class SmsMeetingsController < ApplicationController
     end
     @packages = Package.where('meeting_id is ? and status = ? and type = ?',nil, 'Open', @package_type)
   end
+
 
   def show
     begin
@@ -165,6 +167,7 @@ class SmsMeetingsController < ApplicationController
     @fields = Meeting.get_meta_fields('show')
   end
 
+
   def index
     @records=Object.const_get(params[:type]).includes(:invitations, :host)
     unless current_user.global_admin?
@@ -183,6 +186,7 @@ class SmsMeetingsController < ApplicationController
     @title="#{@type} Meetings"
   end
 
+
   def close
     meeting=Meeting.find(params[:id])
     Transaction.build_for(
@@ -197,10 +201,10 @@ class SmsMeetingsController < ApplicationController
     end
   end
 
-  def update
-    @meeting=Meeting.find(params[:id])
-    @meeting.update_attributes(params[:sms_meeting])
 
+  def update
+    @meeting = Meeting.find(params[:id])
+    @meeting.update_attributes(params[:sms_meeting])
 
     if !params[:packages].blank?
       @meeting.save
@@ -208,8 +212,6 @@ class SmsMeetingsController < ApplicationController
         package = Package.find(value)
         package.meeting_id=@meeting.id
         package.status = "Awaiting Review"
-        #SraTransaction.create(:users_id=>current_user.id,:action=>"Under Review",:content=>"Add to Meeting ##{@meeting.id}", :owner_id=>sra.id,:stamp=>Time.now)
-        #MeetingTransaction.create(:users_id=>current_user.id, :action=>"Added SRA ##{sra.get_id}",:content=>"SRA ##{sra.get_id}", :owner_id => @meeting.id, :stamp=>Time.now)
         package.save
       end
     end
@@ -223,7 +225,6 @@ class SmsMeetingsController < ApplicationController
           new_inv.users_id=val
           new_inv.meeting=@meeting
           new_inv.save
-          #send_notice(new_inv,Time.now+3.days,"You are invited to a meeting.  "+generate_link_to("Click to view",@meeting))
           send_notice(
             new_inv,
             "You are invited to a meeting.  " + g_link(@meeting),

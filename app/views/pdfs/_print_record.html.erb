@@ -24,8 +24,16 @@
     <%if !(defined?(source_of_input) && source_of_input)%>
 
       <div class="col-xs-12">
-        <%owner.template.categories.order(:category_order).each do |cat|%>
 
+       <%rf_by_c = owner.record_fields
+                        .nonempty
+                        .includes(field: :category)
+                        .group_by{ |record_field| record_field.field.category }%>
+       <!-- {category1 => [rf1, rf2], category2 => [rf3, rf4]} -->
+
+        <%record_fields = owner.record_fields.includes(:field).group_by(&:fields_id)%>
+        <%(owner.template.categories.includes(:fields) & rf_by_c.keys).each do |cat|%>
+          <!-- OBSERVATION PHASES (see BSK) -->
           <%if cat.id == 338%>
             <div class="category">
               <div class="sub_sub_title"><%=cat.title%></div>
@@ -39,13 +47,14 @@
                 </thead>
                 <tbody>
                   <%cat.fields.group_by(&:element_id).each do |element_id, arr|%>
-                    <%if owner.record_fields.where(:fields_id => arr.first.id).present? &&
-                      owner.record_fields.where(:fields_id => arr.first.id).first.value.present?%>
+                    <%arr_first = arr.first%>
+                    <%field_item = record_fields[arr_first.id].first%>
+                    <%if field_item.present? && field_item.value.present?%>
                       <tr>
-                        <th><%=arr.first.label%></th>
+                        <th><%=arr_first.label%></th>
                         <%arr.each do |x|%>
-                          <%record_fields = owner.record_fields.where(:fields_id => x.id).first%>
-                          <td><%=record_fields.value%></td>
+                          <%record_field = record_fields[x.id].first%>
+                          <td><%=record_field.value%></td>
                         <%end%>
                       </tr>
                     <%end%>
@@ -55,14 +64,14 @@
             </div>
 
 
-          <%elsif cat.not_empty_for(owner) && (cat.print || !deidentified)%>
+          <%elsif (cat.print || !deidentified)%>
             <div class="content">
               <div class="sub_sub_title">
                 <%=cat.title%>
               </div>
-              <%cat.fields.order(:field_order).each do |field|%>
+              <%cat.fields.each do |field|%>
                 <%if field.print || !deidentified%>
-                  <%value = owner.record_fields.where("fields_id = ?", field.id).first%>
+                  <%value = record_fields[field.id].first rescue nil%>
                   <%if value.present?%>
                     <%value = value.print_value%>
                     <%if value.present?%>

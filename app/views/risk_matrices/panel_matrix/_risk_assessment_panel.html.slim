@@ -12,8 +12,10 @@
         / Baseline, Migate Risk btns, Notes
         - if risk_type == 'All'
           / risk assessment btns
-          - if not ['Pending Approval', 'Completed', 'Rejected', 'Closed'].include? (@owner.status)
-
+          - hide_buttons = false
+          - hide_buttons = hide_btns if defined?(hide_btns)
+          - btns = ['Pending Approval', 'Completed', 'Rejected', 'Closed']
+          - if !hide_buttons && !btns.include?(@owner.status)
             = link_to CONFIG::MATRIX_INFO[:terminology][:mitigate_btn], '#',
               class: 'btn btn-warning pull-right ml5 assess-risk-btn',
               id: 'mitigate_btn',

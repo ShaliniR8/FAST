@@ -193,7 +193,6 @@ class MeetingsController < ApplicationController
   def index
     @table = Object.const_get("Meeting")
     @headers = Meeting.get_meta_fields('index')
-    @title = 'Meetings'
     @action = 'meeting'
     @records = @table.includes(:invitations, :host).where('meetings.type is null')
     unless current_user.has_access('meetings', 'admin', admin: true, strict: true )

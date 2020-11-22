@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   before_filter :send_session
   before_filter :adjust_session
   before_filter :track_activity
+  before_filter :set_page_title
   #before_filter :set_last_seen_at
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
@@ -92,6 +93,23 @@ class ApplicationController < ActionController::Base
 
   def strict_access_validation
     access_validation(true) || current_user.global_admin?
+  end
+
+
+  def set_page_title
+    module_name = case controller_name.titleize
+    when 'Records' then 'Reports'
+    when 'Reports' then 'Events'
+    when 'Sms Actions' then 'Corrective Actions'
+    when 'Sras' then 'SRAs'
+    when 'Faa Reports' then 'FAA Reports'
+    else controller_name.titleize end
+
+    page_name = case action_name.titleize
+    when 'Index' then 'Listing'
+    else action_name.titleize end
+
+    @title = "#{module_name} - #{page_name}"
   end
 
 
@@ -524,13 +542,13 @@ class ApplicationController < ActionController::Base
   def adjust_session
     load_controller_list
     if @sms_list.include? controller_name
-      session[:mode]='SMS'
+      session[:mode] = 'SMS'
     elsif @sms_im_list.include? controller_name
-      session[:mode]='SMS IM'
+      session[:mode] = 'SMS IM'
     elsif @asap_list.include? controller_name
-      session[:mode]='ASAP'
+      session[:mode] = 'ASAP'
     elsif @srm_list.include? controller_name
-      session[:mode]='SRM'
+      session[:mode] = 'SRM'
     end
     true
   end

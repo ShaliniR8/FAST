@@ -1,8 +1,28 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.3',
+      title: 'Version 1.2.4',
       tag: 'New',
+      toggle: 'v1_2_4',
+      date: '11/20/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Report Type in Event listing',
+          'Added Meeting Agenda Tooltip in Meetings',
+          'Added Launched SRA/Investigation in Meeting',
+          'Added Checklist Findings in Findings List'
+        ],
+        'Optimizations & Fixes' => [
+          'Optimized Report processing workflow',
+          'Improved Report page load speed',
+          'Improved PDF generation speed',
+          'Improved FAA Report accuracy'
+          ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.3',
       toggle: 'v1_2_3',
       date: '10/14/2020',
       sections: {

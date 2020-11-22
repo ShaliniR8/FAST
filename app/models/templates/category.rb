@@ -1,6 +1,6 @@
 class Category < ActiveRecord::Base
 	belongs_to :template, foreign_key: "templates_id", class_name: "Template"
-	has_many :fields, foreign_key: "categories_id",class_name: "Field", :dependent => :destroy, :order => 'field_order ASC'
+	has_many :fields, foreign_key: "categories_id", class_name: "Field", :dependent => :destroy, :order => 'field_order ASC'
 	accepts_nested_attributes_for :fields
 
 

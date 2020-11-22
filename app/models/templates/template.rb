@@ -1,9 +1,9 @@
 class Template < ActiveRecord::Base
-  has_many          :categories,                  :foreign_key => "templates_id", :class_name => "Category", :dependent => :destroy
+  has_many          :categories,                  :foreign_key => "templates_id", :class_name => "Category", :dependent => :destroy, order: 'category_order ASC'
   has_many          :records,                     :foreign_key => "templates_id", :class_name => "Record"
   has_many          :fields,                      through: :categories
-  belongs_to :map_template,foreign_key:"map_template_id",class_name:"Template"
-  belongs_to  :created_by,foreign_key:"users_id",class_name: "User"
+  belongs_to :map_template, foreign_key:"map_template_id", class_name:"Template"
+  belongs_to  :created_by, foreign_key:"users_id", class_name: "User"
   accepts_nested_attributes_for :categories, reject_if: Proc.new{|category| category[:title].blank?}
 
 
