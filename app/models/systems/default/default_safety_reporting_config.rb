@@ -88,7 +88,7 @@ class DefaultSafetyReportingConfig
             },
           },
         }),
-        panels: %i[]
+        panels: %i[causes].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
 
@@ -164,7 +164,7 @@ class DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[occurrences sras investigations
+        panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -296,7 +296,7 @@ class DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[occurrences sras investigations
+        panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
         print_panels: %w[risk_matrix occurrences corrective_actions records]
       },
@@ -462,16 +462,16 @@ class DefaultSafetyReportingConfig
             display: proc{|user:,**op| true}},
         ]
       },
-      'Query Center' => {
-        title: 'Query Center', path: '#',
-        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
-        subMenu: [
-          {title: 'All', path: 'queries_path',
-            display: proc{|user:,**op| true}},
-          {title: 'New', path: 'new_query_path',
-            display: proc{|user:,**op| true}},
-        ]
-      },
+      # 'Query Center' => {
+      #   title: 'Query Center', path: '#',
+      #   display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+      #   subMenu: [
+      #     {title: 'All', path: 'queries_path',
+      #       display: proc{|user:,**op| true}},
+      #     {title: 'New', path: 'new_query_path',
+      #       display: proc{|user:,**op| true}},
+      #   ]
+      # },
     }
   }
 

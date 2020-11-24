@@ -164,10 +164,14 @@
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
 
           <%=render "closing_note"%>
+<<<<<<< HEAD
           <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
 
+=======
+>>>>>>> a98c6cd6... Temporary changes for FFT training data validation
           <%=render "record_table"%>
           <%=render '/panels/show_panels', owner: @report%>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
 
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>

@@ -265,7 +265,6 @@
 
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
-
           <%@owner = @record %>
           <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
 

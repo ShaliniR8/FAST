@@ -1,59 +1,40 @@
-<%owner_class = owner.class.superclass.name.include?('Base') ?
-  owner.class.name : owner.class.superclass.name%>
-<%headers = Object.const_get("#{owner_class}#{cause_type.titleize}").get_meta_fields('show')%>
-
 <div class="col-xs-12">
   <div class="panel panel-lightskyblue">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
-        <b><%=cause_type.pluralize.titleize%></b>
+        <b>Causes</b>
         <span class="pull-right clickable">
           <i class="mt5 glyphicon glyphicon-chevron-down"></i>
         </span>
       </div>
     </div>
 
+    <% causes = Cause.where(obj_id: owner.obj_id) %>
+
     <div class="panel-body" style="display:none">
       <div class="row">
         <div class="col-xs-12">
-
-          <%if can_change%>
-            <%=link_to "Add",
-              "#",
-              :class => "btn btn-success pull-right mr5",
-              :id => "add_#{cause_type}_btn",
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
-          <%end%>
-
           <table class="table table-striped table-bordered">
             <thead>
               <tr>
-                <%headers.each do |h|%>
-                  <th><%=h[:title]%></th>
-                <%end%>
-                <%if can_change%>
-                  <th>Actions</th>
-                <%end%>
+                <th>Label</th>
+                <th>Value</th>
               </tr>
             </thead>
             <tbody>
-              <%owner.send("#{cause_type.downcase.pluralize}").each do |c|%>
+              <% causes.each do |cause|%>
+                <% next if cause.value.empty? || cause.value == "\"\"" %>
                 <tr>
-                  <%headers.each do |h|%>
-                    <td>
-                      <%=c.send(h[:field]).gsub(/\n/, '<br/>').html_safe rescue c.attr%>
-                    </td>
-                  <%end%>
-                  <%if can_change%>
-                    <td>
-                      <%=link_to "Delete", "#",
-                        :class => "btn btn-danger delete_#{cause_type}_btn",
-                        "data-cid" => c.id%>
-                    </td>
-                  <%end%>
+                  <td><%="#{cause.category.titleize} > #{cause.attr.titleize}"%></td>
+                  <% if cause.value == "0"%>
+                    <td><%='No'%></td>
+                  <% elsif cause.value == "1"%>
+                    <td><%='Yes'%></td>
+                  <% else %>
+                    <td><%="#{cause.value}".gsub('"','')%></td>
+                  <% end %>
                 </tr>
-              <%end%>
+              <% end %>
             </tbody>
           </table>
         </div>
@@ -62,40 +43,3 @@
   </div>
 </div>
 
-
-
-<style>
-  .checkbox,
-  .radio{
-    display: auto!important;
-  }
-</style>
-
-
-<script>
-
-  $("#add_<%=cause_type%>_btn").on('click',function(){
-    $.get("<%=new_causes_causes_path(
-        :owner_id => owner.id,
-        :owner_type => owner.class.name,
-        :cause_type => cause_type)%>",
-        function(data){
-      $(".modal-content").html(data);
-      $(window).trigger('resize');
-    });
-  });
-
-  $('.delete_<%=cause_type%>_btn').on('click', function(){
-    var result = confirm("Are you sure?");
-    if (result) {
-      btn = $(this);
-      $.ajax({
-        url: "<%=causes_path%>"+"/"+$(this).data('cid'),
-        type: "delete",
-        success: function(){
-          btn.closest('tr').detach();
-        }
-      });
-    }
-  });
-</script>

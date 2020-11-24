@@ -79,7 +79,7 @@
               <%end%>
 
           <%end%>
-
+          <%=render '/panels/show_panels', :owner => @record%>
           <%=render "/forms/attachments_show", :owner => @record, :show_btn => false%>
           <%=render "/records/transactions", :owner => @record%>
 

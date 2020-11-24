@@ -277,6 +277,12 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
     },
+    causes: {
+      partial: '/causes/all',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { owner: owner }  },
+    },
     checklists: {
       partial: '/panels/checklists',
       visible: proc { |owner:,user:,**op| owner.owner.class.name == "ChecklistRow" },
