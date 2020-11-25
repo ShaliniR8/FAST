@@ -15,9 +15,22 @@ class TMCConfig < DefaultConfig
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                false,
     has_root_causes:                   false,
+    drop_down_risk_selection:          true,
 
   })
 
+  MATRIX_INFO = DefaultConfig::MATRIX_INFO.deep_merge({
+    risk_table: {
+      column_header_name: 'LIKELIHOOD',
+
+    }
+  }).merge({ # replace default risk_definitions with tmc custom definitions
+    risk_definitions: {
+      '#60FF60' => {rating: 'Green - Acceptable',      cells: "A1, B2, C3, D4",        },
+      yellow:      {rating: 'Yellow - Acceptable with mitigation', cells: "A2, B2, C4",},
+      orange:      {rating: 'Orange - Unacceptable',     cells: "A4, A3, B4",          },
+    },
+  })
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({
     'CHDO'=>'ACE-FSDO-09',

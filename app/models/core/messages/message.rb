@@ -17,9 +17,15 @@ class Message < ActiveRecord::Base
   def getAll(att)
     if att == "send_from"
       self.send(att).getName
+    elsif att == "send_from_email"
+      self.send_from.user.email
     else
       self.send(att).map{|x| x.getName}.join(", ")
     end
+  end
+
+  def get_send_from_name
+    self.send_from.user.full_name
   end
 
 
@@ -48,6 +54,6 @@ class Message < ActiveRecord::Base
 
 
   def get_time
-    self.time.in_time_zone(Time.zone).strftime("%Y-%m-%d %H:%M:%S") rescue ''
+    self.time.in_time_zone(Time.zone).strftime(CONFIG.getTimeFormat[:datetimeformat]) rescue ''
   end
 end

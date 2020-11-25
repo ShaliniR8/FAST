@@ -1,0 +1,70 @@
+<%=render "/pdfs/print_corrective_action", :owner => @corrective_action, :deidentified => @deidentified%>
+<style>
+  .wrap{
+    word-wrap: break-word !important;
+  }
+  body {
+    font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 14px !important;
+    font: normal 14px Verdana, Arial, sans-serif;
+  }
+  hr {
+    margin-bottom: 2px!important;
+    margin-top: 5px!important;
+    border-top: 1px solid black;
+  }
+  table{
+    font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 14px !important;
+    font: normal 14px Verdana, Arial, sans-serif;
+    width: 580px
+  }
+  th {
+    text-align: center;
+  }
+  td {
+    text-align: center;
+  }
+  .sub_title{
+    margin-bottom: 5px;
+    font: normal 16px Verdana, Arial, sans-serif;
+    font-weight: bold;
+  }
+  .sub_sub_title{
+    margin-top: 5px;
+    margin-bottom: 2px;
+    font: normal 14px Verdana, Arial, sans-serif;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  .title{
+    margin-bottom: 5px;
+    font: normal 18px Verdana, Arial, sans-serif;
+    font-weight: bold;
+  }
+  .category{
+    border: 1px solid black;
+    margin-bottom:10px;
+    padding:3px;
+  }
+  .grid_block{
+    display: inline-block;
+    width: 280px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 3px;
+    margin-top:2px;
+  }
+  .line_block{
+    display: inline-block;
+    width: 590px;
+    margin-right: 5px;
+    margin-left:  5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    border: 1px solid black;
+  }
+  .table_area{
+    width: 600px;
+  }
+</style>

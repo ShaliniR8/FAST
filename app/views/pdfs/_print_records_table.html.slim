@@ -1,0 +1,41 @@
+- if owner.records.present?
+  .col-xs-12
+    hr
+    .title Linked Reports
+    .content
+      table.table.table-bordered.table-striped
+        thead
+          tr
+            - Record.get_meta_fields('index').each do |header|
+              th class="#{header[:size]}"
+                = header[:title]
+            th Additional Info
+        tbody
+          - owner.records.each do |record|
+            tr
+              - Record.get_meta_fields('index').each do |header|
+                - if header[:title] != "Submitted By"
+                  td class=("#{header[:html_class].present? ? record.send(header[:html_class]) : ''}")
+                    = render "forms/show_field", :record => record, :field_hash => header
+                - else
+                  td
+                    = (record.created_by.disable ?                        \
+                      "<font color='red'>Inactive User</font>" :          \
+                      "<font color='green'>Active User</font>").html_safe
+              td
+                - additional_info = record.get_additional_info
+                - additional_info.each do |field|
+                  - if field[:value].present?
+                    p
+                      b> = "#{field[:label]}: "
+                      = field[:value]
+css:
+  .table tbody tr > td.red {
+    background-color: red !important;
+  }
+  .table tbody tr > td.yellow {
+    background-color: yellow !important;
+  }
+  .table tbody tr > td.green {
+    background-color: mediumseagreen !important;
+  }

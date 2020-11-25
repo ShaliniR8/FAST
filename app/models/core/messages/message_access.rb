@@ -4,9 +4,7 @@ class MessageAccess < ActiveRecord::Base
 
   def getName
     if user.present?
-      if user.id == session[:user_id]
-        "#{user.full_name} (Me)"
-      elsif anonymous
+      if anonymous
         'Anonymous'
       else
         user.full_name

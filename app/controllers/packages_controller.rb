@@ -89,6 +89,7 @@ class PackagesController < ApplicationController
     end
     handle_search
     @headers=@table.get_headers
+    @title = Object.const_get(params[:type]).display_name
     @table_name="packages"
   end
 

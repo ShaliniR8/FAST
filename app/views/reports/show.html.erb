@@ -44,6 +44,13 @@
                   :disable_with => "Editing..."%>
               <%end%>
 
+              <%=link_to 'Launch',
+                '#',
+                :id => "launch_btn",
+                :class => "btn btn-warning pull-right mr5 mb5",
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg'%>
+
               <%if @report.investigation.present? &&
                 current_user.has_access('Safety Assurance','module', admin: true, strict: true) %>
                 <%=link_to "View Investigation",
@@ -92,7 +99,7 @@
         </div>
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
-            <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.root_cause_lock? %></b>
+            <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.occurrence_lock? %></b>
             <%if current_user.has_access('reports','edit', admin: true)%>
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
@@ -135,41 +142,14 @@
               :id => 'comment_btn',
               "data-toggle" => "modal",
               "data-target" => ".bs-example-modal-lg"%>
-
-            <%if current_user.has_access('Safety Risk Management','module', admin: true, strict: true) &&
-              @report.status != "Closed" &&
-              !@report.sra.present?%>
-              <%=link_to "Launch SRA(SRM)",
-                new_sra_path(owner_id:@report.id, owner_type:@report.class),
-                :class=>"btn btn-warning pull-right ml5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
-
-            <%if current_user.has_access('Safety Assurance', 'module', admin: true, strict: true) &&
-              @report.status != "Closed" &&
-              !@report.investigation.present?%>
-              <%=link_to "Launch Investigation",
-                new_investigation_path(owner_id:@report.id, owner_type:@report.class),
-                :class=>"btn btn-warning pull-right ml5 mb5",
-                :disable_with => "Redirecting..."%>
-            <%end%>
           </div>
 
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
 
           <%=render "closing_note"%>
           <%=render "record_table"%>
-          <%=render 'shared/choose_show_matrix',
-            :owner => @report,
-            :show_btn => true,
-            :type => 'reports',
-            :allow_mitigate => true,
-            # :color_matrix => @color_matrix,
-            # :frequency => @frequency,
-            # :like => @like,
-            :can_change => can_change%>
-
-          <%= render '/panels/show_panels', owner: @report%>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+          <%=render '/panels/show_panels', owner: @report%>
 
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>
@@ -220,7 +200,7 @@
           <%end%>
 
           <%=render "/forms/show_comment", :owner => @report%>
-          <%=render "/forms/attachments_show", :owner => @report, :attachments => @report.attachments + @report.records.map(&:attachments).flatten%>
+          <%=render "/forms/attachments_show", owner: @report, attachments: @report.attachments + @report.records.map(&:attachments).flatten%>
           <%=render "/records/transactions", :owner => @report%>
 
         </div>
@@ -233,39 +213,39 @@
 
 <script>
   $(document).ready(function(){
+    $('#launch_btn').on('click',function(){
+      $(".modal-content").html('');
+      $.get("<%= eval("launch_report_path(@report)")%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    })
+
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity%>-<%=Finding.get_likelihood.index(@report.likelihood)%>").append("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
     $("#report<%=@report.id%> > tbody > tr > #<%=@report.severity_after%>-<%=Finding.get_likelihood.index(@report.likelihood_after)%>").append("<span class='glyphicon glyphicon-ok' style='color:red'></span>");
     $('#att_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%=new_attachment_report_path(@report)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $('#comment_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%=comment_report_path(@report)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
-    $('#mitigate_btn').on('click',function(){
-      $.get("<%=mitigate_report_path(@report)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
-    $('#baseline_btn').on('click',function(){
-      $.get("<%=baseline_report_path(@report)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
     $('#override_status_btn').on('click',function(){
+      $(".modal-content").html('');
       $.get("<%=override_status_report_path(@report)%>", function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
     $(".close_event_btn").on('click',function(){
+      $(".modal-content").html('');
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');

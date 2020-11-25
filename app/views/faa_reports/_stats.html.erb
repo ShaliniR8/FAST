@@ -15,7 +15,7 @@
             <b><%=stat[:title]%>:</b>
             <%if stat[:link]%>
               <b>
-                <%result = @report.send(stat[:value])[stat[:value_key].to_sym]%>
+                <%result = @statistics[stat[:value_key].to_sym]%>
                 <%=link_to "#{result.length}",
                   '#',
                   :class => 'report_link',

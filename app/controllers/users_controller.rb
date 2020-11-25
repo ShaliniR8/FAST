@@ -48,6 +48,7 @@ class UsersController < ApplicationController
     @user = User.new
     @user.airport = current_user.airport
     @authorized = current_user.global_admin?
+    @departments = CONFIG.custom_options['Departments']
   end
 
 
@@ -126,6 +127,7 @@ class UsersController < ApplicationController
       @authorized = true
       @action = 'new'
       @levels = User.get_levels
+      @departments = CONFIG.custom_options['Departments']
       flash[:error] = @user.errors.full_messages
       render :action => 'new'
     end
@@ -134,12 +136,13 @@ class UsersController < ApplicationController
 
 
   def edit
-    @levels=User.get_levels
+    @levels = User.get_levels
     @authorized = current_user.global_admin?
     @action = 'edit'
     @users = User.find(:all, :conditions => {:airport => current_user.airport})
     match_id = params[:id]
     @user = User.find(params[:id])
+    @departments = CONFIG.custom_options['Departments']
   end
 
 
@@ -172,6 +175,7 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:id])
+    @departments = CONFIG.custom_options['Departments']
 
     # User entered wrong password, only works for the self edit page right now
     if !@user.matching_password?(params[:pw])
@@ -271,12 +275,21 @@ class UsersController < ApplicationController
   end
 
 
-
   def stop_simulation
     @user = User.find(params[:id])
     session.delete(:simulated_id)
     define_session_permissions
     redirect_to user_path(@user)
+  end
+
+
+  def user_json_request
+    respond_to do |format|
+      format.html
+      format.json {
+        render json: User.select('full_name, id').order(:full_name).uniq(&:full_name).collect{|u| u.attributes}
+      }
+    end
   end
 
   private

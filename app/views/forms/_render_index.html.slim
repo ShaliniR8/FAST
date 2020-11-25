@@ -10,6 +10,10 @@
 .panel.panel-primary
   .panel-body
     h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
+    = link_to "Advanced Search", '#',
+      class: "btn btn-default pull-right mr10 ml10", id: "adv",
+      "data-toggle" => "modal",
+      "data-target" => ".bs-example-modal-lg"
     ul class="nav nav-pills"
       - @object[:status].each do |status|
         li class="nav-item status-#{status.parameterize}"
@@ -18,7 +22,8 @@
 
     .tab-content.mt20
       .tab-pane.fade.in.active id='table'
-        .records-table
+        = render 'shared/loaders', loader_text: 'Loading'
+        .records-table style="overflow-x:scroll;"
 
 
 css:
@@ -27,6 +32,9 @@ css:
   }
   .nav-pills > li > a {
     background-color: white;
+  }
+  .table {
+    font-size: 13px !important;
   }
 
 
@@ -37,8 +45,18 @@ javascript:
 
   function loadContent(status) {
     $('li').removeClass('active');
-    $('.status-' + status.toLowerCase()).addClass('active');
-    $.get('#{eval("load_records_#{controller_name}_path")}?status=' + status, function(data){
-      $('.records-table').html(data);
+    $('.status-' + status.toLowerCase().replace(' ', '-')).addClass('active');
+
+    $.ajax({
+      type: "POST",
+      url: '#{eval("load_records_#{controller_name}_path")}?status=' + status,
+      data: {
+        ids: "#{escape_javascript(raw @records_id)}"
+      },
+      beforeSend: function(){$(".records-table").css({'opacity':0.5}); $('#loader1').show();},
+      success: function(data){$('.records-table').html(data);},
+      complete: function(){$('#loader1').hide();$(".records-table").css({'opacity':1});},
+      error: function(response){console.log(response);}
     });
+
   }

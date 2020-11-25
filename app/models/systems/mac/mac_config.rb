@@ -105,6 +105,10 @@ class MAC_Config
     },
 
     risk_table: {
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
       starting_space: true,
       row_header: ['4','3','2','1'],
       column_header: ['FREQUENT - A','PROBABLE - B','OCCASIONAL - C','REMOTE - D'],

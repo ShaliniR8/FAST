@@ -10,6 +10,10 @@ class Field < ActiveRecord::Base
   belongs_to :map_field,        :foreign_key => "map_id",           :class_name => "Field"
   belongs_to :parent_field,     :foreign_key => "nested_field_id",  :class_name => "Field"
 
+  scope :nested, -> {where('nested_field_id is not null').order(category_order: :asc)}
+  scope :non_nested, -> {where('nested_field_id is null').order(category_order: :asc)}
+  scope :active, -> {where(deleted: 0).order(field_order: :asc)}
+
 
   def export_label
     if self.label.length>20
@@ -97,7 +101,7 @@ class Field < ActiveRecord::Base
 
   def getOptions2()
     if self.data_type=="timezone"
-      ["EDT","CDT","EST","CST","MDT","MST","PDT","PST","AKDT","AKST"]
+      ["Hawaii", "Alaska", "Pacific Time (US & Canada)", "Arizona", "Mountain Time (US & Canada)", "Central Time (US & Canada)", "Eastern Time (US & Canada)", "Indiana (East)"]
     else
       self.options.split(";")
     end
@@ -107,14 +111,7 @@ class Field < ActiveRecord::Base
 
   def getOptions()
     if self.data_type=="timezone"
-      ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
-       "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
-       "JT","ALMST","WAST","CXT","MMT","ALMT","MAWT","IOT","MVT","TFT","AFT","MUT","RET",
-       "SCT","IRT","IT","EAT","BT","EETDST","HMT","BDST","CEST","CETDST","EET","FWT","IST",
-       "MEST","METDST","SST","BST","CET","DNT","FST","MET","MEWT","MEZ","NOR","SET","SWT",
-       "WETDST","GMT","UT","UTC","ZULU","WET","WAT","FNST","FNT","BRST","NDT","ADT","AWT",
-       "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
-       "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
+      ActiveSupport::TimeZone.all.map(&:name)
     else
       self.options.split(";")
     end

@@ -47,7 +47,9 @@ module PrdgSession
   config.filter_parameters += %i[password pw base64 json_dump]
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.default_url_options = { :host => 'bsk.prosafet.com' }
+  airline_code = YAML.load_file("#{::Rails.root}/config/airline_code.yml")
+  airline_code += '-training' if Rails.env.training?
+  config.action_mailer.default_url_options = { :host => "#{airline_code}.prosafet.com" }
   config.action_mailer.smtp_settings = {
     address: 'smtp.1and1.com',
     port: 587,
@@ -55,7 +57,7 @@ module PrdgSession
     password: 'pookies224',
     authentication: 'plain',
   }
-  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.raise_delivery_errors = false
 
 
   #Kaushik Mahorker OAuth

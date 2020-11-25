@@ -37,77 +37,23 @@ module RiskHandling
 
   #Object Methods
 
-  def display_after_likelihood
-    if CONFIG::GENERAL[:base_risk_matrix]
-      likelihood_after
-    else
-      get_risk_values[:probability_2] rescue 'N/A'
-    end
-  end
-
-
   def display_after_risk_factor
     risk_factor_after
-    # if CONFIG::GENERAL[:base_risk_matrix]
-    #   risk_factor_after rescue 'N/A'
-    # else
-    #   get_risk_values[:risk_2] rescue 'N/A'
-    # end
-  end
-
-
-  def display_after_severity
-    if CONFIG::GENERAL[:base_risk_matrix]
-      severity_after
-    else
-      get_risk_values[:severity_2] rescue 'N/A'
-    end
-  end
-
-
-  def display_before_likelihood
-    if CONFIG::GENERAL[:base_risk_matrix]
-      likelihood
-    else
-      get_risk_values[:probability_1] rescue 'N/A'
-    end
   end
 
 
   def display_before_risk_factor
     risk_factor
-    # if CONFIG::GENERAL[:base_risk_matrix]
-    #   risk_factor rescue 'N/A'
-    # else
-    #   get_risk_values[:risk_1] rescue 'N/A'
-    # end
-  end
-
-
-  def display_before_severity
-    if CONFIG::GENERAL[:base_risk_matrix]
-      severity
-    else
-      get_risk_values[:severity_1] rescue 'N/A'
-    end
   end
 
 
   def get_after_risk_color
-    if CONFIG::GENERAL[:base_risk_matrix]
-      CONFIG::RISK_MATRIX[:risk_factor][display_after_risk_factor]
-    else
-      CONFIG::MATRIX_INFO[:risk_table_index][display_after_risk_factor]
-    end
+    CONFIG::MATRIX_INFO[:risk_table_index][display_after_risk_factor]
   end
 
 
   def get_before_risk_color
-    if CONFIG::GENERAL[:base_risk_matrix]
-      CONFIG::RISK_MATRIX[:risk_factor][display_before_risk_factor]
-    else
-      CONFIG::MATRIX_INFO[:risk_table_index][display_before_risk_factor]
-    end
+    CONFIG::MATRIX_INFO[:risk_table_index][display_before_risk_factor]
   end
 
 
@@ -161,20 +107,12 @@ module RiskHandling
 
 
   def likelihood_after_index
-    if CONFIG::GENERAL[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood_after).to_i
-    else
-      self.likelihood_after.to_i
-    end
+    self.likelihood_after.to_i
   end
 
 
   def likelihood_index
-    if CONFIG::GENERAL[:base_risk_matrix]
-      self.class.get_likelihood.index(self.likelihood).to_i
-    else
-      self.likelihood.to_i
-    end
+    self.likelihood.to_i
   end
 
 

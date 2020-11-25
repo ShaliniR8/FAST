@@ -18,16 +18,16 @@
             Meeting #<%=@meeting.get_id%>
           </div>
           <div class="top_buttons pull-right">
-            <% if current_user.has_access('meetings','destroy', admin: true) %>
+            <% if current_user.has_access('srm_meetings','destroy', admin: true) %>
               <%=link_to 'Delete',srm_meeting_path(@meeting),:method=>"delete",:confirm=>'Please confirm that you want to cancel this meeting. The cancellation cannot be reverted',:class=>"btn btn-danger pull-right"%>
             <%end%>
-            <% if current_user.has_access('sms_meetings','edit', admin: true) &&
+            <% if current_user.has_access('srm_meetings','edit', admin: true) &&
               @meeting.status != "Closed" &&
               @meeting.has_user(current_user) %>
               <%=link_to "Edit", edit_srm_meeting_path(@meeting), :id=>"edit-btn", :class=>"btn btn-warning pull-right mr5", :disable_with => "Editing..."%>
             <%end%>
             <%=link_to "PDF",
-              print_srm_meeting_path(@meeting, format: :pdf),
+              interpret_srm_meeting_path(@meeting, act: :pdf, format: :pdf, deidentified: false),
               :class => "btn btn-darkturquoise pull-right mr5"%>
             <%=link_to "Expand All","#",:class=>"btn btn-default mr5 expandall pull-right"%>
           </div>
@@ -37,7 +37,7 @@
       <div class="panel-body">
         <div class="col-xs-12 mb15">
 
-          <%if current_user.has_access("sms_meetings","edit") &&
+          <%if current_user.has_access("srm_meetings","edit") &&
                 @meeting.status == "Open" &&
                 @meeting.has_user(current_user)%>
             <%=link_to 'Close Meeting', '#',
@@ -106,7 +106,7 @@
             </div>
             <div class="panel-body" style="display:none">
               <div class="pull-right mb10">
-                <%if current_user.has_access("meetings","edit") &&
+                <%if current_user.has_access("srm_meetings","edit") &&
                   @meeting.status == "Open" &&
                   @meeting.has_user(current_user)%>
                   <%=link_to "Send Agenda/Notice", "#",

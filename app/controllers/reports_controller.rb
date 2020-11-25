@@ -87,7 +87,7 @@ class ReportsController < ApplicationController
       r.save
     end
     @report.destroy
-    redirect_to reports_path, flash: {danger: "Event ##{params[:id]} deleted."}
+    redirect_to reports_path(status: 'All'), flash: {danger: "Event ##{params[:id]} deleted."}
   end
 
 
@@ -116,9 +116,9 @@ class ReportsController < ApplicationController
   def carryover
     report = Report.find(params[:id])
     meeting = Meeting.find(params[:meeting_id])
-    report.agendas.where(owner_id: params[:meeting_id]).map(&:destroy) rescue
-      Rails.logger.warning "Report ##{report.id} Carryover failed to delete proper agendas
-        from Meeting ##{params[:meeting_id]}"
+    # report.agendas.where(owner_id: params[:meeting_id]).map(&:destroy) rescue
+    #   Rails.logger.warning "Report ##{report.id} Carryover failed to delete proper agendas
+    #     from Meeting ##{params[:meeting_id]}"
     connection = Connection.get(meeting, report).update_attributes(archive: true)
     Transaction.build_for(
       meeting,
@@ -215,6 +215,8 @@ class ReportsController < ApplicationController
 
 
   def update
+    convert_from_risk_value_to_risk_index
+
     transaction = true
     @owner = Report.find(params[:id])
 
@@ -281,15 +283,19 @@ class ReportsController < ApplicationController
 
 
   def show
-    load_options
-    @i18nbase = 'sr.event'
-    @report = Report.find(params[:id])
-    @records = @report.records
+    #load_options
     @action = "show"
-    @headers = Record.get_headers
-    @agenda_headers = AsapAgenda.get_headers
     @title = "Included Reports"
     @table_name = "reports"
+
+    @i18nbase = 'sr.event'
+    @report = Report.preload(records: [:attachments, :occurrences]).find(params[:id])
+    @owner = @report
+    @headers = Record.get_headers
+
+    @records = @report.records
+
+    @agenda_headers = AsapAgenda.get_headers
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
@@ -297,6 +303,7 @@ class ReportsController < ApplicationController
       'show',
       CONFIG::GENERAL[:event_summary] ? 'event_summary' : '',
       @report.status == 'Closed' ? 'close' : '')
+    @owner = @report
   end
 
 
@@ -322,8 +329,21 @@ class ReportsController < ApplicationController
   def print
     @deidentified = params[:deidentified]
     @report = Report.find(params[:id])
-    html = render_to_string(:template => "/reports/print.html.erb")
-    pdf = PDFKit.new(html)
+    @meta_field_args = ['show']
+    @meta_field_args << 'admin' if current_user.global_admin?
+    html = render_to_string(:template => "/pdfs/print_report.html.erb")
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Event_##{@report.get_id}" + (@deidentified ? '(de-identified)' : '')
@@ -336,9 +356,14 @@ class ReportsController < ApplicationController
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
     @default_tab = params[:status]
-    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records_hash = @records.group_by(&:status)
-    @records_hash['All'] = @records
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -367,7 +392,7 @@ class ReportsController < ApplicationController
       else
         @records=@records.select{|x| x.status==params[:status]}
       end
-      @title+=" : #{params[:status]}"
+      @title += " : #{params[:status]}"
     end
     handle_search
     #@records.keep_if{|r|(current_user.has_template_access(r.template.name).include? "full")|| ((current_user.has_template_access(r.template.name).include? "viewer")&&r.viewer_access)}
@@ -428,12 +453,10 @@ class ReportsController < ApplicationController
     end
   end
 
-
-
-
   def get_agenda
     @report = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
+    @agendas = @report.get_agendas(@meeting)
     @headers = AsapAgenda.get_headers
     @status = AsapAgenda.get_status
     @tof = {"Yes" => true,"No" => false}
@@ -456,26 +479,28 @@ class ReportsController < ApplicationController
 
 
   def mitigate
-    @owner=Report.find(params[:id])
-    load_options
+    @owner = Report.find(params[:id])
+
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
     load_special_matrix_form('report', 'mitigate', @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-        render :partial=>"shared/mitigate"
-      else
-        render :partial=>"shared/#{AIRLINE_CODE}/mitigate"
-      end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
   def baseline
-    @owner=Report.find(params[:id])
-    load_options
+    @owner = Report.find(params[:id])
+
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
     load_special_matrix_form('report', 'baseline', @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial=>"shared/baseline"
-    else
-      render :partial=>"shared/#{AIRLINE_CODE}/baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -506,10 +531,42 @@ class ReportsController < ApplicationController
 
   private
 
+  def carry_over_baseline(owner, record)
+    return unless CONFIG.sr::GENERAL[:matrix_carry_over]
+    return if record.risk_factor.present?
+
+    baseline_risk_matrix = {
+      likelihood: owner.likelihood,
+      severity: owner.severity,
+      risk_factor: owner.risk_factor,
+      severity_extra: owner.severity_extra,
+      probability_extra: owner.probability_extra
+    }
+
+    record.update_attributes(baseline_risk_matrix)
+  end
+
+  def carry_over_mitigate(owner, record)
+    return unless CONFIG.sr::GENERAL[:matrix_carry_over]
+    return if record.risk_factor_after.present?
+
+    mitigate_risk_matrix = {
+      likelihood_after: owner.likelihood_after,
+      severity_after: owner.severity_after,
+      risk_factor_after: owner.risk_factor_after,
+      mitigated_severity: owner.mitigated_severity,
+      mitigated_probability: owner.mitigated_probability
+    }
+
+    record.update_attributes(mitigate_risk_matrix)
+  end
+
   def close_records(owner)
     owner.records.each do |record|
       if record.status != 'Closed'
         record.close_date = Time.now
+        carry_over_baseline(owner, record)
+        carry_over_mitigate(owner, record)
         record.update_attributes(params[:report]) if record.is_asap
         record.status = 'Closed'
         record.save

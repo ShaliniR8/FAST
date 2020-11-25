@@ -17,6 +17,10 @@ class DefaultSafetyRiskManagementConfig
 
       'Sra' => {
         title: 'SRA',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true, field: 'get_id' },
           status: { default: true },
@@ -161,21 +165,43 @@ class DefaultSafetyRiskManagementConfig
           regulatory_compliances_panel_end: {
             num_cols: 12, type: 'panel_end', visible: 'form,show'
           },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
 
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
-        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[agendas comments hazards extension_requests verifications records attachments transaction_log
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          approve_reject: {
+            btn: :approve_reject,
+            btn_loc: [:inline],
+            access: proc { |owner:,user:,**op|
+              form_confirmed = owner.status == 'Pending Approval' || op[:form_conds] || owner.status == 'Pending Review'
+              user_confirmed = [owner.created_by_id, owner.approver_id, owner.reviewer_id].include?(user.id) ||
+                priv_check.call(owner,user,'admin',true,true) ||
+                op[:user_conds]
+              form_confirmed && user_confirmed
+            },
+          },
+        }),
+        panels: %i[agendas comments source_of_input hazards extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
         title: 'Hazard',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :sra,
+          :responsible_user,
+          :created_by,
+          :approver,
+          :occurrences,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true,
             field: 'get_id', title: 'Hazard ID'
@@ -208,6 +234,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
           occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
@@ -225,7 +252,7 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_sra attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_sra attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject risk_control reopen comment],
           #*%i[assign complete approve_reject reject complete_hazard risk_control reopen comment],
@@ -246,11 +273,15 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[risk_assessment occurrences risk_controls comments extension_requests verifications attachments transaction_log
+        panels: %i[risk_controls occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'RiskControl' => {
         title: 'Risk Control',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           status: { default: true },
@@ -274,6 +305,10 @@ class DefaultSafetyRiskManagementConfig
             field: 'approver_id',
             visible: 'index,form,show'
           },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'none',
+          },
           control_type: {
             field: 'control_type', title: 'Type',
             num_cols: 6, type: 'datalist', visible: 'form,show',
@@ -290,12 +325,13 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_hazard attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_hazard attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen cost comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
@@ -325,6 +361,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'SafetyPlan' => {
         title: 'Safety Plan',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         fields: {
           id: { default: true,
             required: true
@@ -367,8 +404,8 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 6, type: 'date', visible: 'show,eval',
             required: false
           },
-          date_completed: {
-            field: 'date_completed', title: 'Date Completed',
+          date_closed: {
+            field: 'close_date', title: 'Date Completed',
             num_cols: 6, type: 'date', visible: 'show,eval',
             required: false
           },
@@ -423,12 +460,62 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[],
           #INLINE
-          *%i[],
+          *%i[pdf],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[included_sras participants attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       }
     },
+    menu_items: {
+      'Sra' => {
+        title: 'SRA (SRM)', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'sras_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_sra_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'new', true, true)}},
+        ]
+      },
+      'Hazards' => {
+        title: 'Hazards', path: 'hazards_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Hazard'), user, 'index', true, true)},
+      },
+      'Risk Controls' => {
+        title: 'Risk Controls', path: 'risk_controls_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', true, true)},
+      },
+      'Safety Plans' => {
+        title: 'Safety Plans', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'safety_plans_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_safety_plan_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'new', true, true)}},
+        ]
+      },
+      'Meetings' => {
+        title: 'Meetings', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'srm_meetings_path(status: "All")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_srm_meeting_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'new', true, true)}},
+        ]
+      },
+      'Query Center' => {
+        title: 'Query Center', path: '#',
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        subMenu: [
+          {title: 'All', path: 'queries_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_query_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
+    }
   }
 
 end

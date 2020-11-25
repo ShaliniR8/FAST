@@ -19,11 +19,12 @@ css:
           = render '/forms/show_fields',
             fields: Hazard.get_meta_fields('show'),
             record: owner
-        = render '/shared/choose_show_matrix',
-          owner: owner,
-          show_btn: show_btn,
-          type: 'hazards',
-          can_change: !%w[Rejected Completed].include?(owner.status)
+        =render 'risk_analyses/show',
+          :owner => owner,
+          :show_btn => show_btn,
+          :type => 'hazards',
+          :allow_mitigate => true,
+          :can_change => !%w[Rejected Completed].include?(owner.status)
         - if owner.risk_controls.present?
           .col-xs-12
             .panel.clickable.panel-info
@@ -46,3 +47,5 @@ css:
               .panel-body style='display:none'
                 .row
                   = render '/occurrences/occurrences_panel', owner: owner, show_only_table: true
+        = render "/forms/show_comment", owner: owner
+        = render '/forms/attachments_show', owner: owner, show_btn: false

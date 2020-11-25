@@ -53,30 +53,13 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
-  def self.export_all #Used in Mitre Rake Task
-    self.includes(:template).where(completed: true, templates:{report_type: 'asap'}).each do |s|
-      path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
-      dirname = File.join([Rails.root] + path)
-      temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
-      unless File.directory?(dirname)
-        FileUtils.mkdir_p(dirname)
-      end
-      File.open(temp_file, 'w') do |file|
-        file << ApplicationController.new.render_to_string(
-          template: 'submissions/export_component.xml.erb',
-          locals:   { template: s.template, submission: s})
-      end
-    end
-  end
-
-
   def self.get_headers
       [
         {field: 'get_id',            title: 'ID'},
        ({field: 'get_description',   title: 'Title'} if CONFIG.sr::GENERAL[:submission_description]),
         {field: 'get_template',      title: 'Type'},
         {field: 'submit_name',       title: 'Submitted By'},
-        {field: 'get_event_date',    title: 'Event Date'},
+        {field: 'event_date',        title: 'Event Date/Time', type: 'datetime'},
       ].compact
   end
 
@@ -118,7 +101,7 @@ class Submission < Sr::SafetyReportingBase
         description:        description,
         event_date:         event_date,
         users_id:           user_id,
-        status:             'New',
+        status:             (self.template.default_status || 'New'),
         anonymous:          anonymous,
         event_time_zone:    event_time_zone,
       )

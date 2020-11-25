@@ -12,5 +12,13 @@
         $(window).resize();
       });
     });
+
+    $('#adv').on('click',function(){
+      $.get("<%=advanced_search_home_index_path(table: @table.name, status: 'All')%>", function(data){
+        $(".modal-content").html(data);
+        $(window).resize();
+      });
+    });
+
   });
 </script>

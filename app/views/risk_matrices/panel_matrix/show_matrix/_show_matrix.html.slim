@@ -1,0 +1,4 @@
+= render 'risk_matrices/panel_matrix/show_matrix/header'
+/ RISK DEFINITION, SEVERITY, PROBABILITY, MATRIX
+- risk_type = defined?(risk_type) ? risk_type : @risk_type
+= render 'risk_matrices/panel_matrix/risk_content', action: 'show', risk_type: risk_type

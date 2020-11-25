@@ -11,12 +11,12 @@ class AsapAgenda < Agenda
       { title: 'Created At',  field: :get_created},
       { title: 'Updated At',  field: :get_updated},
       { title: 'Discuss',     field: :discuss},
-      { title: 'Disposition', field: :disposition}
+      { title: 'Dispositions',field: :disposition}
     ]
   end
 
   def disposition
-    self.accepted ? 'Yes' : 'No'
+    accepted == 1 ? 'Yes' : (accepted == 0 ? 'No' : accepted)
   end
 
   def discuss

@@ -25,6 +25,45 @@ class BSKSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
           },
         },
       },
+
+      'RiskControl' => {
+        fields: {
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'index,form,show',
+          },
+        }
+      }
     },
+    menu_items: {
+      'Sra' => {
+        title: 'SRA (SRM)', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'sras_path(status: "All")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_sra_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'new', true, true)}},
+        ]
+      },
+      'Hazards' => {
+        title: 'Hazards', path: 'hazards_path(status: "All")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Hazard'), user, 'index', true, true)},
+      },
+      'Risk Controls' => {
+        title: 'Risk Controls', path: 'risk_controls_path(status: "All")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', true, true)},
+      },
+      'Safety Plans' => {
+        title: 'Safety Plans', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'safety_plans_path(status: "All")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_safety_plan_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'new', true, true)}},
+        ]
+      },
+    }
   })
 end

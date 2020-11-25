@@ -1,0 +1,75 @@
+ruby:
+  header_index = -1
+  column_widths = checklist.checklist_header.checklist_header_items.order('display_order').map { |header|
+    header_index += 1
+    if header.size.present?
+      "{ 'width': '#{header.size}%', 'targets': #{header_index} }"
+    end
+  }
+
+table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.id}"
+  thead
+    tr
+      - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
+        th = header.title
+      th Attachments
+      th Findings
+  tbody
+    - checklist.checklist_rows.order(:id).each do |checklist_row|
+      tr class="#{checklist_row.is_header ? 'header-row' : ''}"
+        - checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
+          td
+            = render 'checklist_headers/preview_field',
+              owner_type: checklist.owner_type,
+              cell: checklist_cell,
+              item: checklist_cell.checklist_header_item
+        td
+          - unless checklist_row.is_header?
+            = render 'forms/attachments_show_mini', owner: checklist_row
+        td
+          = checklist_row.display_findings
+          - unless checklist_row.is_header? || owner.nil?
+            - if owner.status != 'Completed'
+              = link_to '',
+                new_finding_path( owner_id: checklist_row.id, owner_type: checklist_row.class.name ),
+                class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
+                id: checklist_row.id,
+                "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add Finding"
+            /= link_to '',
+              '#',
+              class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',
+              id: checklist_row.id,
+              "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Show Findings",
+              "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
+
+javascript:
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replaceAll('"', "'")
+      .replaceAll("&quot;",'')
+      .replaceAll("&#39;",'"')
+  }
+
+  columnWidths = JSON.parse(escapeHtml("#{column_widths}"))
+
+  $("#checklist_records_#{checklist.id}").DataTable({
+    /* Disable initial sort */
+    "order": [],
+    autoWidth: false,
+    "columnDefs": columnWidths
+  })
+  /* Disable sort buttons (table headers) */
+  $("#checklist_records_#{checklist.id}").find("th").off("click")
+
+  $(document).on('click', '.show_finding_btn', function(e) {
+    $.get("#{show_finding_audit_path}?checklist_row_id="+$(this).attr("id"), function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });
+
+css:
+  .dataTable > thead > tr > th[class*='sort']:before,
+  .dataTable > thead > tr > th[class*='sort']:after {
+      content: '';
+  }

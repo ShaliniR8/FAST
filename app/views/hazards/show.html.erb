@@ -37,7 +37,8 @@
         </div>
 
         <%= render "/forms/show_fields", :fields => Hazard.get_meta_fields('show'), :record => @hazard%>
-        <%= render '/panels/show_panels', owner: @hazard%>
+        <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+        <%=render '/panels/show_panels', owner: @hazard%>
 
       </div>
     </div>
@@ -49,18 +50,10 @@
 
 <script>
   $(document).ready(function(){
-    $('#mitigate_btn').on('click',function(){
-      $.get("<%=mitigate_hazard_path(@hazard)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
+    $(".modal").on("hidden.bs.modal", function(){
+      $(".modal-content").html("");
     });
-    $('#baseline_btn').on('click',function(){
-      $.get("<%=baseline_hazard_path(@hazard)%>",function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
-    });
+
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_hazard_path(@hazard)%>",function(data){
         $(".modal-content").html(data);

@@ -1,9 +1,28 @@
 module ApplicationHelper
-  include ShowFormHelper
+  include ShowDataHelper
 
   def getAlltemplates
     return Template.find(:all)
   end
+
+
+  def convert_to_utc(date_time:, time_zone:)
+    time_zone = 'UTC' if time_zone.blank?
+    time_zone = ActiveSupport::TimeZone.new(time_zone)
+    date_time = DateTime.parse(date_time) rescue time_zone.at(Time.now)
+    time_zone.local_to_utc(date_time)
+  end
+
+
+  def display_date_time_in_zone(date_time:, time_zone:, display_zone: time_zone)
+    datetime_to_string(date_time.in_time_zone(time_zone)) + " #{display_zone}"
+  end
+
+
+  def display_local_time_zone
+    Time.now.in_time_zone(CONFIG::GENERAL[:time_zone]).strftime('%Z')
+  end
+
 
   # Calculate the severity based on airport's risk matrix
   def calculate_severity(list)
@@ -191,17 +210,17 @@ module ApplicationHelper
   def group_to_color(group_name)
     case group_name
     when "flight-crew"
-      "LIGHTSKYBLUE"
-    when "cabin"
-      "CORAL"
+      "lightskyblue"
+    when "cabin", 'inflight'
+      "coral"
     when "dispatch"
-      "GOLDENROD"
+      "goldenrod"
     when "maintenance"
-      "lightsalmon"
+      "thistle"
     when "general"
-      "MEDIUMAQUAMARINE"
+      'mediumaquamarine'
     when "ground"
-      "DARKTURQUOISE"
+      'peru'
     else
       "lightgray"
     end
@@ -252,7 +271,6 @@ module ApplicationHelper
     when 'VpIm', "JobAid", "FrameworkIm"
       entry_url = im_url(entry)
     else
-      byebug
       entry_url = "N/A"
     end
     "    <a style='font-weight:bold;text-decoration:underline' href='#{entry_url}'>View</a>"
@@ -327,14 +345,26 @@ module ApplicationHelper
     "    <a href='#{entry_url}'>#{message}</a>"
   end
 
-  def link_to_add_fields(name, f, association, locals={}, partial: nil)
-    target = association.to_s
-    new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
-    partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields"
+
+  # def link_to_add_fields(name, f, association, locals={}, linkOptions={}, customTarget=nil, partial:nil)
+  #   target = customTarget || association.to_s
+  #   new_object = Object.const_get(association.to_s.singularize.titleize.delete(' ')).new
+  #   #new_object = Object.const_get(target.singularize.titleize.delete(' ')).new
+  #   partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields" # #{association.to_s.singularize.downcase}_fields
+  #   fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
+  #     render(partial, :f => builder, :source => 'New', :guest => @guest, :locals => locals)
+  #   end
+  def link_to_add_fields(name, f, association, locals={}, linkOptions={}, customTarget=nil, partial:nil)
+    partial ||= "/forms/add_fields/#{association.to_s.singularize.downcase}_fields" # #{association.to_s.singularize.downcase}_fields
+    #partial ||= "#{association.to_s.singularize.downcase}_fields"
+    target = customTarget || association.to_s
+    new_object = Object.const_get(association.to_s.singularize.titleize.delete(' ')).new
     fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(partial, :f => builder, :source => 'New', :guest => @guest, :locals => locals)
+      render partial, f:builder, source:'New', guest:@guest, locals: locals
     end
-    link_to_function(name, "add_fields(this, \"#{association}\", \"#{escape_javascript(fields)}\", \"#{target}\")")
+    link_to_function name,
+      "add_fields(this, '#{association}', '#{escape_javascript(fields)}', '#{target}')",
+      **linkOptions
   end
 
 
@@ -356,6 +386,51 @@ module ApplicationHelper
   end
 
 
+  def calculate_column_size(field:)
+    xs_val = field.display_size.to_s
+    xs_val = '6' if xs_val.to_i < 6
+
+    size = " col-md-" + field.display_size.to_s +
+           " col-xs-" + xs_val +
+           " col-sm-" + field.display_size.to_s +
+           " col-lg-" + field.display_size.to_s
+
+    return size
+  end
+
+
+  def group_by_column_size_and_nested_fields(fields:)
+
+    arr_group_by_column_size = []
+    arr_temp = []
+    column_size = 0
+
+    fields.each do |field|
+
+      # make new row when column size exceed 12
+      if field.display_size + column_size > 12
+        column_size = 0
+        arr_group_by_column_size << arr_temp
+        arr_temp = []
+      end
+
+      # add field in the row
+      column_size += field.display_size
+      arr_temp << field
+
+      # make new row when there is nested_fields
+      if field.nested_fields.present?
+        column_size = 0
+        arr_group_by_column_size << arr_temp
+        arr_temp = []
+      end
+
+    end
+
+    arr_group_by_column_size << arr_temp
+
+    arr_group_by_column_size
+  end
 
 
   def image_spitter(value)
@@ -431,5 +506,122 @@ module ApplicationHelper
     else
       obj_class.name.downcase.pluralize
     end
+  end
+
+  # IOSA checklist parsing helper
+  def parse_iosa(child, result)
+    case child.name
+    when 'text'
+      result = parse_iosa_text(child, result)
+    when 'Emphasis'
+      result = parse_iosa_emphasis(child, result)
+    when 'nbsp'
+      # add new space?
+    when 'List'
+      result = parse_iosa_list(child, result)
+    when 'Para'
+      result = parse_iosa_para(child, result)
+    end
+
+    return result
+  end
+
+  def parse_iosa_para(element, result)
+    element.children.each do |child|
+      case child.name
+      when 'text', 'XRef'
+        result = parse_iosa_text(child, result) if child.text != '\n'
+      when 'List'
+        result = parse_iosa_list(child, result)
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_text(element, result)
+    result += element.text
+  end
+
+  def parse_iosa_emphasis(element, result)
+    result += "<b>" + element.children[0].text + "</b>"
+  end
+
+  def parse_iosa_list(element, result)
+    list_type = element.attributes["type"].value
+
+    case list_type
+    when 'lower-roman'
+      element.children.each do |item|
+        result = parse_iosa_list_item_roman(item, result)
+      end
+    when 'alphabetical'
+      element.children.each do |item|
+        result = parse_iosa_list_item_alphabet(item, result)
+      end
+    when 'bullet'
+      element.children.each do |item|
+        result = parse_iosa_list_item_bullet(item, result)
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_roman(element, result)
+    case element.name
+    when 'ListItem'
+      if element.children.length == 1
+
+        result += "<br>" if $lower_roman[$index_roman] == 'i'
+
+        result += "&nbsp;&nbsp;" + $lower_roman[$index_roman] + '.&nbsp;&nbsp;' + element.text.to_s + '<br>'
+        $index_roman += 1
+      else
+        temp_str = ''
+
+        element.children.each do |child|
+          case child.name
+          when 'text'
+            temp_str = parse_iosa_text(child, temp_str)
+          when 'Emphasis'
+            temp_str = parse_iosa_emphasis(child, temp_str)
+          when 'List'
+            temp_str = parse_iosa_list(child, temp_str)
+          end
+        end
+
+        result += "&nbsp;&nbsp;" + $lower_roman[$index_roman] + '.&nbsp;&nbsp;' + temp_str + '<br>'
+        $index_roman += 1
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_alphabet(element, result)
+    case element.name
+    when 'List'
+      # result = parse_iosa_list(element, result)
+    when 'ListItem'
+      result += "&nbsp;&nbsp;&nbsp;&nbsp;" + $alphabetical[$index_alphabet] + '.&nbsp;&nbsp;' + element.text.to_s + '<br>'
+      $index_alphabet += 1
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_bullet(element, result)
+    case element.name
+    when 'ListItem'
+      result += "&nbsp;&nbsp;" + "- " + element.text.to_s + '<br>'
+    end
+
+    return result
+  end
+
+
+  def strip_html_tag(text)
+    text.gsub(/<\/?[^>]+>/, '') rescue text
   end
 end

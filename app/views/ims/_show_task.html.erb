@@ -22,6 +22,20 @@
                       :fields => fields,
                       :record => task
                     %>
+
+
+                    <div class='col-xs-12'>
+                      <%if !['Pending Approval', 'Completed'].include? owner.status%>
+                        <%=link_to 'Edit', '#', class: 'edit-task-btn btn btn-warning pull-right mr5',
+                          'data-path' => edit_sms_task_path(task),
+                          'data-toggle' => 'modal',
+                          'data-target' => '.bs-example-modal-lg'%>
+                        <%=link_to 'Delete', sms_task_path(task),
+                          method: 'delete', confirm: 'Are you sure?',
+                          class: 'btn btn-danger pull-right mr5'%>
+                      <%end%>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -32,4 +46,14 @@
     </div>
   </div>
 <%end%>
+
+
+<script>
+  $('.edit-task-btn').on('click', function(){
+    $.get($(this).data('path'), function(data){
+      $('.modal-content').html(data);
+      $(window).trigger('reszie');
+    });
+  });
+</script>
 

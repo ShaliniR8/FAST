@@ -4,12 +4,12 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
 
-<div class="col-xs-12">  
+<div class="col-xs-12">
 	<div class="table-responsive">
 		<table class="table table-bordered table-striped" id="dt">
 			<thead>
 				<tr>
-					<%@action_headers.each do |header|%>
+					<%CorrectiveAction.get_meta_fields('index').each do |header|%>
 						<th class="<%=header[:size]%>">
 							<%=header[:title]%>
 						</th>
@@ -20,19 +20,21 @@
 			<tbody>
 				<%@corrective_actions.each do |c|%>
 					<tr class="atr" action="<%=corrective_action_path(c)%>">
-						<%@action_headers.each do |h|%>
+						<%CorrectiveAction.get_meta_fields('index').each do |h|%>
 							<td>
 								<%if h[:type] == 'user'%>
 									<%=User.find(c.send(h[:field])).full_name rescue ''%>
+                <%elsif h[:type] == 'date'%>
+                  <%=date_to_string(c.send(h[:field]))%>
 								<%else%>
 									<%=c.send(h[:field])%>
-								<%end%>		
+								<%end%>
 							</td>
 						<%end%>
 						<td>
-							<%=link_to 'View', 
+							<%=link_to 'View',
 								corrective_action_path(c),
-								:disable_with => 'Redirecting...', 
+								:disable_with => 'Redirecting...',
 								:class => 'btn btn-info'%>
 						</td>
 					</tr>
@@ -60,9 +62,9 @@
 							.on( 'keyup change input', function(){
 								if(column.search() !== this.value){
 									column.search( this.value ).draw();
-								} 
+								}
 							});
- 
+
 						column.data().unique().sort().each( function ( d, j ) {
 							if(d!="" && d!=undefined){
 								$('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
@@ -77,6 +79,6 @@
 
 <style>
 	tfoot {
-		display: table-header-group; 
+		display: table-header-group;
 	}
 </style>

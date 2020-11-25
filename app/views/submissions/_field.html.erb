@@ -1,11 +1,4 @@
-<%xs_val = field.display_size.to_s%>
-<%if xs_val.to_i < 6 %>
-  <%xs_val = "6"%>
-<%end%>
-<%size = "col-md-" + field.display_size.to_s +
-  " col-xs-" + xs_val + " col-sm-" +
-  field.display_size.to_s + " col-lg-" +
-  field.display_size.to_s%>
+<%size = is_nested_field ? 'col-xs-12' : calculate_column_size(field: field)%>
 
 <div class="<%=size%> form-group">
 
@@ -31,13 +24,16 @@
           {:class => required + " " + field_class + " " + field.element_class,
           :placeholder => field.label,
           :id=>field.element_id}%>
-
       <%elsif field.display_type == "textarea"%>
         <%=rf.text_area :value,
           {:class => required + " form-control " + field.element_class,
           :rows => 4,
+          :maxlength => field.max_length,
+          :placeholder => field.max_length.present? ? "please limit to #{field.max_length} characters" : '',
           :id => field.element_id}%>
-
+        <% if field.max_length.present? %>
+          <h6 id="countchar" class="pull-right">0/<%= field.max_length %></h6>
+        <% end %>
       <%elsif field.display_type == "dropdown"%>
         <%if field.data_type == "timezone"%>
           <div class="input-group">
@@ -58,7 +54,7 @@
               { :class => 'form-control'+" "+field.element_class, :id => field.element_id}%>
           <%else%>
             <%=rf.select :value,
-              options_for_select(field.getOptions),
+              options_for_select(field.getOptions.map { |option| [option, {'data-option' => option.parameterize}]}),
               {:include_blank => ""},
               {"data-id" => field.id,
               :class => required + ' field_select form-control ' + field.element_class,
@@ -66,8 +62,7 @@
           <%end%>
         <%end%>
       <%elsif field.display_type == "checkbox"%>
-        </br>
-        <div class="<%=field.display_size == 12 && field.show_label ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">
@@ -82,7 +77,7 @@
           </div>
         </div>
       <%elsif field.display_type == "radio"%>
-        <div  class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> <%=field.show_label ? 'mt5' : ''%>">
+        <div  class="<%=field.display_size == 12%> <%=field.show_label ? 'mt5' : ''%>">
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">
@@ -174,7 +169,7 @@
           </div>
         <%else%>
           <%=rf.select :value,
-            field.getOptions,
+            field.getOptions.map { |option| [option, {'data-option' => option.parameterize}] },
             {:include_blank => ""},
             {:class => 'field_select form-control ' + required + " " + field.element_class,
             :selected => @record_field.value,
@@ -183,7 +178,7 @@
         <%end%>
       <%elsif field.display_type == "checkbox"%>
         </br>
-        <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">
           <%current_options = @record_field.value.split(";") rescue ''%>
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
@@ -206,7 +201,7 @@
 
       <!-- Render Radio button groups -->
       <%elsif field.display_type == "radio"%>
-        <div class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">  <div class="col-xs-12">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">  <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <label class="radio">
                 <div class="col-xs-6">

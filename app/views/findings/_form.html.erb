@@ -29,12 +29,14 @@
             <%if action_name == 'new'%>
               <%=hidden_field_tag :owner_type, params[:owner_type]%>
               <%=hidden_field_tag :owner_id,  params[:owner_id]%>
+              <%=f.hidden_field :parent_type, :value => @parent_type%>
+              <%=f.hidden_field :parent_id,   :value => @parent_id%>
             <%end%>
 
             <%=render "/shared/privilege_form", :target => "finding[privileges][]", :owner => @owner, :f => f%>
             <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
 
-            <%=render "shared/choose_form_matrix", :f => f, :type => 'findings'%>
+            <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', f: f, risk_type: 'Baseline'%>
 
             <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
 
@@ -43,7 +45,7 @@
                 :class => "btn btn-success pull-right mt5",
                 :disable_with => "Saving..."%>
               <%=link_to "Cancel",
-                action_name == 'new' ? @parent : @owner.becomes(Finding),
+                action_name == 'new' ? @parent_old : @owner.becomes(Finding),
                 :class => "btn btn-warning pull-right mt5 mr5",
                 :confirm => 'Are you sure?'%>
               <%=link_to "Group Access",

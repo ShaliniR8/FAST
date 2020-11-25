@@ -1,5 +1,5 @@
 class Meeting < ProsafetBase
-
+  extend AnalyticsFilters
   include ModelHelpers
 
 #Concerns List
@@ -17,7 +17,7 @@ class Meeting < ProsafetBase
 
   accepts_nested_attributes_for :invitations
   accepts_nested_attributes_for :host
-  accepts_nested_attributes_for :agendas
+  accepts_nested_attributes_for :agendas, allow_destroy: true
   accepts_nested_attributes_for :reports
 
   before_create :init_status
@@ -37,6 +37,7 @@ class Meeting < ProsafetBase
       {field: 'id',               title: 'ID',                num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
       {field: 'status',           title: 'Status',            num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
       {field: 'get_host',         title: 'Host',              num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
+      {field: 'meeting_type',     title: 'Meeting Type',      num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: ['ASAP', 'non-ASAP']},
       {field: 'title',            title: 'Title',             num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: CONFIG.custom_options['Meeting Titles']},
       {                                                                     type: 'newline',    visible: 'form,show'},
       {field: 'review_start',     title: 'Review Start',      num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
@@ -99,8 +100,10 @@ class Meeting < ProsafetBase
 
 
   def has_user(user)
-    if self.host.present?
-      self.host.users_id == user.id || self.invited?(user)
+    if user.global_admin?
+      true
+    elsif self.host.present? && (self.host.users_id == user.id)
+      true
     else
       self.invited?(user)
     end
@@ -110,7 +113,7 @@ class Meeting < ProsafetBase
   def invited?(user)
     result = false
     self.invitations.each do |f|
-      result = result || (f.users_id==user.id && f.status == "Accepted")
+      result = result || f.users_id == user.id
     end
     result
   end
@@ -122,7 +125,9 @@ class Meeting < ProsafetBase
 
 
   def get_tooltip
-    "Review Period is " + self.get_time("review_start") + " to "+self.get_time("review_end")
+    "<b>Meeting Title</b>: #{title} <br>" +
+    "<b>Meeting Period</b>: #{get_time('meeting_start')} - #{get_time('meeting_end')}<br>" +
+    "<b>Review Period</b>: #{get_time('review_start')} - #{get_time('review_end')}"
   end
 
 
@@ -137,14 +142,7 @@ class Meeting < ProsafetBase
 
 
   def self.get_timezones
-    ["Z","NZDT","IDLE","NZST","NZT","AESST","ACSST","CADT","SADT","AEST","CHST","EAST","GST",
-     "LIGT","SAST","CAST","AWSST","JST","KST","MHT","WDT","MT","AWST","CCT","WADT","WST",
-     "JT","ALMST","WAST","CXT","MMT","ALMT","MAWT","IOT","MVT","TFT","AFT","MUT","RET",
-     "SCT","IRT","IT","EAT","BT","EETDST","HMT","BDST","CEST","CETDST","EET","FWT","IST",
-     "MEST","METDST","SST","BST","CET","DNT","FST","MET","MEWT","MEZ","NOR","SET","SWT",
-     "WETDST","GMT","UT","UTC","ZULU","WET","WAT","FNST","FNT","BRST","NDT","ADT","AWT",
-     "BRT","NFT:NST","AST","ACST","EDT","ACT","CDT","EST","CST","MDT","MST","PDT","AKDT",
-     "PST","YDT","AKST","HDT","YST","MART","AHST","HST","CAT","NT","IDLW"]
+    ActiveSupport::TimeZone.all.map(&:name)
   end
 
 
@@ -191,7 +189,7 @@ class Meeting < ProsafetBase
 
 
   def get_time(field)
-    self.send(field).in_time_zone(CONFIG::GENERAL[:time_zone]).strftime("%Y-%m-%d %H:%M:%S") rescue ''
+    self.send(field).in_time_zone(CONFIG::GENERAL[:time_zone]).strftime(CONFIG.getTimeFormat[:datetimeformat]) rescue ''
   end
 
 
@@ -203,10 +201,10 @@ class Meeting < ProsafetBase
   def self.getMessageOptions
     {
       "All Invitees"=>"All",
-      "All Participants (Exclude Rejected Invitations)"=>"Par",
-      "Accepted Invitees"=>"Acp",
-      "Pending Invitees"=>"Pen",
-      "Rejected Invitees"=>"Rej"
+      # "All Participants (Exclude Rejected Invitations)"=>"Par",
+      # "Accepted Invitees"=>"Acp",
+      # "Pending Invitees"=>"Pen",
+      # "Rejected Invitees"=>"Rej"
     }
   end
 

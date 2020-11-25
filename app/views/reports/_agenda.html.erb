@@ -14,21 +14,33 @@
                   <th><%=h[:title]%></th>
                 <%end%>
                 <th>Comment</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="agendas">
-              <%@report.agendas.where(owner_id: @meeting.id).each do |a|%>
+              <%@agendas.each do |a|%>
                 <%if a.user_id==current_user.id%>
                   <%=f.fields_for :agendas,a do |x|%>
-                    <tr>
+                    <tr id="agends_<%= a.id %>">
                       <td><%=x.text_field :title,:class=>"form-control"%></td>
                       <td><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
                       <td><%=a.get_user%></td>
                       <td><%=a.get_created%></td>
                       <td><%=a.get_updated%></td>
                       <td><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
-                      <td><%=x.select :accepted,options_for_select(@accept_deline,a.accepted),{:include_blank=>""},:class=>"form-control"%></td>
+
+                      <td>
+                        <%=x.select :accepted,
+                          CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ?
+                            CONFIG.custom_options['Dispositions'] :
+                            options_for_select(@accept_deline,a.accepted),
+                          {:include_blank=>""},
+                          :class => "form-control"%>
+                      </td>
+
                       <td><%=x.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
+                      <td><button type="button" class="close close_btn" aria-label="Close"><i class="mt5 glyphicon glyphicon-remove close_icon"></i></button></td>
+                       <%= x.hidden_field(:_destroy) %>
                     </tr>
                   <%end%>
                 <%else%>
@@ -41,6 +53,7 @@
                     <td><%=a.discussion ? "Yes" : "No"%></td>
                     <td><%=a.accepted ? "Accepted" : "Declined"%></td>
                     <td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
+                    <td></td>
                   </tr>
                 <%end%>
               <%end%>
@@ -56,3 +69,46 @@
     </div>
   </div>
 </div>
+
+<style>
+  .close_btn {
+    color: red;
+    font-size: 23px;
+  }
+
+  .close_icon {
+    top: 10px;
+    right: 10px;
+  }
+
+  .removed {
+    opacity: 0.4;
+  }
+</style>
+
+<script type="text/javascript">
+  document.querySelectorAll('.close_btn').forEach( close_btn => {
+    close_btn.addEventListener("click", function(event) {
+      const row = event.srcElement.closest("tr")
+      let result = row.classList.toggle("removed");
+
+      if (result) {
+        row.classList.add('removed')
+        row.querySelectorAll(".form-control").forEach( input_field => {
+          input_field.disabled = true
+        })
+      } else {
+        row.classList.remove('removed')
+        row.querySelectorAll(".form-control").forEach( input_field => {
+          input_field.disabled = false
+        })
+      }
+    });
+  })
+
+  document.querySelector('form').addEventListener('submit', function() {
+    document.querySelectorAll('.removed').forEach( element => {
+      element.querySelector("[type='hidden']").value = true
+    })
+  })
+</script>

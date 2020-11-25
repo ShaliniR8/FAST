@@ -32,9 +32,25 @@ class NAMSConfig < DefaultConfig
 
 
   MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Baseline Risk',
+      mitigate_btn: 'Mitigate Risk',
+      'Baseline' => 'Baseline',
+      'Mitigate' => 'Mitigated'
+    },
+
     severity_table: {
-      starting_space: true,
+      title: 'SEVERITY EXERCISE',
+      orientation: :horizontal,
+      direction: :left,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV'],
+      row_header_name: 'CLASS',
       row_header: [
         'Accident or Incident',
         'Employee or Customer Injury',
@@ -106,7 +122,16 @@ class NAMSConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+      row_header_name: 'PROBABILITY',
+      column_header_name: 'CRITERIA',
       row_header: ['A', 'B', 'C', 'D'],
       column_header: ['Audit Findings', 'Events'],
 
@@ -138,10 +163,24 @@ class NAMSConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
+      title: 'RISK ASSESSMENT MATRIX',
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+      cell_style: 'bold',
+
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'column',
+      likelihood_pos: 'row',
+
+      row_header_name: 'PROBABILITY',
+      row_header: ['4', '3', '2', '1', '0'],
+      column_header_name: 'SEVERITY',
       column_header: ['I','II','III','IV'],
       row_header: ['A', 'B', 'C', 'D'],
-      rows: [
+      rows_color: [
         ['crimson',     'crimson',          'coral',              'yellow'              ],
         ['crimson',     'coral',            'yellow',             'mediumseagreen'    ],
         ['coral',       'yellow',           'yellow',             'mediumseagreen'    ],

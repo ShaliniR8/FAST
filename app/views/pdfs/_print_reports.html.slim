@@ -1,0 +1,11 @@
+- if defined?(report) && report.present?
+  = render '/pdfs/print_report', deidentified: deidentified, owner: report
+-elsif owner.class.method_defined?(:reports) || owner.respond_to?(:reports)
+  - if owner.reports.present?
+    - skip_meetings = false
+    .col-xs-12
+      - if owner.class.name == 'Meeting'
+        - skip_meetings = true
+        .title Included Events:
+      - owner.reports.each do |report|
+          = render '/pdfs/print_report', deidentified: deidentified, owner: report, skip_meetings: skip_meetings

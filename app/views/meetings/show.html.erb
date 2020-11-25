@@ -82,14 +82,19 @@
                   :confirm => "Are you sure?",
                   :disable_with => "Reopening..."%>
               <%end%>
+              <%if CONFIG::GENERAL[:cisp_integration]%>
+                <%=link_to "Send CISP Events",
+                  "#",
+                  :class => "btn btn-info mb5 pull-right mr5",
+                  :id => "send_cisp_btn",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg"%>
+              <%end%>
             <%end%>
           </div>
         </div>
 
         <div class="col-xs-12">
-          <%if @current_inv.present?%>
-            <%=render "invitation_form"%>
-          <%end%>
 
           <div class="panel panel-lightskyblue">
             <div class="panel-heading">
@@ -132,7 +137,7 @@
                     "data-target" => ".bs-example-modal-lg"%>
                 <%end%>
               </div>
-              <%=render "invite"%>
+              <%=render "invite", hide_btns:true%>
             </div>
           </div>
         </div>
@@ -165,6 +170,12 @@
     });
     $("#new_report_btn").on("click",function(){
       $.get("<%=get_reports_meeting_path(@meeting)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#send_cisp_btn").on("click",function(){
+      $.get("<%=get_cisp_reports_meeting_path(@meeting)%>",function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

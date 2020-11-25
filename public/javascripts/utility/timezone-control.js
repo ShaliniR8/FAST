@@ -3,7 +3,7 @@ $(document).ready(function(){
 		timezone=$(this).closest(".input-group").find(".tz");
 		if (timezone.hasClass("atz"))
 		{
-			ustimezone=["EDT","CDT","EST","CST","MDT","MST","PDT","PST","AKDT","AKST"]
+			ustimezone=["Hawaii", "Alaska", "Pacific Time (US & Canada)", "Arizona", "Mountain Time (US & Canada)", "Central Time (US & Canada)", "Eastern Time (US & Canada)", "Indiana (East)"]
 			timezone.removeClass("atz");
 			timezone.addClass("ustz");
 			timezone.val('');

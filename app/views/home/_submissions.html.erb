@@ -24,7 +24,8 @@
       height:450,
       colors:['blue'],
       bars: 'horizontal' ,
-      chartArea: {left:250}// Required for Material Bar Charts.
+      isStacked: true,
+      chartArea: {left: 400}// Required for Material Bar Charts.
     };
     var subs_chart = new google.visualization.BarChart(document.getElementById('subs'));
     google.visualization.events.addListener(subs_chart, 'onmouseover', cursor_pointer);
@@ -36,14 +37,14 @@
     subs_chart.draw(subs_data, subs_options);
     google.visualization.events.addListener(subs_chart, 'select', function(){
       var all_status=<%=raw @submissions.keys%>
-      var root_url="<%=submissions_path%>?template=";
+      var root_url="<%=submissions_path%>?status=All&advance_search=true&searchterm_1=get_template&field_1=";
       var dateParams = params ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       var selection = subs_chart.getSelection();
       var message = "";
       var row = selection[0].row + 1;
       var submissionType = data[row][0];
-      message= root_url + submissionType + dateParams;
-      window.location=message;
+      message = root_url + submissionType + dateParams;
+      window.location = message;
     });
   }
 

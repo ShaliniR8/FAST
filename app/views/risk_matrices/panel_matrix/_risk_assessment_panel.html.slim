@@ -1,0 +1,67 @@
+.col-xs-12.col-lg-12
+  .panel.panel-lightskyblue
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b = "Risk Assessment"
+        span.pull-right.clickable
+          i.mt5.glyphicon.glyphicon-chevron-down
+
+    .panel-body style="display:none"
+
+      .col-xs-12
+        / Baseline, Migate Risk btns, Notes
+        - if risk_type == 'All'
+          / risk assessment btns
+          - hide_buttons = false
+          - hide_buttons = hide_btns if defined?(hide_btns)
+          - btns = ['Pending Approval', 'Completed', 'Rejected', 'Closed']
+          - if !hide_buttons && !btns.include?(@owner.status)
+            = link_to CONFIG::MATRIX_INFO[:terminology][:mitigate_btn], '#',
+              class: 'btn btn-warning pull-right ml5 assess-risk-btn',
+              id: 'mitigate_btn',
+              title: 'Assess Mitigated Risk',
+              'data-path' => eval("mitigate_#{@owner.class.name.underscore}_path(@owner)")
+
+            = link_to CONFIG::MATRIX_INFO[:terminology][:baseline_btn], '#',
+              class: 'btn btn-info pull-right assess-risk-btn',
+              id: 'baseline_btn',
+              title: 'Assess Baseline Risk',
+              'data-path' => eval("baseline_#{@owner.class.name.underscore}_path(@owner)")
+          .col-xs-12.mt10.risk-matrix-content
+            = render 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+        - else
+          = render 'risk_matrices/panel_matrix/form_matrix/form_matrix', f: f, risk_type: @risk_type
+          = render 'risk_matrices/panel_matrix/risk_matrix_js', risk_type: @risk_type
+
+
+
+
+
+javascript:
+  $(function() {
+
+    var loader_partial = "#{escape_javascript(render partial: 'shared/loader')}";
+
+    $(document).on('click', '.assess-risk-btn', function(e) {
+      console.log('assess-risk-btn clicked!');
+      e.preventDefault();
+      var content_area = $(this).closest('.panel-body').find('.risk-matrix-content');
+      console.log(content_area);
+      $.ajax({
+        url: $(this).data('path'),
+        type: 'GET',
+        beforeSend: function() {
+          $(content_area).html(loader_partial);
+          $(content_area).find('.loader').show();
+        },
+        success: function(data) {
+          $(content_area).find('.loader').remove();
+          $(content_area).html(data);
+        },
+        error: function(error) {
+          console.log('error: ' + error);
+        }
+      });
+    });
+
+  });

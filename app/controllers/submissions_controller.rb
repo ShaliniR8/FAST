@@ -45,46 +45,63 @@ class SubmissionsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @table = Object.const_get('Submission').preload(CONFIG.hierarchy[session[:mode]][:objects]['Submission'][:preload])
-        index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
-          args << 'admin' if current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name]
-          args
-        end
-        @headers = @table.get_meta_fields(*index_meta_field_args)
-        @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{
-          |x|
-          Rails.logger.info x[:field]
-          x[:field].present?
-        }
-        handle_search
+        object_name = controller_name.classify
+        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+        @table = Object.const_get(object_name).preload(@object[:preload]).where("completed is true")
+        @default_tab = params[:status]
 
-        @categories = Category.all
-        @fields = Field.all
-        @templates = Template.all
+        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+        handle_search if params[:advance_search].present?
+        records = @records.to_a & records.to_a if @records.present?
 
-        records = @records
-          .where(:completed => 1)
-          .preload(:template, :created_by)
-          .can_be_accessed(current_user)
-
-        @records = @records.to_a & records.to_a
-        records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
-        @records = @records.to_a & records.to_a
-
-        if params[:template]
-          records = @records.select{|x| x.template.name == params[:template]}
-        end
-        @records = @records.to_a & records.to_a
-
-        # handle custom view
-        if params[:custom_view].present?
-          selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
-          @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
-          @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
-        end
+        @records_hash = { 'All' => records }
+        @records_id   = { 'All' => records.map(&:id) }
       end
       format.json { index_as_json }
     end
+
+    # respond_to do |format|
+    #   format.html do
+    #     @table = Object.const_get('Submission').preload(CONFIG.hierarchy[session[:mode]][:objects]['Submission'][:preload])
+    #     index_meta_field_args, show_meta_field_args = [['index'], ['show']].map do |args|
+    #       args << 'admin' if current_user.global_admin? || CONFIG.sr::GENERAL[:show_submitter_name]
+    #       args
+    #     end
+    #     @headers = @table.get_meta_fields(*index_meta_field_args)
+    #     @terms = @table.get_meta_fields(*show_meta_field_args).keep_if{
+    #       |x|
+    #       Rails.logger.info x[:field]
+    #       x[:field].present?
+    #     }
+    #     handle_search
+
+    #     # @categories = Category.all
+    #     # @fields = Field.all
+    #     # @templates = Template.all
+
+    #     # records = @records
+    #     #   .where(:completed => 1)
+    #     #   .preload(:template, :created_by)
+    #     #   .can_be_accessed(current_user)
+
+    #     # @records = @records.to_a & records.to_a
+    #     # records = records.filter_array_by_timerange(@records, params[:start_date], params[:end_date])
+    #     # @records = @records.to_a & records.to_a
+
+    #     # if params[:template]
+    #     #   records = @records.select{|x| x.template.name == params[:template]}
+    #     # end
+    #     # @records = @records.to_a & records.to_a
+
+    #     # # handle custom view
+    #     # if params[:custom_view].present?
+    #     #   selected_attributes = params[:selected_attributes].present? ? params[:selected_attributes] : []
+    #     #   @headers = @headers.select{ |header| selected_attributes.include? header[:title] }
+    #     #   @headers += format_header(params[:selected_fields]) if params[:selected_fields].present?
+    #     # end
+    #   end
+    #   format.json { index_as_json }
+    # end
   end
 
 
@@ -174,7 +191,7 @@ class SubmissionsController < ApplicationController
   def destroy
     @record=Submission.find(params[:id])
     @record.destroy
-    redirect_to submissions_path, flash: {danger: "Submission ##{params[:id]} deleted."}
+    redirect_to submissions_path(status: 'All'), flash: {danger: "Submission ##{params[:id]} deleted."}
   end
 
 
@@ -185,6 +202,11 @@ class SubmissionsController < ApplicationController
         field[:value] = field[:value].join(";")
       end
     end
+
+    # edge case for the mobile app
+    # if the user submits a new submission in offline mode,
+    # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
+    params[:commit] = 'Submit' if params[:commit] != 'Save for Later'
 
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
@@ -214,6 +236,8 @@ class SubmissionsController < ApplicationController
         end
       end
     end
+
+    event_date_to_utc
 
     @record = Submission.new(params[:submission])
 
@@ -294,8 +318,19 @@ class SubmissionsController < ApplicationController
     @record = Submission.find(params[:id])
     @meta_field_args = ['show']
     @meta_field_args << 'admin' if current_user.global_admin?
-    html = render_to_string(:template => "/submissions/print.html.erb")
-    pdf = PDFKit.new(html)
+    html = render_to_string(:template => "/pdfs/print_submission.html.erb")
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Submission_##{@record.get_id}" + (@deidentified ? '(de-identified)' : '')
@@ -336,11 +371,17 @@ class SubmissionsController < ApplicationController
 
     @record = Submission.find(params[:id])
 
+    # edge case for the mobile app
+    # if the user submits an existing in progress submission in offline mode,
+    # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
+    params[:commit] = 'Submit' if !@record.completed? && params[:commit] != 'Save for Later'
+
     if params[:commit] != 'Add Notes'
       params[:submission][:completed] = params[:commit] != 'Save for Later'
       params[:submission][:anonymous] = params[:anonymous] == '1'
     end
 
+    event_date_to_utc
 
     if @record.update_attributes(params[:submission])
       notify_notifiers(@record, params[:commit])
@@ -363,7 +404,7 @@ class SubmissionsController < ApplicationController
           notify_notifiers(converted, params[:commit])
         end
         respond_to do |format|
-          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added' : 'Submission submitted.' }
+          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
           format.html { redirect_to submission_path(@record), flash: flash }
           format.json { update_as_json(flash) }
         end
@@ -457,8 +498,18 @@ class SubmissionsController < ApplicationController
 
   private
 
-    def notify_notifiers(owner, commit)
+    def event_date_to_utc
+      # Store event_date as UTC
+      date_time = params[:submission]["event_date"]
 
+      if CONFIG.sr::GENERAL[:submission_time_zone] && date_time.present?
+        time_zone = params[:submission]["event_time_zone"]
+        utc_time  = convert_to_utc(date_time: date_time, time_zone: time_zone)
+        params[:submission]["event_date"] = utc_time
+      end
+    end
+
+    def notify_notifiers(owner, commit)
       mailer_privileges = AccessControl.where(
         :action => 'notifier',
         :entry => owner.template.name)
@@ -469,13 +520,13 @@ class SubmissionsController < ApplicationController
 
       case commit
       when "Submit"
-        notifiers.each do |user|
-          notify(owner, notice: {
-            users_id: user.id,
-            content: "A new #{owner.template.name} submission is submitted. (##{owner.id} #{owner.description})",},
-            mailer: true, subject: "New #{owner.template.name} Submission"
-          )
-        end
+
+        call_rake 'submission_notify',
+            owner_type: owner.class.name,
+            owner_id: owner.id,
+            users: notifiers.map(&:id),
+            attach_pdf: CONFIG.sr::GENERAL[:attach_pdf_submission]
+
       when "Save for Later"
         notify(owner, notice: {
           users_id: owner.created_by.id,

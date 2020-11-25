@@ -17,6 +17,8 @@ class Inspection < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to :approver,             foreign_key: 'approver_id',         class_name: 'User'
@@ -88,6 +90,4 @@ class Inspection < Sa::SafetyAssuranceBase
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       self.items.all?{ |x| x.status == 'Completed' }
   end
-
-
 end

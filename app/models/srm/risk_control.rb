@@ -11,6 +11,8 @@ class RiskControl < Srm::SafetyRiskManagementBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
   belongs_to  :created_by,        foreign_key: "created_by_id",         class_name: "User"
   belongs_to  :approver,          foreign_key: 'approver_id',           class_name: 'User'
@@ -46,19 +48,5 @@ class RiskControl < Srm::SafetyRiskManagementBase
   def type
     "RiskControl"
   end
-
-
-  def self.get_avg_complete
-    candidates=self.where("status=? and date_complete is not ? and date_open is not ?","Completed",nil,nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.date_complete-x.date_open).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
 
 end

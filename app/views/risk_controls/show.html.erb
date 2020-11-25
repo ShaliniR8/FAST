@@ -38,6 +38,10 @@
 
 <script>
   $(document).ready(function(){
+    $(".modal").on("hidden.bs.modal", function(){
+      $(".modal-content").html("");
+    });
+
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_risk_control_path(@risk_control)%>",function(data){
         $(".modal-content").html(data);

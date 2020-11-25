@@ -17,6 +17,8 @@ class Evaluation < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to  :approver,          foreign_key: 'approver_id',             class_name: 'User'
@@ -84,7 +86,6 @@ class Evaluation < Sa::SafetyAssuranceBase
   def get_completion_date
     self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
-
 
   def type
     "Inspection"

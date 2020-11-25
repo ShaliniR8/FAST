@@ -16,6 +16,8 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 
 class QueriesController < ApplicationController
+  include QueriesHelper
+
   before_filter :login_required
   before_filter :set_table
   before_filter :load_options, :only => [:edit, :new, :index]
@@ -105,6 +107,33 @@ class QueriesController < ApplicationController
     render :partial => "building_query"
   end
 
+  def display_chart_result
+    header = 0
+    result_all_ids_str = params[:data_ids].gsub("&quot\;", "\'")
+    result_all_ids = ActiveSupport::JSON.decode(result_all_ids_str)
+
+    params[:row] = params[:row].to_i + 1 if result_all_ids[1][0].empty? # first row is for empty records
+
+    if result_all_ids[header][1] == 'IDs' # when series not present
+      @results_ids = result_all_ids[params[:row].to_i][1]
+    else
+      @results_ids = result_all_ids[params[:row].to_i][params[:col].to_i]
+    end
+
+    x_axis_value = result_all_ids[params[:row].to_i][0]
+    serise_value = result_all_ids[header][params[:col].to_i] unless result_all_ids[header][1] == 'IDs'
+
+    @title = serise_value.present? ? "#{x_axis_value} & #{serise_value}" : x_axis_value
+
+    @owner = Query.find(params[:id])
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
+    @records = @results_ids.map do |result_id|
+      @object_type.find(result_id)
+    end
+  end
+
 
   # add visualization box to query
   def add_visualization
@@ -147,54 +176,30 @@ class QueriesController < ApplicationController
     @records = @object_type.where(id: params[:records].split(','))
     # find x_axis field name
     @x_axis_field = get_field(@owner, @object_type, params[:x_axis])
+
     if params[:series].present? # if series present, build data from both values
       title = "#{params[:x_axis]} By #{params[:series]}"
       # find series field name
       @series_field = get_field(@owner, @object_type, params[:series])
-      # build array of hash to stores values for x_axis and series
-      arr = create_hash_array(@records, @x_axis_field, @series_field)
-      # create a hash to store the occurences of each element
-      data_hash = Hash.new
-      arr.each do |record|
-        x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
-        series = record[:series].blank? ? 'N/A' : record[:series]
 
-        if x_axis.is_a?(Array) && series.is_a?(Array)
-          x_axis.each do |x|
-            series.each do |y|
-              populate_hash(data_hash, x, y)
-            end
-          end
-        elsif x_axis.is_a?(Array)
-          x_axis.each do |x|
-            populate_hash(data_hash, x, series)
-          end
-        elsif series.is_a?(Array)
-          series.each do |y|
-            populate_hash(data_hash, x_axis, y)
-          end
-        else
-          populate_hash(data_hash, x_axis, series)
-        end
-      end
-      # get first row and first column values
-      series = data_hash.values.map(&:keys).flatten.uniq
-      x_axis = data_hash.keys
-      # creates final data array: 2-D array
-      row1 = [params[:x_axis]] << series.sort
-      @data = [row1.flatten]
-      x_axis.sort.each do |x|
-        @data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
-      end
+      @data = get_data_table_for_google_visualization_with_series(x_axis_field_arr: @x_axis_field,
+                                                                  series_field_arr: @series_field,
+                                                                  records: @records,
+                                                                  get_ids: false)
+
+      @data_ids = get_data_table_for_google_visualization_with_series(x_axis_field_arr: @x_axis_field,
+                                                                      series_field_arr: @series_field,
+                                                                      records: @records,
+                                                                      get_ids: true)
     else # when series not present, use default charts
-      @data = [[params[:x_axis], 'Count']]
-      @records.map{|record| get_val(record, @x_axis_field)}
-        .compact.flatten
-        .reject(&:blank?)
-        .inject(Hash.new(0)){|h, e| h[e] += 1; h}
-        .sort_by{|k,v| k}
-        .each{|pair| @data << pair}
-      @data.flatten
+      @data     = get_data_table_for_google_visualization(x_axis_field_arr: @x_axis_field, records: @records)
+      @data_ids = get_data_ids_table_for_google_visualization(x_axis_field_arr: @x_axis_field, records: @records)
+
+      # to draw empty charts for empty data
+      if @data.length == 1 && @data_ids.length == 1
+        @data << ['N/A', 0]
+        @data_ids << ['N/A', 0]
+      end
     end
     @options = { title: title || params[:x_axis] }
     @chart_types = QueryVisualization.chart_types
@@ -329,12 +334,16 @@ class QueriesController < ApplicationController
         case condition.logic
         when "Equals To"
           if field[:type] == 'checkbox'
+            results = records.select{|record| record.send(field[:field]).reject(&:empty?).join("").to_s == '' || record.send(field[:field]) == nil rescue true}
+          elsif field[:field_type] == 'checkbox'
             results = emit_helper(condition.value, records, field, false, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) == "" || record.send(field[:field]) == nil) rescue true}
           end
         when "Not Equal To"
           if field[:type] == 'checkbox'
+            results = records.select{|record| record.send(field[:field] && record.send(field[:field]).reject(&:empty?).join("").to_s != '') != nil rescue true}
+          elsif field[:field_type] == 'checkbox'
             results = emit_helper(condition.value, records, field, true, "equals", from_template)
           else
             results = records.select{|record| (record.send(field[:field]) != "" && record.send(field[:field]) != nil) rescue true}
@@ -430,13 +439,20 @@ class QueriesController < ApplicationController
 
 
   def emit_helper_basic(search_value, records, field, xor, logic_type)
+    field_type = field[:type] || field[:field_type]
     case logic_type
     when "equals"
-      case field[:type]
+      case field_type
       when 'boolean_box', 'boolean'
         return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
       when 'checkbox'
-        return records.select{|record| xor ^ (record.send(field[:field]).reject(&:empty?).join("").to_s.downcase == search_value.downcase)}
+        return records.select{ |record|
+          if record.send(field[:field]).is_a? Array
+            xor ^ (record.send(field[:field]).reject(&:empty?).join("").to_s.downcase.include? search_value.downcase)
+          else
+            xor ^ (record.send(field[:field]).split("\;").reject(&:empty?).join("").to_s.downcase.include? search_value.downcase)
+          end
+        }
       when 'user'
         if search_value.downcase == "Anonymous".downcase
           return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.downcase)}
@@ -452,7 +468,7 @@ class QueriesController < ApplicationController
         return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.to_s.downcase)}
       end
     when "contains"
-      case field[:type]
+      case field_type
       when 'boolean_box', 'boolean'
         return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
       when 'user'
@@ -466,7 +482,7 @@ class QueriesController < ApplicationController
         return records.select{|record| xor ^ ((record.send(field[:field]).to_s.downcase.include? search_value.downcase) rescue false)}
       end
     when "numeric"
-      case field[:type]
+      case field_type
       when 'date', 'datetime'
         dates = search_value.split("to")
         if dates.length > 1
@@ -522,84 +538,6 @@ class QueriesController < ApplicationController
       .select{|x| x.label == label}
       .first if field.nil?
     [field, field_label.split(',').map(&:strip)[1]]
-  end
-
-
-  # returns the formatted values of record's field
-  def get_val(record, field_arr)
-    field = field_arr[0]
-    if field.is_a?(Field)
-      field_type = field.display_type
-      if record.class == Submission
-        value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
-      elsif record.class == Record
-        value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
-      else
-        value = 'Something Went Wrong'
-      end
-    else
-      field_type = field[:type]
-      value = record.send(field[:field])
-    end
-    format_val(value, field_type, field_arr[1])
-  end
-
-
-  # helper for get_val: formats value based on field type
-  def format_val(value, field_type, field_param=nil)
-    case field_type
-    when 'user', 'employee'
-      User.find_by_id(value).full_name rescue 'N/A'
-    when 'datetime', 'date'
-      value.strftime("%Y-%m") rescue 'N/A'
-    when 'boolean_box', 'boolean'
-      (value ? 'Yes' : 'No') rescue 'No'
-    when 'checkbox'
-      value.split(';') rescue nil
-    when 'list'
-      value.split('<br>')
-    when 'category'
-      value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
-    else
-      value
-    end
-  end
-
-
-  # returns an array that stores x_axis and series value pairs
-  def create_hash_array(records, x_axis_field, series_field)
-    arr = records.inject([]) do |res, record|
-      x_val = get_val(record, x_axis_field)
-      y_val = get_val(record, series_field)
-      if x_val.is_a?(Array) && y_val.is_a?(Array)
-        x_val.each do |x|
-          y_val.each do |y|
-            res << {x_axis: x, series: y}
-          end
-        end
-      elsif x_val.is_a?(Array)
-        x_val.each{|x| res << {x_axis: x, series: y_val}}
-      elsif y_val.is_a?(Array)
-        y_val.each{|y| res << {x_axis: x_val, series: y}}
-      else
-        res << {x_axis: x_val, series: y_val}
-      end
-      res
-    end
-    arr
-  end
-
-
-  # return 2D hash of x_axis and series values
-  def populate_hash(data_hash, x_axis, series)
-    if data_hash[x_axis] && data_hash[x_axis][series]
-      data_hash[x_axis][series] += 1
-    elsif data_hash[x_axis]
-      data_hash[x_axis][series] = 1
-    else
-      data_hash[x_axis] = Hash.new
-      data_hash[x_axis][series] = 1
-    end
   end
 
 end

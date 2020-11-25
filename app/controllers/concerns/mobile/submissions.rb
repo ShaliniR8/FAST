@@ -53,11 +53,30 @@ module Concerns
         json[:recent_submissions] = submissions_as_json(recent_submissions.flatten)
 
         # Get timezone data for timezone fields
-        timezoneField = Field.where(data_type: 'timezone').first
-        json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
+        # timezoneField = Field.where(data_type: 'timezone').first
+        # json[:timezones] = { all: timezoneField.getOptions.sort, us: timezoneField.getOptions2.sort }
+        if CONFIG.sr::GENERAL[:submission_time_zone]
+          json[:timezones] = {
+            all: ActiveSupport::TimeZone.all.map(&:name),
+            us: [
+              "Hawaii",
+              "Alaska",
+              "Pacific Time (US & Canada)",
+              "Arizona", "Mountain Time (US & Canada)",
+              "Central Time (US & Canada)",
+              "Eastern Time (US & Canada)",
+              "Indiana (East)"]
+          }
+        else
+          json[:timezones] = {
+            all: ['UTC', 'Local'],
+            us: ['Local']
+          }
+        end
+
 
         # Get id map of all users
-        json[:users] = array_to_id_map User.all.as_json(only: [:id, :full_name, :email])
+        json[:users] = array_to_id_map User.active.as_json(only: [:id, :full_name, :email])
 
         render :json => json
       end
@@ -86,8 +105,9 @@ module Concerns
             },
             attachments: {
               only: [:id, :caption],
-              methods: :document_filename
-            }
+              methods: :url
+            },
+            comments: { only: [:id, :content, :created_at] }
           }
         ).map { |submission| format_submission_json(submission) }
 
@@ -103,6 +123,11 @@ module Concerns
         json[:submission_fields] = array_to_id_map json[:submission_fields], 'fields_id'
 
         # Attachments id map
+        json[:attachments].each do |attachment|
+          attachment[:uri] = "#{request.protocol}#{request.host_with_port}#{attachment[:url]}"
+          attachment.delete(:url)
+        end
+
         json[:attachments] = array_to_id_map json[:attachments]
 
         json

@@ -20,6 +20,12 @@ end
 
 class SrmMeetingsController < ApplicationController
   before_filter :set_table_name,:login_required
+  before_filter :define_owner, only: [:interpret]
+
+  def define_owner
+    @class = Object.const_get('Meeting')
+    @owner = Meeting.find(params[:id]).becomes(Meeting)
+  end
 
   def destroy
     @meeting = Meeting.find(params[:id])
@@ -80,6 +86,8 @@ class SrmMeetingsController < ApplicationController
       end
     end
     if @meeting.save
+      @meeting.set_datetimez
+      @meeting.save
       end_time = @meeting.review_end > @meeting.meeting_end ? @meeting.review_end : @meeting.meeting_end
       @meeting.invitations.each do |inv|
         notify(@meeting, notice: {
@@ -100,8 +108,14 @@ class SrmMeetingsController < ApplicationController
     @action = "new"
     @timezones = Meeting.get_timezones
     @headers = User.invite_headers
-    @users = User.find(:all) - [current_user]
-    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+    # @users = User.find(:all) - [current_user]
+    # @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+
     @sra_headers = Sra.get_meta_fields('index')
     @sras = Sra.where('meeting_id is ?', nil)
   end
@@ -116,7 +130,7 @@ class SrmMeetingsController < ApplicationController
     end
     @action = "show"
     @headers = User.invite_headers
-    @users = @meeting.invitations.map{|x| x.user}
+    @available_participants = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
     @sra_headers = Sra.get_meta_fields('index')
     @fields = SrmMeeting.get_meta_fields('show')
@@ -217,6 +231,8 @@ class SrmMeetingsController < ApplicationController
       @owner.status = status
       @owner.save
     end
+    @owner.set_datetimez
+    @owner.save
     redirect_to srm_meeting_path(@owner)
   end
 
@@ -225,8 +241,10 @@ class SrmMeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id])
     @action = "edit"
     @headers = User.invite_headers
-    @users = User.find(:all) - [@meeting.host.user]
-    @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
     @timezones = Meeting.get_timezones
     @sra_headers = Sra.get_meta_fields('index')
     @sras = @meeting.sras + Sra.where('meeting_id is ?', nil)
@@ -340,12 +358,4 @@ class SrmMeetingsController < ApplicationController
   end
 
 
-  def print
-    @meeting = Meeting.find(params[:id])
-    html = render_to_string(:template=>"/srm_meetings/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    send_data pdf.to_pdf, :filename => "Meeting_##{@meeting.get_id}.pdf"
-  end
 end

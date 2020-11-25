@@ -1,5 +1,5 @@
-- menu_items = CONFIG.sr::HIERARCHY[:menu_items].select{|item| item[:display].call(user: current_user)}
-- menu_items.each do |item|
+- menu_items = CONFIG.sr::HIERARCHY[:menu_items].select{|key, item| item[:display].call(user: current_user)}
+- menu_items.each do |key, item|
   - if item[:display].call(user: current_user)
     - if item[:subMenu].present?
       li class="dropdown"
@@ -14,5 +14,3 @@
     - else
       - if item[:display].call(user: current_user)
         li = link_to item[:title], eval(item[:path])
-
-

@@ -1,0 +1,13 @@
+ruby:
+  @params.merge!({
+    searchterm_1: is_row_probability? ? :likelihood_after : :severity_after, # row
+    searchterm_2: is_row_probability? ? :severity_after : :likelihood_after, # col
+    field_1: @row,
+    field_2: @col
+  })
+
+  cell_url_to_hazards = hazards_path(@params)
+
+td.color_cell.hazard_after_cell href="#{cell_url_to_hazards}" style="background: #{@cell_bg_color}"
+  center
+    b = @hazard_after_matrix[@row][@col]

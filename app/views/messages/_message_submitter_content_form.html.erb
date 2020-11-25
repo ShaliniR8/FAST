@@ -80,11 +80,13 @@
     <%=f.submit action_name == 'new' ? 'Send Message' : action_name.titleize,
       class: 'btn btn-success pull-right ml5',
         disable_with: 'Sending...'%>
-    <%=link_to 'Cancel',
-      params[:link] || root_url,
-      confirm: 'Are you sure?',
-      disable_with: 'Redirecting...',
-      class: 'btn btn-warning pull-right'%>
+    <%if action_name == 'new'%>
+      <%=link_to 'Cancel',
+        params[:link] || root_url,
+        confirm: 'Are you sure?',
+        disable_with: 'Redirecting...',
+        class: 'btn btn-warning pull-right'%>
+    <%end%>
   </div>
 </div>
 

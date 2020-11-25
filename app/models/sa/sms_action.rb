@@ -14,6 +14,8 @@ class SmsAction < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to  :approver,                foreign_key: "approver_id",               class_name: "User"
@@ -74,20 +76,6 @@ class SmsAction < Sa::SafetyAssuranceBase
       { :field => :display_after_risk_factor,       :title => "Mitigated Risk",                   :html_class => :get_after_risk_color  },
       { :field => :status,                          :title => "Status"                                                                  },
     ]
-  end
-
-
-  def self.get_avg_complete
-    candidates = self.where("status = ? and complete_date is not ? and created_at is not null",
-      "Completed", nil)
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.complete_date - x.created_at.to_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
   end
 
 

@@ -17,6 +17,89 @@ end
 
 class SafetyAssuranceController < ApplicationController
 
+  def update
+    convert_from_risk_value_to_risk_index
+
+    object_name = self.class.name.gsub('Controller', '').underscore.singularize
+
+    transaction = true
+
+    if params[object_name][:checklists_attributes].present?
+      params[object_name][:checklists_attributes].each do |key, checklist|
+
+        checklist[:checklist_rows_attributes].each do |row_key, row_attributes|
+
+          if row_attributes[:attachments_attributes].present?
+
+            row_attributes[:attachments_attributes].each do |att_key, attachment|
+
+              # File is a base64 string
+              if attachment[:name].present? && attachment[:name].is_a?(Hash)
+                file_params = attachment[:name]
+
+                temp_file = Tempfile.new('file_upload')
+                temp_file.binmode
+                temp_file.write(Base64.decode64(file_params[:base64]))
+                temp_file.rewind()
+
+                file_name = file_params[:fileName]
+                mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+                uploaded_file = ActionDispatch::Http::UploadedFile.new(
+                  :tempfile => temp_file,
+                  :filename => file_name,
+                  :type     => mime_type)
+
+                # Replace attachment parameter with the created file
+                params[object_name][:checklists_attributes][key][:checklist_rows_attributes][row_key][:attachments_attributes][att_key][:name] = uploaded_file
+              end
+            end
+          end
+        end
+      end
+    end
+
+
+    current_status = @owner.status
+    @owner.update_attributes(params[object_name.to_sym])
+    send_notification(@owner, params[:commit])
+    case params[:commit]
+    when 'Assign'
+      @owner.open_date = Time.now
+    when 'Complete'
+      if @owner.approver
+        transaction_content ='Pending Approval'
+      else
+        @owner.close_date = Time.now
+      end
+    when 'Reject'
+    when 'Approve'
+      @owner.close_date = Time.now
+    when 'Override Status'
+      transaction_content = "Status overridden from #{current_status} to #{@owner.status}"
+      @owner.close_date = params[object_name.to_sym][:status] == 'Completed' ? Time.now : nil
+    when 'Add Cost', 'Add Contact', 'Add Attachment'
+      transaction = false
+    end
+
+    if transaction
+      Transaction.build_for(
+        @owner,
+        params[:commit],
+        current_user.id,
+        transaction_content,
+        nil,
+        current_user,
+        session[:platform]
+      )
+    end
+    @owner.save
+    respond_to do |format|
+      format.html { redirect_to eval "#{object_name}_path(@owner)" }
+      format.json { update_as_json }
+    end
+  end
+
   #############################
   ####    SHARED FORMS     ####
   #############################
@@ -25,7 +108,7 @@ class SafetyAssuranceController < ApplicationController
 
   def destroy #KEEP
     @owner.destroy
-    redirect_to eval("#{@class.name.underscore}s_path"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
+    redirect_to eval("#{@class.name.underscore}s_path(status: 'All')"), flash: {danger: "#{@class.name.titleize} ##{@owner.id} deleted."}
   end
 
   def new_attachment #KEEP

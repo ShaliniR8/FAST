@@ -3,6 +3,10 @@ class HazardsController < ApplicationController
   before_filter :set_table_name,:login_required
   before_filter :define_owner, only: [:interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:hazard)}
+  before_filter(only: [:create]) {set_parent(:hazard)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @hazard)}
+
   def define_owner
     @class = Object.const_get('Hazard')
     @owner = Hazard.find(params[:id])
@@ -16,32 +20,31 @@ class HazardsController < ApplicationController
 
 
   def index
-    @adv_only = true
-    @table = Object.const_get("Hazard")
-    @title = "Hazards"
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    if params[:status].present?
-       @records = @records.select{|x| x.status == params[:status]}
-      @title += " : #{params[:status]}"
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
-    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
-    @headers = @table.get_meta_fields('index')
-    @table_name = "hazards"
-    if !current_user.has_access('hazards', 'admin', admin: true, strict: true)
-      hazards = Hazard.includes(:sra)
-      cars = hazards.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'], current_user.id)
-      cars += hazards.where('approver_id = ?', current_user.id)
-      cars += Hazard.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
-    end
+    filter_hazards
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
 
   def show
     @hazard = Hazard.find(params[:id])
+    @owner = @hazard
     @i18nbase = 'srm.hazard'
     @root_cause_headers = HazardRootCause.get_headers
     load_options
@@ -53,15 +56,21 @@ class HazardsController < ApplicationController
 
   def new
     @hazard = Hazard.new
-    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    if params[:owner_type].present?
+      @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    else # from Launch Object
+      @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id])
+    end
     load_options
     @fields = Hazard.get_meta_fields('form')
+    @risk_type = 'Baseline'
     load_special_matrix_form("hazard", "baseline", @hazard)
   end
 
 
 
   def create
+    convert_from_risk_value_to_risk_index
     @hazard = Hazard.create(params[:hazard])
     @hazard.status = 'New'
     @hazard.save
@@ -71,6 +80,7 @@ class HazardsController < ApplicationController
 
 
   def edit
+    @risk_type = 'Baseline'
     @hazard = Hazard.find(params[:id])
     @owner = @hazard
     load_options
@@ -82,6 +92,8 @@ class HazardsController < ApplicationController
 
 
   def update
+    convert_from_risk_value_to_risk_index
+
     transaction = true
     @owner = Hazard.find(params[:id])
 
@@ -167,7 +179,7 @@ class HazardsController < ApplicationController
   def destroy
     hazard=Hazard.find(params[:id])
     hazard.destroy
-    redirect_to hazards_path, flash: {danger: "Hazard ##{params[:id]} deleted."}
+    redirect_to hazards_path(status: 'All'), flash: {danger: "Hazard ##{params[:id]} deleted."}
     #redirect_to root_url
   end
 
@@ -264,19 +276,6 @@ class HazardsController < ApplicationController
   end
 
 
-
-  def print
-    @deidentified = params[:deidentified]
-    @hazard = Hazard.find(params[:id])
-    print_special_matrix(@hazard)
-    html = render_to_string(:template => "/hazards/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Hazard_##{@hazard.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
   def comment
     @owner = Hazard.find(params[:id])
     @comment = @owner.comments.new
@@ -288,11 +287,9 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     load_special_matrix_form("hazard", "mitigate", @owner)
-    if CONFIG::GENERAL[:base_risk_matrix] && AIRLINE_CODE != 'Demo' && AIRLINE_CODE != 'Trial'
-      render :partial=>"shared/mitigate"
-    else
-      render :partial=>"shared/#{AIRLINE_CODE}/mitigate"
-    end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -301,11 +298,9 @@ class HazardsController < ApplicationController
     @owner=Hazard.find(params[:id])
     load_options
     load_special_matrix_form("hazard", "baseline", @owner)
-    if CONFIG::GENERAL[:base_risk_matrix] && AIRLINE_CODE != 'Demo' && AIRLINE_CODE != 'Trial'
-      render :partial=>"shared/baseline"
-    else
-      render :partial=>"shared/#{AIRLINE_CODE}/baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -315,5 +310,20 @@ class HazardsController < ApplicationController
     reopen_report(@hazard)
   end
 
+private
+
+  def filter_hazards
+    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
+    @headers = @table.get_meta_fields('index')
+    @table_name = "hazards"
+    if !current_user.has_access('hazards', 'admin', admin: true, strict: true)
+      hazards = Hazard.includes(:sra)
+      cars = hazards.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'], current_user.id)
+      cars += hazards.where('approver_id = ?', current_user.id)
+      cars += Hazard.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
+  end
 
 end

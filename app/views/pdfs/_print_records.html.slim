@@ -1,0 +1,5 @@
+- if defined? record
+	= render '/pdfs/print_record', deidentified: deidentified, owner: record
+-elsif owner.class.method_defined?(:records)
+	- owner.records.each do |record|
+		= render '/pdfs/print_record', deidentified: deidentified, owner: record

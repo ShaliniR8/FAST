@@ -18,30 +18,50 @@ class DefaultConfig
   GENERAL = {
     # AIRLINE-SPECIFIC CONFIGS
       # Please Ensure these are filled out for each airline
-    version:        '1.2.0',                      # Helps to track most recent logged updates
+    version:        '1.2.4',                      # Helps to track most recent logged updates
     name:           'Not Initialized',            # Airline Name- shown throughout site
     time_zone:      'Pacific Time (US & Canada)', # Used in varied locations
+
 
     # SYSTEM CONFIGS
     enable_mailer:                      true,    # Enables emails to be sent via the system - default on
     enable_sso:                         false,   # Enables Single Sign-On integration (req. _sso_config) - default off
+    login_option:                       'prosafet', # Login page UI config => available options: dual, prosafet, sso
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
+    cisp_integration:                   false,
+    hide_asap_submissions_in_dashboard: false,
+    has_pdf_footer:                     false,    # Enables custom airline footer
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
-    base_risk_matrix:                   true,    # Indicates the use of the default risk matrix - default on
+    base_risk_matrix:                   false,    # Indicates the use of the default risk matrix - default on
     configurable_risk_matrices:         false,   # Enables the use of varied risk matrices - default off
     has_root_causes:                    true,    # Enables the use of root causes - default on
     shared_links:                       false,   # Enables shareable links to be created for forms - default off
+    drop_down_risk_selection:           false,
 
     # TO BE REMOVED:
-    allow_set_alert:                    false,   # Allows forms to use alerts (notifications to users/self)
+    allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)
     has_extension:                      true,   # Allows forms to request extensions
     has_verification:                   true,   # Allows forms to be verified (additional step)
   }
 
+  LAUNCH_OBJECTS = {
+    records: ['Sra', 'Investigation'],
+    reports: ['Sra', 'Investigation'],
+    audits: ['Sra'],
+    inspections: ['Sra'],
+    evaluations: ['Sra'],
+    investigations: ['Sra'],
+  }
 
+  OBJECT_NAME_MAP = {
+    'Sra'       => 'SRA',
+    'SmsAction' => 'Corrective Action',
+    'Record'    => 'Report',
+    'Report'    => 'Event'
+  }
 
   def self.getTimeFormat
     {
@@ -120,6 +140,29 @@ class DefaultConfig
     self.object[obj.class.name][:actions][action][:access].call(owner:obj,user:user,**op)
   end
 
+  ###################################
+  ###        CISP MAPPING         ###
+  ###################################
+  CISP_TITLE_PARSE = {
+    'Flight Crew ASAP'   => 'flightcrew',
+  }
+
+  CISP_FIELD_PARSE = {
+    'Flight Crew ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+        'flightPhase'   => 'Flight Phase at Start of Event'
+      },
+      'Narratives' => { # THIS IS THE FFT CONFIG
+        'eventDescription' => "Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved",
+      }
+    }
+  }
+
+  CISP_TIMEZONES = {"UTC" => "UTC","AST" => "Atlantic Time (Canada)","ADT" => "Atlantic Time (Canada)","AKDT" => "Alaska","AKST" => "Alaska","CST" => "Central Time (US & Canada)","CDT" => "Central Time (US & Canada)","EST" => "Eastern Time (US & Canada)","EDT" => "Eastern Time (US & Canada)","EGST" => "Azores","EGT" => "Azores","HST" => "Hawaii","HAST" => "Hawaii","HADT" => "Hawaii","MST" => "Mountain Time (US & Canada)","MDT" => "Mountain Time (US & Canada)","NST" => "Newfoundland","NDT" => "Newfoundland","PST" => "Pacific Time (US & Canada)","PDT" => "Pacific Time (US & Canada)","PMST" => "Greenland","PMDT" => "Greenland","SST" => "Samoa","WST" => "Greenland","WGT" => "Greenland","WGST" => "Greenland"}
 
   ###################################
   ### DEFAULT RISK MATRIX CONFIGS ###
@@ -132,9 +175,27 @@ class DefaultConfig
   }
 
   MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Baseline Risk',
+      mitigate_btn: 'Mitigate Risk',
+      'Baseline' => 'Baseline',
+      'Mitigate' => 'Mitigated'
+    },
+
     severity_table: {
-      starting_space: true,
-      row_header: ['5','4','3','2','1'],
+      title: 'SEVERITY EXERCISE',
+
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      row_header_name: 'SEVERITY',
+      row_header: ['4', '3', '2', '1', '0'],
+      column_header_name: 'CLASS',
       column_header: [
         'Safety (Impact)',
         'People (Injury)',
@@ -151,17 +212,28 @@ class DefaultConfig
     },
 
     severity_table_dict: {
-      0 => "5",
-      1 => "4",
-      2 => "3",
-      3 => "2",
-      4 => "1"
+      0 => "4",
+      1 => "3",
+      2 => "2",
+      3 => "1",
+      4 => "0",
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: '',
       row_header: [''],
-      column_header: ['A','B','C','D','E'],
+      column_header_name: 'PROBABILITY',
+      column_header: ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent'],
       rows: [
         [
           'Improbable (10 Years)',
@@ -174,43 +246,68 @@ class DefaultConfig
     },
 
     probability_table_dict: {
-      0 => 'Improbable (10 Years)',
-      1 => 'Remote (5 Years)',
-      2 => 'Occasional (1 Year)',
-      3 => 'Probable (6 Months)',
-      4 => 'Frequent (30 Days)'
+      0 => 'A - Improbable',
+      1 => 'B - Unlikely',
+      2 => 'C - Remote',
+      3 => 'D - Probable',
+      4 => 'E - Frequent',
     },
 
     risk_table: {
-      starting_space: true,
-      row_header: ['5','4','3','2','1'],
-      column_header: ['A','B','C','D','E'],
-      rows: [
-        ['yellow','red','red','red','red'],
-        ['yellow','yellow','red','red','red'],
-        ['limegreen','yellow','yellow','yellow','red'],
-        ['limegreen','limegreen','yellow','yellow','yellow'],
-        ['limegreen','limegreen','limegreen','yellow','yellow']
+      title: 'RISK ASSESSMENT MATRIX',
 
-      ]
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+      cell_style: 'bold',
+
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
+      row_header_name: 'SEVERITY',
+      row_header: ['4', '3', '2', '1', '0'],
+      column_header_name: 'PROBABILITY',
+      column_header: ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent'],
+      rows_color: [
+        ['yellow',    'yellow',     'orange',     'orange',     'orange' ],
+        ['yellow',    'yellow',     'yellow',     'orange',     'orange' ],
+        ['#60FF60',   '#60FF60',    'yellow',     'yellow',     'orange' ],
+        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60'],
+        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60']
+      ],
     },
 
     risk_definitions: {
-      red:       {rating: "HIGH",     cells: "A4, A3, B4",     description: "Unacceptable"                 },
-      yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
-      limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
+      '#60FF60' => { rating: 'Green - Acceptable'                   },
+      yellow:      { rating: 'Yellow - Acceptable with mitigation'  },
+      orange:      { rating: 'Orange - Unacceptable'                },
     },
 
     risk_table_index: {
-      "High"      => 'red',
-      "Moderate"  => 'yellow',
-      "Low"       => 'limegreen'
+      'Orange - Unacceptable'                => 'orange',
+      'Yellow - Acceptable with mitigation'  => 'yellow',
+      'Green - Acceptable'                   => 'limegreen',
+      'Red - Unacceptable'                   => 'red',
+
+      'Moderate' => 'yellow',
+      'Low'      => 'limegreen',
+      'High'     => 'red',
+
+      'MODERATE' => 'yellow',
+      'LOW'      => 'limegreen',
+      'HIGH'     => 'red',
     },
 
     risk_table_dict: {
-      red:        "High",
-      yellow:     "Moderate",
-      limegreen:  "Low"
+      '#60FF60'   => 'Green - Acceptable',
+      'limegreen' => 'Green - Acceptable',
+      'red'       => 'Red - Unacceptable',
+      yellow:        'Yellow - Acceptable with mitigation',
+      orange:        'Orange - Unacceptable',
+
     }
   }
 
@@ -231,15 +328,15 @@ class DefaultConfig
   end
 
   def self.print_severity(owner, severity_score)
-    self::MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
+    self::MATRIX_INFO[:severity_table_dict][severity_score] if severity_score.present?
   end
 
   def self.print_probability(owner, probability_score)
-    self::MATRIX_INFO[:probability_table_dict][probability_score] unless probability_score.nil?
+    self::MATRIX_INFO[:probability_table_dict][probability_score] if probability_score.present?
   end
 
   def self.print_risk(probability_score, severity_score)
-    if !probability_score.nil? && !severity_score.nil?
+    if probability_score.present? && severity_score.present?
       lookup_table = MATRIX_INFO[:risk_table][:rows]
       return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
     end

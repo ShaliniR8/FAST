@@ -83,7 +83,7 @@
 
                     <% if CONFIG::GENERAL[:enable_sso] %>
                       <div class="form-group row">
-                        <%= f.label :sso_id, 'SSO Identifying Value', :class => "col-sm-4 col-form-label required_label" %>
+                        <%= f.label :sso_id, 'SSO Identifying Value', :class => "col-sm-4 col-form-label" %>
                         <div class="col-sm-8">
                           <%= f.text_field :sso_id, {:class=> "form-control required_field"}%>
                         </div>
@@ -120,6 +120,22 @@
                         </div>
                       </div>
                     <%end%>
+
+
+                    <div class='form-group row'>
+                      <%=f.label :departments, :class => 'col-xs-12 col-form-label'%>
+                      <div class="col-xs-12">
+                        <%@departments.each do |dep|%>
+                          <div class='col-xs-6'>
+                            <label class='checkbox'>
+                              <%=f.check_box :departments, {multiple: true, :class => '
+                                '}, dep, nil%>
+                              <%=dep%>
+                            </label>
+                          </div>
+                        <%end%>
+                      </div>
+                    </div>
 
                   <%end%>
 

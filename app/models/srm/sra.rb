@@ -12,6 +12,9 @@ class Sra < Srm::SafetyRiskManagementBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
+
 #Association List
   has_many :hazards,                  :foreign_key => "sra_id",     :class_name => "Hazard",              :dependent => :destroy
   has_many :srm_agendas,              :foreign_key => "event_id",   :class_name => "SrmAgenda",           :dependent => :destroy
@@ -56,6 +59,16 @@ end
       "<a style='font-weight:bold' href='/#{owner_type.downcase.pluralize}/#{self.owner_id}'>
         #{self.owner_titleize} ##{self.owner_id}
       </a>".html_safe
+    elsif self.get_parent.present?
+      obejct_name =
+        if CONFIG::OBJECT_NAME_MAP[self.get_parent.class.name].present?
+          CONFIG::OBJECT_NAME_MAP[self.get_parent.class.name]
+        else
+          self.get_parent.class.name
+        end
+      "<a style='font-weight:bold' href='/#{self.get_parent.class.name.underscore.pluralize}/#{self.get_parent.id}'>
+        #{obejct_name} ##{self.get_parent.id}
+      </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end
@@ -82,25 +95,10 @@ end
     self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
   end
 
-
-  def self.get_avg_complete
-    candidates = self.where("status=? and date_complete is not ? ", "Completed", nil)
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.date_complete - x.created_at.to_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
-
   def can_approve?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) || (
       self.status == 'Pending Review' && ( self.reviewer_id == user.id || has_admin_rights?(user) )
     )
   end
-
 
 end

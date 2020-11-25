@@ -22,33 +22,41 @@ class SrasController < ApplicationController
   before_filter :load_options
   before_filter :define_owner, only: [:show, :interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:sra)}
+  before_filter(only: [:create]) {set_parent(:sra)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @sra)}
+
   def define_owner
     @class = Object.const_get('Sra')
     @owner = Sra.find(params[:id])
   end
 
   def index
-    @title = "SRAs"
-    @table = Object.const_get("Sra")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    if params[:departments].present?
-      @records = @records.select{|rec| rec.departments.present? &&
-        rec.departments.any?{|x| params[:departments].include?(x)}
-      }
-    end
+    # @title = "SRAs"
+    # @table = Object.const_get("Sra")
+    # @headers = @table.get_meta_fields('index')
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+    # filter_sras
 
-    if !current_user.has_access('sras','admin', admin: true, strict: true)
-      cars = Sra.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
-        current_user.id)
-      cars += Sra.where('approver_id = ? OR reviewer_id = ?',
-        current_user.id, current_user.id)
-      cars += Sra.where(viewer_access: true) if current_user.has_access('sras','viewer')
-      cars += Sra.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_sras
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -70,16 +78,16 @@ class SrasController < ApplicationController
 
 
   def create
-    sra = Sra.create(params[:sra])
-    sra.status = 'New'
+    @sra = Sra.create(params[:sra])
+    @sra.status = 'New'
     if params[:matrix_id].present?
       connection = SraMatrixConnection.create(
         :matrix_id => params[:matrix_id],
-        :owner_id => sra.id)
+        :owner_id => @sra.id)
       connection.save
     end
-    if sra.save
-      redirect_to sra_path(sra), flash: {success: "SRA (SRM) created."}
+    if @sra.save
+      redirect_to sra_path(@sra), flash: {success: "SRA (SRM) created."}
     end
   end
 
@@ -118,7 +126,6 @@ class SrasController < ApplicationController
           mailer: true,
           subject: 'SRA Pending Approval')
       else
-        @owner.date_complete = Time.now
         @owner.close_date = Time.now
         update_status = 'Completed'
       end
@@ -145,6 +152,7 @@ class SrasController < ApplicationController
     when 'Approve'
       if !@owner.approver #Approved by reviewer with absent approver case
         update_status = 'Completed'
+        @owner.close_date = Time.now
         notify(@owner,
           notice: {
             users_id: @owner.responsible_user.id,
@@ -162,7 +170,6 @@ class SrasController < ApplicationController
           subject: 'SRA Pending Approval') if @owner.responsible_user
         transaction_content = 'Approved by the Quality Reviewer'
       else
-        @owner.date_complete = Time.now
         @owner.close_date = Time.now
         notify(@owner,
           notice: {
@@ -259,7 +266,7 @@ class SrasController < ApplicationController
   def destroy
     sra = Sra.find(params[:id])
     sra.destroy
-    redirect_to sras_path, flash: {danger: "SRA ##{params[:id]} deleted."}
+    redirect_to sras_path(status: 'All'), flash: {danger: "SRA ##{params[:id]} deleted."}
   end
 
 
@@ -294,16 +301,6 @@ class SrasController < ApplicationController
     render :partial => '/forms/workflow_forms/override_status'
   end
 
-  def print
-    @deidentified = params[:deidentified]
-    @sra = Sra.find(params[:id])
-    html = render_to_string(:template => "/sras/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "SRA_##{@sra.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
 
   def comment
     @owner = Sra.find(params[:id])
@@ -351,11 +348,9 @@ class SrasController < ApplicationController
     @risk_group = @owner.matrix_connection.matrix_group
     load_options
     mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial=>"shared/mitigate"
-    else
-      render :partial => "/risk_matrix_groups/form_mitigated"
-    end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -365,11 +360,9 @@ class SrasController < ApplicationController
     @risk_group = @owner.matrix_connection.matrix_group
     form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
     load_options
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial=>"shared/baseline"
-    else
-      render :partial => "/risk_matrix_groups/form_baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -455,5 +448,25 @@ class SrasController < ApplicationController
       edit_section(@section.owner.id, @section.id)
   end
 
+private
+
+  def filter_sras
+    if params[:departments].present?
+      @records = @records.select{|rec| rec.departments.present? &&
+        rec.departments.any?{|x| params[:departments].include?(x)}
+      }
+    end
+
+    if !current_user.has_access('sras','admin', admin: true, strict: true)
+      cars = Sra.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
+        current_user.id)
+      cars += Sra.where('approver_id = ? OR reviewer_id = ?',
+        current_user.id, current_user.id)
+      cars += Sra.where(viewer_access: true) if current_user.has_access('sras','viewer')
+      cars += Sra.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
+  end
 
 end

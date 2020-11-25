@@ -17,10 +17,10 @@ class DefaultSafetyAssuranceConfig
 
       'Audit' => {
         title: 'Audit',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
-          :approver,
+          :findings,
           :responsible_user,
-          :created_by,
           :verifications,
           :extension_requests],
         fields: {
@@ -71,22 +71,28 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6,  type: 'text', visible: 'index',
             required: false
           },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
 
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
+          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Inspection' => {
         title: 'Inspection',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :responsible_user,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -135,21 +141,27 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Evaluation' => {
         title: 'Evaluation',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :responsible_user,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -202,21 +214,27 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Investigation' => {
         title: 'Investigation',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :responsible_user,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -283,6 +301,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -294,16 +313,23 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments source_of_input sras findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Finding' => {
         title: 'Finding',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+         preload: [
+          :occurrences,
+          :responsible_user,
+          :approver,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -315,7 +341,7 @@ class DefaultSafetyAssuranceConfig
           },
           created_by: { default: true, on_newline: true },
           responsible_user: { default: true },
-          approver: { default: true, visible: 'index,form,show' },
+          approver: { default: true, visible: 'index,form,show'  },
           due_date: { field: 'due_date', default: true },
           reference: { default: true, title: 'Reference or Requirement' },
           classification: {
@@ -418,8 +444,9 @@ class DefaultSafetyAssuranceConfig
           occurrences: {default: true, title: (Finding.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
-            title: "Full #{Finding.find_top_level_section.label rescue nil}"},
-
+            title: "Full #{Finding.find_top_level_section.label rescue nil}"
+          },
+          verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -431,23 +458,33 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification recommendation sms_action approve_reject reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
-              DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
-              (owner.immediate_action || owner.owner.status == 'Completed')
+              if owner.owner.class.name == "ChecklistRow"
+                true
+              else
+                DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
+                (owner.immediate_action || owner.owner.status == 'Completed')
+              end
             },
           },
         }),
-        panels: %i[comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
+        panels: %i[checklists comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'SmsAction' => {
         title: 'Corrective Action',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :responsible_user,
+          :approver,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -461,11 +498,15 @@ class DefaultSafetyAssuranceConfig
           due_date: { default: true, field: 'due_date', on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true },
-          approver: { default: true, visible: 'index,form,show', required: true },
+          approver: { default: true, visible: 'index,form,show', required: false },
           responsible_department: {
             field: 'responsible_department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'form,show',
             required: false, options: "CONFIG.custom_options['Departments']"
+          },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'none',
           },
           emp: {
             field: 'emp', title: 'Employee Corrective Action',
@@ -513,6 +554,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -524,7 +566,7 @@ class DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_parent attach_in_message expand_all],
             #TODO: Complete Notices<=Notifications Update and add set_alert after view_parent
           #INLINE
           *%i[assign complete request_extension schedule_verification cost approve_reject reopen comment],
@@ -542,6 +584,12 @@ class DefaultSafetyAssuranceConfig
 
       'Recommendation' => {
         title: 'Recommendation',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :responsible_user,
+          :approver,
+          :verifications,
+          :extension_requests],
         fields: {
           id: { default: true },
           title: { default: true },
@@ -558,7 +606,7 @@ class DefaultSafetyAssuranceConfig
             required: true, on_newline: true
           },
           close_date: { default: true, title: 'Actual Response Date' },
-          responsible_user: { default: true, on_newline: true },
+          responsible_user: { default: true, on_newline: true  },
           approver: { default: true },
           department: {
             field: 'department', title: 'Responsible Department',
@@ -586,12 +634,13 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
         actions: [
           #TOP
-          *%i[delete override_status edit deid_pdf pdf view_parent attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen comment]
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
@@ -606,7 +655,112 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       }
     },
+    menu_items: {
+      'Audits' => {
+        title: 'Audits', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'audits_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_audit_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'new', true, true)}},
+          {title: 'Recurring Audits', path: "recurrences_path(form_type: 'Audit')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Audit'), user, 'admin', true, true)}},
+          {title: 'New Recurring Audits', path: "new_recurrence_path(form_type: 'Audit')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Audit'), user, 'admin', true, true)}},
+        ]
+      },
+      'Inspections' => {
+        title: 'Inspections', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'inspections_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_inspection_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'new', true, true)}},
+          {title: 'Recurring Inspections', path: "recurrences_path(form_type: 'Inspection')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Inspection'), user, 'admin', true, true)}},
+          {title: 'New Recurring Inspections', path: "new_recurrence_path(form_type: 'Inspection')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Inspection'), user, 'admin', true, true)}},
+        ]
+      },
+      'Evaluations' => {
+        title: 'Evaluations', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'evaluations_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_evaluation_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'new', true, true)}},
+          {title: 'Recurring Evaluations', path: "recurrences_path(form_type: 'Evaluation')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Evaluation'), user, 'admin', true, true)}},
+          {title: 'New Recurring Evaluations', path: "new_recurrence_path(form_type: 'Evaluation')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Evaluation'), user, 'admin', true, true)}},
+        ]
+      },
+      'Investigations' => {
+        title: 'Investigations', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'investigations_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_investigation_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'new', true, true)}},
+        ]
+      },
+      'Findings' => {
+        title: 'Findings', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'findings_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
+          {title: 'For Audits', path: 'findings_path(status: "New", :type=>"Audit")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', true, true)}},
+          {title: 'For Inspections', path: 'findings_path(status: "New", :type=>"Inspection")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', true, true)}},
+          {title: 'For Evaluations', path: 'findings_path(status: "New", :type=>"Evaluation")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)}},
+          {title: 'For Investigations', path: 'findings_path(status: "New", :type=>"Investigation")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+        ]
+      },
+      'Corrective Actions' => {
+        title: 'Corrective Actions', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'sms_actions_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)}},
+          {title: 'For Findings', path: 'sms_actions_path(status: "New", :type=>"Finding")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
+          {title: 'For Investigations', path: 'sms_actions_path(status: "New", :type=>"Investigation")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+          {title: 'New', path: 'new_sms_action_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'new', true, true)}},
+        ]
+      },
+      'Recommendations' => {
+        title: 'Recommendations', path: '#',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Recommendation'), user, 'index', true, true)},
+        subMenu: [
+          {title: 'All', path: 'recommendations_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)}},
+          {title: 'For Findings', path: 'recommendations_path(status: "New", :type=>"Finding")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
+          {title: 'For Investigations', path: 'recommendations_path(status: "New", :type=>"Investigation")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+        ]
+      },
+      'Query Center' => {
+        title: 'Query Center', path: '#',
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        subMenu: [
+          {title: 'All', path: 'queries_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_query_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
+    }
   }
-
 
 end

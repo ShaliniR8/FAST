@@ -90,7 +90,7 @@ class MeetingsController < ApplicationController
       x.save
     end
     @meeting.destroy
-    redirect_to meetings_path, flash: {danger: "Meeting ##{params[:id]} deleted."}
+    redirect_to meetings_path(status: 'All'), flash: {danger: "Meeting ##{params[:id]} deleted."}
   end
 
 
@@ -157,10 +157,14 @@ class MeetingsController < ApplicationController
     @action = "new"
     @timezones = Meeting.get_timezones
     @headers = User.invite_headers
-    @users = User.find(:all) - [current_user]
-    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+
     @report_headers = Report.get_meta_fields('meeting_form')
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.reports_for_meeting
   end
 
 
@@ -176,11 +180,12 @@ class MeetingsController < ApplicationController
         return
       end
     end
+
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
     @report_headers = Report.get_meta_fields('index', 'meeting')
     @reports = @meeting.reports.sort_by{|x| x.id}
-    @users = @meeting.invitations.map{|x| x.user}
+    @available_participants = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user == current_user && x.status == "Pending"}.first
   end
 
@@ -188,7 +193,6 @@ class MeetingsController < ApplicationController
   def index
     @table = Object.const_get("Meeting")
     @headers = Meeting.get_meta_fields('index')
-    @title = 'Meetings'
     @action = 'meeting'
     @records = @table.includes(:invitations, :host).where('meetings.type is null')
     unless current_user.has_access('meetings', 'admin', admin: true, strict: true )
@@ -213,6 +217,7 @@ class MeetingsController < ApplicationController
 
   def update
     transaction = true
+    @flash_message = nil
     @owner = Meeting.find(params[:id])
 
     if params[:reports].present?
@@ -250,6 +255,8 @@ class MeetingsController < ApplicationController
       transaction = false
     when 'Save Agenda'
       transaction_content = "Event ##{params[:event_id]}"
+    when 'Send to CISP'
+      send_cisp_reports
     end
 
     if params[:invitations].present?
@@ -280,6 +287,24 @@ class MeetingsController < ApplicationController
       end
     end
 
+
+    # update included agendas
+    if params[:meeting].present? && params[:meeting][:agendas_attributes].present?
+      meetings_agendas = Meeting.find(params[:id]).agendas
+
+      agendas = params[:meeting][:agendas_attributes]
+      agendas.each do |agenda|
+        found = false
+        meetings_agendas.each do |meeting_agenda|
+          found = true if meeting_agenda.id == agenda[1][:id]
+        end
+
+        next if found
+
+        Meeting.find(params[:id]).agendas << Agenda.find(agenda[1][:id]) if agenda[1][:id].present?
+      end
+    end
+
     @owner.update_attributes(params[:meeting])
     if transaction
       Transaction.build_for(
@@ -289,9 +314,10 @@ class MeetingsController < ApplicationController
         transaction_content
       )
     end
-    @owner.set_datetimez
+
+    @owner.set_datetimez if params[:commit] == 'Update'
     @owner.save
-    redirect_to meeting_path(@owner)
+    redirect_to meeting_path(@owner), flash: @flash_message
   end
 
 
@@ -300,21 +326,41 @@ class MeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id])
     @action = 'edit'
     @headers = User.invite_headers
-    @users = User.find(:all) - [@meeting.host.user]
-    @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
+    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    privileges = rules.map(&:privileges).flatten
+    users = privileges.map(&:users).flatten.uniq
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
     @timezones = Meeting.get_timezones
     @report_headers = Report.get_headers
     @associated_reports = @meeting.reports.map(&:id)
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.reports_for_meeting
   end
 
 
   def get_reports
     @report_headers = Report.get_meta_fields('index')
     @meeting = Meeting.find(params[:id])
-    @reports = Report.where(status: ['Meeting Ready', 'Under Review'])
+    @reports = Report.reports_for_meeting
     @reports = @reports.where('id NOT IN (?)', @meeting.reports.map(&:id)) if @meeting.reports.present?
     render :partial => "reports"
+  end
+
+  def get_cisp_reports
+    @owner = Meeting.find(params[:id])
+    keys = CONFIG::CISP_TITLE_PARSE.keys
+    @reports = @owner.reports.includes(:records)
+    asap_reports = []
+    @reports.each do |rep|
+      asap_found = false
+      rep.records.each do |rec|
+        asap_found = true if CONFIG::CISP_TITLE_PARSE[rec.template.name]
+        break if asap_found
+      end
+      asap_reports << rep if asap_found
+    end
+    @available_reports = asap_reports.select { |report| not report.cisp_sent }
+    @report_headers = Report.get_meta_fields('index')
+    render :partial => "cisp_reports"
   end
 
 
@@ -362,7 +408,7 @@ class MeetingsController < ApplicationController
     users.each do |user|
       SendTo.create(messages_id: message.id, users_id: user.id)
       notify(message, notice: {
-        users_id: user,
+        users_id: user.id,
         content: "You have a new internal message sent from Meeting ##{@meeting.id}."},
         mailer: true, subject: 'New Internal Meeting Message')
     end
@@ -372,12 +418,55 @@ class MeetingsController < ApplicationController
 
   def print
     @meeting = Meeting.find(params[:id])
-    html = render_to_string(:template=>"/meetings/print.html.erb")
-    pdf = PDFKit.new(html)
+    html = render_to_string(:template=>"/pdfs/print_meeting.html.erb")
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     send_data pdf.to_pdf, :filename => "Meeting_##{@meeting.get_id}.pdf"
   end
 
 
+  private
+
+  def send_cisp_reports
+    # ex params: "meeting"=>{"reports_attributes"=>{"11"=>{"cisp_sent"=>"0", "id"=>"670"}
+    reports_ids = params[:meeting][:reports_attributes].map { |key, val| val[:id] if val[:cisp_sent] == '1' }.compact rescue nil
+    if reports_ids.present?
+      test_run = Rails.env.production? ? false : true
+      Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids)
+      # remove extra line
+      path = File.join(Rails.root, "cisp")
+      file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+      original = File.open(file_name, 'r') { |file| file.readlines }
+      blankless = original.reject{ |line| line.match(/^$/) }
+      File.open(file_name, 'w') do |file|
+        blankless.each { |line| file.puts line }
+      end
+
+      begin
+        unless test_run
+          system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+        end
+        puts 'SENT events to CISP'
+        @flash_message = { success: 'Event(s) Sent To CISP.' }
+      rescue
+        puts 'FAILED to send events to CISP'
+      end
+    else
+      puts 'NO events sent to CISP'
+      @flash_message = { danger:  'No Events Sent To CISP.' }
+    end
+    # render :partial => "cisp_reports_result"
+  end
 end

@@ -17,6 +17,8 @@ class Audit < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to  :approver,            foreign_key: 'approver_id',           class_name: 'User'
@@ -99,12 +101,24 @@ class Audit < Sa::SafetyAssuranceBase
 
   def included_findings
     result = ""
-    Finding.where(owner_type: self.type).where(owner_id: self.id).each do |finding|
+    self.findings.each do |finding|
       result += "
         <a style='font-weight:bold' href='/findings/#{finding.id}'>
           ##{finding.id}
         </a><br>"
     end
+
+    self.checklists.each do |checklist|
+      checklist.checklist_rows.each do |checklist_row|
+        checklist_row.findings. each do |finding|
+          result += "
+            <a style='font-weight:bold' href='/findings/#{finding.id}'>
+              ##{finding.id}
+            </a><br>"
+        end
+      end
+    end
+
     result.html_safe
   end
 
@@ -112,7 +126,6 @@ class Audit < Sa::SafetyAssuranceBase
   def type
     "Audit"
   end
-
 
   def self.get_headers
     [

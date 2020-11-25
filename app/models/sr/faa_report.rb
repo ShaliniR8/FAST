@@ -52,19 +52,13 @@ class FaaReport < ActiveRecord::Base
         link: true, mode: 4, value: 'statistics', value_key: 'asap_accepted_closed'},
       {title: 'Number of accepted reports present quarter (both sole source & non-sole source) closed with corrective action under ASAP for the employee',
         link: true, mode: 5, value: 'statistics', value_key: 'asap_accepted_employee_car'},
-      {title: 'Number of reports present quarter, which resulted in recommendations to the company for corrective action',
+      {title: 'Number of accepted reports present quarter, which resulted in recommendations to the company for corrective action',
         link: true, mode: 6, value: 'statistics', value_key: 'asap_aceepted_company_car'},
     ]
   end
 
 
-  def statistics
-    asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        self.get_start_date, self.get_end_date)
-      .select{|x|
-        (x.template.name.include? "ASAP") &&
-        (x.template.name.include? "#{self.employee_group}")}
+  def statistics(asap_reports)
     accepted_reports = asap_reports.select{|report| report.asap}
     result = {
       asap_submitted: asap_reports.map(&:id),
@@ -78,6 +72,22 @@ class FaaReport < ActiveRecord::Base
   end
 
 
+  # set statistics for FAA Report Print Word
+  def set_statistics
+    asap_reports = self.select_records_in_date_range(self.get_start_date, self.get_end_date)
+      .select{|x|
+        (x.template.name.include? "ASAP") &&
+        (x.template.name.include? "#{self.employee_group}")}
+    stats = self.statistics(asap_reports)
+    self.asap_submit = stats[:asap_submitted].size
+    self.asap_accept = stats[:asap_accepted].size
+    self.sole        = stats[:asap_accepted_sole_source].size
+    self.asap_close  = stats[:asap_accepted_closed].size
+    self.asap_emp    = stats[:asap_accepted_employee_car].size
+    self.asap_com    = stats[:asap_aceepted_company_car].size
+    self.save
+  end
+
 
   def self.get_new(y,q)
     result = FaaReport.new
@@ -90,18 +100,62 @@ class FaaReport < ActiveRecord::Base
 
 
   def get_start_date
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
     case self.quarter
       when 1
-        "#{self.year-1}-10-01"
+        faa_report_format ? "10/01/#{self.year-1}" : "#{self.year-1}-10-01"
       when 2
-        "#{self.year}-01-01"
+        faa_report_format ? "01/01/#{self.year}"   : "#{self.year}-01-01"
       when 3
-        "#{self.year}-04-01"
+        faa_report_format ? "04/01/#{self.year}"   : "#{self.year}-04-01"
       when 4
-        "#{self.year}-07-01"
+        faa_report_format ? "07/01/#{self.year}"   : "#{self.year}-07-01"
     end
   end
 
+
+  def get_end_date
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    case self.quarter
+      when 1
+        faa_report_format ? "12/31/#{self.year-1}" : "#{self.year-1}-12-31"
+      when 2
+        faa_report_format ? "03/31/#{self.year}"   : "#{self.year}-03-31"
+      when 3
+        faa_report_format ? "06/30/#{self.year}"   : "#{self.year}-06-30"
+      when 4
+        faa_report_format ? "09/30/#{self.year}"   : "#{self.year}-09-30"
+    end
+  end
+
+
+  def faa_format_date(date)
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    faa_report_format ? Date.strptime(date, '%m/%d/%Y') : Date.strptime(date, '%Y-%m-%d')
+  end
+
+
+  def select_records_in_date_range(start_date, end_date)
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    start_date = faa_format_date(start_date)
+    end_date = faa_format_date(end_date)
+    asap_reports = Record.preload(:corrective_actions, :template, report: :corrective_actions).all.select do |r|
+      selected = false
+      if r.event_date.present?
+        r_date = r.event_date
+        r_time_zone = r.event_time_zone
+        r_time_zone = 'UTC' if r_time_zone.blank?
+        r_date = r_date.in_time_zone(r_time_zone) if CONFIG.sr::GENERAL[:submission_time_zone]
+        begin
+          r_date = r_date.to_date
+        rescue
+          r_date = r.event_date.in_time_zone('UTC').to_date
+        end
+        selected = true if r_date >= start_date && r_date <= end_date
+      end
+      selected
+    end
+  end
 
 
   def self.getEmployeeGroup
@@ -109,24 +163,11 @@ class FaaReport < ActiveRecord::Base
   end
 
 
-
-  def get_end_date
-    case self.quarter
-      when 1
-        "#{self.year-1}-12-31"
-      when 2
-        "#{self.year}-03-31"
-      when 3
-        "#{self.year}-06-30"
-      when 4
-        "#{self.year}-09-30"
-    end
-  end
-
-
-
   def get_range
-    "#{self.get_start_date} To #{self.get_end_date}"
+    faa_report_format = CONFIG.getTimeFormat[:faa_report]
+    start_date = self.get_start_date
+    end_date = self.get_end_date
+    "#{start_date} To #{end_date}"
   end
 
 
@@ -164,9 +205,7 @@ class FaaReport < ActiveRecord::Base
 
   def car_docx
     result = ""
-    asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        self.get_start_date, self.get_end_date)
+    asap_reports = select_records_in_date_range(self.get_start_date, self.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}

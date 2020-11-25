@@ -1,8 +1,12 @@
-<%options = (cell.options || item.options) rescue item.options%>
+<%
+  field_type = (cell.data_type || item.data_type) rescue item.data_type
+  options = (cell.options || item.options) rescue item.options
+%>
+  
 
 <%case owner_type%>
 <%when 'Sample'%>
-  <%case item.data_type%>
+  <%case field_type%>
   <%when 'text'%>
     <input class="form-control" value="<%=(defined? cell) ? cell.value : ''%>"></input>
   <%when 'dropdown'%>
@@ -21,12 +25,25 @@
         </label><br>
       <%end%>
     </div>
+  <%when 'checkboxes'%>
+    <div class="col-xs-12 ml5">
+      <%options.split(";").each do |option|%>
+        <label class="checkbox checkbox-inline">
+          <%=check_box_tag 'value[]', option%>
+          <%=option%>
+        </label><br>
+      <%end%>
+    </div>
   <%end%>
 
 <%when 'ChecklistHeader'%>
-  <%case item.data_type%>
+  <%case field_type%>
   <%when 'text'%>
-    <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+    <%if item.editable%>
+      <%=text_area_tag "value_#{cell.id}", nil, class: "form-control"%>
+    <%else%>
+      <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+    <%end%>
   <%when 'dropdown'%>
     <select class="form-control field_select" id="preview_select" name="preview_select">
       <option></option>
@@ -43,10 +60,24 @@
         </label><br>
       <%end%>
     </div>
+  <%when 'checkboxes'%>
+    <div class="col-xs-12 ml5">
+      <%options.split(";").each do |option|%>
+        <label class="checkbox checkbox-inline">
+          <%=check_box_tag "value_#{cell.id}", option, option == cell.value%>
+          <%=option%>
+        </label><br>
+      <%end%>
+    </div>
   <%end%>
 
 <%else%>
-  <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+  <%case field_type%>
+  <%when 'checkboxes', 'radio', 'dropdown'%>
+    <%=cell.value.split(';').join('<br>').html_safe rescue ''%>
+  <%else%>
+    <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+  <%end%>
 <%end%>
 
 

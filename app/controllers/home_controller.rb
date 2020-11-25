@@ -1,23 +1,41 @@
 class HomeController < ApplicationController
-
+  include RiskMatricesHelper
 
   before_filter :login_required
 
 
   def index
+
+    module_name = case session[:mode]
+    when "ASAP" then 'Safety Reporting'
+    when "SMS IM" then 'SMS IM'
+    when "SMS" then 'Safety Assurance'
+    when "SRM" then 'SRA (SRM)' end
+    @title = "#{module_name} Dashboard"
+
     if session[:mode].blank?
       redirect_to choose_module_home_index_path
       return
     end
+
     @action = "home"
     @notices = current_user.notices.where(status: 1).reverse.first(6)
+
     prepare_analytics
     prepare_calendar
     prepare_special_risk_matrix
     prepare_risk_matrix
     prepare_templates
-  end
 
+    @params = {
+      advance_search: true,
+      status: 'All',
+      start_date: @start_date,
+      end_date: @end_date,
+      emp_groups: @emp_groups,
+      departments: @departments,
+    }
+  end
 
 
   def prepare_special_risk_matrix
@@ -150,7 +168,6 @@ class HomeController < ApplicationController
   end
 
 
-
   def prepare_templates
     templates = current_user.get_all_submitter_templates
     @templates = Template.where(:name => templates)
@@ -160,7 +177,6 @@ class HomeController < ApplicationController
       .sort_by!{|x| x.name}
     @orm_templates = OrmTemplate.order(:name).all
   end
-
 
 
   def choose_module
@@ -185,133 +201,20 @@ class HomeController < ApplicationController
   end
 
 
-
   def prepare_risk_matrix
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
     risk_matrix_initializer
 
-    # Safety Assurance Module
-    if session[:mode] == "SMS"
-      # Findings
-      @finding_matrix = Array.new(5){Array.new(5,0)}
-      @finding_after_matrix = Array.new(5){Array.new(5,0)}
-      Finding.within_timerange(@start_date, @end_date).each do |finding|
-        if finding.severity.present? && finding.likelihood_index.present?
-          @finding_matrix[finding.severity.to_i][finding.likelihood_index] =
-            @finding_matrix[finding.severity.to_i][finding.likelihood_index]+1
-        end
-        if finding.severity_after.present? && finding.likelihood_after_index.present?
-          @finding_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] =
-            @finding_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index]+1
-        end
-      end
-      Rails.logger.debug "finding_after_matrix=#{@finding_after_matrix.inspect}"
-
-      # Investigations
-      @inv_after_matrix = Array.new(5){Array.new(5,0)}
-      @inv_matrix = Array.new(5){Array.new(5,0)}
-      Investigation.within_timerange(@start_date, @end_date).each do |finding|
-        if finding.severity.present? && finding.likelihood_index.present?
-          @inv_matrix[finding.severity.to_i][finding.likelihood_index] =
-            @inv_matrix[finding.severity.to_i][finding.likelihood_index]+1
-        end
-        if finding.severity_after.present? && finding.likelihood_after_index.present?
-          @inv_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] =
-            @inv_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index]+1
-        end
-      end
-
-      # Sms Actions
-      @car_after_matrix=Array.new(5){Array.new(5,0)}
-      @car_matrix=Array.new(5){Array.new(5,0)}
-      SmsAction.within_timerange(@start_date, @end_date).each do |car|
-        if car.severity.present? && car.likelihood_index.present?
-          @car_matrix[car.severity.to_i][car.likelihood_index] =
-            @car_matrix[car.severity.to_i][car.likelihood_index]+1
-        end
-        if car.severity_after.present? && car.likelihood_after_index.present?
-          @car_after_matrix[car.severity_after.to_i][car.likelihood_after_index] =
-            @car_after_matrix[car.severity_after.to_i][car.likelihood_after_index]+1
-        end
-      end
-
-      @matrix_title="#{I18n.t("core.risk.baseline.title")} Risk Analysis: Findings"
-      @after_title="#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Findings"
-
-
-    # Safety Reporting Module
-    elsif session[:mode] == "ASAP"
-      @record_matrix = Array.new(5){Array.new(5,0)}
-      @record_after_matrix = Array.new(5){Array.new(5,0)}
-      Record.can_be_accessed(current_user)
-        .within_timerange(@start_date, @end_date)
-        .by_emp_groups(params[:emp_groups])
-        .each do |record|
-        #if record.to_show
-          if record.severity_after.present? && record.likelihood_after_index.present?
-            @record_after_matrix[record.severity_after.to_i][record.likelihood_after_index] =
-              @record_after_matrix[record.severity_after.to_i][record.likelihood_after_index]+1
-          end
-          if record.severity.present? && record.likelihood_index.present?
-            @record_matrix[record.severity.to_i][record.likelihood_index] =
-              @record_matrix[record.severity.to_i][record.likelihood_index]+1
-          end
-        #end
-      end
-      @report_matrix = Array.new(5){Array.new(5,0)}
-      @report_after_matrix = Array.new(5){Array.new(5,0)}
-      Report.within_timerange(@start_date, @end_date).each do |report|
-        if report.severity_after.present? && report.likelihood_after_index.present?
-          @report_after_matrix[report.severity_after.to_i][report.likelihood_after_index] =
-            @report_after_matrix[report.severity_after.to_i][report.likelihood_after_index] + 1
-        end
-        if report.severity.present? && report.likelihood_index.present?
-          @report_matrix[report.severity.to_i][report.likelihood_index] =
-            @report_matrix[report.severity.to_i][report.likelihood_index] + 1
-        end
-      end
-      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Reports"
-      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Reports"
-
-
-    # Safety Risk Management Module
-    else
-
-
-
-      @hazard_matrix = Array.new(5){Array.new(5,0)}
-      @hazard_after_matrix = Array.new(5){Array.new(5,0)}
-      Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |hazard|
-        if hazard.severity_after.present? && hazard.likelihood_after_index.present?
-          @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] =
-            @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] + 1
-        end
-        if hazard.severity.present? && hazard.likelihood_index.present?
-          @hazard_matrix[hazard.severity.to_i][hazard.likelihood_index] =
-            @hazard_matrix[hazard.severity.to_i][hazard.likelihood_index] + 1
-        end
-      end
-      @sra_matrix = Array.new(5){Array.new(5,0)}
-      @sra_after_matrix = Array.new(5){Array.new(5,0)}
-      # Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
-      #   if sra.severity_after.present? && sra.likelihood_after_index.present?
-      #     @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index]=@sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index]+1
-      #   end
-      #   if sra.severity.present? && sra.likelihood_index.present?
-      #     @sra_matrix[sra.severity.to_i][sra.likelihood_index]=@sra_matrix[sra.severity.to_i][sra.likelihood_index]+1
-      #   end
-      # end
-      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Hazards"
-      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Hazards"
-
-    end
+    create_risk_matrices_with_num_of_occurrences
   end
 
 
   def prepare_calendar
     @calendar_entries = []
     current_user_id = session[:simulated_id] || session[:user_id]
+
+
     if session[:mode] == "SMS"
 
       objects = ['Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation']
@@ -334,49 +237,75 @@ class HomeController < ApplicationController
 
 
       Verification.where(:status => 'New').each do |x|
-        if x.validator == current_user
-          owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
-          @calendar_entries.push({
-            :url => "#{x.owner.class.table_name}/#{x.owner_id}",
-            :start => x.verify_date,
-            :color => 'skyblue',
-            :textColor => "darkslategrey",
-            :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
-          })
+        x.get_all_validators.each do |validator|
+          if validator == current_user
+
+            next if x.owner.class.name == 'CorrectiveAction'
+
+            owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
+            @calendar_entries.push({
+              :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+              :start => x.verify_date,
+              :color => 'skyblue',
+              :textColor => "darkslategrey",
+              :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
+            })
+
+          end
         end
       end
 
 
     elsif session[:mode] == "ASAP"
       if current_user.has_access("meeting", "index")
-        meetings = Meeting.where("status != ? and type is null", "Closed")
+        meetings = Meeting.preload(:host, :invitations).where("status != ? and type is null", "Closed")
         meetings = meetings.select{|x| x.has_user(current_user)}
-        meetings.each do |a|
+        meetings.each do |meeting|
           @calendar_entries.push({
-            :url => meeting_path(a),
-            :start => a.get_time("meeting_start"),
-            :end => a.get_time("meeting_end"),
-            :title => "Meeting \##{a.id}",
+            :url => meeting_path(meeting),
+            :start => meeting.get_time("meeting_start"),
+            :end => meeting.get_time("meeting_end"),
+            :title => "#{meeting.meeting_type} Meeting \##{meeting.id}",
             :color => "khaki",
             :textColor => "darkslategrey",
-            :description => a.get_tooltip
+            :description => meeting.get_tooltip
           })
         end
       end
 
       if current_user.has_access("submissions", "index")
-        submissions = Submission.preload(:template).where("completed = ? and event_date is not ?", true, nil)
-          .can_be_accessed(current_user)
-          .by_emp_groups(params[:emp_groups])
+        submissions = Submission.preload(:template)
+                      .where("completed = ? and event_date is not ? and user_id = ?",
+                              true, nil, current_user.id)
+                      .can_be_accessed(current_user)
+                      .by_emp_groups(params[:emp_groups])
+                      .select { |x| x.template.present? }
         submissions.each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
             :start => a.get_date,
             :title => "#{a.template.name} ##{a.get_id}",
             :textColor => "darkslategrey",
-            :description => a.description,
+            :description => "<b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
             :color => group_to_color(a.template.emp_group)
-          })
+          }) if a.get_date.present?
+        end
+      end
+
+      if current_user.has_access("records", "index")
+        records = Record.preload(:template)
+                        .where("event_date is not ?", nil)
+                        .can_be_accessed(current_user)
+                        .by_emp_groups(params[:emp_groups])
+        records.each do |a|
+          @calendar_entries.push({
+            :url => record_path(a),
+            :start => a.get_date,
+            :title => "#{a.template.name} ##{a.get_id}",
+            :textColor => "darkslategrey",
+            :description => "<b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
+            :color => group_to_color(a.template.emp_group)
+          }) if a.get_date.present?
         end
       end
 
@@ -460,15 +389,19 @@ class HomeController < ApplicationController
       end
 
       Verification.where(:status => 'New').each do |x|
-        if x.validator == current_user
-          owner_class = x.owner.class.name == 'SmsAction' ? 'CorrectiveAction' : x.owner.class.name
-          @calendar_entries.push({
-            :url => "#{x.owner.class.table_name}/#{x.owner_id}",
-            :start => x.verify_date,
-            :color => 'skyblue',
-            :textColor => "darkslategrey",
-            :title => "#{owner_class.titleize} ##{x.owner.id}: Verification required"
-          })
+        x.get_all_validators.each do |validator|
+          if validator == current_user
+
+            next if ['SmsAction', 'CorrectiveAction'].include? x.owner.class.name
+
+            @calendar_entries.push({
+              :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+              :start => x.verify_date,
+              :color => 'skyblue',
+              :textColor => "darkslategrey",
+              :title => "#{x.owner.class.name.titleize} ##{x.owner.id}: Verification required"
+            })
+          end
         end
       end
 
@@ -538,17 +471,21 @@ class HomeController < ApplicationController
 
     if session[:mode] == "ASAP"
       if current_user.has_access('submissions','index')
-        @submissions = Submission.where(:completed => 1)
-          .can_be_accessed(current_user)
-          .within_timerange(@start_date, @end_date)
-          .by_emp_groups(params[:emp_groups])
-          .group_by{|x| x.template.name}
+        @submissions = Submission.preload(:template).where(completed: 1)
+                        .within_timerange(@start_date, @end_date)
+                        .can_be_accessed(current_user)
+                        .by_emp_groups(params[:emp_groups])
+                        .select{|x| x.template.present?}
+                        .group_by{|x| x.template.name}
+                        .sort_by{|k, v| k}.to_h
       end
       if current_user.has_access('records','index')
-        @records = Record.can_be_accessed(current_user)
-          .within_timerange(@start_date, @end_date)
-          .by_emp_groups(params[:emp_groups])
-          .group_by(&:status)
+        @records = Record.preload(:template)
+                    .within_timerange(@start_date, @end_date)
+                    .can_be_accessed(current_user)
+                    .by_emp_groups(params[:emp_groups])
+                    .select { |x| x.template.present? }
+                    .group_by(&:status)
       end
       if current_user.has_access('reports','index')
         @reports = Report.within_timerange(@start_date, @end_date)
@@ -629,6 +566,9 @@ class HomeController < ApplicationController
         .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
       @hazards = hazards.group_by{|x| x.status}
+      if (temp=hazards.select{|x| x.overdue}).present?
+        @hazards['Overdue'] = temp
+      end
       risk_controls = RiskControl.within_timerange(@start_date, @end_date)
         .by_departments(params[:departments])
         .sort{|x,y| status_index(x) <=> status_index(y)}
@@ -693,13 +633,19 @@ class HomeController < ApplicationController
     end
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
     @departments = params[:departments] ? params[:departments] : nil
+
+    @params = {
+      advance_search: true,
+      status: 'All',
+      start_date: @start_date,
+      end_date: @end_date,
+      emp_groups: @emp_groups,
+      departments: @departments,
+    }
+
     prepare_analytics
     prepare_calendar
-    if CONFIG::GENERAL[:base_risk_matrix]
-      prepare_risk_matrix
-    else
-      prepare_special_risk_matrix
-    end
+    prepare_risk_matrix
   end
 
 
@@ -970,10 +916,11 @@ class HomeController < ApplicationController
 
   def advanced_search
     @table = Object.const_get(params[:table])
-    @path = send("#{@table.table_name}_path")
+    @path = eval("#{@table.table_name}_path")
     meta_field_args = ['show']
     meta_field_args.push('admin') if current_user.admin?
     @terms = @table.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present?}
+    @status = params[:status]
     render :partial => '/shared/advanced_search'
   end
 

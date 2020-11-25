@@ -4,6 +4,9 @@ class RecordField < ActiveRecord::Base
   after_update :create_transaction
 
 
+  scope :nonempty, where('value <> ?', '')
+
+
   def display_type
     self.field.display_type
   end

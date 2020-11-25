@@ -64,7 +64,7 @@
 
 
       <div class="panel-body" id="form_body">
-        <%=form_for @record , :html => {:multipart => true} do |f|%>
+        <%=form_for @record , :html => {:multipart => true, :novalidate => true} do |f|%>
 
           <div class="col-xs-12">
             <%=render "shared/instructions",
@@ -123,34 +123,61 @@
             </div>
 
             <%if CONFIG.sr::GENERAL[:submission_description]%>
-              <div class="col-xs-12 col-sm-4 mb5">
-                <%=label_tag :description,
-                  "Event Title",
-                  :style => "color:red" %>
+              <%if CONFIG.sr::GENERAL[:submission_description_required]%>
+                <div class="col-xs-12 col-sm-4 mb5">
+                  <%=label_tag :description,
+                    "Event Title",
+                    :style => "color:red" %>
                   <%=f.text_field :description,
                     {:class => "form-control required_field",
                     :maxlength => "30",
                     :placeholder => "please limit to 30 characters"}%>
-              </div>
+                  <h6 id="countchar" class="pull-right">0/30</h6>
+                </div>
+              <% else %>
+                <div class="col-xs-12 col-sm-4 mb5">
+                  <%=label_tag :description,
+                    "Event Title"%>
+                  <%=f.text_field :description,
+                    {:class => "form-control",
+                    :maxlength => "30",
+                    :placeholder => "please limit to 30 characters"}%>
+                  <h6 id="countchar" class="pull-right">0/30</h6>
+                </div>
+              <% end %>
             <%end%>
 
             <div class="col-xs-12 col-sm-4 mb5">
+              <%date_value = @record.event_date.present? ? @record.event_date.in_time_zone(@record.event_time_zone) : nil%>
+              <%if !CONFIG.sr::GENERAL[:submission_time_zone]%>
+                <%date_value = @record.event_date%>
+              <%end%>
               <%=label_tag :event_date, "Date and Time of Event", :style => "color:red"%>
-              <%=f.text_field :event_date, {:class => 'field-datetime form-control required_field', :id => "event_date"}%>
+              <%=f.text_field :event_date,
+                {:class => 'field-datetime form-control required_field', :id => "event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker],
+                  value: date_value}%>
             </div>
 
-            <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
-              <div class="col-xs-12 col-sm-2 mb5">
-                <%=label_tag :event_time_zone, "Time Zone"%>
+            <div class="col-xs-12 col-sm-2 mb5">
+              <%event_time_zone = @record.event_time_zone%>
+              <%=label_tag :event_time_zone, "Time Zone", :style => "color:red"%>
+              <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
+                <%event_time_zone = 'UTC' if event_time_zone.blank?%>
                 <div class="input-group">
                   <%=f.select :event_time_zone,
-                    @record.getTimeZone,
-                    {:include_blank => ""},
-                    {:class => 'form-control tz atz toplevel_timezone'}%>
+                     ActiveSupport::TimeZone.all.map(&:name),
+                    {:selected => event_time_zone},
+                    {:class => 'form-control tz atz toplevel_timezone required_field'}%>
                   <span class="input-group-addon tc">All</span>
                 </div>
-              </div>
-            <%end%>
+              <%else%>
+                <%event_time_zone = 'Local' if event_time_zone.blank?%>
+                <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
+                <button id="time-zone-toggle-btn" type="button" class="input-group btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+                  <%=event_time_zone%>
+                </button>
+              <%end%>
+            </div>
           </div>
 
           <div class="col-xs-12 mt20">
@@ -287,6 +314,26 @@
   var airport_table;
 
   $(document).ready(function(){
+    timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
+    if (timeZoneToggleBtn != null) {
+      $('#time-zone-toggle-btn').on('click', function() {
+        if (timeZoneToggleBtn.innerHTML == 'Local') {
+          timeZoneToggleBtn.innerHTML = 'UTC'
+          $('#submission_event_time_zone').val('UTC')
+        } else {
+          timeZoneToggleBtn.innerHTML = 'Local'
+          $('#submission_event_time_zone').val('Local')
+        }
+      })
+    }
+
+    // Count the characters limit
+    $('#submission_description, textarea').keyup(function(){
+      len = $(this).val().length;
+      max = $(this).attr('maxlength');
+
+      $(this).siblings('h6').text(len + '/' + max);
+    })
 
     update_timezones();
 
@@ -320,18 +367,9 @@
         }
       });
     });
-
-
-
   });
 
-
-
-
-
-
 </script>
-
 
 
 <style type="text/css">

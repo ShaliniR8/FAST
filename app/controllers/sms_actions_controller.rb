@@ -29,8 +29,12 @@ class SmsActionsController < SafetyAssuranceController
     :new_attachment,
     :override_status,
     :show,
-    :update
+    :update,
   ]
+
+  before_filter(only: [:new])    {set_parent_type_id(:sms_action)}
+  before_filter(only: [:create]) {set_parent(:sms_action)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @owner)}
 
   def define_owner
     @class = Object.const_get('SmsAction')
@@ -50,28 +54,36 @@ class SmsActionsController < SafetyAssuranceController
     load_options
     @fields = SmsAction.get_meta_fields('form')
     choose_load_special_matrix_form(@owner, 'sms_action')
+    @risk_type = 'Baseline'
   end
 
 
   def create
-    owner = SmsAction.create(params[:sms_action])
-    redirect_to owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
+    @owner = SmsAction.create(params[:sms_action])
+    redirect_to @owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
   end
 
 
   def index
-    @table = Object.const_get("SmsAction")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @title = 'Corrective Actions'
-    if !current_user.has_access('sms_actions','admin', admin: true, strict: true)
-      cars = SmsAction.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += SmsAction.where('approver_id = ?',  current_user.id)
-      cars += SmsAction.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    params[:type].present? ? @table = Object.const_get(object_name).preload(@object[:preload]).where(owner_type: params[:type])
+                           : @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_records(object_name, controller_name)
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -90,6 +102,7 @@ class SmsActionsController < SafetyAssuranceController
     choose_load_special_matrix_form(@owner, 'sms_action')
     @type = get_car_owner(@owner)
     @users.keep_if{|u| u.has_access(@type, 'edit')}
+    @risk_type = 'Baseline'
   end
 
 
@@ -110,64 +123,14 @@ class SmsActionsController < SafetyAssuranceController
     render :partial => "reassign"
   end
 
-  def update
-    transaction = true
-    @owner.update_attributes(params[:sms_action])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Reassign'
-    when 'Assign'
-    when 'Complete'
-      if @owner.approver
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:sms_action][:status]}"
-      params[:sms_action][:close_date] = params[:sms_action][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:sms_action])
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to sms_action_path(@owner)
-  end
-
-
-  def print
-    @deidentified = params[:deidentified]
-    @corrective_action = SmsAction.find(params[:id])
-    html = render_to_string(:template => "/sms_actions/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Corrective Action##{@corrective_action.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
 
   def mitigate
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     load_options
     load_special_matrix_form('sms_action', 'mitigate', @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/mitigate"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
-    end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
@@ -175,12 +138,8 @@ class SmsActionsController < SafetyAssuranceController
     @owner = SmsAction.find(params[:id]).becomes(SmsAction)
     load_options
     load_special_matrix_form('sms_action', 'baseline', @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/baseline"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
-
-
 end

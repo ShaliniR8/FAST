@@ -47,25 +47,16 @@ class MessagesController < ApplicationController
       end
     end
 
-    if params[:send_to].present? && params[:send_to].values.find{|val| val == "-1"}.nil?
-      params[:send_to].values.each do |v|
-        SendTo.create(messages_id: @message.id, users_id: v, anonymous: (params[:to_anonymous] || false))
-        notify(@message,
-          notice: {users_id: v, content: "You have a new message in ProSafeT."},
-          mailer: true,
-          subject: 'New Internal Message')
-      end
-    end
+    # send messages
+    call_rake 'notify',
+      messages_id: @message.id,
+      owner_type: params[:message][:owner_type],
+      owner_id: params[:message][:owner_id],
+      subject: params[:message][:subject],
+      send_to: params[:send_to],
+      cc_to: params[:cc_to],
+      to_anonymous: params[:to_anonymous]
 
-    if params[:cc_to].present?
-      params[:cc_to].values.each do |v|
-        CC.create(:messages_id => @message.id, :users_id => v)
-        notify(@message,
-          notice: {users_id: v, content: "You have a new message in ProSafeT."},
-          mailer: true,
-          subject: 'New Internal Message')
-      end
-    end
     if @message.owner
       Transaction.build_for(
         @message.owner,
@@ -74,12 +65,17 @@ class MessagesController < ApplicationController
         g_link(@message)
       )
     end
-    redirect_to @message.owner || message_path(@message), flash: { success: 'Message sent.' }
+
+    respond_to do |format|
+      format.json {render json: {message: 'Message sent.'}}
+      format.html {redirect_to @message.owner || message_path(@message), flash: { success: 'Message Sent' }}
+    end
+
   end
 
 
   def destroy
-    @message=Message.find(params[:id])
+    @message = Message.find(params[:id])
     if params[:source]=="Sent"
       s=@message.send_from
       s.visible=false
@@ -112,7 +108,7 @@ class MessagesController < ApplicationController
 
 
   def sent
-    @messages = current_user.sent_messages.select{|x| x.visible}.map{|x| x.message}
+    @messages = current_user.sent_messages.select{|x| x.visible && x.message.present?}.map{|x| x.message}
     @title = "Sent"
   end
 
@@ -126,7 +122,7 @@ class MessagesController < ApplicationController
         send_to: :user,
         cc: :user
       ]).select(&:visible).map(&:message)
-    }.flatten
+    }.flatten.compact
     @messages.uniq!
 
     respond_to do |format|

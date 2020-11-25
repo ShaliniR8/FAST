@@ -2,6 +2,10 @@ class SafetyPlansController < ApplicationController
   before_filter :login_required
   before_filter :define_owner, only: [:interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:safety_plan)}
+  before_filter(only: [:create]) {set_parent(:safety_plan)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @safety_plan)}
+
   def define_owner
     @class = Object.const_get('SafetyPlan')
     @owner = SafetyPlan.find(params[:id])
@@ -9,10 +13,24 @@ class SafetyPlansController < ApplicationController
 
 
   def index
-    @table = Object.const_get("SafetyPlan")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
+    # @table = Object.const_get("SafetyPlan")
+    # @headers = @table.get_meta_fields('index')
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -28,8 +46,8 @@ class SafetyPlansController < ApplicationController
 
 
   def create
-    safety_plan = SafetyPlan.create(params[:safety_plan])
-    redirect_to safety_plan, flash: {success: "Safety Plan created."}
+    @safety_plan = SafetyPlan.create(params[:safety_plan])
+    redirect_to @safety_plan, flash: {success: "Safety Plan created."}
   end
 
 
@@ -71,7 +89,7 @@ class SafetyPlansController < ApplicationController
   def destroy
     safety_plan = SafetyPlan.find(params[:id])
     safety_plan.destroy
-    redirect_to safety_plans_path, flash: {danger: "Safety Plan ##{params[:id]} deleted."}
+    redirect_to safety_plans_path(status: 'All'), flash: {danger: "Safety Plan ##{params[:id]} deleted."}
   end
 
 
@@ -90,16 +108,6 @@ class SafetyPlansController < ApplicationController
   end
 
 
-
-  def print
-    @fields = SafetyPlan.get_meta_fields('show')
-    @safety_plan = SafetyPlan.find(params[:id])
-    html = render_to_string(:template => "/safety_plans/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    send_data pdf.to_pdf, :filename => "Safety_Plan_##{@safety_plan.get_id}.pdf"
-  end
-
   def comment
     @owner = SafetyPlan.find(params[:id])
     @comment = @owner.comments.new
@@ -114,7 +122,6 @@ class SafetyPlansController < ApplicationController
       current_user.id
     )
     safety_plan.status="Completed"
-    safety_plan.date_completed = Time.now
     safety_plan.close_date = Time.now
     if safety_plan.save
       redirect_to safety_plan_path(safety_plan)

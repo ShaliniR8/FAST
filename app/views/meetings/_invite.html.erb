@@ -5,28 +5,30 @@
         <%User.invite_headers.each do |header|%>
           <th><%=header[:title]%></th>
         <%end%>
-        <th>Action</th>
+        <%if !(defined?(hide_btns) && hide_btns)%>
+          <th>Action</th>
+        <%end%>
       </tr>
     </thead>
     <tbody>
-      <%User.includes(:invitations).where(id: @users.map(&:id)).each do |user|%>
+      <%@available_participants.each do |user|%>
         <tr user="<%=user.id%>">
           <%User.invite_headers.each do |header|%>
-            <td>
-              <%=user.send(header[:field])%>
-            </td>
+            <td><%=user.send(header[:field])%></td>
           <%end%>
-          <% invite_status = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.status rescue
-            'Not Invited'%>
-          <%if action_name == "new"%>
-            <td><a class="btn btn-info invite_btn">Invite</a></td>
-          <%elsif action_name == "show"%>
-            <td><%=invite_status%></td>
-          <%else%>
-            <%if invite_status == "Not Invited"%>
+          <%if !(defined?(hide_btns) && hide_btns)%>
+            <% invite_status = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.status rescue
+              'Not Invited'%>
+            <%if action_name == "new"%>
               <td><a class="btn btn-info invite_btn">Invite</a></td>
+            <%elsif action_name == "show"%>
+              <td><%=invite_status%></td>
             <%else%>
-              <td><a class="btn btn-success invite_btn">Invited</a></td>
+              <%if invite_status == "Not Invited"%>
+                <td><a class="btn btn-info invite_btn">Invite</a></td>
+              <%else%>
+                <td><a class="btn btn-success invite_btn">Invited</a></td>
+              <%end%>
             <%end%>
           <%end%>
         </tr>

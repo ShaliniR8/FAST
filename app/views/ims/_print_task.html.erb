@@ -1,8 +1,0 @@
-<div class="title">
-  Task #<%=owner.id%> <%=owner.title%>
-</div>
-
-<div class="content">
-  <%fields = SmsTask.get_meta_fields('show')%>
-  <%=render '/forms/print_fields', :fields => fields, :owner => owner, :deidentified => deidentified%>
-</div>

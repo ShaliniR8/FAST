@@ -29,6 +29,23 @@ class DefaultMobileConfig
     scx_shrtrain_sso: { label: 'Training (Shared)',             subdomain: 'scx-training',  sso: true,  shared: true },
     scx_shrtrain_dir: { label: 'Training (Shared) (ProSafeT)',  subdomain: 'scx-training',              shared: true },
 
+    #FFT portals
+    fft_training_dir: { label: 'Training',                      subdomain: 'fft-training'},
+    fft_training_sso: { label: 'Training SSO',                  subdomain: 'fft-training',  sso: true},
+    fft_dir:          { label: 'Login with ProSafeT',           subdomain: 'fft'},
+    fft_sso:          { label: 'SSO',                           subdomain: 'fft',           sso: true},
+
+    #ATN portals
+    atn_training_dir: { label: 'Training',                      subdomain: 'atn-training'},
+    atn_dir:          { label: 'General',                       subdomain: 'atn'},
+    #atn_training_sso: { label: 'Training SSO',                  subdomain: 'fft-training',  sso: true},
+    #atn_dir:          { label: 'Login with ProSafeT',           subdomain: 'fft'},
+    #atn_sso:          { label: 'SSO',                           subdomain: 'fft',           sso: true},
+
+    # RVF portals
+    rvf_training_dir: { label: 'Training',                      subdomain: 'rvf-training'},
+    rvf_dir:          { label: 'General',                       subdomain: 'rvf'},
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -74,12 +91,54 @@ class DefaultMobileConfig
     'SCX Beta Key'=>{ # 35E1-98A2-2C8F-A912
       key_name: 'Sun Country Airlines Mobile Beta',
       portals: %i[
-        scx_training_sso
         scx_training_dir
-        scx_shrtrain_sso
-        scx_shrtrain_dir
+        scx_training_sso
       ]
     },
+
+
+    'FFT Beta Key' =>{ # EE6C-D7FB-19B0-8377
+      key_name: 'Frontier Airlines Mobile',
+      portals: %i[
+        fft_dir
+      ]
+    },
+
+    'FFT Key' =>{ # 4D25-BE28-93CA-8088
+      key_name: 'Frontier Airlines',
+      portals: %i[
+        fft_sso
+      ]
+    },
+
+
+    'ATN Beta Key' =>{ # 5D8F-3A12-1E33-0C4A
+      key_name: 'Air Transport International Mobile Beta',
+      portals: %i[
+        atn_training_dir
+      ]
+    },
+    'ATN Key' =>{ # EF23-C9BC-C96D-1417
+      key_name: 'Air Transport International',
+      portals: %i[
+        atn_dir
+      ]
+    },
+
+
+    'RVF Beta Key' =>{ # 5F85-7FC8-D717-84E8
+      key_name: 'Ravn Alaska',
+      portals: %i[
+        rvf_training_dir
+      ]
+    },
+    'RVF Key' =>{ # 0447-31ED-DF24-ABF9
+      key_name: 'Ravn Alaska',
+      portals: %i[
+        rvf_dir
+      ]
+    },
+
 
     'Trial Key' => { # 6158-BC31-0338-233B
       key_name: 'Trial',

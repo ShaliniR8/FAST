@@ -1,6 +1,7 @@
 class Record < Sr::SafetyReportingBase
   extend AnalyticsFilters
   include RiskHandling
+  include ModelHelpers
 
 #Concerns List
   include Attachmentable
@@ -10,6 +11,8 @@ class Record < Sr::SafetyReportingBase
   include RootCausable
   include Sraable
   include Transactionable
+  include Childable
+  include Parentable
 
 #Associations List
   has_one     :submission,          foreign_key: 'records_id',   class_name: 'Submission'
@@ -35,7 +38,7 @@ class Record < Sr::SafetyReportingBase
   accepts_nested_attributes_for :record_fields
   accepts_nested_attributes_for :descriptions
 
-  after_create -> { create_transaction(context: 'Generated Report From User Submission.') if !self.description.include?('-- copy')}
+  after_create -> { create_transaction(context: 'Generated Report From User Submission.') if self.description.present? && !self.description.include?('-- copy')}
 
 
   def handle_anonymous_reports
@@ -88,18 +91,6 @@ class Record < Sr::SafetyReportingBase
       end
     end
     false
-  end
-
-
-  def getTimeZone()
-    ['Z','NZDT','IDLE','NZST','NZT','AESST','ACSST','CADT','SADT','AEST','CHST','EAST','GST',
-     'LIGT','SAST','CAST','AWSST','JST','KST','MHT','WDT','MT','AWST','CCT','WADT','WST',
-     'JT','ALMST','WAST','CXT','MMT','ALMT','MAWT','IOT','MVT','TFT','AFT','MUT','RET',
-     'SCT','IRT','IT','EAT','BT','EETDST','HMT','BDST','CEST','CETDST','EET','FWT','IST',
-     'MEST','METDST','SST','BST','CET','DNT','FST','MET','MEWT','MEZ','NOR','SET','SWT',
-     'WETDST','GMT','UT','UTC','ZULU','WET','WAT','FNST','FNT','BRST','NDT','ADT','AWT',
-     'BRT','NFT:NST','AST','ACST','EDT','ACT','CDT','EST','CST','MDT','MST','PDT','AKDT',
-     'PST','YDT','AKST','HDT','YST','MART','AHST','HST','CAT','NT','IDLW']
   end
 
 
@@ -161,6 +152,16 @@ class Record < Sr::SafetyReportingBase
     ["New", "In Progress", "Closed"]
   end
 
+  def get_cisp_timezone
+    timezone = {"UTC" => "UTC"}
+    # if record has old time zone
+    if CONFIG::CISP_TIMEZONES.keys.include? self.event_time_zone
+      timezone = {self.event_time_zone => CONFIG::CISP_TIMEZONES[self.event_time_zone]}
+    elsif CONFIG::CISP_TIMEZONES.values.include? self.event_time_zone
+      timezone = {CONFIG::CISP_TIMEZONES.key(self.event_time_zone) => self.event_time_zone}
+    end
+    timezone
+  end
 
   def title
     description
@@ -260,21 +261,6 @@ class Record < Sr::SafetyReportingBase
       end
     end
   end
-
-
-  def self.get_avg_complete(current_user)
-    candidates = self.where("status = ? and close_date is not ?", "Closed", nil)
-    candidates.keep_if{|r| current_user.has_access(r.template.name, "full" ) }
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.close_date.to_date - x.created_at.to_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
 
   def satisfy(conditions)
 
@@ -389,5 +375,47 @@ class Record < Sr::SafetyReportingBase
     end
   end
 
+  def getEventId
+    self.report.id rescue nil
+  end
+
+  def self.export_all
+    date_from = Time.now.at_beginning_of_month
+
+    all_record_fields = []
+    all_records = self.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).select { |record| record.event_date > date_from rescue false }
+    all_records.each { |record| all_record_fields << record.record_fields.map{|sf| [sf.fields_id, sf]} }
+    all_record_fields = all_record_fields.flatten(1).to_h
+
+    all_records.each do |s|
+
+      path = ['mitre'] + (s.event_date.strftime('%Y:%b').split(':') rescue ['no_date']) + [s.template.emp_group]
+      dirname = File.join([Rails.root] + path)
+      temp_file = File.join([Rails.root] + path + ["#{s.id}.xml"])
+      unless File.directory?(dirname)
+        FileUtils.mkdir_p(dirname)
+      end
+      File.open(temp_file, 'w') do |file|
+        file << ApplicationController.new.render_to_string(
+          template: 'records/export_component.xml.erb',
+          locals:   { template: s.template, record: s, all_record_fields: all_record_fields})
+      end
+    end
+  end
+
+
+  def get_additional_info
+    additional_info = []
+    all_record_fields = self.record_fields.map{|sf| [sf.fields_id, sf] }.to_h
+    additional_info_fields = self.template.fields.select { |field| field.additional_info && !field.deleted }
+
+    additional_info_fields.each do |field|
+      if all_record_fields[field.id].present?
+        additional_info << { label: field.label, value: all_record_fields[field.id].value }
+      end
+    end
+
+    additional_info
+  end
 
 end

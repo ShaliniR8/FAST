@@ -1,0 +1,4 @@
+- owner.risk_controls.each do |risk_control|
+	= render '/pdfs/print',
+		owner: risk_control,
+		deidentified: deidentified

@@ -1,6 +1,32 @@
 $(document).ready(function(){
+  let datetime_format = 'Y-m-d H:i'
+  let date_format     = 'Y-m-d'
+
+  // Update date_format
+  try {
+    date_format = $('.field-date')[0].dataset["format"]
+    if (date_format == undefined) {
+      date_format = 'Y-m-d'
+    }
+  } catch(error) {
+    // console.log(error)
+    date_format = 'Y-m-d'
+  }
+
+  // Update datetime_format
+  try {
+    datetime_format = $('.field-datetime')[0].dataset["format"]
+    if (datetime_format == undefined) {
+      datetime_format = 'Y-m-d H:i'
+    }
+  } catch(error) {
+    // console.log(error)
+    datetime_format = 'Y-m-d H:i'
+  }
 
   $('.field-date').flatpickr({
+    altInput: true,
+    altFormat: date_format,
     dateFormat: 'Y-m-d',
   });
 
@@ -12,9 +38,12 @@ $(document).ready(function(){
   });
 
   $('.field-datetime').flatpickr({
+    altInput: true,
+    altFormat: datetime_format,
     enableTime: true,
     dateFormat: 'Y-m-d H:i',
     time_24hr: true,
+    allowInput: true,
   });
 
 

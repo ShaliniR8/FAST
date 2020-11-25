@@ -31,7 +31,7 @@
     <%FaaReport.get_stats.each do |stat|%>
       <b><%=stat[:title]%>:</b>
       <%if stat[:link]%>
-        <%=@report.send(stat[:value])[stat[:value_key].to_sym].length%>
+        <%=@statistics[stat[:value_key].to_sym].length%>
       <%else%>
         <%=@report.send(stat[:value])%>
       <%end%>

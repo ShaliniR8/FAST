@@ -15,26 +15,11 @@ $(function() {
   })
 })
 
+
 function markAsDirty() {
   $(this).addClass('changed')
-  
   var changedHiddenInput = $(this).next(':hidden')
-  while (changedHiddenInput.length) {
-    changedHiddenInput.addClass('changed')
-    changedHiddenInput = changedHiddenInput.next(':hidden')
-  }
-
-  var nestedData = $(this).attr('name').split(/[[\]]{1,2}/).slice(0, -2)
-  while (nestedData.length > 1) {
-    parentSelector = `#${nestedData.join('_')}_id`
-    $(parentSelector).addClass('changed')
-
-    var changedHiddenInput = $(parentSelector).next(':hidden')
-    while (changedHiddenInput.length) {
-      changedHiddenInput.addClass('changed')
-      changedHiddenInput = changedHiddenInput.next(':hidden')
-    }
-
-    nestedData = nestedData.slice(0, -2)
-  }
+  changedHiddenInput.addClass('changed');
+  $(this).closest('td').find('.cell-id').addClass('changed');
+  $(this).closest('tr').find('.row-id').addClass('changed');
 }

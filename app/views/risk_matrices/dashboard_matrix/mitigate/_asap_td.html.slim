@@ -1,0 +1,18 @@
+ruby:
+  @params.merge!({
+    searchterm_1: is_row_probability? ? :likelihood_after : :severity_after, # row
+    searchterm_2: is_row_probability? ? :severity_after : :likelihood_after, # col
+    field_1: @row,
+    field_2: @col
+  })
+
+  cell_url_to_records = records_path(@params)
+  cell_url_to_reports = reports_path(@params)
+
+td.color_cell.record_after_cell href="#{cell_url_to_records}" style="background: #{@cell_bg_color}"
+  center
+    b = @record_after_matrix[@row][@col]
+
+td.color_cell.report_after_cell href="#{cell_url_to_reports}" style="background: #{@cell_bg_color};display:none"
+  center
+    b = @report_after_matrix[@row][@col]

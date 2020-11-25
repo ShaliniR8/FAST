@@ -1,0 +1,31 @@
+ruby:
+  definition_size = is_row_probability? ? CONFIG::MATRIX_INFO[:probability_table][:size] : CONFIG::MATRIX_INFO[:severity_table][:size]
+
+div class="#{definition_size} "
+  hr
+  h4
+    b = 'RISK DEFINITIONS'
+  table.table.table-bordered.table-fixed.table-centered
+    tr
+      - num_of_definition = CONFIG::MATRIX_INFO[:risk_definitions].length
+      - CONFIG::MATRIX_INFO[:risk_definitions].each do |color, definition|
+        td bgcolor="#{color}" width="#{100.0/num_of_definition}%"
+          h5
+            b = definition[:rating].html_safe
+
+    - descriptions = CONFIG::MATRIX_INFO[:risk_definitions].map { |key, value| value[:description] }.select(&:present?)
+    - description_approvals = CONFIG::MATRIX_INFO[:risk_definitions].map { |key, value| value[:description_approval] }.select(&:present?)
+
+    - if descriptions.present?
+      tr
+        - descriptions.each do |description|
+          td
+            = description.html_safe
+
+    - if description_approvals.present?
+      tr
+        - description_approvals.each do |description_approval|
+          td
+            = description_approval.html_safe
+
+  h5 = CONFIG::MATRIX_INFO[:risk_definitions_additional_info]

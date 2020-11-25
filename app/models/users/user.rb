@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
 
   has_many :privileges, :through => :roles
 
+
   #Kaushik Mahorker OAuth
   has_many :client_applications
   has_many :tokens, :class_name => "Oauth2Token", :order => "authorized_at desc", :include => [:client_application]
@@ -20,6 +21,7 @@ class User < ActiveRecord::Base
   has_many :access_levels
   accepts_nested_attributes_for :access_levels, reject_if: :all_blank, allow_destroy: true
 
+  serialize :departments
 
   # new columns need to be added here to be writable through mass assignment
   attr_accessible :username, :email,
@@ -28,7 +30,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable, :sso_id, :updated_at
+    :android_version, :disable, :sso_id, :updated_at, :departments
 
 
 
@@ -45,6 +47,15 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password, :message => " must match."
   validates_length_of :password, :minimum => 4, :allow_blank => true, :message => " needs to be at least 4 characters long."
 
+
+  scope :active, where('disable = 0 or disable is null')
+
+
+  def search_content
+    content = "#{full_name} (##{employee_number})"
+    content += " (##{id})" if Rails.env.development?
+    content
+  end
 
 
   def get_all_access
@@ -76,7 +87,13 @@ class User < ActiveRecord::Base
 
 
   def get_all_submitter_templates
-    result = privileges.map(&:access_controls).flatten.select{|x| x[:action] == "full" || x[:action] == "submitter"}.map{|x| x[:entry]}.uniq
+    result = privileges.map(&:access_controls).flatten.select{ |x|
+      if CONFIG::GENERAL[:hide_asap_submissions_in_dashboard] && (x[:entry].include? 'ASAP')
+        false
+      else
+        x[:action] == "full" || x[:action] == "submitter"
+      end
+    }.map{|x| x[:entry]}.uniq
   end
 
 
@@ -180,7 +197,7 @@ class User < ActiveRecord::Base
         { field: "full_name",              title: 'Name',             type: 'text',      visible: 'index', required: false},
         { field: "email",                  title: "Email",            type: 'text',      visible: 'index', required: false},
         { field: "account_status",         title: "Account Status",   type: 'text',      visible: 'index', required: false},
-        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: 'index', required: false},
+        { field: "get_last_seen_at",       title: "Last Seen At",     type: 'datetime',  visible: '', required: false},
       ].select{|f| (f[:visible].split(',') & visible_fields).any?}
     if (CONFIG::GENERAL[:has_mobile_app])
       headers_table.push({ field: 'android_version', title: 'Android Version', type: 'text', visible: 'index', required: false})
@@ -341,7 +358,7 @@ class User < ActiveRecord::Base
 
 
   def self.get_levels
-    ['Global Admin', 'Admin', 'Staff', 'Pilot', 'Ground', 'Analyst']
+    ['Global Admin', 'Admin', 'Staff']
   end
 
 

@@ -1,11 +1,14 @@
 <%@record = record%>
+<%deid = defined?(deid) ? deid : false%>
 <%@record.categories.order(:category_order).each do |c|%>
   <%@cat = c%>
-  <%if @cat.id == 338%>
-    <%if @cat.not_empty_for(@record)%>
-      <%=render "/records/show_observation_phases_category"%>
+  <%if @cat.print || !deid%>
+    <%if @cat.id == 338%>
+      <%if @cat.not_empty_for(@record)%>
+        <%=render "/records/show_observation_phases_category", deid:deid%>
+      <%end%>
+    <%elsif @cat.not_empty_for(@record)%>
+      <%=render "/records/category", deid:deid%>
     <%end%>
-  <%elsif @cat.not_empty_for(@record)%>
-    <%=render "/records/category"%>
   <%end%>
 <%end%>

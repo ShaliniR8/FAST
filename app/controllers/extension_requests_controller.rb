@@ -49,6 +49,13 @@ class ExtensionRequestsController < ApplicationController
   end
 
 
+  def destroy
+    @extension_request = ExtensionRequest.find(params[:id])
+    @extension_request.destroy
+    redirect_to @extension_request.owner, flash: {success: 'Extension Request deleted.'}
+  end
+
+
   def send_notification(commit, ext_req)
     users_id = commit == 'Address' ? ext_req.requester.id : ext_req.approver.id rescue nil
     verb = commit == 'Address' ? 'Addresse' : commit

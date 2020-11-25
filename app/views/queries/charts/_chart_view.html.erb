@@ -24,7 +24,6 @@
         aria-labelledby="nav-<%=chart[:chart_name].parameterize%>-tab-<%=@visualization.id%>">
         <div class='mt10' id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>" style="width:'100%'"></div>
         <div class="mr5" id="<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download" align="right"></div>
-
         <%case chart[:val]%>
         <%when 1%>
           <div class="col-xs-12 col-sm-12 mt20">
@@ -38,10 +37,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <%@data[1..-1].each do |row|%>
+                  <%@data[1..-1].each_with_index do |row, row_index|%>
                     <tr>
-                      <%row.each do |value|%>
-                        <td><%=value%></td>
+                      <%row.each_with_index do |value, col_index|%>
+                        <%if col_index == 0%>
+                          <td><%=value%></td>
+                        <%else%>
+                          <td><a href="javascript:void(0)" class="gridRow" data-row="<%=row_index%>" data-col="<%=col_index%>"><%=value%></a></td>
+                        <%end%>
                       <%end%>
                     </tr>
                   <%end%>
@@ -50,7 +53,43 @@
             </div>
           </div>
           <script type="text/javascript">
-            $("#grid-table-<%=@visualization.id%>").DataTable();
+            $("#grid-table-<%=@visualization.id%>").DataTable({
+              dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+                   "<'row'<'col-sm-12'tr>>" +
+                   "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
+                   "<'row'<'col-sm-12'B>>",
+              buttons: ['copy', 'csv', 'excel',
+              {
+                extend: 'print',
+                exportOptions: {
+                  columns: 'th:not(:last-child)'
+                }
+              }],
+            });
+
+            for(i=0; i<$(".gridRow").length; i++) {
+              $(".gridRow")[i].addEventListener('click', function () {
+                row = parseInt(this.getAttribute('data-row'));
+                col = parseInt(this.getAttribute('data-col'));
+
+                $.ajax({
+                  type: "POST",
+                  url: "<%=display_chart_result_query_path(@owner)%>",
+                  data: {
+                    "data_ids": "<%=@data_ids%>",
+                    "row": row + 1, // including header,
+                    "col": col
+                  },success: function(response){
+                    var w = window.open('about:blank');
+                    w.document.open();
+                    w.document.write(response);
+                    w.document.close();
+                  }
+                })
+
+              })
+            }
+
           </script>
         <%when 2%>
           <script type="text/javascript">
@@ -61,16 +100,107 @@
               drawPieChart();
             });
 
+            function preparePieCharts(data, data_arr) {
+              numberOfPies = data.length
+              header = data[0]
+
+              for (i=1; i<numberOfPies; i++) {
+                pie_data = [[data[0][0], "Count"]]
+
+                for (j=1; j<data[i].length; j++) {
+                  new_row = [header[j], data[i][j]]
+                  pie_data.push(new_row)
+                }
+                data_arr.push(pie_data)
+              }
+
+              return data_arr
+            }
+
             function drawPieChart(){
-              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
-              var options = <%=raw options.to_json%>;
-              var pieChart = new google.visualization.PieChart(document.getElementById(
-                '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
-              google.visualization.events.addListener(pieChart, 'ready', function () {
-                document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
-                  '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
-              });
-              pieChart.draw(data, options);
+              data_arr = []
+              data = <%=raw @data.as_json%>
+
+              <% if params[:"series"].present? %>
+                data_arr = preparePieCharts(data, data_arr)
+              <%else%>
+                data_arr.push(data)
+              <%end%>
+
+              data_arr.forEach(function(element, index, array) {
+                var data = new google.visualization.arrayToDataTable(element);
+                var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
+                var options = <%=raw options.to_json%>;
+
+                <% if params[:"series"].present? %>
+                  var title = <%=raw @data.as_json%>[index+1][0]
+                  options["title"] = title
+                <%end%>
+
+                // Pie chart
+                if ( index == 0) {
+                  var pieChart = new google.visualization.PieChart(document.getElementById(
+                  '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+                } else {
+                  // Cretate Div for the additional pie charts
+                  pie_chart_nav = document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>").parentNode
+                  new_chart = document.createElement("div");
+                  new_chart.setAttribute("id", "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-" + index);
+                  pie_chart_nav.appendChild(new_chart)
+
+                  var pieChart = new google.visualization.PieChart(document.getElementById(
+                  '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-' + index));
+                }
+
+                // Download Link
+                if ( index == 0) {
+                  google.visualization.events.addListener(pieChart, 'ready', function () {
+                    document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
+                      '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                  });
+                } else {
+                  // Cretate Div for the additional pie charts
+                  pie_chart_nav = document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>").parentNode
+                  new_link = document.createElement("div");
+                  new_link.setAttribute("id", "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download-" + index);
+                  new_link.setAttribute("align", "right")
+                  pie_chart_nav.appendChild(new_link)
+
+                  google.visualization.events.addListener(pieChart, 'ready', function () {
+                    document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download-" + index).innerHTML =
+                      '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                  });
+                }
+
+                google.visualization.events.addListener(pieChart, 'select', function() {
+                  var selectedItem = pieChart.getSelection()[0];
+
+                  <% if params[:"series"].present? %>
+                    row = index + 1
+                  <%else%>
+                    row = selectedItem.row + 1
+                  <%end%>
+
+                  if (selectedItem) {
+                    $.ajax({
+                      type: "POST",
+                      url: "<%=display_chart_result_query_path(@owner)%>",
+                      data: {
+                        "data_ids": "<%=@data_ids%>",
+                        "row": row, // including header,
+                        "col": selectedItem.row + 1 // including header
+                      },success: function(response){
+                        var w = window.open('about:blank');
+                        w.document.open();
+                        w.document.write(response);
+                        w.document.close();
+                      }
+                    })
+                  }
+                });
+
+                pieChart.draw(data, options);
+              })
             }
           </script>
         <%when 3%>
@@ -84,13 +214,37 @@
 
             function drawBarChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
               var options = <%=raw options.to_json%>;
+
               var barChart = new google.visualization.ComboChart(document.getElementById(
                 '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
+
               google.visualization.events.addListener(barChart, 'ready', function () {
                 document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
                   '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
               });
+
+              google.visualization.events.addListener(barChart, 'select', function() {
+                var selectedItem = barChart.getSelection()[0];
+                if (selectedItem) {
+                  $.ajax({
+                    type: "POST",
+                    url: "<%=display_chart_result_query_path(@owner)%>",
+                    data: {
+                      "data_ids": "<%=@data_ids%>",
+                      "row": selectedItem.row + 1, // including header
+                      "col": selectedItem.column
+                    },success: function(response){
+                      var w = window.open('about:blank');
+                      w.document.open();
+                      w.document.write(response);
+                      w.document.close();
+                    }
+                  })
+                }
+              });
+
               barChart.draw(data, options);
             }
           </script>
@@ -105,13 +259,37 @@
 
             function drawLineChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
               var options = <%=raw options.to_json%>;
+
               var lineChart = new google.visualization.ComboChart(document.getElementById(
                 "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+
               google.visualization.events.addListener(lineChart, 'ready', function () {
                 document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
                   '<a href="' + lineChart.getImageURI() + '"download><u>Download Chart</u></a>';
               });
+
+              google.visualization.events.addListener(lineChart, 'select', function() {
+                var selectedItem = lineChart.getSelection()[0];
+                if (selectedItem) {
+                  $.ajax({
+                    type: "POST",
+                    url: "<%=display_chart_result_query_path(@owner)%>",
+                    data: {
+                      "data_ids": "<%=@data_ids%>",
+                      "row": selectedItem.row + 1, // including header
+                      "col": selectedItem.column
+                    },success: function(response){
+                      var w = window.open('about:blank');
+                      w.document.open();
+                      w.document.write(response);
+                      w.document.close();
+                    }
+                  })
+                }
+              });
+
               lineChart.draw(data, options);
             }
           </script>
@@ -126,13 +304,37 @@
 
             function drawStackedChart(){
               var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
               var options = <%=raw options.to_json%>;
+
               var stackedChart = new google.visualization.ColumnChart(document.getElementById(
                 "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
+
               google.visualization.events.addListener(stackedChart, 'ready', function () {
                 document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
                   '<a href="' + stackedChart.getImageURI() + '"download><u>Download Chart</u></a>';
               });
+
+              google.visualization.events.addListener(stackedChart, 'select', function() {
+                var selectedItem = stackedChart.getSelection()[0];
+                if (selectedItem) {
+                  $.ajax({
+                    type: "POST",
+                    url: "<%=display_chart_result_query_path(@owner)%>",
+                    data: {
+                      "data_ids": "<%=@data_ids%>",
+                      "row": selectedItem.row + 1, // including header
+                      "col": selectedItem.column
+                    },success: function(response){
+                      var w = window.open('about:blank');
+                      w.document.open();
+                      w.document.write(response);
+                      w.document.close();
+                    }
+                  })
+                }
+              });
+
               stackedChart.draw(data, options);
             }
           </script>
@@ -157,3 +359,4 @@
     visibility: visible;
   }
 </style>
+

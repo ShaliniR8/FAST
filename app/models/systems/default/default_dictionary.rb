@@ -92,6 +92,11 @@ class DefaultDictionary
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
     },
+    launch: {
+      btn: :launch,
+      btn_loc: [:top],
+      access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? && priv_check.call(owner,user,'edit',true,true) },
+    },
     hazard: {
       btn: :hazard,
       btn_loc: [:inline],
@@ -113,7 +118,7 @@ class DefaultDictionary
     pdf: {
       btn: :pdf,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| true },
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',true,true) },
     },
     private_link: {
       btn: :private_link,
@@ -161,7 +166,7 @@ class DefaultDictionary
       btn: :risk_control,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        !['Completed', 'Rejected'].include?(owner.status) && !owner.root_cause_lock?
+        !['Completed', 'Rejected'].include?(owner.status) && !owner.occurrence_lock?
       },
     },
     schedule_verification:{
@@ -220,7 +225,7 @@ class DefaultDictionary
     view_parent: {
       btn: :view_parent,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| owner.owner.present? },
+      access: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
     },
     view_sra: {
       btn: :view_sra,
@@ -248,17 +253,35 @@ class DefaultDictionary
     #   show_btns: Conditional to determine if panel buttons should be shown
     #   data: proc to generate a hash of local parameters for the panel- will be splatted into render
     # },
-    agendas: {
-      partial: '/panels/agendas',
-      visible: proc { |owner:,user:,**op| owner.srm_agendas.present? },
+    # records: { # WIP
+    #   partial: '/panels/records',
+    #   visible: proc { |owner:,user:,**op| owner.owner.present? },
+    #   show_btns: proc { |owner:,user:,**op| false },
+    #   data: proc { |owner:,user:,**op| {
+    #     records: Array(owner.owner),
+    #     title: 'Report'
+    #   }},
+    # },
+    source_of_input: {
+      partial: '/panels/source_of_input',
+      visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
       show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { sra: owner } },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        parent: owner.get_parent.present? ? owner.get_parent : owner.owner
+      }},
     },
     attachments: {
       partial: '/panels/attachments',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
+    },
+    checklists: {
+      partial: '/panels/checklists',
+      visible: proc { |owner:,user:,**op| owner.owner.class.name == "ChecklistRow" },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { checklist: owner.owner.checklist, checklist_row: owner.owner } },
     },
     comments: {
       partial: '/panels/comments',
@@ -271,34 +294,95 @@ class DefaultDictionary
       visible: proc { |owner:,user:,**op| owner.contacts.present? },
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| {
-        fields: Contact.get_meta_fields('show'),
-        contacts: owner.contacts
-      }},
-    },
-    costs: {
-      partial: '/panels/costs',
-      visible: proc { |owner:,user:,**op| owner.costs.present? },
-      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
-      data: proc { |owner:,user:,**op| { costs: owner.costs } },
-    },
-    descriptions: {
-      partial: '/causes/all',
-      visible: proc { |owner:,user:,**op| true },
-      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
-      data: proc { |owner:,user:,**op| {
         owner: owner,
-        cause_type: 'description',
-        can_change: owner.status == 'New' && priv_check.call(owner,user,'edit',true)
+        parent: owner.get_parent.present? ? owner.get_parent : owner.owner
       }},
+    },
+    records: {
+      partial: '/panels/records',
+      print_partial: '/pdfs/print_records',
+      visible: proc { |owner:,user:,**op| owner.owner.class.name == 'Record' },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { record: owner.owner } },
+    },
+    reports: {
+      partial: '/panels/reports',
+      print_partial: '/pdfs/print_reports',
+      visible: proc { |owner:,user:,**op| owner.owner.class.name == 'Report' },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { report: owner.owner } },
+    },
+    investigations: {
+      partial: '/panels/investigations',
+      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Investigation').present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { investigations: owner.get_children(child_type: 'Investigation') } },
     },
     findings: {
       partial: '/panels/findings',
-      visible: proc { |owner:,user:,**op| owner.findings.present? },
+      print_partial: '/pdfs/print_findings',
+      visible: proc do |owner:, user:, **op|
+        visible = owner.findings.present?
+        unless visible
+          has_checklists = owner.class.method_defined?(:checklists)
+          checklists = has_checklists ? owner.checklists : nil
+          if has_checklists
+          # search checklist rows for findings unless owner has findings
+            checklists = owner.checklists.includes(checklist_rows: :findings)
+            checklists.each do |checklist|
+              checklist.checklist_rows.each do |checklist_row|
+                visible = true if checklist_row.findings.present?
+                break if visible
+              end
+              break if visible
+            end
+          end
+        end
+        visible
+      end,
+      show_btns: proc { |owner:, user:, **op| false },
+      data: proc do |owner:, user:, **op|
+        has_checklists = owner.class.method_defined?(:checklists)
+        findings = []
+        findings << owner.findings
+        if has_checklists
+          findings << owner.checklists.includes(checklist_rows: :findings)
+                                      .map{|checklist| checklist.checklist_rows.map(&:findings)}
+        end
+        { findings: findings.flatten }
+      end
+    },
+    sms_actions: { # WIP
+      partial: '/sms_actions/show_all',
+      print_partial: '/pdfs/print_sms_actions',
+      visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { findings: owner.findings } },
+      data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    recommendations: { # WIP
+      partial: '/recommendations/show_all',
+      print_partial: '/pdfs/print_recommendations',
+      visible: proc { |owner:,user:,**op| owner.recommendations.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { owner: owner } },
+    },
+    included_sras: {
+      partial: '/panels/sras',
+      print_partial: '/pdfs/print_sras',
+      visible: proc { |owner:,user:,**op| owner.becomes(SrmMeeting).sras.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { sras: owner.becomes(SrmMeeting).sras } },
+    },
+    sras: {
+      partial: '/panels/sras',
+      print_partial: '/pdfs/print_sras',
+      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Sra').present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { sras: owner.get_children(child_type: 'Sra') } },
     },
     hazards: {
       partial: '/panels/hazards',
+      print_partial: '/pdfs/print_hazards',
       visible: proc { |owner:,user:,**op| owner.hazards.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| {
@@ -306,29 +390,32 @@ class DefaultDictionary
         hazards: owner.hazards
       }},
     },
+    risk_controls: { # WIP
+      partial: '/panels/risk_controls',
+      print_partial: '/pdfs/print_risk_controls',
+      visible: proc { |owner:,user:,**op| owner.risk_controls.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        risk_controls: owner.risk_controls
+      }},
+    },
     occurrences: {
       partial: '/occurrences/occurrences_panel',
+      print_partial: '/pdfs/print_occurrences',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| { owner: owner } },
     },
-    recommendations: { # WIP
-      partial: '/recommendations/show_all',
-      visible: proc { |owner:,user:,**op| owner.recommendations.present? },
-      show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { owner: owner } },
-    },
-    records: { # WIP
-      partial: '/panels/records',
-      visible: proc { |owner:,user:,**op| owner.owner.present? },
-      show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| {
-        records: Array(owner.owner),
-        title: 'Report'
-      }},
+    participants: {
+      print_partial: '/pdfs/print_participants',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { owner: owner, hide_btns: true } },
     },
     requirements: { # WIP
       partial: '/audits/show_requirements',
+      print_partial: '/pdfs/print_requirements',
       visible: proc { |owner:,user:,**op| owner.requirements.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner, type: owner.class.name.downcase } },
@@ -345,15 +432,6 @@ class DefaultDictionary
         can_change: owner.status != 'Completed' && priv_check.call(owner,user,'hazards','edit')
       }},
     },
-    risk_controls: { # WIP
-      partial: '/panels/risk_controls',
-      visible: proc { |owner:,user:,**op| owner.risk_controls.present? },
-      show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| {
-        owner: owner,
-        risk_controls: owner.risk_controls
-      }},
-    },
     root_causes: { # WIP
       partial: '/panels/root_causes',
       visible: proc { |owner:,user:,**op| CONFIG::GENERAL[:has_root_causes] },
@@ -367,6 +445,7 @@ class DefaultDictionary
     },
     signatures: {
       partial: '/panels/signatures',
+      print_partial: '/pdfs/print_signatures',
       visible: proc { |owner:,user:,**op| owner.signatures.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| {
@@ -374,14 +453,9 @@ class DefaultDictionary
         fields: Signature.get_meta_fields('show')
       }},
     },
-    sms_actions: { # WIP
-      partial: '/sms_actions/show_all',
-      visible: proc { |owner:,user:,**op| true },
-      show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { owner: owner } },
-    },
     tasks: { # WIP
       partial: '/ims/show_task',
+      print_partial: '/pdfs/print_tasks',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| {
@@ -398,7 +472,8 @@ class DefaultDictionary
       }},
     },
     extension_requests: {
-      partial: '/extension_requests/show_requests',
+      partial: '/extension_requests/show_extension_requests',
+      print_partial: '/pdfs/print_extension_requests',
       visible: proc { |owner:, user:, **op| owner.extension_requests.present?},
       show_btns: proc { |owner:, user:, **op| true},
       data: proc { |owner:, user:, **op| {
@@ -407,12 +482,59 @@ class DefaultDictionary
     },
     verifications: {
       partial: '/verifications/show_verifications',
+      print_partial: '/pdfs/print_verifications',
       visible: proc { |owner:, user:, **op| owner.verifications.present?},
       show_btns: proc { |owner:, user:, **op| true},
       data: proc { |owner:, user:, **op| {
         records: owner.verifications
       }},
-    }
+    },
+    agendas: {
+      partial: '/panels/agendas',
+      visible: proc { |owner:,user:,**op| owner.srm_agendas.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { sra: owner } },
+    },
+    attachments: {
+      partial: '/panels/attachments',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
+    },
+    comments: {
+      partial: '/panels/comments',
+      print_partial: '/pdfs/print_comments',
+      visible: proc { |owner:,user:,**op| owner.comments.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { comments: owner.comments.preload(:viewer) } },
+    },
+    contacts: {
+      partial: '/panels/contacts',
+      print_partial: '/pdfs/print_contacts',
+      visible: proc { |owner:,user:,**op| owner.contacts.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| {
+        fields: Contact.get_meta_fields('show'),
+        contacts: owner.contacts
+      }},
+    },
+    costs: {
+      partial: '/panels/costs',
+      print_partial: '/pdfs/print_costs',
+      visible: proc { |owner:,user:,**op| owner.costs.present? },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| { costs: owner.costs } },
+    },
+    descriptions: {
+      partial: '/causes/all',
+      visible: proc { |owner:,user:,**op| true },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        cause_type: 'description',
+        can_change: owner.status == 'New' && priv_check.call(owner,user,'edit',true)
+      }},
+    },
   }
 
   META_DATA = {
@@ -454,12 +576,12 @@ class DefaultDictionary
     responsible_user: {
       field: 'responsible_user_id', title: 'Responsible User',
       num_cols: 6,  type: 'user', visible: 'index,form,show',
-      required: false
+      required: false, display: 'get_responsible_user_name'
     },
     approver: {
       field: 'approver_id', title: 'Final Approver',
       num_cols: 6,  type: 'user', visible: 'form,show',
-      required: false
+      required: false, display: 'get_approver_name'
     },
     location: {
       field: 'location', title: 'Location',
@@ -512,7 +634,7 @@ class DefaultDictionary
       required: false
     },
     risk_factor: {
-      field: 'get_risk_classification', title: 'Baseline Risk',
+      field: 'risk_factor', title: 'Baseline Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_before_risk_color'
     },
@@ -532,7 +654,7 @@ class DefaultDictionary
       required: false
     },
     risk_factor_after: {
-      field: 'get_risk_classification_after', title: 'Mitigated Risk',
+      field: 'risk_factor_after', title: 'Mitigated Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_after_risk_color'
     },
@@ -547,6 +669,11 @@ class DefaultDictionary
       num_cols: 12, type: 'textarea', visible: 'show',
       required: false
     },
+    verifications: {
+      field: 'included_verifications', title: 'Verifications',
+      num_cols: 6,  type: 'text', visible: 'index',
+      required: false
+    },
     template: {
       field: 'get_template', title: 'Template Type',
       num_cols: 6, type: 'text', visible: 'index,show',
@@ -554,7 +681,7 @@ class DefaultDictionary
     },
     submitter: {
       field: 'get_submitter_name', title: 'Submitted By',
-      num_cols: 6, type: 'text', visible: 'admin', #should include show+form w/ sr::CONFIG[:show_submitter_name]
+      num_cols: 6, type: 'user', visible: 'admin', #should include show+form w/ sr::CONFIG[:show_submitter_name]
       required: false, censor_deid: true
     },
     event_date: {

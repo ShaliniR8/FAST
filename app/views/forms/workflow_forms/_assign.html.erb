@@ -5,10 +5,11 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
 <%=form_for @owner do |f|%>
+  <%owner_name = @owner.class.name%>
   <div class="panel-warning">
     <div class="panel-heading">
       <div class="panel-title">
-        Assign <%=@owner.class.name.titleize%>
+        Assign <%=owner_name.titleize%>
         <button type="button"
           class="close pull-right"
           data-dismiss="modal"
@@ -24,7 +25,8 @@
           <%=f.hidden_field :status, :value => 'Assigned'%>
 
           <b style="color:red">*</b>
-          <%=label_tag :res, 'Responsible User'%>
+          <%resp_user_title = CONFIG.hierarchy[session[:mode]][:objects][owner_name][:fields][:responsible_user][:title] || 'Responsible User' rescue 'Responsible User'%>
+          <%=label_tag :res, resp_user_title%>
           <div class="input-group">
             <%=text_field_tag :res,
               "",
@@ -41,7 +43,8 @@
       </div>
 
       <%=f.submit "Assign",
-        :class => "btn btn-warning pull-right mt5"%>
+        :class => "btn btn-warning pull-right mt5",
+        disable_with: 'Assigning...'%>
 
     </div>
   </div>

@@ -35,10 +35,14 @@ class Document < ActiveRecord::Base
           {name: 'User Privileges',               href: 'standard_video', class: 'tv', content: ['privileges']},
           {name: 'Creating/Editing a Custom ORM', href: 'standard_video', class: 'tv', content: ['custom_orms']},
           #{name: 'Risk Matrix Customization',     href: 'risk_matrix',    class: ''},
+          {name: 'Create Safety Reporting Templates', href: 'standard_video', class: 'tv', content: ['create_template']},
+          {name: 'Edit Safety Reporting Templates', href: 'standard_video', class: 'tv', content: ['edit_template']},
+          {name: 'Add Privileges to a Safety Reporting Template', href: 'standard_video', class: 'tv', content: ['add_privileges']},
         ]
       },
       {name: 'Safety Reporting', href: 'safety_reporting', class: 'doc title',
         topics: [
+          {name: 'Safety Reporting Demo',               href: 'standard_video',  class: 'tv',  content: ['sr_demo']},
           {name: 'Dashboard Walkthrough',               href: 'standard_video',  class: 'tv',  content: ['sr_dashboard']},
           {name: 'Filing a Safety Report',              href: 'standard_video',  class: 'tv',  content: ['file_report'],},
           {name: 'Continuing an In-Progress Report',    href: 'standard_video',  class: 'tv',  content: ['continue_report'],},
@@ -48,10 +52,12 @@ class Document < ActiveRecord::Base
           {name: 'Corrective Actions',                  href: 'standard_video',  class: 'tv',  content: ['car_from_report', 'car_from_event', 'edit_car', 'car_advanced_search'],},
           {name: 'FAA Reports',                         href: 'standard_video',  class: 'tv',  content: ['new_faa_report', 'edit_faa_reports'],},
           {name: 'Meetings',                            href: 'standard_video',  class: 'tv',  content: ['new_meeting', 'process_meeting'],},
+          {name: 'Query Center',                        href: 'standard_video',  class: 'tv',  content: ['safety_reporting_query_center'],},
         ]
       },
       {name: 'Safety Assurance', href: 'safety_assurance', class: 'doc title',
         topics: [
+          {name: 'Safety Assurance Demo', href: 'standard_video',  class: 'tv',  content: ['sa_demo']},
           {name: 'Dashboard Walkthrough', href: 'standard_video',  class: 'tv', content: ['sa_dashboard'],},
           {name: 'Audits',                href: 'standard_video',  class: 'tv', content: ['audit_new', 'audit_recurring', 'audit_edit'],},
           {name: 'Findings',              href: 'standard_video',  class: 'tv', content: ['finding_new'],},
@@ -65,6 +71,7 @@ class Document < ActiveRecord::Base
 
       {name: 'Safety Risk Assessment (SRA/SRM)', href: 'sra', class: 'doc title',
         topics: [
+          {name: 'Safety Risk Assessment Demo', href: 'standard_video',   class: 'tv', content: ['sra_demo']},
           {name: 'Dashboard Walkthrough',       href: 'standard_video',   class: 'tv', content: ['sra_dashboard'],  },
           {name: 'SRAs',                        href: 'standard_video',   class: 'tv', content: ['sra_new', 'sra_edit'],},
           {name: 'Hazards',                     href: 'standard_video',   class: 'tv', content: ['hazard_new'],},

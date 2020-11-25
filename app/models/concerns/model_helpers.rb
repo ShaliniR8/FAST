@@ -11,12 +11,30 @@ module ModelHelpers
   #######################
   included do
 
-    def self.get_avg_complete
-      candidates = self.where('status = ? and due_date is not ? and open_date is not ? ', 'Completed', nil, nil)
-      if candidates.present?
+    def self.get_avg_complete(current_user=nil)
+      completed_objects = self.where('status = ? and close_date is not ?', 'Completed', nil)
+
+      case self.name
+      when 'Record'
+        # completed_objects = self.where('status = ? and close_date is not ?', 'Closed', nil)
+        # completed_objects.keep_if{|r| (current_user.has_access(r.template.name, "full" ) rescue false) }
+
+        completed_objects = self.preload(:template)
+                            .where('status = ? and close_date is not ?', 'Closed', nil)
+                            .can_be_accessed(current_user)
+
+      when 'Report'
+        completed_objects = self.where('status = ? and close_date is not ?', 'Closed', nil)
+      end
+
+      if completed_objects.present?
         sum = 0
-        candidates.map{|x| sum += (x.due_date - x.open_date).to_i}
-        result = (sum.to_f / candidates.length.to_f).round(1)
+        completed_objects.map{ |x|
+          has_open_date = (self.columns.map(&:name).include? 'open_date') && x.open_date.present?
+          start_date = has_open_date ? x.open_date : x.created_at
+          sum += (x.close_date.to_date - start_date.to_date).to_i rescue next # when created_at is nil
+        }
+        result = (sum.to_f / completed_objects.length.to_f).round(1)
         result
       else
         'N/A'

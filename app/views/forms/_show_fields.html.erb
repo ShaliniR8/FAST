@@ -66,13 +66,28 @@
             <%=boolean_options[field_value]%>
 
           <%when "boolean_box"%>
-            <%=(field_value || field_value == '1') ? "Yes" : ""%>
+            <%=(field_value || field_value == '1') ? "Yes" : "No"%>
 
           <%when "date"%>
             <%=date_to_string(field_value)%>
 
           <%when "datetime"%>
-            <%=datetime_to_string(field_value)%>
+            <%event_date_field = field_name == 'event_date'%>
+            <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
+              <%if event_date_field && record.event_time_zone.present?%>
+                <%=display_date_time_in_zone(date_time: field_value, time_zone: record.event_time_zone)%>
+              <%elsif event_date_field%>
+                <%=display_date_time_in_zone(date_time: field_value, time_zone: 'UTC')%>
+              <% else %>
+                <%=datetime_to_string(field_value)%>
+              <% end %>
+            <% else %>
+              <%if event_date_field%>
+                <%=datetime_to_string(field_value) + " #{record.event_time_zone}"%>
+              <% else %>
+                <%=datetime_to_string(field_value)%>
+              <% end %>
+            <% end %>
 
           <%when 'datetimez'%>
             <%=datetimez_to_string(field_value)%>

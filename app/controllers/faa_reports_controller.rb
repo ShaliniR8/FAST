@@ -48,15 +48,25 @@ class FaaReportsController < ApplicationController
   def print
     @report = FaaReport.find(params[:id])
     @identification = CONFIG::FAA_INFO
-    asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        @report.get_start_date, @report.get_end_date)
+    asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
+    @statistics = @report.statistics(asap_reports)
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     html = render_to_string(:template=>"/faa_reports/print.html.erb")
-    pdf = PDFKit.new(html)
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     send_data pdf.to_pdf, :filename => "FAA_Quarterly_Report_#{@report.year}_Quarter#{@report.quarter}.pdf"
@@ -129,12 +139,11 @@ class FaaReportsController < ApplicationController
 
   def show
     @report = FaaReport.find(params[:id])
-    asap_reports = Record
-      .where("event_date >= ? and event_date <= ?",
-        @report.get_start_date, @report.get_end_date)
+    asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{@report.employee_group}")}
+    @statistics = @report.statistics(asap_reports)
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     @identification = CONFIG::FAA_INFO
   end
@@ -150,10 +159,11 @@ class FaaReportsController < ApplicationController
 
 
   def reports_table
-    @headers = Record.get_headers
-    @report = FaaReport.find(params[:id])
+    object_name = controller_name.classify
+    @table = Object.const_get('Record')
+    @fields = Record.get_meta_fields('index')
     @title = params[:title]
-    @result = Record.where(:id => params[:reports].split)
+    @records = Record.where(:id => params[:reports].split)
     render :partial => "table"
   end
 
@@ -162,6 +172,7 @@ class FaaReportsController < ApplicationController
   def export_word
     require "docx"
     @report = FaaReport.find(params[:id])
+    @report.set_statistics
     doc = Docx::Document.open("#{Rails.root}/public/test.docx")
     doc.paragraphs.each do |p|
 

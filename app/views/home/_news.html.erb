@@ -17,7 +17,7 @@
             <tr data-link="<%=read_message_notice_path(notice)%>">
               <td style=<%=Notice.get_category[notice.category][:style]%>>
                 <i class='glyphicon glyphicon-<%=Notice.get_category[notice.category][:icon]%>'> </i>
-                <%=sanitize notice.content.html_safe%>
+                <%=sanitize truncate(notice.content, length: 220).html_safe%>
               </td>
               <td style='text-align:right'>
                 <%=time_ago_in_words(notice.created_at).scan(/\w+/).join(' ')%> ago

@@ -103,3 +103,46 @@ task :import_fft_user => :environment do
   p 'Privileges are assigned!'
 
 end
+
+
+
+require 'csv'
+
+task :import_fft_distribution_list => :environment do
+  CSV.foreach("#{Dir.pwd}/lib/tasks/FFT/inflight_list.csv") do |row|
+
+    first_name = row[1].strip
+    last_name = row[0].strip
+    email = row[2].tr('<>', '').strip.downcase
+    username = email.split('@')[0]
+
+    user = User.where("LOWER(email) = ?", email).first
+    user = User.where("LOWER(username) = ?", username).first if !user.present?
+    puts "#{first_name}, #{last_name}, #{email} => #{user}"
+
+    if !user.present?
+      user = User.new(
+        username: email.split('@')[0],
+        level: 'Staff',
+        email: email,
+        first_name: first_name,
+        last_name: last_name,
+        full_name: "#{first_name} #{last_name}",
+        job_title: 'Flight Crew Incident Report Receiver',
+        password: 'prosafet2020!'
+        )
+    else
+      user.email = email
+      user.level = "Staff" if user.level.nil? || user.level == ""
+    end
+
+    user.save!
+
+    inflight_prev = Privilege.find_by_name("Inflight: Incident Analyst")
+    flight_crew_prev = Privilege.find_by_name("Flight Operations: Incident Analyst")
+
+    #user.privileges << flight_crew_prev
+    user.privileges << inflight_prev
+
+  end
+end

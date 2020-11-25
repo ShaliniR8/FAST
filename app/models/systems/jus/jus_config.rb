@@ -123,6 +123,10 @@ class JUSConfig < DefaultConfig
     },
 
     risk_table: {
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
       starting_space: true,
       column_header: ['Critical = 5','Serious = 3','Minor = 1'],
       row_header: ['High = 5','Medium = 3','Low = 1'],

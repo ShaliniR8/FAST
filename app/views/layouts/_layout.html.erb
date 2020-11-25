@@ -4,20 +4,7 @@
 <html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
-
-    <%if session[:mode] == "ASAP"%>
-      <title>ProSafeT Safety Reporting</title>
-    <%elsif session[:mode] == "SMS"%>
-      <title>ProSafeT Safety Assurance</title>
-    <%elsif session[:mode] == "SMS IM"%>
-      <title>ProSafeT SMS IM</title>
-    <%elsif session[:mode] == "SRM"%>
-      <title>ProSafeT SRA (SRM)</title>
-    <%else%>
-      <title>ProSafeT General Information</title>
-    <%end%>
-
-
+    <title><%=@title || 'ProSafeT'%></title>
     <%= csrf_meta_tag %>
     <!-- Mobile specific metas -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1 user-scalable=no">
@@ -66,6 +53,16 @@
         padding: 5px;
         color: #808C99;
         font-size: 18px;
+      }
+      .attachments{
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 102px;
+      }
+      .width-cap{
+        max-width: 200px;
+        overflow-wrap: break-word;
       }
       .non-link:hover{
         background-color:#f0ffff
@@ -194,10 +191,14 @@
       .panel-thin .panel-heading .panel-title {
         padding: 5px;
       }
-      .tooltip-inner {
-        max-width: 80% !important;
-        font-weight: bold;
+      .tooltip > .tooltip-inner {
+        max-width: 100% !important;
+        background-color: aliceblue;
+        color: black;
         font-size: 13px !important;
+        border: 1px solid transparent;
+        border-color: aliceblue;
+        text-align: left;
       }
       .click-heading:hover{
         cursor: pointer;
@@ -265,6 +266,12 @@
         font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
         font-size: 14px;
       }
+
+      .swal2-modal {
+        font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+        width: 50% !important;
+      }
+
       .bold {
         font-weight: bold;
       }
@@ -277,13 +284,13 @@
         border-radius: 50%;
       }
       .initial-circle {
-        border: 3px solid #87CEEB;
+        border: 5px solid blue
       }
       .mitigated-circle {
-        border: 3px solid #FF69B4;
+        border: 5px solid pink;
       }
       .overlap-circle {
-        border: 3px solid #9400D3;
+        border: 5px solid #9400D3;
       }
 
     </style>
@@ -318,16 +325,7 @@
           <ul class="nav navbar-nav">
             <%if session[:mode].present?%>
               <li><a href ="/">Dashboard</a></li>
-            <%end%>
-
-            <%if session[:mode] == "ASAP"%>
-              <%=render :partial => '/layouts/asap'%>
-            <%elsif session[:mode] == "SMS IM"%>
-              <%=render :partial => '/layouts/smsim'%>
-            <%elsif session[:mode] == 'SMS'%>
-              <%=render :partial => '/layouts/sms'%>
-            <%elsif session[:mode] == 'SRM'%>
-              <%=render :partial => '/layouts/srm'%>
+              <%=render :partial => '/layouts/menu'%>
             <%end%>
           </ul>
 

@@ -1,0 +1,124 @@
+= javascript_include_tag \
+  'utility/jquery.dataTables.min',
+  'utility/dataTables.bootstrap.min',
+  'utility/dataTables.buttons.min',
+  'utility/nested_fields',
+  'utility/checklist-control',
+  'utility/dirty-form'
+
+= form_for @record, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|
+
+  .item.active.mt50
+    .grid.per90.center-block
+      .col-xs-12
+        .panel.panel-warning
+          .panel-heading
+            .panel-title
+              = "#{action_name.titleize} Checklist"
+              h5.pull-right#auto-save style="visibility: hidden;" = "Auto Save enabled"
+
+          .panel-body style="height: calc(85vh - 210px);overflow-y:auto"
+            .col-xs-12
+              - if @record.table_view
+                table class='table table-bordered table-striped mt10' id="table-view-#{@record.id}"
+                  thead
+                    tr
+                      - @record.checklist_header.checklist_header_items.each do |item|
+                        th width="#{item.size}%" = item.title
+                      th Attachments
+                  tbody.checklist_rows#checklist_rows
+                    - @record.checklist_rows.each do |checklist_row|
+                      = f.fields_for :checklist_rows, checklist_row do |row_form|
+                        = render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing'
+              - else # Page View
+                table class='table table-bordered table-striped mt10' id="page-view-update-#{@record.id}"
+                  thead
+                    th = "Page View"
+                  tbody
+                    - @record.checklist_rows.each do |checklist_row|
+                      - is_header = (defined? checklist_row) && checklist_row.is_header || false
+                      = f.fields_for :checklist_rows, checklist_row do |row_form|
+                        tr
+                          td
+                            table class='table table-bordered table-striped mt10'
+                              thead
+                                = row_form.hidden_field :id
+                                th = "Header"
+                                th = "Content"
+                              tbody.checklist_rows
+                                - checklist_row.checklist_cells.each do |checklist_cell|
+                                  tr
+                                    = row_form.fields_for :checklist_cells, checklist_cell do |cell_form|
+                                      - header_item = checklist_cell.checklist_header_item
+                                      td
+                                        b = header_item.title
+                                      = render 'checklist_row_fields_td',
+                                        :source => 'Existing',
+                                        :header_item => header_item,
+                                        :checklist_cell => checklist_cell,
+                                        :f => cell_form
+                                - if action_name != 'edit'
+                                  td
+                                    b Attachments
+                                  td
+                                    - unless is_header
+                                      = render 'forms/attachments_show_mini', owner: checklist_row, edit: true, f: row_form
+
+          = f.submit 'Save', class: 'btn btn-success pull-right mt20 mb20', disable_with: 'Saving...'
+
+css:
+  .bootstrap-tagsinput {
+    padding: 6px 12px;
+  }
+  .changed {
+    box-shadow: 0px 0px 7px orange;
+  }
+
+script src="/plugins/forms/bootstrap-tagsinput/bootstrap-tagsinput.js"
+script src="/js/libs/typeahead.bundle.js"
+
+javascript:
+  $(function(){
+    autoSaveText = document.getElementById('auto-save');
+
+    $("#table-view-#{@record.id}").DataTable({
+      "paging":   false,
+      /* Disable initial sort */
+      "order": [],
+      autoWidth: false,
+    })
+
+    /* Disable sort buttons (table headers) */
+    $("#table-view-#{@record.id}").find("th").off("click")
+
+    var table = $("#page-view-update-#{@record.id}").DataTable({
+      "aaSorting": [],
+      "aLengthMenu": [[1, -1], [1, "All"]],
+      "iDisplayLength": -1,
+    })
+
+    function autosave() {
+      $.ajax({
+        type: "POST",
+        url: $('form').attr('action'),
+        data: $('form').serialize(),
+        dataType: "script"
+      });
+    }
+
+    runAutosave = setInterval(autosave, 60000);
+    setInterval(function() {
+      autoSaveText.style.visibility = (autoSaveText.style.visibility == 'hidden' ? '' : 'hidden');
+    }, 1000);
+
+    $(window).on('beforeunload', function(){
+      clearInterval(runAutosave)
+      return true;
+    });
+
+    $(document).on("submit", "form", function(event){
+        // disable unload warning
+        $(window).off('beforeunload');
+    });
+
+  })

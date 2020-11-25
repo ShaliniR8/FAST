@@ -11,7 +11,7 @@
     <div class="panel-body" style="max-height:500px;overflow-y:auto;">
       <%if action_name == 'new'%>
         <div class="col-xs-6">
-          
+
           <div class="span4 collapse-group">
             <a class="btn" data-toggle="collapse" data-target="#viewinstructionNew">View Instructions &raquo;</a>
             <div class="collapse" id="viewinstructionNew">
@@ -19,7 +19,7 @@
                 <div class="col-xs-12 well">
                   <ol>
                     <li>
-                      Select a Checklist Header base for the template. 
+                      Select a Checklist Header base for the template.
                     </li>
                     <li>
                       Input a title for the checklist.
@@ -46,7 +46,7 @@
 
           <%=label_tag :checklist_header, "Select a Checklist Header:"%>
           <%=select_tag :checklist_header,
-            options_for_select(@checklist_headers),
+            options_for_select(@checklist_headers.sort),
             {:include_blank => "",
             :class => 'form-control',
             :id => "checklist_header_select"}%>
@@ -59,7 +59,7 @@
             </p>
             <%= label_tag :checklist_template, 'Select a Checklist Template:' %>
             <%= select_tag :checklist_template,
-              options_for_select(@checklist_templates),
+              options_for_select(@checklist_templates.sort),
               {:include_blank => '',
               :class => 'form-control',
               :id => 'checklist_template_select'}%>

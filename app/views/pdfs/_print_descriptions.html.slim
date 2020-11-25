@@ -1,0 +1,9 @@
+- if descriptions.length > 0
+  .col-xs-12
+    hr
+    .sub_sub_title
+      = title
+    - descriptions.each do |description|
+      = description.category
+      = description.get_attr
+      = description.get_value

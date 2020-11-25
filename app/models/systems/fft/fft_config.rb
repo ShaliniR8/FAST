@@ -5,20 +5,96 @@ class FFTConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
+  MOBILE_MODULES = %w[ASAP]
+
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                               'Frontier Airlines',
     time_zone:                          'Mountain Time (US & Canada)',
 
     # SYSTEM CONFIGS
+    enable_sso:                         true,
+    login_option:                       'sso',
+    has_mobile_app:                     true,
+    cisp_integration:                   true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
     allow_reopen_forms:                false,
     has_root_causes:                   false,
+    attach_pdf_submission:             true
   })
 
 
+  def self.getTimeFormat
+    {
+      :timepicker       => 'H:i',
+      :datepicker       => 'm/d/Y',
+      :datetimepicker   => 'm/d/Y H:i',
+      :dateformat       => '%m/%d/%Y',
+      :datetimeformat   => '%m/%d/%Y %H:%M',
+      :datetimezformat  => '%m/%d/%Y %H:%M %Z',
+      :faa_report       => true
+    }
+  end
+
+
+  P_CODE = 'FFT671'
+  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({
+    'Maintenance ASAP'   => 'maintenance',
+    'Inflight ASAP'      => 'inflight',
+    'Dispatch ASAP'      => 'dispatch',
+  })
+  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({
+    'Flight Crew ASAP' => {
+      'Altitude/Navigation/Speed Deviation' => {
+        'altitude'  => 'Altitude (Ft) MSL',
+      },
+      'ATC Information' => {
+        'ATCFacility' => 'Name of ATC Facility',
+      },
+    },
+    'Maintenance ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+      },
+      'Location of Event' => {
+        'location'  => 'Location',
+      },
+      'Narratives' => {
+        'eventDescription' => 'Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved',
+      },
+    },
+    'Inflight ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+      },
+      'Event Information'  => {
+        'flightPhase' => 'Flight Phase at Start of Event',
+      },
+      'Narratives' => {
+        'eventDescription' => 'Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved',
+      },
+    },
+    'Dispatch ASAP' => {
+      'Flight Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'aircraftType'  => 'Aircraft Type',
+        'altitude'      => 'Filed Altitude (MSL)',
+      },
+      'Narratives' => {
+        'eventDescription' => 'Please provide a narrative about the event, including what happened, where and when the event occurred, and who was involved',
+      },
+    },
+  })
 
   FAA_INFO = {
     "CHDO"=>"XXX",
@@ -30,9 +106,27 @@ class FFTConfig < DefaultConfig
 
 
   MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Initial Risk',
+      mitigate_btn: 'Residual Risk',
+      'Baseline' => 'Initial',
+      'Mitigate' => 'Residual'
+    },
+
     severity_table: {
-      starting_space: true,
+      title: 'SEVERITY EXERCISE',
+
+      orientation: :vertical,
+      direction: :down,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
+      column_header_name: 'CATEGORY',
       column_header: ['Regulatory',"Accident/Incident/</br>Damage/OSHA",'Operational Events','Company Impact'],
       rows: [
         [ # Negligible
@@ -77,8 +171,19 @@ class FFTConfig < DefaultConfig
     },
 
     probability_table: {
-      starting_space: true,
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: '',
       row_header: [''],
+      column_header_name: 'PROBABILITY',
       column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
         [
@@ -100,32 +205,49 @@ class FFTConfig < DefaultConfig
     },
 
     risk_table: {
-      starting_space: true,
+      title: 'RISK ASSESSMENT MATRIX',
+
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+      cell_style: 'bold',
+
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
+      row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
+      column_header_name: 'PROBABILITY',
       column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
-        ["limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
-        ["limegreen",     "limegreen",    "steelblue",      "steelblue",    "yellow"     ],
-        ["limegreen",     "steelblue",    "yellow",         "yellow",       "orange"     ],
-        ["steelblue",     "yellow",       "yellow",         "orange",       "red"        ],
-        ["steelblue",     "yellow",       "orange",         "red",          "red"        ]
-      ],
-      rows_content: [
         ['2',     '3',    '4',      '5',    '6'  ],
         ['4',     '6',    '8',      '10',   '12' ],
         ['6',     '9',    '12',     '15',   '18' ],
         ['8',     '12',   '16',     '20',   '24' ],
         ['10',    '15',   '20',     '25',   '30' ]
+      ],
+
+      rows_color: [
+        ["limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
+        ["limegreen",     "limegreen",    "steelblue",      "steelblue",    "yellow"     ],
+        ["limegreen",     "steelblue",    "yellow",         "yellow",       "orange"     ],
+        ["steelblue",     "yellow",       "yellow",         "orange",       "red"        ],
+        ["steelblue",     "yellow",       "orange",         "red",          "red"        ]
       ]
     },
 
     risk_definitions: {
-      limegreen:        { rating: 'LOW',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
-      steelblue:        { rating: 'MINOR',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
-      yellow:           { rating: 'MEDIUM',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
-      orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
-      red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
+      limegreen:        { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'No action may be required, but risk reviewed for possible control/mitigation to ALARP',    description_approval: 'Manager or higher review and acceptance required*'                                                            },
+      steelblue:        { rating: 'Minor',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  description: 'Review and control/mitigate risk to ALARP',                                                description_approval: 'Senior/Regional or Program Manager or higher review and acceptance required*'                                 },
+      yellow:           { rating: 'Medium',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Mitigate risk to ALARP, acceptable with implementation of risk controls',                  description_approval: 'Director or higher review and acceptance required*'                                                           },
+      orange:           { rating: 'Serious',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
+      red:              { rating: 'High',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
     },
+
+    risk_definitions_additional_info: '* Risk Acceptance authority can be delegated on a temporary basis',
 
     risk_table_index: {
       'Low - 2' => 'limegreen',
@@ -134,21 +256,26 @@ class FFTConfig < DefaultConfig
       'Low - 5' => 'limegreen',
       'Low - 6' => 'limegreen',
       'Low' =>  'limegreen',
+      'LOW' =>  'limegreen',
       'Minor - 8' => 'steelblue',
       'Minor - 9' => 'steelblue',
       'Minor - 10' => 'steelblue',
       'Minor' => 'steelblue',
+      'MINOR' => 'steelblue',
       'Medium - 12' => 'yellow',
       'Medium - 15' => 'yellow',
       'Medium - 16' => 'yellow',
       'Medium' => 'yellow',
+      'MEDIUM' => 'yellow',
       'Serious - 18' => 'orange',
       'Serious - 20' => 'orange',
       'Serious' => 'orange',
+      'SERIOUS' => 'orange',
       'High - 24' => 'red',
       'High - 25' => 'red',
       'High - 30' => 'red',
       'High' => 'red',
+      'HIGH' => 'red',
     },
 
     risk_table_dict: {
@@ -169,6 +296,49 @@ class FFTConfig < DefaultConfig
       25 => 'High - 25',
       30 => 'High - 30',
     }
+  }
+
+  ULTIPRO_DATA = {
+    upload_path: '/var/sftp/fftsftpuser/ProSafeT_User_List.XML',
+    expand_output: false, #Shows full account generation details
+    dry_run: false, #Prevents the saving of data to the database
+
+    #The following identifies what account type is associated with each employee-group
+    group_mapping: {
+      'dispatch'    => 'Analyst',
+      'fight-crew'  => 'Pilot',
+      'ground'      => 'Ground',
+      'maintenance' => 'Staff',
+      'other'       => 'Staff'
+    }, #Cabin
+    tracked_privileges: [
+      'Flight Operations: Incident Submitter',
+      'Flight Operations: ASAP Submitter',
+      'Flight Operations: Fatigue Submitter',
+      'Flight Operations: Medical Event Submitter',
+      'Flight Operations: Fume Event Submitter',
+      'Inflight: Incident Submitter',
+      'Inflight: ASAP Submitter',
+      'Inflight: Fatigue Submitter',
+      'Inflight: Medical Event Submitter',
+      'Inflight: Fume Event Submitter',
+
+      'Ground: Incident Submitter',
+      'Ground: General Submitter',
+      'Other: General Submitter',
+      'Flight Crew: ASAP Submitter',
+      'Flight Crew: Incident Submitter',
+      'Flight Crew: Fatigue Submitter',
+      'Dispatch: ASAP Submitter',
+      'Dispatch: Incident Submitter',
+      'Dispatch: Fatigue Submitter',
+      'Maintenance: ASAP Submitter',
+      'Maintenance: Incident Submitter',
+      'Maitnenance: Fatigue Submitter',
+      'Cabin: ASAP Submitter',
+      'Cabin: Incident Submitter',
+      'Cabin: Fatigue Submitter'
+    ],
   }
 
 

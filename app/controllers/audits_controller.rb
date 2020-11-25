@@ -27,12 +27,18 @@ class AuditsController < SafetyAssuranceController
     :interpret,
     :new_attachment,
     :override_status,
+    :launch,
     :show,
     :update,
     :update_checklist_records,
     :upload_checklist,
-    :viewer_access
+    :viewer_access,
   ]
+
+  before_filter(only: [:new])    {set_parent_type_id(:audit)}
+  before_filter(only: [:create]) {set_parent(:audit)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @audit)}
+
   include Concerns::Mobile # used for [method]_as_json
 
   def define_owner
@@ -44,12 +50,24 @@ class AuditsController < SafetyAssuranceController
   def index
     respond_to do |format|
       format.html do
-        @table = Object.const_get("Audit")
-          .preload(CONFIG.hierarchy[session[:mode]][:objects]['Audit'][:preload])
-        @headers = @table.get_meta_fields('index')
-        @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-        handle_search
-        filter_audits
+        object_name = controller_name.classify
+        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+        @table = Object.const_get(object_name).preload(@object[:preload])
+        @default_tab = params[:status]
+
+        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+        if params[:advance_search].present?
+          handle_search
+        else
+          @records = records
+        end
+        filter_records(object_name, controller_name)
+        records = @records.to_a & records.to_a if @records.present?
+
+        @records_hash = records.group_by(&:status)
+        @records_hash['All'] = records
+        @records_hash['Overdue'] = records.select{|x| x.overdue}
+        @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
       end
       format.json { index_as_json }
     end
@@ -64,8 +82,8 @@ class AuditsController < SafetyAssuranceController
 
 
   def create
-    audit = Audit.create(params[:audit])
-    redirect_to audit_path(audit), flash: {success: "Audit created."}
+    @audit = Audit.create(params[:audit])
+    redirect_to audit_path(@audit), flash: {success: "Audit created."}
   end
 
 
@@ -130,52 +148,6 @@ class AuditsController < SafetyAssuranceController
   end
 
 
-  def update
-    transaction = true
-    @owner.update_attributes(params[:audit])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:audit][:status]}"
-      params[:audit][:close_date] = params[:audit][:status] == 'Completed' ? Time.now : nil
-    when 'Add Cost', 'Add Contact', 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:audit])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content,
-        nil,
-        current_user,
-        session[:platform]
-      )
-    end
-    @owner.save
-    respond_to do |format|
-      format.html { redirect_to audit_path(@owner) }
-      format.json { update_as_json }
-    end
-  end
-
-
   def show
     respond_to do |format|
       format.html do
@@ -215,45 +187,14 @@ class AuditsController < SafetyAssuranceController
   end
 
 
-  def print
-    @deidentified = params[:deidentified]
-    @audit = Audit.find(params[:id])
-    html = render_to_string(:template=>"/audits/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Audit_#{@audit.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
   def download_checklist
     @audit = Audit.find(params[:id])
   end
 
+  def show_finding
+    @findings =  ChecklistRow.find(params[:"checklist_row_id"]).findings
 
-private
-
-  def filter_audits
-    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-    if !current_user.has_access('audits','admin', admin: true, strict: true)
-      cars = Audit.where('(status in (:status) AND responsible_user_id = :id) OR approver_id = :id OR created_by_id = :id',
-        { status: ['Assigned', 'Pending Approval', 'Completed'], id: current_user[:id] }
-      )
-      if current_user.has_access('audits','viewer')
-        Audit.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.blank?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
-      end
-      @records = @records & cars
-    end
+    render :partial=>"show_finding"
   end
 
 end

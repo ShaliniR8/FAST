@@ -1,0 +1,16 @@
+- users = owner.invitations.map{|x| x.user}
+- if users.present?
+  .col-xs-12
+    hr
+    .title Participants
+    .table.mt10
+      table#participants.table.table-striped.table-bordered
+        thead
+          tr
+            - User.invite_headers.each do |header|
+              th = header[:title]
+        tbody
+          - User.includes(:invitations).where(id: users.select(&:present?).map(&:id)).each do |user|
+            tr
+              - User.invite_headers.each do |header|
+                td = user.send(header[:field])

@@ -26,8 +26,12 @@ class InvestigationsController < SafetyAssuranceController
     :new_attachment,
     :show,
     :update,
-    :viewer_access
+    :viewer_access,
   ]
+
+  before_filter(only: [:new])    {set_parent_type_id(:investigation)}
+  before_filter(only: [:create]) {set_parent(:investigation)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @investigation)}
 
   def define_owner
     @class = Object.const_get('Investigation')
@@ -46,89 +50,46 @@ class InvestigationsController < SafetyAssuranceController
     end
     load_options
     @fields = Investigation.get_meta_fields('form')
+
+    @risk_type = 'Baseline'
     load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
 
   def edit
+    @risk_type = 'Baseline'
     load_options
     @fields = Investigation.get_meta_fields('form')
     load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
-
-  def update
-    transaction = true
-    @owner.update_attributes(params[:investigation])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:investigation][:status]}"
-      params[:investigation][:close_date] = params[:investigation][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:investigation])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to investigation_path(@owner)
-  end
-
-
   def create
-    investigation = Investigation.new(params[:investigation])
-    if investigation.save
-      redirect_to investigation_path(investigation), flash: {success: "Investigation created."}
+    convert_from_risk_value_to_risk_index
+
+    @investigation = Investigation.new(params[:investigation])
+    if @investigation.save
+      redirect_to investigation_path(@investigation), flash: {success: "Investigation created."}
     end
   end
 
   def index
-    @table = Object.const_get("Investigation")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-    if !current_user.has_access('investigations', 'admin', admin: true, strict: true)
-      cars = Investigation.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Investigation.where('approver_id = ?',  current_user.id)
-      if current_user.has_access('investigations','viewer')
-        Investigation.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.blank?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
-      end
-      cars += Investigation.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_records(object_name, controller_name)
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -161,39 +122,21 @@ class InvestigationsController < SafetyAssuranceController
   end
 
 
-  def print
-    @deidentified = params[:deidentified]
-    @investigation = Investigation.find(params[:id])
-    html = render_to_string(:template => "/investigations/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Investigation_##{@investigation.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
   def mitigate
     @owner = Investigation.find(params[:id])
     load_special_matrix_form("investigation", "mitigate", @owner)
     load_options
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/mitigate"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
-    end
+
+    @risk_type = 'Mitigate'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
   def baseline
     @owner = Investigation.find(params[:id])
     load_options
     load_special_matrix_form("investigation", "baseline", @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/baseline"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/baseline"
-    end
+
+    @risk_type = 'Baseline'
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
-
-
 end

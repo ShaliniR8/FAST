@@ -22,8 +22,12 @@ end
 class CorrectiveActionsController < ApplicationController
 
   before_filter :set_table_name, :login_required
+  before_filter :define_owner, only: [:request_extension, :schedule_verification]
 
-
+  def define_owner
+    @class = Object.const_get('CorrectiveAction')
+    @owner = @class.find(params[:id])
+  end
 
   def set_table_name
     @table_name = "Corrective Actions"
@@ -44,10 +48,13 @@ class CorrectiveActionsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("CorrectiveAction")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
 
     if !current_user.has_access('corrective_actions', 'admin', admin: true, strict: true)
       cars = CorrectiveAction.where('status in (?) and responsible_user_id = ?',
@@ -56,6 +63,12 @@ class CorrectiveActionsController < ApplicationController
       cars += CorrectiveAction.where('created_by_id = ?', current_user.id)
       @records = @records & cars
     end
+
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -160,7 +173,7 @@ class CorrectiveActionsController < ApplicationController
   def destroy
     @corrective_action = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
     @corrective_action.destroy
-    redirect_to corrective_actions_path, flash: {danger: "Corrective Action ##{params[:id]} deleted."}
+    redirect_to corrective_actions_path(status: 'All'), flash: {danger: "Corrective Action ##{params[:id]} deleted."}
   end
 
 
@@ -188,11 +201,36 @@ class CorrectiveActionsController < ApplicationController
     render :partial => "forms/viewer_comment"
   end
 
+  def request_extension
+    @extension_request = @owner.extension_requests.new
+    @extension_request.requester = current_user
+    @extension_request.approver = @owner.approver
+    @extension_request.request_date = Time.now
+    render :partial => 'extension_requests/new'
+  end
+
+  def schedule_verification
+      @verification = @owner.verifications.new
+      @verification.validator = @owner.responsible_user
+      render :partial => 'verifications/new'
+  end
+
   def print
     @deidentified = params[:deidentified]
     @corrective_action = CorrectiveAction.find(params[:id])
-    html = render_to_string(:template => "/corrective_actions/print.html.erb")
-    pdf = PDFKit.new(html)
+    html = render_to_string(:template => "/pdfs/print_corrective_action.html.erb")
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Corrective_Action_##{@corrective_action.get_id}" + (@deidentified ? '(de-identified)' : '')

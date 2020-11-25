@@ -45,7 +45,7 @@
             "data-toggle" => "modal",
             "data-target" => ".bs-example-modal-lg"%>
           <%=link_to "Reset",
-            request.path,
+            request.fullpath,
             :disable_with => 'Resetting...',
             :class => "btn btn-default pull-right mr5"%>
 
@@ -152,7 +152,7 @@
   $(function(){
 
     $('#adv').on('click',function(){
-      $.get("<%=advanced_search_home_index_path(:table => @table)%>", function(data){
+      $.get("<%=advanced_search_home_index_path(:table => @table.name)%>", function(data){
         $(".modal-content").html(data);
         $(window).resize();
       });

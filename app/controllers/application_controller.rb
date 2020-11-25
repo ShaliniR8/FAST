@@ -10,7 +10,8 @@ class ApplicationController < ActionController::Base
   before_filter :send_session
   before_filter :adjust_session
   before_filter :track_activity
-  before_filter :set_last_seen_at
+  before_filter :set_page_title
+  #before_filter :set_last_seen_at
   skip_before_filter :authenticate_user! #Kaushik Mahorker OAuth
 
   helper :all # include all helpers, all the time
@@ -44,6 +45,8 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password
   def access_validation(strict=false)
 
+    expire_after = 180 # minutes
+
     if session[:digest].present?
       if request.url == session[:digest].link && session[:digest].expire_date > Time.now.to_date
         return
@@ -65,7 +68,7 @@ class ApplicationController < ActionController::Base
 
     if !session[:last_active].present?
       session[:last_active] = Time.now
-    elsif (Time.now - session[:last_active])/60 > 100 && !CONFIG::GENERAL[:enable_sso] && !current_token.present?
+    elsif (Time.now - session[:last_active])/60 > expire_after && !CONFIG::GENERAL[:enable_sso] && !current_token.present?
        redirect_to logout_path
        return false
     else
@@ -90,6 +93,23 @@ class ApplicationController < ActionController::Base
 
   def strict_access_validation
     access_validation(true) || current_user.global_admin?
+  end
+
+
+  def set_page_title
+    module_name = case controller_name.titleize
+    when 'Records' then 'Reports'
+    when 'Reports' then 'Events'
+    when 'Sms Actions' then 'Corrective Actions'
+    when 'Sras' then 'SRAs'
+    when 'Faa Reports' then 'FAA Reports'
+    else controller_name.titleize end
+
+    page_name = case action_name.titleize
+    when 'Index' then 'Listing'
+    else action_name.titleize end
+
+    @title = "#{module_name} - #{page_name}"
   end
 
 
@@ -122,6 +142,14 @@ class ApplicationController < ActionController::Base
         redirect_to errors_path if !group_validation
       elsif current_user.id == report.created_by_id
         redirect_to errors_path if !group_validation
+      elsif report.respond_to? :verifications
+        validators_ids = report.verifications.map { |v| v.additional_validators }.flatten
+        if validators_ids.include?(current_user.id.to_s)
+          true
+        else
+          false
+          redirect_to errors_path
+        end
       else
         false
         redirect_to errors_path
@@ -181,10 +209,54 @@ class ApplicationController < ActionController::Base
   ####    SHARED FORMS     ####
   #############################
 
+  def launch
+    current_object = params[:controller].to_sym
+    # @objects: list of object names that can be launched from the current object
+    @objects =  CONFIG::LAUNCH_OBJECTS[current_object].map { |object|
+      if CONFIG::OBJECT_NAME_MAP[object].present?
+        [CONFIG::OBJECT_NAME_MAP[object], object.underscore]
+      else
+        [object, object.underscore]
+      end
+    }
+    render :partial => '/forms/workflow_forms/launch'
+  end
+
+  def launch_new_object
+    parent_type = params[:controller]
+    parent_id = params[:id]
+    child = params[:child]
+
+    redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+  end
+
+  def set_parent_type_id(object)
+    # if parent exists, set parent type and id
+    @parent_type = params[:parent_type]
+    @parent_id   = params[:parent_id]
+  end
+
+  def set_parent(object)
+    if params[object][:parent_type].present? && params[object][:parent_id].present?
+      @parent = Object.const_get(params[object][:parent_type].camelize.singularize).find(params[object][:parent_id])
+    end
+
+    params[object].except!(:parent_type)
+    params[object].except!(:parent_id)
+  end
+
+  def create_parent_and_child(parent: parent, child: child)
+    if parent.present?
+      Child.create(child: child, owner:@parent)
+      Parent.create(parent: parent, owner: child)
+    end
+  end
+
   # Handles permissions and ability to execute button actions
   def interpret
+    op = params[:op].present? ? params[:op].symbolize_keys : {}
     begin
-      unless CONFIG.check_action(current_user, params[:act].to_sym, @owner)
+      unless CONFIG.check_action(current_user, params[:act].to_sym, @owner, **op)
         redirect_to eval("#{@class.name.underscore}_path(@owner)"),
           flash: {danger: "Unable to #{params[:commit] || params[:act]} #{@owner.class.titleize}."}
         return false
@@ -240,17 +312,78 @@ class ApplicationController < ActionController::Base
 
     # :edit handled safely by link_to in render_buttons
 
-    #TODO- properly make the print functionality class ambiguous (applies for pdf and deid_pdf)
-    # when :print
-    #   # Add to filter_before for defining @owner and class
-    #   @deidentified = params[:deidentified]
-    #   html = render_to_string(:template=>"/audits/print.html.erb")
-    #   pdf = PDFKit.new(html)
-    #   pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    #   pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    #   filename = "Audit_#{@audit.get_id}" + (@deidentified ? '(de-identified)' : '')
-    #   send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+    # TODO - properly make the print functionality class ambiguous (applies for pdf and deid_pdf)
+    when :pdf
+      mod = session[:mode]
+      # TODO - refactor SR and SMS IM printing
+      owner_class_name = @owner.class.name
+      name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
+      owner_name = name_mapping.present? ? name_mapping : owner_class_name
+      # Only for SA and SRM
+      if mod != 'ASAP' && mod != 'SMS IM'
+        # begin action specific behavior
+        print_special_matrix(@owner) if owner_class_name == 'Hazard'
+        # end
+        @deidentified = params[:deidentified]
+        @meta_field_args = ['show']
+        @meta_field_args << 'admin' if current_user.global_admin?
+        html = render_to_string(:template=>"/pdfs/print.html.slim")
+        pdf_options = {
+          header_html:  'app/views/pdfs/print_header.html',
+          header_spacing:  2,
+          header_right: '[page] of [topage]'
+        }
+        if CONFIG::GENERAL[:has_pdf_footer]
+          pdf_options.merge!({
+            footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+            footer_spacing:  3,
+          })
+        end
+        pdf = PDFKit.new(html, pdf_options)
+        pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+        pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+        filename = "#{owner_name}_#{@owner.get_id}" + (@deidentified ? '(de-identified)' : '')
+        send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+      else
+        redirect_to eval("print_#{owner_class_name.downcase}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
+        return false
+      end
 
+    when :deid_pdf
+      mod = session[:mode]
+      # TODO - refactor SR and SMS IM printing
+      owner_class_name = @owner.class.name
+      name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
+      owner_name = name_mapping.present? ? name_mapping : owner_class_name
+      # Only for SA and SRM
+      if mod != 'ASAP' && mod != 'SMS IM'
+        # begin action specific behavior
+        print_special_matrix(@owner) if owner_class_name == 'Hazard'
+        # end
+        @deidentified = params[:deidentified]
+        @meta_field_args = ['show']
+        @meta_field_args << 'admin' if current_user.global_admin?
+        html = render_to_string(:template=>"/pdfs/print.html.slim")
+        pdf_options = {
+          header_html:  'app/views/pdfs/print_header.html',
+          header_spacing:  2,
+          header_right: '[page] of [topage]'
+        }
+        if CONFIG::GENERAL[:has_pdf_footer]
+          pdf_options.merge!({
+            footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+            footer_spacing:  3,
+          })
+        end
+        pdf = PDFKit.new(html, pdf_options)
+        pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+        pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+        filename = "#{owner_name}_#{@owner.get_id}" + (@deidentified ? '(de-identified)' : '')
+        send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+      else
+        redirect_to eval("print_#{owner_class_name.downcase}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
+        return false
+      end
     # :finding redirect handled in render_buttons
 
     # :hazard redirect handled in render_buttons
@@ -409,13 +542,13 @@ class ApplicationController < ActionController::Base
   def adjust_session
     load_controller_list
     if @sms_list.include? controller_name
-      session[:mode]='SMS'
+      session[:mode] = 'SMS'
     elsif @sms_im_list.include? controller_name
-      session[:mode]='SMS IM'
+      session[:mode] = 'SMS IM'
     elsif @asap_list.include? controller_name
-      session[:mode]='ASAP'
+      session[:mode] = 'ASAP'
     elsif @srm_list.include? controller_name
-      session[:mode]='SRM'
+      session[:mode] = 'SRM'
     end
     true
   end
@@ -565,6 +698,8 @@ class ApplicationController < ActionController::Base
         if params[:field_1].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_1]}.first
           if field[:type] == 'user'
+            params[:searchterm_1] = "get_submitter_id" if params[:searchterm_1] == "get_submitter_name"
+
             params[:field_1] = User.where('full_name LIKE ?', '%' + params[:field_1] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_1].include? r.send(params[:searchterm_1])}
           elsif field[:type] == 'boolean_box'
@@ -582,6 +717,7 @@ class ApplicationController < ActionController::Base
         if params[:field_2].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_2]}.first
           if field[:type] == 'user'
+            params[:searchterm_2] = "get_submitter_id" if params[:searchterm_2] == "get_submitter_name"
             params[:field_2] = User.where('full_name LIKE ?', '%' + params[:field_2] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_2].include? r.send(params[:searchterm_2])}
           else
@@ -598,6 +734,7 @@ class ApplicationController < ActionController::Base
         if params[:field_3].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_3]}.first
           if field[:type] == 'user'
+            params[:searchterm_3] = "get_submitter_id" if params[:searchterm_3] == "get_submitter_name"
             params[:field_3] = User.where('full_name LIKE ?', '%' + params[:field_3] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_3].include? r.send(params[:searchterm_3])}
           else
@@ -614,6 +751,7 @@ class ApplicationController < ActionController::Base
         if params[:field_4].present?
           field = @terms.select{|header| header[:field] == params[:searchterm_4]}.first
           if field[:type] == 'user'
+            params[:searchterm_4] = "get_submitter_id" if params[:searchterm_4] == "get_submitter_name"
             params[:field_4] = User.where('full_name LIKE ?', '%' + params[:field_4] + '%').map{|x| x.id}
             @records.keep_if{|r| params[:field_4].include? r.send(params[:searchterm_4])}
           else
@@ -702,30 +840,36 @@ class ApplicationController < ActionController::Base
         mailer: true,
         subject: "#{object_name} Pending Approval") if owner.approver.present?
     when 'Reject'
-      notify(owner,
-        notice: {
-          users_id: owner.responsible_user.id,
-          content: "#{object_name} ##{owner.id} was Rejected by the Final Approver."},
-        mailer: true,
-        subject: "#{object_name} Rejected") if owner.approver.present?
+      if owner.responsible_user.present?
+        notify(owner,
+          notice: {
+            users_id: owner.responsible_user.id,
+            content: "#{object_name} ##{owner.id} was Rejected by the Final Approver."},
+          mailer: true,
+          subject: "#{object_name} Rejected") if owner.approver.present?
+      end
     when 'Approve'
-      notify(owner,
+      if owner.responsible_user.present?
+        notify(owner,
         notice: {
           users_id: owner.responsible_user.id,
           content: "#{object_name} ##{owner.id} was Approved by the Final Approver."},
         mailer: true,
         subject: "#{object_name} Approved") if owner.approver.present?
+      end
     end
   end
 
 
   # sample arg => notice: {users_id: 1, content: 'Audit is assigned'}, mailer: true, subject: 'Audit Assigned'
   def notify(record, arg)
-    if arg[:notice][:users_id].present? && record.present?
+    if arg[:notice][:users_id].present? &&
+        User.find(arg[:notice][:users_id]).present? &&
+        record.present? && record.respond_to?(:notices)
       notice = record.notices.create(arg[:notice])
-      byebug if notice.owner_type.nil?
+      puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
-        NotifyMailer.notify(notice, arg[:subject])
+        NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment])
       end
     end
   end
@@ -744,11 +888,124 @@ class ApplicationController < ActionController::Base
   def load_records
     object = CONFIG.hierarchy[session[:mode]][:objects][controller_name.classify]
     @table = Object.const_get(controller_name.classify).preload(object[:preload])
-    handle_search
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records = @records.to_a & records.to_a
+
+    ids = JSON.parse params["ids"].gsub('=>', ':')
+    if ids[params["status"]].present?
+      @records = @table.select { |record| ids[params["status"]].include? record.id }
+    else
+      @records = nil
+    end
+
+    # records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    # @records = @records.to_a & records.to_a
     @fields = @table.get_meta_fields('index')
     render :partial => 'forms/render_index_tab'
+  end
+
+  def filter_records(object_name, controller_name)
+    if %w[Aduit Inspection Evaluation Investigation].include? object_name
+      @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
+      if !current_user.has_access(controller_name,'admin', admin: true, strict: true)
+        cars =  Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
+          ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+        cars +=  Object.const_get(object_name).where('approver_id = ?',  current_user.id)
+        if current_user.has_access(controller_name,'viewer')
+           Object.const_get(object_name).where('viewer_access = true').each do |viewable|
+            if viewable.privileges.blank?
+              cars += [viewable]
+            else
+              viewable.privileges.each do |privilege|
+                current_user.privileges.include? privilege
+                cars += [viewable]
+              end
+            end
+          end
+        end
+        cars +=  Object.const_get(object_name).where('created_by_id = ?', current_user.id)
+        @records = @records & cars
+      end
+    else # Findings, Corrective Actions, Recommendations
+      if !current_user.has_access(controller_name, 'admin', admin: true, strict: true)
+        cars = Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
+          ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+        cars += Object.const_get(object_name).where('approver_id = ?', current_user.id)
+        cars += Object.const_get(object_name).where('created_by_id = ?', current_user.id)
+        @records = @records & cars
+      end
+    end
+  end
+
+  # http://railscasts.com/episodes/127-rake-in-background
+  def call_rake(task, options={})
+    options[:rails_env] = Rails.env
+    args = options.map { |n, v| "#{n.to_s.upcase}='#{v}'"}
+    Rails.logger.info "running `rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &`"
+
+    if Rails.env.production?
+      system "/usr/local/bin/bundle exec /usr/local/bin/rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
+    else
+      system "rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"
+    end
+  end
+
+
+  def convert_from_risk_value_to_risk_index
+    if CONFIG::GENERAL[:drop_down_risk_selection]
+      risk_table    = CONFIG::MATRIX_INFO[:risk_table]
+      column_header = risk_table[:column_header]
+      row_header  = risk_table[:row_header]
+      object_name = self.class.name.gsub('Controller', '').underscore.singularize
+
+      if params[object_name][:risk_factor].present?
+        severity_value    = params[object_name][:severity]
+        probability_value = params[object_name][:likelihood]
+        params[object_name][:severity]   = row_header.find_index(severity_value)
+        params[object_name][:likelihood] = column_header.find_index(probability_value)
+      end
+
+      if params[object_name][:risk_factor_after].present?
+        severity_after_value    = params[object_name][:severity_after]
+        probability_after_value = params[object_name][:likelihood_after]
+        params[object_name][:severity_after]   = row_header.find_index(severity_after_value)
+        params[object_name][:likelihood_after] = column_header.find_index(probability_after_value)
+      end
+    end
+  end
+
+
+  # save records through ajax call
+  def ajax_update
+    object_name = self.class.name.gsub('Controller', '').underscore.singularize
+    class_name = self.class.name.gsub('Controller', '').singularize
+    @owner = Object.const_get(class_name).find(params[:id])
+
+
+    case params[:commit]
+    when 'Update Risk Matrix'
+      convert_from_risk_value_to_risk_index
+      @owner.update_attributes(params[object_name.to_sym])
+      load_special_matrix(@owner)
+      render partial: 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+
+    when 'Save Fields'
+      if params[:record][:record_fields_attributes].present?
+        params[:record][:record_fields_attributes].each_value do |field|
+          if field[:value].is_a?(Array)
+            field[:value].delete("")
+            field[:value] = field[:value].join(";")
+          end
+        end
+      end
+
+      @owner.update_attributes(params[object_name.to_sym])
+      @record = @owner
+      category = Category.find(params[:category_id])
+      fields = category.fields
+      @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
+      render partial: 'records/show_category', locals: {category: category, fields: fields}
+    else
+    end
+
   end
 
 

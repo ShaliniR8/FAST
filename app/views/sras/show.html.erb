@@ -55,6 +55,10 @@
 
 <script>
   $(document).ready(function(){
+    $(".modal").on("hidden.bs.modal", function(){
+      $(".modal-content").html("");
+    });
+
     $("#section_btn").on('click',function(){
       $.get("<%=new_section_sras_path%>", {"owner_id" : <%=@sra.id%>});
     });

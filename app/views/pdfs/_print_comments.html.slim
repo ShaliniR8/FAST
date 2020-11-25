@@ -1,0 +1,7 @@
+- if comments.present?
+  .col-xs-12
+    hr
+    .title Comments
+    ul.content
+      - comments.each do |comment|
+        li = "#{comment.viewer.full_name}: #{comment.content}"

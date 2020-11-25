@@ -1,3 +1,4 @@
+<%deid = defined?(deid) ? deid : false%>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="panel <%=@cat.panel%>">
     <div class="panel-heading click-heading">
@@ -12,16 +13,18 @@
       <div class="row" id="fields" style="word-wrap: break-word">
         <%all_record_fields = @record.record_fields.map{|sf| [sf.fields_id, sf] }.to_h%>
         <%@cat.fields.each do |field|%>
-          <%if field.nested_field_id.nil?%>
-            <%record_field = all_record_fields[field.id]%>
-            <%=render "submissions/display_field", :field => field, :sub_field => record_field%>
-            <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
-              <div class="col-xs-12">
-                <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
-                  <%sn_field = all_record_fields[nest_field.id]%>
-                  <%=render "submissions/display_field", :field => nest_field, :sub_field => sn_field%>
-                <%end%>
-              </div>
+          <%if field.print || !deid%>
+            <%if field.nested_field_id.nil?%>
+              <%record_field = all_record_fields[field.id]%>
+              <%=render "submissions/display_field", :field => field, :sub_field => record_field, deid:deid%>
+              <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
+                <div class="col-xs-12">
+                  <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
+                    <%sn_field = all_record_fields[nest_field.id]%>
+                    <%=render "submissions/display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
+                  <%end%>
+                </div>
+              <%end%>
             <%end%>
           <%end%>
         <%end%>

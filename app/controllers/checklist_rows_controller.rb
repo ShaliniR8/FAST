@@ -16,12 +16,28 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 
 class ChecklistRowsController < ApplicationController
+  before_filter :define_owner, only: [:new_attachment, :update]
+
+  def new_attachment
+    @attachment = Attachment.new
+    render partial: 'shared/attachment_modal'
+  end
+
+  def update
+    @owner.update_attributes(params[:checklist_row])
+    @owner.save
+    redirect_to audit_path(@owner.checklist.owner)
+  end
 
   def destroy
     ChecklistRow.find(params[:id]).destroy
     render json: {}, status: 200
   end
 
-
+  private
+  def define_owner
+    @class = ChecklistRow
+    @owner = @class.find(params[:id])
+  end
 
 end

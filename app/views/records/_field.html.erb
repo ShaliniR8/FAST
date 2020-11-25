@@ -1,136 +1,148 @@
-<%=f.fields_for :record_fields, record_field do |rf|%>
+<%size = is_nested_field ? 'col-xs-12' : calculate_column_size(field: field)%>
 
-  <%if field.display_type == "text"%>
-    <%if field.data_type == 'date'%>
-      <%field_class = 'field-date form-control'%>
-    <%elsif field.data_type == 'datetime'%>
-      <%field_class = 'field-datetime form-control'%>
-    <%else%>
-      <%field_class = 'form-control'%>
-    <%end%>
-    <%=rf.text_field :value,
-      {:class=> field_class+" "+field.element_class,
-      :placeholder=>field.label,
-      :id=>field.element_id}%>
+<div class="<%=size%> form-group">
+  <%=f.fields_for :record_fields, record_field do |rf|%>
 
-  <%elsif field.display_type == "textarea"%>
-    <div class="col-xs-12">
-      <%=rf.text_area :value,
-        {:class => "form-control " + field.element_class,
-        :rows => 4,
-        :id => field.element_id}%>
-    </div>
+    <label>
+      <%=field.get_label.present? ? field.get_label.html_safe : nil%>
+    </label>
 
-  <%elsif field.display_type == "dropdown"%>
-    <%if field.data_type == "timezone"%>
-      <div class="input-group">
+
+    <%if field.display_type == "text"%>
+      <%if field.data_type == 'date'%>
+        <%field_class = 'field-date form-control'%>
+      <%elsif field.data_type == 'datetime'%>
+        <%field_class = 'field-datetime form-control'%>
+      <%else%>
+        <%field_class = 'form-control'%>
+      <%end%>
+      <%=rf.text_field :value,
+        {:class=> field_class+" "+field.element_class,
+        :placeholder=>field.label,
+        :id=>field.element_id}%>
+
+    <%elsif field.display_type == "textarea"%>
+      <div class="col-xs-12">
+        <%=rf.text_area :value,
+          {:class => "form-control " + field.element_class,
+          :rows => 4,
+          :id => field.element_id}%>
+      </div>
+
+    <%elsif field.display_type == "dropdown"%>
+      <%if field.data_type == "timezone"%>
+        <div class="input-group">
+          <%=rf.select :value,
+            field.getOptions,
+            {:include_blank=>""},
+            {:class=>'form-control tz atz',
+            :selected => record_field.value}%>
+          <span class="input-group-addon tc">All</span>
+        </div>
+      <%else%>
         <%=rf.select :value,
           field.getOptions,
           {:include_blank=>""},
-          {:class=>'form-control tz atz',
-          :selected => record_field.value}%>
-        <span class="input-group-addon tc">All</span>
+          {:class=>'form-control'+" "+field.element_class,
+          :selected => record_field.value,
+          :id => field.element_id}%>
+      <%end%>
+
+    <%elsif field.display_type == "checkbox"%>
+      <%current_options = record_field.value.split(";") rescue ''%>
+      <div class="col-xs-12">
+        <%field.getOptions.each do |option|%>
+          <div class="col-xs-6">
+            <label class="checkbox">
+              <%=rf.check_box :value,
+                {:multiple => true,
+                :checked=>current_options.include?(option)},
+                option,
+                nil%>
+              <%=option%>
+            </label>
+          </div>
+        <%end%>
       </div>
+
+    <%elsif field.display_type == "radio"%>
+      <div class="col-xs-12">
+        <%field.getOptions.each do |option|%>
+          <div class="col-xs-6">
+            <label class="checkbox">
+              <%=rf.radio_button :value,
+                option%>
+              <%=option%>
+            </label>
+          </div>
+        <%end%>
+      </div>
+
+    <%elsif field.display_type == "employee"%>
+      <div class="input-group">
+        <%employee = ""%>
+        <%if record_field.value.present?%>
+          <%if record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+            <%employee = User.find(record_field.value).full_name%>
+          <%else%>
+            <%employee = record_field.value%>
+          <%end%>
+        <%end%>
+        <%=text_field_tag field.get_label,
+          "",
+          {:class=>"form-control ml5 emp",
+          :readonly=>true,
+          :id=>"emp#{field.id}",
+          :value => employee}%>
+        <%=rf.hidden_field :value,
+          :id=>"employee-select#{field.id}"%>
+        <span class="input-group-btn">
+          <%=link_to "...",
+            "#",
+            :class=>"btn btn-info emp_button",
+            "data-toggle"=>"modal",
+            "data-target"=>".emp_modal",
+            :id=>"#{field.id}"%>
+        </span>
+      </div>
+
+    <%elsif field.display_type == "airport"%>
+      <div class="input-group">
+        <%=text_field_tag field.get_label,
+          "",
+          {:class=>"form-control ml5 airport",
+          :readonly=>true,
+          :id=>"airport#{field.id}",
+          :value=>record_field.value}%>
+        <%=rf.hidden_field :value,
+          :id=>"airport-select#{field.id}"%>
+        <span class="input-group-btn">
+          <%=link_to "...",
+            "#",
+            :class=>"btn btn-info airport_button",
+            "data-toggle"=>"modal",
+            "data-target"=>".airport_modal",
+            :id=>"#{field.id}"%>
+        </span>
+      </div>
+
+    <%elsif field.display_type == "datalist"%>
+      <%= rf.text_field :value,
+        {:list=>"#{field.id}",
+        :class=>"form-control",
+        :value=>record_field.value}%>
+      <datalist id="<%=field.id%>">
+        <% field.getOptions.each do |opt|%>
+          <option value="<%=opt%>"></option>
+        <%end%>
+      </datalist>
+
     <%else%>
-      <%=rf.select :value,
-        field.getOptions,
-        {:include_blank=>""},
-        {:class=>'form-control'+" "+field.element_class,
-        :selected => record_field.value,
-        :id => field.element_id}%>
+       No!
     <%end%>
 
-  <%elsif field.display_type == "checkbox"%>
-    <%current_options = record_field.value.split(";") rescue ''%>
-    <div class="col-xs-12">
-      <%field.getOptions.each do |option|%>
-        <div class="col-xs-6">
-          <label class="checkbox">
-            <%=rf.check_box :value,
-              {:multiple => true,
-              :checked=>current_options.include?(option)},
-              option,
-              nil%>
-            <%=option%>
-          </label>
-        </div>
-      <%end%>
-    </div>
 
-  <%elsif field.display_type == "radio"%>
-    <div class="col-xs-12">
-      <%field.getOptions.each do |option|%>
-        <div class="col-xs-6">
-          <label class="checkbox">
-            <%=rf.radio_button :value,
-              option%>
-            <%=option%>
-          </label>
-        </div>
-      <%end%>
-    </div>
+    <%#=" (##{field.id})" if Rails.env.development?%>
 
-  <%elsif field.display_type == "employee"%>
-    <div class="input-group">
-      <%employee = ""%>
-      <%if record_field.value.present?%>
-        <%if record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-          <%employee = User.find(record_field.value).full_name%>
-        <%else%>
-          <%employee = record_field.value%>
-        <%end%>
-      <%end%>
-      <%=text_field_tag field.get_label,
-        "",
-        {:class=>"form-control ml5 emp",
-        :readonly=>true,
-        :id=>"emp#{field.id}",
-        :value => employee}%>
-      <%=rf.hidden_field :value,
-        :id=>"employee-select#{field.id}"%>
-      <span class="input-group-btn">
-        <%=link_to "...",
-          "#",
-          :class=>"btn btn-info emp_button",
-          "data-toggle"=>"modal",
-          "data-target"=>".emp_modal",
-          :id=>"#{field.id}"%>
-      </span>
-    </div>
-
-  <%elsif field.display_type == "airport"%>
-    <div class="input-group">
-      <%=text_field_tag field.get_label,
-        "",
-        {:class=>"form-control ml5 airport",
-        :readonly=>true,
-        :id=>"airport#{field.id}",
-        :value=>record_field.value}%>
-      <%=rf.hidden_field :value,
-        :id=>"airport-select#{field.id}"%>
-      <span class="input-group-btn">
-        <%=link_to "...",
-          "#",
-          :class=>"btn btn-info airport_button",
-          "data-toggle"=>"modal",
-          "data-target"=>".airport_modal",
-          :id=>"#{field.id}"%>
-      </span>
-    </div>
-
-  <%elsif field.display_type == "datalist"%>
-    <%= rf.text_field :value,
-      {:list=>"#{field.id}",
-      :class=>"form-control",
-      :value=>record_field.value}%>
-    <datalist id="<%=field.id%>">
-      <% field.getOptions.each do |opt|%>
-        <option value="<%=opt%>"></option>
-      <%end%>
-    </datalist>
-
-  <%else%>
-     No!
   <%end%>
-
-<%end%>
+</div>

@@ -83,7 +83,7 @@ ruby:
 
   - when :deid_pdf
     = link_to 'De-ID PDF',
-      eval("print_#{owner_class}_path(@audit, format: :pdf, deidentified: true)"),
+      eval("interpret_#{owner_class}_path(owner, act: :deid_pdf, format: :pdf, deidentified: true, op: op)"),
       class: 'btn btn-darkturquoise pull-right mr5 mb5'
 
   - when :delete
@@ -116,6 +116,14 @@ ruby:
       class: 'btn btn-success pull-right mr5 mb5',
       disable_with: 'Adding...'
 
+  - when :launch
+    = link_to 'Launch',
+      '#',
+      class: 'btn btn-warning pull-right mr5 mb5',
+      id: 'launch_btn',
+      'data-toggle' => 'modal',
+      'data-target' => '.bs-example-modal-lg'
+
   - when :hazard
     = link_to 'Add Hazard',
       new_hazard_path( owner_id: owner.id, owner_type: owner.class.name ),
@@ -140,7 +148,7 @@ ruby:
 
   - when :pdf
     = link_to 'PDF',
-      eval("print_#{owner_class}_path(@audit, format: :pdf, deidentified: false)"),
+      eval("interpret_#{owner_class}_path(owner, act: :pdf, format: :pdf, deidentified: false, op: op)"),
       class: 'btn btn-darkturquoise pull-right mr5 mb5'
 
   - when :private_link
@@ -251,11 +259,23 @@ ruby:
       disable_with: 'Redirecting...'
 
   - when :view_parent
-    - parent_class = owner.owner.class.name
-    = link_to "View #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
-      eval("#{parent_class.underscore}_path(owner.owner)"),
-      class: 'btn btn-info pull-right mr5 mb5',
-      disable_with: 'Redirecting...'
+    - if owner.parents.present?
+      - parent_class = owner.get_parent.class.name
+      = link_to "View #{parent_class.titleize}",
+        eval("#{parent_class.underscore}_path(owner.get_parent)"),
+        class: 'btn btn-info pull-right mr5 mb5',
+        disable_with: 'Redirecting...'
+    - else
+      - parent_class = owner.owner.class.name
+      - if parent_class == 'ChecklistRow'
+        - parent_path = "#{owner.owner.checklist.owner.class.name.underscore}_path(owner.owner.checklist.owner)"
+      - else
+        - parent_path = "#{parent_class.underscore}_path(owner.owner)"
+
+      = link_to "View #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
+        eval(parent_path),
+        class: 'btn btn-info pull-right mr5 mb5',
+        disable_with: 'Redirecting...'
 
   - when :view_report
     = link_to 'View Report',
@@ -334,6 +354,15 @@ ruby:
         $.get('#{eval("interpret_#{owner_class}_path(owner, act: :cost)")}',function(data){
           $(".modal-content").html(data);
           $(window).trigger('resize');
+        });
+      });
+
+  - when :launch
+    javascript:
+      $('#launch_btn').on('click',function(){
+        $.get('#{eval("launch_#{owner_class}_path(owner)")}', function(data){
+            $(".modal-content").html(data);
+            $(window).trigger('resize');
         });
       });
 

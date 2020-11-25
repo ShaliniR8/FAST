@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="/javascripts/utility/select2.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/select2.min.js"></script>
+
 <%if !defined?(@base_defined) #for embedding multiple _form_fields renders%>
   <div class="modal fade emp_modal"
     tabindex="-1"
@@ -46,7 +49,7 @@
   <%field_name            = field_hash[:field]%>
   <%field_required_field  = field_hash[:required] ? "required_field" : ""%>
   <%field_required_label  = field_hash[:required] ? "required_label" : ""%>
-  <%field_options         = eval(field_hash[:options]).sort! rescue []%>
+  <%field_options         = (field_hash[:options].is_a? String) ? eval(field_hash[:options]).sort! : field_hash[:options].sort! rescue []%>
 
   <%if field_name%>
     <div class="form-group col-xs-<%=field_num_cols%> <%=field_name%>">
@@ -74,16 +77,31 @@
         <%when "checkbox"%>
           <div class="col-xs-12">
             <%=f.label(field_name, field_description, :class => field_required_label)%></br>
-            <%field_options.each do |option|%>
-              <div class="col-sm-6 col-md-6 col-lg-6">
-                <label class="checkbox">
-                  <%=f.check_box field_name,
-                    {:multiple => true, :class => "checkbox"},
-                    option, nil%>
-                  <%=option%>
-                </label>
-              </div>
-            <%end%>
+            <%option_groups = field_options.in_groups(2)%>
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <%option_groups[0].each do |option|%>
+                <div class="col-xs-12">
+                  <label class="checkbox">
+                    <%=f.check_box field_name,
+                      {:multiple => true, :class => "checkbox"},
+                      option, nil%>
+                    <%=option%>
+                  </label>
+                </div>
+              <%end%>
+            </div>
+            <div class="col-sm-6 col-md-6 col-lg-6">
+              <%option_groups[1].select(&:present?).each do |option|%>
+                <div class="col-xs-12">
+                  <label class="checkbox">
+                    <%=f.check_box field_name,
+                      {:multiple => true, :class => "checkbox"},
+                      option, nil%>
+                    <%=option%>
+                  </label>
+                </div>
+              <%end%>
+            </div>
           </div>
 
         <%when "datalist"%>
@@ -103,14 +121,19 @@
 
         <%when "date"%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
+          <%val=record.send(field_name) rescue ''%>
           <%=f.text_field field_name,
-            :class => "form-control field-date "  + field_required_field%>
+            :class => "form-control field-date "  + field_required_field,
+            value: val,
+            'data-format' => CONFIG.getTimeFormat[:datepicker]%>
 
         <%when 'datetime', 'datetimez'%>
           <%=f.label(field_name, field_description, class: field_required_label)%>
+          <%val=record.send(field_name).in_time_zone(CONFIG::GENERAL[:time_zone]) rescue ''%>
           <%=f.text_field field_name,
-            value: datetimez_to_string(record.send(field_name)),
-            class: "form-control field-datetime #{field_required_field}"%>
+            value: val,
+            class: "form-control field-datetime #{field_required_field}",
+            'data-format' => CONFIG.getTimeFormat[:datetimepicker]%>
 
         <%when "select"%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
@@ -118,6 +141,24 @@
             options_for_select(field_options, record.send(field_name)),
             {:include_blank => ""},
             {:class => "field_select form-control " + field_required_field}%>
+
+        <%when "select_multiple"%>
+          <%=f.label(field_name, field_description, :class => field_required_label)%>
+          <%if field_name == "additional_validators"%>
+            <%alt_option = record.get_all_validators%>
+            <%default_option = (@owner.present? && @owner.responsible_user.present?) ? @owner.responsible_user.id : (alt_option.map(&:id) if alt_option.any?)%>
+            <%=f.select field_name,
+              options_for_select(field_options, default_option),
+              {:include_blank => ""},
+              {:class => "select-multiple field_select form-control " + field_required_field,
+              :multiple => "multiple"}%>
+          <%else%>
+            <%=f.select field_name,
+              options_for_select(field_options, record.send(field_name)),
+              {:include_blank => ""},
+              {:class => "select-multiple field_select form-control " + field_required_field,
+              :multiple => "multiple"}%>
+          <%end%>
 
         <%when 'select_map'%>
           <%=f.label(field_name, field_description, :class => field_required_label)%>
@@ -191,7 +232,9 @@
 
 <%if !defined?(@base_defined) %>
   <script>
-
+    $(document).ready(function() {
+      $('.select-multiple').select2();
+    });
     var employee_table;
 
     function build_user_table(){
@@ -206,6 +249,7 @@
     }
 
     $(function() {
+      $('.select-multiple').select2();
 
       $(window).resize();
       build_user_table();
@@ -238,7 +282,7 @@
         var result = true;
         $(".required_field").css('border-color', '');
         $(this).find('.required_field').each(function(){
-          if ($(this).val() == ""){
+          if ($(this).val() == "" || $(this).val() == null){
             error = true;
             result = false;
             $(this).css('border-color', 'red');

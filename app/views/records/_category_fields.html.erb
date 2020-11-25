@@ -1,8 +1,11 @@
-<div class="col-sm-12 col-md-12 col-lg-12"%>
+<div class="col-xs-12">
   <div class="panel <%=@cat.panel%>">
     <div class="panel-heading click-heading collapsed">
       <div class="panel-title">
-        <b><%=@cat.title%></b>
+        <b>
+          <%=@cat.title%>
+          <%=" (##{@cat.id})" if Rails.env.development?%>
+        </b>
         <span class="pull-right clickable">
           <i class="mt5 glyphicon glyphicon-chevron-down"></i>
         </span>
@@ -15,181 +18,34 @@
         <h5 style="color:blue"><b><%=@cat.description%></b></h5>
       </div>
 
-      <div class="row" id="fields">
+      <div class="col-xs-12">
 
-        <%@cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order).each do |field|%>
+        <%fields = @fields_hash[@cat.id] || []%>
+        <%category_fields_by_rows = group_by_column_size_and_nested_fields(fields: fields)%>
 
-          <%size="col-xs-" + field.display_size.to_s%>
+        <%category_fields_by_rows.each do |row|%>
+          <div class="row is-flex">
+            <%row.each do |field|%>
+              <%record_field = (@record_fields_hash[field.id] || []).first%>
+              <%record_field = RecordField.new(value: '') if !record_field.present?%>
+              <%=render "records/field", field: field, f: f, record_field: record_field, is_nested_field:false%>
 
-          <div class="<%=size%> inputgroup">
-            <h5><b><%=field.get_label%></b></h5>
-
-            <!-- NEW?? -->
-            <%if @action == "new" && false%>
-              <%=f.fields_for :record_fields do |rf|%>
-
-                <%=rf.hidden_field :fields_id, :value => field.id%>
-
-                <%if field.display_type == "text"%>
-                  <%if field.data_type == 'date'%>
-                    <%field_class = 'field-date form-control'%>
-                  <%elsif field.data_type == 'datetime'%>
-                    <%field_class = 'field-datetime form-control'%>
-                  <%else%>
-                    <%field_class = 'form-control'%>
-                  <%end%>
-                  <%=rf.text_field :value,
-                    {:class=> field_class + " " + field.element_class,
-                    :placeholder => field.label,
-                    :id => field.element_id}%>
-
-                <%elsif field.display_type == "textarea"%>
-                  <div class="col-xs-12">
-                    <%=rf.text_area :value,
-                      {:class => "form-control " + field.element_class,
-                      :rows => 4,
-                      :id => field.element_id}%>
-                  </div>
-
-                <%elsif field.display_type == "dropdown"%>
-                  <%if field.data_type == "timezone"%>
-                    <div class="input-group">
-                      <%=rf.select :value,
-                        field.getOptions,
-                        {:include_blank=>""},
-                        {:class=>'form-control tz atz'}%>
-                      <span class="input-group-addon tc">All</span>
+              <%nested_fields = @nested_fields_hash[field.id]%>
+              <%if nested_fields.present?%>
+                <div class="col-xs-12 nested_field_row">
+                  <%nested_fields.each do |nested_field|%>
+                    <%record_field = (@record_fields_hash[nested_field.id] || []).first%>
+                    <%record_field = RecordField.new(value: '') if !record_field.present?%>
+                    <div class="nested_field
+                      nested_field_<%=field.id%>
+                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>">
+                      <%#=render "records/field", field: nested_field, f: f, record_field: record_field%>
                     </div>
-                  <%else%>
-                    <%=rf.select :value,
-                      field.getOptions,
-                      {:include_blank=>""},
-                      {:class=>'form-control'+" "+field.element_class,
-                      :id=>field.element_id}%>
                   <%end%>
-
-                <%elsif field.display_type == "checkbox"%>
-                  <div class="col-xs-12">
-                    <%field.getOptions.each do |option|%>
-                      <div class="col-xs-6">
-                        <label class="checkbox">
-                          <%=rf.check_box :value,
-                            {:multiple => true},
-                            option,
-                            nil%>
-                          <%=option%>
-                        </label>
-                      </div>
-                    <%end%>
-                  </div>
-
-                <%elsif field.display_type == "radio"%>
-                  <div class="col-xs-12">
-                    <%field.getOptions.each do |option|%>
-                      <div class="col-xs-6">
-                        <label class="checkbox">
-                          <%=rf.radio_button :value,
-                            option%>
-                          <%=option%>
-                        </label>
-                      </div>
-                    <%end%>
-                  </div>
-
-                <%elsif field.display_type == "employee"%>
-                  <div class="input-group">
-                    <%=text_field_tag field.get_label,
-                      "",
-                      {:class=>"form-control ml5 emp",
-                      :readonly=>true,
-                      :id=>"emp#{field.id}"}%>
-                    <%=rf.hidden_field :value,
-                      :id=>"employee-select#{field.id}"%>
-                    <span class="input-group-btn">
-                      <%=link_to "...",
-                        "#",
-                        :class=>"btn btn-info emp_button",
-                        "data-toggle"=>"modal",
-                        "data-target"=>".emp_modal",
-                        :id=>"#{field.id}"%>
-                    </span>
-                  </div>
-
-                <%elsif field.display_type == "airport"%>
-                  <div class="input-group">
-                    <%=text_field_tag field.get_label,
-                      "",
-                      {:class=>"form-control ml5 airport",
-                      :readonly=>true,
-                      :id=>"airport#{field.id}"}%>
-                    <%=rf.hidden_field :value,
-                      :id=>"airport-select#{field.id}"%>
-                    <span class="input-group-btn">
-                      <%=link_to "...",
-                        "#",
-                        :class=>"btn btn-info airport_button",
-                        "data-toggle"=>"modal",
-                        "data-target"=>".airport_modal",
-                        :id=>"#{field.id}"%>
-                    </span>
-                  </div>
-
-                <%elsif field.display_type == "datalist"%>
-                  <%= rf.text_field :value,
-                    {:list=>"#{field.id}",
-                    :class=>"form-control"}%>
-                  <datalist id="<%=field.id%>">
-                    <% field.getOptions.each do |opt|%>
-                      <option value="<%=opt%>"></option>
-                    <%end%>
-                  </datalist>
-                <%end%>
-
-              <%end%>
-
-            <!-- UPDATE -->
-            <%else%>
-              <%fields = @record.record_fields.where("fields_id = ?", field.id)%>
-              <%
-                if fields.empty?
-                  record_field = RecordField.new
-                  record_field.value = ""
-                else
-                  record_field = fields.first
-                end
-              %>
-
-              <%=render "records/field", :field => field, :f => f, :record_field => record_field%>
-
-            <%end%>
-          </div>
-
-          <div class="col-xs-12 mt5">
-            <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-              <%size = "col-xs-" + nested_field.display_size.to_s%>
-              <%fields = @record.record_fields.where("fields_id = ?", nested_field.id)%>
-              <%
-                if fields.empty?
-                  record_field = RecordField.new
-                  record_field.value = ""
-                else
-                  record_field = fields.first
-                end
-              %>
-
-              <div class="nested_field
-                nested_field_<%=field.id%>
-                nested_field_<%=field.id%>_<%=nested_field.nested_field_value%>">
-                <div class="form-group <%=size%>">
-                  <b><%=nested_field.get_label%></b>
-                  <%=render "records/field", :field => nested_field, :f => f, :record_field => record_field%>
                 </div>
-              </div>
-
+              <%end%>
             <%end%>
           </div>
-
-
         <%end%>
       </div>
     </div>
@@ -204,4 +60,33 @@
     top: 50%;
     transform: translateY(-50%);
   }
+  .row.is-flex {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .row.is-flex > [class*='col-'] {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .row.is-flex > .nested_field_row {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .graybox {
+    padding: 15px 0;
+    background-color: rgb(211,211,211, 0.15);
+    border-radius: 5px;
+  }
+
+  .row.is-flex > .nested_field_row > .nested_field > .form-group {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
 </style>

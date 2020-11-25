@@ -1,0 +1,4 @@
+=render '/forms/show_fields', fields: Sra.get_meta_fields('show'), record: owner
+=render '/panels/hazards', hazards: owner.hazards, show_btns: false
+=render '/forms/show_comment', owner: owner
+=render '/forms/attachments_show', owner: owner, show_btn: false

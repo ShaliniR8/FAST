@@ -9,6 +9,9 @@ class Report < Sr::SafetyReportingBase
   include RootCausable
   include Sraable
   include Transactionable
+  include Childable
+  include Parentable
+
 
   has_many :records,            foreign_key: 'reports_id',  class_name: 'Record'
   has_many :corrective_actions, foreign_key: 'reports_id',  class_name: 'CorrectiveAction',   dependent: :destroy
@@ -46,6 +49,19 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+  def self.reports_for_meeting
+    if CONFIG.sr::GENERAL[:allow_event_reuse]
+      Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready', 'Under Review'])
+    else
+      Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready'])
+    end
+  end
+
+
+  def title
+    name
+  end
+
   def title
     name
   end
@@ -61,10 +77,23 @@ class Report < Sr::SafetyReportingBase
   end
 
 
-  def get_minutes_agenda(meeting_id)
-    agenda = "<b>Agendas:</b><br>#{agendas.where(owner_id: meeting_id).map(&:get_content).join('<br>')}" if agendas.length > 0
-    meeting_minutes = "<hr><b>Minutes:</b> <br>#{minutes}" if !minutes.blank?
-    "#{agenda || ''} #{meeting_minutes || ''}".html_safe
+  def get_agendas(meeting)
+    if CONFIG.sr::GENERAL[:share_meeting_agendas]
+      agendas
+    else # SCX do not shared agendas outside their specific ASAP meetings
+      agendas.select { |agenda| meeting.id == agenda.owner_id }
+    end
+  end
+
+  def get_minutes_agenda(meeting)
+    agendas = get_agendas(meeting)
+    agendas_present = agendas.present?
+    agendas_result = agendas_present ? "<b>Agendas:</b><br>#{agendas.map(&:get_content).join('<br>')}" : ''
+
+    minutes_present = minutes.present?
+    minutes_result =  minutes_present ? "<b>Minutes:</b> <br>#{minutes}" : ''
+    minutes_result = '<hr>' + minutes_result if agendas_present && minutes_present
+    "#{agendas_result} #{minutes_result}".html_safe
   end
 
 
@@ -77,18 +106,59 @@ class Report < Sr::SafetyReportingBase
   end
 
   def additional_info
-    if attachments.length > 0 || records.map(&:attachments).flatten.length > 0
-      "<i class='fa fa-paperclip view_attachments'></i>".html_safe
+    atts = ""
+
+    if attachments.length > 0
+      attachments.each do |attachment|
+        att_name = attachment[:name]
+        att_name = att_name.truncate(23) if att_name.present?
+        atts +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{att_name}</a><br>"
+      end
     end
+
+    if records.map(&:attachments).flatten.length > 0
+      records.map(&:attachments).flatten.each do |attachment|
+        att_name = attachment[:name]
+        att_name = att_name.truncate(23) if att_name.present?
+        atts +="<a href='#{attachment.name.url}' target='_blank'><i class='fa fa-paperclip view_attachments'></i> #{att_name}</a><br>"
+      end
+    end
+
+    atts_present = atts.present?
+    atts = '<div><b>Attachments:</b><br>' + atts + '</div>' if atts_present
+    launches = ''
+
+    invs = self.get_children(child_type: 'Investigation')
+    if invs.present?
+      invs.each do |inv|
+        title = "Investigation ##{inv.id} #{inv.title}".truncate(23)
+        launches += "<a href='#{investigation_path(inv)}' target='_blank'>#{title}</a><br>"
+      end
+    end
+
+    sras = self.get_children(child_type: 'Sra')
+    if sras.present?
+      sras.each do |sra|
+        title = "SRA ##{sra.id} #{sra.title}".truncate(23)
+        launches += "<a href='#{sra_path(sra)}' target='_blank'>#{title}</a><br>"
+      end
+    end
+
+    if launches.present?
+      separating =  atts_present ? '<hr>' : ''
+      launches = "#{separating}<div><b>Launch Items:</b><br>" + launches + '</div>'
+    end
+
+    (atts + launches).html_safe
   end
 
 
   def included_reports
     result = ""
-    self.records.each do |record|
+    records.each do |record|
       result += "
         <a style='font-weight:bold' href='/records/#{record.id}'>
-          ##{record.id} -
+          ##{record.id} (#{record.template.name}) -
           #{record.created_by.disable ?
           '<font color="red">Inactive User</font>' :
           '<font color="green">Active User</font>'}
@@ -154,13 +224,13 @@ class Report < Sr::SafetyReportingBase
 
   def self.get_headers
     [
-      {:field => :get_id,                             :title => "ID"                                                                      },
-      {:field => :name,                               :title => "Title"                                                                   },
-      {:field => :num_records,                        :title => "Reports Included"                                                        },
-      {:field => :get_event_date,                     :title => "Event Date"                                                              },
-      {:field => :display_before_risk_factor,         :title => "Baseline Risk",                    :html_class => :get_before_risk_color },
-      {:field => :display_after_risk_factor,          :title => "Mitigated Risk",                   :html_class => :get_after_risk_color  },
-      {:field => :status,                             :title => "Status"                                                                  },
+      {:field => :get_id,                      :title => "ID"                                                     },
+      {:field => :name,                        :title => "Title"                                                  },
+      {:field => :num_records,                 :title => "Reports Included"                                       },
+      {:field => :get_event_date,              :title => "Event Date",      :type => "date"                       },
+      {:field => :display_before_risk_factor,  :title => "Baseline Risk",   :html_class => :get_before_risk_color },
+      {:field => :display_after_risk_factor,   :title => "Mitigated Risk",  :html_class => :get_after_risk_color  },
+      {:field => :status,                      :title => "Status"                                                 },
     ]
   end
 
@@ -335,38 +405,38 @@ class Report < Sr::SafetyReportingBase
 
   def self.getFormHeaders
     if CONFIG.sr::GENERAL[:submission_description]
-        [
-          {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
-          {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
-          {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
-          {:field=>"get_description" ,:size=>"col-xs-3 col-lg-3",:title=>"Description"},
-          {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
-        ]
-      else
-        [
-          {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
-          {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
-          {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
-          {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
-        ]
-      end
-  end
-
-    def self.dispositions
       [
-        'Delegate for General Safety Review',
-        'Electronic Response',
-        'Informal Action',
-        'Letter of Correction',
-        'Letter of No Action',
-        'No Action',
-        'Open Investigation',
-        'Voluntary Self-Disclosure',
-        'Warning Notice'
+        {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
+        {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
+        {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
+        {:field=>"get_description" ,:size=>"col-xs-3 col-lg-3",:title=>"Description"},
+        {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
+      ]
+    else
+      [
+        {:field=>"get_id", :size=>"col-xs-2 col-lg-2",:title=>"ID"},
+        {:field=>"status" ,:size=>"col-xs-2 col-lg-2",:title=>"Status"},
+        {:field=>"get_date" ,:size=>"col-xs-2 col-lg-2",:title=>"Date"},
+        {:field=>"submit_name" ,:size=>"col-xs-2 col-lg-2",:title=>"Submitted By"}
       ]
     end
+  end
 
-    def self.get_terms
+  def self.dispositions
+    [
+      'Delegate for General Safety Review',
+      'Electronic Response',
+      'Informal Action',
+      'Letter of Correction',
+      'Letter of No Action',
+      'No Action',
+      'Open Investigation',
+      'Voluntary Self-Disclosure',
+      'Warning Notice'
+    ]
+  end
+
+  def self.get_terms
     {
       "Title"                   => "name",
       "Status"                  => "status",
@@ -380,38 +450,44 @@ class Report < Sr::SafetyReportingBase
     }
   end
 
-    def self.company_dis
-      [
-        'No Action',
-        'Voluntary Self-Disclosure'
-      ]
-    end
+  def self.company_dis
+    [
+      'No Action',
+      'Voluntary Self-Disclosure'
+    ]
+  end
 
 
-    def get_privileges
-      self.privileges.present? ?  self.privileges : []
+  def get_privileges
+    self.privileges.present? ?  self.privileges : []
+  end
+
+
+  def self.export_all_for_cisp(test_run: false, reports_ids:)
+    reports = Report.where(id: reports_ids)
+    dirname = File.join([Rails.root] + ['cisp'])
+    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    unless File.directory?(dirname)
+      FileUtils.mkdir_p(dirname)
     end
-  def self.get_avg_complete
-    candidates = self.where("status=? and close_date is not ?","Closed",nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.close_date.to_date - x.created_at.to_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
+
+    File.open(temp_file, 'w') do |file|
+      file << ApplicationController.new.render_to_string(
+        template: 'reports/export_component_cisp.xml.erb',
+        locals:   { test_run: test_run, reports: reports, p_code: CONFIG::P_CODE })
     end
   end
+
 
   def can_meeting_ready?(user, form_conds: false, user_conds: false)
     form_confirmed = self.status == 'New' || form_conds
     user_confirmed = true
-    form_confirmed && user_confirmed && !self.root_cause_lock?
+    form_confirmed && user_confirmed && !self.occurrence_lock?
   end
 
   def can_close?(user, form_conds: false, user_conds: false)
     form_confirmed = self.status != 'Closed' || form_conds
     user_confirmed = true
-    form_confirmed && user_confirmed && !self.root_cause_lock?
+    form_confirmed && user_confirmed && !self.occurrence_lock?
   end
 end

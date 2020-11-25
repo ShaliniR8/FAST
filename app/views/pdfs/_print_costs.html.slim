@@ -1,0 +1,10 @@
+- costs.each do |cost|
+  .col-xs-12
+    hr
+    .title = "Cost ##{cost.id}"
+    .content
+      - fields = Cost.get_meta_fields('show')
+      = render "pdfs/print_fields",
+        fields: fields,
+        owner:  cost,
+        deidentified: deidentified

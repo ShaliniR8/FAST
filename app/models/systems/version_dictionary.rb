@@ -1,8 +1,93 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.0',
+      title: 'Version 1.2.4',
       tag: 'New',
+      toggle: 'v1_2_4',
+      date: '11/24/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Report Type in Event listing',
+          'Added Meeting Agenda Tooltip in Meetings',
+          'Added Launched SRA/Investigation in Meeting',
+          'Added Checklist Findings in Findings List'
+        ],
+        'Optimizations & Fixes' => [
+          'Optimized Report processing workflow',
+          'Improved Report page load speed',
+          'Improved PDF generation speed',
+          'Improved FAA Report accuracy'
+          ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.3',
+      toggle: 'v1_2_3',
+      date: '10/14/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Series visualization and drill down to Query Center.',
+          'Revised Checklist formatting and added table/page view.',
+          'Attach Findings to checklist rows.',
+          'Auto save on address checklist.',
+          'Added more content + page numbering and new look to PDF.',
+          'Added auto-close/default status feature to Reports/Templates.',
+          'Custom Options for Event Title.',
+          'Extension Request and Verification delete buttons.',
+        ],
+        'Optimizations & Fixes' => [
+          'Fixed Submission/Template nested fields related issue.',
+          'Improved Submission/Template layout.',
+          'Simplified user account types.',
+          'Fixed some FAA Report information not showing correctly.',
+          'Improved formatting on FAA Reports.',
+          'New look for Risk Matrix.',
+          ]
+      }
+    },
+    {
+      title: 'Version 1.2.2',
+      toggle: 'v1_2_2',
+      date: '8/21/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Additional Info column to Report table.',
+          'Added Launch functionalities from SA to SRM module.',
+          'Added due date to Verifications column in Corrective Action table.',
+          'Added assigning multiple Verification Validators.',
+          'Added message content to email notifications.',
+          'Added Category/Root Cause to Report/Event PDF.',
+          'Added Meeting Type to Meeting and Meeting table.',
+          'Added Delete functionality for Meeting Agenda.'
+        ],
+        'Optimizations & Fixes' => [
+          'Fixed Advanced Search for Submitted By in Report table.',
+          'Fixed nested panels display.',
+          'Improved date and time accuracy.',
+          'Updated Meeting Minutes and Agenda to show in all Meetings.'
+          ]
+      }
+    },
+    {
+      title: 'Version 1.2.1',
+      toggle: 'v1_2_1',
+      date: '3/31/2020',
+      sections: {
+        'What\'s New' => [
+          'Added Tab view on all pages.',
+          'Added Advanced Search back on all pages.',
+          'Added configurable Max Character Count for Text Area field in Safety Reports Templates.',
+          'Added Edit/Delete functionalities for Costs, Contacts, Comments, and Tasks.'
+        ],
+        'Optimizations & Fixes' => [
+          'Updated list of Time Zone options and displaying time with time zone.',
+          'Fixed viewing privileges on access control rules page',
+        ]
+      }
+    },
+    {
+      title: 'Version 1.2.0',
       toggle: 'v1_2_0',
       date: '2/11/2020',
       sections: {

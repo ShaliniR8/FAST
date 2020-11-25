@@ -83,9 +83,9 @@
                       <%if field_value == "Anonymous"%>
                         Anonymous
                       <%elsif field_value != nil && field_value != ""%>
-                        <%user = User.find(field_value)%>
+                        <%user = User.find_by_full_name(field_value)%>
                         <%if user.present?%>
-                          <%=User.find(field_value).full_name%>
+                          <%=field_value%>
                         <%end%>
                       <%else%>
                         <%=""%>

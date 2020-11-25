@@ -20,6 +20,8 @@ class Investigation < Sa::SafetyAssuranceBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Childable
+  include Parentable
 
 #Associations List
   belongs_to :owner,                    polymorphic: true
@@ -60,6 +62,16 @@ class Investigation < Sa::SafetyAssuranceBase
       "<a style='font-weight:bold' href='/#{owner_type.downcase.pluralize}/#{self.owner_id}'>
         #{owner_titleize} ##{self.owner_id}
       </a>".html_safe
+    elsif self.get_parent.present?
+      obejct_name =
+        if CONFIG::OBJECT_NAME_MAP[self.get_parent.class.name].present?
+          CONFIG::OBJECT_NAME_MAP[self.get_parent.class.name]
+        else
+          self.get_parent.class.name
+        end
+      "<a style='font-weight:bold' href='/#{self.get_parent.class.name.underscore.pluralize}/#{self.get_parent.id}'>
+        #{obejct_name} ##{self.get_parent.id}
+      </a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end
@@ -99,19 +111,5 @@ class Investigation < Sa::SafetyAssuranceBase
   def type
     return "Investigation"
   end
-
-
-  def self.get_avg_complete
-    candidates=self.where("status=? and complete_date is not ?","Completed",nil)
-    if candidates.present?
-      sum=0
-      candidates.map{|x| sum+=(x.complete_date-x.created_at.to_date).to_i}
-      result= (sum.to_f/candidates.length.to_f).round(1)
-      result
-    else
-      "N/A"
-    end
-  end
-
 
 end

@@ -6,71 +6,86 @@ namespace :ultipro do
   ### Tasks
 
     task :update_userbase => [:environment] do |t, args|
-      logger.info '##############################'
-      logger.info '### UPDATING USER DATABASE ###'
-      logger.info '##############################'
-      logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
-
-      assign_configs
-      fetch_file
-
       begin
-        data_dump = File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
-      rescue
-        logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
-        next #Abort
-      end
 
-      if File.exist?('lib/tasks/ultipro_data_prior.xml') && compare_file('lib/tasks/ultipro_data_prior.xml', 'lib/tasks/ultipro_data.xml')
-        logger.info "[INFO] Historical Data was identical- no update necessary"
-        next #abort- nothing to update
-      end
-      begin
-        logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
-        @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
-        @log_data = []
-        User.transaction do
-          Hash.from_xml(data_dump)['wbat_poc']['poc']
-            .map{ |poc| [poc['user_name'], poc]}
-            .to_h
-            .each do |username, user_hash|
-              @err_username = username #Used for error logging
-              @err_user_hash = user_hash  #Used for error logging
-              @log_entry = ""
-              if @users.key?(username)
-                user = @users[username]
-              else
-                user = generate_user user_hash
-                next if user.nil?
-                @log_entry << " Account Created"
-              end
-              update_account_detail user, user_hash
-              update_privileges user, user_hash
-              if !@log_entry.empty?
-                @log_data << ("  [User] #{user.username}:" << @log_entry)
-              end
-            end
+        logger.info '##############################'
+        logger.info '### UPDATING USER DATABASE ###'
+        logger.info '##############################'
+        logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
+
+        assign_configs
+        fetch_file
+
+        begin
+          data_dump = case AIRLINE_CODE
+            when 'SCX'
+              File.read('lib/tasks/ultipro_data.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
+            when 'FFT'
+              File.read('lib/tasks/ultipro_data.xml').sub(/\<\/xml\>/, '')
+          end
+        rescue
+          logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/ultipro_data.xml'} could not be opened"
+          next #Abort
         end
-        IO.copy_stream('lib/tasks/ultipro_data.xml', 'lib/tasks/ultipro_data_prior.xml') #Update Historical File
-        logger.info '###################################'
-        logger.info '### ULTIPRO MIGRATION COMPLETED ###'
-        logger.info '###################################'
-      rescue
-        logger.info '################################'
-        logger.info '### ULTIPRO MIGRATION FAILED ###'
-        logger.info '################################'
-        logger.info "Failed on: #{@err_username}"
-        logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
-        logger.info "Final log entry: #{@log_entry}"
-      end
-      logger.info "SERVER DATE+TIME OF CONCLUSION: #{DateTime.now.strftime("%F %R")}"
-      logger.info 'SUMMARY OF EVENTS:'
-      if @log_data.empty?
-        logger.info 'No Userbase Changes'
-      else
-        @log_data.each do |log|
-          logger.info log
+
+        if File.exist?('lib/tasks/ultipro_data_prior.xml') && compare_file('lib/tasks/ultipro_data_prior.xml', 'lib/tasks/ultipro_data.xml')
+          logger.info "[INFO] Historical Data was identical- no update necessary"
+          next #abort- nothing to update
         end
+        begin
+          logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
+          @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
+          @log_data = []
+          User.transaction do
+            Hash.from_xml(data_dump)['wbat_poc']['poc']
+              .map{ |poc| [poc['user_name'], poc]}
+              .to_h
+              .each do |username, user_hash|
+                @err_username = username #Used for error logging
+                @err_user_hash = user_hash  #Used for error logging
+                @log_entry = ""
+                if @users.key?(username.downcase)
+                  user = @users[username.downcase]
+                elsif @users.key?(username)
+                  user = @users[username]
+                else
+                  user = generate_user user_hash
+                  next if user.nil?
+                  @log_entry << " Account Created"
+                end
+                update_account_detail user, user_hash
+                update_privileges user, user_hash
+                if !@log_entry.empty?
+                  @log_data << ("  [User] #{user.username}:" << @log_entry)
+                end
+              end
+          end
+          IO.copy_stream('lib/tasks/ultipro_data.xml', 'lib/tasks/ultipro_data_prior.xml') #Update Historical File
+          logger.info '###################################'
+          logger.info '### ULTIPRO MIGRATION COMPLETED ###'
+          logger.info '###################################'
+        rescue
+          logger.info '################################'
+          logger.info '### ULTIPRO MIGRATION FAILED ###'
+          logger.info '################################'
+          logger.info "Failed on: #{@err_username}"
+          logger.info "User's Ultipro Hash Data: #{@err_user_hash}"
+          logger.info "Final log entry: #{@log_entry}"
+        end
+        logger.info "SERVER DATE+TIME OF CONCLUSION: #{DateTime.now.strftime("%F %R")}"
+        logger.info 'SUMMARY OF EVENTS:'
+        if @log_data.empty?
+          logger.info 'No Userbase Changes'
+        else
+          @log_data.each do |log|
+            logger.info log
+          end
+        end
+      rescue => error
+        location = 'ultipro:update_userbase'
+        subject = "Rake Task Error Encountered In #{location.upcase}"
+        error_message = error.message
+        NotifyMailer.notify_rake_errors(subject, error_message, location)
       end
     end #END update_userbase
 
@@ -100,6 +115,7 @@ namespace :ultipro do
 
 
     def generate_user user_hash
+
       begin
         user = User.new({
           username: user_hash['user_name'],
@@ -111,7 +127,14 @@ namespace :ultipro do
           employee_number: user_hash['employee_number'],
           level: map_account_level(user_hash['employee_group'])
         })
-        user[:sso_id] = user_hash['email_address']
+
+        case AIRLINE_CODE
+        when 'SCX'
+          user[:sso_id] = user_hash['email_address']
+         when 'FFT'
+          user[:sso_id] = user_hash['employee_number']
+        end
+
         user.save! if !@dry_run
         return user
       rescue
@@ -130,7 +153,7 @@ namespace :ultipro do
 
       privileges.each do |priv| #First check user has all privileges expected
         if user.level.nil?
-          user[:level] = map_account_level(pr['employee_group'])
+          user[:level] = map_account_level(priv['employee_group'])
           user.save!
         end
         generate_privilege priv unless @privilege_list.key?(priv) #Ensure privilege exists
@@ -150,9 +173,27 @@ namespace :ultipro do
 
 
     def update_account_detail user, user_hash
+
+      case AIRLINE_CODE
+      when 'SCX'
+        if user.sso_id != user_hash['email_address']
+          @log_entry << "\n     Update SSO ID: to #{user_hash['email_address']}"
+          user.sso_id = user_hash['email_address']
+        end
+      when 'FFT'
+        if user.sso_id != user_hash['employee_number']
+          @log_entry << "\n     Update SSO ID: #{user.email} => #{user_hash['employee_number']}"
+          user.sso_id = user_hash['employee_number']
+        end
+      end
+
       if user.email != user_hash['email_address']
         @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
         user.email = user_hash['email_address']
+      end
+      if user.employee_number != user_hash['employee_number']
+        @log_entry << "\n     Update Employee #: #{user.employee_number} => #{user_hash['employee_number']}"
+        user.employee_number = user_hash['employee_number']
       end
       if user.first_name != user_hash['first_name']
         @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"

@@ -1,0 +1,11 @@
+.col-xs-12.wrap
+  .title = "Meeting ##{owner.get_id}"
+  .col-xs-12
+    .content
+      = render "/pdfs/print_fields",
+        fields: Meeting.get_meta_fields('show'),
+        owner: owner,
+        deidentified: deidentified
+      = render '/pdfs/print_reports_table', owner: owner, deidentified: deidentified
+      = render '/pdfs/print_comments', comments: owner.comments
+      = render '/pdfs/print_participants', owner: owner

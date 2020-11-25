@@ -21,6 +21,9 @@ PrdgSession::Application.routes.draw do |map|
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
   map.login 'login', :controller => 'sessions', :action => 'new'
+  match 'direct_login', to: 'sessions#new', as: :new, direct: :true
+
+
   map.resources :sessions
 
 
@@ -45,6 +48,11 @@ PrdgSession::Application.routes.draw do |map|
   end
 
   # System Feature
+  resources :sms_tasks
+  resources :contacts
+  resources :costs
+  resources :viewer_comments
+
   resources :automated_notifications do
     collection do
       get 'retract_fields'
@@ -133,6 +141,7 @@ PrdgSession::Application.routes.draw do |map|
       post "add_visualization"
       get "remove_visualization"
       post "generate_visualization"
+      post "display_chart_result"
     end
     collection do
       get 'load_conditions_block'
@@ -199,7 +208,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :checklists do
     member do
-      get 'start'
+      get 'address'
       get 'export'
     end
     collection do
@@ -208,7 +217,11 @@ PrdgSession::Application.routes.draw do |map|
       post 'add_template'
     end
   end
-  resources :checklist_rows
+  resources :checklist_rows do
+    member do
+      get 'new_attachment'
+    end
+  end
   resources :responsible_users
 
 
@@ -233,6 +246,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'get_json'   #Added by BP July 14 2017
       get 'submission_json'
       get "notices_json"    #added by BL OCT 10 2018
+      get 'user_json_request'
     end
   end
   resources :password_resets
@@ -279,6 +293,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'comment'
     end
     collection do
+      post 'load_records'
       get 'query'
       get 'advanced_search'
       get "detailed_search"
@@ -295,6 +310,8 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :records do
     member do
+      get 'launch'
+      get 'launch_new_object'
       get "close"
       get 'convert'
       get 'mitigate'
@@ -307,9 +324,11 @@ PrdgSession::Application.routes.draw do |map|
       get "display"
       get 'open'
       get 'override_status'
+      put 'ajax_update'
+      get 'edit_field'
     end
     collection do
-      get 'load_records'
+      post 'load_records'
       post "search"
       post "search_all"
       post "filter"
@@ -332,6 +351,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :reports do
     collection do
+      post 'load_records'
       get "add"
       get "bind"
       get 'print'
@@ -341,6 +361,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'load_records'
     end
     member do
+      get 'launch'
+      get 'launch_new_object'
       get 'mitigate'
       get 'baseline'
       get "print"
@@ -355,6 +377,7 @@ PrdgSession::Application.routes.draw do |map|
       get "reopen"
       get 'override_status'
       get 'comment'
+      put 'ajax_update'
     end
   end
   resources :meetings do
@@ -367,14 +390,19 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get "reopen"
       get "get_reports"
+      get 'get_cisp_reports'
+      post 'send_cisp_reports'
       get 'override_status'
     end
     collection do
+      post 'load_records'
+      get 'advanced_search'
       get "send_success"
     end
   end
   resources :corrective_actions do
     collection do
+      post 'load_records'
       get 'advanced_search'
       get 'get_term'
     end
@@ -387,6 +415,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'approve'
       get 'comment'
+      get 'schedule_verification'
+      get 'request_extension'
     end
   end
   resources :query_statements do
@@ -406,6 +436,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'get_json'
       get "archive"
+      get 'clone'
     end
     collection do
       get "show_nested"
@@ -440,13 +471,17 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_checklist'
       get 'new_requirement'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'update_checklist'
       get 'update_checklist_records'
       get 'viewer_access'
+      get 'show_finding'
       post 'upload_checklist'
     end
     collection do
+      post 'load_records'
       get "advanced_search"
     end
   end
@@ -458,12 +493,15 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_checklist'
       get 'new_requirement'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'update_checklist'
       get 'viewer_access'
       post 'upload_checklist'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
   end
@@ -473,12 +511,15 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_attachment'
       get 'new_checklist'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'update_checklist'
       get 'viewer_access'
       post 'upload_checklist'
     end
     collection do
+      post 'load_records'
       get "advanced_search"
     end
   end
@@ -491,14 +532,18 @@ PrdgSession::Application.routes.draw do |map|
       get 'new_desc'
       get 'new_attachment'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'viewer_access'
       post 'add_causes'
       post 'add_desc'
+      put 'ajax_update'
     end
     collection do
       get 'retract_cause_attributes'
       get 'retract_desc_attributes'
+      post 'load_records'
       get "advanced_search"
     end
   end
@@ -513,13 +558,18 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get 'reopen'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
+      put 'ajax_update'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
   end
   resources :sms_actions do
     collection do
+      post 'load_records'
       get 'advanced_search'
       get 'get_term'
     end
@@ -529,8 +579,11 @@ PrdgSession::Application.routes.draw do |map|
       get 'mitigate'
       get 'new_attachment'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
       get 'reassign'
+      put 'ajax_update'
     end
   end
 
@@ -539,9 +592,12 @@ PrdgSession::Application.routes.draw do |map|
       get 'interpret'
       get 'new_attachment'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'print'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
   end
@@ -569,10 +625,13 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'get_agenda'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
       get 'viewer_access'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
       get "new_section"
       post "add_section"
@@ -594,9 +653,13 @@ PrdgSession::Application.routes.draw do |map|
       get "new_root_cause"
       get "reload_root_causes"
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
+      put 'ajax_update'
     end
     collection do
+      post 'load_records'
       get 'advanced_search'
       get "retract_root_cause_categories"
       get "root_cause_trend"
@@ -608,6 +671,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :risk_controls do
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
     member do
@@ -621,11 +685,15 @@ PrdgSession::Application.routes.draw do |map|
       get 'print_deidentified'
       get 'reopen'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
+      put 'ajax_update'
     end
   end
   resources :safety_plans do
     collection do
+      post 'load_records'
       get 'advanced_search'
     end
     member do
@@ -635,6 +703,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'complete'
       get 'reopen'
       get 'override_status'
+      get 'launch'
+      get 'launch_new_object'
       get 'comment'
     end
   end

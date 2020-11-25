@@ -75,7 +75,12 @@ class RecordsController < ApplicationController
       "#{(record.viewer_access ? 'Enable' : 'Disable')} Viewer Access",
       current_user.id)
     record.save
-    redirect_to record_path(record)
+    # redirect_to record_path(record)
+    render json: {
+        message: 'Viewer Access Updated',
+        btn: "#{(record.viewer_access ? 'Disable' : 'Enable')} Viewer Access",
+        html: "<b>Viewer Access:</b> #{record.viewer_access ? 'Yes' : 'No'}"
+      }
   end
 
 
@@ -112,7 +117,13 @@ class RecordsController < ApplicationController
     rescue
     end
     @record.save
-    redirect_to @record, flash: {success: "Report Opened."}
+
+    render json: {
+        message: 'Report Opened',
+        html: "<b>Status:</b> #{@record.status}"
+      }
+
+    #redirect_to @record, flash: {success: "Report Opened."}
   end
 
 
@@ -122,9 +133,14 @@ class RecordsController < ApplicationController
     @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
     @table = Object.const_get(object_name).preload(@object[:preload])
     @default_tab = params[:status]
-    @records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    @records_hash = @records.group_by(&:status)
-    @records_hash['All'] = @records
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    handle_search if params[:advance_search].present?
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -200,11 +216,27 @@ class RecordsController < ApplicationController
 
   def edit
     start_time = Time.now
-    load_options
+
+    # @users = User.find(:all)
+    # @headers = User.get_headers
+    # @frequency = (0..4).to_a.reverse
+    # @like = Record.get_likelihood
+    # risk_matrix_initializer
+    # load_special_matrix_form("record", "baseline", @record)
+
     @action = "edit"
     @record = Record.find(params[:id])
-    load_special_matrix_form("record", "baseline", @record)
-    @template = @record.template
+    @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).group_by(&:fields_id)
+
+    @template = Template.preload(categories: [fields: :nested_fields]).find(@record.templates_id)
+
+    @categories = Category.preload(:fields).where(templates_id: @template.id).active
+    fields = Field.preload(:nested_fields).where(categories_id: @categories.map(&:id)).active
+
+    @fields_hash = fields.non_nested.group_by(&:categories_id)
+    @nested_fields_hash = fields.nested.group_by(&:nested_field_id)
+
+
     access_level = current_user.has_template_access(@template.name)
     if !(access_level.include? "full")
       redirect_to root_url
@@ -212,18 +244,13 @@ class RecordsController < ApplicationController
     end
     if @record.status == "New"
       @record.status = "Open"
-      Transaction.build_for(
-        @record,
-        'Open',
-        current_user.id
-      )
+      Transaction.build_for(@record, 'Open', current_user.id)
       if @record.submission.present?
         Transaction.build_for(
           @record.submission,
           'Open',
           current_user.id,
-          'Report has been opened.'
-        )
+          'Report has been opened.')
         notify(@record.submission, notice: {
           users_id: @record.created_by.id,
           content: "Your submission ##{@record.submission.id} has been opened by analyst."},
@@ -265,7 +292,7 @@ class RecordsController < ApplicationController
   def destroy
     @record = Record.find(params[:id])
     @record.destroy
-    redirect_to records_path, flash: {danger: "Report ##{params[:id]} deleted."}
+    redirect_to records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
   end
 
 
@@ -397,18 +424,23 @@ class RecordsController < ApplicationController
 
 
   def show
-    load_options
     @i18nbase = 'sr.report'
-    @record = Record.find(params[:id])
-    @corrective_actions = @record.corrective_actions
-    if @record.report.present?
-      @corrective_actions << @record.report.corrective_actions
-    end
-    @template = @record.template
+    @record = Record.preload(:record_fields).find(params[:id])
+    @template = Template.preload(categories: [:fields]).find(@record.templates_id)
+
     access_level = current_user.has_template_access(@template.name)
     redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
                               access_level.split(';').include?('full') ||
                               (access_level.split(';').include?('viewer') && @record.viewer_access)
+
+
+    @corrective_actions = @record.corrective_actions
+    @corrective_actions << @record.report.corrective_actions if @record.report.present?
+
+    # category and field hash
+    @template_hash = @template.categories.sort_by(&:category_order).map{|cat| [cat, cat.fields]}.to_h
+    @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
+
     load_special_matrix(@record)
   end
 
@@ -419,8 +451,19 @@ class RecordsController < ApplicationController
     @record = Record.find(params[:id])
     @meta_field_args = ['show']
     @meta_field_args << 'admin' if current_user.global_admin?
-    html = render_to_string(:template => "/records/print.html.erb")
-    pdf = PDFKit.new(html)
+    html = render_to_string(:template => "/pdfs/print_record.html.erb")
+    pdf_options = {
+      header_html:  'app/views/pdfs/print_header.html',
+      header_spacing:  2,
+      header_right: '[page] of [topage]'
+    }
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Report_##{@record.get_id}" + (@deidentified ? '(de-identified)' : '')
@@ -435,6 +478,8 @@ class RecordsController < ApplicationController
 
 
   def update
+    convert_from_risk_value_to_risk_index
+
     transaction = true
     @owner = Record.find(params[:id])
 
@@ -470,6 +515,8 @@ class RecordsController < ApplicationController
     end
 
     @owner.update_attributes(params[:record])
+
+
     if transaction
       Transaction.build_for(
         @owner,
@@ -478,6 +525,13 @@ class RecordsController < ApplicationController
         transaction_content
       )
     end
+
+    event_date = params[:record][:event_date]
+
+    if CONFIG.sr::GENERAL[:submission_time_zone] && event_date.present?
+      @owner.event_date = convert_to_utc(date_time: event_date, time_zone: @owner.event_time_zone)
+    end
+
     @owner.save
     redirect_to record_path(@owner)
   end
@@ -544,25 +598,48 @@ class RecordsController < ApplicationController
 
   def mitigate
     @owner = Record.find(params[:id])
+    @risk_type = 'Mitigate'
+
+    # base matrix
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
+    # premium matrix
     load_special_matrix_form('record', 'mitigate', @owner)
-    load_options
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/mitigate"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/mitigate"
-    end
+
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
   end
 
 
   def baseline
     @owner = Record.find(params[:id])
-    load_options
+    @risk_type = 'Baseline'
+
+    # base matrix
+    @frequency = (0..4).to_a.reverse
+    @like = Record.get_likelihood
+    risk_matrix_initializer
+    # premium matrix
     load_special_matrix_form('record', 'baseline', @owner)
-    if CONFIG::GENERAL[:base_risk_matrix]
-      render :partial => "shared/baseline"
-    else
-      render :partial => "shared/#{AIRLINE_CODE}/baseline"
-    end
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
+  end
+
+
+  def edit_field
+    record = Record.find(params[:id])
+    category = Category.find(params[:category_id])
+    fields = category.fields.active
+    parent_fields = fields.non_nested
+    nested_fields = fields.nested
+    record_fields_hash = RecordField.preload(:field).where(records_id: record.id).group_by(&:fields_id)
+    render partial: 'records/edit_category', locals: {
+      record: record,
+      category: category,
+      fields: fields,
+      parent_fields: parent_fields,
+      nested_fields: nested_fields,
+      record_fields_hash: record_fields_hash
+    }
   end
 
 

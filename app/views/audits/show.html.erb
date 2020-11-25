@@ -56,6 +56,14 @@
       });
     });
 
+    $('.att_btn_checklist_row').click(function() {
+      var checklist_row_id = $(this).data('id')
+      $.get(`/checklist_rows/${checklist_row_id}/new_attachment`, function(data) {
+        $('.modal-content').html(data)
+        $(window).trigger('resize')
+      })
+    })
+
 
     $('#item_table').dataTable();
   });

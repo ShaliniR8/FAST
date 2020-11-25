@@ -43,7 +43,7 @@ class ChecklistsController < ApplicationController
     if params[:checklist_upload].present?
       @upload = File.open(params[:checklist_upload].tempfile)
       case params[:checklist_upload].tempfile.content_type
-      when "application/xml"
+      when "application/xml", "text/xml"
         upload_xml(@upload, @record)
       else
         upload_csv(@upload, @record)
@@ -64,6 +64,28 @@ class ChecklistsController < ApplicationController
 
   def update
     @record = @table.find(params[:id])
+
+    # Assignee update
+    if params[:assignee_names].present?
+      user = User.find_by_full_name(params[:assignee_names])
+      params[:checklist][:assignee_ids] = user.id if user.present?
+    end
+
+    # TODO: refactor needed
+    if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+      params[:checklist][:checklist_rows_attributes].each do |x, y|
+        next if y[:checklist_cells_attributes].nil? # when update only attachments
+        y[:checklist_cells_attributes].each do |m, n|
+          n.each do |key, value|
+            if value.is_a?(Array)
+              n[:value].delete("")
+              n[:value] = n[:value].join(";")
+            end
+          end
+        end
+      end
+    end
+
     @record.update_attributes(params[:checklist])
     redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner
   end
@@ -78,12 +100,11 @@ class ChecklistsController < ApplicationController
   end
 
 
-  def start
+  def address
     @record = @table.includes(
       checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
       checklist_header: :checklist_header_items,
     ).find(params[:id])
-    render :partial => 'edit'
   end
 
 
@@ -112,7 +133,10 @@ class ChecklistsController < ApplicationController
 
 
   def export
-    @record = @table.find(params[:id])
+    @record = @table.includes(
+                checklist_rows: :checklist_cells,
+                checklist_header: :checklist_header_items)
+      .find(params[:id])
   end
 
   def add_template
@@ -149,7 +173,7 @@ class ChecklistsController < ApplicationController
           checklist_row = ChecklistRow.create({
             checklist_id: owner.id,
             created_by_id: current_user.id,
-            is_header: has_header_col && is_header && is_header.upcase == 'Y'
+            is_header: has_header_col && is_header && (is_header.upcase == 'Y' || is_header.upcase == 'YES')
           })
 
           checklist_header_items.each_with_index do |header_item, index|
@@ -171,79 +195,302 @@ class ChecklistsController < ApplicationController
     end
   end
 
+# TODO: move helper methods ####################
+  def parse_iosa(child, result)
+    case child.name
+    when 'text'
+      result = parse_iosa_text(child, result)
+    when 'Emphasis'
+      result = parse_iosa_emphasis(child, result)
+    when 'nbsp'
+      # add new space?
+    when 'List'
+      result = parse_iosa_list(child, result)
+    when 'Para'
+      result = parse_iosa_para(child, result)
+    end
+
+    return result
+  end
+
+  def parse_iosa_para(element, result)
+    element.children.each do |child|
+      case child.name
+      when 'text', 'XRef'
+        result = parse_iosa_text(child, result) if child.text != '\n'
+      when 'List'
+        result = parse_iosa_list(child, result)
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_text(element, result)
+    result += element.text
+  end
+
+  def parse_iosa_emphasis(element, result)
+    result += "<b>" + element.children[0].text + "</b>"
+  end
+
+  def parse_iosa_list(element, result)
+    list_type = element.attributes["type"].value
+
+    case list_type
+    when 'lower-roman'
+      element.children.each do |item|
+        result = parse_iosa_list_item_roman(item, result)
+      end
+    when 'alphabetical'
+      element.children.each do |item|
+        result = parse_iosa_list_item_alphabet(item, result)
+      end
+    when 'bullet'
+      element.children.each do |item|
+        result = parse_iosa_list_item_bullet(item, result)
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_roman(element, result)
+    case element.name
+    when 'ListItem'
+      if element.children.length == 1
+
+        result += "<br>" if $lower_roman[$index_roman] == 'i'
+
+        result += "&nbsp;&nbsp;" + $lower_roman[$index_roman] + '.&nbsp;&nbsp;' + element.text.to_s + '<br>'
+        $index_roman += 1
+      else
+        temp_str = ''
+
+        element.children.each do |child|
+          case child.name
+          when 'text'
+            temp_str = parse_iosa_text(child, temp_str)
+          when 'Emphasis'
+            temp_str = parse_iosa_emphasis(child, temp_str)
+          when 'List'
+            temp_str = parse_iosa_list(child, temp_str)
+          end
+        end
+
+        result += "&nbsp;&nbsp;" + $lower_roman[$index_roman] + '.&nbsp;&nbsp;' + temp_str + '<br>'
+        $index_roman += 1
+      end
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_alphabet(element, result)
+    case element.name
+    when 'List'
+      # result = parse_iosa_list(element, result)
+    when 'ListItem'
+      result += "&nbsp;&nbsp;&nbsp;&nbsp;" + $alphabetical[$index_alphabet] + '.&nbsp;&nbsp;' + element.text.to_s + '<br>'
+      $index_alphabet += 1
+    end
+
+    return result
+  end
+
+  def parse_iosa_list_item_bullet(element, result)
+    case element.name
+    when 'ListItem'
+      result += "&nbsp;&nbsp;" + "- " + element.text.to_s + '<br>'
+    end
+
+    return result
+  end
+###############################################
+
+
   def upload_xml(upload, owner)
     begin
       xml = Nokogiri::XML(upload)
-      questions = xml.xpath("//sasdct:DCTQuestions/sasdct:Question")
+
+      if xml.children[0].name == "Section1"
+        questions = xml.xpath("//NumberedPara")
+        file = "IOSA"
+      else
+        questions = xml.xpath("//sasdct:DCTQuestions/sasdct:Question")
+        file = "FSIMS"
+      end
+
     rescue Exception => e
       puts e
     end
 
-    questions_array = []
-    questions.each_with_index do |question, index|
-      question_hash = []
-      question.children.each do |children|
-        question_hash << [children.name, children.text] if children.elem?
+    case file
+    when "IOSA"
+      questions_array = []
+      $lower_roman  = [ 'i',  'ii',  'iii',  'iv',  'v',  'vi',  'vii',  'viii',  'ix', 'x',
+                      'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx']
+      $alphabetical = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't']
+
+      questions.each_with_index do |question, index|
+
+        break if index == 15
+
+        question_hash = []
+        question.children.each do |children|
+
+          if children.name == 'Para'
+            child_text     = ''
+            $index_roman    = 0
+            $index_alphabet = 0
+
+            children.children.each do |child|
+              child_text = parse_iosa(child, child_text)
+            end
+
+            question_hash << [children.name, child_text] if children.elem?
+          elsif children.name == 'Guidance'
+            child_text     = ''
+
+            children.children.each do |child|
+              child_text = parse_iosa(child, child_text) if child.elem?
+            end
+            question_hash << [children.name, child_text] if children.elem?
+          elsif children.name == 'Metadata'
+            child_text     = ''
+
+            children.children.each do |child|
+              if child.name == 'AuditorActions' && child.elem?
+                child.children.each do |aa_checkbox|
+                  if aa_checkbox.name == "AACheckbox"
+                    child_text += aa_checkbox.text.gsub(/\;/, ":") + ";"
+                  end
+                end
+              end
+
+              child_text = parse_iosa(child, child_text)
+            end
+
+            end_str = child_text.rindex(/\;/)
+            child_text = child_text[0..(end_str-1)] # remove last ';'
+            question_hash << [children.name, child_text] if children.elem?
+          else
+            question_hash << [children.name, children.text] if children.elem?
+          end
+
+        end
+        questions_array << question_hash.to_h
       end
-      question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
-      question_hash << ["DisplayOrder", question["DisplayOrder"]]
-      question_hash << ["QuestionID", question["QuestionID"]]
-      header_section = question.children.select{|x| x.name if x.name == "SectionHeaderMLF"}.first.attributes
 
-      question_hash << ["MLFLabel", header_section["MLFLabel"].value]
-      question_hash << ["MLFName", header_section["MLFName"].value]
+      checklist_header_items = owner.checklist_header.checklist_header_items.order("display_order")
 
-      questions_array << question_hash.to_h
-    end
+      questions_array.each_with_index do |question_list, index|
+        checklist_row = ChecklistRow.create({
+          :checklist_id => owner.id,
+          :created_by_id => current_user.id,
+          :is_header => false
+        })
 
-    checklist_header_items = owner.checklist_header.checklist_header_items.order("display_order")
+        checklist_header_items.each_with_index do |h_item, i|
 
-    questions_array.group_by{|x| [x["MLFLabel"], x["MLFName"]]}.each do |(mlflabel, mlfname), question_list|
+          case h_item.title
+          when 'Number'
+            value = question_list['ParaNumber']
+          when 'Question'
+            value = question_list['Para']
+          when 'Auditor Actions'
+            value = question_list['Metadata']
+          when 'Guidance'
+            value = question_list['Guidance']
+          else
+            value = ''
+          end
 
-      checklist_row = ChecklistRow.create({
-        :checklist_id => owner.id,
-        :created_by_id => current_user.id,
-        :is_header => true})
-
-      header_values = [mlflabel, mlfname]
-
-      checklist_header_items.each_with_index do |h_item, i|
-        value = header_values[i] rescue ''
-        ChecklistCell.create({
-          :checklist_row_id => checklist_row.id,
-          :value => h_item.editable ? "" : value,
-          :options => h_item.editable ? value : "",
-          :checklist_header_item_id => h_item.id})
+          ChecklistCell.create({
+            :checklist_row_id => checklist_row.id,
+            :value => h_item.editable ? "" : value,
+            :options => h_item.editable ? value : "",
+            :checklist_header_item_id => h_item.id})
+        end
       end
+    when "FSIMS"
+      if questions[0].name == "Question" && questions[0].namespace.prefix == "sasdct"
+        questions_array = []
+        questions.each_with_index do |question, index|
+          question_hash = []
+          question.children.each do |children|
+            question_hash << [children.name, children.text] if children.elem?
+          end
+          question_hash << ["QuestionReferences", question.children.children.map{|x| x["SRCLabel"]}.compact.join(", ")]
+          question_hash << ["DisplayOrder", question["DisplayOrder"]]
+          question_hash << ["QuestionID", question["QuestionID"]]
+          question_hash << ["Rev", question["VersionNumber"] + " " + question["VersionDate"]]
+          question_hash << ["Status", question["Status"]]
+          header_section = question.children.select{|x| x.name if x.name == "SectionHeaderMLF"}.first.attributes
 
+          question_hash << ["MLFLabel", header_section["MLFLabel"].value]
+          question_hash << ["MLFName", header_section["MLFName"].value]
 
-      Checklist.transaction do
-        question_list.each do |question|
-          question_number = question["DisplayOrder"]
-          question_qid = question["QuestionID"]
-          question_text = question["Text"]
-          responses = question["QuestionResponses"].gsub("\t", "").split("\n").reject(&:empty?).join(";") rescue ''
-          references = question["QuestionReferences"] +
-            "\n\nQID: #{question['QuestionID']}" +
-            "\nSafety Attribute: #{question['SafetyAttribute']}"
-          question_bullets = question["QuestionBullets"]
-            .split("\n\t\t\t\t")
-            .reject(&:empty?)
-            .each_with_index.map{|x, i| "##{i+1}. #{x}"}
-            .join("\n\t\t\t\t") rescue ''
+          questions_array << question_hash.to_h
+        end
 
-          question_text += "\n\t\t\t\t#{question_bullets}"
+        checklist_header_items = owner.checklist_header.checklist_header_items.order("display_order")
 
-          values = [question_number, question_text, responses, "placeholder for comment", references]
-          checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+        questions_array.group_by{|x| [x["MLFLabel"], x["MLFName"]]}.each do |(mlflabel, mlfname), question_list|
+
+          checklist_row = ChecklistRow.create({
+            :checklist_id => owner.id,
+            :created_by_id => current_user.id,
+            :is_header => true})
+
+          header_values = [mlflabel, mlfname]
 
           checklist_header_items.each_with_index do |h_item, i|
-            value = values[i]
+            value = header_values[i] rescue ''
             ChecklistCell.create({
               :checklist_row_id => checklist_row.id,
               :value => h_item.editable ? "" : value,
               :options => h_item.editable ? value : "",
               :checklist_header_item_id => h_item.id})
+          end
+
+
+          Checklist.transaction do
+            question_list.each do |question|
+              question_number = question["DisplayOrder"]
+              question_qid = question["QuestionID"]
+              question_text = question["Text"]
+              responses = question["QuestionResponses"].gsub("\t", "").split("\n").reject(&:empty?).join(";") rescue ''
+              references = question["QuestionReferences"] +
+                "\n\n<strong>Safety Attribute:</strong> #{question['SafetyAttribute']}".html_safe +
+                "\n<strong>Question Type:</strong> #{question['QuestionType']}".html_safe +
+                "\n\n<strong>Scoping Attribute:</strong> #{question['ScopingAttribute']}".html_safe +
+                "\n<strong>Rev.</strong> #{question['Rev']}".html_safe +
+                "\n\n<strong>QID:</strong> #{question['QuestionID']}".html_safe +
+                "\n<strong>Response Details:</strong> #{question['ResponseDetails']}".html_safe +
+                "\n<strong>Status:</strong> #{question['Status']}".html_safe
+
+              question_bullets = question["QuestionBullets"]
+                .split("\n\t\t\t\t")
+                .reject(&:empty?)
+                .each_with_index.map{|x, i| "##{i+1}. #{x}"}
+                .join("\n\t\t\t\t") rescue ''
+
+              question_text += "\n\t\t\t\t#{question_bullets}"
+
+              values = [question_number, question_text, responses, "placeholder for comment", references]
+              checklist_row = ChecklistRow.create({:checklist_id => owner.id, :created_by_id => current_user.id})
+
+              checklist_header_items.each_with_index do |h_item, i|
+                value = values[i]
+                ChecklistCell.create({
+                  :checklist_row_id => checklist_row.id,
+                  :value => h_item.editable ? "" : value,
+                  :options => h_item.editable ? value : "",
+                  :checklist_header_item_id => h_item.id})
+              end
+            end
           end
         end
       end

@@ -16,18 +16,6 @@ class ProsafetBase < ActiveRecord::Base
   self.abstract_class = true
   include Rails.application.routes.url_helpers #For path method
 
-  def self.get_avg_complete
-    candidates = self.where('status = ? and complete_date is not ? and open_date is not ? ', 'Completed', nil, nil)
-    if candidates.present?
-      sum = 0
-      candidates.map{|x| sum += (x.complete_date - x.open_date).to_i}
-      result = (sum.to_f / candidates.length.to_f).round(1)
-      result
-    else
-      'N/A'
-    end
-  end
-
   # Returns the AccessControl table name of the object (for user.has_access lookups)
   def self.rule_name
     self.name.demodulize.underscore.pluralize
@@ -94,5 +82,15 @@ class ProsafetBase < ActiveRecord::Base
   def self.find_top_level_section
     Rails.application.config.occurrence_templates[self.name] ||
       Rails.application.config.occurrence_templates['Default']
+  end
+
+  def included_verifications
+    result = ""
+    counter = 1
+    self.verifications.each do |verification|
+      result  += "##{counter}: #{verification.status}, <b>#{verification.verify_date.strftime(CONFIG.getTimeFormat[:dateformat])}</b><br><br>"
+      counter += 1
+    end
+    result.html_safe
   end
 end

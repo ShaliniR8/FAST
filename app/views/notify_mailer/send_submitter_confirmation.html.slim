@@ -1,17 +1,23 @@
 html
   body
-    ="Hello #{@user.full_name},"
-    <br>
-    <br>
-    ="This message is to confirm that your Submission ##{@submission_id}, #{@submission_description}, has been successfully submitted." " #{@submission_url.html_safe}".html_safe
-    <br>
-    <br>
-    <br>
-    | Thank you,<br>
-    | ProSafeT System<br>
-    = image_tag(attachments["logo.png"].url, :size => "145x35")
-    <br><br>
-    | NOTICE:<br>
-    | This is an automated message. If you need assistance, please contact us at <a href='https://support.prosafet.com/home'>support.prosafet.com</a>.<br>
-    | If you received this message in error, notify us through the support portal. Thank you.
+    = "Hello #{@user.first_name},"
+    br
+    br
+    br
+    - if @submitter_message.present?
+      = @submitter_message.html_safe
+    - else
+      = "This message is to confirm that your submission ##{@submission_id}, #{@submission_description}, has been successfully submitted."
+    = @submission_url.html_safe
+    br
+    br
+    br
+    br Thank you,
+    | ProSafeT System
+    br
+    br
+    br: b NOTICE:
+    | This is an automated message. If you need assistance, please contact us at
+    a< href='https://support.prosafet.com/home' support.prosafet.com.
+    br If you received this message in error, notify us through the support portal. Thank you.
 

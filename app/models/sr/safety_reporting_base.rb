@@ -27,7 +27,7 @@ module Sr
     end
 
     def get_event_date
-      event_date.strftime("%Y-%m-%d %H:%M:%S") rescue ''
+      event_date.strftime(CONFIG.getTimeFormat[:datetimeformat]) rescue ''
     end
 
 
@@ -51,8 +51,12 @@ module Sr
       anonymous ? 'Anonymous' : created_by.full_name
     end
 
+    def get_submitter_id
+      created_by.id
+    end
+
     def get_template
-      template.name
+      template.name rescue ''
     end
 
 
@@ -60,6 +64,13 @@ module Sr
       return 100000.0 if event_date.blank?
       diff = ((event_date - base.event_date) / (24*60*60)).abs
     end
+
+
+    def getTimeZone()
+      ActiveSupport::TimeZone.all.map(&:name)
+    end
+
+
 
   end
 end

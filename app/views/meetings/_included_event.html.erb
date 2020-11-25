@@ -1,19 +1,42 @@
-<% events.each do |event| %>
+<%events.each do |event|%>
   <tr data-id="<%=event.id%>">
     <%@report_headers.each do |h|%>
-      <td class="<%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
-        <% if h[:field] == 'get_minutes_agenda' %>
-          <%= event.get_minutes_agenda(meeting.id) %>
-        <% else %>
+      <%formatting = h[:title] == 'Attachments' ? 'attachments' : ''%>
+      <td class="<%=formatting%> width-cap <%=h[:html_class].present? ? event.send(h[:html_class]) : ''%>">
+        <%if h[:field] == 'get_minutes_agenda'%>
+          <%agendas = event.get_agendas(meeting)%>
+          <%agendas_present = agendas.present?%>
+          <%if agendas_present%>
+            <div><b>Agendas:</b></div>
+              <%agendas.each do |a|%>
+                <div
+                  style='cursor: pointer'
+                  type='button'
+                  hover='tooltip'
+                  data-html='true'
+                  data-placement='right'
+                  title="<%=a.preview%>">
+                  <%=a.get_content%>
+                </div>
+              <%end%>
+          <%end%>
+          <%if event.minutes.present?%>
+            <%if agendas_present%>
+              <hr>
+            <%end%>
+            <div><b>Minutes:</b></div>
+            <%=event.minutes%>
+          <%end%>
+        <%else%>
           <%=render "forms/show_field", :record => event, :field_hash => h%>
-        <% end %>
+        <%end%>
       </td>
     <%end%>
     <td>
       <!-- View Narrative -->
       <%=link_to "<i class='glyphicon glyphicon-file'></i>".html_safe,
         '#',
-        :class => "btn btn-info mb5 view_narrative_btn",
+        :class => "btn btn-sm btn-info mb5 view_narrative_btn",
         "data-toggle" => "modal",
         "data-target" => ".bs-example-modal-lg",
         'hover' => 'tooltip',
@@ -25,42 +48,44 @@
         target: :_blank,
         'hover' => 'tooltip',
         title: 'View Event',
-        :class => "btn btn-info mb5"%>
+        :class => "btn btn-sm btn-info mb5"%>
       <%if meeting.has_user(current_user) || meeting.host.users_id == current_user.id%>
-        <%if event.status != "Closed" && meeting.status != "Closed"%>
+        <%if meeting.status != "Closed"%>
           <%if current_user.has_access('meetings','edit', admin: true)%>
-            <!-- Close Event -->
-            <%=link_to "<i class='glyphicon glyphicon-ok-circle'></i>".html_safe, '#',
-              :class => 'btn btn-danger close_event_btn mb5',
-              'data-toggle' => 'modal',
-              'data-target' => '.bs-example-modal-lg',
-              'hover' => 'tooltip',
-              title: 'Close Event',
-              :route => close_report_path(event, :redirect_path => meeting_path(meeting))%>
+            <%if event.status != "Closed"%>
+              <!-- Close Event -->
+              <%=link_to "<i class='glyphicon glyphicon-ok-circle'></i>".html_safe, '#',
+                :class => 'btn btn-sm btn-danger close_event_btn mb5',
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg',
+                'hover' => 'tooltip',
+                title: 'Close Event',
+                :route => close_report_path(event, :redirect_path => meeting_path(meeting))%>
+              <!-- Meeting Minutes -->
+              <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
+                :class => "btn btn-sm btn-success minutes_btn mb5",
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg",
+                'hover' => 'tooltip',
+                title: 'Add Meeting Minutes',
+                :route => new_minutes_report_path(event, :meeting => meeting) %>
+            <%end%>
             <!-- Carryover Event -->
             <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
-              :class=>"btn btn-danger mb5",
+              :class=>"btn btn-sm btn-danger mb5",
               :onclick=>"delete_report(#{event.id}, #{meeting.id},this)",
               'hover' => 'tooltip',
               title: 'Carryover Event'%>
-            <!-- Meeting Minutes -->
-            <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
-              :class => "btn btn-success minutes_btn mb5",
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg",
-              'hover' => 'tooltip',
-              title: 'Add Meeting Minutes',
-              :route => new_minutes_report_path(event, :meeting => meeting) %>
           <%end%>
-          <!-- Add Agenda -->
-          <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
-            :class => "btn btn-warning agenda_btn mb5",
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg",
-            'hover' => 'tooltip',
-            title: 'View/Add Meeting Agenda',
-            :route => get_agenda_report_path(event, :meeting => meeting.id)%>
         <%end%>
+        <!-- Add Agenda -->
+        <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
+          :class => "btn btn-sm btn-warning agenda_btn mb5",
+          "data-toggle" => "modal",
+          "data-target" => ".bs-example-modal-lg",
+          'hover' => 'tooltip',
+          title: 'View/Add Meeting Agenda',
+          :route => get_agenda_report_path(event, :meeting => meeting.id)%>
       <%end%>
     </td>
   </tr>

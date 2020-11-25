@@ -13,12 +13,14 @@ module Concerns
         fetch_months = current_user.mobile_fetch_months
         @records = fetch_months > 0 ? Audit.where('created_at > ?', Time.now - fetch_months.months)
           : Audit.all
-        filter_audits
+
+        # filter_audits
+        filter_records('Audit', 'audits')
 
         json = {}
 
         # Convert to id map for fast audit lookup
-        json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :completion])
+        json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :due_date])
 
         # Get ids of the 3 most recent assigned audits
         recent_audits = @records.keep_if{ |audit| audit[:status] == 'Assigned' }
@@ -37,7 +39,7 @@ module Concerns
         audits = Audit.where(id: ids).includes({
           checklists: { # Preload checklists to prevent N+1 queries
             checklist_header: :checklist_header_items,
-            checklist_rows: :checklist_cells
+            checklist_rows: [:checklist_cells, :attachments],
           }
         })
 
@@ -46,7 +48,10 @@ module Concerns
           .select{ |field| field[:field].present? }
 
         # Array of fields to whitelist for the JSON
-        json_fields = @fields.map{ |field| field[:field].to_sym }
+
+        # json_fields = @fields.map{ |field| field[:field].to_sym }
+        json_fields = Audit.column_names.map(&:to_sym)
+
 
         # Include other fields that should always be whitelisted
         whitelisted_fields = [:id, *json_fields]
@@ -70,6 +75,10 @@ module Concerns
                   include: {
                     checklist_cells: {
                       only: [:id, :value, :checklist_header_item_id, :options, :checklist_row_id]
+                    },
+                    attachments: {
+                      only: [:id, :caption, :owner_id],
+                      methods: :url
                     }
                   }
                 }
@@ -86,6 +95,8 @@ module Concerns
         # Default checklists to an empty array
         json[:checklists] = [] if json[:checklists].blank?
 
+        json[:attachments] = {}
+
         checklist_headers = {}
         json[:checklists] = json[:checklists].reduce({}) do |checklists, checklist|
           # Gathers all checklist headers that belong to this audit's checklists
@@ -95,6 +106,13 @@ module Concerns
 
           # Creates id maps for checklist rows and checklist cells
           checklist[:checklist_rows] = checklist[:checklist_rows].reduce({}) do |checklist_rows, row|
+            row[:attachments].each do |attachment|
+              attachment[:uri] = "#{request.protocol}#{request.host_with_port}#{attachment[:url]}"
+              attachment.delete(:url)
+              json[:attachments][attachment['id']] = attachment
+            end
+            row.delete(:attachments)
+
             row[:checklist_cells] = row[:checklist_cells].reduce({}) do |checklist_cells, cell|
               if cell['options'].present?
                 cell['options'] = cell['options']

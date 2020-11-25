@@ -27,8 +27,12 @@ class InspectionsController < SafetyAssuranceController
     :show,
     :update,
     :upload_checklist,
-    :viewer_access
+    :viewer_access,
   ]
+
+  before_filter(only: [:new])    {set_parent_type_id(:inspection)}
+  before_filter(only: [:create]) {set_parent(:inspection)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @inspection)}
 
   def define_owner
     @class = Object.const_get('Inspection')
@@ -49,59 +53,6 @@ class InspectionsController < SafetyAssuranceController
   end
 
 
-  def print
-    @deidentified = params[:deidentified]
-    @inspection = Inspection.find(params[:id])
-    @requirement_headers = InspectionRequirement.get_meta_fields('show')
-    html = render_to_string(:template=>"/inspections/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Inspection_##{@inspection.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
-  def update
-    transaction = true
-    @owner.update_attributes(params[:inspection])
-    send_notification(@owner, params[:commit])
-    case params[:commit]
-    when 'Assign'
-      @owner.open_date = Time.now
-    when 'Complete'
-      if @owner.approver
-        update_status = 'Pending Approval'
-      else
-        @owner.complete_date = Time.now
-        @owner.close_date = Time.now
-        update_status = 'Completed'
-      end
-    when 'Reject'
-    when 'Approve'
-      @owner.complete_date = Time.now
-      @owner.close_date = Time.now
-    when 'Override Status'
-      transaction_content = "Status overridden from #{@owner.status} to #{params[:inspection][:status]}"
-      params[:inspection][:close_date] = params[:inspection][:status] == 'Completed' ? Time.now : nil
-    when 'Add Attachment'
-      transaction = false
-    end
-    # @owner.update_attributes(params[:inspection])
-    @owner.status = update_status || @owner.status
-    if transaction
-      Transaction.build_for(
-        @owner,
-        params[:commit],
-        current_user.id,
-        transaction_content
-      )
-    end
-    @owner.save
-    redirect_to inspection_path(@owner)
-  end
-
-
   def new_requirement
     @audit = Inspection.find(params[:id])
     @requirement = InspectionRequirement.new
@@ -112,38 +63,32 @@ class InspectionsController < SafetyAssuranceController
 
 
   def create
-    inspection = Inspection.new(params[:inspection])
-    if inspection.save
-      redirect_to inspection_path(inspection),  flash: {success: "Inspection created."}
+    @inspection = Inspection.new(params[:inspection])
+    if @inspection.save
+      redirect_to inspection_path(@inspection),  flash: {success: "Inspection created."}
     end
   end
 
 
   def index
-    @table = Object.const_get("Inspection")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-    if !current_user.has_access('inspections','admin', admin: true, strict: true)
-      cars = Inspection.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += Inspection.where('approver_id = ?',  current_user.id)
-      if current_user.has_access('inspections','viewer')
-        Inspection.where('viewer_access = true').each do |viewable|
-          if viewable.privileges.blank?
-            cars += [viewable]
-          else
-            viewable.privileges.each do |privilege|
-              current_user.privileges.include? privilege
-              cars += [viewable]
-            end
-          end
-        end
-      end
-      cars += Inspection.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_records(object_name, controller_name)
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
@@ -213,5 +158,4 @@ class InspectionsController < SafetyAssuranceController
   def download_checklist
     @inspection = Inspection.find(params[:id])
   end
-
 end

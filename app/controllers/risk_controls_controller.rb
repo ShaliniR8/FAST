@@ -24,6 +24,10 @@ class RiskControlsController < ApplicationController
   before_filter :login_required
   before_filter :define_owner, only: [:interpret]
 
+  before_filter(only: [:new])    {set_parent_type_id(:risk_control)}
+  before_filter(only: [:create]) {set_parent(:risk_control)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @risk_control)}
+
   def define_owner
     @class = Object.const_get('RiskControl')
     @owner = RiskControl.find(params[:id])
@@ -31,26 +35,41 @@ class RiskControlsController < ApplicationController
 
 
   def index
-    @table = Object.const_get("RiskControl")
-    @headers = @table.get_meta_fields('index')
-    @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    handle_search
-    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
+    # @table = Object.const_get("RiskControl")
+    # @headers = @table.get_meta_fields('index')
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    # handle_search
+    # filter_risk_controls
 
-    if !current_user.has_access('risk_controls', 'admin', admin: true, strict: true)
-      rcs = RiskControl.includes(hazard: :sra)
-      cars = rcs.where('status in (?) and responsible_user_id = ?',
-        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
-      cars += rcs.where('approver_id = ?',  current_user.id)
-      cars += RiskControl.where('created_by_id = ?', current_user.id)
-      @records = @records & cars
+    object_name = controller_name.classify
+    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+    @table = Object.const_get(object_name).preload(@object[:preload])
+    @default_tab = params[:status]
+
+    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+    if params[:advance_search].present?
+      handle_search
+    else
+      @records = records
     end
+    filter_risk_controls
+    records = @records.to_a & records.to_a if @records.present?
+
+    @records_hash = records.group_by(&:status)
+    @records_hash['All'] = records
+    @records_hash['Overdue'] = records.select{|x| x.overdue}
+    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
   end
 
 
 
   def new
-    @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    if params[:owner_type].present?
+      @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    else # from Launch Object
+      @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id])
+    end
+
     @risk_control = RiskControl.new
     @fields = RiskControl.get_meta_fields('form')
   end
@@ -104,7 +123,7 @@ class RiskControlsController < ApplicationController
     case params[:commit]
     when 'Assign'
       @owner.update_attributes(params[:risk_control])
-      @owner.date_open = Time.now
+      @owner.open_date = Time.now
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,
         content: "Risk Control ##{@owner.id} has been assigned to you."},
@@ -116,7 +135,6 @@ class RiskControlsController < ApplicationController
           content: "Risk Control ##{@owner.id} needs your Approval."},
           mailer: true, subject: 'Risk Control Pending Approval')
       else
-        @owner.date_complete = Time.now
         @owner.close_date = Time.now
       end
     when 'Reject'
@@ -125,7 +143,6 @@ class RiskControlsController < ApplicationController
         content: "Risk Control ##{@owner.id} was Rejected by the Final Approver."},
         mailer: true, subject: 'Risk Control Reject') if @owner.responsible_user
     when 'Approve'
-      @owner.date_complete = Time.now
       @owner.close_date = Time.now
       notify(@owner, notice: {
         users_id: @owner.responsible_user.id,
@@ -161,7 +178,7 @@ class RiskControlsController < ApplicationController
   def destroy
     risk_control = RiskControl.find(params[:id])
     risk_control.destroy
-    redirect_to risk_controls_path, flash: {danger: "Risk Control ##{params[:id]} deleted."}
+    redirect_to risk_controls_path(status: 'All'), flash: {danger: "Risk Control ##{params[:id]} deleted."}
   end
 
 
@@ -191,22 +208,25 @@ class RiskControlsController < ApplicationController
   end
 
 
-
-  def print
-    @deidentified = params[:deidentified]
-    @risk_control = RiskControl.find(params[:id])
-    html = render_to_string(:template => "/risk_controls/print.html.erb")
-    pdf = PDFKit.new(html)
-    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Risk_Control_##{@risk_control.get_id}" + (@deidentified ? '(de-identified)' : '')
-    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
-  end
-
-
   def reopen
     @risk_control = RiskControl.find(params[:id])
     reopen_report(@risk_control)
+  end
+
+private
+
+  def filter_risk_controls
+
+    @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
+
+    if !current_user.has_access('risk_controls', 'admin', admin: true, strict: true)
+      rcs = RiskControl.includes(hazard: :sra)
+      cars = rcs.where('status in (?) and responsible_user_id = ?',
+        ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+      cars += rcs.where('approver_id = ?',  current_user.id)
+      cars += RiskControl.where('created_by_id = ?', current_user.id)
+      @records = @records & cars
+    end
   end
 
 end

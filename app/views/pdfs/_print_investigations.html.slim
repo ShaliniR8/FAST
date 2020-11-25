@@ -1,0 +1,5 @@
+- investigations.each do |investigation|
+  = render '/pdfs/print',
+    owner: investigation,
+    deidentified: deidentified,
+    launch_item: true
