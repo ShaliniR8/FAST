@@ -4,7 +4,7 @@ class VersionDictionary
       title: 'Version 1.2.4',
       tag: 'New',
       toggle: 'v1_2_4',
-      date: '11/20/2020',
+      date: '11/24/2020',
       sections: {
         'What\'s New' => [
           'Added Report Type in Event listing',
