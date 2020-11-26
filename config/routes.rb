@@ -458,7 +458,7 @@ PrdgSession::Application.routes.draw do |map|
   resources :faa_reports do
     member do
       get "enhance"
-      get "reports_table"
+      post "reports_table"
       get "print"
       get "export_word"
       get "edit_enhancement"

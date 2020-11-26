@@ -492,7 +492,7 @@ class ApplicationController < ActionController::Base
   def get_car_owner(car)
     case car.owner_type
       when 'Finding'
-        return car.owner.get_owner
+        return car.owner.get_owner rescue Finding.where(obj_id: car.owner_obj_id)
       when 'Investigation'
         return 'investigations'
     end

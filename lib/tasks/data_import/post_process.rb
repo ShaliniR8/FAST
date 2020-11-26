@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 require 'rake'
 
-database_name = "prosafet_bsk_data_db"
-rails_dir = "/home/jiaming/wbat_system_v1_0_dev/"
+database_name = "prosafet_fft_dev_db"
+rails_dir = "/home/devuser/taeho/ProSafeT/"
 
 task_list = [
 	"link_submissions_to_records",
@@ -13,8 +13,8 @@ task_list = [
 	#{}"link_objects",
 	# "id_to_title_if_blank",
 	"create_missing_users_for_transactions",
-	"set_package_meetings",
-	"set_agenda_title_and_status",
+	# "set_package_meetings",
+	# "set_agenda_title_and_status",
 ]
 
 sql_to_run = [

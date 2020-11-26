@@ -1,5 +1,5 @@
 task :link_records_to_reports => :environment do
-	links = JSON.parse(File.read("/home/jiaming/mysql_dumps/miamiair_official_migration/A_Mapping/1103_BSK_datadump/josh/record_report_links.json"))
+	links = JSON.parse(File.read("/home/devuser/taeho/data_import/wbat_data_import/import/data/record_report_links.json"))
 	links.each do |link|
 		puts link
 		record = Record.where(obj_id: link["record_object_id"]).first

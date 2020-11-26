@@ -40,7 +40,7 @@ class Recommendation < Sa::SafetyAssuranceBase
 
   def can_assign?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
-      (self.immediate_action || self.owner.status == 'Completed')
+      (self.immediate_action || (self.owner.present? && self.owner.status == 'Completed'))
   end
 
   def get_completion_date
