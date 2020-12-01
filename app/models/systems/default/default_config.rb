@@ -32,6 +32,7 @@ class DefaultConfig
     cisp_integration:                   false,
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
+    power_bi_integration:               false,
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on

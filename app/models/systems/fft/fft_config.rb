@@ -17,6 +17,7 @@ class FFTConfig < DefaultConfig
     login_option:                       'sso',
     has_mobile_app:                     true,
     cisp_integration:                   true,
+    power_bi_integration:               true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,

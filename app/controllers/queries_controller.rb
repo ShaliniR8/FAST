@@ -33,10 +33,69 @@ class QueriesController < ApplicationController
 
 
   def show
-    @query_fields = @table.get_meta_fields('show')
-    @owner = @table.find(params[:id])
-    @chart_types = QueryVisualization.chart_types
-    apply_query
+    respond_to do |format|
+      format.html do
+        @query_fields = @table.get_meta_fields('show')
+        @owner = @table.find(params[:id])
+        @chart_types = QueryVisualization.chart_types
+        apply_query
+      end
+      format.json do
+        query_result = {
+          query_detail: {},
+          visualizations:[]
+        }
+
+        @owner = Query.find(params[:id])
+        @object_type = Object.const_get(@owner.target)
+        apply_query # get @records
+        total_records = @records.size
+
+        query_result[:query_detail] = get_query_detail_json(@owner, total_records)
+        query_result[:visualizations] = get_visualizations_json(@owner)
+
+        render :json => query_result
+      end
+    end
+  end
+
+
+  def get_all_query_result_json
+
+    all_queries_result = {}
+
+    Query.all.select { |query| query.is_ready_to_export }.each do |query|
+
+      query_result = {
+        query_detail: {},
+        visualizations:[]
+      }
+
+      @owner = query
+      @object_type = Object.const_get(@owner.target)
+      apply_query # get @records
+      total_records = @records.size
+
+      query_result[:query_detail] = get_query_detail_json(@owner, total_records)
+      query_result[:visualizations] = get_visualizations_json(@owner)
+
+      all_queries_result[@owner.id] = query_result
+    end
+
+    render :json => all_queries_result
+  end
+
+
+  def enable
+    query = Query.find(params[:id])
+    query.is_ready_to_export = !query.is_ready_to_export
+    query.save
+
+    msg = params[:disabled] == "true" ? 'Disabled to Export' : 'Enabled to Export'
+
+    render json: {
+      message: msg,
+    }
   end
 
 

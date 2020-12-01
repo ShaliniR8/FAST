@@ -142,9 +142,11 @@ PrdgSession::Application.routes.draw do |map|
       get "remove_visualization"
       post "generate_visualization"
       post "display_chart_result"
+      post "enable"
     end
     collection do
       get 'load_conditions_block'
+      get "get_all_query_result_json"
     end
   end
 
