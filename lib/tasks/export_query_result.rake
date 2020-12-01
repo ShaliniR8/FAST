@@ -566,6 +566,7 @@ task export_query_result: :environment do
       p 'UPLOAD FAILED'
     end
   end
+<<<<<<< HEAD
 end
 
 task save_query_result: :environment do
