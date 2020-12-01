@@ -46,6 +46,7 @@ class QueriesController < ApplicationController
           visualizations:[]
         }
 
+        @query_fields = @table.get_meta_fields('show')
         @owner = Query.find(params[:id])
         @object_type = Object.const_get(@owner.target)
         apply_query # get @records
@@ -63,6 +64,7 @@ class QueriesController < ApplicationController
   def get_all_query_result_json
 
     all_queries_result = {}
+    @query_fields = @table.get_meta_fields('show')
 
     Query.all.select { |query| query.is_ready_to_export }.each do |query|
 
@@ -73,8 +75,18 @@ class QueriesController < ApplicationController
 
       @owner = query
       @object_type = Object.const_get(@owner.target)
-      apply_query # get @records
-      total_records = @records.size
+
+      @module_name = case @object_type.name
+      when 'Submission', 'Record', 'Report', 'CorrectiveAction'
+        'ASAP'
+      when 'Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation'
+        'SMS'
+      when 'Sra', 'Hazard', 'RiskControl', 'SafetyPlan'
+        'SRM'
+      end
+
+      records = get_records # get @records
+      total_records = records.size
 
       query_result[:query_detail] = get_query_detail_json(@owner, total_records)
       query_result[:visualizations] = get_visualizations_json(@owner)
@@ -308,7 +320,43 @@ class QueriesController < ApplicationController
     @records = records
   end
 
+  def get_records
+    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
+    @title = CONFIG.hierarchy[@module_name][:objects][@owner.target][:title].pluralize
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @template_fields = []
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
+      }
+    }
+    @fields = @target_fields + @template_fields
 
+    if @title == "Submissions"
+      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
+    elsif @title == "Reports"
+      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+    else
+      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
+    end
+
+    @owner.query_conditions.each do |condition|
+      records = records & expand_emit(condition, records)
+    end
+
+    @records = records
+  end
 
   private
 

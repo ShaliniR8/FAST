@@ -211,7 +211,7 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
 end
 
 
-def apply_query
+def get_records
   adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
   @title = CONFIG.hierarchy[@module_name][:objects][@owner.target][:title].pluralize
   @object_type = Object.const_get(@owner.target)
@@ -435,10 +435,14 @@ end
 
 
 def get_query_detail_json(owner, total_records)
+  attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
+
   {
     id: owner.id,
     title: owner.title,
     created_by: User.find(owner.created_by_id).full_name,
+    target: owner.send(attributes["get_target"]),
+    templates: owner.send(attributes["get_templates"]),
     total: total_records
   }
 end
@@ -472,7 +476,7 @@ end
 def get_visualization_wo_series_json(data, visualization)
   visualization_hash = {}
   visualization_hash[:x_axis] = visualization.x_axis
-  visualization_hash[:series] = "NA"
+  visualization_hash[:series] = "N/A"
   visualization_hash[:data] = {}
 
   data.each do |x_axis|
@@ -517,6 +521,7 @@ task export_query_result: :environment do
   #------------------------------#
 
   all_queries_result = {}
+  @query_fields = Query.get_meta_fields('show')
 
   Query.all.select { |query| query.is_ready_to_export }.each do |query|
 
@@ -537,8 +542,8 @@ task export_query_result: :environment do
         'SRM'
       end
 
-    apply_query # get @records
-    total_records = @records.size
+    records = get_records # get @records
+    total_records = records.size
 
     query_result[:query_detail] = get_query_detail_json(@owner, total_records)
     query_result[:visualizations] = get_visualizations_json(@owner)
