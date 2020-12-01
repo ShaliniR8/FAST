@@ -91,7 +91,7 @@ class QueriesController < ApplicationController
     query.is_ready_to_export = !query.is_ready_to_export
     query.save
 
-    msg = params[:disabled] == "true" ? 'Disabled to Export' : 'Enabled to Export'
+    msg = query.is_ready_to_export ? 'Enabled to Export' : 'Disabled to Export'
 
     render json: {
       message: msg,
