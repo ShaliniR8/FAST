@@ -105,11 +105,14 @@
       offstyle: offStyle
     });
 
-
     $('.toggle.btn').change(function() {
+      disabled = $(this).attr('class').includes("off")
+      console.log(disabled)
+
       $.ajax({
         type: "POST",
         url: "<%=enable_query_path(@owner)%>",
+        data: { disabled: disabled },
         dataType: 'json',
         success: function(data) {
           Swal.fire({

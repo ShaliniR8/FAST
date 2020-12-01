@@ -74,6 +74,7 @@ class QueriesController < ApplicationController
         @owner = Query.find(params[:id])
         @object_type = Object.const_get(@owner.target)
         apply_query
+
         total_records = @records.size
 
         query_result[:query_detail] = get_query_detail_json(@owner, total_records)
