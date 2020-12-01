@@ -546,10 +546,14 @@ module QueriesHelper
 
 
   def get_query_detail_json(owner, total_records)
+    attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
+
     {
       id: owner.id,
       title: owner.title,
       created_by: User.find(owner.created_by_id).full_name,
+      target: owner.send(attributes["get_target"]),
+      templates: owner.send(attributes["get_templates"]),
       total: total_records
     }
   end
