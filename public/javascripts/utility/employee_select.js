@@ -16,6 +16,7 @@ $(document).ready(function(){
 	build_user_table();
 	$(this).find(".emp_button").each(function(index, item){
 		$(item).on("click", function(){
+      $(window).resize();
 			var field_id = $(this).prop('id');
 			console.log(field_id);
 			$(".emp_modal").show();

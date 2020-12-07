@@ -27,7 +27,6 @@ ruby:
     - else
       - record_fields = @record_fields_hash.select{|field, records| fields.include?(field)}.values.flatten
       - if record_fields.length > 0
-
         .col-xs-12
           div class="panel #{category.panel}"
             .panel-heading.click-heading
@@ -42,38 +41,70 @@ ruby:
                 - fields.each do |field|
                   - record_field = @record_fields_hash[field].first rescue nil
                   - if record_field.present? && record_field.value.present?
-                    - size = "col-xs-#{field.display_size.to_s}"
-                    div class="#{size}"
-                      //= "(##{field.id}, ##{record_field.id})<br>".html_safe if Rails.env.development?
-                      b = "#{field.label.html_safe}: "
-                      - value = record_field.value.present? ? record_field.value : ""
+                    div class="nested_field_row"
+                    - size = "col-xs-#{field.display_size.to_s} style=\"padding:12px;\""
+                    - if field.nested_field_id.present?
+                      - rec_field_for_nested = record_fields.select{ |r| r.fields_id == field.nested_field_id }
+                      - if rec_field_for_nested.first.present?
+                        - if (rec_field_for_nested.first.value.parameterize == field.nested_field_value.parameterize) || (rec_field_for_nested.first.value.include?(';') && rec_field_for_nested.first.value.include?(field.nested_field_value))
+                          div class="#{size}"
+                          //= "(##{field.id}, ##{record_field.id})<br>".html_safe if Rails.env.development?
+                          b = "#{field.label.html_safe}: "
+                          - value = record_field.value.present? ? record_field.value : ""
 
-                      - case field.display_type
-                      - when 'checkbox', 'radio'
-                        - value.split(';').each do |val|
-                          .col-xs-12
-                            span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
-                            = val
-                      - when 'textarea'
-                        br
-                        = value.gsub(/\n/, '<br/>').html_safe
-                      - when 'employee'
-                        - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
-                          = User.find(value).full_name
-                        - else
-                          = value
-                      - else
-                        - case field.data_type
-                        - when 'datetime'
-                          = datetime_to_string(DateTime.parse value) rescue ''
-                        - else
-                          = value
+                          - case field.display_type
+                          - when 'checkbox', 'radio'
+                            - value.split(';').each do |val|
+                              .col-xs-12
+                                span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
+                                = val
+                          - when 'textarea'
+                            br
+                            = value.gsub(/\n/, '<br/>').html_safe
+                          - when 'employee'
+                            - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
+                              = User.find(value).full_name
+                            - else
+                              = value
+                          - else
+                            - case field.data_type
+                            - when 'datetime'
+                              = datetime_to_string(DateTime.parse value) rescue ''
+                            - else
+                              = value
+                    - else
+                      div class="#{size}"
+                        //= "(##{field.id}, ##{record_field.id})<br>".html_safe if Rails.env.development?
+                        b = "#{field.label.html_safe}: "
+                        - value = record_field.value.present? ? record_field.value : ""
 
-                .col-xs-12.mt10
-                  - if record_edit_access
-                    = link_to 'Edit', '#',
-                      class: 'btn btn-sm btn-warning pull-right edit-category-btn',
-                      'data-path' => edit_field_record_path(@record, category_id: category.id)
+                        - case field.display_type
+                        - when 'checkbox', 'radio'
+                          - value.split(';').each do |val|
+                            .col-xs-12
+                              span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
+                              = val
+                        - when 'textarea'
+                          br
+                          = value.gsub(/\n/, '<br/>').html_safe
+                        - when 'employee'
+                          - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
+                            = User.find(value).full_name
+                          - else
+                            = value
+                        - else
+                          - case field.data_type
+                          - when 'datetime'
+                            = datetime_to_string(DateTime.parse value) rescue ''
+                          - else
+                            = value
+
+                - if @record.status == 'Open' || @record.status == 'Linked'
+                  .col-xs-12.mt10
+                    - if record_edit_access
+                      = link_to 'Edit', '#',
+                        class: 'btn btn-sm btn-warning pull-right edit-category-btn',
+                        'data-path' => edit_field_record_path(@record, category_id: category.id)
 
 css:
   .row.is-flex {

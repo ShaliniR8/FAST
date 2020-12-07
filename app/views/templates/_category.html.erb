@@ -87,7 +87,7 @@
 <script>
   $(function(){
     $(".required_field").css('border-color', '');
-    $(".required_field").closest('.form-group').find('label').css("color", "red");
+    $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
     $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
     $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
 
@@ -102,6 +102,31 @@
       $(".nested_field_" + field_id).parent().removeClass("graybox")
       $(".nested_field_" + field_id + "_" + field_value).show();
       $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox")
+    });
+
+    $(".field_cb_select").on("change", function(){
+      var field_id = $(this).attr("data-id");
+      var field_value = string_parameterize($(this).attr('name'))
+      if ($(this).prop('checked')) {
+        $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).show();
+      } else {
+        $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).hide();
+      }
+    });
+
+    $(".field_rb_select").on("change", function(){
+      var field_id = $(this).attr("data-id");
+      var field_value = string_parameterize($(this).val())
+      $(".nested_field_" + field_id).hide();
+      if ($(this).prop('checked')) {
+        $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).show();
+      } else {
+        $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).hide();
+      }
     });
   });
 </script>

@@ -23,6 +23,9 @@
                 <th>Show Label</th>
                 <th>Required</th>
                 <th>Print in De-ID</th>
+                <th>Max Character Count</th>
+                <th>Min Options Selectable</th>
+                <th>Additional Info?</th>
                 <th width="30%">Options</th>
                 <th>Action</th>
               </tr>
@@ -42,6 +45,9 @@
                     <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
                     <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
                     <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
+                    <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
+                    <td><%=f.number_field :max_options,                                         {:class => "form-control"}%>                    </td>
+                    <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
                     <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
                     <td>
 
@@ -76,6 +82,7 @@
 
 
   <%=submit_tag "Submit", :class => "btn btn-success pull-right mr20", :disable_with => "Submitting..."%>
+  <a class="btn btn-warning pull-right mr20" onclick="closeSwal()">Cancel</a>
 <%end%>
 
 
@@ -111,7 +118,5 @@
       }
     });
   });
-
-
 
 </script>

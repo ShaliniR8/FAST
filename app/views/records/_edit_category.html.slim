@@ -1,8 +1,20 @@
 = javascript_include_tag "/javascripts/utility/format-builder.js"
 = javascript_include_tag "/javascripts/utility/timezone-control.js"
+= javascript_include_tag "/javascripts/utility/airport_select.js"
+= javascript_include_tag "/javascripts/utility/employee_select.js"
 
+.modal.fade.bs-example-modal-lg.airport_modal aria-labelledby="myLargeModalLabel" role="dialog" tabindex="-1"
+    .modal-dialog.modal-lg role="document"
+      .modal-content
+        = render 'airports_select'
+
+.modal.fade.bs-example-modal-lg.emp_modal aria-labelledby="myLargeModalLabel" role="dialog" tabindex="-1"
+  .modal-dialog.modal-lg role="document"
+    .modal-content
+      = render 'emp'
 
 = form_for record do |f|
+
   = hidden_field_tag :commit, 'Save Fields'
   = hidden_field_tag :category_id, category.id
 
@@ -20,13 +32,14 @@
             - nested_fields.each do |nested_field|
               - record_field = (record_fields_hash[nested_field.id] || []).first
               - record_field = RecordField.new(value: '') if !record_field.present?
-              - if record_field.present? && record_field.value != ''
-                div.nested_field.graybox
-                  = render "records/field",
-                    field: nested_field,
-                    f: f,
-                    record_field: record_field,
-                    is_nested_field: true
+
+              - custom_class = "\"nested_field_#{field.id}_#{nested_field.nested_field_value.parameterize}\""
+              - if field.display_type == 'dropdown' || field.display_type == 'checkbox' || field.display_type == 'radio'
+                - if field.options.include?(nested_field.nested_field_value)
+                  == "<div class=nested_field>"
+                  == "<div class=#{custom_class}>#{render 'records/field', field: nested_field, f: f, record_field: record_field, is_nested_field: true}</div></div></div>"
+              - else
+                - Rails.logger.debug "Do not render"
     hr
 
   = link_to 'Save Fields', '#',
@@ -35,16 +48,85 @@
 
 
 javascript:
-  // Get listing of all the airport buttons
-  var field_id;
-  $(document).find(".airport_button").each(function(index, item){
-    // Get the button that's being clicked
-    $(item).on("click", function(){
-      console.log('airport btn clicked!');
-      // Get the selected airport's field id
-      field_id = $(this).prop("id");
-      resetModal(field_id);
-      $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
-      $("#search_btn_" + field_id).on("click", {field_id: field_id}, handleSearch);
+
+  var airport_table;
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+
+    $("[class^=nested_field_]").each(function(){
+      console.log($(this).attr('class'))
+      $(this).hide();
+    });
+    $(".nested_field_" + field_id + "_" + field_value).show();
+  }
+
+  function update_cb_rb_nested(field){
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+
+    if($(field).prop('checked')){
+      $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).show();
+    } else {
+      $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).hide();
+    }
+  }
+
+  $(document).ready(function(){
+
+    $(".required_field").css('border-color', '');
+    $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
+
+    $(".field_select").on("change", function(){
+      update_nested_fields($(this));
+    });
+
+    $(".field_select").each(function(){
+      update_nested_fields($(this));
+    });
+
+    $(".field_cb_select").each( function(){
+      update_cb_rb_nested($(this));
+    });
+
+    $(".field_rb_select").each(function(){
+      update_cb_rb_nested($(this));
+    });
+
+    $(".field_cb_select").on("change", function(){
+      update_cb_rb_nested($(this));
+    });
+
+    $(".field_rb_select").on("change", function(){
+      $(".field_rb_select").each(function(){
+        update_cb_rb_nested($(this));
+      });
+    });
+
+    // Get listing of all the airport buttons
+    var field_id;
+    $(document).find(".airport_button").each(function(index, item){
+      // Get the button that's being clicked
+      $(item).on("click", function(){
+        console.log('airport btn clicked!');
+        // Get the selected airport's field id
+        field_id = $(this).prop("id");
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_" + field_id).on("click", {field_id: field_id}, handleSearch);
+      });
     });
   });
+
+  function resetModal(field_id){
+    // Reset the table, field, and close the modal
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }

@@ -72,7 +72,7 @@
               "<p>
                 Click on the <b>grey panels</b> to expand accordian and see content.</br>
                 Items in <b>red</b> are required. </br>
-                Scroll to the button of the page to <b>Submit/Save</b> the submission.</br>
+                Scroll to the bottom of the page to <b>Submit/Save</b> the submission.</br>
               </p>"%>
           </div>
 
@@ -350,24 +350,66 @@
       });
     });
 
+    var count;
+    var isValidationReq = true;
 
+    $('.submit_btn').click(function(){
+      if ($(this).val() == 'Save for Later'){
+        isValidationReq = false;
+      } else {
+        isValidationReq = true;
+      }
+    });
 
-    $("form").on('submit',function(){
+    $("form").on('submit', function(){
+      if(isValidationReq) {
+        $("div.category-panel").find('.panel-body').slideUp();
+        $("div.category-panel").closest('div.category-panel').addClass('collapsed');
+        $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+        $(this).find('.required_field').each(function(){
+          var cboxes = $(this).find('.checkbox_mul').get();
+          var radios = $(this).find('.radio_req').get();
 
-      $("div.category-panel").find('.panel-body').slideUp();
-      $("div.category-panel").closest('div.category-panel').addClass('collapsed');
-      $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+          if (radios == null || radios.length == 0) {
+            if (cboxes == null || cboxes.length == 0) {
+              if ($(this).val() == "") {
+                prop_up_errors(this);
+              }
+            } else {
+              var lim = $(this).attr('name');
+              count = 0;
+              $(this).find('.checkbox_mul').each(function() {
+                if ($(this).prop('checked')) {
+                  count ++;
+                }
+              });
+              if (count < lim) {
+                prop_up_errors(this);
+              }
+            }
+          } else {
+            count = 0;
+            $(this).find('.radio_req').each(function() {
+                if ($(this).prop('checked')) {
+                  count ++;
+                }
+            });
+            if (count < 1) {
+              prop_up_errors(this);
+            }
+          }
 
-      $(this).find('.required_field').each(function(){
-        if ($(this).val() == ""){
-          $(this).css('border-color', 'red');
-          $(this).closest('div.category-panel').removeClass('collapsed');
-          $(this).closest('div.category-panel').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-          $(this).closest('div.category-panel').find('.panel-body').slideDown();
-        }
-      });
+        });
+      }
     });
   });
+
+  function prop_up_errors(target) {
+    $(target).css('border-color', 'red');
+    $(target).closest('div.category-panel').removeClass('collapsed');
+    $(target).closest('div.category-panel').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+    $(target).closest('div.category-panel').find('.panel-body').slideDown();
+  }
 
 </script>
 

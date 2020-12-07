@@ -52,28 +52,57 @@
             <div class="sub_sub_title"><%=cat.title%></div>
             <%cat.fields.order(:field_order).each do |field|%>
               <%if field.print || !deidentified%>
-                <%value = owner.submission_fields.where("fields_id = ?", field.id).first%>
-                <%if value.present?%>
-                  <%value = value.print_value%>
+                <%record_field = owner.submission_fields.where("fields_id = ?", field.id).first%>
+                <%if record_field.present?%>
+                  <%value = record_field.print_value%>
                   <%if value.present?%>
-                    <%if cat.title == "Narratives" %>
-                      <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
-                    <%else%>
-                      <b><%=field.label%>: </b>
-                      <%if field.display_type == "employee"%>
-                        <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                          <%=User.find(value).full_name%>
-                        <%else%>
-                          <%=value%>
-                        <%end%>
+                    <%if field.nested_field_id.nil?%>
+                      <%if cat.title == "Narratives" %>
+                        <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
                       <%else%>
-                        <%if field.data_type == "datetime"%>
-                          <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                        <b><%=field.label%>: </b>
+                        <%if field.display_type == "employee"%>
+                          <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                            <%=User.find(value).full_name%>
+                          <%else%>
+                            <%=value%>
+                          <%end%>
                         <%else%>
-                          <%=value%>
+                          <%if field.data_type == "datetime"%>
+                            <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                          <%else%>
+                            <%=value%>
+                          <%end%>
+                        <%end%>
+                        </br>
+                      <%end%>
+                    <%else%>
+                      <%record_field = owner.submission_fields.where("fields_id = ?", field.nested_field_id).first%>
+                      <%Rails.logger.debug "Field: " + field.attributes.to_s + "\n\n"%>
+                      <%if record_field.present? && record_field.value.present?%>
+                        <%Rails.logger.debug "Record Field: " + record_field.attributes.to_s + "\n\n"%>
+                        <%if field.nested_field_value.parameterize == record_field.value.parameterize || record_field.value.include?(field.nested_field_value)%>
+                          <%if cat.title == "Narratives" %>
+                            <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                          <%else%>
+                            <b><%=field.label%>: </b>
+                            <%if field.display_type == "employee"%>
+                              <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                                <%=User.find(value).full_name%>
+                              <%else%>
+                                <%=value%>
+                              <%end%>
+                            <%else%>
+                              <%if field.data_type == "datetime"%>
+                                <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                              <%else%>
+                                <%=value%>
+                              <%end%>
+                            <%end%>
+                            </br>
+                          <%end%>
                         <%end%>
                       <%end%>
-                      </br>
                     <%end%>
                   <%end%>
                 <%end%>
@@ -87,3 +116,4 @@
 
   </div>
 </div>
+<!-- sub_field.value.include?(nest_field.nested_field_value) -->

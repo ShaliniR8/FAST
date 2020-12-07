@@ -5,33 +5,61 @@
       - record_field = @record_fields_hash[field].first rescue nil
       - if record_field.present? && record_field.value.present?
         - size = "col-xs-#{field.display_size.to_s}"
-        div class="#{size}"
-          b = "#{field.label.html_safe}: "
-          - value = record_field.value.present? ? record_field.value : ""
+        - if field.nested_field_id.present?
+          - rec_field_for_nested = record_fields.select{ |r| r.fields_id == field.nested_field_id }
+          - if rec_field_for_nested.first.value.parameterize == field.nested_field_value.parameterize
+            div class="#{size}"
+            b = "#{field.label.html_safe}: "
+            - value = record_field.value.present? ? record_field.value : ""
 
-          - case field.display_type
-          - when 'checkbox', 'radio'
-            - value.split(';').each do |val|
-              .col-xs-12
-                span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
-                = val
-          - when 'textarea'
-            br
-            = value.gsub(/\n/, '<br/>').html_safe
-          - when 'employee'
-            - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
-              = User.find(value).full_name
+            - case field.display_type
+            - when 'checkbox', 'radio'
+              - value.split(';').each do |val|
+                .col-xs-12
+                  span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
+                  = val
+            - when 'textarea'
+              br
+              = value.gsub(/\n/, '<br/>').html_safe
+            - when 'employee'
+              - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
+                = User.find(value).full_name
+              - else
+                = value
             - else
-              = value
-          - else
-            - case field.data_type
-            - when 'datetime'
-              = datetime_to_string(DateTime.parse value) rescue ''
-            - else
-              = value
+              - case field.data_type
+              - when 'datetime'
+                = datetime_to_string(DateTime.parse value) rescue ''
+              - else
+                = value
+        - else
+          div class="#{size}"
+            b = "#{field.label.html_safe}: "
+            - value = record_field.value.present? ? record_field.value : ""
 
-    .col-xs-12
-      = link_to 'Edit', '#',
-        class: 'btn btn-sm btn-warning pull-right edit-category-btn',
-        'data-path' => edit_field_record_path(@record, category_id: category.id)
+            - case field.display_type
+            - when 'checkbox', 'radio'
+              - value.split(';').each do |val|
+                .col-xs-12
+                  span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
+                  = val
+            - when 'textarea'
+              br
+              = value.gsub(/\n/, '<br/>').html_safe
+            - when 'employee'
+              - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
+                = User.find(value).full_name
+              - else
+                = value
+            - else
+              - case field.data_type
+              - when 'datetime'
+                = datetime_to_string(DateTime.parse value) rescue ''
+              - else
+                = value
+    - if @record.status == 'Open' || @record.status == 'Linked'
+      .col-xs-12
+        = link_to 'Edit', '#',
+          class: 'btn btn-sm btn-warning pull-right edit-category-btn',
+          'data-path' => edit_field_record_path(@record, category_id: category.id)
 

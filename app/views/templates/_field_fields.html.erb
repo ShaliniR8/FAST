@@ -32,10 +32,9 @@
   <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-  <% if params[:action] == 'edit' %>
-    <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
-    <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
-  <% end %>
+  <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
+  <td><%=f.number_field :max_options,                                         {:class => "form-control"}%>                    </td>
+  <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
   <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
   <td>
     <%if source == 'Existing'%>

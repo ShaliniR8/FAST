@@ -49,7 +49,7 @@ class Field < ActiveRecord::Base
       "Employee Select Field"         => "employee",
       "Autocomplete Field"        => "datalist",
       "Text Field"      => "text",
-      #{}"Radio Button"   => "radio",
+      "Radio Button"   => "radio",
       "Drop Down Menu"  => "dropdown",
       "Check Boxes"       => "checkbox",
       "Text Area"       => "textarea"
@@ -128,7 +128,5 @@ class Field < ActiveRecord::Base
   def get_field_data_type
     "#{custom_id}-#{data_type}"
   end
-
-
 
 end
