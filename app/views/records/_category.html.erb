@@ -1,4 +1,6 @@
 <%deid = defined?(deid) ? deid : false%>
+<%from_rec_show = defined?(from_record_show) ? true : false%>
+<%record_edit_access = defined?(record_edit_access) ? record_edit_access : false%>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="panel <%=@cat.panel%>">
     <div class="panel-heading click-heading">
@@ -32,6 +34,17 @@
           <%end%>
         <%end%>
       </div>
+        <%if from_rec_show%>
+          <%if @record.status == 'Open' || @record.status == 'Linked'%>
+            <div class = "col-xs-12 mt10">
+              <%if record_edit_access%>
+                <%=link_to 'Edit', '#',
+                  class: 'btn btn-sm btn-warning pull-right edit-category-btn',
+                  'data-path' => edit_field_record_path(@record, category_id: @cat.id) %>
+              <%end%>
+            </div>
+          <%end%>
+        <%end%>
     </div>
   </div>
 </div>
