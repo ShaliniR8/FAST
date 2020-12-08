@@ -7,7 +7,7 @@
         - size = "col-xs-#{field.display_size.to_s}"
         - if field.nested_field_id.present?
           - rec_field_for_nested = record_fields.select{ |r| r.fields_id == field.nested_field_id }
-          - if rec_field_for_nested.first.value.parameterize == field.nested_field_value.parameterize
+          - if (rec_field_for_nested.first.value.parameterize == field.nested_field_value.parameterize) || (rec_field_for_nested.first.value.include?(";") && rec_field_for_nested.first.value.include?(field.nested_field_value))
             div class="#{size}"
             b = "#{field.label.html_safe}: "
             - value = record_field.value.present? ? record_field.value : ""

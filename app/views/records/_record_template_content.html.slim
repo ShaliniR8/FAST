@@ -1,21 +1,6 @@
 ruby:
   deid = defined?(deid) ? deid : false
 
-
-/ // airport selector
-/ .modal.fade.bs-example-modal-lg.airport_modal tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-/   .modal-dialog.modal-lg role='document'
-/     .airport-select-modal
-/       = render 'records/airports_select'
-
-/ // employee selector
-/ .modal.fade.bs-example-modal-lg.emp_modal tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-/   .modal-dialog.modal-lg role='document'
-/     .emp-select-modal
-/       = render 'records/emp'
-
-
-
 - @template_hash.each do |category, fields|
   - @cat = category
   - if @cat.print || !deid
@@ -132,56 +117,6 @@ javascript:
       var timezone = $('.toplevel_timezone').val();
       $(".timezone_field").val(timezone);
     });
-  }
-
-
-  // Updata airport table
-  function handleSearch(event){
-    // Get field id
-    var field_id = event.data.field_id
-    // Get the keywords user searched for
-    var icao = $("#icao").val();
-    var iata = $("#iata").val();
-    var arpt_name = $("#arpt_name").val();
-    // Do nothing if nothing is searched
-    if(icao == "" && iata == "" && arpt_name ==""){
-    // Update the table if icao code is not empty
-    }else{
-      // Get the data from server
-      $.get("#{airport_data_submissions_path}?field_id=" + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
-        // Render airport table with data
-        $("#airports_table").html(data);
-        updateAirportTable(field_id);
-      });
-    }
-  }
-
-  function updateAirportTable(field_id){
-    // Initialize table as a datatable
-    airport_table = $('#airports' + field_id).DataTable({
-      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-      "iDisplayLength": 5
-    });
-    // User clicked on a row
-    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
-      // Get the row information
-      var icao = $(this).find("td").eq(0).text();
-      var iata = $(this).find("td").eq(1).text();
-      // Set the value on the form
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
-      resetModal(field_id);
-    });
-  }
-
-  function resetModal(field_id){
-    // Reset the table, field, and close the modal
-    $("#airports_table").html("");
-    $("#icao").val("");
-    $("#iata").val("");
-    $("#arpt_name").val("");
-    $('#airport_div').hide();
-    $(".airport_modal").modal("hide");
   }
 
 

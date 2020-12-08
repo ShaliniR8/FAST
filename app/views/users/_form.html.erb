@@ -161,7 +161,7 @@
 
               <input type="hidden" name="page" value="<%=@action%>"/>
               <div class="form-actions pull-right mt20 mr20">
-                <%=link_to "Cancel",(@action == "new")? users_path : user_path(@user) , :id => "cancel-btn", :class=>"mr5 btn btn-warning", :confirm => "Are you sure?"%>
+                <%=link_to "Cancel",(@action == "new")? users_path : user_path(@user) , :id => "cancel-btn", :class=>"mr5 btn btn-default", :confirm => "Are you sure?"%>
                 <%=f.submit "Save", :class => "btn btn-success", :disable_with => "Saving..."%>
 
               </div>

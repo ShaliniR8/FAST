@@ -88,11 +88,11 @@
           <div class="mt10">
             <%= f.submit "Save", class:"btn btn-success pull-right", disable_with: "Saving..."%>
             <%if action_name == "new"%>
-              <%=link_to "Cancel", ims_path(:type=>@im.type), :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right", :confirm=>'The Implementation Plan has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+              <%=link_to "Cancel", ims_path(:type=>@im.type), :id=>"cancel-btn", :class=>"mr5 btn btn-default pull-right", :confirm=>'The Implementation Plan has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
             <%elsif action_name == "edit"%>
-              <%=link_to "Cancel", im_path(@im), :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right", :confirm=>'The Implementation Plan has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+              <%=link_to "Cancel", im_path(@im), :id=>"cancel-btn", :class=>"mr5 btn btn-default pull-right", :confirm=>'The Implementation Plan has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
             <%elsif action_name == "reoccur"%>
-              <%=link_to "Cancel", im_path(@base), :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right", :confirm=>'The Implementation Plan has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+              <%=link_to "Cancel", im_path(@base), :id=>"cancel-btn", :class=>"mr5 btn btn-default pull-right", :confirm=>'The Implementation Plan has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
             <%end%>
           </div>
         <%end%>

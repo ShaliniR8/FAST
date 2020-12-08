@@ -7,12 +7,15 @@ function build_user_table(){
 	});
 }
 function clear_user_table(){
-	employee_table.destroy();
+  if(employee_table != null) {
+  	employee_table.destroy();
+  }
 }
 
 
 $(document).ready(function(){
 	$(window).resize();
+  clear_user_table();
 	build_user_table();
 	$(this).find(".emp_button").each(function(index, item){
 		$(item).on("click", function(){

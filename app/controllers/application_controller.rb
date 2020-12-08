@@ -997,12 +997,20 @@ class ApplicationController < ActionController::Base
         end
       end
 
+      # @owner.update_attributes(params[object_name.to_sym])
+      # @record = @owner
+      # category = Category.find(params[:category_id])
+      # fields = category.fields
+      # @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
+      # render partial: 'records/show_category', locals: {category: category, fields: fields}
       @owner.update_attributes(params[object_name.to_sym])
       @record = @owner
-      category = Category.find(params[:category_id])
-      fields = category.fields
-      @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
-      render partial: 'records/show_category', locals: {category: category, fields: fields}
+      @cat = Category.find(params[:category_id])
+      render partial: 'records/category',
+             locals: {deid: !current_user.has_template_access(@record.template.name).include?('full'),
+             from_record_show: true,
+             record_edit_access: current_user.has_access('records', 'edit', admin: true),
+             hide_panel_head: true}
     else
     end
 

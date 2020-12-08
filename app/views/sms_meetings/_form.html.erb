@@ -80,7 +80,7 @@
             <%=link_to "Cancel",
               action_name == "edit" ? sms_meeting_path(@meeting) : sms_meetings_path(:type=>params[:type]),
               :id=>"cancel-btn",
-              :class=>"mr5 btn btn-warning pull-right", :confirm=>'Are you sure?'%>
+              :class=>"mr5 btn btn-default pull-right", :confirm=>'Are you sure?'%>
           </div>
         <%end%>
       </div>

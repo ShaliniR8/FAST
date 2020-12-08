@@ -51,7 +51,7 @@
             </ol>
             <b>Template Information</b>
             <br>
-            These fields will be mapped over from the template when the item is generated.            
+            These fields will be mapped over from the template when the item is generated.
             <ol>
               <li>
                 Scheduled Completion Date: select a date for the recurrent item to be scheduled for completion
@@ -96,7 +96,7 @@
             <%=link_to "Cancel",
               action_name == 'new' ? recurrences_path : recurrences_path(@recurrence),
               :id => "cancel-btn",
-              :class => "mr5 btn btn-warning pull-right",
+              :class => "mr5 btn btn-default pull-right",
               :confirm => 'Are you sure?'%>
 
           </div>

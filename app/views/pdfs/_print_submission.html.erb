@@ -78,29 +78,30 @@
                       <%end%>
                     <%else%>
                       <%record_field = owner.submission_fields.where("fields_id = ?", field.nested_field_id).first%>
-                      <%Rails.logger.debug "Field: " + field.attributes.to_s + "\n\n"%>
                       <%if record_field.present? && record_field.value.present?%>
-                        <%Rails.logger.debug "Record Field: " + record_field.attributes.to_s + "\n\n"%>
-                        <%if field.nested_field_value.parameterize == record_field.value.parameterize || record_field.value.include?(field.nested_field_value)%>
-                          <%if cat.title == "Narratives" %>
-                            <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
-                          <%else%>
-                            <b><%=field.label%>: </b>
-                            <%if field.display_type == "employee"%>
-                              <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                                <%=User.find(value).full_name%>
-                              <%else%>
-                                <%=value%>
-                              <%end%>
+                        <%if (field.nested_field_value.parameterize == record_field.value.parameterize) ||
+                             (record_field.value.include?(field.nested_field_value))%>
+                          <div class="nested_field" style="margin-left:15px;">
+                            <%if cat.title == "Narratives" %>
+                              <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
                             <%else%>
-                              <%if field.data_type == "datetime"%>
-                                <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                              <b><%=field.label%>: </b>
+                              <%if field.display_type == "employee"%>
+                                <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                                  <%=User.find(value).full_name%>
+                                <%else%>
+                                  <%=value%>
+                                <%end%>
                               <%else%>
-                                <%=value%>
+                                <%if field.data_type == "datetime"%>
+                                  <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                                <%else%>
+                                  <%=value%>
+                                <%end%>
                               <%end%>
+                              </br>
                             <%end%>
-                            </br>
-                          <%end%>
+                          </div>
                         <%end%>
                       <%end%>
                     <%end%>

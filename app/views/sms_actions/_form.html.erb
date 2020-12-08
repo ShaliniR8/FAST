@@ -47,7 +47,7 @@
               disable_with: "Saving..."%>
             <%=link_to "Cancel",
               @parent.present? ? @parent : @owner.becomes(SmsAction),
-              :class=>"btn btn-warning pull-right mr5 mt5",
+              :class=>"btn btn-default pull-right mr5 mt5",
               :confirm=>'Are you sure?'%>
             <%=link_to "Group Access",
               "#",

@@ -213,7 +213,7 @@
                 <%=link_to "Cancel",
                   new_submission_path,
                   :id=>"cancel-btn",
-                  :class=>"mr5 btn btn-warning pull-right",
+                  :class=>"mr5 btn btn-default pull-right",
                   :confirm=>'Are you sure?',
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
@@ -221,7 +221,7 @@
               <%else%>
                 <%=link_to "Cancel", root_url,
                   :id=>"cancel-btn",
-                  :class=>"mr5 btn btn-warning pull-right",
+                  :class=>"mr5 btn btn-default pull-right",
                   :confirm=>'Are you sure?',
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
@@ -230,7 +230,7 @@
             <%elsif @action == "Continue"%>
               <%=link_to "Cancel", incomplete_submissions_path,
                 :id=>"cancel-btn",
-                :class=>"mr5 btn btn-warning pull-right",
+                :class=>"mr5 btn btn-default pull-right",
                 :confirm=>'Are you sure?',
                 "data-toggle" => "tooltip",
                 "data-placement" => "top",
@@ -238,7 +238,7 @@
             <%else%>
               <%=link_to "Cancel", submission_path(@record),
                 :id=>"cancel-btn",
-                :class=>"mr5 btn btn-warning pull-right",
+                :class=>"mr5 btn btn-default pull-right",
                 :confirm=>'Are you sure?',
                 "data-toggle" => "tooltip",
                 "data-placement" => "top",

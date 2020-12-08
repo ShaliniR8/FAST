@@ -43,7 +43,7 @@
             <%=link_to "Cancel",
               action_name == "edit" ? corrective_action_path(@corrective_action) : @report.present? ? report_path(@report) : record_path(@record),
               :id => "cancel-btn",
-              :class => "mr5 btn btn-warning pull-right",
+              :class => "mr5 btn btn-default pull-right",
               :confirm => 'Are you sure?'%>
             <%#=link_to "Group Access",
               "#",

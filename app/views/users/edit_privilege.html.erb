@@ -50,9 +50,9 @@
 
           <div class="col-xs-12 mr10 mt10">
             <%=submit_tag "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
-            <%=link_to "Cancel", user_path(@user), :class => "btn btn-warning pull-right mr5"%>
-            <%=link_to "Uncheck All", "#", :class => "btn btn-default pull-right mr5", :onclick => "uncheckall()"%>
-            <%=link_to "Check All", "#", :class => "btn btn-default pull-right mr5", :onclick => "checkall(true)"%>
+            <%=link_to "Cancel", user_path(@user), :class => "btn btn-default pull-right mr5"%>
+            <%=link_to "Uncheck All", "#", :class => "btn btn-warning pull-right mr5", :onclick => "uncheckall()"%>
+            <%=link_to "Check All", "#", :class => "btn btn-warning pull-right mr5", :onclick => "checkall(true)"%>
           </div>
         </div>
       <%end%>

@@ -15,9 +15,9 @@
             <div class="top_buttons pull-right">
               <%=f.submit "Save Query", :class=>"btn btn-success pull-right mr5", disable_with: "Saving..."%>
               <%if action_name == "new"%>
-                <%=link_to "Cancel", query_statements_path, :id => "cancel-btn", :class => "mr5 btn btn-warning pull-right"%>
+                <%=link_to "Cancel", query_statements_path, :id => "cancel-btn", :class => "mr5 btn btn-default pull-right"%>
               <%elsif action_name == "edit"%>
-                <%=link_to "Cancel", query_statement_path(@query), :id => "cancel-btn", :class => "mr5 btn btn-warning pull-right", :confirm => 'The query has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
+                <%=link_to "Cancel", query_statement_path(@query), :id => "cancel-btn", :class => "mr5 btn btn-default pull-right", :confirm => 'The query has not been saved or submitted, and all information that you have entered will be lost. Do you want to continue to cancel?'%>
               <%end%>
             </div>
           </div>

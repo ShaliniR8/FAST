@@ -29,7 +29,11 @@ class Field < ActiveRecord::Base
 
   def get_label
     if self.show_label
-      self.label
+      if self.display_type == 'checkbox' && self.required
+        label = self.label + " (Minimum #{self.max_options})"
+      else
+        self.label
+      end
     else
       nil
     end

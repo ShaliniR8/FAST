@@ -21,13 +21,13 @@
                 <%= label_tag :email %>
                 <%= text_field_tag :email, params[:email], :class=>"form-control" %>
               </div>
-              
+
               <div class="form-actions pull-right">
                 <%= submit_tag "Submit", class:"btn btn-success", disable_with: "Submitting..."%>
               </div>
 
-              <%=link_to "Cancel", root_url , :id=>"cancel-btn", :class=>"mr5 btn btn-warning pull-right"%>
-              
+              <%=link_to "Cancel", root_url , :id=>"cancel-btn", :class=>"mr5 btn btn-default pull-right"%>
+
             <%end%>
           </div>
         </div>
