@@ -66,4 +66,47 @@
 
 </tr>
 
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    $('td').each(function(){
+      $(this).find('select').each(function(){
+        if ($(this).find('option:selected').attr('value') == 'text') {
+          $(this).siblings('textarea').hide()
+        } else {
+          $(this).siblings('textarea').show()
+        }
+      });
+    });
+
+    $('.header_toggle_btn').on('click', function(){
+      var btn_state = $(this).attr("class").split(/\s+/);
+      $(this).closest('td').siblings().each(function(){
+        $(this).find('select').each(function(){
+          if (btn_state.includes('btn-success')){
+            $(this).show();
+            if ($(this).find('option:selected').attr('value') == 'text') {
+              $(this).siblings('textarea').hide();
+            } else {
+              $(this).siblings('textarea').show();
+            }
+          } else {
+            $(this).hide();
+            $(this).siblings('textarea').hide();
+          }
+        });
+      });
+    });
+
+    $('select').on("change", function(){
+      if ($(this).find('option:selected').attr('value') == 'text') {
+          $(this).siblings('textarea').hide();
+        } else {
+          $(this).siblings('textarea').show();
+        }
+    });
+  })
+
+</script>
+
 
