@@ -114,6 +114,7 @@ class Config < Thor
       transactions
       verifications
       viewer_comments
+      canned_messages
     ].each do |table|
       print "Truncating #{Rails.configuration.database_configuration[environment]['database']}:#{table}..."
       ActiveRecord::Base.connection.execute("TRUNCATE #{table}")
