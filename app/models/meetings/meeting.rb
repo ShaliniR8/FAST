@@ -46,17 +46,27 @@ class Meeting < ProsafetBase
       {field: 'meeting_end',      title: 'Meeting End',       num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
       {field: 'notes',            title: 'Notes',             num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
       {field: 'final_comment',    title: 'Final Comment',     num_cols: 12, type: 'textarea',   visible: 'show',            required: false},
+      {field: 'host',             title: 'Host',              num_cols: 12, type: 'user',       visible: 'auto',            required: false},
+      {field: 'participants',     title: 'Participants',      num_cols: 12, type: 'user',       visible: 'auto',            required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+
+  def participants
+    parts = []
+    invitations.each do |inv|
+      parts << inv.user
+    end
+    parts
   end
 
 
   def self.progress
     {
-      "Open"        => { :score => 25,  :color => "default"},
+      "Open"      => { :score => 25,  :color => "default"},
       "Closed"    => { :score => 100, :color => "success"},
     }
   end
-
 
   def create_transaction(action)
     if !self.changes()['viewer_access'].present?

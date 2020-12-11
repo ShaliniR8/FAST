@@ -5,8 +5,8 @@ class NotifyMailer < ApplicationMailer
 
 
   def notify_rake_errors(subject, error, location)
-	    emails = ['blair.li@prodigiq.com', 'taeho.kim@prodigiq.com', 'trevor.ryles@prodigiq.com', 'engineering@prosafet.com']
-	    default = 'noc@prodigiq.com'
+	    emails = ['blair.li@prodigiq.com', 'taeho.kim@prodigiq.com', 'trevor.ryles@prodigiq.com', 'engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com']
+	    default = 'noc@prosafet.com'
 	    @error = error
 	    @location = location
   	if Rails.env.production?

@@ -15,15 +15,28 @@ namespace :notifications do
         content = rule.content
 
         records = Object.const_get(object_type.classify)
-          .where("status = ? AND #{anchor_date_field} = ?",
+          .where("status = ? AND DATE(#{anchor_date_field}) = ?",
             anchor_status, Time.now.in_time_zone.to_date + interval.days)
+
         puts "Alert ##{rule.id} count: #{records.length}"
         records.each do |record|
-          user = User.find(record.send(audience_field)) rescue nil
-          if user.present?
-            NotifyMailer.automated_reminder(user, subject, content, record)
-            content = content[0..251] + '...' if content.length > 255
-            record.notices.create({users_id: user.id, content: content})
+          user_or_users = record.send(audience_field)
+          if user_or_users.is_a?(Array)
+            user_or_users.each do |u|
+              if u.is_a?(User)
+                send_email(u, subject, content, record)
+              end
+            end
+          elsif user_or_users.is_a?(Fixnum)
+            user = User.find(user_or_users) rescue nil
+            if user.present?
+              send_email(user, subject, content, record)
+            end
+          else
+            user = user_or_users.user rescue nil
+            if user.present?
+              send_email(user, subject, content, record)
+            end
           end
         end
       end
@@ -33,6 +46,12 @@ namespace :notifications do
       error_message = error.message
       NotifyMailer.notify_rake_errors(subject, error_message, location)
     end
+  end
+
+  def send_email(user, subject, content, record)
+    NotifyMailer.automated_reminder(user, subject, content, record)
+    content = content[0..251] + '...' if content.length > 255
+    record.notices.create({users_id: user.id, content: content})
   end
 
   desc 'Send out user-designated email reminders'

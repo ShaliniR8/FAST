@@ -36,14 +36,24 @@ class AutomatedNotificationsController < ApplicationController
 
     @object_type = @record.object_type
     @object_class = Object.const_get(@object_type.classify)
-    @anchor_date_fields = @object_class.get_meta_fields('form')
-      .select{|header| header[:type] == 'date'}
-      .map{|x| [x[:title], x[:field]]}.to_h
-    @audience_fields = @object_class.get_meta_fields('form')
-      .select{|header| header[:type] == 'user'}
-      .map{|x| [x[:title], x[:field]]}.to_h
-    @anchor_status = @object_class.progress.keys
 
+    case @object_type.classify
+    when 'Meeting'
+      @anchor_date_fields = get_fields(@object_class, 'form', 'datetimez')
+    when 'Verification'
+      @anchor_date_fields = get_fields(@object_class, 'auto', 'date')
+    else
+      @anchor_date_fields = get_fields(@object_class, 'form', 'date')
+    end
+
+    case @object_type.classify
+    when 'Verification', 'Meeting'
+      @audience_fields = get_fields(@object_class, 'auto', 'user')
+    else
+      @audience_fields = get_fields(@object_class, 'form', 'user')
+    end
+
+    @anchor_status = @object_class.progress.keys
     render :partial => "form"
   end
 
@@ -73,14 +83,31 @@ class AutomatedNotificationsController < ApplicationController
     @record = AutomatedNotification.new
     @object_type = params[:object_type]
     @object_class = Object.const_get(@object_type.classify)
-    @anchor_date_fields = @object_class.get_meta_fields('form')
-      .select{|header| header[:type] == 'date'}
-      .map{|x| [x[:title], x[:field]]}.to_h
-    @audience_fields = @object_class.get_meta_fields('form')
-      .select{|header| header[:type] == 'user'}
-      .map{|x| [x[:title], x[:field]]}.to_h
+
+    case @object_type.classify
+    when 'Meeting'
+      @anchor_date_fields = get_fields(@object_class, 'form', 'datetimez')
+    when 'Verification'
+      @anchor_date_fields = get_fields(@object_class, 'auto', 'date')
+    else
+      @anchor_date_fields = get_fields(@object_class, 'form', 'date')
+    end
+
+    case @object_type.classify
+    when 'Verification', 'Meeting'
+      @audience_fields = get_fields(@object_class, 'auto', 'user')
+    else
+      @audience_fields = get_fields(@object_class, 'form', 'user')
+    end
+
     @anchor_status = @object_class.progress.keys
     render :partial => "automated_notifications/form_extra"
   end
 
+
+  def get_fields(obj_class, visibility, field_type)
+    obj_class.get_meta_fields(visibility)
+    .select{|header| header[:type] == field_type}
+    .map{|x| [x[:title], x[:field]]}.to_h
+  end
 end
