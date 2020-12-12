@@ -65,8 +65,9 @@
 
       <%when 'dropdown'%>
         <%if action_name == 'address'%>
+          <% opts = checklist_cell.options || header_item.options %>
           <%= f.select :value,
-            header_item.options.split(';'),
+            opts.split(';'),
             { include_blank: ''},
             { class: "form-control field_select #{is_new ? 'changed' : ''}" }
           %>
