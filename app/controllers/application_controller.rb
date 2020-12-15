@@ -18,22 +18,43 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   def index
+    # @object_name = controller_name.classify
+    # @table_name = Object.const_get(@object_name).table_name
+    # @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+    # @default_tab = params[:status]
+    # @counts_for_each_status = {}
+
+    # begin
+    #   @object[:status].each do |status|
+    #     @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).can_be_accessed(current_user).count
+    #   end
+    # rescue
+    #   p 'errors'
+    # end
+
+    # @counts_for_each_status['Overdue'] = Object.const_get(@object_name).can_be_accessed(current_user).select{|x| x.overdue}.count if ['SMS', 'SRM'].include? session[:mode]
+    # @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).can_be_accessed(current_user).count
+
     @object_name = controller_name.classify
-    @table_name = Object.const_get(@object_name).table_name
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+
+    @table_name = Object.const_get(@object_name).table_name
     @default_tab = params[:status]
-    @counts_for_each_status = {}
 
-    begin
-      @object[:status].each do |status|
-        @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).can_be_accessed(current_user).count
-      end
-    rescue
-      p 'errors'
-    end
+    # @counts_for_each_status = {}
+    # @object[:status].each do |status|
+    #   @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
+    # end
+    # @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).count
 
-    @counts_for_each_status['Overdue'] = Object.const_get(@object_name).can_be_accessed(current_user).select{|x| x.overdue}.count if ['SMS', 'SRM'].include? session[:mode]
-    @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).can_be_accessed(current_user).count
+    @columns = get_data_table_columns(controller_name.classify)
+    @column_titles = @columns.map { |col| col[:title] }
+
+    @column_date_type = @column_titles.map.with_index { |val, inx|
+      (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+    }.select(&:present?)
+
+    @advance_search_params = params
 
     render 'forms/index'
   end
@@ -904,47 +925,60 @@ class ApplicationController < ActionController::Base
   helper_method :airport_admin, :airport_has_access?, :current_airport_admin
 
 
-  # load records on index page
-  def load_records
-    @columns = get_data_table_columns(controller_name.classify)
-    @advance_search_params = params["advance_search"]
-    #  if owner_type exists, use advanced search
-    @advance_search_params["advance_search"] = 'true' if params[:advance_search][:type].present?
+  # # load records on index page
+  # def load_records
+  #   @columns = get_data_table_columns(controller_name.classify)
+  #   @advance_search_params = params["advance_search"]
+  #   #  if owner_type exists, use advanced search
+  #   @advance_search_params["advance_search"] = 'true' if params[:advance_search][:type].present?
 
-    render :partial => 'forms/render_index_tab'
-  end
+  #   render :partial => 'forms/render_index_tab'
+  # end
 
+
+  # def get_dataset
+  #   object_name = controller_name.classify
+  #   data_by_status_count = params['count']
+
+  #   params_for_filter = {
+  #     object_name: object_name,
+  #     status: params['status'],
+  #     search_value: params['search']['value'],
+  #     columns: params["columns"],
+  #     advance_search:  params["advance_search"]
+  #   }
+
+  #   # filter (by status and search values)
+  #   filtered_data = get_filtered_data(params_for_filter)
+
+  #   # order by column and direction
+  #   ordered_data = get_ordered_data(filtered_data, params['order'], object_name)
+
+  #   # (pagenation) get data only for the current page
+  #   data = ordered_data[params['start'].to_i, params['length'].to_i]
+
+  #   # format
+  #   data = format_index_column_data(records: data, object_name: object_name)
+
+  #   render json: {
+  #     data: data,
+  #     draw: params['draw'].to_i,
+  #     recordsTotal: data_by_status_count,
+  #     recordsFiltered: filtered_data.count
+  #   }
+  # end
 
   def get_dataset
-    object_name = controller_name.classify
-    data_by_status_count = params['count']
+    object_name =  params[:controller].classify
 
-    params_for_filter = {
-      object_name: object_name,
-      status: params['status'],
-      search_value: params['search']['value'],
-      columns: params["columns"],
-      advance_search:  params["advance_search"]
-    }
-
-    # filter (by status and search values)
-    filtered_data = get_filtered_data(params_for_filter)
-
-    # order by column and direction
-    ordered_data = get_ordered_data(filtered_data, params['order'], object_name)
-
-    # (pagenation) get data only for the current page
-    data = ordered_data[params['start'].to_i, params['length'].to_i]
-
-    # format
-    data = format_index_column_data(records: data, object_name: object_name)
-
-    render json: {
-      data: data,
-      draw: params['draw'].to_i,
-      recordsTotal: data_by_status_count,
-      recordsFiltered: filtered_data.count
-    }
+    case object_name
+    when 'Submission'
+      render json: SubmissionDatatable.new(view_context, current_user)
+    when 'CorrectiveAction'
+      render json: CorrectiveActionDatatable.new(view_context, current_user)
+    else
+      render json: ApplicationDatatable.new(view_context, current_user)
+    end
   end
 
 

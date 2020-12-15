@@ -66,6 +66,18 @@ class Report < Sr::SafetyReportingBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Report'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                           .map { |key, _| key.to_s }
+
+    keys[keys.index('template')] = 'templates.name'
+    keys[keys.index('occurrences')] = 'occurrences.value'
+
+    keys
+  end
+
+
   def self.reports_for_meeting
     if CONFIG.sr::GENERAL[:allow_event_reuse]
       Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready', 'Under Review'])

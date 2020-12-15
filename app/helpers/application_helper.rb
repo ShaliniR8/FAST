@@ -191,15 +191,11 @@ module ApplicationHelper
 
   def get_data_table_columns(object_name)
     fields = Object.const_get(object_name).get_meta_fields('index')
-    fields.map! { |field| { data: field[:field], title:field[:title] } }
-
-    # add additional columns
-    if false #object_name == 'Record'
-      fields << { data: 'get_additional_info', title: 'Additional Info'}
-    end
-    fields << { data: 'actions', title: 'Action'}
-
-    fields
+      .map { |field| { data: field[:field], title:field[:title] } }
+      .tap { |fields|
+          # fields << { data: 'get_additional_info', title: 'Additional Info'} if object_name == 'Record'
+          fields << { data: 'actions', title: 'Action'}
+      }
   end
 
   # TODO: replace Record
@@ -259,8 +255,8 @@ module ApplicationHelper
       # TODO: Refactor here
 
       # actions
-      open_link = "<a href="+"/#{@table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5'>Open</a>"
-      open_in_new_tab_link = "<a href="+"/#{@table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5' target='_blank'>Open in New Tab</a>"
+      open_link = "<a href="+"/#{object.table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5'>Open</a>"
+      open_in_new_tab_link = "<a href="+"/#{object.table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5' target='_blank'>Open in New Tab</a>"
 
       # risk matrix color
       risk_color = CONFIG::MATRIX_INFO[:risk_table_index][record_hash['get_risk_classification']]
@@ -275,14 +271,14 @@ module ApplicationHelper
           "<span class='risk_color #{risk_color}'>#{record_hash['get_risk_classification_after']}</span>"
       end
 
-      if false # object_name == 'Record'
-        # additional_info
-        additional_info = record.get_additional_info
-        additional_info.map! do |field|
-          "<b>#{field[:label]}</b>: #{field[:value]}<br><br>" if field[:value].present?
-        end
-        record_hash['get_additional_info'] = additional_info
-      end
+      # if object_name == 'Record'
+      #   # additional_info
+      #   additional_info = record.get_additional_info
+      #   additional_info.map! do |field|
+      #     "<b>#{field[:label]}</b>: #{field[:value]}<br><br>" if field[:value].present?
+      #   end
+      #   record_hash['get_additional_info'] = additional_info
+      # end
 
       record_hash['actions'] = open_link + open_in_new_tab_link
 

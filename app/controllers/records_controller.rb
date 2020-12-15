@@ -121,15 +121,26 @@ class RecordsController < ApplicationController
 
 
   # def index
+
   #   @object_name = controller_name.classify
-  #   @table_name = Object.const_get(@object_name).table_name
   #   @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+
+  #   @table_name = Object.const_get(@object_name).table_name
   #   @default_tab = params[:status]
-  #   @counts_for_each_status = {}
-  #   @object[:status].each do |status|
-  #     @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
-  #   end
-  #   @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).count
+
+  #   # @counts_for_each_status = {}
+  #   # @object[:status].each do |status|
+  #   #   @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
+  #   # end
+  #   # @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).count
+
+  #   @columns = get_data_table_columns(controller_name.classify)
+  #   @column_titles = @columns.map { |col| col[:title] }
+  #   # byebug
+
+  #   @column_date_type = @column_titles.map.with_index { |val, inx|
+  #     (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+  #   }.select(&:present?)
   # end
 
 

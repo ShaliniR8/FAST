@@ -46,13 +46,19 @@ class SubmissionsController < ApplicationController
     respond_to do |format|
       format.html do
         @object_name = controller_name.classify
-        @table_name = Object.const_get(@object_name).table_name
         @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
-        @default_tab = params[:status]
-        @counts_for_each_status = {}
-        submission_count = Object.const_get(@object_name).where(:completed => 1).can_be_accessed(current_user).count
 
-        @counts_for_each_status['All'] = params[:advance_search] ?  nil : submission_count
+        @table_name = Object.const_get(@object_name).table_name
+        @default_tab = params[:status]
+
+        @columns = get_data_table_columns(controller_name.classify)
+        @column_titles = @columns.map { |col| col[:title] }
+
+        @column_date_type = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+        }.select(&:present?)
+
+        @advance_search_params = params
 
         render 'forms/index'
       end

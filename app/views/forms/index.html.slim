@@ -1,0 +1,181 @@
+= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css"
+= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js"
+= javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"
+= javascript_include_tag "/javascripts/utility/format-builder.js"
+
+
+.item.active.mt50 sytle="height:auto"
+  .grid.per90.center-block
+    = render 'shared/alerts'
+    = render 'access_controls/new_modal'
+
+    .panel.panel-primary
+      .panel-body
+        h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
+        = link_to "Advanced Search", '#',
+          class: "btn btn-default pull-right mr10 ml10", id: "adv",
+          "data-toggle" => "modal",
+          "data-target" => ".bs-example-modal-lg"
+
+        ul class="nav nav-pills"
+          - @object[:status].each do |status|
+            li class="nav-item status-#{status.parameterize}" data-status="#{status.parameterize}"
+              a data-toggle="pill" href="#table" onclick="loadContent('#{status}')"
+                = status
+
+        .tab-content.mt20
+          .tab-pane.fade.in.active id='table'
+            = render 'shared/loaders', loader_text: 'Loading'
+            .records-table
+              table id='records_table' class='table table-hover table-striped table-bordered index_table'
+                thead
+                  tr
+                    - @column_titles.each do |column_title|
+                      th = column_title
+                tfoot
+                  tr
+                    - @column_titles.each do |column_title|
+                      th = column_title
+
+
+css:
+  .nav-pills {
+    border-bottom: 1px solid #0bacd3;
+  }
+  .nav-pills > li > a {
+    background-color: white;
+  }
+  .records-table {
+    display: none;
+  }
+
+javascript:
+  function initContent(status) {
+    $('li').removeClass('active');
+    $('.status-' + status.toLowerCase().replace(' ', '-')).addClass('active');
+  }
+
+  function loadContent(status) {
+    initContent(status);
+    $('#records_table').DataTable().ajax.reload();
+  }
+
+  function classifyString(str) {
+    // str = str.replace('_', ' ')
+    return str[0].toUpperCase() + str.substring(1)
+  }
+
+  function updateStatusCounts(statusCounts) {
+    for (statusName in statusCounts) {
+      statusCount = statusCounts[statusName]
+      statusTab = `${classifyString(statusName)} <span class='badge badge-pill badge-info'>${statusCount}</span>`
+
+      $(`li.nav-item.status-${statusName} > a`).html(statusTab);
+    }
+  }
+
+  function addIndividualColumnSearchField() {
+    $('#records_table tfoot th').each(function(index) {
+
+      isDateField = "#{@column_date_type}".includes(index)
+      if (isDateField) {
+        $(this).html('<input type="date" class="form-control" />');
+      } else {
+        $(this).html('<input type="text" class="form-control" />');
+      }
+    });
+  }
+
+  function disableaActionColumnSearchField() {
+    $('#records_table tfoot tr th:last-child').children().hide();
+  }
+
+  function alignExportBtns() {
+    $('.dt-buttons.btn-group').addClass("pull-right mb15");
+  }
+
+  function loadMatrixColor() {
+    colors = ['red', 'orangered', 'yellow', 'green', 'limegreen', 'orange', 'lime', 'mediumseagreen', 'steelblue', 'crimson', 'coral', 'gold', 'skyblue']
+
+    colors.forEach((color) => {
+      $(`.table tbody tr td:has(span.${color})`).css('background-color',color);
+    });
+  }
+
+  function columnSearch() {
+    $('#records_table').dataTable().api().columns().every(function() {
+      var column = this;
+
+      $('input', this.footer()).on('keyup change', function(e) {
+        // keyCode 13 is 'Enter'
+        if(e.keyCode == 13 && column.search() !== this.value){
+          search_term = this.value
+
+          // reset the filters
+          $('#records_table').dataTable().api().columns().search('')
+
+          column.search(search_term).draw();
+        }
+      });
+    });
+  }
+
+  function drawTableCallBack() {
+    addIndividualColumnSearchField();
+    disableaActionColumnSearchField();
+    alignExportBtns();
+    loadMatrixColor();
+    $('#loader1').hide();
+    $(".records-table").css({'opacity':1});
+    $('.records-table').show();
+    columnSearch();
+  }
+
+  $(function() {
+
+    initContent("#{@default_tab}");
+
+    var recordsTable = $('#records_table').DataTable({
+      sDom: 'Blrtip', // hide search input field
+      ajax: {
+        url: "#{controller_name}/get_dataset",
+        method: "POST",
+        data: function (d) {
+          d.status = $('li.nav-item.active').data('status')
+          d.statuses = #{raw @object[:status].to_json}
+
+          d.advance_search = JSON.parse('#{raw @advance_search_params.to_json}')
+        },
+        beforeSend: function(){
+          $(".records-table").css({'opacity':0.5});
+          $('#loader1').show();
+        },
+        complete: function(data) {
+          statusCounts = data.responseJSON['statusCounts']
+
+          updateStatusCounts(statusCounts)
+        },
+      },
+      serverSide: true,
+      columns: #{raw @columns.to_json},
+      drawCallback: drawTableCallBack,
+      order: [['0', 'desc']],
+    });
+
+
+    $('#cus').on('click', function(){
+      $.get("#{custom_view_records_path}",function(data){
+        $(".modal-content").html(data);
+        $(window).resize();
+      });
+    });
+
+    $('#adv').on('click',function(){
+      $.get("#{advanced_search_home_index_path(table: @object_name, status: 'All')}", function(data){
+        $(".modal-content").html(data);
+        $(window).resize();
+      });
+    });
+
+
+  });

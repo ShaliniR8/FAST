@@ -48,6 +48,17 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Submission'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                               .map { |key, _| key.to_s }
+
+    keys[keys.index('template')] = 'templates.name'
+
+    keys
+  end
+
+
   def getEventId
     record.report.id rescue nil
   end
