@@ -140,6 +140,7 @@
 
     $(".field_select").on("change", function(){
       update_nested_fields($(this));
+      update_panel_titles($(this));
     });
 
     $(".field_select").each(function(){
@@ -156,15 +157,32 @@
 
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
 
     $(".field_cb_select").on("change", function(){
       update_cb_rb_nested($(this), false);
+      update_panel_titles($(this));
     });
 
     $(".field_rb_select").on("change", function(){
       update_cb_rb_nested($(this), true)
+      update_panel_titles($(this));
     });
   });
+
+  function update_panel_titles(target){
+    var count = 0;
+    $(target).closest('div.category-panel').find('.required_field').each(function(){
+      if ($(this).is(':visible')) {
+        count++;
+      }
+    });
+    if (count > 0) {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+      $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
+    } else {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "");
+      $(target).closest('div.category-panel').find('.panel-title').value = "" ;
+    }
+  }
+
 </script>

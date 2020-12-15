@@ -33,10 +33,10 @@
                           <%if (record_field.value.parameterize == nested_field.nested_field_value.parameterize) ||
                                (record_field.value.include?(';') && record_field.value.include?(nested_field.nested_field_value))%>
                                <div class="nested_field
-                                nested_field_<%=field.id%>
-                                nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
-                                <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
-                              </div>
+                                  nested_field_<%=field.id%>
+                                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
+                                  <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+                                </div>
                           <%else%>
                             <div class="nested_field
                               nested_field_<%=field.id%>
@@ -134,12 +134,11 @@
 
     $(".field_select").on("change", function(){
       update_nested_fields($(this));
+      update_panel_titles($(this));
     });
 
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
 
     $(".field_cb_select").on("change", function(){
       var field_id = $(this).attr("data-id");
@@ -151,6 +150,7 @@
         $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).hide();
       }
+      update_panel_titles($(this));
     });
 
     $(".field_rb_select").on("change", function(){
@@ -164,6 +164,23 @@
         $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).hide();
       }
+      update_panel_titles($(this));
     });
   });
+
+  function update_panel_titles(target){
+    var count = 0;
+    $(target).closest('div.category-panel').find('.required_field').each(function(){
+      if ($(this).is(':visible')) {
+        count++;
+      }
+    });
+    if (count > 0) {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+      $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
+    } else {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "");
+      $(target).closest('div.category-panel').find('.panel-title').value = "" ;
+    }
+  }
 </script>

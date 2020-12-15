@@ -186,6 +186,13 @@
         $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
       });
     });
+
+    $('.required_field').each(function(){
+      if ($(this).parents('.nested_field_row').find('.nested_field').css('display') != 'none'){
+        update_titles($(this));
+      }
+    });
+
   });
 
   // Updata airport table
@@ -235,6 +242,11 @@
     $("#arpt_name").val("");
     $('#airport_div').hide();
     $(".airport_modal").modal("hide");
+  }
+
+  function update_titles(target){
+    $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+    $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
 </script>
 

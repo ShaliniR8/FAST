@@ -118,3 +118,20 @@
   }
 </style>
 
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    $('.required_field').each(function(){
+      if ($(this).parents('.nested_field').css('display') != 'none'){
+        update_titles($(this));
+      }
+    });
+  });
+
+  function update_titles(target){
+    $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+    $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
+  }
+
+</script>
+

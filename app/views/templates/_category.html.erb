@@ -88,8 +88,8 @@
   $(function(){
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
+    // $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
+    // $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
 
     string_parameterize = function (str) {
       return str.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -102,6 +102,7 @@
       $(".nested_field_" + field_id).parent().removeClass("graybox")
       $(".nested_field_" + field_id + "_" + field_value).show();
       $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox")
+      update_panel_titles($(this));
     });
 
     $(".field_cb_select").on("change", function(){
@@ -114,6 +115,7 @@
         $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).hide();
       }
+      update_panel_titles($(this));
     });
 
     $(".field_rb_select").on("change", function(){
@@ -127,8 +129,25 @@
         $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).hide();
       }
+      update_panel_titles($(this));
     });
   });
+
+  function update_panel_titles(target){
+    var count = 0;
+    $(target).closest('div.category-panel').find('.required_field').each(function(){
+      if ($(this).is(':visible')) {
+        count++;
+      }
+    });
+    if (count > 0) {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+      $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
+    } else {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "");
+      $(target).closest('div.category-panel').find('.panel-title').value = "" ;
+    }
+  }
 </script>
 
 

@@ -350,6 +350,12 @@
       });
     });
 
+    $('.required_field').each(function(){
+      if ($(this).parents('.nested_field').css('display') != 'none'){
+        update_titles($(this));
+      }
+    });
+
     var count;
     var isValidationReq = true;
 
@@ -398,7 +404,6 @@
               prop_up_errors(this);
             }
           }
-
         });
       }
     });
@@ -409,6 +414,11 @@
     $(target).closest('div.category-panel').removeClass('collapsed');
     $(target).closest('div.category-panel').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
     $(target).closest('div.category-panel').find('.panel-body').slideDown();
+  }
+
+  function update_titles(target){
+    $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+    $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
 
 </script>
