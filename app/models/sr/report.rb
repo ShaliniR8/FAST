@@ -49,6 +49,23 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+
+  def self.update_event_title_list(template_id:, fields:)
+    template_name = Template.find(template_id).name
+    options = CONFIG.custom_options[template_name]
+
+    if options.present? # if there is no option for the template, default "Event Titles" is used
+      fields.each do |field|
+        if field[:field] == 'name'
+          field[:options] = options
+        end
+      end
+    end
+
+    fields
+  end
+
+
   def self.reports_for_meeting
     if CONFIG.sr::GENERAL[:allow_event_reuse]
       Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready', 'Under Review'])

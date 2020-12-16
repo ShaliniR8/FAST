@@ -150,6 +150,11 @@ class ReportsController < ApplicationController
       @report.records.push(base)
     end
     @fields = Report.get_meta_fields('form', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
+
+    if CONFIG.sr::GENERAL[:dropdown_event_title_list] # FFT
+      @fields = Report.update_event_title_list(template_id: params[:template], fields: @fields)
+    end
+
     @report_fields = Record.get_meta_fields('index')
     @candidates = Record
       .find(:all)

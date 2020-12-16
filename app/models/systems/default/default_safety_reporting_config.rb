@@ -19,10 +19,11 @@ class DefaultSafetyReportingConfig
     share_meeting_agendas:            true,
 
     # Airline-Specific Features:
-    observation_phases_trend: false,     # Specific Feature for BSK - default off
-    event_summary:            false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
-    event_tabulation:         false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
-    allow_event_reuse:        true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
+    observation_phases_trend:  false,     # Specific Feature for BSK - default off
+    event_summary:             false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
+    event_tabulation:          false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
+    allow_event_reuse:         true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
+    dropdown_event_title_list: false,     # Specific Feature for FFT - default off
   }
 
   OBSERVATION_PHASES = [
