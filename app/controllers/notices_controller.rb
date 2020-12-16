@@ -21,6 +21,12 @@ class NoticesController < ApplicationController
 
   def create
     owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
+    Rails.logger.debug "Class Name: #{owner.class.name.demodulize}"
+    case owner.class.name.demodulize
+    when 'Verification'
+      owner = owner.owner
+    end
+
     @table = params[:owner_type]
     @notice = owner.notices.new(params[:notice])
     @notice.content = "From #{current_user.full_name}: #{@notice.content} #{g_link(owner)}"
@@ -42,7 +48,11 @@ class NoticesController < ApplicationController
     @owner = Notice.find(params[:id])
     @owner.status = 2
     @owner.save
-    redirect_to @owner.owner || home_index_path
+    redirection = @owner.owner
+    if redirection.class.name.demodulize == 'Verification'
+      redirection = redirection.owner
+    end
+    redirect_to redirection || home_index_path
   end
 
 

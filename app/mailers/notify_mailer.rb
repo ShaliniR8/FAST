@@ -52,7 +52,14 @@ class NotifyMailer < ApplicationMailer
     @user = user
     @message = message.gsub('\n', '<br>') rescue ''
     @record = record
-    @record_url = g_link(record)
+
+    case @record.class.name.demodulize
+    when 'Verification'
+      @record_url = g_link(record.owner)
+    else
+      @record_url = g_link(record)
+    end
+
     subject = "ProSafeT: #{subject}"
     mail(**to_email(user.email), subject: subject).deliver
   end
