@@ -205,6 +205,11 @@ class ReportsController < ApplicationController
     @action = "edit"
     @report = Report.find(params[:id])
     @fields = Report.get_meta_fields('form', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
+
+    if CONFIG.sr::GENERAL[:dropdown_event_title_list] # FFT
+      @fields = Report.update_event_title_list(template_id: @report.records.first.templates_id, fields: @fields)
+    end
+
     load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
