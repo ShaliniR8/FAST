@@ -19,11 +19,12 @@ task :submission_notify => [:environment] do |t|
   owner_type = ENV['OWNER_TYPE']
   owner_id   = ENV['OWNER_ID']
   attach_pdf = ENV['ATTACH_PDF']
+  Rails.logger.debug "ATTACH_PDF: #{attach_pdf.to_s}"
   owner = Object.const_get(owner_type).find(owner_id)
   content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
   content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.id} " + "#{owner.description})") if !content.present?
   users.each do |user_id|
-    if attach_pdf
+    if attach_pdf == 'true'
 
       html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: owner, deidentified: false}, layout: false)
       pdf = PDFKit.new(html)
