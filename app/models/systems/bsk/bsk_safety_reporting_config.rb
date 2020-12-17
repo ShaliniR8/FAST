@@ -4,6 +4,7 @@ class BSKSafetyReportingConfig < DefaultSafetyReportingConfig
     template_nested_fields:             true,
     # Airline-Specific Features:
     observation_phases_trend:           true,
+    attach_pdf_submission:              false,
   })
 
   OBSERVATION_PHASES = [

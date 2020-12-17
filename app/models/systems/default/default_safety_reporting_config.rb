@@ -14,7 +14,7 @@ class DefaultSafetyReportingConfig
     template_nested_fields:           true,      # WIP nested smart forms functionality - default off
     enable_dual_report:               true,
     matrix_carry_over:                false,
-    attach_pdf_submission:            false,
+    attach_pdf_submission:            true,
     configurable_agenda_dispositions: false,
     share_meeting_agendas:            true,
 
