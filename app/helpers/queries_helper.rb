@@ -24,7 +24,7 @@ module QueriesHelper
   def format_val(value, field_type, field_param=nil)
     case field_type
     when 'user', 'employee'
-      User.find_by_id(value).full_name rescue 'N/A'
+      User.find_by_id(value).full_name rescue value
     when 'datetime', 'date'
       value.strftime("%Y-%m") rescue 'N/A'
     when 'boolean_box', 'boolean'
