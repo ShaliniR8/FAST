@@ -99,7 +99,7 @@ class DefaultSafetyReportingConfig
           id: { default: true, field: 'get_id' },
           status: { default: true },
           template: { default: true, title: 'Type' },
-          submitter: { default: true, visible: "admin" },
+          submitter: { default: true, visible: "admin,query" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
