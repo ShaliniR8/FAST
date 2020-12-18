@@ -72,7 +72,7 @@
               </div>
               <%cat_fields_processed = []%>
               <%cat.fields.each do |field|%>
-                <%if cat_fields_processed.exclude?(field.id)%>
+                <%if cat_fields_processed.exclude?(field.id) && field.nested_field_id.nil?%>
                   <%if field.print || !deidentified%>
                     <%record_field = record_fields[field.id].first rescue nil%>
                     <%if record_field.present?%>

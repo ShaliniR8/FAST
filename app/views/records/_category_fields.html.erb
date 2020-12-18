@@ -34,17 +34,18 @@
               <%if nested_fields.present?%>
                 <div class="col-xs-12 nested_field_row">
                   <%nested_fields.each do |nested_field|%>
+                    <%size = calculate_column_size(field: nested_field)%>
                     <%record_field = (@record_fields_hash[nested_field.id] || []).first%>
                     <%record_field = RecordField.new(value: '') if !record_field.present?%>
                     <%if record_field.value.present?%>
                       <%if nested_field.options.include?(record_field.value)%>
-                        <div class="nested_field
+                        <div class="<%=size%> nested_field
                           nested_field_<%=field.id%>
                           nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
                           <%=render "records/field", field: nested_field, f: f, record_field: record_field, is_nested_field: true%>
                         </div>
                       <%else%>
-                        <div class="nested_field
+                        <div class="<%=size%> nested_field
                           nested_field_<%=field.id%>
                           nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
                           style="display:none;">
@@ -52,7 +53,7 @@
                         </div>
                       <%end%>
                     <%else%>
-                      <div class="nested_field
+                      <div class="<%=size%> nested_field
                         nested_field_<%=field.id%>
                         nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
                         style="display:none">

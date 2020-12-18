@@ -25,6 +25,7 @@
       - row.each do |field|
         - record_field = (record_fields_hash[field.id] || []).first
         - record_field = RecordField.new(value: '') if !record_field.present?
+
         = render "records/field", field: field, f: f, record_field: record_field, is_nested_field: false
 
         // nested fields
@@ -33,11 +34,12 @@
             .col-xs-12.nested_field_row
               - record_field = (record_fields_hash[nested_field.id] || []).first
               - record_field = RecordField.new(value: '') if !record_field.present?
-
+              / - size = calculate_column_size(field: nested_field)
+              - size = "col-xs-12 col-sm-12 col-md-12 col-lg-12"
               - custom_class = "\"nested_field_#{field.id}_#{nested_field.nested_field_value.parameterize}\""
               - if field.display_type == 'dropdown' || field.display_type == 'checkbox' || field.display_type == 'radio'
                 - if field.options.include?(nested_field.nested_field_value)
-                  .nested_field
+                  div class="#{size}"
                     == "<div class=#{custom_class}>#{render 'records/field', field: nested_field, f: f, record_field: record_field, is_nested_field: true}</div>"
               - else
                 - Rails.logger.debug "Do not render"
@@ -68,10 +70,10 @@ javascript:
     var field_value = $(field).attr("data-option");
 
     if($(field).prop('checked')){
-      $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+      // $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
       $(".nested_field_" + field_id + "_" + field_value).show();
     } else {
-      $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+      // $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
       $(".nested_field_" + field_id + "_" + field_value).hide();
     }
   }

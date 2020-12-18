@@ -52,7 +52,7 @@
             <div class="sub_sub_title"><%=cat.title%></div>
             <%cat_fields_processed = []%>
             <%cat.fields.order(:field_order).each do |field|%>
-              <%if cat_fields_processed.exclude?(field.id)%>
+              <%if cat_fields_processed.exclude?(field.id) && field.nested_field_id.nil?%>
                 <%if field.print || !deidentified%>
                   <%record_field = owner.submission_fields.where("fields_id = ?", field.id).first%>
                   <%if record_field.present?%>
