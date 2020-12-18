@@ -1,8 +1,28 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.4',
+      title: 'Version 1.2.5',
       tag: 'New',
+      toggle: 'v1_2_5',
+      date: '12/18/2020',
+      sections: {
+        'What\'s New' => [
+          'Added ability to enforce required property on checkboxes and radio button fields',
+          'Added ability to enforce minimum number of options to be selected for checkboxes',
+          'Added ability to add nested fields to radio buttons and checkboxes',
+          'Added ability to edit airport and employee fields from the edit individual category panel',
+          'Added ability to set up automated notifications for Verifications and Meetings',
+        ],
+        'Optimizations & Fixes' => [
+          'Auto-expansion for text-areas to allow for longer narratives',
+          'Placeholder texts added to checklist textboxes so that template creators and addressees can understand the purpose of the field better',
+          'Events listed in any meeting display page will now be sorted from oldest to newest',
+          ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.4',
       toggle: 'v1_2_4',
       date: '11/24/2020',
       sections: {
