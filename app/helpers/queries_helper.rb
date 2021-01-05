@@ -47,15 +47,20 @@ module QueriesHelper
       x_val = get_val(record, x_axis_field)
       y_val = get_val(record, series_field)
       if x_val.is_a?(Array) && y_val.is_a?(Array)
-        x_val.each do |x|
-          y_val.each do |y|
-            res << {x_axis: x, series: y, id: record.id}
-          end
-        end
+        # x_val.each do |x|
+        #   y_val.each do |y|
+        #     res << {x_axis: x, series: y, id: record.id}
+        #   end
+        # end
+
+        # only return the first value for the record to prevent duplication
+        res << {x_axis: x_val[0], series: y_val[0], id: record.id}
       elsif x_val.is_a?(Array)
-        x_val.each{|x| res << {x_axis: x, series: y_val, id: record.id}}
+        # x_val.each{|x| res << {x_axis: x, series: y_val, id: record.id}}
+        res << {x_axis: x_val[0], series: y_val, id: record.id}
       elsif y_val.is_a?(Array)
-        y_val.each{|y| res << {x_axis: x_val, series: y, id: record.id}}
+        # y_val.each{|y| res << {x_axis: x_val, series: y, id: record.id}}
+        res << {x_axis: x_val, series: y_val[0], id: record.id}
       else
         res << {x_axis: x_val, series: y_val, id: record.id}
       end
