@@ -480,10 +480,10 @@ class Report < Sr::SafetyReportingBase
   end
 
 
-  def self.export_all_for_cisp(test_run: false, reports_ids:)
+  def self.export_all_for_cisp(test_run: false, reports_ids:, timestamp:)
     reports = Report.where(id: reports_ids)
     dirname = File.join([Rails.root] + ['cisp'])
-    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP_#{timestamp}.xml"])
     unless File.directory?(dirname)
       FileUtils.mkdir_p(dirname)
     end
