@@ -20,7 +20,12 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
             field: 'name', title: 'Event Title',
             num_cols: 6, type: 'datalist', visible: 'index,form,meeting_form,show',
             required: true, on_newline: true, options: CONFIG.custom_options['Event Titles']
-          }
+          },
+          event_types: {
+            field: 'event_type', title: 'Event Type',
+            num_cols: 12, type: 'text', visible: 'query',
+            required: false
+          },
         },
         print_panels: %w[risk_matrix occurrences records ]
       }
