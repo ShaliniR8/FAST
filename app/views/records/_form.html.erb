@@ -205,7 +205,7 @@
       if ($(this).parents('.nested_field').css('display') != 'none'){
         update_titles($(this));
       }
-    });
+    }
 
     $(this).find(".map_button").each(function(index, item) {
       $(item).on('click', function(){
@@ -290,12 +290,10 @@
     $(".airport_modal").modal("hide");
   }
 
-<<<<<<< HEAD
   function update_titles(target){
     $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
     $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
-=======
 
   function updateMarkers(id) {
     markers = [];
@@ -456,7 +454,6 @@
     delete pointsHolder[id];
   }
 
->>>>>>> 63a768d8... Implement RUH launch features
 </script>
 
 

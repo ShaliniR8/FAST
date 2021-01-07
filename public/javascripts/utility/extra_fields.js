@@ -74,6 +74,10 @@ $(document).ready(function(){
             customClass: 'custom-swal',
           }).catch(swal.noop);
           return result;
+        } else {
+          if($(".map_button")[0]) {
+            remove_placeholder_point_html();
+          }
         }
       });
       if (error){

@@ -31,13 +31,13 @@
                 = render :partial => 'shared/static_map',  locals: {points: record_field.points}
               - else
                 b = "No Points Selected"
-
             - else
               - case field.data_type
               - when 'datetime'
                 = datetime_to_string(DateTime.parse value) rescue ''
               - else
                 = value
+
     - if @record.status == 'Open' || @record.status == 'Linked'
       .col-xs-12
         = link_to 'Edit', '#',

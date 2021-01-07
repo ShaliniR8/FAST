@@ -136,6 +136,10 @@
                                           <%else%>
                                             <%=value%>
                                           <%end%>
+                                        <%elsif field.display_type == "map"%>
+                                          <%if valueCopy.points.present?%>
+                                            <%=render :partial => 'shared/static_map', locals: {points: valueCopy.points}%>
+                                          <%end%>
                                         <%else%>
                                           <%if nested_field.data_type == "datetime"%>
                                             <%=datetime_to_string(DateTime.parse value) rescue ''%>

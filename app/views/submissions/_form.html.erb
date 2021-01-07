@@ -21,7 +21,6 @@
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDRNvISiW_CO6FTNCdV40Nh19rAncpeLJo"></script>
 <%end%>
 
-
 <%if @template.js_link.present?%>
   <script type="text/javascript" src="/javascripts/templates/<%=@template.js_link%>"></script>
 <%end%>
@@ -339,7 +338,6 @@
 
   var airport_table;
 
-<<<<<<< HEAD
   $(document).ready(function() {
     autoSaveText = document.getElementById('auto-save');
 
@@ -371,7 +369,7 @@
       return true;
     });
 
-=======
+
   var map,
       mapTypes = {},
       pointsHolder = {},
@@ -382,8 +380,8 @@
       mapZoom = <%=CONFIG::GENERAL[:gMapZoom]%>,
       clicked_map_field_id;
 
+
   $(document).ready(function(){
->>>>>>> 63a768d8... Implement RUH launch features
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
     if (timeZoneToggleBtn != null) {
       $('#time-zone-toggle-btn').on('click', function() {
@@ -440,6 +438,37 @@
       }
     });
 
+    $(this).find(".map_button").each(function(index, item) {
+      $(item).on('click', function(){
+        clicked_map_field_id = $(this).prop("id");
+        swal ({
+          title: "Add or Remove Map Marker for Map field",
+          allowOutsideClick: false,
+          showCancelButton: false,
+          html: "<%= escape_javascript render :partial => 'shared/map_point', layout: false%>",
+          onOpen: function() {
+            updateMarkers(clicked_map_field_id);
+          },
+          onClose: function() {
+            cnt = count_visible_markers_for_field(clicked_map_field_id);
+            if (cnt > 0) {
+              if (cnt > 1) {
+                str = cnt + " points marked"
+              } else {
+                str = "1 point marked"
+              }
+
+              $("#map" + clicked_map_field_id).val(str);
+              $("#map-select" + clicked_map_field_id).val(str);
+            } else {
+              $("#map" + clicked_map_field_id).val("");
+              $("#map-select" + clicked_map_field_id).val("");
+            }
+          }
+        }).catch(swal.noop);
+      });
+    });
+
     $("form").on('submit', function() {
       if(isValidationReq) {
         $("div.category-panel").find('.panel-body').slideUp();
@@ -494,53 +523,6 @@
     $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
 
-=======
-    $(this).find(".map_button").each(function(index, item) {
-      $(item).on('click', function(){
-        clicked_map_field_id = $(this).prop("id");
-        swal ({
-          title: "Add or Remove Map Marker for Map field",
-          allowOutsideClick: false,
-          showCancelButton: false,
-          html: "<%= escape_javascript render :partial => 'shared/map_point', layout: false%>",
-          onOpen: function() {
-            updateMarkers(clicked_map_field_id);
-          },
-          onClose: function() {
-            cnt = count_visible_markers_for_field(clicked_map_field_id);
-            if (cnt > 0) {
-              if (cnt > 1) {
-                str = cnt + " points marked"
-              } else {
-                str = "1 point marked"
-              }
-
-              $("#map" + clicked_map_field_id).val(str);
-              $("#map-select" + clicked_map_field_id).val(str);
-            } else {
-              $("#map" + clicked_map_field_id).val("");
-              $("#map-select" + clicked_map_field_id).val("");
-            }
-          }
-        }).catch(swal.noop);
-      });
-    });
-
-    $("form").on('submit',function(){
-      $("div.category-panel").find('.panel-body').slideUp();
-      $("div.category-panel").closest('div.category-panel').addClass('collapsed');
-      $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-
-      $(this).find('.required_field').each(function(){
-        if ($(this).val() == ""){
-          $(this).css('border-color', 'red');
-          $(this).closest('div.category-panel').removeClass('collapsed');
-          $(this).closest('div.category-panel').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-          $(this).closest('div.category-panel').find('.panel-body').slideDown();
-        }
-      });
-    });
-  });
 
   function updateMarkers(id) {
     markers = [];
@@ -700,7 +682,6 @@
     marker.setMap(null);
     delete pointsHolder[id];
   }
->>>>>>> 63a768d8... Implement RUH launch features
 </script>
 
 

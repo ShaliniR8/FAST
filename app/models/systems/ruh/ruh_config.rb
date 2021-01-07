@@ -28,7 +28,6 @@ class RUHConfig < DefaultConfig
     lng:                             46.700779,
     gMapZoom:                        14,
     has_confidential_forms:             true
-
   })
 
 
@@ -42,6 +41,49 @@ class RUHConfig < DefaultConfig
       :datetimezformat  => '%m/%d/%Y %H:%M %Z',
       :faa_report       => true
     }
+  end
+
+  def self.getCustomMapInfo
+    # {
+    #   base_directory: '/airports/RUH/',
+    #   base_zoom: 15,
+    #   # lat: 29.630911893011824,
+    #   # lng: -95.29592674768303,
+    #   maps: {
+    #     main_terminal: {
+    #       title: 'Main Terminal',
+    #       directory: 'Main_Terminal/',
+    #       zoom_max: 4,
+    #       zoom_min: 1,
+    #       format: 'tile_Z_X-Y.png',
+    #       bounds: [7_711, 13_556]
+    #     },
+    #     baggage: {
+    #       title: 'Baggage Level',
+    #       directory: 'Terminal_Baggage_Level/',
+    #       zoom_max: 4,
+    #       zoom_min: 1,
+    #       format: 'tile_Z_X-Y.png',
+    #       bounds: [7_711, 13_556]
+    #     },
+    #     mezzanine: {
+    #       title: 'Mezzanine Level',
+    #       directory: 'Terminal_Mezzanine_Level/',
+    #       zoom_max: 4,
+    #       zoom_min: 1,
+    #       format: 'tile_Z_X-Y.png',
+    #       bounds: [7_711, 13_556]
+    #     },
+    #     ticket: {
+    #       title: 'Ticket Level',
+    #       directory: 'Terminal_Ticket_Level/',
+    #       zoom_max: 4,
+    #       zoom_min: 1,
+    #       format: 'tile_Z_X-Y.png',
+    #       bounds: [7_711, 13_556]
+    #     }
+    #   }
+    # }
   end
 
 
