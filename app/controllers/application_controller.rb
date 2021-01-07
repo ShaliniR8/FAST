@@ -24,12 +24,6 @@ class ApplicationController < ActionController::Base
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
     @default_tab = params[:status]
 
-    # # Counts for status
-    # @counts_for_each_status = @object[:status].each_with_object({}) { |status, counts_hash|
-    #   counts_hash[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
-    # }
-    # @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).count
-
     # Datatable Column Info
     @columns = get_data_table_columns(@object_name)
     @column_titles = @columns.map { |col| col[:title] }
@@ -959,7 +953,11 @@ class ApplicationController < ActionController::Base
       render json: SubmissionDatatable.new(view_context, current_user)
     when 'CorrectiveAction'
       render json: CorrectiveActionDatatable.new(view_context, current_user)
-    else
+    when 'Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation'
+      render json: SafetyAssuranceDatatable.new(view_context, current_user)
+    when 'Sra', 'Hazard', 'RiskControl', 'SafetyPlan'
+      render json: SafetyAssuranceDatatable.new(view_context, current_user)
+    else # 'Record', 'Report' < TODO: Refactor & switch ApplicationDatatable and SafetyAssuranceDatatable
       render json: ApplicationDatatable.new(view_context, current_user)
     end
   end

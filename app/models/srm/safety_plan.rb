@@ -21,6 +21,15 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
     CONFIG.object['SafetyPlan'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['SafetyPlan'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                               .map { |key, _| key.to_s }
+    keys
+  end
+
+
   def self.progress
     {
       'New'               => { :score => 33,  :color => 'default'},

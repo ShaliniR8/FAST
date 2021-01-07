@@ -58,24 +58,19 @@ class AuditsController < SafetyAssuranceController
     respond_to do |format|
       format.html do
         @object_name = controller_name.classify
-        @table_name = Object.const_get(@object_name).table_name
+        @table_name = controller_name
+
         @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
         @default_tab = params[:status]
-        @counts_for_each_status = {}
 
-        begin
-          @object[:status].each do |status|
-            @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
-          end
-        rescue
-          p '[info] There is a missing status'
-        end
+        # Datatable Column Info
+        @columns = get_data_table_columns(@object_name)
+        @column_titles = @columns.map { |col| col[:title] }
+        @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+        }.select(&:present?)
 
-        audit_count = Object.const_get(@object_name).can_be_accessed(current_user).count
-        audit_count = Object.const_get(@object_name).filter_array_by_emp_groups(audit_count, params[:emp_groups])
-
-        @counts_for_each_status['Overdue'] = Object.const_get(@object_name).select{|x| x.overdue}.count
-        @counts_for_each_status['All'] = params[:advance_search] ?  nil : audit_count
+        @advance_search_params = params
 
         render 'forms/index'
       end
