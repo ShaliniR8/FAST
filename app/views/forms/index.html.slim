@@ -61,8 +61,13 @@ javascript:
   }
 
   function classifyString(str) {
-    // str = str.replace('_', ' ')
-    return str[0].toUpperCase() + str.substring(1)
+    return str.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }
+
+  function kebabCaseString(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1-$2')    // get all lowercase letters that are near to uppercase ones
+              .replace(/[\s_]+/g, '-')                // replace all spaces and low dash
+              .toLowerCase()                          // convert to lower case
   }
 
   function updateStatusCounts(statusCounts) {
@@ -70,14 +75,14 @@ javascript:
       statusCount = statusCounts[statusName]
       statusTab = `${classifyString(statusName)} <span class='badge badge-pill badge-info'>${statusCount}</span>`
 
-      $(`li.nav-item.status-${statusName} > a`).html(statusTab);
+      $(`li.nav-item.status-${kebabCaseString(statusName)} > a`).html(statusTab);
     }
   }
 
   function addIndividualColumnSearchField() {
     $('#records_table tfoot th').each(function(index) {
 
-      isDateField = "#{@column_date_type}".includes(index)
+      isDateField = "#{@date_type_column_indices}".includes(index)
       if (isDateField) {
         $(this).html('<input type="date" class="form-control" />');
       } else {
@@ -86,7 +91,7 @@ javascript:
     });
   }
 
-  function disableaActionColumnSearchField() {
+  function hideActionColumnSearchField() {
     $('#records_table tfoot tr th:last-child').children().hide();
   }
 
@@ -95,6 +100,7 @@ javascript:
   }
 
   function loadMatrixColor() {
+    // TODO: get colors from config file
     colors = ['red', 'orangered', 'yellow', 'green', 'limegreen', 'orange', 'lime', 'mediumseagreen', 'steelblue', 'crimson', 'coral', 'gold', 'skyblue']
 
     colors.forEach((color) => {
@@ -122,7 +128,7 @@ javascript:
 
   function drawTableCallBack() {
     addIndividualColumnSearchField();
-    disableaActionColumnSearchField();
+    hideActionColumnSearchField();
     alignExportBtns();
     loadMatrixColor();
     $('#loader1').hide();
@@ -141,7 +147,7 @@ javascript:
         url: "#{controller_name}/get_dataset",
         method: "POST",
         data: function (d) {
-          d.status = $('li.nav-item.active').data('status')
+          d.status = classifyString($('li.nav-item.active').data('status'))
           d.statuses = #{raw @object[:status].to_json}
 
           d.advance_search = JSON.parse('#{raw @advance_search_params.to_json}')
@@ -152,7 +158,6 @@ javascript:
         },
         complete: function(data) {
           statusCounts = data.responseJSON['statusCounts']
-
           updateStatusCounts(statusCounts)
         },
       },

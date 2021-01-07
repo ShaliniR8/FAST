@@ -18,39 +18,22 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   def index
-    # @object_name = controller_name.classify
-    # @table_name = Object.const_get(@object_name).table_name
-    # @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
-    # @default_tab = params[:status]
-    # @counts_for_each_status = {}
-
-    # begin
-    #   @object[:status].each do |status|
-    #     @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).can_be_accessed(current_user).count
-    #   end
-    # rescue
-    #   p 'errors'
-    # end
-
-    # @counts_for_each_status['Overdue'] = Object.const_get(@object_name).can_be_accessed(current_user).select{|x| x.overdue}.count if ['SMS', 'SRM'].include? session[:mode]
-    # @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).can_be_accessed(current_user).count
-
     @object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+    @table_name = controller_name
 
-    @table_name = Object.const_get(@object_name).table_name
+    @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
     @default_tab = params[:status]
 
-    # @counts_for_each_status = {}
-    # @object[:status].each do |status|
-    #   @counts_for_each_status[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
-    # end
+    # # Counts for status
+    # @counts_for_each_status = @object[:status].each_with_object({}) { |status, counts_hash|
+    #   counts_hash[status] = params[:advance_search] ?  nil : Object.const_get(@object_name).where(status: status).count
+    # }
     # @counts_for_each_status['All'] = params[:advance_search] ?  nil : Object.const_get(@object_name).count
 
-    @columns = get_data_table_columns(controller_name.classify)
+    # Datatable Column Info
+    @columns = get_data_table_columns(@object_name)
     @column_titles = @columns.map { |col| col[:title] }
-
-    @column_date_type = @column_titles.map.with_index { |val, inx|
+    @date_type_column_indices = @column_titles.map.with_index { |val, inx|
       (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
     }.select(&:present?)
 

@@ -3,13 +3,11 @@ class CorrectiveActionDatatable < ApplicationDatatable
   private
 
   def records_total
-
     counts = object.group(:status).count
 
     params[:statuses].reduce({}) { |acc, status|
-      status_name = status.underscore
-      status_count = case status_name
-        when 'all'
+      status_count = case status
+        when 'All'
           counts.values.sum
         when 'overdue'
           #
@@ -17,143 +15,85 @@ class CorrectiveActionDatatable < ApplicationDatatable
           counts[status].nil? ? 0 : counts[status]
         end
 
-      acc.update( status_name => status_count)
+      acc.update( status => status_count)
     }
   end
 
 
-  def records
-    @records ||= fetch_records
-  end
-
-
-  def fetch_records
-    records_filtered
-  end
-
-
-  def records_filtered
-    columns =  object.get_meta_fields_keys('index')
-
-
-    start_date, end_date = records_adv_searched
-    if start_date.nil? && end_date.nil?
-      start_date = params[:advance_search][:start_date].to_datetime rescue nil
-      end_date = params[:advance_search][:end_date].to_datetime rescue nil
-    end
-
-
-    # ex) {"1"=>"New"}
-    search_terms_and_columns_map = params[:columns].reduce({}) { |acc, (key,value)|
-      acc.merge({key => value[:search][:value]})
-    }.keep_if { |key,value| value.present? }
-
-
-    # ex) ["status like '%New%'"]
-    search_string = []
-    search_terms_and_columns_map.each do |index, term|
-      search_string << "#{columns[index.to_i]} like '%#{term}%'"
-    end
-
-    # ex) object.joins(:template).where("templates.name LIKE ?", "%#{'inflight'}%")
-    # ex) object.joins(join_tables).where(search_string.join(' or '))
-    join_tables = columns.select.with_index { |column, index|
-      orderable = column == sort_column
-      searchable = search_terms_and_columns_map[index.to_s].present?
-
-      (orderable || searchable) && column.include?('.')
-     }
-    .map { |x|
-      column = x.split('.').first
-      column = case column
-      when 'templates'
-        :template
-      else
-        column.to_sym
-      end
-    }
-
-    # If there is no search term
-    if search_string.empty? && (start_date.nil? && end_date.nil?)
-      case status
-      when 'all'
-        object.joins(join_tables).order("#{sort_column} #{sort_direction}")
-              .group("#{object.table_name}.id")
-              .limit(params['length'].to_i)
-              .offset(params['start'].to_i)
-      when 'overdue'
-        #
-      else
+  def query_with_search_term(search_string, join_tables,start_date, end_date)
+    has_date_range = start_date.present? && end_date.present?
+    case status
+    when 'All'
+      if has_date_range
         object.joins(join_tables)
-              .where(status: status)
+              .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
+      else
+       object.joins(join_tables)
+              .where(search_string.join(' and '))
+              .order("#{sort_column} #{sort_direction}")
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
+              .limit(params['length'].to_i)
+              .offset(params['start'].to_i)
       end
-
-
-    # If there are search terms
+    when 'overdue'
+      #
     else
-
-      if start_date.nil? && end_date.nil?
-        @status_count = object.joins(join_tables)
-          .where(search_string.join(' and '))
-          .group(:status).count
+      if has_date_range
+        object.where(status: status)
+              .joins(join_tables)
+              .where(search_string.join(' and '))
+              .order("#{sort_column} #{sort_direction}")
+              .group("#{object.table_name}.id")
+              .limit(params['length'].to_i)
+              .offset(params['start'].to_i)
       else
-        @status_count = object.joins(join_tables)
-          .where(search_string.join(' and '))
-          .within_timerange(start_date, end_date)
-          .group(:status).count
-      end
-
-
-      case status
-      when 'all'
-
-        if start_date.nil? && end_date.nil?
-          object.joins(join_tables)
-                .where(search_string.join(' and '))
-                .order("#{sort_column} #{sort_direction}")
-                .group("#{object.table_name}.id")
-                .limit(params['length'].to_i)
-                .offset(params['start'].to_i)
-        else # date range serach
-          object.joins(join_tables)
-                .where(search_string.join(' and '))
-                .order("#{sort_column} #{sort_direction}")
-                .within_timerange(start_date, end_date).group("#{object.table_name}.id")
-                .limit(params['length'].to_i)
-                .offset(params['start'].to_i)
-        end
-
-      when 'overdue'
-        #
-      else
-        if start_date.nil? && end_date.nil?
-          object.where(status: status)
-                .joins(join_tables)
-                .where(search_string.join(' and '))
-                .order("#{sort_column} #{sort_direction}")
-                .group("#{object.table_name}.id")
-                .limit(params['length'].to_i)
-                .offset(params['start'].to_i)
-        else # date range serach
-          object.where(status: status)
-                .joins(join_tables)
-                .where(search_string.join(' and '))
-                .order("#{sort_column} #{sort_direction}")
-                .within_timerange(start_date, end_date).group("#{object.table_name}.id")
-                .limit(params['length'].to_i)
-                .offset(params['start'].to_i)
-        end
+        object.where(status: status)
+              .joins(join_tables)
+              .where(search_string.join(' and '))
+              .order("#{sort_column} #{sort_direction}")
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
+              .limit(params['length'].to_i)
+              .offset(params['start'].to_i)
       end
     end
   end
 
 
-  def data
-    format_index_column_data(records: records, object_name: object_name)
+  def query_without_search_term(search_string, join_tables,start_date, end_date)
+    case status
+    when 'All'
+      object.joins(join_tables).order("#{sort_column} #{sort_direction}")
+            .group("#{object.table_name}.id")
+            .limit(params['length'].to_i)
+            .offset(params['start'].to_i)
+    when 'overdue'
+      #
+    else
+      object.joins(join_tables)
+            .where(status: status)
+            .order("#{sort_column} #{sort_direction}")
+            .group("#{object.table_name}.id")
+            .limit(params['length'].to_i)
+            .offset(params['start'].to_i)
+    end
+  end
+
+
+  def update_status_count(search_string, join_tables, start_date, end_date)
+    if start_date.nil? && end_date.nil?
+      @status_count = object.joins(join_tables)
+        .where(search_string.join(' and '))
+        .group(:status).count
+    else
+      @status_count = object.joins(join_tables)
+        .where(search_string.join(' and '))
+        .within_timerange(start_date, end_date)
+        .group(:status).count
+    end
   end
 
 end
