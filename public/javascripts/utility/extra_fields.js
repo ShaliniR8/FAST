@@ -75,6 +75,19 @@ $(document).ready(function(){
           }).catch(swal.noop);
           return result;
         }
+      });
+      if (error){
+        swal({
+          title: "Error",
+          text: "Please fill in all required fields.",
+          type: "error",
+          customClass: 'custom-swal',
+        }).catch(swal.noop);
+        return result;
+      } else {
+        if($(".map_button")[0]) {
+          remove_placeholder_point_html();
+        }
       }
     }
   });

@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
       .preload(:access_controls)
       .map(&:access_controls)
       .flatten
-      .select{|x| x[:action] == "full" || x[:action] == "viewer"}
+      .select{|x| x[:action] == "full" || x[:action] == "viewer" || x[:action] == "confidential"}
       .map{|x| x[:entry]}
       .uniq
   end
@@ -81,7 +81,8 @@ class User < ActiveRecord::Base
     rules = privileges.preload(:access_controls).map(&:access_controls).flatten
     {
       :full => rules.select{|rule| rule[:action] == 'full'}.map{|x| x[:entry]}.uniq,
-      :viewer => rules.select{|rule| rule[:action] == 'viewer'}.map{|x| x[:entry]}.uniq
+      :viewer => rules.select{|rule| rule[:action] == 'viewer'}.map{|x| x[:entry]}.uniq,
+      :confidential => rules.select{|rule| rule[:action] == 'confidential'}.map{|x| x[:entry]}.uniq
     }
   end
 

@@ -124,6 +124,7 @@ class Submission < Sr::SafetyReportingBase
         users_id:           user_id,
         status:             (self.template.default_status || 'New'),
         anonymous:          anonymous,
+        confidential:       confidential,
         event_time_zone:    event_time_zone,
       )
 
@@ -136,10 +137,20 @@ class Submission < Sr::SafetyReportingBase
 
       self.save
       submission_fields.each do |f|
+        points = []; # Needed in order to transfer points from submission to record
+
+        if f.points.present?
+          f.points.each do |point|
+            pt = point.clone;
+            points << pt
+          end
+        end
+
         RecordField.create(
           records_id: record.id,
           fields_id: f.fields_id,
-          value: f.value)
+          value: f.value,
+          points: points)
       end
       record.handle_anonymous_reports
     end
@@ -198,6 +209,7 @@ class Submission < Sr::SafetyReportingBase
       new_temp = Template.find(temp_id)
       converted = self.class.create({
         anonymous:        self.anonymous,
+        confidential:     self.confidential,
         templates_id:     temp_id,
         description:      self.description + ' -- dual report',
         event_date:       self.event_date,

@@ -55,16 +55,30 @@ class Field < ActiveRecord::Base
 
 
   def self.getDisplay_type
-    {
-      "Airport Select Field"        => "airport",
-      "Employee Select Field"         => "employee",
-      "Autocomplete Field"        => "datalist",
-      "Text Field"      => "text",
-      "Radio Button"   => "radio",
-      "Drop Down Menu"  => "dropdown",
-      "Check Boxes"       => "checkbox",
-      "Text Area"       => "textarea"
-    }
+    if CONFIG::GENERAL[:has_gmap].present?
+      {
+        "Airport Select Field"        => "airport",
+        "Employee Select Field"         => "employee",
+        "Autocomplete Field"        => "datalist",
+        "Text Field"      => "text",
+        "Radio Button"   => "radio",
+        "Drop Down Menu"  => "dropdown",
+        "Check Boxes"       => "checkbox",
+        "Text Area"       => "textarea",
+        "Map Points"       => "map"
+      }
+    else
+      {
+        "Airport Select Field"        => "airport",
+        "Employee Select Field"         => "employee",
+        "Autocomplete Field"        => "datalist",
+        "Text Field"      => "text",
+        "Radio Button"   => "radio",
+        "Drop Down Menu"  => "dropdown",
+        "Check Boxes"       => "checkbox",
+        "Text Area"       => "textarea"
+      }
+    end
   end
 
 

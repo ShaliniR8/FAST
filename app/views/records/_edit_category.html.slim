@@ -54,30 +54,6 @@ javascript:
 
   var airport_table;
 
-  function update_nested_fields(field) {
-    var field_id = $(field).attr("data-id");
-    var field_value = $(field).find('option:selected').attr("data-option");
-
-    $("[class^=nested_field_]").each(function(){
-      console.log($(this).attr('class'))
-      $(this).hide();
-    });
-    $(".nested_field_" + field_id + "_" + field_value).show();
-  }
-
-  function update_cb_rb_nested(field){
-    var field_id = $(field).attr("data-id");
-    var field_value = $(field).attr("data-option");
-
-    if($(field).prop('checked')){
-      // $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
-      $(".nested_field_" + field_id + "_" + field_value).show();
-    } else {
-      // $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
-      $(".nested_field_" + field_id + "_" + field_value).hide();
-    }
-  }
-
   $(document).ready(function(){
 
     $(".required_field").css('border-color', '');
@@ -118,7 +94,232 @@ javascript:
         $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
       });
     });
+
+    // Get listing of all the airport buttons
+    var field_id;
+
+    var map,
+        mapTypes = {},
+        pointsHolder = {},
+        mapSettings = {},
+        markers = [],
+        centerLat = #{ CONFIG::GENERAL[:lat] },
+        centerLng = #{ CONFIG::GENERAL[:lng] },
+        mapZoom = #{ CONFIG::GENERAL[:gMapZoom] },
+        clicked_map_field_id;
+
+    $(document).find(".airport_button").each(function(index, item){
+      // Get the button that's being clicked
+      $(item).on("click", function(){
+        console.log('airport btn clicked!');
+        // Get the selected airport's field id
+        field_id = $(this).prop("id");
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_" + field_id).on("click", {field_id: field_id}, handleSearch);
+      });
+    });
+
+    $(document).find(".map_button").each(function(index, item){
+      $(item).on('click', function(){
+        clicked_map_field_id = $(this).prop("id");
+        swal ({
+          title: "Add or Remove Map Marker for Map field",
+          allowOutsideClick: false,
+          showCancelButton: false,
+          html: "#{escape_javascript render :partial => 'shared/map_point', layout: false}",
+          onOpen: function() {
+            updateMarkers(clicked_map_field_id);
+          },
+          onClose: function() {
+            cnt = count_visible_markers_for_field(clicked_map_field_id);
+            if (cnt > 0) {
+              if (cnt > 1) {
+                str = cnt + " points marked"
+              } else {
+                str = "1 point marked"
+              }
+
+              $("#map" + clicked_map_field_id).val(str);
+              $("#map-select" + clicked_map_field_id).val(str);
+            } else {
+              $("#map" + clicked_map_field_id).val("");
+              $("#map-select" + clicked_map_field_id).val("");
+            }
+          }
+        }).catch(swal.noop);
+      });
+    });
+
   });
+
+  function updateMarkers(id) {
+    markers = [];
+    mapTypes = {};
+    pointsHolder = {};
+
+    read_form_points(id);
+    initialize();
+  }
+
+  function read_form_points(id) {
+    action = "<%=@action%>";
+    $('.pin-container').each(function(){
+      if ($(this).closest("#pin-holder").attr("name") == id) {
+        if($(this).hasClass("unsaved")) {
+          if ($(this).find(".pin-lat").val()){
+            var mark = {id:$(this).attr("data-id"), map_type:$(this).find(".pin-map-type").val(), lat:$(this).find(".pin-lat").val(), lng:$(this).find(".pin-lng").val()};
+            markers.push(mark);
+          }
+        } else {
+          if (action != "new") {
+            if($(this).find(".pin-destroy").val() == "false"){
+              if ($(this).find(".pin-lat").val()){
+                var mark = {id:$(this).attr("data-id"), map_type:$(this).find(".pin-map-type").val(), lat:$(this).find(".pin-lat").val(), lng:$(this).find(".pin-lng").val()};
+                markers.push(mark);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function count_visible_markers_for_field(id) {
+    action = "<%=@action%>";
+    count = 0;
+    $('.pin-container').each(function(){
+      if ($(this).closest("#pin-holder").attr("name") == id) {
+        if($(this).hasClass("unsaved")) {
+          if ($(this).find(".pin-lat").val()){
+            count ++;
+          }
+        } else {
+          if (action != "new") {
+            if($(this).find(".pin-destroy").val() == "false"){
+              if ($(this).find(".pin-lat").val()){
+                count ++;
+              }
+            }
+          }
+        }
+      }
+    });
+    return count;
+  }
+
+  function remove_placeholder_point_html() {
+    $('.pin-container.unsaved').each(function(){
+      if($(this).find(".pin-lat").val() == ""){
+        $(this).remove();
+      }
+    });
+  }
+
+  function initialize() {
+    mapSettings[google.maps.MapTypeId.SATELLITE] = {
+      center: new google.maps.LatLng(parseFloat(centerLat), parseFloat(centerLng)),
+      zoom: mapZoom
+    };
+
+    var mapOptions = {
+      zoom: mapZoom,
+      center: new google.maps.LatLng(centerLat, centerLng),
+      mapTypeId: google.maps.MapTypeId.SATELLITE,
+      keyboardShortcuts: false,
+      scrollwheel: false,
+      disableDoubleClickZoom: false,
+      zoomControl: true,
+      streetViewControl: false,
+      disableDefaultUI: false,
+      minZoom: mapZoom
+    };
+
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    map.setTilt(0);
+
+    google.maps.event.addListener(map, 'click', function(event){
+      var id = moment().valueOf(); // get new id
+
+      var marker = new google.maps.Marker({
+        id: id,
+        position: event.latLng,
+        map: map,
+        mapType: map.getMapTypeId(),
+      });
+
+      pointsHolder[id] = marker;
+
+      var newPinContainer = $('#pin-template[name="'+clicked_map_field_id+'"]').html().replace(/\[points\_attributes\]\[\d+\]/g, '[points_attributes]['+id+']')
+      $('#pin-holder[name="'+clicked_map_field_id+'"]').append(newPinContainer);
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last').attr('data-id', id);
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last .pin-lat').val(event.latLng.lat());
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last .pin-lng').val(event.latLng.lng());
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last .pin-map-type').val(map.getMapTypeId());
+
+      marker.addListener('click', function(){
+        delMarker(this.id);
+      })
+    });
+
+    // Draw existing pins
+    if (markers.length > 0) {
+      for(var i = 0, len = markers.length; i < len; i++){
+        if (i == 0) {
+          map.setMapTypeId(markers[i].map_type);
+        }
+
+        console.log("Existing Marker ID: " + markers[i].id);
+
+        var marker = new google.maps.Marker({
+          id: markers[i].id,
+          position: new google.maps.LatLng(markers[i].lat, markers[i].lng),
+          map: map,
+          mapType: markers[i].map_type,
+          visible: markers[i].map_type === map.getMapTypeId(),
+        });
+
+        pointsHolder[markers[i].id] = marker;
+
+        marker.addListener('click', function(){
+          delMarker(this.id);
+        });
+      }
+    }
+  }
+
+  function setMapType(mapType) {
+    map.setZoom(mapSettings[mapType].zoom);
+    map.setCenter(mapSettings[mapType].center);
+
+    for (var id in pointsHolder) {
+      pointsHolder[id].setVisible(pointsHolder[id].mapType === mapType);
+    }
+  }
+
+  function delMarker(id) {
+    console.log("Deleting Marker ID: " + id);
+    var pinContainer = $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container[data-id="'+id+'"]');
+
+    var pinDestroy = $('.pin-destroy', pinContainer)
+    if (pinContainer.hasClass("unsaved"))
+      pinContainer.remove();
+    else
+      pinDestroy.val(1);
+
+    marker = pointsHolder[id];
+    marker.setMap(null);
+    delete pointsHolder[id];
+  }
+
+  function resetModal(field_id){
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }
 
   function handleSearch(event){
     var field_id = event.data.field_id
@@ -149,11 +350,45 @@ javascript:
     });
   }
 
-  function resetModal(field_id){
-    $("#airports_table").html("");
-    $("#icao").val("");
-    $("#iata").val("");
-    $("#arpt_name").val("");
-    $('#airport_div').hide();
-    $(".airport_modal").modal("hide");
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+
+    $("[class^=nested_field_]").each(function(){
+      console.log($(this).attr('class'))
+      $(this).hide();
+    });
+    $(".nested_field_" + field_id + "_" + field_value).show();
+  }
+
+  function update_cb_rb_nested(field){
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+
+    if($(field).prop('checked')){
+      // $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).show();
+    } else {
+      // $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).hide();
+    }
+  }
+
+css:
+  .tc {
+    cursor: pointer;
+  }
+  .checkbox,
+  .radio{
+    cursor: pointer;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+  .checkbox:hover {
+    font-weight:bold;
+  }
+  .radio:hover {
+    font-weight:bold;
+>>>>>>> 63a768d8... Implement RUH launch features
   }

@@ -19,6 +19,12 @@
       <%else%>
         <%=value%>
       <%end%>
+    <%elsif field.display_type == "map"%>
+      <%if sub_field.points.present?%>
+        <%=render :partial => 'shared/static_map', locals: {points: sub_field.points}%>
+      <%else%>
+        <b>No Points Selected</b>
+      <%end%>
     <%else%>
       <%if field.data_type == "datetime"%>
         <%=datetime_to_string(DateTime.parse value) rescue ''%>

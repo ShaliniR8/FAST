@@ -86,6 +86,20 @@
           :id=>"#{field.id}"%>
       </span>
     </div>
+  <%elsif field.display_type == "map"%>
+    <div class="input-group">
+      <%=text_field_tag field.get_label, nil,
+        { class: "form-control ml5 map #{required}",
+          readonly: true,
+          id: "map#{field.id}"}%>
+      <span class="input-group-btn">
+        <%=link_to "...", "#",
+          :class => "btn btn-info map_button",
+          "data-toggle"=>"modal",
+          # "data-target"=>".emp_modal",
+          :id=>"#{field.id}"%>
+      </span>
+    </div>
   <%elsif field.display_type == "airport"%>
     <div class="input-group">
       <%=text_field_tag field.get_label, nil,

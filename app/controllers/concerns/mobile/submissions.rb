@@ -92,6 +92,7 @@ module Concerns
           only: [
             :id,
             :anonymous,
+            :confidential,
             :completed,
             :description,
             :event_date,
