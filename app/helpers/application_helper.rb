@@ -191,12 +191,13 @@ module ApplicationHelper
 
   def get_data_table_columns(object_name)
     fields = Object.const_get(object_name).get_meta_fields('index')
-      .map { |field| { data: field[:field], title:field[:title] } }
+      .map { |field| { data: field[:field], title:field[:title] } } # DataTable Column Format
       .tap { |fields|
           # fields << { data: 'get_additional_info', title: 'Additional Info'} if object_name == 'Record'
           fields << { data: 'actions', title: 'Action'}
       }
   end
+
 
   # TODO: replace Record
   def format_index_column_data(records:, object_name:)

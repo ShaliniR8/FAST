@@ -1,23 +1,41 @@
-class SafetyAssuranceDatatable < ApplicationDatatable
+class SafetyReportingDatatable < ApplicationDatatable
 
   private
 
   def records_total
-    counts = object.group(:status).count
-    # # add overdue counts
-    # byebug
+    counts = object.can_be_accessed(@current_user).group(:status).count
 
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
         when 'All'
           counts.values.sum
-        when 'Overdue'
-          object.all.select{ |x| x.overdue }.size
         else
           counts[status].nil? ? 0 : counts[status]
         end
 
-      acc.update( status => status_count)
+      acc.update(status => status_count)
+    }
+  end
+
+
+  def status_counts
+    if @status_count.empty?
+      # when there is no search
+      return records_total
+    else
+      # when there is a search terms
+      counts = @status_count
+    end
+
+    params[:statuses].reduce({}) { |acc, status|
+      status_count = case status
+        when 'All'
+          counts.values.sum
+        else
+          counts[status].nil? ? 0 : counts[status]
+        end
+
+      acc.update(status => status_count)
     }
   end
 
@@ -30,26 +48,26 @@ class SafetyAssuranceDatatable < ApplicationDatatable
         object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .group("#{object.table_name}.id")
-              .limit(params['length'].to_i)
-              .offset(params['start'].to_i)
-      else
-       object.joins(join_tables)
-              .where(search_string.join(' and '))
-              .order("#{sort_column} #{sort_direction}")
+              .can_be_accessed(@current_user)
               .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
+      else
+        object.joins(join_tables)
+              .where(search_string.join(' and '))
+              .order("#{sort_column} #{sort_direction}")
+              .can_be_accessed(@current_user).group("#{object.table_name}.id")
+              .limit(params['length'].to_i)
+              .offset(params['start'].to_i)
       end
-    when 'Overdue'
-      #
     else
       if has_date_range
         object.where(status: status)
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .group("#{object.table_name}.id")
+              .can_be_accessed(@current_user)
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       else
@@ -57,7 +75,7 @@ class SafetyAssuranceDatatable < ApplicationDatatable
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
+              .can_be_accessed(@current_user).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
@@ -69,19 +87,15 @@ class SafetyAssuranceDatatable < ApplicationDatatable
     case status
     when 'All'
       object.joins(join_tables).order("#{sort_column} #{sort_direction}")
-            .group("#{object.table_name}.id")
+            .can_be_accessed(@current_user).group("#{object.table_name}.id")
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
-    when 'Overdue'
-      object.joins(join_tables).order("#{sort_column} #{sort_direction}")
-                               .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
-                               .limit(params['length'].to_i)
-                               .offset(params['start'].to_i)
     else
       object.joins(join_tables)
             .where(status: status)
             .order("#{sort_column} #{sort_direction}")
             .group("#{object.table_name}.id")
+            .can_be_accessed(@current_user)
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
     end
@@ -90,14 +104,16 @@ class SafetyAssuranceDatatable < ApplicationDatatable
 
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
-      @status_count = object.joins(join_tables)
-        .where(search_string.join(' and '))
-        .group("#{object.table_name}.status").count
+      object.joins(join_tables)
+            .where(search_string.join(' and '))
+            .can_be_accessed(@current_user)
+            .group(:status).count
     else
-      @status_count = object.joins(join_tables)
-        .where(search_string.join(' and '))
-        .within_timerange(start_date, end_date)
-        .group("#{object.table_name}.status").count
+      object.joins(join_tables)
+            .where(search_string.join(' and '))
+            .can_be_accessed(@current_user)
+            .within_timerange(start_date, end_date)
+            .group(:status).count
     end
   end
 

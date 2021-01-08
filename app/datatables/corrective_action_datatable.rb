@@ -9,8 +9,6 @@ class CorrectiveActionDatatable < ApplicationDatatable
       status_count = case status
         when 'All'
           counts.values.sum
-        when 'overdue'
-          #
         else
           counts[status].nil? ? 0 : counts[status]
         end

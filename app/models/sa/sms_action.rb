@@ -39,9 +39,9 @@ class SmsAction < Sa::SafetyAssuranceBase
     keys = CONFIG.object['SmsAction'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                               .map { |key, _| key.to_s }
 
-    keys[keys.index('get_source')] = 'owner_id' # TODO: find a way
-    keys[keys.index('responsible_user')] = 'responsible_user_id' # TODO: connect User table to get full name
-    keys[keys.index('approver')] = 'approver_id' # TODO
+    keys[keys.index('get_source')] = 'owner_id'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name'
+    keys[keys.index('approver')] = 'approver#approver.full_name'
     keys[keys.index('verifications')] = 'verifications.address_comment'
 
     keys

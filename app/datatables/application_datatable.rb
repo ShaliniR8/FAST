@@ -28,22 +28,25 @@ class ApplicationDatatable
 
 
   def records_total
-    counts = object.can_be_accessed(@current_user).group(:status).count
+    counts = object.group(:status).count
 
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
         when 'All'
-          counts.values.sum
-        when 'overdue'
-          #
+          if counts['Overdue'].nil?
+            counts.values.sum
+          else
+            counts.values.sum - counts['Overdue']
+          end
+        when 'Overdue'
+          object.all.select{ |x| x.overdue }.size
         else
           counts[status].nil? ? 0 : counts[status]
         end
 
-      acc.update(status => status_count)
+      acc.update( status => status_count)
     }
   end
-
 
   def status_counts
     if @status_count.empty?
@@ -57,9 +60,11 @@ class ApplicationDatatable
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
         when 'All'
-          counts.values.sum
-        when 'overdue'
-          #
+          if counts['Overdue'].nil?
+            counts.values.sum
+          else
+            counts.values.sum - counts['Overdue']
+          end
         else
           counts[status].nil? ? 0 : counts[status]
         end
@@ -75,7 +80,8 @@ class ApplicationDatatable
 
 
   def sort_column
-    columns[params[:order]['0'][:column].to_i]
+    column = columns[params[:order]['0'][:column].to_i]
+    column.include?('#') ? column.split('#').second : column
   end
 
 
@@ -121,15 +127,19 @@ class ApplicationDatatable
 
 
   def handle_search
-    # ex) {"1"=>"New"}
+    # ex) {"1"=>"New"} - {<column_index> => <term>}
     search_columns_and_terms_map = params[:columns].reduce({}) { |acc, (key,value)|
       acc.merge({key => value[:search][:value]})
     }.keep_if { |key,value| value.present? }
 
-    # ex) ["status like '%New%'"]
+    # ex) ["status like '%New%'"] - [<column_name> like '%<search_terms>%']
     search_string = []
     search_columns_and_terms_map.each do |index, term|
-      search_string << "#{columns[index.to_i]} like '%#{term}%'"
+      column = columns[index.to_i]
+      column = column.include?('#') ? column.split('#').second : column
+      # ex) 'responsible_user#users.full_name'
+      # ex) 'findings.id'
+      search_string << "#{column} like '%#{term}%'"
     end
 
     {search_columns_and_terms_map: search_columns_and_terms_map, search_string: search_string}
@@ -140,18 +150,25 @@ class ApplicationDatatable
     # ex) object.joins(:template).where("templates.name LIKE ?", "%#{'inflight'}%")
     # ex) object.joins(join_tables).where(search_string.join(' or '))
     join_tables = columns.select.with_index { |column, index|
+
+      # helper method to filter join columns
+      column = column.include?('#') ? column.split('#').second : column
+
       orderable = column == sort_column
       searchable = search_params[:search_columns_and_terms_map][index.to_s].present?
 
       (orderable || searchable) && column.include?('.')
     }
-    .map { |x|
-      column = x.split('.').first
+    .map { |column|
       column = case column
-      when 'templates'
+      when 'templates.name'
         :template
+      when 'responsible_user#responsible_user.full_name'
+        "INNER JOIN users AS responsible_user ON #{object.table_name}.responsible_user_id = responsible_user.id"
+      when 'approver#approver.full_name'
+        "INNER JOIN users AS approver ON #{object.table_name}.approver_id = approver.id"
       else
-        column.to_sym
+        column.split('.').first.to_sym
       end
     }
 
@@ -172,7 +189,7 @@ class ApplicationDatatable
   end
 
 
-  def query_with_search_term(search_string, join_tables,start_date, end_date)
+  def query_with_search_term(search_string, join_tables, start_date, end_date)
     has_date_range = start_date.present? && end_date.present?
     case status
     when 'All'
@@ -180,28 +197,32 @@ class ApplicationDatatable
         object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .can_be_accessed(@current_user)
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
+              .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       else
         object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .can_be_accessed(@current_user).group("#{object.table_name}.id")
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
-    when 'overdue'
-      #
+    when 'Overdue'
+      object.joins(join_tables).joins(join_tables)
+            .where(search_string.join(' and '))
+            .order("#{sort_column} #{sort_direction}")
+            .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
+            .limit(params['length'].to_i)
+            .offset(params['start'].to_i)
+
     else
       if has_date_range
         object.where(status: status)
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .can_be_accessed(@current_user)
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
+              .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       else
@@ -209,7 +230,7 @@ class ApplicationDatatable
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .can_be_accessed(@current_user).group("#{object.table_name}.id")
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
@@ -217,21 +238,26 @@ class ApplicationDatatable
   end
 
 
-  def query_without_search_term(search_string, join_tables,start_date, end_date)
+  def query_without_search_term(search_string, join_tables, start_date, end_date)
     case status
     when 'All'
-      object.joins(join_tables).order("#{sort_column} #{sort_direction}")
-            .can_be_accessed(@current_user).group("#{object.table_name}.id")
+
+      object.joins(join_tables)
+            .order("#{sort_column} #{sort_direction}")
+            .group("#{object.table_name}.id")
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
-    when 'overdue'
-      #
+
+    when 'Overdue'
+      object.joins(join_tables).order("#{sort_column} #{sort_direction}")
+                               .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
+                               .limit(params['length'].to_i)
+                               .offset(params['start'].to_i)
     else
       object.joins(join_tables)
             .where(status: status)
             .order("#{sort_column} #{sort_direction}")
             .group("#{object.table_name}.id")
-            .can_be_accessed(@current_user)
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
     end
@@ -240,17 +266,21 @@ class ApplicationDatatable
 
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
-      object.joins(join_tables)
-            .where(search_string.join(' and '))
-            .can_be_accessed(@current_user)
-            .group(:status).count
+      @status_count = object.joins(join_tables)
+                            .where(search_string.join(' and '))
+                            .group("#{object.table_name}.status").count
     else
-      object.joins(join_tables)
-            .where(search_string.join(' and '))
-            .can_be_accessed(@current_user)
-            .within_timerange(start_date, end_date)
-            .group(:status).count
+      @status_count = object.joins(join_tables)
+                            .where(search_string.join(' and '))
+                            .within_timerange(start_date, end_date)
+                            .group("#{object.table_name}.status").count
     end
+
+    @status_count['Overdue'] = object.joins(join_tables)
+                                     .where(search_string.join(' and '))
+                                     .group("#{object.table_name}.id")
+                                     .select{ |x| x.overdue }.size
+    @status_count
   end
 
 
@@ -314,7 +344,7 @@ class ApplicationDatatable
     ]
 
     # Update columns params
-    columns = params[:columns]
+    columns_param = params[:columns]
 
     start_date = nil
     end_date = nil
@@ -322,7 +352,7 @@ class ApplicationDatatable
     search_fields.each do |field|
       if field[:term].present? # what column to search
         if field[:field].present? # what term to search
-          handle_search_term(field[:term], field[:field], columns)
+          handle_search_term(field[:term], field[:field], columns_param)
         elsif field[:start_date].present? && field[:end_date].present?
           start_date = field[:start_date].to_date
           end_date = field[:end_date].to_date

@@ -53,8 +53,9 @@ class Investigation < Sa::SafetyAssuranceBase
     keys = CONFIG.object['Investigation'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                                   .map { |key, _| key.to_s }
 
-    keys[keys.index('responsible_user')] = 'responsible_user_id' # TODO: connect User table to get full name
-    keys[keys.index('verifications')] = 'verifications.address_comment'
+    keys[keys.index('get_source')] = 'owner_id'
+    keys[keys.index('responsible_user')] = 'responsible_user#users.full_name'
+    keys[keys.index('verifications')] = 'verifications.status'
 
     keys
   end
