@@ -40,7 +40,7 @@ class Recommendation < Sa::SafetyAssuranceBase
 
     keys[keys.index('get_source')] = 'owner_id'
     keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name'
-    keys[keys.index('verifications')] = 'verifications.address_comment'
+    keys[keys.index('verifications')] = 'verifications.status'
 
     keys
   end

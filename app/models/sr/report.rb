@@ -71,6 +71,7 @@ class Report < Sr::SafetyReportingBase
     keys = CONFIG.object['Report'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                            .map { |key, _| key.to_s }
 
+    keys[keys.index('reports')] = 'records.id'
     keys[keys.index('event_description')] = 'narrative'
     keys[keys.index('occurrences')] = 'occurrences.value'
 

@@ -86,7 +86,8 @@ class SafetyReportingDatatable < ApplicationDatatable
   def query_without_search_term(search_string, join_tables,start_date, end_date)
     case status
     when 'All'
-      object.joins(join_tables).order("#{sort_column} #{sort_direction}")
+      object.joins(join_tables)
+            .order("#{sort_column} #{sort_direction}")
             .can_be_accessed(@current_user).group("#{object.table_name}.id")
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)

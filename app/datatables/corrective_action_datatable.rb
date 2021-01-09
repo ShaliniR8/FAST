@@ -26,6 +26,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
         object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
@@ -33,18 +34,16 @@ class CorrectiveActionDatatable < ApplicationDatatable
        object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
-    when 'overdue'
-      #
     else
       if has_date_range
         object.where(status: status)
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
+              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
@@ -53,7 +52,6 @@ class CorrectiveActionDatatable < ApplicationDatatable
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
@@ -64,12 +62,11 @@ class CorrectiveActionDatatable < ApplicationDatatable
   def query_without_search_term(search_string, join_tables,start_date, end_date)
     case status
     when 'All'
-      object.joins(join_tables).order("#{sort_column} #{sort_direction}")
+      object.joins(join_tables)
+            .order("#{sort_column} #{sort_direction}")
             .group("#{object.table_name}.id")
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
-    when 'overdue'
-      #
     else
       object.joins(join_tables)
             .where(status: status)
@@ -84,13 +81,13 @@ class CorrectiveActionDatatable < ApplicationDatatable
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
       @status_count = object.joins(join_tables)
-        .where(search_string.join(' and '))
-        .group(:status).count
+                            .where(search_string.join(' and '))
+                            .group(:status).count
     else
       @status_count = object.joins(join_tables)
-        .where(search_string.join(' and '))
-        .within_timerange(start_date, end_date)
-        .group(:status).count
+                            .where(search_string.join(' and '))
+                            .within_timerange(start_date, end_date)
+                            .group(:status).count
     end
   end
 
