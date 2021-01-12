@@ -19,6 +19,27 @@ class SubmissionDatatable < ApplicationDatatable
   end
 
 
+  def handle_search
+    search_columns_and_terms_map = params[:columns].reduce({}) { |acc, (key,value)|
+      acc.merge({key => value[:search][:value]})
+    }.keep_if { |key,value| value.present? }
+
+    search_string = []
+    search_columns_and_terms_map.each do |index, term|
+      column = columns[index.to_i]
+      column = column.include?('#') ? column.split('#').second : column
+      column = column.include?('.') ? column : "#{object.table_name}.#{column}"
+
+      search_string << "#{column} like '%#{term}%'"
+    end
+
+    term = 'true'
+    search_string << "completed = true"
+
+    {search_columns_and_terms_map: search_columns_and_terms_map, search_string: search_string}
+  end
+
+
   def query_with_search_term(search_string, join_tables,start_date, end_date)
     has_date_range = start_date.present? && end_date.present?
     case status

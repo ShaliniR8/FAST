@@ -82,12 +82,12 @@ class CorrectiveActionDatatable < ApplicationDatatable
     if start_date.nil? && end_date.nil?
       @status_count = object.joins(join_tables)
                             .where(search_string.join(' and '))
-                            .group(:status).count
+                            .group("#{object.table_name}.status").count
     else
       @status_count = object.joins(join_tables)
                             .where(search_string.join(' and '))
                             .within_timerange(start_date, end_date)
-                            .group(:status).count
+                            .group("#{object.table_name}.status").count
     end
   end
 

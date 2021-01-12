@@ -54,7 +54,7 @@ class Investigation < Sa::SafetyAssuranceBase
                                                   .map { |key, _| key.to_s }
 
     keys[keys.index('get_source')] = 'owner_id'
-    keys[keys.index('responsible_user')] = 'responsible_user#users.full_name'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name'
     keys[keys.index('verifications')] = 'verifications.status'
 
     keys

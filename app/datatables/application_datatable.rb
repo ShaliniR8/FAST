@@ -15,7 +15,8 @@ class ApplicationDatatable
       data: data,
       recordsTotal: records_total[status],
       recordsFiltered: status_counts[status],
-      statusCounts: status_counts
+      statusCounts: status_counts,
+      searchTerms: handle_search[:search_columns_and_terms_map]
     }
   end
 
@@ -111,9 +112,19 @@ class ApplicationDatatable
     search_params = handle_search
     join_tables = prepare_join_tables(search_params)
 
-    query_records(search_params, join_tables, start_date, end_date)
+    if dashboard_risk_matrix_link
+      adv_params = params[:advance_search]
+      query_records_for_risk(search_params, adv_params, join_tables)
+    else
+      query_records(search_params, join_tables, start_date, end_date)
+    end
   end
 
+
+  def dashboard_risk_matrix_link
+    adv_params = params[:advance_search]
+    adv_params[:advance_search] && %w[severity likelihood].include?(adv_params[:searchterm_1])
+  end
 
   def update_adv_search_columns_and_get_start_end_date
     start_date, end_date = records_adv_searched # apply adavanced search and update params
@@ -136,9 +147,14 @@ class ApplicationDatatable
     search_string = []
     search_columns_and_terms_map.each do |index, term|
       column = columns[index.to_i]
+
+      # ex) 'responsible_user#responsible_user.full_name' - 'responsible_user.full_name'
+      # ex) 'findings.id'                                 - 'findings.id'
+      # ex) 'id'                                          - 'audits.id'
+
       column = column.include?('#') ? column.split('#').second : column
-      # ex) 'responsible_user#users.full_name'
-      # ex) 'findings.id'
+      column = column.include?('.') ? column : "#{object.table_name}.#{column}"
+
       search_string << "#{column} like '%#{term}%'"
     end
 
@@ -160,13 +176,17 @@ class ApplicationDatatable
       (orderable || searchable) && column.include?('.')
     }
     .map { |column|
-      column = case column
+      case column
       when 'templates.name'
         :template
       when 'responsible_user#responsible_user.full_name'
         "INNER JOIN users AS responsible_user ON #{object.table_name}.responsible_user_id = responsible_user.id"
       when 'approver#approver.full_name'
         "INNER JOIN users AS approver ON #{object.table_name}.approver_id = approver.id"
+      when 'occurrences.value'
+        "LEFT JOIN occurrences ON #{object.table_name}.id = occurrences.owner_id and occurrences.owner_type = '#{object_name}'"
+      when 'verifications.status'
+        "LEFT JOIN verifications ON #{object.table_name}.id = verifications.owner_id and verifications.owner_type = '#{object_name}'"
       else
         column.split('.').first.to_sym
       end
@@ -264,6 +284,32 @@ class ApplicationDatatable
   end
 
 
+  def query_records_for_risk(search_params, adv_params, join_tables)
+    search_string = search_params[:search_string]
+
+    if adv_params[:searchterm_1] == 'severity'
+      sev = adv_params[:field_1]
+      like = adv_params[:field_2]
+    else
+      sev = adv_params[:field_2]
+      like = adv_params[:field_1]
+    end
+
+    @status_count = object.joins(join_tables)
+          .order("#{sort_column} #{sort_direction}")
+          .where(search_string.join(' and '))
+          .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
+          .group("#{object.table_name}.status").count
+
+    object.joins(join_tables)
+          .order("#{sort_column} #{sort_direction}")
+          .where(search_string.join(' and '))
+          .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
+          .limit(params['length'].to_i)
+          .offset(params['start'].to_i)
+  end
+
+
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
       @status_count = object.joins(join_tables)
@@ -289,32 +335,32 @@ class ApplicationDatatable
 
     adv_params = params[:advance_search]
 
-    # risk matrix number from dashboard
-    if (["severity", "likelihood"].include? adv_params["searchterm_1"]) || (["severity", "likelihood"].include? adv_params["searchterm_2"])
+    # # risk matrix number from dashboard
+    # if (["severity", "likelihood"].include? adv_params["searchterm_1"]) || (["severity", "likelihood"].include? adv_params["searchterm_2"])
 
-      field_1 = adv_params["field_1"].to_i
-      field_2 = adv_params["field_2"].to_i
+    #   field_1 = adv_params["field_1"].to_i
+    #   field_2 = adv_params["field_2"].to_i
 
-      risk_color = CONFIG::MATRIX_INFO[:risk_table][:rows_color][field_1][field_2]
+    #   risk_color = CONFIG::MATRIX_INFO[:risk_table][:rows_color][field_1][field_2]
 
-      adv_params["field_1"] = CONFIG::MATRIX_INFO[:risk_definitions][risk_color.to_sym][:rating]
-      adv_params["searchterm_1"] = "get_risk_classification"
+    #   adv_params["field_1"] = CONFIG::MATRIX_INFO[:risk_definitions][risk_color.to_sym][:rating]
+    #   adv_params["searchterm_1"] = "get_risk_classification"
 
-      adv_params.delete("field_2")
-      adv_params.delete("searchterm_2")
-    elsif (["severity_after", "likelihood_after"].include? adv_params["searchterm_1"]) || (["severity_after", "likelihood_after"].include? adv_params["searchterm_2"])
+    #   adv_params.delete("field_2")
+    #   adv_params.delete("searchterm_2")
+    # elsif (["severity_after", "likelihood_after"].include? adv_params["searchterm_1"]) || (["severity_after", "likelihood_after"].include? adv_params["searchterm_2"])
 
-      field_1 = adv_params["field_1"].to_i
-      field_2 = adv_params["field_2"].to_i
+    #   field_1 = adv_params["field_1"].to_i
+    #   field_2 = adv_params["field_2"].to_i
 
-      risk_color = CONFIG::MATRIX_INFO[:risk_table][:rows_color][field_1][field_2]
+    #   risk_color = CONFIG::MATRIX_INFO[:risk_table][:rows_color][field_1][field_2]
 
-      adv_params["field_1"] = CONFIG::MATRIX_INFO[:risk_definitions][risk_color.to_sym][:rating]
-      adv_params["searchterm_1"] = "get_risk_classification_after"
+    #   adv_params["field_1"] = CONFIG::MATRIX_INFO[:risk_definitions][risk_color.to_sym][:rating]
+    #   adv_params["searchterm_1"] = "get_risk_classification_after"
 
-      adv_params.delete("field_2")
-      adv_params.delete("searchterm_2")
-    end
+    #   adv_params.delete("field_2")
+    #   adv_params.delete("searchterm_2")
+    # end
 
     search_fields = [
       {

@@ -108,13 +108,13 @@ class SafetyReportingDatatable < ApplicationDatatable
       object.joins(join_tables)
             .where(search_string.join(' and '))
             .can_be_accessed(@current_user)
-            .group(:status).count
+            .group("#{object.table_name}.status").count
     else
       object.joins(join_tables)
             .where(search_string.join(' and '))
             .can_be_accessed(@current_user)
             .within_timerange(start_date, end_date)
-            .group(:status).count
+            .group("#{object.table_name}.status").count
     end
   end
 

@@ -79,6 +79,13 @@ javascript:
     }
   }
 
+  function updateSearchTerms(searchTerms) {
+    console.log(searchTerms)
+    for (column in searchTerms) {
+      $(`tfoot tr th:nth-child(${column+1}) input`).val(searchTerms[column])
+    }
+  }
+
   function addIndividualColumnSearchField() {
     $('#records_table tfoot th').each(function(index) {
 
@@ -157,8 +164,8 @@ javascript:
           $('#loader1').show();
         },
         complete: function(data) {
-          statusCounts = data.responseJSON['statusCounts']
-          updateStatusCounts(statusCounts)
+          updateStatusCounts(data.responseJSON['statusCounts'])
+          updateSearchTerms(data.responseJSON['searchTerms'])
         },
       },
       serverSide: true,
