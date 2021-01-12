@@ -45,11 +45,11 @@ class Finding < Sa::SafetyAssuranceBase
     keys = CONFIG.object['Finding'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                             .map { |key, _| key.to_s }
 
-    keys[keys.index('get_source')] = 'owner_id'
-    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name'
-    keys[keys.index('approver')] = 'approver#approver.full_name'
-    keys[keys.index('occurrences')] = 'occurrences.value'
-    keys[keys.index('verifications')] = 'verifications.status'
+    keys[keys.index('get_source')] = 'owner_id' if keys.include? 'get_source'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('approver')] = 'approver#approver.full_name' if keys.include? 'approver'
+    keys[keys.index('occurrences')] = 'occurrences.value' if keys.include? 'occurrences'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
 
     keys
   end

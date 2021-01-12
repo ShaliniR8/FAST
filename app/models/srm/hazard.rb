@@ -42,10 +42,10 @@ class Hazard < Srm::SafetyRiskManagementBase
     keys = CONFIG.object['Hazard'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                            .map { |key, _| key.to_s }
 
-    keys[keys.index('source')] = 'sra_id'
-    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name'
-    keys[keys.index('occurrences')] = 'occurrences.value'
-    keys[keys.index('verifications')] = 'verifications.status'
+    keys[keys.index('source')] = 'sra_id' if keys.include? 'source'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('occurrences')] = 'occurrences.value' if keys.include? 'occurrences'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
 
     keys
   end

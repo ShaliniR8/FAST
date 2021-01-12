@@ -57,8 +57,8 @@ class Record < Sr::SafetyReportingBase
     keys = CONFIG.object['Record'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                            .map { |key, _| key.to_s }
 
-    keys[keys.index('template')] = 'templates.name'
-    keys[keys.index('occurrences')] = 'occurrences.value'
+    keys[keys.index('template')] = 'templates.name' if keys.include? 'template'
+    keys[keys.index('occurrences')] = 'occurrences.value' if keys.include? 'occurrences'
 
     keys
   end

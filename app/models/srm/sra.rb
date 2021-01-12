@@ -50,9 +50,9 @@ class Sra < Srm::SafetyRiskManagementBase
     keys = CONFIG.object['Sra'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                         .map { |key, _| key.to_s }
 
-    keys[keys.index('source')] = 'owner_id'
-    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name'
-    keys[keys.index('verifications')] = 'verifications.status'
+    keys[keys.index('source')] = 'owner_id' if keys.include? 'source'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
 
     keys
   end
