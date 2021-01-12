@@ -6,6 +6,9 @@ class ApplicationDatatable
     @view = view
     @current_user = current_user
     @status_count = {}
+
+    @records_total = records_total
+    @status_counts = status_counts
   end
 
 
@@ -13,9 +16,9 @@ class ApplicationDatatable
     {
       draw: params['draw'].to_i,
       data: data,
-      recordsTotal: records_total[status],
-      recordsFiltered: status_counts[status],
-      statusCounts: status_counts,
+      recordsTotal: @records_total[status],
+      recordsFiltered: @status_counts[status],
+      statusCounts: @status_counts,
       searchTerms: handle_search[:search_columns_and_terms_map]
     }
   end
@@ -52,7 +55,7 @@ class ApplicationDatatable
   def status_counts
     if @status_count.empty?
       # when there is no search
-      return records_total
+      return @records_total
     else
       # when there is a search terms
       counts = @status_count
@@ -125,6 +128,7 @@ class ApplicationDatatable
     adv_params = params[:advance_search]
     adv_params[:advance_search] && %w[severity likelihood].include?(adv_params[:searchterm_1])
   end
+
 
   def update_adv_search_columns_and_get_start_end_date
     start_date, end_date = records_adv_searched # apply adavanced search and update params
@@ -261,7 +265,6 @@ class ApplicationDatatable
   def query_without_search_term(search_string, join_tables, start_date, end_date)
     case status
     when 'All'
-
       object.joins(join_tables)
             .order("#{sort_column} #{sort_direction}")
             .group("#{object.table_name}.id")
@@ -296,10 +299,10 @@ class ApplicationDatatable
     end
 
     @status_count = object.joins(join_tables)
-          .order("#{sort_column} #{sort_direction}")
-          .where(search_string.join(' and '))
-          .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
-          .group("#{object.table_name}.status").count
+                          .order("#{sort_column} #{sort_direction}")
+                          .where(search_string.join(' and '))
+                          .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
+                          .group("#{object.table_name}.status").count
 
     object.joins(join_tables)
           .order("#{sort_column} #{sort_direction}")

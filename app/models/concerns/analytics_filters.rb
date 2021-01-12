@@ -20,13 +20,16 @@ module AnalyticsFilters
       reports = Record.preload(:template, :report)
         .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
           full_access_templates, viewer_access_templates)
-        .map(&:report).flatten.uniq.compact
-      Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports.map(&:id))
+        # .map(&:report).flatten.uniq.compact
+
+      reports = reports.select { |x| x.report.present? }.map { |x| x.report.id }
+
+      # Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports.map(&:id))
+      Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports)
     else
       all
     end
   end
-
 
   def within_timerange(start_date, end_date)
     begin

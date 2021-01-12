@@ -80,9 +80,8 @@ javascript:
   }
 
   function updateSearchTerms(searchTerms) {
-    console.log(searchTerms)
     for (column in searchTerms) {
-      $(`tfoot tr th:nth-child(${column+1}) input`).val(searchTerms[column])
+      $(`tfoot tr th:nth-child(${parseInt(column)+1}) input`).val(searchTerms[column])
     }
   }
 
@@ -125,7 +124,7 @@ javascript:
           search_term = this.value
 
           // reset the filters
-          $('#records_table').dataTable().api().columns().search('')
+          // $('#records_table').dataTable().api().columns().search('')
 
           column.search(search_term).draw();
         }
