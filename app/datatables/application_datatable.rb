@@ -304,6 +304,8 @@ class ApplicationDatatable
                           .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
                           .group("#{object.table_name}.status").count
 
+    dashboard_risk_matrix_link_status_counts_update
+
     object.joins(join_tables)
           .order("#{sort_column} #{sort_direction}")
           .where(search_string.join(' and '))
@@ -312,6 +314,23 @@ class ApplicationDatatable
           .offset(params['start'].to_i)
   end
 
+
+  def dashboard_risk_matrix_link_status_counts_update
+    @status_counts = params[:statuses].reduce({}) { |acc, status|
+     count = case status
+        when 'All'
+          if @status_counts['Overdue'].nil?
+            @status_count.values.sum
+          else
+            @status_count.values.sum - @status_count['Overdue'].to_i
+          end
+        else
+          @status_count[status].nil? ? 0 : @status_count[status]
+        end
+
+      acc.update(status => count)
+    }
+  end
 
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
