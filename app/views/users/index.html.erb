@@ -5,7 +5,7 @@
       :btn_path => new_user_path,
       :panel => 'steelblue'%>
     <%btns = [{:btn_name => 'New', :btn_path => new_user_path, :btn_class => 'btn btn-success'}]%>
-    <%=render "/forms/index_fields", :btns => btns%>
+    <%=render "/forms/index_fields", :btns => btns, :from_user => true%>
 
     <div class='col-xs-12'>
       <div class='panel panel-steelblue'>

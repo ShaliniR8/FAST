@@ -10,28 +10,44 @@ class UsersController < ApplicationController
       return
     end
 
+    @disabled = (params[:disabled] || false)
+
     @headers = User.get_meta_fields('index')
     # @headers = User.get_headers_table
 
     @records = User.where({airport: current_user.airport})
 
-    active_users = @records.where('disable = ? OR disable IS ?', false, nil)
-    @statistics = [{ :label => 'Active Users', :value => active_users.count }]
+    if @disabled.present?
+      @records = @records.where('disable = ?', 1)
+      @statistics = [{ :label => 'Disabled Users', :value => @records.count }]
+      @title = "Disabled Users"
+    else
+      @records = @records.where('disable != ? OR disable IS ?', 1, nil)
+      @statistics = [{ :label => 'Active Users', :value => @records.count }]
+      @title = "Active Users"
+    end
 
     if CONFIG::GENERAL[:has_mobile_app]
       latest_version = latest_android_version
-      android_users = active_users.where('android_version > ?', 0)
-      latest_android_users = active_users.where({android_version: latest_version})
+      android_users = @records.where('android_version > ?', 0)
+      latest_android_users = @records.where({android_version: latest_version})
 
-      @statistics.concat([
-        { :label => 'Latest Android Version', :value => latest_version},
-        { :label => 'Up-to-Date Android Users', :value => latest_android_users.count },
-        { :label => 'Total Android Users', :value => android_users.count },
-      ])
+      if @disabled.present?
+        @statistics.concat([
+          { :label => 'Latest Android Version', :value => latest_version},
+          { :label => 'Up-to-Date Disabled Android Users', :value => latest_android_users.count },
+          { :label => 'Total Disabled Android Users', :value => android_users.count },
+        ])
+      else
+        @statistics.concat([
+          { :label => 'Latest Android Version', :value => latest_version},
+          { :label => 'Up-to-Date Android Users', :value => latest_android_users.count },
+          { :label => 'Total Android Users', :value => android_users.count },
+        ])
+      end
     end
     @table = Object.const_get("User")
     @table_name = "users"
-    @title = "Users"
     #@users.keep_if{|u| !u.disable}
   end
 

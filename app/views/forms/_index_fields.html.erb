@@ -48,7 +48,19 @@
             request.fullpath,
             :disable_with => 'Resetting...',
             :class => "btn btn-default pull-right mr5"%>
-
+          <%if defined? from_user%>
+            <%if @disabled.present? %>
+              <%=link_to "Show Active",
+              "/users/",
+              :disable_with => 'Redirecting...',
+              :class => "btn btn-default pull-right mr5"%>
+            <%else%>
+              <%=link_to "Show Disabled",
+              "/users/?disabled=1",
+              :disable_with => 'Redirecting...',
+              :class => "btn btn-default pull-right mr5"%>
+            <%end%>
+          <%end%>
         </div>
       </div>
     </div>
