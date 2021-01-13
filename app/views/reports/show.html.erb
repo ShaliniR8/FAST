@@ -127,6 +127,16 @@
                   "data-placement" => "top",
                   :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
               <%end%>
+              <%#if @report.can_meeting_ready?(current_user)%>
+              <%if true%>
+                <%=link_to 'Add To Meeting(s)',
+                  "#",
+                  :class=>"btn btn-darkturquoise pull-right mb5 ml5 add_to_meeting_btn",
+                  :disable_with => "Adding...",
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  :title => "This will open a pop-up allowing you to add this Event directly to one or more Meetings"%>
+              <%end%>
               <%if @report.can_close?(current_user)%>
                 <%=link_to 'Close Event', '#',
                   :class => 'btn btn-danger close_event_btn pull-right ml5 mb5',
@@ -212,7 +222,7 @@
 
 
 <script>
-  $(document).ready(function(){
+  $(document).ready(function() {
     $('#launch_btn').on('click',function(){
       $(".modal-content").html('');
       $.get("<%= eval("launch_report_path(@report)")%>", function(data){
@@ -251,6 +261,31 @@
         $(window).trigger('resize');
       });
     });
+
+    $('.add_to_meeting_btn').on('click', function(){
+      report_id = "<%=@report.id%>";
+      report_name = "<%=@report.name%>";
+
+      swal({
+        title: "Add Event # "+ report_id + ": " + report_name + " to Open Meetings",
+        allowOutsideClick: false,
+        showCancelButton: false,
+        showConfirmButton: false,
+        html: "<%= escape_javascript render :partial => 'reports/add_to_meeting', layout: false%>"
+      }).catch(swal.noop)
+    });
   });
+
+  function getMeetings() {
+    var meeting_items = '';
+    meeting_elems = $("input.meetings:checked");
+
+    meeting_elems.each(function(index, elem){
+        meeting_items += $(elem).val() + ",";
+    });
+
+    $('#meetings_selected').val(meeting_items);
+    return true;
+  }
 </script>
 

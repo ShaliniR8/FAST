@@ -22,6 +22,7 @@ class Investigation < Sa::SafetyAssuranceBase
   include Verifiable
   include Childable
   include Parentable
+  include RootCausable
 
 #Associations List
   belongs_to :owner,                    polymorphic: true

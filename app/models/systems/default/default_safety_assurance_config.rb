@@ -232,6 +232,7 @@ class DefaultSafetyAssuranceConfig
         title: 'Investigation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :occurrences,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -301,6 +302,11 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          occurrences: {default: true, title: (Investigation.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Investigation.find_top_level_section.label rescue nil}"
+          },
           verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
@@ -317,7 +323,7 @@ class DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments source_of_input sras findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments occurrences source_of_input sras findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 

@@ -1,0 +1,24 @@
+css:
+  .checkbox-custom input[type=checkbox]{ position: relative; }
+
+ruby:
+  meetings = Meeting.where("status = ?", "open")
+
+= form_tag action: :add_to_meeting
+  = hidden_field_tag :meetings_selected, ''
+  .col-md-12.category-panel
+    .panel-body
+      - meetings.each do |meeting|
+        .col-xs-12.checkbox-custom
+            input.check.meetings id=meeting[:id] type="checkbox" value=meeting[:id]
+            = label_tag meeting[:id], meeting[:title]
+
+      .pull-right
+        = submit_tag 'Cancel',
+                     class: "btn btn-lg btn-default panel-button",
+                     disable_with: 'Cancelling...'
+        = submit_tag 'Add',
+                     disabled: meetings.blank?,
+                     disable_with: 'Adding...',
+                     class: "btn btn-lg btn-success panel-button m10",
+                     onclick: 'return getMeetings();'

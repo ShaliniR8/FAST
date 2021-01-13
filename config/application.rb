@@ -53,7 +53,8 @@ module PrdgSession
   config.action_mailer.smtp_settings = {
     address: 'smtp.1and1.com',
     port: 587,
-    user_name: 'donotreply@prosafet.com',
+    # user_name: 'donotreply@prosafet.com',
+    user_name: 'noc@prosafet.com',
     password: 'pookies224',
     authentication: 'plain',
   }

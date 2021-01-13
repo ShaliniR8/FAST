@@ -111,6 +111,43 @@ class ReportsController < ApplicationController
   end
 
 
+  def add_to_meeting
+    @report = Report.find(params[:id])
+    if params[:commit].present?
+      case params[:commit]
+      when 'Add'
+        meetings_to_add = params[:meetings_selected].split(',')
+        if meetings_to_add.present? && meetings_to_add.size > 0
+          meetings = Meeting.where("id in (?)", params[:meetings_selected].chomp(',').split(','))
+          added = ""
+          not_added = ""
+          if meetings.present?
+            meetings.each do |meeting|
+              Rails.logger.debug "Meeting: #{meeting.attributes.to_s}\n\n"
+              meeting.reports << @report
+              if meeting.save
+                added += meeting.id.to_s + " "
+              else
+                not_added += meeting.id.to_s + " "
+              end
+            end
+            if not_added.present?
+              flash[:error] = "Failed to add event to meeting IDs #{not_added}"
+            else
+              flash[:notice] = "Added event to meeting IDs #{added}"
+            end
+          else
+            flash[:error] = "Meeting not found"
+          end
+        else
+          flash[:notice] = "Event not added to any meeting"
+        end
+      when 'Cancel'
+        flash[:notice] = "Cancelled"
+      end
+      redirect_to report_path(@report)
+    end
+  end
 
 
   def carryover

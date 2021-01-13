@@ -53,6 +53,15 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def get_matching_record_id
+    if completed && records_id.present?
+      records_id
+    else
+      id
+    end
+  end
+
+
   def self.get_headers
       [
         {field: 'get_id',            title: 'ID'},

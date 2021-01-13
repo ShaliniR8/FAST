@@ -372,6 +372,7 @@ PrdgSession::Application.routes.draw do |map|
       get "add_meeting"
       get "carryover"
       get "meeting_ready"
+      post "add_to_meeting"
       get "get_agenda"
       get "new_attachment"
       get "new_minutes"

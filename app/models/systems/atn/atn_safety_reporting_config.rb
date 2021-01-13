@@ -7,4 +7,16 @@ class ATNSafetyReportingConfig < DefaultSafetyReportingConfig
   })
 
 
+  HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
+    objects:{
+      'Submission' => {
+        fields: {
+          id: {
+            default: true, field: 'get_matching_record_id',
+          }
+        }
+      }
+    }
+  })
+
 end

@@ -71,14 +71,25 @@ task :notify => [:environment] do |t|
   cc_to   = eval ENV['CC_TO']
   controller = ApplicationController.new
   @message = Message.find(ENV['MESSAGES_ID'])
+  attachment = nil
 
-
-  if false # TODO: add other record types
+  # if false # TODO: add other record types
+  if ENV['ATTACH_PDF'] == "1" # TODO: add other record types
     owner_type = ENV['OWNER_TYPE']
     owner_id   = ENV['OWNER_ID']
     @record = Object.const_get(owner_type).find(owner_id)
 
-    html = controller.render_to_string(:template => "/records/_print.html.erb",  locals: {owner: @record, deidentified: true}, layout: false)
+    case owner_type
+    when "Submission"
+      html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: @record, deidentified: true}, layout: false)
+    when "Record"
+      html = controller.render_to_string(:template => "/pdfs/_print_record.html.erb",  locals: {owner: @record, deidentified: true}, layout: false)
+    when "Report"
+      html = controller.render_to_string(:template => "/pdfs/_print_report.html.erb",  locals: {owner: @record, deidentified: true, first_print: true}, layout: false)
+    else
+      html = controller.render_to_string(:template => "/pdfs/_print.html.erb",  locals: {owner: @record, deidentified: true}, layout: false)
+    end
+
     pdf = PDFKit.new(html)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
@@ -94,7 +105,8 @@ task :notify => [:environment] do |t|
       controller.notify(@message,
         notice: {users_id: v, content: "You have a new message in ProSafeT."},
         mailer: true,
-        subject:  ENV['SUBJECT'])
+        subject:  ENV['SUBJECT'],
+        attachment: attachment)
     end
   end
 
@@ -104,7 +116,8 @@ task :notify => [:environment] do |t|
       controller.notify(@message,
         notice: {users_id: v, content: "You have a new message in ProSafeT."},
         mailer: true,
-        subject: ENV['SUBJECT'])
+        subject: ENV['SUBJECT'],
+        attachment: attachment)
     end
   end
 

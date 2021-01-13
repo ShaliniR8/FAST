@@ -16,6 +16,7 @@
 
 <!-- This calculate  "#total_duty_time" based on "#duty_on_time" and "#duty_off_time". Fields need to have exact HTML ID -->
 <script type="text/javascript" src="/javascripts/templates/total_duty_time_calculation.js"></script>
+<!-- <script type="text/javascript" src="/javascripts/utility/dirty-form.js"></script> -->
 
 
 <%if @template.js_link.present?%>
@@ -37,6 +38,9 @@
               data-placement="top"
               title="Expand all panels">Expand All</a>
           </div>
+          <!-- <div>
+            <h5 id="auto-save" class="pull-right" style="visibility:hidden;">Auto Save enabled</h5>
+          </div> -->
         </div>
       </div>
 
@@ -64,7 +68,7 @@
 
 
       <div class="panel-body" id="form_body">
-        <%=form_for @record , :html => {:multipart => true, :novalidate => true} do |f|%>
+        <%=form_for @record , :html => {id: 'submit-form', class: 'dirty-submit', :multipart => true, :novalidate => true} do |f|%>
 
           <div class="col-xs-12">
             <%=render "shared/instructions",
@@ -314,6 +318,31 @@
   var airport_table;
 
   $(document).ready(function(){
+    // autoSaveText = document.getElementById('auto-save');
+
+    // function autosave() {
+    //   $("#submission_completed").val(true);
+    //   datum = $('form').serialize()
+    //   console.log("Data: " + datum);
+    //   $.ajax({
+    //     type: "POST",
+    //     url: $('form').attr('action'),
+    //     // data: $('form').serialize(),
+    //     data: datum,
+    //     dataType: "script",
+    //   });
+    // }
+
+    // runAutosave = setInterval(autosave, 15000);
+    // setInterval(function() {
+    //   autoSaveText.style.visibility = (autoSaveText.style.visibility == 'hidden' ? '' : 'hidden');
+    // }, 1000);
+
+    // $(window).on('beforeunload', function(){
+    //   // clearInterval(runAutosave)
+    //   return true;
+    // });
+
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
     if (timeZoneToggleBtn != null) {
       $('#time-zone-toggle-btn').on('click', function() {
@@ -368,6 +397,7 @@
     });
 
     $("form").on('submit', function(){
+      $(window).off('beforeunload');
       if(isValidationReq) {
         $("div.category-panel").find('.panel-body').slideUp();
         $("div.category-panel").closest('div.category-panel').addClass('collapsed');

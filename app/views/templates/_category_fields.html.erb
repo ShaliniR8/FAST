@@ -1,4 +1,4 @@
-<div class="col-sm-12 col-md-12 col-lg-12" %>
+<div class="col-sm-12 col-md-12 col-lg-12">
 
   <!--TR 9/8/18 If the category is deleted then add the deleted_categories class-->
   <%if defined?(category) && category.deleted?%>
@@ -16,9 +16,9 @@
             <%if source == 'Existing'%>
               <%= f.hidden_field :category_order, :value => cat_index, :class => "form-template-order" %>
             <%else%>
-              <%= f.hidden_field :category_order, :value => 10000, :class => "form-template-order" %>
+              <%= f.hidden_field :category_order, :value => 10000, :class => "form-template-order changed" %>
             <%end%>
-            <%= f.text_field :title, {:class=> "form-control", :placeholder=>"Category Title", :style=>"max-width:400px"}%>
+            <%= f.text_field :title, {:class=> "form-control changed", :placeholder=>"Category Title", :style=>"max-width:400px"}%>
           </div>
           <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right">
             <span class="pull-right clickable ">
@@ -30,17 +30,32 @@
     </div>
 
     <div class="panel-body" style="<%= source == 'Existing' ? 'display:none' : 'display:block'%>" >
-
+      <%if source == 'Existing'%>
+        <%= f.hidden_field :id, :class => "category-changeable" %>
+      <%end%>
       <div class="col-xs-2">
         <b>Color</b>
-        <%=f.select :panel, Category.getColor, {}, {:class=>"form-control"}%><br/>
+        <%if source == 'Existing'%>
+          <%=f.select :panel, Category.getColor, {}, {:class=>"form-control"}%><br/>
+        <%else%>
+          <%=f.select :panel, Category.getColor, {}, {:class=>"form-control changed"}%><br/>
+        <%end%>
       </div>
       <div class="col-xs-2">
         <b>Print in De-ID</b>
-        <%=f.select :print,[["Yes", true], ["No", false]],{},{:class=>"form-control"}%><br/>
+        <%if source == 'Existing'%>
+          <%=f.select :print, [["Yes", true], ["No", false]], {}, {:class=>"form-control"}%><br/>
+        <%else%>
+          <%=f.select :print, [["Yes", true], ["No", false]], {}, {:class=>"form-control changed"}%><br/>
+        <%end%>
       </div>
       <div class="col-xs-6">
-        <b>Description</b> <%=f.text_area :description, {:class=>"form-control", :size=>"1"}%><br/>
+        <b>Description</b>
+        <%if source == 'Existing'%>
+          <%=f.text_area :description, {:class=>"form-control", :size=>"1"}%><br/>
+        <%else%>
+          <%=f.text_area :description, {:class=>"form-control changed", :size=>"1"}%><br/>
+        <%end%>
       </div>
       <div class="col-xs-2">
         <b>Archive</b><br/><%=f.check_box :deleted%>

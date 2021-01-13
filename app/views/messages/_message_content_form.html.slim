@@ -53,10 +53,31 @@ ruby:
           = f.hidden_field :owner_id, value: @owner.id
           = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
 
-.col-xs-12.mt5
+/.col-xs-12.mt5
   .col-xs-12.col-xs-offset-2
     = check_box_tag :from_anonymous, 1, false
     = label_tag :from_anonymous, 'Message Anonymously', class: 'control-label ml5'
+
+.col-xs-12.mt5
+    = label_tag 'template', 'Do you want to send this message anonymously?', class: 'control-label col-xs-2'
+    .col-xs-6.inner
+      .col-xs-3
+        = radio_button_tag :from_anonymous, 1
+        = label_tag :from_anonymous, 'Yes', class: 'control-label ml5'
+      .col-xs-3
+        = radio_button_tag :from_anonymous, 0
+        = label_tag :from_anonymous, 'No', class: 'control-label ml5'
+
+- if @owner.present? && CONFIG::GENERAL[:attach_pdf_in_message].present?
+  .col-xs-12.mt5
+    = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.id} with the email?", class: 'control-label col-xs-2'
+    .col-xs-6 style="vertical-align:middle;"
+      .col-xs-3
+        = radio_button_tag :attach_pdf, 1
+        = label_tag :attach_pdf, 'Yes', class: 'control-label ml5'
+      .col-xs-3
+        = radio_button_tag :attach_pdf, 0
+        = label_tag :attach_pdf, 'No', class: 'control-label ml5'
 
 .col-xs-12.mt5
   .col-xs-12.mt10
@@ -158,5 +179,3 @@ javascript:
     document.getElementById("to_list").innerHTML = to_user_ids.sort().join(', ');
     document.getElementById("cc_list").innerHTML = cc_user_ids.sort().join(', ');
   }
-
-

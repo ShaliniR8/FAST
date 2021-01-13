@@ -29,6 +29,10 @@ class NotifyMailer < ApplicationMailer
       filename = "#{object_name}_#{object_id}_#{submission_type}_#{title}"
 
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?
+    elsif object_name == "Message"
+      title = record.owner.description rescue ''
+      filename = "#{record.owner.class.name}_#{record.owner.id}_#{title}"
+      attachments["#{filename}.pdf"] = attachment unless attachment.nil?
     end
 
     if CONFIG::GENERAL[:enable_mailer]

@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
 <script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
 <script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dirty-form.js"></script>
 
 
 <div class="item active mt50" style="height:auto;">
@@ -21,7 +22,7 @@
 
         <div class="panel-body" id="form_body">
 
-          <%=form_for @template do |f|%>
+          <%=form_for @template, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|%>
             <%=render "shared/instructions",
               :instruction =>
               'Use  <span class="glyphicon glyphicon-move"></span>  to reorder Fields and Categories</br>Nested fields can only be added to dropdown fields</br>'%>

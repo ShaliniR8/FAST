@@ -18,6 +18,7 @@ class ATNConfig < DefaultConfig
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,
+    attach_pdf_in_message:              true,
   })
 
   P_CODE = 'A9T2N7'

@@ -55,7 +55,8 @@ class MessagesController < ApplicationController
       subject: params[:message][:subject],
       send_to: params[:send_to],
       cc_to: params[:cc_to],
-      to_anonymous: params[:to_anonymous]
+      to_anonymous: params[:to_anonymous],
+      attach_pdf: (params[:attach_pdf] || false)
 
     if @message.owner
       Transaction.build_for(
