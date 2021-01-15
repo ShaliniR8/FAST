@@ -123,10 +123,13 @@ class ReportsController < ApplicationController
           not_added = ""
           if meetings.present?
             meetings.each do |meeting|
-              Rails.logger.debug "Meeting: #{meeting.attributes.to_s}\n\n"
               meeting.reports << @report
               if meeting.save
                 added += meeting.id.to_s + " "
+                if @report.status != "Under Review"
+                  @report.status = "Under Review"
+                  @report.save
+                end
               else
                 not_added += meeting.id.to_s + " "
               end

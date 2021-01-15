@@ -12,6 +12,7 @@ ruby:
     meetings = Meeting.where("status = ?", "Open")
   end
   title = "Add Event ##{report.id}: #{report.name} to Open Meetings"
+  instruction = "<p> Click anywhere on the <b>ROW</b> of the meeting to which you want to add this event.</p>"
 
 = form_tag action: :add_to_meeting
   = hidden_field_tag :meetings_selected, ''
@@ -22,31 +23,33 @@ ruby:
           strong
             | #{title}
   .panel-body
-    table id="records_table" class="table table-bordered table-striped"
-      thead
-        tr
-          th
-            | Meeting ID
-          th
-            | Meeting Name
-          th
-            | Add Status
-      tbody
-        - meetings.order('id DESC').each do |meeting|
-          tr.pointer id=meeting[:id]
-            td
-              .col-xs-12
-                strong
-                  | #{meeting[:id]}
-            td
-              .col-xs-12
-                strong
-                  | #{meeting[:title]}
-            td
-              .col-xs-12.hidden
-                input.check.meetings id=meeting[:id] type="checkbox" value=meeting[:id]
-              strong id=meeting[:id] style="color:red"
-                | Not Added
+    .col-xs-12
+      = render "shared/instructions", :instruction => instruction
+      table id="records_table" class="table table-bordered table-striped"
+        thead
+          tr
+            th
+              | Meeting ID
+            th
+              | Meeting Name
+            th
+              | Add Status
+        tbody
+          - meetings.order('id DESC').each do |meeting|
+            tr.pointer id=meeting[:id]
+              td
+                .col-xs-12
+                  strong
+                    | #{meeting[:id]}
+              td
+                .col-xs-12
+                  strong
+                    | #{meeting[:title]}
+              td
+                .col-xs-12.hidden
+                  input.check.meetings id=meeting[:id] type="checkbox" value=meeting[:id]
+                strong id=meeting[:id] style="color:red"
+                  | Not Added
 
   .pull-right
     = label_tag 'Cancel', nil,

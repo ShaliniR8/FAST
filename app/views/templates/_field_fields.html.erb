@@ -21,6 +21,7 @@
     <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
     <%if source == 'Existing'%>
       <%= f.hidden_field :field_order, :value => fld_index, :class => "form-field-order" %>
+      <%= f.hidden_field :id, :class => "form-control" %>
     <%else%>
       <%= f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
     <%end%>
@@ -47,7 +48,7 @@
         <a class="btn btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
       <%end%>
 
-      <%=f.hidden_field :deleted, :id => "delete_field"%>
+      <%=f.hidden_field :deleted, :id => "delete_field", :class => "form-control"%>
     <%else%>
       <button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
     <%end%>
