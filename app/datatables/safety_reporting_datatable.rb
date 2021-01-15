@@ -7,7 +7,7 @@ class SafetyReportingDatatable < ApplicationDatatable
 
     @object_access_filtered = object.can_be_accessed(@current_user)
     @records_total = records_total
-    @status_counts = status_counts
+    @status_counts = {}
   end
 
   private

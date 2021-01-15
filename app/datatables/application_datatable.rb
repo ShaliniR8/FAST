@@ -8,7 +8,7 @@ class ApplicationDatatable
     @status_count = {}
 
     @records_total = records_total
-    @status_counts = status_counts
+    @status_counts = {}
   end
 
 
@@ -17,8 +17,8 @@ class ApplicationDatatable
       draw: params['draw'].to_i,
       data: data,
       recordsTotal: @records_total[status],
-      recordsFiltered: @status_counts[status],
-      statusCounts: @status_counts,
+      recordsFiltered: status_counts[status],
+      statusCounts: status_counts,
       searchTerms: handle_search[:search_columns_and_terms_map]
     }
   end
