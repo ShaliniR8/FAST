@@ -7,7 +7,8 @@
         :show_btn => false,
         :type => 'records',
         can_change: false%>
-
-<%=render '/panels/show_panels', :owner => owner%>
+<%if !defined? hide_extra%>
+  <%=render '/panels/show_panels', :owner => owner%>
+<%end%>
 
 <%=render "/forms/show_comment", :owner => owner%>

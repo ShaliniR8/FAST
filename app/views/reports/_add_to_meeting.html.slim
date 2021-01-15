@@ -1,24 +1,58 @@
 css:
   .checkbox-custom input[type=checkbox]{ position: relative; }
 
+  .pointer{
+    cursor:pointer;
+  }
+
 ruby:
-  meetings = Meeting.where("status = ?", "open")
+  if meeting_ids.present? && meeting_ids.size > 0
+    meetings = Meeting.where("status = ? AND id NOT IN (?)", "Open", meeting_ids)
+  else
+    meetings = Meeting.where("status = ?", "Open")
+  end
+  title = "Add Event ##{report.id}: #{report.name} to Open Meetings"
 
 = form_tag action: :add_to_meeting
   = hidden_field_tag :meetings_selected, ''
-  .col-md-12.category-panel
-    .panel-body
-      - meetings.each do |meeting|
-        .col-xs-12.checkbox-custom
-            input.check.meetings id=meeting[:id] type="checkbox" value=meeting[:id]
-            = label_tag meeting[:id], meeting[:title]
+  .col-lg-12
+    .panel.panel-primary
+      .panel-heading
+        .panel-title
+          strong
+            | #{title}
+  .panel-body
+    table id="records_table" class="table table-bordered table-striped"
+      thead
+        tr
+          th
+            | Meeting ID
+          th
+            | Meeting Name
+          th
+            | Add Status
+      tbody
+        - meetings.order('id DESC').each do |meeting|
+          tr.pointer id=meeting[:id]
+            td
+              .col-xs-12
+                strong
+                  | #{meeting[:id]}
+            td
+              .col-xs-12
+                strong
+                  | #{meeting[:title]}
+            td
+              .col-xs-12.hidden
+                input.check.meetings id=meeting[:id] type="checkbox" value=meeting[:id]
+              strong id=meeting[:id] style="color:red"
+                | Not Added
 
-      .pull-right
-        = submit_tag 'Cancel',
-                     class: "btn btn-lg btn-default panel-button",
-                     disable_with: 'Cancelling...'
-        = submit_tag 'Add',
-                     disabled: meetings.blank?,
-                     disable_with: 'Adding...',
-                     class: "btn btn-lg btn-success panel-button m10",
-                     onclick: 'return getMeetings();'
+  .pull-right
+    = label_tag 'Cancel', nil,
+                 class: "btn btn-lg btn-default panel-button close_modal_btn"
+    = submit_tag 'Add',
+                 disabled: meetings.blank?,
+                 disable_with: 'Adding...',
+                 class: "btn btn-lg btn-success panel-button m10",
+                 onclick: 'return getMeetings();'

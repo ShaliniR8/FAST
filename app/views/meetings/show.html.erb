@@ -110,7 +110,9 @@
               </div>
             </div>
           </div>
-          <%=render "all_reports"%>
+          <%if !defined? hide_extra%>
+            <%=render "all_reports"%>
+          <%end%>
         </div>
 
         <%=render "/forms/show_comment", :owner => @meeting%>
@@ -141,6 +143,7 @@
             </div>
           </div>
         </div>
+
         <%=render "/forms/attachments_show", :owner => @meeting%>
         <%=render "records/transactions", :owner => @meeting%>
       </div>

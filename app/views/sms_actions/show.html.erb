@@ -40,7 +40,6 @@
         <% unless ['BSK'].include? AIRLINE_CODE %>
           <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
         <% end %>
-
         <%= render '/panels/show_panels', owner: @owner %>
       </div>
     </div>

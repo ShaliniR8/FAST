@@ -142,6 +142,11 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true },
           verifications: { default: true },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -215,6 +220,11 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true },
           verifications: { default: true },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -313,7 +323,12 @@ class DefaultSafetyAssuranceConfig
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
           likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
           severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
-          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
+          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

@@ -127,15 +127,22 @@
                   "data-placement" => "top",
                   :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
               <%end%>
-              <%#if @report.can_meeting_ready?(current_user)%>
-              <%if true%>
-                <%=link_to 'Add To Meeting(s)',
+              <%is_multiple_addition_allowed = CONFIG.sr::GENERAL[:allow_event_reuse].present?%>
+              <%if @report.status == 'Meeting Ready' && ((!@meeting_ids.present? && !is_multiple_addition_allowed) || (is_multiple_addition_allowed))%>
+                <%if is_multiple_addition_allowed
+                    btn_title = "Add To Meeting(s)"
+                    tooltip_title = "This will open a pop-up allowing you to add this Event directly to one or more open Meetings"
+                  else
+                    btn_title = "Add To Meeting"
+                    tooltip_title = "This will open a pop-up allowing you to add this Event directly to an open Meeting"
+                  end
+                %>
+                <%=link_to btn_title,
                   "#",
                   :class=>"btn btn-darkturquoise pull-right mb5 ml5 add_to_meeting_btn",
-                  :disable_with => "Adding...",
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
-                  :title => "This will open a pop-up allowing you to add this Event directly to one or more Meetings"%>
+                  :title => tooltip_title%>
               <%end%>
               <%if @report.can_close?(current_user)%>
                 <%=link_to 'Close Event', '#',
@@ -157,8 +164,9 @@
           <%can_change = @report.status != "Closed" && current_user.has_access("reports", "edit")%>
 
           <%=render "closing_note"%>
-          <%=render "record_table"%>
           <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+
+          <%=render "record_table"%>
           <%=render '/panels/show_panels', owner: @report%>
 
           <%if @report.meetings.present?%>
@@ -262,21 +270,40 @@
       });
     });
 
-    $('.add_to_meeting_btn').on('click', function(){
-      report_id = "<%=@report.id%>";
-      report_name = "<%=@report.name%>";
-
+    $('.add_to_meeting_btn').on('click', function() {
       swal({
-        title: "Add Event # "+ report_id + ": " + report_name + " to Open Meetings",
         allowOutsideClick: false,
         showCancelButton: false,
         showConfirmButton: false,
-        html: "<%= escape_javascript render :partial => 'reports/add_to_meeting', layout: false%>"
-      }).catch(swal.noop)
+        html: "<%= escape_javascript render :partial => 'reports/add_to_meeting', :layout => false, :locals => {:meeting_ids => @meeting_ids, :report => @report}%>",
+        onOpen: function() {
+          $("tr").on('click', function() {
+            id = $(this).attr('id');
+            $('.meetings').each(function() {
+              if($(this).attr('id') == id) {
+                if ($(this).is(':checked')) {
+                  $(this).prop('checked', false);
+                  $(this).closest('td').find('strong').first().css("color", "red");
+                  $(this).closest('td').find('strong').first().html("Not Added");
+                } else {
+                  $(this).prop('checked', true);
+                  $(this).closest('td').find('strong').first().css("color", "green");
+                  $(this).closest('td').find('strong').first().html("To be Added");
+                }
+              }
+            });
+          });
+
+          $('.close_modal_btn').on('click', function(){
+            swal.close();
+          });
+        }
+      });
     });
   });
 
   function getMeetings() {
+    multiple_meetings_allowed = <%=CONFIG.sr::GENERAL[:allow_event_reuse]%>
     var meeting_items = '';
     meeting_elems = $("input.meetings:checked");
 
@@ -284,8 +311,18 @@
         meeting_items += $(elem).val() + ",";
     });
 
-    $('#meetings_selected').val(meeting_items);
-    return true;
+    if (multiple_meetings_allowed) {
+      $('#meetings_selected').val(meeting_items);
+      return true;
+    } else {
+      if (meeting_elems.length > 1) {
+        alert('Please select ONE meeting only!');
+        return false;
+      } else {
+        $('#meetings_selected').val(meeting_items);
+        return true;
+      }
+    }
   }
 </script>
 

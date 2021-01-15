@@ -84,6 +84,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         title: 'Inspection',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -135,6 +136,11 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -152,6 +158,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         title: 'Evaluation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -207,6 +214,11 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -224,6 +236,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         title: 'Investigation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -298,7 +311,12 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
           likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
           severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
-          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
+          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

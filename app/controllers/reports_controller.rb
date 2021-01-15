@@ -341,6 +341,7 @@ class ReportsController < ApplicationController
     @headers = Record.get_headers
 
     @records = @report.records
+    @meeting_ids = @report.meetings.map(&:id)
 
     @agenda_headers = AsapAgenda.get_headers
     @action_headers = CorrectiveAction.get_meta_fields('index')

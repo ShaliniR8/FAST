@@ -31,7 +31,7 @@
 
     <div class="panel-body" style="<%= source == 'Existing' ? 'display:none' : 'display:block'%>" >
       <%if source == 'Existing'%>
-        <%= f.hidden_field :id, :class => "category-changeable" %>
+        <%= f.hidden_field :id, :class => "changed category-changeable" %>
       <%end%>
       <div class="col-xs-2">
         <b>Color</b>

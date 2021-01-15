@@ -15,37 +15,37 @@ ruby:
   end
 
 .col-xs-12
-  = f.label :subject, 'Subject', class: 'control-label col-xs-2'
-  .col-xs-10
+  = f.label :subject, 'Subject', class: 'control-label col-xs-4'
+  .col-xs-8
     = f.text_field :subject, class: 'form-control', value: subject
 
 .col-xs-12.mt10
-  = f.label :to_list, 'TO', class: 'control-label col-xs-2'
-  .col-xs-10
+  = f.label :to_list, 'TO', class: 'control-label col-xs-4'
+  .col-xs-8
     p style='overflow-y:auto' id='to_list'
 
 .col-xs-12.mt10
-  = f.label :cc_list, 'CC', class: 'control-label col-xs-2'
-  .col-xs-10
+  = f.label :cc_list, 'CC', class: 'control-label col-xs-4'
+  .col-xs-8
     p style='overflow-y:auto' id='cc_list'
 
 .col-xs-12.mt10
-  = f.label :distribution_list, 'Distribution List', class: 'control-label col-xs-2'
-  .col-xs-6
+  = f.label :distribution_list, 'Distribution List', class: 'control-label col-xs-4'
+  .col-xs-8
     = select_tag :distribution_list,
       options_for_select(DistributionList.all.collect{|p| [p['title'], p['id']]}),
       {include_blank: true, class: 'form-control distribution_list'}
 
 .col-xs-12.mt10
-  = label_tag 'template', 'Template', class: 'control-label col-xs-2'
-  .col-xs-6
+  = label_tag 'template', 'Template', class: 'control-label col-xs-4'
+  .col-xs-8
     = select_tag 'template',
       options_for_select(CannedMessage.all.collect{|p| [p['name'], p['id']]}),
       include_blank: true, class: 'form-control template'
 
 - if @owner.present?
-  .col-xs-12.mt5
-    = label_tag 'template', 'Attached', class: 'control-label col-xs-2'
+  .col-xs-12.mt10
+    = label_tag 'template', 'Attached', class: 'control-label col-xs-4'
     .col-xs-6
       strong
         - if @owner.present?
@@ -53,14 +53,9 @@ ruby:
           = f.hidden_field :owner_id, value: @owner.id
           = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
 
-/.col-xs-12.mt5
-  .col-xs-12.col-xs-offset-2
-    = check_box_tag :from_anonymous, 1, false
-    = label_tag :from_anonymous, 'Message Anonymously', class: 'control-label ml5'
-
-.col-xs-12.mt5
-    = label_tag 'template', 'Do you want to send this message anonymously?', class: 'control-label col-xs-2'
-    .col-xs-6.inner
+.col-xs-12.mt10
+    = label_tag 'template', 'Do you want to send this message anonymously?', class: 'control-label col-xs-4'
+    .col-xs-6
       .col-xs-3
         = radio_button_tag :from_anonymous, 1
         = label_tag :from_anonymous, 'Yes', class: 'control-label ml5'
@@ -69,8 +64,8 @@ ruby:
         = label_tag :from_anonymous, 'No', class: 'control-label ml5'
 
 - if @owner.present? && CONFIG::GENERAL[:attach_pdf_in_message].present?
-  .col-xs-12.mt5
-    = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.id} with the email?", class: 'control-label col-xs-2'
+  .col-xs-12.mt10
+    = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.id} with the email?", class: 'control-label col-xs-4'
     .col-xs-6 style="vertical-align:middle;"
       .col-xs-3
         = radio_button_tag :attach_pdf, 1
@@ -81,7 +76,7 @@ ruby:
 
 .col-xs-12.mt5
   .col-xs-12.mt10
-    = f.text_area :content, class: 'form-control', rows: 15, id: 'content'
+    = f.text_area :content, class: 'form-control', rows: 10, id: 'content'
 
 .col-xs-12.mt5
   #attachments.col-xs-11.row

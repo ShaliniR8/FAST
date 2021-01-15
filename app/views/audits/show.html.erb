@@ -36,8 +36,8 @@
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
-        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
 
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
         <%=render '/panels/show_panels', owner: @owner%>
 
       </div>
