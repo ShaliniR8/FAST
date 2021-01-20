@@ -203,6 +203,12 @@ class SubmissionsController < ApplicationController
       end
     end
 
+    create_notice = true
+    if params[:is_autosave].present? && params[:is_autosave] == "2"
+      params[:commit] = 'Save for Later'
+      create_notice = false
+    end
+
     # edge case for the mobile app
     # if the user submits a new submission in offline mode,
     # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
@@ -239,10 +245,19 @@ class SubmissionsController < ApplicationController
 
     event_date_to_utc
 
-    @record = Submission.new(params[:submission])
+    if params[:present_id].present?
+      @record = Submission.find(params[:present_id])
+      saved = @record.update_attributes(params[:submission])
+    else
+      @record = Submission.new(params[:submission])
+      saved = @record.save
+    end
 
-    if @record.save
-      notify_notifiers(@record, params[:commit])
+    if saved
+      if create_notice
+        notify_notifiers(@record, params[:commit])
+      end
+
       if params[:commit] == 'Submit'
         @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         if params[:create_copy] == '1'
@@ -258,11 +273,12 @@ class SubmissionsController < ApplicationController
           flash = { success: 'Submission submitted.' }
           NotifyMailer.send_submitter_confirmation(current_user, @record)
           format.html { redirect_to submission_path(@record), flash: flash }
+          format.json { update_as_json(flash) }
         else
           flash = { success: 'Submission created in progress.' }
           format.html { redirect_to incomplete_submissions_path, flash: flash }
+          format.json {  render :json => { :result => 'success', :redirect => continue_submission_path(@record.id), :record_id => @record.id } }
         end
-        format.json { update_as_json(flash) }
       end
 
     else
@@ -333,7 +349,7 @@ class SubmissionsController < ApplicationController
     pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Submission_##{@record.get_id}" + (@deidentified ? '(de-identified)' : '')
+    filename = "Submission_##{@record.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
@@ -370,6 +386,11 @@ class SubmissionsController < ApplicationController
     end
 
     @record = Submission.find(params[:id])
+    create_notice = true
+    if params[:is_autosave].present? && params[:is_autosave] == "2"
+      params[:commit] = 'Save for Later'
+      create_notice = false
+    end
 
     # edge case for the mobile app
     # if the user submits an existing in progress submission in offline mode,
@@ -384,7 +405,10 @@ class SubmissionsController < ApplicationController
     event_date_to_utc
 
     if @record.update_attributes(params[:submission])
-      notify_notifiers(@record, params[:commit])
+      if create_notice
+        notify_notifiers(@record, params[:commit])
+      end
+
       if params[:commit] == "Save for Later"
         respond_to do |format|
           flash = { success: "Submission ##{@record.id} updated." }

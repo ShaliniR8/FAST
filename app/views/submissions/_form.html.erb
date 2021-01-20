@@ -33,14 +33,22 @@
             <%=@action.titleize + " " + @record.template.name%> Submission
           </div>
           <div class="top_buttons pull-right">
+            <h5 id="auto-save" class="pull-right ml10" style="visibility:hidden">Auto Save Enabled</h5>
             <a class="btn btn-default expandall mb5"
               data-toggle="tooltip"
               data-placement="top"
               title="Expand all panels">Expand All</a>
+            <%if @action == 'Continue'%>
+              <%=link_to "Delete",
+                  submission_path(@record),
+                  :method => 'delete',
+                  :id=>"delete-btn",
+                  :class=>"ml10 mr5 btn btn-danger pull-right",
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  "title" => "This will delete the submission permanently"%>
+            <%end%>
           </div>
-          <!-- <div>
-            <h5 id="auto-save" class="pull-right" style="visibility:hidden;">Auto Save enabled</h5>
-          </div> -->
         </div>
       </div>
 
@@ -68,7 +76,10 @@
 
 
       <div class="panel-body" id="form_body">
-        <%=form_for @record , :html => {id: 'submit-form', class: 'dirty-submit', :multipart => true, :novalidate => true} do |f|%>
+        <%=form_for @record , :html => {:novalidate => true} do |f|%>
+
+          <%=hidden_field_tag 'is_autosave', 1%>
+          <%=hidden_field_tag 'present_id', ""%>
 
           <div class="col-xs-12">
             <%=render "shared/instructions",
@@ -110,11 +121,10 @@
           <%end%>
 
           <%=f.hidden_field :templates_id, :value => @template.id%>
-          <%=f.hidden_field :completed %>
+          <%=f.hidden_field :completed%>
           <%if @action == "new"%>
             <%=f.hidden_field :user_id, :value => current_user.id%>
           <%end%>
-
 
           <div class="col-xs-12 mt10">
 
@@ -218,7 +228,6 @@
                   new_submission_path,
                   :id=>"cancel-btn",
                   :class=>"mr5 btn btn-default pull-right",
-                  :confirm=>'Are you sure?',
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
                   "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
@@ -226,7 +235,6 @@
                 <%=link_to "Cancel", root_url,
                   :id=>"cancel-btn",
                   :class=>"mr5 btn btn-default pull-right",
-                  :confirm=>'Are you sure?',
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
                   "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
@@ -235,7 +243,6 @@
               <%=link_to "Cancel", incomplete_submissions_path,
                 :id=>"cancel-btn",
                 :class=>"mr5 btn btn-default pull-right",
-                :confirm=>'Are you sure?',
                 "data-toggle" => "tooltip",
                 "data-placement" => "top",
                 "title" => "This cancels the Submission, you will lose all the unsaved changes"%>
@@ -259,7 +266,7 @@
 
 <script type="text/javascript">
 
-  function update_timezones(){
+  function update_timezones() {
      $('.toplevel_timezone').on('change',function(){
       var timezone = $('.toplevel_timezone').val();
       $(".timezone_field").val(timezone);
@@ -267,7 +274,7 @@
   }
 
   // Updata airport table
-  function handleSearch(event){
+  function handleSearch(event) {
     // Get field id
     var field_id = event.data.field_id
     // Get the keywords user searched for
@@ -287,7 +294,7 @@
     }
   }
 
-  function updateAirportTable(field_id){
+  function updateAirportTable(field_id) {
     // Initialize table as a datatable
     airport_table = $('#airports' + field_id).DataTable({
       "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
@@ -305,7 +312,7 @@
     });
   }
 
-  function resetModal(field_id){
+  function resetModal(field_id) {
     // Reset the table, field, and close the modal
     $("#airports_table").html("");
     $("#icao").val("");
@@ -317,31 +324,33 @@
 
   var airport_table;
 
-  $(document).ready(function(){
-    // autoSaveText = document.getElementById('auto-save');
+  $(document).ready(function() {
+    autoSaveText = document.getElementById('auto-save');
 
-    // function autosave() {
-    //   $("#submission_completed").val(true);
-    //   datum = $('form').serialize()
-    //   console.log("Data: " + datum);
-    //   $.ajax({
-    //     type: "POST",
-    //     url: $('form').attr('action'),
-    //     // data: $('form').serialize(),
-    //     data: datum,
-    //     dataType: "script",
-    //   });
-    // }
+    function autosave() {
+      $("#is_autosave").val(2);
+      $.ajax({
+        type: "POST",
+        url: $('form').attr('action'),
+        data: $('form').serialize(),
+        dataType: "json",
+        success: function(data) {
+          if(data.record_id) {
+            $('#present_id').val(data.record_id);
+          }
+        }
+      });
+    }
 
-    // runAutosave = setInterval(autosave, 15000);
-    // setInterval(function() {
-    //   autoSaveText.style.visibility = (autoSaveText.style.visibility == 'hidden' ? '' : 'hidden');
-    // }, 1000);
+    runAutosave = setInterval(autosave, 30000);
+    setInterval(function() {
+      autoSaveText.style.visibility = (autoSaveText.style.visibility == 'hidden' ? '' : 'hidden');
+    }, 1000);
 
-    // $(window).on('beforeunload', function(){
-    //   // clearInterval(runAutosave)
-    //   return true;
-    // });
+    $(window).on('beforeunload', function() {
+      clearInterval(runAutosave);
+      return true;
+    });
 
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
     if (timeZoneToggleBtn != null) {
@@ -357,7 +366,7 @@
     }
 
     // Count the characters limit
-    $('#submission_description, textarea').keyup(function(){
+    $('#submission_description, textarea').keyup(function() {
       len = $(this).val().length;
       max = $(this).attr('maxlength');
 
@@ -379,7 +388,7 @@
       });
     });
 
-    $('.required_field').each(function(){
+    $('.required_field').each(function() {
       if ($(this).parents('.nested_field').css('display') != 'none'){
         update_titles($(this));
       }
@@ -388,21 +397,23 @@
     var count;
     var isValidationReq = true;
 
-    $('.submit_btn').click(function(){
-      if ($(this).val() == 'Save for Later'){
+    $('.submit_btn').click(function() {
+      if ($(this).val() == 'Save for Later') {
         isValidationReq = false;
+        $("#is_autosave").val(1);
       } else {
         isValidationReq = true;
+        $("#is_autosave").val(1);
       }
     });
 
-    $("form").on('submit', function(){
+    $("form").on('submit', function() {
       $(window).off('beforeunload');
       if(isValidationReq) {
         $("div.category-panel").find('.panel-body').slideUp();
         $("div.category-panel").closest('div.category-panel').addClass('collapsed');
         $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-        $(this).find('.required_field').each(function(){
+        $(this).find('.required_field').each(function() {
           var cboxes = $(this).find('.checkbox_mul').get();
           var radios = $(this).find('.radio_req').get();
 
@@ -446,7 +457,7 @@
     $(target).closest('div.category-panel').find('.panel-body').slideDown();
   }
 
-  function update_titles(target){
+  function update_titles(target) {
     $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
     $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }

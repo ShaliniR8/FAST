@@ -298,10 +298,11 @@ class HomeController < ApplicationController
                         .can_be_accessed(current_user)
                         .by_emp_groups(params[:emp_groups])
         records.each do |a|
+          title_status = a.status == 'Closed' ? "#{a.template.name} ##{a.get_id} (Closed)" : "#{a.template.name} ##{a.get_id}"
           @calendar_entries.push({
             :url => record_path(a),
             :start => a.get_date,
-            :title => "#{a.template.name} ##{a.get_id}",
+            :title => title_status,
             :textColor => "darkslategrey",
             :description => "<b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
             :color => group_to_color(a.template.emp_group)

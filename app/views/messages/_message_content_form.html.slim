@@ -51,7 +51,10 @@ ruby:
         - if @owner.present?
           = f.hidden_field :owner_type, value: @owner.class.name
           = f.hidden_field :owner_id, value: @owner.id
-          = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
+          - if @owner.class.name == 'Submission'
+            = link_to "#{@owner.class.name} ##{@owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}", @owner, target: :_blank
+          - else
+            = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
 
 .col-xs-12.mt10
     = label_tag 'template', 'Do you want to send this message anonymously?', class: 'control-label col-xs-4'
@@ -65,7 +68,10 @@ ruby:
 
 - if @owner.present? && CONFIG::GENERAL[:attach_pdf_in_message].present?
   .col-xs-12.mt10
-    = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.id} with the email?", class: 'control-label col-xs-4'
+    - if @owner.class.name == 'Submission'
+      = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} with the email?", class: 'control-label col-xs-4'
+    - else
+      = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.id} with the email?", class: 'control-label col-xs-4'
     .col-xs-6 style="vertical-align:middle;"
       .col-xs-3
         = radio_button_tag :attach_pdf, 1

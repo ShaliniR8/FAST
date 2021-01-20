@@ -22,7 +22,7 @@ task :submission_notify => [:environment] do |t|
   Rails.logger.debug "ATTACH_PDF: #{attach_pdf.to_s}"
   owner = Object.const_get(owner_type).find(owner_id)
   content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
-  content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.id} " + "#{owner.description})") if !content.present?
+  content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} " + "#{owner.description})") if !content.present?
   users.each do |user_id|
     if attach_pdf == 'true'
 

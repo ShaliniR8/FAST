@@ -1,6 +1,6 @@
 <div class = 'wrap'>
   <div class="title">
-    Submission <%="##{owner.get_id}: #{owner.template.name} - #{owner.get_description}"%>
+    Submission <%="##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}: #{owner.template.name} - #{owner.get_description}"%>
   </div>
 
   <div class="content">

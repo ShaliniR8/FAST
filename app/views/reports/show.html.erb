@@ -303,9 +303,9 @@
   });
 
   function getMeetings() {
-    multiple_meetings_allowed = <%=CONFIG.sr::GENERAL[:allow_event_reuse]%>
-    var meeting_items = '';
-    meeting_elems = $("input.meetings:checked");
+    let multiple_meetings_allowed = <%=CONFIG.sr::GENERAL[:allow_event_reuse]%>;
+    let meeting_items = '';
+    let meeting_elems = $("input.meetings:checked");
 
     meeting_elems.each(function(index, elem){
         meeting_items += $(elem).val() + ",";

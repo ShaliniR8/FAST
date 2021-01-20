@@ -25,6 +25,7 @@ class NotifyMailer < ApplicationMailer
     object_id   = record.id
     title       = record.description rescue ''
     if object_name == 'Submission'
+      object_id = record.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])
       submission_type = record.template.name
       filename = "#{object_name}_#{object_id}_#{submission_type}_#{title}"
 
@@ -70,7 +71,7 @@ class NotifyMailer < ApplicationMailer
 
   def send_submitter_confirmation(user, submission)
     @user = user
-    @submission_id = submission.id
+    @submission_id = submission.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])
     @submission_description = submission.get_description
     @submission_url = g_link(submission)
     @submitter_message = submission.template.submitter_message.gsub("\n", '<br>') rescue nil
