@@ -55,7 +55,7 @@ ruby:
                     td = occurrence.value.gsub(/[\r\n]+/, '<br>').html_safe
                     - if show_btns
                       td =link_to 'Delete', '#',
-                      class: 'btn btn-danger delete_occurrence_btn',
+                      class: "btn btn-danger delete_occurrence_btn_#{owner_id}",
                       'data-cid' => occurrence.id
 javascript:
   $(document).ready(function(){
@@ -68,7 +68,7 @@ javascript:
     });
   })
 
-  $('.delete_occurrence_btn').click(function(){
+  $(".delete_occurrence_btn_#{owner.id}").click(function(){
     if(confirm('Are you sure?')){
       btn = $(this)
       $.ajax({

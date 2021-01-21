@@ -38,10 +38,9 @@
               data-toggle="tooltip"
               data-placement="top"
               title="Expand all panels">Expand All</a>
-            <%if @action == 'Continue'%>
-              <%=link_to "Delete",
-                  submission_path(@record),
-                  :method => 'delete',
+            <%if @action == 'Continue' && current_user.has_access("submissions", "destroy") || current_user.id == @record.user_id%>
+              <%=link_to "Discard",
+                  discard_submission_path(@record),
                   :id=>"delete-btn",
                   :class=>"ml10 mr5 btn btn-danger pull-right",
                   "data-toggle" => "tooltip",

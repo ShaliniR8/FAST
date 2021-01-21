@@ -201,6 +201,13 @@ class SubmissionsController < ApplicationController
   end
 
 
+  def discard
+    @record=Submission.find(params[:id])
+    @record.destroy
+    redirect_to submissions_path(status: 'All'), flash: {danger: "Submission ##{params[:id]} deleted."}
+  end
+
+
   def create
     params[:submission][:submission_fields_attributes].each_value do |field|
       if field[:value].is_a?(Array)

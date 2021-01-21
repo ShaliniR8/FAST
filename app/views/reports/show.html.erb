@@ -128,7 +128,7 @@
                   :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
               <%end%>
               <%is_multiple_addition_allowed = CONFIG.sr::GENERAL[:allow_event_reuse].present?%>
-              <%if @report.status == 'Meeting Ready' && ((!@meeting_ids.present? && !is_multiple_addition_allowed) || (is_multiple_addition_allowed))%>
+              <%if %w[New Closed].exclude?(@report.status) && ((!@meeting_ids.present? && !is_multiple_addition_allowed) || (is_multiple_addition_allowed))%>
                 <%if is_multiple_addition_allowed
                     btn_title = "Add To Meeting(s)"
                     tooltip_title = "This will open a pop-up allowing you to add this Event directly to one or more open Meetings"

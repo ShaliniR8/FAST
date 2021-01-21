@@ -293,6 +293,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'csap'
       get 'dsap'
       get 'comment'
+      get 'discard'
     end
     collection do
       post 'load_records'

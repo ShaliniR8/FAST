@@ -243,6 +243,7 @@ class DefaultSafetyAssuranceConfig
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :occurrences,
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
