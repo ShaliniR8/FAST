@@ -86,6 +86,7 @@ class ApplicationDatatable
   def sort_column
     column = columns[params[:order]['0'][:column].to_i]
     column.include?('#') ? column.split('#').second : column
+    column == 'id' ? "#{object.table_name}.#{column}" : column
   end
 
 
