@@ -49,6 +49,10 @@ css:
     display: none;
   }
 
+  th, td { font-size: 13px; }
+  td > a { font-size: 13px !important; }
+
+
 javascript:
   function initContent(status) {
     $('li').removeClass('active');
@@ -132,6 +136,13 @@ javascript:
     });
   }
 
+  function addRecordIdToRow() {
+    $("tbody tr").each(function () {
+      recordId = $(this).find(">:first-child").text();
+      $(this).attr("record-id",recordId);
+    })
+  }
+
   function drawTableCallBack() {
     addIndividualColumnSearchField();
     hideActionColumnSearchField();
@@ -141,6 +152,7 @@ javascript:
     $(".records-table").css({'opacity':1});
     $('.records-table').show();
     columnSearch();
+    addRecordIdToRow();
   }
 
   $(function() {
@@ -171,6 +183,14 @@ javascript:
       columns: #{raw @columns.to_json},
       drawCallback: drawTableCallBack,
       order: [['0', 'desc']],
+    });
+
+    $(document).on('click', "#records_table tbody tr td", function(){
+      var cellIdx = $(this)[0].cellIndex;
+      var lastIdx = $(this).closest("tr").find("td:last")[0].cellIndex;
+      if(cellIdx != lastIdx){
+        window.location = ("/#{@table_name}/" + $(this).closest("tr").attr('record-id'));
+      }
     });
 
 

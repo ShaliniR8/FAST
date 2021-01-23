@@ -462,16 +462,16 @@ class DefaultSafetyReportingConfig
             display: proc{|user:,**op| true}},
         ]
       },
-      # 'Query Center' => {
-      #   title: 'Query Center', path: '#',
-      #   display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
-      #   subMenu: [
-      #     {title: 'All', path: 'queries_path',
-      #       display: proc{|user:,**op| true}},
-      #     {title: 'New', path: 'new_query_path',
-      #       display: proc{|user:,**op| true}},
-      #   ]
-      # },
+      'Query Center' => {
+        title: 'Query Center', path: '#',
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        subMenu: [
+          {title: 'All', path: 'queries_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_query_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
     }
   }
 

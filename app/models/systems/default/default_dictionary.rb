@@ -279,7 +279,7 @@ class DefaultDictionary
     },
     causes: {
       partial: '/causes/all',
-      visible: proc { |owner:,user:,**op| true },
+      visible: proc { |owner:,user:,**op| owner.causes.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { owner: owner }  },
     },
