@@ -264,7 +264,7 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },
-          occurrences: {default: true, title: "(Report.find_top_level_section.label rescue '')"},
+          occurrences: {default: true, title: (Report.find_top_level_section.label rescue '')},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Report.find_top_level_section.label rescue nil}"},
