@@ -8,12 +8,11 @@ class VersionDictionary
       sections: {
         'What\'s New' => [
           'Added Auto-Save functionality to Submissions. Auto-Saved submissions can be found in the In Progress tab',
-          'Added ability to discard in progress submissions so that auto-saved submissions can be discarded',
-          'Added Included Findings column to Inspections index, Evaluations index and Investigations index',
+          'Added ability to discard in progress submissions',
+          'Added Included Findings column to Inspections, Evaluations and Investigations \'All\' page',
           'Added ability to attach PDF in email notification sent from messages',
           'Added ability to add an Event to a Meeting directly from the event display page',
           'Added ability to save large pieces of text in Verification Details and Verification comment boxes',
-          'Added ability to save large pieces of text in SMS Actions comment boxes',
           'Added a separate page for listing disabled users',
           'Added Root Cause to Investigations',
         ],
