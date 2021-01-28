@@ -68,11 +68,7 @@ class MessagesController < ApplicationController
       end
     end
 
-    if params[:message][:attachment_attributes].present?
-      no_of_attachments = params[:message][:attachment_attributes].size
-    else
-      no_of_attachments = 0
-    end
+    no_of_attachments = params[:message][:attachments_attributes].present? ? params[:message][:attachments_attributes].size : 0
 
     # send messages
     call_rake 'notify',

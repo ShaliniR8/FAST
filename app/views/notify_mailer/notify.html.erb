@@ -10,8 +10,11 @@
       <br>
       --------------------------------------------
       <br>
-      <%= "From #{@message.get_send_from_name}"%><br>
-      <%= "#{ @message.getAll('send_from_email')}"%><br>
+      <% from_name = @message.send("send_from").getName %>
+      <%= "From #{from_name}"%><br>
+      <%if from_name != 'Anonymous' %>
+        <%= "#{ @message.getAll('send_from_email')}"%><br>
+      <%end%>
       <br>
       <% message = @message.content.gsub("\n", "<br>") %>
       <%=message.html_safe rescue ''%>
@@ -31,7 +34,11 @@
     <br>
     <br>
     <%if @extra > 0%>
-      <%="There are #{@extra} additional attachments with this message, please login to the ProSafeT portal to view/download them from your messages."%>
+      <%if @extra > 1%>
+        <b><%="There are #{@extra} additional attachments with this message, please login to the ProSafeT portal to view/download them from your messages."%></b>
+      <%else%>
+        <b><%="There is 1 additional attachment with this message, please login to the ProSafeT portal to view/download it from your messages."%></b>
+      <%end%>
     <%end%>
     <br>
     <br>

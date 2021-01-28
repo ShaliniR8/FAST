@@ -109,7 +109,10 @@ javascript:
       });
     });
 
-    recipients_table = $('#recipients').DataTable();
+    // recipients_table = $('#recipients').DataTable();
+    var recipients_table = $('#recipients').DataTable({
+        "iDisplayLength": 5
+    });
 
     $('.distribution_list').on('change', function() {
       var distribution_list_id = $(this).val();
@@ -133,13 +136,51 @@ javascript:
       renderRecipients(recipients_table);
 
       $("#recipients").on('click','.send_btn',function() {
-        $(this).toggleClass('selected');
-        renderRecipients(recipients_table);
+        if ($(this).hasClass('selected')){
+          $(this).removeClass('btn-danger').addClass('btn-transparent');
+          $(this).toggleClass('selected');
+          renderRecipients(recipients_table);
+        } else {
+          if ($(this).next('.cc_btn').hasClass('selected')) {
+            $(this).removeClass('btn-transparent').addClass('btn-danger');
+            $(this).next('.cc_btn').removeClass('btn-danger selected').addClass('btn-transparent');
+            $(this).toggleClass('selected');
+            renderRecipients(recipients_table);
+          } else {
+            if (isRecipientListOverLimit()){
+              alert("You can only select 10 recipients for this message");
+            } else {
+              $(this).removeClass('btn-transparent').addClass('btn-danger');
+              $(this).next(".cc_btn").removeClass('btn-danger selected').addClass('btn-transparent');
+              $(this).toggleClass('selected');
+              renderRecipients(recipients_table);
+            }
+          }
+        }
       });
 
       $("#recipients").on('click','.cc_btn',function() {
-        $(this).toggleClass('selected');
-        renderRecipients(recipients_table);
+        if ($(this).hasClass('selected')){
+          $(this).removeClass('btn-danger').addClass('btn-transparent');
+          $(this).toggleClass('selected');
+          renderRecipients(recipients_table);
+        } else {
+          if ($(this).prev('.send_btn').hasClass('selected')) {
+            $(this).removeClass('btn-transparent').addClass('btn-danger');
+            $(this).prev('.send_btn').removeClass('btn-danger selected').addClass('btn-transparent');
+            $(this).toggleClass('selected');
+            renderRecipients(recipients_table);
+          } else {
+            if (isRecipientListOverLimit()){
+              alert("You can only select 10 recipients for this message");
+            } else {
+              $(this).removeClass('btn-transparent').addClass('btn-danger');
+              $(this).prev(".send_btn").removeClass('btn-danger selected').addClass('btn-transparent');
+              $(this).toggleClass('selected');
+              renderRecipients(recipients_table);
+            }
+          }
+        }
       });
 
       var allPages = recipients_table.cells().nodes();
@@ -162,13 +203,46 @@ javascript:
         });
         renderRecipients(recipients_table);
       });
-    });
 
+      $('form').on('submit', function() {
+        var send_count = 0
+        var cc_count = 0
+        var form = $(this)
+        recipients_table.rows().nodes().to$().each(function() {
+          if ($(this).find('.send_btn').hasClass('btn-danger')){
+            form.append("<input type='hidden' name=send_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
+          }
+
+          if ($(this).find('.cc_btn').hasClass('btn-danger')){
+            form.append("<input type='hidden' name=cc_to[" + cc_count++ + "] value=" + $(this).attr('user') + ">")
+          }
+        })
+
+        if (send_count === 0) {
+          event.preventDefault()
+          swal({
+            title:  'Message has no recipient.',
+            type:   'error',
+          })
+          return false
+        }
+        return true
+      });
+    });
   });
+
+  function isRecipientListOverLimit () {
+    if (($("#to_list").text().split(", ").concat($("#cc_list").text().split(", "))).length >= 10) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   function renderRecipients(recipients_table) {
     var to_user_ids = [];
     var cc_user_ids = [];
+
     recipients_table.rows().nodes().to$().each(function() {
       if ($(this).find('.send_btn').hasClass('btn-danger')) {
         to_user_ids.push($(this).attr('name'));
