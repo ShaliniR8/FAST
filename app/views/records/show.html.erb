@@ -229,10 +229,12 @@
           <%
             meta_field_args = ['show']
             # show_submitter_name is FALSE and current_user is global admin
-            cond1 = !CONFIG.sr::GENERAL[:show_submitter_name] && current_user.global_admin?
+            # cond1 = !CONFIG.sr::GENERAL[:show_submitter_name] && current_user.global_admin?
             # show_submitter_name is TRUE and current_user had full access
-            cond2 = CONFIG.sr::GENERAL[:show_submitter_name] && template_full_access
-            meta_field_args.push('admin') if cond1 || cond2
+            if CONFIG.sr::GENERAL[:show_submitter_name] || current_user.global_admin?
+              template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
+              meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.users_id == current_user.id
+            end
             meta_field_args.push('close') if @record.status == 'Closed' && @record.is_asap
           %>
           <%=render "forms/show_fields", fields: Record.get_meta_fields(*meta_field_args), record: @record%>
@@ -386,6 +388,7 @@
           $('.event-btn').show();
           $('#edit-btn').show();
           $('#ca-btn').show();
+          $('.edit-category-btn').show();
         }
       });
     });

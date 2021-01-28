@@ -45,7 +45,7 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },
-          submitter: { default: true, visible: "admin" },
+          submitter: { default: true, visible: "admin,query,index" },
           event_date: { default: true },
           description: { default: true },
         }.reduce({}) { |acc,(key,data)|
@@ -100,7 +100,7 @@ class DefaultSafetyReportingConfig
           id: { default: true, field: 'get_id' },
           status: { default: true },
           template: { default: true, title: 'Type' },
-          submitter: { default: true, visible: "admin,query" },
+          submitter: { default: true, visible: "admin,query,index" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
@@ -361,7 +361,7 @@ class DefaultSafetyReportingConfig
           },
           immediate_action: {
             field: 'immediate_action', title: 'Immediate Action Detail',
-            num_cols: 12, type: 'text', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
           bcomprehensive_action: {
@@ -371,7 +371,7 @@ class DefaultSafetyReportingConfig
           },
           comprehensive_action: {
             field: 'comprehensive_action', title: 'Comprehensive Action Detail',
-            num_cols: 10, type: 'text', visible: 'form,show',
+            num_cols: 10, type: 'textarea', visible: 'form,show',
             required: false
           },
           action: {

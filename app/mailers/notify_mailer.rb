@@ -16,11 +16,12 @@ class NotifyMailer < ApplicationMailer
 	  end
   end
 
-  def notify(notice, subject, record, attachment = nil)
+  def notify(notice, subject, record, attachment = nil, extra_attachments = 0)
     @user = notice.user
     @notice = notice
     @link = g_link(notice.owner)
     @message = record
+    @extra = extra_attachments.to_i
     object_name = record.class.name
     object_id   = record.id
     title       = record.description rescue ''
@@ -30,7 +31,7 @@ class NotifyMailer < ApplicationMailer
       filename = "#{object_name}_#{object_id}_#{submission_type}_#{title}"
 
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?
-    elsif object_name == "Message"
+    elsif object_name == "Message" && record.owner.present?
       title = record.owner.description rescue ''
       filename = "#{record.owner.class.name}_#{record.owner.id}_#{title}"
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?

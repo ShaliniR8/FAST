@@ -26,6 +26,18 @@ class ApplicationController < ActionController::Base
 
     # Datatable Column Info
     @columns = get_data_table_columns(@object_name)
+    if @object_name == 'Record'
+      if !CONFIG.sr::GENERAL[:show_submitter_name]
+        if !current_user.global_admin?
+          @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      else
+        if !current_user.admin?
+          @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      end
+    end
+
     @column_titles = @columns.map { |col| col[:title] }
     @date_type_column_indices = @column_titles.map.with_index { |val, inx|
       (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
@@ -889,7 +901,11 @@ class ApplicationController < ActionController::Base
       notice = record.notices.create(arg[:notice])
       puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
-        NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment])
+        if arg[:extra_attachments].present?
+          NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment], arg[:extra_attachments])
+        else
+          NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment], 0)
+        end
       end
     end
   end

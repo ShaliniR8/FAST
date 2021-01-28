@@ -75,7 +75,7 @@
 
 
       <div class="panel-body" id="form_body">
-        <%=form_for @record , :html => {:novalidate => true} do |f|%>
+        <%=form_for @record , :html => {:multipart => true, :novalidate => true} do |f|%>
 
           <%=hidden_field_tag 'is_autosave', 1%>
           <%=hidden_field_tag 'present_id', ""%>
@@ -331,8 +331,11 @@
       $.ajax({
         type: "POST",
         url: $('form').attr('action'),
-        data: $('form').serialize(),
-        dataType: "json",
+        data: new FormData($('form')[0]),
+        enctype: 'multipart/form-data',
+        processData: false,
+        contentType: false,
+        dataType: 'json',
         success: function(data) {
           if(data.record_id) {
             $('#present_id').val(data.record_id);
@@ -397,17 +400,16 @@
     var isValidationReq = true;
 
     $('.submit_btn').click(function() {
+      $(window).off('beforeunload');
+      $("#is_autosave").val(1);
       if ($(this).val() == 'Save for Later') {
         isValidationReq = false;
-        $("#is_autosave").val(1);
       } else {
         isValidationReq = true;
-        $("#is_autosave").val(1);
       }
     });
 
     $("form").on('submit', function() {
-      $(window).off('beforeunload');
       if(isValidationReq) {
         $("div.category-panel").find('.panel-body').slideUp();
         $("div.category-panel").closest('div.category-panel').addClass('collapsed');

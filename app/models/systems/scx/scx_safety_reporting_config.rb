@@ -14,9 +14,6 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
     objects:{
       'Submission' => {
-        fields: {
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
-        },
         actions: {
           pdf: {
             access: proc { |owner:,user:,**op|
@@ -27,9 +24,6 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
         },
       },
       'Record' => {
-        fields: {
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
-        },
         actions: {
           pdf: {
             access: proc { |owner:,user:,**op|

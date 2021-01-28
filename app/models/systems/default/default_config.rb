@@ -18,7 +18,7 @@ class DefaultConfig
   GENERAL = {
     # AIRLINE-SPECIFIC CONFIGS
       # Please Ensure these are filled out for each airline
-    version:        '1.2.5',                      # Helps to track most recent logged updates
+    version:        '1.2.6',                      # Helps to track most recent logged updates
     name:           'Not Initialized',            # Airline Name- shown throughout site
     time_zone:      'Pacific Time (US & Canada)', # Used in varied locations
 

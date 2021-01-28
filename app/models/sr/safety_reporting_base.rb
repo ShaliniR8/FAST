@@ -70,7 +70,5 @@ module Sr
       ActiveSupport::TimeZone.all.map(&:name)
     end
 
-
-
   end
 end

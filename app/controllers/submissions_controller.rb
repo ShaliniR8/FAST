@@ -52,6 +52,16 @@ class SubmissionsController < ApplicationController
         @default_tab = params[:status]
 
         @columns = get_data_table_columns(controller_name.classify)
+        if !CONFIG.sr::GENERAL[:show_submitter_name]
+          if !current_user.global_admin?
+            @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+          end
+        else
+          if !current_user.admin?
+            @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+          end
+        end
+
         @column_titles = @columns.map { |col| col[:title] }
 
         @column_date_type = @column_titles.map.with_index { |val, inx|
@@ -219,9 +229,9 @@ class SubmissionsController < ApplicationController
     create_notice = true
     if params[:is_autosave].present? && params[:is_autosave] == "2"
       params[:commit] = 'Save for Later'
+      params[:submission].delete(:attachments_attributes)
       create_notice = false
     end
-
     # edge case for the mobile app
     # if the user submits a new submission in offline mode,
     # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
@@ -230,48 +240,36 @@ class SubmissionsController < ApplicationController
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
 
-
     if params[:submission][:attachments_attributes].present?
       params[:submission][:attachments_attributes].each do |key, attachment|
-        # File is a base64 string
-        if attachment[:name].present? && attachment[:name].is_a?(Hash)
-          file_params = attachment[:name]
-
-          temp_file = Tempfile.new('file_upload')
-          temp_file.binmode
-          temp_file.write(Base64.decode64(file_params[:base64]))
-          temp_file.rewind()
-
-          file_name = file_params[:fileName]
-          mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
-
-          uploaded_file = ActionDispatch::Http::UploadedFile.new(
-            :tempfile => temp_file,
-            :filename => file_name,
-            :type     => mime_type)
-
-          # Replace attachment parameter with the created file
-          params[:submission][:attachments_attributes][key][:name] = uploaded_file
+        if attachment[:name].present?
+          params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+        else
+          params[:submission][:attachments_attributes].delete(key)
         end
       end
     end
-
     event_date_to_utc
 
     if params[:present_id].present?
       @record = Submission.find(params[:present_id])
+      sub_fields = SubmissionField.where("submissions_id=?", params[:present_id])
+      sub_fields.map(&:destroy)
+      @record.submission_fields = []
+      @record.save
       saved = @record.update_attributes(params[:submission])
     else
       @record = Submission.new(params[:submission])
       saved = @record.save
     end
 
-    if saved
+    if saved.present?
       if create_notice
         notify_notifiers(@record, params[:commit])
       end
 
       if params[:commit] == 'Submit'
+        @record.make_report
         @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         if params[:create_copy] == '1'
           converted = @record.convert
@@ -308,8 +306,12 @@ class SubmissionsController < ApplicationController
     respond_to do |format|
       format.html do
         @meta_field_args = ['show']
-        @meta_field_args << 'admin' if current_user.global_admin?
         @record = Submission.preload(:submission_fields).find(params[:id])
+        if CONFIG.sr::GENERAL[:show_submitter_name] || current_user.global_admin?
+          template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
+          @meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.user_id == current_user.id
+        end
+
         if !@record.completed
           if @record.user_id == current_user.id
             redirect_to continue_submission_path(@record)
@@ -378,33 +380,23 @@ class SubmissionsController < ApplicationController
       end
     end
 
-    if params[:submission][:attachments_attributes].present?
-      params[:submission][:attachments_attributes].each do |key, attachment|
-        # File is a base64 string
-        if attachment[:name].present? && attachment[:name].is_a?(Hash)
-          file_params = attachment[:name]
-          temp_file = Tempfile.new('file_upload')
-          temp_file.binmode
-          temp_file.write(Base64.decode64(file_params[:base64]))
-          temp_file.rewind()
-          file_name = file_params[:fileName]
-          mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
-          uploaded_file = ActionDispatch::Http::UploadedFile.new(
-            :tempfile => temp_file,
-            :filename => file_name,
-            :type     => mime_type)
-          params[:submission][:attachments_attributes][key][:name] = uploaded_file
-        end
-      end
-    end
-
     @record = Submission.find(params[:id])
     create_notice = true
     if params[:is_autosave].present? && params[:is_autosave] == "2"
       params[:commit] = 'Save for Later'
+      params[:submission].delete(:attachments_attributes)
       create_notice = false
     end
 
+    if params[:submission][:attachments_attributes].present?
+      params[:submission][:attachments_attributes].each do |key, attachment|
+        if attachment[:name].present?
+          params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+        else
+          params[:submission][:attachments_attributes].delete(key)
+        end
+      end
+    end
     # edge case for the mobile app
     # if the user submits an existing in progress submission in offline mode,
     # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
@@ -432,6 +424,7 @@ class SubmissionsController < ApplicationController
         if params[:commit] == 'Add Notes'
           @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
         else
+          @record.make_report
           @record.create_transaction(action: 'Create', context: 'User Submitted Report')
           NotifyMailer.send_submitter_confirmation(current_user, @record)
         end

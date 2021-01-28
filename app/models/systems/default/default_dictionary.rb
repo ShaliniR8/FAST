@@ -687,7 +687,7 @@ class DefaultDictionary
     },
     submitter: {
       field: 'get_submitter_name', title: 'Submitted By',
-      num_cols: 6, type: 'user', visible: 'admin,query', #should include show+form w/ sr::CONFIG[:show_submitter_name]
+      num_cols: 6, type: 'user', visible: 'admin,query,index', #should include show+form w/ sr::CONFIG[:show_submitter_name]
       required: false, censor_deid: true
     },
     event_date: {

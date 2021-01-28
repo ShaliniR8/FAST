@@ -55,7 +55,7 @@ module PrdgSession
     port: 587,
     # user_name: 'donotreply@prosafet.com',
     user_name: 'noc@prosafet.com',
-    password: 'Jimmy21!',
+    password: 'Cookie2021!',
     authentication: 'plain',
   }
   config.action_mailer.raise_delivery_errors = false

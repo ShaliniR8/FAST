@@ -30,6 +30,9 @@
     <%=@link.html_safe%>
     <br>
     <br>
+    <%if @extra > 0%>
+      <%="There are #{@extra} additional attachments with this message, please login to the ProSafeT portal to view/download them from your messages."%>
+    <%end%>
     <br>
     <br>
     Thank you,<br>

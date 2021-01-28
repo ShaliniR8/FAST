@@ -39,15 +39,14 @@
           <%end%>
         </div>
         <%if from_rec_show%>
-          <%if @record.status == 'Open' || @record.status == 'Linked'%>
-            <div class = "col-xs-12 mt10">
-              <%if record_edit_access%>
-                <%=link_to 'Edit', '#',
-                  class: 'btn btn-sm btn-warning pull-right edit-category-btn',
-                  'data-path' => edit_field_record_path(@record, category_id: @cat.id) %>
-              <%end%>
-            </div>
-          <%end%>
+          <div class = "col-xs-12 mt10">
+            <%if record_edit_access%>
+              <%=link_to 'Edit', '#',
+                class: 'btn btn-sm btn-warning pull-right edit-category-btn',
+                'data-path' => edit_field_record_path(@record, category_id: @cat.id),
+                style: "display: #{%w[Open Linked].include?(@record.status) ? 'block' : 'none'}" %>
+            <%end%>
+          </div>
         <%end%>
       </div>
     </div>
@@ -76,15 +75,14 @@
     <%end%>
   </div>
   <%if from_rec_show%>
-    <%if @record.status == 'Open' || @record.status == 'Linked'%>
-      <div class = "col-xs-12 mt10">
-        <%if record_edit_access%>
-          <%=link_to 'Edit', '#',
-            class: 'btn btn-sm btn-warning pull-right edit-category-btn',
-            'data-path' => edit_field_record_path(@record, category_id: @cat.id) %>
-        <%end%>
-      </div>
-    <%end%>
+    <div class = "col-xs-12 mt10">
+      <%if record_edit_access%>
+        <%=link_to 'Edit', '#',
+          class: 'btn btn-sm btn-warning pull-right edit-category-btn',
+          'data-path' => edit_field_record_path(@record, category_id: @cat.id),
+          style: "display: #{%w[Open Linked].include?(@record.status) ? 'block' : 'none'}" %>
+      <%end%>
+    </div>
   <%end%>
 <%end%>
 

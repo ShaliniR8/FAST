@@ -285,9 +285,17 @@ class ReportsController < ApplicationController
     if params[:records].present?
       params[:records].each_pair do |index, value|
         record = Record.find(value);
-        record.report = @owner
-        record.status = "Linked"
-        record.save
+        if record.report.present?
+          if record.report.id != @owner.id
+            record.report = @owner
+            record.status = "Linked"
+            record.save
+          end
+        else
+          record.report = @owner
+          record.status = "Linked"
+          record.save
+        end
       end
     end
 

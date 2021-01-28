@@ -45,8 +45,7 @@ ruby:
                 current_user.has_access(owner.class.table_name,'admin', admin: true) || \
                 owner.responsible_user_id == current_user.id)
                 = link_to "Address", address_checklist_path(checklist),
-                  class: 'btn btn-success pull-right mr5',
-                  target: "_blank"
+                  class: 'btn btn-success pull-right mr5'
 
               - if owner.status != 'Completed' && current_user.has_access(owner.class.table_name,'edit', admin: true)
 

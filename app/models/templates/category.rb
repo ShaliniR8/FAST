@@ -61,14 +61,12 @@ class Category < ActiveRecord::Base
 	def not_empty_for(record)
 		fields_id = fields.map(&:id)
 		if record.class.name.demodulize == 'Record'
-			field_values = RecordField
-				.where("records_id = ? and fields_id in (?) and value <> ?",
+			field_values = RecordField.where("records_id = ? and fields_id in (?) and value <> ?",
 				record.id,
 				fields_id,
 				'')
 		elsif record.class.name.demodulize == 'Submission'
-			field_values = SubmissionField
-				.where("submissions_id = ? and fields_id in (?) and value <> ?",
+			field_values = SubmissionField.where("submissions_id = ? and fields_id in (?) and value <> ?",
 				record.id,
 				fields_id,
 				'')

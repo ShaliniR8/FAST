@@ -19,7 +19,7 @@ task :submission_notify => [:environment] do |t|
   owner_type = ENV['OWNER_TYPE']
   owner_id   = ENV['OWNER_ID']
   attach_pdf = ENV['ATTACH_PDF']
-  Rails.logger.debug "ATTACH_PDF: #{attach_pdf.to_s}"
+
   owner = Object.const_get(owner_type).find(owner_id)
   content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
   content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} " + "#{owner.description})") if !content.present?
@@ -74,7 +74,7 @@ task :notify => [:environment] do |t|
   attachment = nil
 
   # if false # TODO: add other record types
-  if ENV['ATTACH_PDF'] == "1" # TODO: add other record types
+  if ENV['ATTACH_PDF'] == "1" && ENV['OWNER_TYPE'].present? && ENV['OWNER_ID'].present? # TODO: add other record types
     owner_type = ENV['OWNER_TYPE']
     owner_id   = ENV['OWNER_ID']
     @record = Object.const_get(owner_type).find(owner_id)
@@ -102,22 +102,40 @@ task :notify => [:environment] do |t|
       SendTo.create(messages_id: ENV['MESSAGES_ID'], users_id: v, anonymous: (ENV['TO_ANONYMOUS'] || false))
 
       logger.info "Notification sent to #{User.find(v).full_name}"
-      controller.notify(@message,
+      if ENV['EXTRA_ATTACHMENTS'].to_i > 0
+        controller.notify(@message,
+        notice: {users_id: v, content: "You have a new message in ProSafeT."},
+        mailer: true,
+        extra_attachments: ENV['EXTRA_ATTACHMENTS'].to_i,
+        subject:  ENV['SUBJECT'],
+        attachment: attachment)
+      else
+        controller.notify(@message,
         notice: {users_id: v, content: "You have a new message in ProSafeT."},
         mailer: true,
         subject:  ENV['SUBJECT'],
         attachment: attachment)
+      end
     end
   end
 
   if cc_to.present?
     cc_to.values.each do |v|
       CC.create(messages_id: ENV['MESSAGES_ID'], :users_id => v)
-      controller.notify(@message,
+      if ENV['EXTRA_ATTACHMENTS'].to_i > 0
+        controller.notify(@message,
+        notice: {users_id: v, content: "You have a new message in ProSafeT."},
+        mailer: true,
+        extra_attachments: ENV['EXTRA_ATTACHMENTS'].to_i,
+        subject: ENV['SUBJECT'],
+        attachment: attachment)
+      else
+        controller.notify(@message,
         notice: {users_id: v, content: "You have a new message in ProSafeT."},
         mailer: true,
         subject: ENV['SUBJECT'],
         attachment: attachment)
+      end
     end
   end
 

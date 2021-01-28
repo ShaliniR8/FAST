@@ -19,8 +19,8 @@ class Submission < Sr::SafetyReportingBase
 
   accepts_nested_attributes_for :submission_fields
 
-  after_create :make_report
-  after_update :make_report
+  # after_create :make_report  # Logic moved to Submissions Controller create & update methods
+  # after_update :make_report
 
   def create_transaction(action: nil, context: nil)
     Transaction.build_for(

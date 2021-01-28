@@ -510,6 +510,8 @@ module ApplicationHelper
       'mediumaquamarine'
     when "ground"
       'peru'
+    when "observation"
+      'crimson'
     else
       "lightgray"
     end
