@@ -392,8 +392,6 @@ class SubmissionsController < ApplicationController
       params[:submission][:attachments_attributes].each do |key, attachment|
         if attachment[:name].present?
           params[:submission][:attachments_attributes][key][:name] = attachment[:name]
-        else
-          params[:submission][:attachments_attributes].delete(key)
         end
       end
     end
