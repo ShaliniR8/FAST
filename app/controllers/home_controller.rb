@@ -284,9 +284,9 @@ class HomeController < ApplicationController
           @calendar_entries.push({
             :url => submission_path(a),
             :start => a.get_date,
-            :title => "#{a.template.name} ##{a.get_id}",
+            :title => "#{a.template.name} ##{a.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}",
             :textColor => "darkslategrey",
-            :description => "<b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
+            :description => "<b>#{a.template.name} ##{a.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}</b>: #{a.description}",
             :color => group_to_color(a.template.emp_group)
           }) if a.get_date.present?
         end

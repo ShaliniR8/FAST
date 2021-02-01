@@ -64,6 +64,7 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def create
+    convert_from_risk_value_to_risk_index
     @owner = SmsAction.create(params[:sms_action])
     redirect_to @owner.becomes(SmsAction), flash: {success: "Corrective Action created."}
   end
