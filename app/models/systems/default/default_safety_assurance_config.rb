@@ -313,7 +313,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
-          occurrences: {default: true, title: (Investigation.find_top_level_section.label rescue nil)},
+          # occurrences: {default: true, title: (Investigation.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Investigation.find_top_level_section.label rescue nil}"
@@ -463,7 +463,7 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true, type: 'text' },
 
-          occurrences: {default: true, title: (Finding.find_top_level_section.label rescue nil)},
+          # occurrences: {default: true, title: (Finding.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Finding.find_top_level_section.label rescue nil}"
