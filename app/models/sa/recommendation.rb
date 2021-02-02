@@ -33,7 +33,6 @@ class Recommendation < Sa::SafetyAssuranceBase
   end
 
 
-<<<<<<< HEAD
   def self.get_meta_fields_keys(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
     keys = CONFIG.object['Recommendation'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
