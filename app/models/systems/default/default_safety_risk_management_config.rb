@@ -235,7 +235,7 @@ class DefaultSafetyRiskManagementConfig
           },
           final_comment: { default: true },
           verifications: { default: true },
-          # occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
+          occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Hazard.find_top_level_section.label rescue nil}"},

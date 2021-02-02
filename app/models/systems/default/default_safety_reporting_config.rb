@@ -150,7 +150,7 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },
-          # occurrences: {default: true, title: (Record.find_top_level_section.label rescue nil)},
+          occurrences: {default: true, title: (Record.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Record.find_top_level_section.label rescue nil}"},
