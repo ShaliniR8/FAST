@@ -184,7 +184,11 @@ class QueriesController < ApplicationController
     @owner = params[:query_id].present? ? Query.find(params[:query_id]) : Query.new
 
     @target = params[:target]
-    @templates = Template.where(:id => params[:templates])
+    if @target == 'Report'
+      @templates = Template.all
+    else
+      @templates = Template.where(:id => params[:templates])
+    end
 
     @target_display_name = params[:target_display_name]
     @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
@@ -198,7 +202,7 @@ class QueriesController < ApplicationController
         }
       }
     end
-    @fields = @fields.sort_by{|field| field[:title]}
+    @fields = @fields.sort_by{|field| (field[:title].present? ? field[:title] : "")}
     render :partial => "building_query"
   end
 
@@ -206,8 +210,7 @@ class QueriesController < ApplicationController
     header = 0
     result_all_ids_str = params[:data_ids].gsub("&quot\;", "\'")
     result_all_ids = ActiveSupport::JSON.decode(result_all_ids_str)
-
-    params[:row] = params[:row].to_i + 1 if result_all_ids[1][0].empty? # first row is for empty records
+    params[:row] = params[:row].to_i + 1 if result_all_ids[1][0].to_s.empty? # first row is for empty records
 
     if result_all_ids[header][1] == 'IDs' # when series not present
       @results_ids = result_all_ids[params[:row].to_i][1]
@@ -268,7 +271,11 @@ class QueriesController < ApplicationController
     end
     @owner = Query.find(params[:id])
     @object_type = Object.const_get(@owner.target)
-    @records = @object_type.where(id: params[:records].split(','))
+    if @object_type == Report
+      @records = Report.preload(:records).where(id: params[:records].split(','))
+    else
+      @records = @object_type.where(id: params[:records].split(','))
+    end
     # find x_axis field name
     @x_axis_field = get_field(@owner, @object_type, params[:x_axis])
 
@@ -340,7 +347,6 @@ class QueriesController < ApplicationController
     @owner.query_conditions.each do |condition|
       records = records & expand_emit(condition, records)
     end
-
     @records = records
   end
 
@@ -510,8 +516,22 @@ class QueriesController < ApplicationController
       else
         if @owner.target == "Submission"
           results = emit(condition, records, "Submission")
-        elsif @owner.target = "Record"
+        elsif @owner.target == "Record"
           results = emit(condition, records, "Record")
+        elsif @owner.target == "Report"
+          events = emit(condition, records, "Report")
+          results_ids = events.map(&:id)
+          results = []
+          records.each do |rec|
+            if rec.records.present?
+              rec.records.each do |rep|
+                if results_ids.include?(rep.id)
+                  results << rec
+                  break
+                end
+              end
+            end
+          end
         end
       end
     end
@@ -568,6 +588,18 @@ class QueriesController < ApplicationController
     elsif from_template == "Record"
       record_fields = records.map(&:record_fields).flatten
       return emit_helper_dynamic(search_value, record_fields, field, xor, logic_type, "Record")
+    elsif from_template == "Report"
+      record_fields = []
+      records.each do |ev|
+        if ev.records.present?
+          ev.records.each do |rep|
+            rep.record_fields.each do |rf|
+              record_fields << rf
+            end
+          end
+        end
+      end
+      return emit_helper_dynamic(search_value, record_fields, field, xor, logic_type, "Report")
     else
       return emit_helper_basic(search_value, records, field, xor, logic_type)
     end
@@ -631,9 +663,10 @@ class QueriesController < ApplicationController
         result = related_fields.select{|record| xor ^ ((x.value.to_f >= search_value.to_f) rescue false)}
       end
     end
+
     if target_name == "Submission"
       return result.map(&:submission)
-    elsif target_name == "Record"
+    elsif target_name == "Record" || target_name == "Report"
       return result.map(&:record)
     else
       return []

@@ -43,7 +43,7 @@
                         <%if col_index == 0%>
                           <td><%=value%></td>
                         <%else%>
-                          <td><a href="javascript:void(0)" class="gridRow" data-row="<%=row_index%>" data-col="<%=col_index%>"><%=value%></a></td>
+                          <td><a href="javascript:void(0)" class="gridRow" data-row="<%=row_index%>" data-col="<%=col_index%>" data-vis="<%=@visualization.id%>"><%=value%></a></td>
                         <%end%>
                       <%end%>
                     </tr>
@@ -53,6 +53,30 @@
             </div>
           </div>
           <script type="text/javascript">
+            for(i=0; i<$(".gridRow").length; i++) {
+              $(".gridRow")[i].addEventListener('click', function () {
+                row = parseInt(this.getAttribute('data-row'));
+                col = parseInt(this.getAttribute('data-col'));
+
+                if (this.getAttribute('data-vis') == "<%=@visualization.id%>") {
+                  $.ajax({
+                    type: "POST",
+                    url: "<%=display_chart_result_query_path(@owner)%>",
+                    data: {
+                      "data_ids": "<%=@data_ids%>",
+                      "row": row + 1, // including header,
+                      "col": col
+                    },success: function(response){
+                      var w = window.open('about:blank');
+                      w.document.open();
+                      w.document.write(response);
+                      w.document.close();
+                    }
+                  })
+                }
+              })
+            }
+
             $("#grid-table-<%=@visualization.id%>").DataTable({
               dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
                    "<'row'<'col-sm-12'tr>>" +
@@ -66,29 +90,6 @@
                 }
               }],
             });
-
-            for(i=0; i<$(".gridRow").length; i++) {
-              $(".gridRow")[i].addEventListener('click', function () {
-                row = parseInt(this.getAttribute('data-row'));
-                col = parseInt(this.getAttribute('data-col'));
-
-                $.ajax({
-                  type: "POST",
-                  url: "<%=display_chart_result_query_path(@owner)%>",
-                  data: {
-                    "data_ids": "<%=@data_ids%>",
-                    "row": row + 1, // including header,
-                    "col": col
-                  },success: function(response){
-                    var w = window.open('about:blank');
-                    w.document.open();
-                    w.document.write(response);
-                    w.document.close();
-                  }
-                })
-
-              })
-            }
 
           </script>
         <%when 2%>

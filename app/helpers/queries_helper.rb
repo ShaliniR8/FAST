@@ -1,7 +1,7 @@
 module QueriesHelper
 
   # returns the formatted values of record's field
-  def get_val(record, field_arr)
+  def get_val(record, field_arr, title = nil)
     field = field_arr[0]
     if field.is_a?(Field)
       field_type = field.display_type
@@ -9,6 +9,11 @@ module QueriesHelper
         value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
       elsif record.class == Record
         value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
+        if value.nil? && title.present?
+          rf_f_ids = record.record_fields.map(&:fields_id)
+          field = Field.where("label = ? AND id IN (?)", title, rf_f_ids).first
+          value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
+        end
       else
         value = 'Something Went Wrong'
       end
@@ -47,24 +52,77 @@ module QueriesHelper
 
   # returns an array that stores x_axis and series value pairs
   def create_hash_array(records, x_axis_field, series_field)
-    arr = records.inject([]) do |res, record|
-      x_val = get_val(record, x_axis_field)
-      y_val = get_val(record, series_field)
-      if x_val.is_a?(Array) && y_val.is_a?(Array)
-        x_val.each do |x|
-          y_val.each do |y|
-            res << {x_axis: x, series: y, id: record.id}
+    x_axis_field_title = x_axis_field[0][:title].nil? ? x_axis_field[0][:label] : x_axis_field[0][:title]
+    series_field_title = series_field[0][:title].nil? ? series_field[0][:label] : series_field[0][:title]
+
+    if records[0].class == Report
+      arr = records.inject([]) do |res, report|
+        rep_id = report.id
+        if x_axis_field[0].is_a?(Field) && series_field[0].is_a?(Field)
+          x_val = nil
+          y_val = nil
+          if report.records.present?
+            report.records.each do |rec|
+              x_val = get_val(rec, x_axis_field, x_axis_field_title)
+              report.records.each do |inner_rec|
+                y_val = get_val(rec, series_field, series_field_title)
+                if x_val.present? && y_val.present?
+                  res << {x_axis: x_val, series: y_val, id: rep_id}
+                end
+              end
+            end
+          end
+        elsif x_axis_field[0].is_a?(Field) && !series_field[0].is_a?(Field)
+          x_val = nil
+          y_val = get_val(report, series_field)
+          if report.records.present?
+            report.records.each do |rec|
+              x_val = get_val(rec, x_axis_field, x_axis_field_title)
+              if x_val.present? && y_val.present?
+                res << {x_axis: x_val, series: y_val, id: rep_id}
+              end
+            end
+          end
+        elsif !x_axis_field[0].is_a?(Field) && series_field[0].is_a?(Field)
+          x_val = get_val(report, x_axis_field)
+          y_val = nil
+          if report.records.present?
+            report.records.each do |rec|
+              y_val = get_val(rec, series_field, series_field_title)
+              if x_val.present? && y_val.present?
+                res << {x_axis: x_val, series: y_val, id: rep_id}
+              end
+            end
+          end
+        else
+          x_val = get_val(report, x_axis_field)
+          y_val = get_val(report, series_field)
+          if x_val.present? && y_val.present?
+            res << {x_axis: x_val, series: y_val, id: rep_id}
           end
         end
-        res << {x_axis: x_val[0], series: y_val[0], id: record.id}
-      elsif x_val.is_a?(Array)
-        x_val.each{|x| res << {x_axis: x, series: y_val, id: record.id}}
-      elsif y_val.is_a?(Array)
-        y_val.each{|y| res << {x_axis: x_val, series: y, id: record.id}}
-      else
-        res << {x_axis: x_val, series: y_val, id: record.id}
+        res
       end
-      res
+    else
+      arr = records.inject([]) do |res, record|
+        x_val = get_val(record, x_axis_field)
+        y_val = get_val(record, series_field)
+        if x_val.is_a?(Array) && y_val.is_a?(Array)
+          x_val.each do |x|
+            y_val.each do |y|
+              res << {x_axis: x, series: y, id: record.id}
+            end
+          end
+          res << {x_axis: x_val[0], series: y_val[0], id: record.id}
+        elsif x_val.is_a?(Array)
+          x_val.each{|x| res << {x_axis: x, series: y_val, id: record.id}}
+        elsif y_val.is_a?(Array)
+          y_val.each{|y| res << {x_axis: x_val, series: y, id: record.id}}
+        else
+          res << {x_axis: x_val, series: y_val, id: record.id}
+        end
+        res
+      end
     end
     arr
   end
@@ -145,13 +203,39 @@ module QueriesHelper
 
     data = [[x_axis_field_title, 'Count']]
 
-    records.map{|record| get_val(record, x_axis_field_arr)}
-      .compact.flatten
-      .reject(&:blank?)
-      .inject(Hash.new(0)){|h, e| h[e] += 1; h}
-      .sort_by{|k,v| k}
-      .each{|pair| data << pair}
-
+    if x_axis_field_arr[0].is_a?(Field) && records[0].class == Report
+      val_hash = Hash.new
+      all_vals = []
+      records.each do |report|
+        rep_id = report.id
+        if report.records.present?
+          vals = []
+          report.records.each do |rec|
+            val = get_val(rec, x_axis_field_arr, x_axis_field_title)
+            vals << val if val.present?
+            all_vals << val if val.present?
+          end
+          val_hash[rep_id] = vals
+        end
+      end
+      all_vals = all_vals.uniq.sort
+      all_vals.each do |v|
+        count = 0
+        val_hash.each do |key, value|
+          if value.include?(v)
+            count = count + 1
+          end
+        end
+        data << [v, count]
+      end
+    else
+      records.map{|record| get_val(record, x_axis_field_arr)}
+        .compact.flatten
+        .reject(&:blank?)
+        .inject(Hash.new(0)){|h, e| h[e] += 1; h}
+        .sort_by{|k,v| k}
+        .each{|pair| data << pair}
+    end
     return data
   end
 
@@ -161,24 +245,50 @@ module QueriesHelper
     x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
 
     data_ids = [[x_axis_field_title, 'IDs']]
-    records.map{|record| [record.id, get_val(record, x_axis_field_arr)] }
-      .reject{ |x| x[1].nil? } # remove empty records
-      .inject(Hash.new([])) { |hash, element|
-        record_id = element[0]
-        x_axis_field_value = element[1]
 
-        if hash[x_axis_field_value].present?
-          hash[x_axis_field_value] << record_id
-        else
-          hash[x_axis_field_value] = []
-          hash[x_axis_field_value] << record_id
+    if x_axis_field_arr[0].is_a?(Field) && records[0].class == Report
+      val_hash = Hash.new
+      records.each do |report|
+        rep_id = report.id
+        if report.records.present?
+          report.records.each do |rec|
+            val = get_val(rec, x_axis_field_arr, x_axis_field_title)
+            if val.present?
+              if val_hash[val].present?
+                if val_hash[val].exclude?(rep_id)
+                  val_hash[val] << rep_id
+                end
+              else
+                val_hash[val] = []
+                val_hash[val] << rep_id
+              end
+            end
+          end
         end
+      end
+      val_hash = val_hash.sort
+      val_hash.each do |k, v|
+        data_ids << [k, v]
+      end
+    else
+      records.map{|record| [record.id, get_val(record, x_axis_field_arr)] }
+        .reject{ |x| x[1].nil? } # remove empty records
+        .inject(Hash.new([])) { |hash, element|
+          record_id = element[0]
+          x_axis_field_value = element[1]
 
-        ; hash
-      }
-      .sort_by{|k,v| k}
-      .each{|pair| data_ids << pair}
+          if hash[x_axis_field_value].present?
+            hash[x_axis_field_value] << record_id
+          else
+            hash[x_axis_field_value] = []
+            hash[x_axis_field_value] << record_id
+          end
 
+          ; hash
+        }
+        .sort_by{|k,v| k}
+        .each{|pair| data_ids << pair}
+    end
     return data_ids
   end
 
