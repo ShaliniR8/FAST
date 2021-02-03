@@ -3,7 +3,6 @@ module QueriesHelper
   # returns the formatted values of record's field
   def get_val(record, field_arr, title = nil)
     field = field_arr[0]
-    byebug
     if field.is_a?(Field)
       field_type = field.display_type
       if record.class == Submission
