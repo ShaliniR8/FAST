@@ -6,7 +6,6 @@ class RPAConfig < DefaultConfig
 
   MOBILE_MODULES = %w[ASAP SMS]
 
-
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'Republic Airways',
@@ -236,5 +235,4 @@ class RPAConfig < DefaultConfig
       30 => 'High - 30',
     }
   }
-
 end
