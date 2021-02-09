@@ -6,7 +6,7 @@ default:
       baseline:
         title: Baseline
       mitigated:
-        title: Substitute
+        title: Mitigated
   sr:
     title: Safety Reporting
     corrective_action:
