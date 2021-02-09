@@ -76,7 +76,7 @@ class NotifyMailer < ApplicationMailer
     @submission_description = submission.get_description
     @submission_url = g_link(submission)
     @submitter_message = submission.template.submitter_message.gsub("\n", '<br>') rescue nil
-    subject = "ProSafeT: Submission ##{submission.id} Received"
+    subject = "ProSafeT: Submission ##{@submission_id} Received"
     mail(**to_email(user.email), subject: subject).deliver
   end
 
