@@ -671,7 +671,6 @@ module ApplicationHelper
 
 
 
-
   def link_to_add_blocks(name, name_space, insert_space)
     link_to_function(name, "add_blocks(this, \"#{name_space}\", \"#{insert_space}\")")
   end

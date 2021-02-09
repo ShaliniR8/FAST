@@ -192,10 +192,10 @@
       "aaSorting": [[0, "desc"]],
       "columnDefs": [{ type: 'natural', targets: 0 }],
     });
-    $("#candidates").dataTable({
-      "aaSorting": [[0, "desc"]],
-      "columnDefs": [{ type: 'natural', targets: 0 }],
-    });
+    // $("#candidates").dataTable({
+    //   "aaSorting": [[0, "desc"]],
+    //   "columnDefs": [{ type: 'natural', targets: 0 }],
+    // });
 
     $(".view_btn").on('click',function(){
       window.open("/records/" + $(this).closest("tr").children("td").eq(0).html());
