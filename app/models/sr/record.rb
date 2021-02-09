@@ -392,10 +392,13 @@ class Record < Sr::SafetyReportingBase
   end
 
   def self.export_all
-    date_from = Time.now.at_beginning_of_month
+    date_from = (Time.now - 1.month).at_beginning_of_month
+    date_to = (Time.now - 1.month).end_of_month
+
+    all_records = Record.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).where([
+"event_date >= ? and event_date <= ?", date_from, date_to])
 
     all_record_fields = []
-    all_records = self.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).select { |record| record.event_date > date_from rescue false }
     all_records.each { |record| all_record_fields << record.record_fields.map{|sf| [sf.fields_id, sf]} }
     all_record_fields = all_record_fields.flatten(1).to_h
 
