@@ -15,6 +15,10 @@ module QueriesHelper
     else
       field_type = field[:type]
       value = strip_html_tag(record.send(field[:field]))
+
+      if value.present? && field[:field].downcase.include?('get_source')
+        value = value.split.first
+      end
     end
     format_val(value, field_type, field_arr[1])
   end

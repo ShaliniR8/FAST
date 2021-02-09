@@ -120,9 +120,12 @@ class Finding < Sa::SafetyAssuranceBase
       checklist_num = @owner.checklist_cells[0].value
 
 
+      # "<a style='font-weight:bold' href='/#{true_owner_table_name}/#{true_owner.id}'>
+      #   #{true_owner.class.name} ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
+      # </a>".html_safe
+
       "<a style='font-weight:bold' href='/#{true_owner_table_name}/#{true_owner.id}'>
-        #{true_owner.class.name} ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
-      </a>".html_safe
+        #{true_owner.class.name} ##{true_owner.id}</a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end
