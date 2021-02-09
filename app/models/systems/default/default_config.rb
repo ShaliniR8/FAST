@@ -273,17 +273,18 @@ class DefaultConfig
       row_header: ['4', '3', '2', '1', '0'],
       column_header_name: 'PROBABILITY',
       column_header: ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent'],
+
       rows_color: [
-        ['yellow',    'yellow',     'orange',     'orange',     'orange' ],
-        ['yellow',    'yellow',     'yellow',     'orange',     'orange' ],
-        ['#60FF60',   '#60FF60',    'yellow',     'yellow',     'orange' ],
-        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60'],
-        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60']
+        ['yellow',      'yellow',       'orange',       'orange',       'orange' ],
+        ['yellow',      'yellow',       'yellow',       'orange',       'orange' ],
+        ['limegreen',   'limegreen',    'yellow',       'yellow',       'orange' ],
+        ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen'],
+        ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen']
       ],
     },
 
     risk_definitions: {
-      '#60FF60' => { rating: 'Green - Acceptable'                   },
+      limegreen:   { rating: 'Green - Acceptable'                   },
       yellow:      { rating: 'Yellow - Acceptable with mitigation'  },
       orange:      { rating: 'Orange - Unacceptable'                },
     },
@@ -308,9 +309,8 @@ class DefaultConfig
     },
 
     risk_table_dict: {
-      '#60FF60'   => 'Green - Acceptable',
-      'limegreen' => 'Green - Acceptable',
-      'red'       => 'Red - Unacceptable',
+      limegreen:  'Green - Acceptable',
+      red:        'Red - Unacceptable',
       yellow:        'Yellow - Acceptable with mitigation',
       orange:        'Orange - Unacceptable',
 
