@@ -14,11 +14,11 @@ class DefaultSafetyReportingConfig
     template_nested_fields:           true,      # WIP nested smart forms functionality - default off
     enable_dual_report:               true,
     matrix_carry_over:                false,
-    attach_pdf_submission:            true,
     configurable_agenda_dispositions: false,
     share_meeting_agendas:            true,
 
     # Airline-Specific Features:
+    attach_pdf_submission:     'ided',    # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
     observation_phases_trend:  false,     # Specific Feature for BSK - default off
     event_summary:             false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
     event_tabulation:          false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off

@@ -11,6 +11,7 @@ task :submission_notify => [:environment] do |t|
   logger.info "#{ENV['OWNER_TYPE']}"
   logger.info "#{ENV['OWNER_ID']}"
   logger.info "#{ENV['USERS']}"
+  logger.info "#{ENV['ATTACH_PDF']}"
   logger.info '##############################'
 
 
@@ -24,26 +25,34 @@ task :submission_notify => [:environment] do |t|
   content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
   content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} " + "#{owner.description})") if !content.present?
   users.each do |user_id|
-    if attach_pdf == 'true'
+    if attach_pdf == 'none'
+      controller.notify(
+        owner,
+        notice: {
+          users_id: user_id,
+          content: content
+        },
+        mailer: true,
+        subject: "New #{owner.template.name} Submission",
+      )
+    else
+      is_deidentified = attach_pdf == 'deid'
 
-      html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: owner, deidentified: false}, layout: false)
+      html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: owner, deidentified: is_deidentified}, layout: false)
       pdf = PDFKit.new(html)
       pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
       pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
       attachment = pdf.to_pdf
 
-
-      controller.notify(owner, notice: {
-        users_id: user_id,
-        content: content},
-        mailer: true, subject: "New #{owner.template.name} Submission",
+      controller.notify(
+        owner,
+        notice: {
+          users_id: user_id,
+          content: content
+        },
+        mailer: true,
+        subject: "New #{owner.template.name} Submission",
         attachment: attachment
-      )
-    else
-      controller.notify(owner, notice: {
-        users_id: user_id,
-        content: content},
-        mailer: true, subject: "New #{owner.template.name} Submission",
       )
     end
   end

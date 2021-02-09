@@ -7,7 +7,6 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
     submission_time_zone:             true,
     submission_description_required:  true,
     configurable_agenda_dispositions: true,
-    attach_pdf_submission:            true,
     dropdown_event_title_list:        true,
     # Airline-Specific Features:
   })
