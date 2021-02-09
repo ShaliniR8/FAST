@@ -252,11 +252,11 @@ class RVFConfig < DefaultConfig
       # orange:           { rating: 'SERIOUS',   cells: '3/6, 4/5, 5/4',                            description: 'Operations may be continued, mitigation of risk to ALARP',                                 description_approval: 'Part 119 or Officer acceptance required with review and approval of Integrated Safety Committee*'             },
       # red:              { rating: 'HIGH',      cells: '4/6, 5/5, 5/6',                            description: 'Mitigation required, risk cannot be accepted',                                             description_approval: 'Review by Part 119 to determine if operations be discontinued until risk is mitigated to an acceptable level' }
 
-      limegreen:        { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   },
+      mediumseagreen:   { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   },
       steelblue:        { rating: 'Minor',     cells: '2/4, 2/5, 3/3, 4/2, 5/2',                  },
-      yellow:           { rating: 'Moderate',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             },
-      orange:           { rating: 'Serious',   cells: '3/6, 4/5, 5/4',                            },
-      red:              { rating: 'High',      cells: '4/6, 5/5, 5/6',                            }
+      yellow:           { rating: 'Moderate',  cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             },
+      coral:            { rating: 'Serious',   cells: '3/6, 4/5, 5/4',                            },
+      crimson:          { rating: 'High',      cells: '4/6, 5/5, 5/6',                            }
 
     },
 

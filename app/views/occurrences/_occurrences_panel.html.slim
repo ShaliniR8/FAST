@@ -1,9 +1,8 @@
 ruby:
-  owner_edit_access = current_user.has_access(owner.class.name.downcase.pluralize, 'edit', admin: true)
   if !defined?(show_btns)
-    show_btns = %w[New Assigned Linked].include?(owner.status)
+    show_btns = %w[New Assigned Linked].include?(owner.status) &&
+      current_user.has_access(owner.class, 'Edit', admin: true)
   end
-  show_btns = show_btns && owner_edit_access
   occurrence_label = owner.class.find_top_level_section.label
   show_only_table ||= false
   owner_id = owner.id
