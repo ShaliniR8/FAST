@@ -182,6 +182,8 @@ class ApplicationDatatable
     }
     .map { |column|
       case column
+      when 'users.full_name'
+        :created_by
       when 'templates.name'
         :template
       when 'responsible_user#responsible_user.full_name'

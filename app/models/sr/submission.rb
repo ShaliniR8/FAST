@@ -53,6 +53,7 @@ class Submission < Sr::SafetyReportingBase
     keys = CONFIG.object['Submission'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                                .map { |key, _| key.to_s }
 
+    keys[keys.index('submitter')] = 'users.full_name' if keys.include? 'submitter'
     keys[keys.index('template')] = 'templates.name' if keys.include? 'template'
 
     keys
