@@ -457,7 +457,7 @@ class MeetingsController < ApplicationController
 
       begin
         unless test_run
-          system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+          system ("curl -X PUT --url \"https://www.atsapsafety.org/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
         end
 
         puts 'SENT events to CISP'
