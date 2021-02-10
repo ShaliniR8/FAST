@@ -24,6 +24,7 @@ class RPAConfig < DefaultConfig
     sabre_integration:            true,
   })
 
+<<<<<<< HEAD
   SABRE_MAPPABLE_FIELD_OPTIONS = {
     "Flight Date"        => "flight_date",
     "Flight Number"      => "flight_number",
