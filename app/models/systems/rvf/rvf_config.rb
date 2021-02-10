@@ -16,7 +16,7 @@ class RVFConfig < DefaultConfig
     # enable_sso:                         true,
     # login_option:                       'sso',
     has_mobile_app:                     true,
-    cisp_integration:                   true,
+    cisp_integration:                   false,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
@@ -38,9 +38,9 @@ class RVFConfig < DefaultConfig
   end
 
 
-  P_CODE = 'FFT671'
-  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
-  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({})
+  # P_CODE = 'FFT671'
+  # CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
+  # CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({})
 
   FAA_INFO = {
     "CHDO"=>"XXX",
