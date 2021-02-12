@@ -3,7 +3,6 @@
 <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"></script>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 
-
 <div class="col-xs-12">
   <%= render "shared/alerts"%>
   <%= render "access_controls/new_modal"%>
@@ -40,89 +39,85 @@
     <div class="panel-body">
       <div class="table-responsive">
         <table id="records_table" class="table table-hover table-striped table-bordered" width="100%">
-          <% if data_too_large %>
-            <h4 style="color:red;"><b>Result table is unable to display due to large data set. Please split this query into multiple queries. Thank you.<b></h4>
-          <% else %>
-            <thead>
-              <tr>
+          <thead>
+            <tr>
+              <%@headers.each do |header|%>
+                <th><%=header[:title]%></th>
+              <%end%>
+              <th width="20%">Action</th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <%@headers.each do |header|%>
+                <th><%=header[:title]%></th>
+              <%end%>
+              <th>Action</th>
+            </tr>
+          </tfoot>
+          <tbody>
+            <%@records.each do |record|%>
+              <tr record_id="<%=record.id%>">
                 <%@headers.each do |header|%>
-                  <th><%=header[:title]%></th>
-                <%end%>
-                <th width="20%">Action</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <%@headers.each do |header|%>
-                  <th><%=header[:title]%></th>
-                <%end%>
-                <th>Action</th>
-              </tr>
-            </tfoot>
-            <tbody>
-              <%@records.each do |record|%>
-                <tr record_id="<%=record.id%>">
-                  <%@headers.each do |header|%>
 
-                    <%field_name = header[:field]%>
-                    <%field_value = record.send(field_name)%>
-                    <%field_display = header[:display]%>
-                    <%field_progress = header[:progress].present? ? record.send(header[:progress]) : '0%'%>
+                  <%field_name = header[:field]%>
+                  <%field_value = record.send(field_name)%>
+                  <%field_display = header[:display]%>
+                  <%field_progress = header[:progress].present? ? record.send(header[:progress]) : '0%'%>
 
-                    <%html_class = header[:html_class].present? ? record.send(header[:html_class]) : ''%>
+                  <%html_class = header[:html_class].present? ? record.send(header[:html_class]) : ''%>
 
-                    <td class="<%=html_class%> percent" percentage="<%=field_progress%>">
-                      <%case header[:type]%>
-                      <%when "boolean"%>
-                        <%boolean_options = {true => "Yes", false => "No"}%>
-                        <%=boolean_options[field_value]%>
-                      <%when "date"%>
-                        <%=date_to_string(field_value)%>
-                      <%when "datetime"%>
-                        <%=datetime_to_string(field_value)%>
-                      <%when "checkbox"%>
-                        <%=field_value%>
-                      <%when "user"%>
-                        <%if field_value == "Anonymous"%>
-                          Anonymous
-                        <%elsif field_value != nil && field_value != ""%>
-                          <%user = User.find_by_full_name(field_value)%>
-                          <%if user.present?%>
-                            <%=field_value%>
-                          <%end%>
-                        <%else%>
-                          <%=""%>
-                        <%end%>
-                      <%when "textarea"%>
-                        <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
-                      <%when "list"%>
-                        <%=field_value.gsub('<br>',', <br>')%>
-                      <%when "select"%>
-                        <%if field_display.present?%>
-                          <%=field_display[field_value]%>
-                        <%else%>
+                  <td class="<%=html_class%> percent" percentage="<%=field_progress%>">
+                    <%case header[:type]%>
+                    <%when "boolean"%>
+                      <%boolean_options = {true => "Yes", false => "No"}%>
+                      <%=boolean_options[field_value]%>
+                    <%when "date"%>
+                      <%=date_to_string(field_value)%>
+                    <%when "datetime"%>
+                      <%=datetime_to_string(field_value)%>
+                    <%when "checkbox"%>
+                      <%=field_value%>
+                    <%when "user"%>
+                      <%if field_value == "Anonymous"%>
+                        Anonymous
+                      <%elsif field_value != nil && field_value != ""%>
+                        <%user = User.find_by_full_name(field_value)%>
+                        <%if user.present?%>
                           <%=field_value%>
                         <%end%>
                       <%else%>
+                        <%=""%>
+                      <%end%>
+                    <%when "textarea"%>
+                      <%=(field_value.length > 50 ? "#{field_value[0..50]}..." : "#{field_value[0..50]}") rescue ''%>
+                    <%when "list"%>
+                      <%=field_value.gsub('<br>',', <br>')%>
+                    <%when "select"%>
+                      <%if field_display.present?%>
+                        <%=field_display[field_value]%>
+                      <%else%>
                         <%=field_value%>
                       <%end%>
-                    </td>
-                  <%end%>
-
-                  <td width="20%">
-                    <%=link_to "Open",
-                      "/#{@table_name}/#{record.id}",
-                      :class => "btn btn-lightblue mr5 mb5",
-                      :target => nil%>
-                    <%=link_to "Open in New Tab",
-                      "/#{@table_name}/#{record.id}",
-                      :class => "btn btn-lightblue mr5 mb5",
-                      :target => :_blank%>
+                    <%else%>
+                      <%=field_value%>
+                    <%end%>
                   </td>
-                </tr>
-              <%end%>
-            </tbody>
-          <% end %>
+                <%end%>
+
+                <td width="20%">
+                  <%=link_to "Open",
+                    "/#{@table_name}/#{record.id}",
+                    :class => "btn btn-lightblue mr5 mb5",
+                    :target => nil%>
+                  <%=link_to "Open in New Tab",
+                    "/#{@table_name}/#{record.id}",
+                    :class => "btn btn-lightblue mr5 mb5",
+                    :target => :_blank%>
+                </td>
+              </tr>
+            <%end%>
+          </tbody>
         </table>
       </div>
     </div>

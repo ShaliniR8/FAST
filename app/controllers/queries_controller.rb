@@ -15,6 +15,8 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
+require 'yaml'
+
 class QueriesController < ApplicationController
   include QueriesHelper
 
@@ -32,12 +34,24 @@ class QueriesController < ApplicationController
   end
 
 
+  def refresh_query
+    @owner = @table.find(params[:id])
+
+    query_file_path = "/public/queries/#{params[:id]}.yml"
+    query_file_full_path = File.join([Rails.root] + [query_file_path])
+    File.delete(query_file_full_path)
+
+    redirect_to @owner
+  end
+
+
   def show
     respond_to do |format|
       format.html do
         @query_fields = @table.get_meta_fields('show')
         @owner = @table.find(params[:id])
         @chart_types = QueryVisualization.chart_types
+
         apply_query
       end
       format.json do
@@ -49,7 +63,7 @@ class QueriesController < ApplicationController
         @query_fields = @table.get_meta_fields('show')
         @owner = Query.find(params[:id])
         @object_type = Object.const_get(@owner.target)
-        apply_query # get @records
+        apply_query
         total_records = @records.size
 
         query_result[:query_detail] = get_query_detail_json(@owner, total_records)
@@ -288,6 +302,7 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
+
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
     Template.preload(:categories, :fields)
@@ -305,20 +320,48 @@ class QueriesController < ApplicationController
     }
     @fields = @target_fields + @template_fields
 
-    if @title == "Submissions"
-      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
-    elsif @title == "Reports"
-      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
-    else
-      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
-    end
+    query_file_path = "/public/queries/#{params[:id]}.yml"
+    query_file_full_path = File.join([Rails.root] + [query_file_path])
 
-    @owner.query_conditions.each do |condition|
-      records = records & expand_emit(condition, records)
-    end
+    # append 'processing_' to avoid race condition
+    # ex. "/public/queries/processing_1234.yml"
+    query_processing_file_full_path = query_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
 
-    @records = records
+    first_run_query = (not File.exist? query_processing_file_full_path) && (not File.exist? query_file_full_path)
+
+    # 1) RUN QUERY
+    if first_run_query
+      @records = []
+      @status_msg = 'PROCESSING... (Notification will be sent out once the query is ready)'
+      @query_status = "new"
+
+      call_rake 'save_query_result',
+        title: @title,
+        owner_id: @owner.id,
+        object_type: @object_type,
+        file_path: query_file_full_path,
+        user_id: current_user.id,
+        processing_file_path: query_processing_file_full_path
+
+    # 2) QUERY PROCESSING..
+    elsif File.exist? query_processing_file_full_path
+      @records = []
+      @status_msg = 'STILL PROCESSING... (Please revisit the page later)'
+      @query_status = "new"
+
+    # 3) DISPLAY QUERY RESULT
+    elsif File.exist? query_file_full_path
+      @records = YAML.load(File.read(query_file_full_path))
+
+      file_updated_at = File.mtime(query_file_full_path)
+                          .in_time_zone(CONFIG::GENERAL[:time_zone])
+                          .strftime('%a, %d %b %Y %l:%M %p')
+
+      @status_msg = "Last Updated At #{file_updated_at}"
+      @query_status = "done"
+    end
   end
+
 
   def get_records
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)

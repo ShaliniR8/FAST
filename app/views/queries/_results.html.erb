@@ -1,1 +1,1 @@
-<%=render "/shared/index_table", open_new_tab: true, data_too_large: data_too_large%>
+<%=render "/shared/index_table", open_new_tab: true if @records.present? %>

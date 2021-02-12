@@ -566,5 +566,91 @@ task export_query_result: :environment do
       p 'UPLOAD FAILED'
     end
   end
+end
+
+task save_query_result: :environment do
+
+  logger = Logger.new("log/save_query_result.log")
+
+  logger.info "title:          #{ENV['TITLE']}"
+  logger.info "owner_id:       #{ENV['OWNER_ID']}"
+  logger.info "object_type:    #{ENV['OBJECT_TYPE']}"
+  logger.info "file_path:      #{ENV['FILE_PATH']}"
+
+  @title = ENV['TITLE']
+  @owner = Query.find(ENV['OWNER_ID'])
+  @object_type = Object.const_get(ENV['OBJECT_TYPE'])
+  @user_id   = ENV['USER_ID']
+  @file_path = "#{ENV['FILE_PATH']}"
+  @processing_file_path = "#{ENV['PROCESSING_FILE_PATH']}"
+
+  File.open(@processing_file_path, "w") do |file|
+    file.write("processing...")
+  end
+
+  @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+  @template_fields = []
+  Template.preload(:categories, :fields)
+    .where(id:  @owner.templates)
+    .map(&:fields)
+    .flatten
+    .uniq{|field| field.label}
+    .each{|field|
+    @template_fields << {
+      title: field.label,
+      field: field.label,
+      data_type: field.data_type,
+      field_type: field.display_type,
+    }
+  }
+  @fields = @target_fields + @template_fields
+
+  # Query records
+  if @title == "Submissions"
+    records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
+  elsif @title == "Reports"
+    records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+  else
+    records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
+  end
+
+  @owner.query_conditions.each do |condition|
+    records = records & expand_emit(condition, records)
+  end
+
+  @records = @object_type.where(id: records.map(&:id))
+
+  # Save query result into file
+  File.open(@file_path, "w") do |file|
+    file.write(@records.to_yaml)
+  end
+
+  # Remove processing file
+  File.delete(@processing_file_path)
+
+  # Send notification who creates the queyr after rake task is done
+  @message = Message.create(
+    subject: "Query ##{@owner.id} IS READY",
+    content: "Your query processing is finished. Please revisit your Query ##{@owner.id}. Thank you."
+  )
+  @message.time = Time.now
+  @message.save
+  SendFrom.create(
+    messages_id: @message.id,
+    users_id: @user_id,
+    anonymous: false
+  )
+  SendTo.create(
+    messages_id: @message.id,
+    users_id: @user_id,
+    anonymous: false
+  )
+
+  controller = ApplicationController.new
+  controller.notify(@message,
+    notice: {users_id: @user_id, content: "Your query processing is finished. Please revisit your Query ##{@owner.id}. Thank you."},
+    mailer: true,
+    subject: "Query ##{@owner.id} IS READY"
+  )
 
 end

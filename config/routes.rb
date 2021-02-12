@@ -137,6 +137,7 @@ PrdgSession::Application.routes.draw do |map|
   resources :recurrences
   resources :queries do
     member do
+      post "refresh_query"
       get "clone"
       post "add_visualization"
       get "remove_visualization"
