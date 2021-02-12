@@ -33,8 +33,8 @@
   <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
   <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-  <td class="extra_info"><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
-  <td class="extra_info"><%=f.number_field :max_options,                                         {:class => "form-control"}%>                    </td>
+  <td class="extra_info"><%=f.number_field :max_length,                       {:class => "form-control"}%>                    </td>
+  <td class="extra_info"><%=f.number_field :max_options,                      {:class => "form-control"}%>                    </td>
   <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
   <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
   <td>
@@ -44,8 +44,8 @@
   </td>
 
 
-  <td class="extra_info"><%=f.text_field :element_id,         {:class => "form-control"}%></td>
-  <td class="extra_info"><%=f.text_field :element_class,      {:class => "form-control"}%></td>
+  <td style="display:none"><%=f.text_field :element_id,         {:class => "form-control"}%></td>
+  <td style="display:none"><%=f.text_field :element_class,      {:class => "form-control"}%></td>
   <td class="extra_info"><%=f.text_field :map_id,             {:class => "form-control"}%></td>
 
 

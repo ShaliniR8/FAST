@@ -39,7 +39,7 @@
             </div>
 
             <div class="col-xs-12 mt20">
-              <div class="form-inline col-xs-3">
+              <div class="form-inline col-xs-4">
                 <%if @template.map_template_id.present?%>
                   <%map_template =  @template.map_template_id%>
                 <%end%>
@@ -50,12 +50,12 @@
                   {:class=>"form-control"}%>
               </div>
 
-              <div class="form-inline col-xs-3">
+              <div class="form-inline col-xs-3" style = "display:none">
                 <%=f.label :js_link, "Custom JS"%>
                 <%=f.text_field :js_link, {:class => "form-control"}%>
               </div>
 
-              <div class="form-inline col-xs-3">
+              <div class="form-inline col-xs-4">
                 <%=f.label :allow_anonymous, "Allow Anonymous Submission"%>
                 <%boolean_options = {"Yes" => true, "No" => false}%>
                 <%=f.select :allow_anonymous,
@@ -63,7 +63,7 @@
                   {},
                   {:class => "form-control"}%>
               </div>
-              <div class="form-inline col-xs-3">
+              <div class="form-inline col-xs-4">
                 <%default_status = @template.default_status || 'New'%>
                 <%=f.label :default_status, "Default Status"%>
                 <%=f.select :default_status,

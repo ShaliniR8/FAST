@@ -13,11 +13,12 @@
           .panel-title
             .top_text
               b Category/Root Cause Templates
-            .top_buttons.pull-right
-              = link_to 'New Category',
-                new_root_occurrence_templates_path,
-                method: :post,
-                class: 'btn btn-success pull-right'
+            - if current_user.id.to_i == 1
+              .top_buttons.pull-right
+                = link_to 'New Category',
+                  new_root_occurrence_templates_path,
+                  method: :post,
+                  class: 'btn btn-success pull-right'
 
         .panel-body
           .alert.alert-warning role="alert"

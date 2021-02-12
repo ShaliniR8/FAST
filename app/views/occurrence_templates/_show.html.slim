@@ -51,7 +51,12 @@ css:
         - if owner.children.present?
           a href="#list_#{owner.id}" class="cat_#{owner.id} glyphicon glyphicon-chevron-right" data-toggle="collapse"
 
-        b = owner.title
+        - if owner.title == 'Record'
+          b = "Report"
+        - elsif owner.title == 'Report'
+          b = "Event"
+        - else
+          b = owner.title
         small = (owner.parent_id.nil? ? " (#{owner.label})" : '')
 
         .pull-right aid="#{owner.id}" id="#{owner.id}"
@@ -59,7 +64,8 @@ css:
           a href="#" class="glyphicon glyphicon-plus ml5 add_btn" data-toggle="modal" data-target=".bs-example-modal-lg"
           / = link_to 'Edit'
           - if owner.id != 1
-            a href="#" class="glyphicon glyphicon-cog ml5 edit_btn" data-toggle="modal" data-target=".bs-example-modal-lg"
+            - if current_user.id.to_i == 1 || owner.parent_id.present?
+              a href="#" class="glyphicon glyphicon-cog ml5 edit_btn" data-toggle="modal" data-target=".bs-example-modal-lg"
             / = link_to 'Archive'
             a href="#{archive_occurrence_template_path(owner)}" class="glyphicon glyphicon-trash ml5" data-method="post" data-confirm="Are you sure?"
         .list-group.collapse id="list_#{owner.id}"
