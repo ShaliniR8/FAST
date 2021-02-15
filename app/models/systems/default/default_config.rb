@@ -41,6 +41,7 @@ class DefaultConfig
     has_root_causes:                    true,    # Enables the use of root causes - default on
     shared_links:                       false,   # Enables shareable links to be created for forms - default off
     drop_down_risk_selection:           false,
+    query_processing_in_rake_task:      false,
 
     # TO BE REMOVED:
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)

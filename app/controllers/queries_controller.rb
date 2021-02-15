@@ -52,7 +52,11 @@ class QueriesController < ApplicationController
         @owner = @table.find(params[:id])
         @chart_types = QueryVisualization.chart_types
 
-        apply_query
+        if CONFIG::GENERAL[:query_processing_in_rake_task]
+          apply_query_with_file
+        else
+          apply_query
+        end
       end
       format.json do
         query_result = {
@@ -293,6 +297,49 @@ class QueriesController < ApplicationController
 
 
   def apply_query
+    if !session[:mode].present?
+      redirect_to choose_module_home_index_path
+      return
+    end
+    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
+    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @template_fields = []
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
+      }
+    }
+    @fields = @target_fields + @template_fields
+
+    if @title == "Submissions"
+      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
+    elsif @title == "Reports"
+      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+    else
+      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
+    end
+
+    @owner.query_conditions.each do |condition|
+      records = records & expand_emit(condition, records)
+    end
+
+    @records = records
+  end
+
+
+  def apply_query_with_file
     if !session[:mode].present?
       redirect_to choose_module_home_index_path
       return
