@@ -569,6 +569,9 @@ task export_query_result: :environment do
 end
 
 task save_query_result: :environment do
+  queries_dir_path = "/public/queries"
+  dir = File.join([Rails.root] + [queries_dir_path])
+  FileUtils.mkdir_p(dir) unless File.directory?(dir)
 
   logger = Logger.new("log/save_query_result.log")
 
