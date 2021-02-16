@@ -13,7 +13,7 @@
           .panel-title
             .top_text
               b Category/Root Cause Templates
-            - if current_user.id.to_i == 1
+            - if current_user.full_name == 'ProSafeT Engineering'
               .top_buttons.pull-right
                 = link_to 'New Category',
                   new_root_occurrence_templates_path,

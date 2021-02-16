@@ -14,6 +14,8 @@ class RPAConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:               false,
+    enable_sso:                   true,
+    login_option:                 'dual',
 
     # TO BE REMOVED
     base_risk_matrix:             false,

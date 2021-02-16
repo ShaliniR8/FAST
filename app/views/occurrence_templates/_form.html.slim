@@ -17,7 +17,7 @@
           .col-sm-8
             = f.text_field :title,
               class: 'form-control'
-        - if current_user.id.to_i == 1 || (controller.action_name != 'new' && @owner.parent_id.nil?)
+        - if current_user.full_name == 'ProSafeT Engineering' || (controller.action_name != 'new' && @owner.parent_id.nil?)
           .form-group.col-sm-6
             = f.label :title, 'Label',
               class: 'col-sm-4 col-form-label'
