@@ -252,12 +252,15 @@ class SubmissionsController < ApplicationController
     event_date_to_utc
 
     if params[:present_id].present?
+      saved = false
       @record = Submission.find(params[:present_id])
-      sub_fields = SubmissionField.where("submissions_id=?", params[:present_id])
-      sub_fields.map(&:destroy)
-      @record.submission_fields = []
-      @record.save
-      saved = @record.update_attributes(params[:submission])
+      if !@record.completed
+        sub_fields = SubmissionField.where("submissions_id=?", params[:present_id])
+        sub_fields.map(&:destroy)
+        @record.submission_fields = []
+        @record.save
+        saved = @record.update_attributes(params[:submission])
+      end
     else
       @record = Submission.new(params[:submission])
       saved = @record.save
@@ -407,34 +410,36 @@ class SubmissionsController < ApplicationController
 
     event_date_to_utc
 
-    if @record.update_attributes(params[:submission])
-      if create_notice
-        notify_notifiers(@record, params[:commit])
-      end
+    if !@record.completed || params[:commit] == 'Add Notes'
+      if @record.update_attributes(params[:submission])
+        if create_notice
+          notify_notifiers(@record, params[:commit])
+        end
 
-      if params[:commit] == "Save for Later"
-        respond_to do |format|
-          flash = { success: "Submission ##{@record.id} updated." }
-          format.html { redirect_to incomplete_submissions_path, flash: flash }
-          format.json { update_as_json(flash) }
-        end
-      else
-        if params[:commit] == 'Add Notes'
-          @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+        if params[:commit] == "Save for Later"
+          respond_to do |format|
+            flash = { success: "Submission ##{@record.id} updated." }
+            format.html { redirect_to incomplete_submissions_path, flash: flash }
+            format.json { update_as_json(flash) }
+          end
         else
-          @record.make_report
-          @record.create_transaction(action: 'Create', context: 'User Submitted Report')
-          NotifyMailer.send_submitter_confirmation(current_user, @record)
-        end
-        if params[:create_copy] == '1'
-          converted = @record.convert
-          converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
-          notify_notifiers(converted, params[:commit])
-        end
-        respond_to do |format|
-          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
-          format.html { redirect_to submission_path(@record), flash: flash }
-          format.json { update_as_json(flash) }
+          if params[:commit] == 'Add Notes'
+            @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+          else
+            @record.make_report
+            @record.create_transaction(action: 'Create', context: 'User Submitted Report')
+            NotifyMailer.send_submitter_confirmation(current_user, @record)
+          end
+          if params[:create_copy] == '1'
+            converted = @record.convert
+            converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
+            notify_notifiers(converted, params[:commit])
+          end
+          respond_to do |format|
+            flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
+            format.html { redirect_to submission_path(@record), flash: flash }
+            format.json { update_as_json(flash) }
+          end
         end
       end
     end
