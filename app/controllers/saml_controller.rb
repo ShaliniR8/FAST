@@ -16,6 +16,7 @@ class SamlController < ApplicationController
     if response.is_valid?(collect_errors = true)
       user = saml_config.digest_response response
       if user.nil? || response.name_id.empty?
+        @name_id = saml_config::SAML_DATA[:name_id_format].split(':').last
         render 'errors/sso_error'
         return
       else

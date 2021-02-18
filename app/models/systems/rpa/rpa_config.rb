@@ -102,9 +102,10 @@ class RPAConfig < DefaultConfig
       row_header_name: '',
       row_header: [''],
       column_header_name: 'LIKELIHOOD',
-      column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
+      column_header: ['1&nbsp;Reactive Only','2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
         [
+          "Reactive Only; therefore there is no predetermined likelihood",
           "A remote likelihood, being almost inconceivable that event will occur</br><1 occurrence in 10 years at the Company",
           "Very unlikely to occur</br>An activity or event that occurs intermittently</br>Regulator/Auditor have low likelihood of issue identification during any general or focused review</br>≥1 occurrence in 10 years, but <1 occurrence in 2 years",
           "Unlikely, but possible to occur</br>Potential for infrequent occurrence. Events are sporadic in nature</br>Auditor/Regulator have potential of issue discovery during focused or specialized review</br>≥1 occurrence in 2 years, but <1 occurrence every year",
@@ -115,11 +116,12 @@ class RPAConfig < DefaultConfig
     },
 
     probability_table_dict: {
-      0 => '2 - Remote',
-      1 => '3 - Seldom',
-      2 => '4 - Occasional',
-      3 => '5 - Probable',
-      4 => '6 - Frequent'
+      0 => '1 - Reactive Only',
+      1 => '2 - Remote',
+      2 => '3 - Seldom',
+      3 => '4 - Occasional',
+      4 => '5 - Probable',
+      5 => '6 - Frequent'
     },
 
     risk_table: {
@@ -139,21 +141,21 @@ class RPAConfig < DefaultConfig
       row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
       column_header_name: 'LIKELIHOOD',
-      column_header: ['2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
+      column_header: ['1&nbsp;Reactive Only','2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
-        ['2',     '3',    '4',      '5',    '6'  ],
-        ['4',     '6',    '8',      '10',   '12' ],
-        ['6',     '9',    '12',     '15',   '18' ],
-        ['8',     '12',   '16',     '20',   '24' ],
-        ['10',    '15',   '20',     '25',   '30' ]
+        ['1',     '2',     '3',    '4',      '5',    '6'  ],
+        ['2',     '4',     '6',    '8',      '10',   '12' ],
+        ['3',     '6',     '9',    '12',     '15',   '18' ],
+        ['4',     '8',     '12',   '16',     '20',   '24' ],
+        ['5',     '10',    '15',   '20',     '25',   '30' ]
       ],
 
       rows_color: [
-        ["limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
-        ["limegreen",     "limegreen",    "limegreen",      "yellow",       "yellow"     ],
-        ["limegreen",     "yellow",       "yellow",         "orange",       "orange"     ],
-        ["limegreen",     "yellow",       "orange",         "orange",       "red"        ],
-        ["yellow",        "orange",       "orange",         "red",          "red"        ]
+        ["limegreen",     "limegreen",     "limegreen",    "limegreen",      "limegreen",    "limegreen"  ],
+        ["limegreen",     "limegreen",     "limegreen",    "limegreen",      "yellow",       "yellow"     ],
+        ["limegreen",     "limegreen",     "yellow",       "yellow",         "orange",       "orange"     ],
+        ["limegreen",     "limegreen",     "yellow",       "orange",         "orange",       "red"        ],
+        ["limegreen",     "yellow",        "orange",       "orange",         "red",          "red"        ]
       ]
     },
 
@@ -165,6 +167,7 @@ class RPAConfig < DefaultConfig
     },
 
     risk_table_index: {
+      'Low - 1' => 'limegreen',
       'Low - 2' => 'limegreen',
       'Low - 3' => 'limegreen',
       'Low - 4' => 'limegreen',
@@ -192,6 +195,7 @@ class RPAConfig < DefaultConfig
     },
 
     risk_table_dict: {
+      1 => 'Low - 1',
       2 => 'Low - 2',
       3 => 'Low - 3',
       4 => 'Low - 4',
