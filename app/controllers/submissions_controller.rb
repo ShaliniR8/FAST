@@ -171,7 +171,9 @@ class SubmissionsController < ApplicationController
       @record = Submission.build(@template)
       @record.submission_fields.build
     else
-      @templates = Template.find(:all)
+      # @templates = Template.find(:all)
+      templates = current_user.get_all_submitter_templates
+      @templates = Template.where(:name => templates)
       unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
         @templates.keep_if{|x|
             (current_user.has_template_access(x.name).include? 'full') ||
