@@ -140,6 +140,12 @@
 </div>
 
 
+<datalist id="eccairs_attributes_names">
+  <%@eccairs_attributes.each do |attribute|%>
+    <option value="<%=attribute.attribute_synonym%>" data-id="<%=attribute.id%>"></option>
+  <%end%>
+</datalist>
+
 <script>
   $(function(){
 
@@ -195,6 +201,14 @@
           });
         }
       });
+    });
+
+
+    // ECCAIRS
+    $(document).on('change', '.eccairs_attribute_name_field', function() {
+      var selected = $(this).val();
+      var attribute_id = $('#eccairs_attributes_names option[value="' + selected +'"]').attr('data-id');
+      $(this).next('.eccairs_attribute_id_field').val(attribute_id);
     });
 
   });

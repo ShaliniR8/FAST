@@ -34,6 +34,9 @@ class DefaultConfig
     has_pdf_footer:                     false,    # Enables custom airline footer
     power_bi_integration:               false,
 
+    # Third Party Integrations:
+    integrations: ['mitre'],
+
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
     base_risk_matrix:                   false,    # Indicates the use of the default risk matrix - default on

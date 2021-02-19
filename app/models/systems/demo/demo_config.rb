@@ -17,6 +17,9 @@ class DemoConfig < DefaultConfig
     has_mobile_app:               true,
     track_log:                    true,
 
+    # Third Party Integrations:
+    integrations: ['mitre', 'eccairs'],
+
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_report:          false,
     configurable_risk_matrices:   true,

@@ -80,4 +80,11 @@ class NotifyMailer < ApplicationMailer
     mail(**to_email(user.email), subject: subject).deliver
   end
 
+
+  def send_export(email, filename, file)
+    email = 'noc@prosafet.com' unless Rails.env.production?
+    attachments[filename] = file
+    mail(to: email, subject: 'Report Export Complete').deliver
+  end
+
 end

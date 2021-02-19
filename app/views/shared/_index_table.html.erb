@@ -32,6 +32,26 @@
               :class => "btn btn-default pull-right mr5"%>
           <%end%>
 
+
+
+          <%if defined?(btns)%>
+            <%btns.each do |btn|%>
+              <%if btn[:modal]%>
+                <%= link_to btn[:btn_name], '#',
+                  class: "btn #{btn[:btn_class]} pull-right mr5",
+                  id: "#{btn[:class_id]}",
+                  "data-toggle" => "modal",
+                  "data-toggle" => "modal"%>
+              <%else%>
+                <%= link_to btn[:btn_name],
+                  btn[:btn_path],
+                  class: "btn #{btn[:btn_class]} pull-right mr5",
+                  onclick: btn[:onclick]%>
+              <%end%>
+            <%end%>
+          <%end%>
+
+
         </div>
       </div>
     </div>

@@ -434,4 +434,45 @@ class Record < Sr::SafetyReportingBase
     additional_info
   end
 
+
+  def eccairs_export
+
+    field_content = {}
+    self.record_fields.each do |record_field|
+      record_field.field.eccairs_attributes.each do |attribute|
+        field_content[attribute] = record_field
+      end
+    end
+
+    occurrence_content = self.template
+      .fields.map(&:eccairs_attributes)
+      .flatten.compact
+      .group_by{|x| x.entity_synonym}
+
+    attributes = occurrence_content["Occurrence"]
+    occurrence_content.delete("Occurrence")
+    entities = occurrence_content
+
+
+    path = ['integrations', 'eccairs']
+    dirname = File.join([Rails.root] + path)
+    temp_file = File.join([Rails.root] + path + ["Occurrence_#{self.id}.xml"])
+    FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
+    File.open(temp_file, 'w') do |file|
+      file << ApplicationController.new.render_to_string(
+        template: 'records/eccairs_template.xml.erb',
+        locals: {
+          template: self.template,
+          record: self,
+          entities: entities,
+          attributes: attributes,
+          field_content: field_content,
+        }
+      )
+    end
+
+  end
+
+
+
 end

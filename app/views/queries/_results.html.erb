@@ -1,1 +1,14 @@
-<%=render "/shared/index_table", open_new_tab: true unless @query_status == "new" %>
+<% btns = []
+  if CONFIG::GENERAL[:integrations].include?('eccairs')
+    btns << {
+      btn_name: 'ECCAIRS Export',
+      btn_path: params.merge(eccairs:true),
+      btn_class: 'btn btn-success',
+      class_id: 'eccairs',
+      onclick: "alert('You will receive an email with the ECCAIRS files. This may take several minutes depending on the number of reports included.');"
+    }
+  end
+%>
+
+
+<%=render "/shared/index_table", open_new_tab: true, btns: btns unless @query_status == "new" %>

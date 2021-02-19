@@ -78,10 +78,13 @@
               <th width="6%">Min Options Selectable</th>
               <th>Additional Info?</th>
               <th width="15%">Options (split by semicolon)</th>
-              <th>Action</th>
               <th class="extra_info">HTML ID</th>
               <th class="extra_info">HTML CLASS</th>
               <th class="extra_info">Mapped Field</th>
+              <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
+                <th class="extra_info">ECCAIRS Attribute Name</th>
+              <%end%>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody class="draggableFieldGroup" id="fields">

@@ -37,29 +37,41 @@
   <td><%=f.number_field :max_options,                                         {:class => "form-control"}%>                    </td>
   <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
   <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
-  <td>
-    <%if source == 'Existing'%>
-      <%if field.deleted?%>
-        <a class="btn btn-default archive_btn">Unarchive</a>
-      <%else%>
-        <a class="btn btn-warning archive_btn">Archive</a>
-      <%end%>
-      <%if CONFIG.sr::GENERAL[:template_nested_fields]%>
-        <a class="btn btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
-      <%end%>
-
-      <%=f.hidden_field :deleted, :id => "delete_field", :class => "form-control"%>
-    <%else%>
-      <button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
-    <%end%>
-  </td>
-
 
   <td class="extra_info"><%=f.text_field :element_id,         {:class => "form-control"}%></td>
   <td class="extra_info"><%=f.text_field :element_class,      {:class => "form-control"}%></td>
   <td class="extra_info"><%=f.text_field :map_id,             {:class => "form-control"}%></td>
 
+  <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
+    <td class='extra_info'>
+      <%eccairs_mapping = (field.eccairs_mappings.first rescue nil) || (field.eccairs_mappings.build rescue nil)%>
+      <%eccairs_mapping ||= EccairsMapping.new%>
+      <%=f.fields_for :eccairs_mappings, eccairs_mapping do |eccairs_form|%>
+        <%=text_field_tag :eccairs_attribute_name,
+          (eccairs_mapping.eccairs_attribute.attribute_synonym rescue nil),
+          list: 'eccairs_attributes_names', class: 'form-control eccairs_attribute_name_field'%>
+        <%=eccairs_form.hidden_field :eccairs_attribute_id, class: 'eccairs_attribute_id_field'%>
+      <%end%>
+    </td>
+  <%end%>
 
+
+  <td>
+    <%if source == 'Existing'%>
+      <%if field.deleted?%>
+        <a class="btn btn-sm btn-default archive_btn">Unarchive</a>
+      <%else%>
+        <a class="btn btn-sm btn-warning archive_btn">Archive</a>
+      <%end%>
+      <%if CONFIG.sr::GENERAL[:template_nested_fields]%>
+        <a class="btn btn-sm btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
+      <%end%>
+
+      <%=f.hidden_field :deleted, :id => "delete_field", :class => "form-control"%>
+    <%else%>
+      <button type="button" class="btn btn-sm btn-danger" onclick="removeField(this)">Remove</button>
+    <%end%>
+  </td>
 
 </tr>
 

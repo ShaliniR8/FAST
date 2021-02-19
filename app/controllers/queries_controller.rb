@@ -57,6 +57,12 @@ class QueriesController < ApplicationController
         else
           apply_query
         end
+
+        if defined?(params[:eccairs]) && params[:eccairs]
+          call_rake "eccairs:export", email: current_user.email, records: JSON.dump(@records.map(&:id))
+          redirect_to "/queries/#{@owner.id}"
+        end
+
       end
       format.json do
         query_result = {

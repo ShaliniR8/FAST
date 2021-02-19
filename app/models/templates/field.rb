@@ -10,6 +10,12 @@ class Field < ActiveRecord::Base
   belongs_to :map_field,        :foreign_key => "map_id",           :class_name => "Field"
   belongs_to :parent_field,     :foreign_key => "nested_field_id",  :class_name => "Field"
 
+
+  has_many :eccairs_mappings, foreign_key: :field_id, class_name: 'EccairsMapping'
+  has_many :eccairs_attributes, :through => :eccairs_mappings
+  accepts_nested_attributes_for :eccairs_mappings, reject_if: proc { |attributes| attributes["eccairs_attribute_id"].blank? }
+
+
   scope :nested, -> {where('nested_field_id is not null').order(category_order: :asc)}
   scope :non_nested, -> {where('nested_field_id is null').order(category_order: :asc)}
   scope :active, -> {where(deleted: 0).order(field_order: :asc)}
