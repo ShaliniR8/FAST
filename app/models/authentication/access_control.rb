@@ -77,10 +77,19 @@ class AccessControl < ActiveRecord::Base
   end
 
 
+  def self.set_reporting_module_name
+    if CONFIG::GENERAL[:reporting_module_name].present?
+      CONFIG::GENERAL[:reporting_module_name]
+    else
+      "ASAP"
+    end
+  end
+
 
   def self.module_map
+    reporting_name = set_reporting_module_name
     {
-      "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
+      "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", reporting_name.to_s, "corrective_actions"],
       "smsim" => ["SMS IM", "ims", "packages"],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations'],
       "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls'],
@@ -92,6 +101,7 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.get_descriptions
+    reporting_name = set_reporting_module_name
     {
       "submissions"=>{
         "new"                 => generate_desc("Submission", "new"),
@@ -285,7 +295,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("SMS IM Meeting", "viewer"),
        },
 
-       'ASAP'=>{
+       reporting_name.to_s =>{
         'module'              => generate_desc("Safety Reporting", "module"),
        },
 
@@ -313,6 +323,7 @@ class AccessControl < ActiveRecord::Base
   end
 
   def self.get_meta
+    reporting_name = set_reporting_module_name
     {
       "submissions"=>{
         "New"=>"new",
@@ -513,7 +524,7 @@ class AccessControl < ActiveRecord::Base
         "Viewer"=>"viewer",
         "Admin"=>"admin"
        },
-       'ASAP'=>{
+       reporting_name.to_s =>{
         'Module'=>'module'
        },
        'SMS IM'=>{
@@ -559,13 +570,14 @@ class AccessControl < ActiveRecord::Base
   end
 
   def self.entry_options
+    reporting_name = set_reporting_module_name
     {
       "Submissions"                           => "submissions",
       "Reports"                               => "records",
       "Event Reports"                         => "reports",
       "Trackings"                             => "trackings",
       "Meetings"                              => "meetings",
-      "Corrective Actions(ASAP)"              => "corrective_actions",
+      "Corrective Actions(#{reporting_name})" => "corrective_actions",
       "FAA Reports"                           => "faa_reports",
       "Documents"                             => "documents",
       "Audits"                                => "audits",
@@ -583,7 +595,7 @@ class AccessControl < ActiveRecord::Base
       "IM Plans"                              => "ims",
       "IM Packages"                           => "packages",
       "SRM Meetings"                          => "srm_meetings",
-      "ASAP"                                  => "ASAP",
+      reporting_name.to_s                     => "ASAP",
       "SMS IM"                                => "SMS IM",
       "Safety Assurance"                      => "Safety Assurance",
       "Safety Risk Management"                => "Safety Risk Management",
@@ -594,9 +606,10 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.object_types
+    reporting_name = set_reporting_module_name
     {
       "Meetings"                              => "meetings",
-      "Corrective Actions(ASAP)"              => "corrective_actions",
+      "Corrective Actions(#{reporting_name})" => "corrective_actions",
       "Audits"                                => "audits",
       "Inspections"                           => "inspections",
       "Evaluations"                           => "evaluations",

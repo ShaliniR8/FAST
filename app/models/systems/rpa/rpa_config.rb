@@ -20,7 +20,8 @@ class RPAConfig < DefaultConfig
     # TO BE REMOVED
     base_risk_matrix:             false,
     has_verification:             true,
-    hazard_root_cause_lock:       true
+    hazard_root_cause_lock:       true,
+    reporting_module_name:        "SR",
   })
 
   MATRIX_INFO = {
