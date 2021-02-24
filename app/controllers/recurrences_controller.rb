@@ -10,7 +10,7 @@ class RecurrencesController < ApplicationController
   end
 
   def child_access_validation(con_name, act_name)
-    redirect_to errors_path unless current_user.has_access(con_name.downcase.pluralize, act_name, admin: true)
+    redirect_to errors_path unless current_user.has_access(con_name.downcase.pluralize, act_name, admin: CONFIG::GENERAL[:global_admin_default])
   end
   helper_method :child_access_validation
 

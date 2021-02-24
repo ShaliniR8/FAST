@@ -507,7 +507,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'Query Center' => {
         title: 'Query Center', path: '#',
-        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])},
         subMenu: [
           {title: 'All', path: 'queries_path',
             display: proc{|user:,**op| true}},

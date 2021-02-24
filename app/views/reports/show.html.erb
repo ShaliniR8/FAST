@@ -18,7 +18,7 @@
               Event #<%=@report.get_id%>: <%=@report.name%>
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.has_access('reports','destroy', admin: true, strict: true)%>
+              <%if current_user.has_access('reports','destroy', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
                 <%=link_to 'Delete',
                   report_path(@report),
                   :method=>"delete",
@@ -27,7 +27,7 @@
               <%end%>
 
 
-              <%if current_user.has_access('reports', 'admin', admin: true, strict: true)%>
+              <%if current_user.has_access('reports', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
                 <%=link_to 'Override Status', '#',
                   :class => 'btn btn-danger pull-right mr5 mb5',
                   :id => 'override_status_btn',
@@ -36,7 +36,7 @@
               <%end%>
 
               <%if @report.status != "Closed" &&
-                current_user.has_access('reports', 'edit', admin: true)%>
+                current_user.has_access('reports', 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
                 <%=link_to 'Edit',
                   edit_report_path(@report),
                   :id => "edit-btn",
@@ -52,7 +52,7 @@
                 'data-target' => '.bs-example-modal-lg'%>
 
               <%if @report.investigation.present? &&
-                current_user.has_access('Safety Assurance','module', admin: true, strict: true) %>
+                current_user.has_access('Safety Assurance','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
                 <%=link_to "View Investigation",
                   investigation_path(@report.investigation),
                   :class=>"btn btn-info mb5 pull-right mr5 ",
@@ -60,7 +60,7 @@
               <%end%>
 
               <%if @report.sra.present? &&
-                current_user.has_access('Safety Risk Management','module', admin: true, strict: true) %>
+                current_user.has_access('Safety Risk Management','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
                 <%=link_to "View SRA(SRM)",
                   sra_path(@report.sra),
                   :class=>"btn btn-info mb5 pull-right mr5 ",
@@ -74,7 +74,7 @@
                   :format => :pdf),
                 :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
 
-              <%if current_user.has_access('reports', 'admin', admin: true, strict: true)%>
+              <%if current_user.has_access('reports', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
                 <%=link_to "PDF",
                   print_report_path(
                     @report,
@@ -100,7 +100,7 @@
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
             <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.occurrence_lock? %></b>
-            <%if current_user.has_access('reports','edit', admin: true)%>
+            <%if current_user.has_access('reports','edit', admin: CONFIG::GENERAL[:global_admin_default])%>
               <%if @report.status == "Closed"%>
                 <%=link_to "Reopen Event",
                   reopen_report_path(@report),
@@ -112,7 +112,7 @@
                   :title => "This will the Event and all the included Reports"%>
               <%end%>
               <%if @report.status != "Closed" &&
-                current_user.has_access('corrective_actions','new', admin: true)%>
+                current_user.has_access('corrective_actions','new', admin: CONFIG::GENERAL[:global_admin_default])%>
                 <%=link_to "Add Corrective Action",
                   new_corrective_action_path(:report => @report.id),
                   :class => "btn btn-success pull-right ml5 mb5",

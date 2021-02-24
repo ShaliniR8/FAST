@@ -32,7 +32,7 @@
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
             <%if current_user.id == @record.created_by.id ||
-              current_user.has_access('submissions', 'admin', admin: true, strict: true)%>
+              current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
               <span data-toggle="modal" data-target=".bs-example-modal-lg">
                 <%=link_to "Add Additional Notes","#",
                   :class => "btn btn-success pull-right mr10 mb5",

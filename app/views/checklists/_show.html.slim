@@ -13,7 +13,7 @@ ruby:
 
     .panel-body style="display:none"
 
-      - if owner.status != 'Completed' && current_user.has_access(owner.class.table_name,'edit', admin: true)
+      - if owner.status != 'Completed' && current_user.has_access(owner.class.table_name,'edit', admin: CONFIG::GENERAL[:global_admin_default])
         = link_to 'Add New Checklist', '#',
           class: 'btn btn-success pull-right mr5 mb10',
           id: 'upload_btn',
@@ -42,12 +42,12 @@ ruby:
               = checklist.assignees.map(&:full_name).join(', ')
 
               - if owner.status != 'Completed' && (\
-                current_user.has_access(owner.class.table_name,'admin', admin: true) || \
+                current_user.has_access(owner.class.table_name,'admin', admin: CONFIG::GENERAL[:global_admin_default]) || \
                 owner.responsible_user_id == current_user.id)
                 = link_to "Address", address_checklist_path(checklist),
                   class: 'btn btn-success pull-right mr5'
 
-              - if owner.status != 'Completed' && current_user.has_access(owner.class.table_name,'edit', admin: true)
+              - if owner.status != 'Completed' && current_user.has_access(owner.class.table_name,'edit', admin: CONFIG::GENERAL[:global_admin_default])
 
                 = link_to "Update", '#',
                   :class => 'btn btn-warning pull-right mr5 update_btn',

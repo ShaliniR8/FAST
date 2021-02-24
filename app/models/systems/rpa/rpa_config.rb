@@ -21,7 +21,7 @@ class RPAConfig < DefaultConfig
     base_risk_matrix:             false,
     has_verification:             true,
     hazard_root_cause_lock:       true,
-    reporting_module_name:        "SR",
+    global_admin_default:         false,
   })
 
   MATRIX_INFO = {

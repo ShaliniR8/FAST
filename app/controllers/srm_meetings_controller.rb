@@ -139,7 +139,7 @@ class SrmMeetingsController < ApplicationController
 
   def index
     @records=SrmMeeting.includes(:invitations, :host)
-    unless current_user.has_access('srm_meetings', 'admin', admin: true, strict: true)
+    unless current_user.has_access('srm_meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end

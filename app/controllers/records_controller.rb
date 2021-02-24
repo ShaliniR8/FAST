@@ -25,7 +25,7 @@ class RecordsController < ApplicationController
   before_filter :check_user_privilege, only: [:query_all, :observation_phases_trend]
 
   def check_user_privilege
-    if current_user.has_access('home','query_all', admin: true)
+    if current_user.has_access('home','query_all', admin: CONFIG::GENERAL[:global_admin_default])
       true
     else
       flash[:no_access] = 'You do not have access to this function.'
@@ -429,8 +429,8 @@ class RecordsController < ApplicationController
     @template = Template.preload(categories: [:fields]).find(@record.templates_id)
 
     access_level = current_user.has_template_access(@template.name)
-    redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
-                              access_level.split(';').include?('full') ||
+    redirect_to errors_path unless current_user.has_access('records', 'view', admin: CONFIG::GENERAL[:global_admin_default], strict: true) &&
+                              (access_level.split(';').include?('full') ||
                               (access_level.split(';').include?('viewer') && @record.viewer_access) ||
                               (access_level.split(';').include?('confidential') && @record.confidential)
 

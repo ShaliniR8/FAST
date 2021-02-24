@@ -20,9 +20,9 @@ module Concerns
           submodules = []
           case module_name
           when 'ASAP'
-            submodules.push('Submissions') if current_user.has_access('submissions', 'show', admin: true, strict: true)
+            submodules.push('Submissions') if current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           when 'Safety Assurance'
-            submodules.push('Audits') if current_user.has_access('audits', 'show', admin: true, strict: true)
+            submodules.push('Audits') if current_user.has_access('audits', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           end
           module_access[module_name] = submodules if submodules.length > 0 &&
             CONFIG.mobile_modules.include?(module_name)
@@ -46,9 +46,9 @@ module Concerns
         end
 
         permissions = { :submissions => [], :audits => [] }
-        permissions[:submissions].push('new') if current_user.has_access('submissions', 'new', admin: true, strict: true)
-        permissions[:submissions].push('index') if current_user.has_access('submissions', 'index', admin: true, strict: true)
-        permissions[:submissions].push('show') if current_user.has_access('submissions', 'show', admin: true, strict: true)
+        permissions[:submissions].push('new') if current_user.has_access('submissions', 'new', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+        permissions[:submissions].push('index') if current_user.has_access('submissions', 'index', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+        permissions[:submissions].push('show') if current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         mobile_user_info[:permissions] = permissions
 
         # change when configs are updated to v1.2

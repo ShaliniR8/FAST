@@ -51,7 +51,7 @@
         :class => "btn btn-sm btn-info mb5"%>
       <%if meeting.has_user(current_user) || meeting.host.users_id == current_user.id%>
         <%if meeting.status != "Closed"%>
-          <%if current_user.has_access('meetings','edit', admin: true)%>
+          <%if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default])%>
             <%if event.status != "Closed"%>
               <!-- Close Event -->
               <%=link_to "<i class='glyphicon glyphicon-ok-circle'></i>".html_safe, '#',

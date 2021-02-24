@@ -463,7 +463,7 @@ private
       }
     end
 
-    if !current_user.has_access('sras','admin', admin: true, strict: true)
+    if !current_user.has_access('sras','admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       cars = Sra.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
         current_user.id)

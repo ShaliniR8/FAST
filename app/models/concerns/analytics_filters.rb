@@ -2,7 +2,7 @@ module AnalyticsFilters
 
 
   def can_be_accessed(current_user)
-    is_admin = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: true, strict: true)
+    is_admin = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
     full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:full])
     confidential_access_templates = Template.where(name: current_user.get_all_templates_hash[:confidential])
 

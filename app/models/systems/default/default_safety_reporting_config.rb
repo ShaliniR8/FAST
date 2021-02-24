@@ -85,7 +85,7 @@ class DefaultSafetyReportingConfig
           comment: {
             access: proc { |owner:,user:,**op|
               DICTIONARY::ACTION[:comment][:access].call(owner:owner,user:user,**op) &&
-                (owner.user_id == user.id || user.has_access('submissions','admin',admin:true,strict:true))
+                (owner.user_id == user.id || user.has_access('submissions','admin',admin:CONFIG::GENERAL[:global_admin_default],strict:true))
             },
           },
         }),
@@ -460,7 +460,7 @@ class DefaultSafetyReportingConfig
       },
       'FAA Reports' => {
         title: 'FAA Reports', path: '#',
-        display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: true)},
+        display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: CONFIG::GENERAL[:global_admin_default])},
         subMenu: [
           {title: 'All', path: 'faa_reports_path',
             display: proc{|user:,**op| true}},
@@ -470,7 +470,7 @@ class DefaultSafetyReportingConfig
       },
       'Query Center' => {
         title: 'Query Center', path: '#',
-        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: true)},
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])},
         subMenu: [
           {title: 'All', path: 'queries_path',
             display: proc{|user:,**op| true}},

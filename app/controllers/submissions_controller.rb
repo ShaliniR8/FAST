@@ -174,7 +174,7 @@ class SubmissionsController < ApplicationController
       # @templates = Template.find(:all)
       templates = current_user.get_all_submitter_templates
       @templates = Template.where(:name => templates)
-      unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+      unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         @templates.keep_if{|x|
             (current_user.has_template_access(x.name).include? 'full') ||
             (current_user.has_template_access(x.name).include? 'submitter')}
@@ -352,10 +352,10 @@ class SubmissionsController < ApplicationController
         @template = @record.template
 
         @template_access = @record.user_id == current_user.id ||
-          current_user.has_access('submissions', 'admin', admin: true, strict: true) ||
-          current_user.has_access(@template.name, 'full', admin: true) ||
-          current_user.has_access(@template.name, 'viewer', admin: true) ||
-          current_user.has_access(@template.name, 'confidential', admin: true, strict: true)
+          (current_user.has_access('submissions', 'view', admin: CONFIG::GENERAL[:global_admin_default], strict: true) &&
+          (current_user.has_access(@template.name, 'full', admin: CONFIG::GENERAL[:global_admin_default]) ||
+          current_user.has_access(@template.name, 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) ||
+          current_user.has_access(@template.name, 'confidential', admin: CONFIG::GENERAL[:global_admin_default], strict: true)))
 
         redirect_to errors_path unless @template_access
 
