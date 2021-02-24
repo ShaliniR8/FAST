@@ -78,8 +78,9 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.module_map
+    reporting_name = set_reporting_module_name
     {
-      "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
+      "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", reporting_name.to_s, "corrective_actions"],
       "smsim" => ["SMS IM", "ims", "packages"],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations'],
       "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls'],
@@ -91,6 +92,7 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.get_descriptions
+    reporting_name = set_reporting_module_name
     {
       "submissions"=>{
         "new"                 => generate_desc("Submission", "new"),
@@ -312,6 +314,7 @@ class AccessControl < ActiveRecord::Base
   end
 
   def self.get_meta
+    reporting_name = set_reporting_module_name
     {
       "submissions"=>{
         "New"=>"new",
@@ -512,7 +515,7 @@ class AccessControl < ActiveRecord::Base
         "Viewer"=>"viewer",
         "Admin"=>"admin"
        },
-       'ASAP'=>{
+       reporting_name.to_s =>{
         'Module'=>'module'
        },
        'SMS IM'=>{
@@ -558,6 +561,7 @@ class AccessControl < ActiveRecord::Base
   end
 
   def self.entry_options
+    reporting_name = set_reporting_module_name
     {
       "Submissions"                           => "submissions",
       "Reports"                               => "records",
@@ -593,6 +597,7 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.object_types
+    reporting_name = set_reporting_module_name
     {
       "Meetings"                              => "meetings",
       "Corrective Actions(Safety Reporting)"  => "corrective_actions",
