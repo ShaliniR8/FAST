@@ -27,12 +27,8 @@
                 <%if field.nested_fields.where(deleted: false).present?%>
                   <%field.nested_fields.where(deleted: false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
 
-<<<<<<< HEAD
                     <div class="col-xs-12 nested_field_area" style="display:none">
                       <h4 class="nested_field_header"><span><b><%=nv%></b></span></h4>
-=======
-                    <%field.nested_fields.where(:deleted => false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
->>>>>>> 69d919e2... Fixes nested field ordering and updates ASAP Module name to SR
 
                       <%nested_fields_by_rows = group_by_column_size_and_nested_fields(fields: nested_fields)%>
                       <%nested_fields_by_rows.each do |nested_field_row|%>

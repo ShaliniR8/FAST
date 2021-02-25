@@ -13,7 +13,7 @@ class RPAConfig < DefaultConfig
     time_zone:                    'Eastern Time (US & Canada)',
 
     # SYSTEM CONFIGS
-    has_mobile_app:               false,
+    has_mobile_app:               true,
     enable_sso:                   true,
     login_option:                 'dual',
 
