@@ -352,7 +352,7 @@ class SubmissionsController < ApplicationController
         @template = @record.template
 
         @template_access = @record.user_id == current_user.id ||
-          (current_user.has_access('submissions', 'view', admin: CONFIG::GENERAL[:global_admin_default], strict: true) &&
+          (current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) &&
           (current_user.has_access(@template.name, 'full', admin: CONFIG::GENERAL[:global_admin_default]) ||
           current_user.has_access(@template.name, 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) ||
           current_user.has_access(@template.name, 'confidential', admin: CONFIG::GENERAL[:global_admin_default], strict: true)))
