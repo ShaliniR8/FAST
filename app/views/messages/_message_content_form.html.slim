@@ -120,14 +120,19 @@ javascript:
         $.get('#{distribution_lists_path}/' + distribution_list_id, function(data) {
           var dist_users = data.data.user_ids;
           var allPages = recipients_table.cells().nodes();
-          for(var i = 0; i < dist_users.length; i++) {
-            var send_btn = $(allPages).find('.id_' + dist_users[i]);
-            if (!send_btn.hasClass('selected')) {
-              $(send_btn).click();
-              $(send_btn).addClass('selected');
+          if (dist_users.length + recipientCount() > 10){
+            alert("Adding this list will add more than 10 recipients. Please adjust recipients list");
+          } else {
+            for(var i = 0; i < dist_users.length; i++) {
+              var send_btn = $(allPages).find('.id_' + dist_users[i]);
+              if (!send_btn.hasClass('selected')) {
+                $(send_btn).removeClass('btn-transparent').addClass('btn-danger');
+                $(send_btn).next(".cc_btn").removeClass('btn-danger selected').addClass('btn-transparent');
+                $(send_btn).addClass('selected');
+              }
             }
+            renderRecipients(recipients_table);
           }
-          renderRecipients(recipients_table);
         });
       }
     });
@@ -231,8 +236,26 @@ javascript:
     });
   });
 
+  function recipientCount(){
+    let cc = $("#cc_list").text().split(", ")
+    let to = $("#to_list").text().split(", ")
+    let count = 0;
+    for (let i = 0; i < cc.length; i++) {
+      if (cc[i] != "") {
+        count ++;
+      }
+    }
+
+    for (let i = 0; i < to.length; i++) {
+      if (to[i] != "") {
+        count ++;
+      }
+    }
+    return count;
+  }
+
   function isRecipientListOverLimit () {
-    if (($("#to_list").text().split(", ").concat($("#cc_list").text().split(", "))).length >= 10) {
+    if (recipientCount() >= 10) {
       return true;
     } else {
       return false;
