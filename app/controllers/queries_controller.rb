@@ -30,7 +30,7 @@ class QueriesController < ApplicationController
 
   def index
     @headers = @table.get_meta_fields('index')
-    @records = @table.where(:target => @types.values)
+    @records = @table.where(target: @types.values).includes(:created_by)
   end
 
 
