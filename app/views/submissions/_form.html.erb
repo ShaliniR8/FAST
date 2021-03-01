@@ -9,8 +9,9 @@
 <script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/employee_select.js"></script>
+<!-- <script type="text/javascript" src="/javascripts/utility/employee_select.js"></script> -->
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/3.3.2/js/dataTables.fixedColumns.min.js"></script>
 <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
@@ -44,7 +45,7 @@
               data-toggle="tooltip"
               data-placement="top"
               title="Expand all panels">Expand All</a>
-            <%if @action == 'Continue' && current_user.has_access("submissions", "destroy") || current_user.id == @record.user_id%>
+            <%if (@action == 'Continue' && current_user.has_access("submissions", "destroy")) || current_user.id == @record.user_id%>
               <%=link_to "Discard",
                   discard_submission_path(@record),
                   :id=>"delete-btn",
@@ -52,6 +53,9 @@
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
                   "title" => "This will delete the submission permanently"%>
+            <%end%>
+            <%if CONFIG::GENERAL[:sabre_integration].present?%>
+              <a class="btn btn-success ml10 mb5 mr5 refresh_sabre" style="display:none">Refresh Sabre</a>
             <%end%>
           </div>
         </div>
@@ -281,20 +285,69 @@
 
 <script type="text/javascript">
 
+  var airport_table;
+  var map,
+      mapTypes = {},
+      pointsHolder = {},
+      mapSettings = {},
+      markers = [],
+      centerLat = "<%=CONFIG::GENERAL[:lat]%>",
+      centerLng = "<%=CONFIG::GENERAL[:lng]%>",
+      mapZoom = "<%=CONFIG::GENERAL[:gMapZoom]%>",
+      clicked_map_field_id;
+
+  function update_timezones() {
+     $('.toplevel_timezone').on('change',function(){
+      var timezone = $('.toplevel_timezone').val();
+      $(".timezone_field").val(timezone);
+    });
+  }
+
+  // Updata airport table
+  function handleSearch(event) {
+    // Get field id
+    var field_id = event.data.field_id
+    // Get the keywords user searched for
+    var icao = $("#icao").val();
+    var iata = $("#iata").val();
+    var arpt_name = $("#arpt_name").val();
+    // Do nothing if nothing is searched
+    if(icao == "" && iata == "" && arpt_name ==""){
+    // Update the table if icao code is not empty
+    }else{
+      // Get the data from server
+      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+        // Render airport table with data
+        $("#airports_table").html(data);
+        updateAirportTable(field_id);
+      });
+    }
+  }
+
+  function updateAirportTable(field_id) {
+    // Initialize table as a datatable
+    airport_table = $('#airports' + field_id).DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+    // User clicked on a row
+    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+      // Get the row information
+      var icao = $(this).find("td").eq(0).text();
+      var iata = $(this).find("td").eq(1).text();
+      // Set the value on the form
+      if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
+        $("#airport" + field_id).val(iata);
+        $("#airport-select" + field_id).val(iata);
+      } else {
+        $("#airport" + field_id).val(icao + ";" + iata);
+        $("#airport-select" + field_id).val(icao + ";" + iata);
+      }
+      resetModal(field_id);
+    });
+  }
+
   $(document).ready(function() {
-
-    var airport_table;
-    var map,
-        mapTypes = {},
-        pointsHolder = {},
-        mapSettings = {},
-        markers = [],
-        centerLat = "<%=CONFIG::GENERAL[:lat]%>",
-        centerLng = "<%=CONFIG::GENERAL[:lng]%>",
-        mapZoom = "<%=CONFIG::GENERAL[:gMapZoom]%>",
-        clicked_map_field_id;
-
-
     autoSaveText = document.getElementById('auto-save');
 
     runAutosave = setInterval(autosave, 60000);
@@ -435,8 +488,157 @@
         });
       }
     });
+
+    sabre_fields = []
+    if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
+      $(".form-control").each(function() {
+        if ($(this).attr("sabre-map") != null && $(this).attr("sabre-map") != "") {
+          sabre_fields.push($(this));
+        }
+      });
+
+      if (sabre_fields.length > 0 && "<%=@action%>" != "Continue") {
+        $(".refresh_sabre").show();
+        open_flights_table();
+        $(".refresh_sabre").on('click', function(){
+          open_flights_table();
+        });
+      } else {
+        $(".refresh_sabre").hide();
+      }
+    }
+
+    employee_table = null;
+    clear_user_table();
+    build_user_table();
+    $(this).find(".emp_button").each(function(index, item){
+      $(item).on("click", function(){
+        $(window).resize();
+        var field_id = $(this).prop('id');
+        $(".emp_modal").show();
+        clear_user_table();
+        $("tbody tr").unbind();
+        $(".close").unbind();
+        $("tbody tr").on("click", function(){
+          if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
+            $(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(3).text());
+            $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
+          } else {
+            $(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(1).text());
+            $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
+          }
+          $('#emp_div').hide();
+          $('.emp_modal').modal('toggle');
+        });
+        $('.close').on('click',function(){
+          $(item).parent().parent().find("#emp"+field_id).val("");
+          $(item).parent().parent().find("#employee-select"+field_id).val("");
+          $('#emp_div').hide();
+        });
+        build_user_table();
+      });
+    });
+
   });
 
+  function build_user_table(){
+    employee_table=$('#users').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  }
+
+  function clear_user_table(){
+    if(employee_table != null) {
+      employee_table.destroy();
+    }
+  }
+
+  function open_flights_table() {
+    swal({
+      allowOutsideClick: false,
+      showCancelButton: false,
+      showConfirmButton: false,
+      html: "<%=escape_javascript render :partial => 'sabre_flights_table', :layout => false, :locals => {:flights => @flights}%>",
+      onOpen: function() {
+        let flights_table = $('#flights_table').DataTable({
+            "iDisplayLength": 7,
+        });
+
+
+        $("tr").on('click', function() {
+          id = $(this).attr('id');
+          swal.close();
+          $.ajax({
+            type: "GET",
+            url: "<%=flight_selected_submissions_path%>" + "?flight_record_id="+id,
+            dataType: 'json',
+            success: function(data) {
+              console.log(data['message']);
+              for (let i = 0; i < sabre_fields.length; i++){
+                value = fill_sabre_data(data, $(sabre_fields[i]).attr("sabre-map"));
+                $(sabre_fields[i]).val(value);
+              }
+            }
+          });
+        });
+
+        $('.close_swal_btn').on('click', function(){
+          swal.close();
+        });
+      }
+    });
+  }
+
+  function fill_sabre_data(data, attr) {
+    switch (attr) {
+      case "flight_date":
+        return data['flight_date'];
+      case "flight_number":
+        return data['flight_number'];
+      case "tail_number":
+        return data['tail_number'];
+      case "departure_airport":
+        return data['departure_airport'];
+      case "arrival_airport":
+        return data['arrival_airport'];
+      case "landing_airport":
+        return data['landing_airport'];
+      case "ca":
+        return process_employee_positions("CA", data['all_employee_data']);
+      case "fo":
+        return process_employee_positions("FO", data['all_employee_data']);
+      case "fa_1":
+        return process_employee_positions("FA", data['all_employee_data']);
+      case "fa_2":
+        return process_employee_positions("Flight Attendant 2", data['all_employee_data']);
+      default:
+        return "";
+    }
+  }
+
+  function process_employee_positions(attr, emp_data) {
+    if (attr == "Flight Attendant 2") {
+      let count = 0;
+      for (let i = 0; i < emp_data.length; i++) {
+        if (emp_data[i]['title'] == "FA") {
+          if (count >= 1) {
+            return emp_data[i]['number'];
+          } else {
+            count ++;
+          }
+        }
+      }
+      return "";
+    } else {
+      for (let i = 0; i < emp_data.length; i++) {
+        if (emp_data[i]['title'] == attr) {
+          return emp_data[i]['number'];
+        }
+      }
+    }
+    return "";
+  }
 
   function prop_up_errors(target) {
     $(target).css('border-color', 'red');
@@ -451,51 +653,6 @@
     $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
 
-  function update_timezones() {
-     $('.toplevel_timezone').on('change',function(){
-      var timezone = $('.toplevel_timezone').val();
-      $(".timezone_field").val(timezone);
-    });
-  }
-
-  // Updata airport table
-  function handleSearch(event) {
-    // Get field id
-    var field_id = event.data.field_id
-    // Get the keywords user searched for
-    var icao = $("#icao").val();
-    var iata = $("#iata").val();
-    var arpt_name = $("#arpt_name").val();
-    // Do nothing if nothing is searched
-    if(icao == "" && iata == "" && arpt_name ==""){
-    // Update the table if icao code is not empty
-    }else{
-      // Get the data from server
-      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
-        // Render airport table with data
-        $("#airports_table").html(data);
-        updateAirportTable(field_id);
-      });
-    }
-  }
-
-  function updateAirportTable(field_id) {
-    // Initialize table as a datatable
-    airport_table = $('#airports' + field_id).DataTable({
-      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-      "iDisplayLength": 5
-    });
-    // User clicked on a row
-    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
-      // Get the row information
-      var icao = $(this).find("td").eq(0).text();
-      var iata = $(this).find("td").eq(1).text();
-      // Set the value on the form
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
-      resetModal(field_id);
-    });
-  }
 
   function resetModal(field_id) {
     // Reset the table, field, and close the modal
@@ -683,80 +840,6 @@
     marker = pointsHolder[id];
     marker.setMap(null);
     delete pointsHolder[id];
-  }
-
-  function update_timezones() {
-     $('.toplevel_timezone').on('change',function(){
-      var timezone = $('.toplevel_timezone').val();
-      $(".timezone_field").val(timezone);
-    });
-  }
-
-  // Updata airport table
-  function handleSearch(event) {
-    // Get field id
-    var field_id = event.data.field_id
-    // Get the keywords user searched for
-    var icao = $("#icao").val();
-    var iata = $("#iata").val();
-    var arpt_name = $("#arpt_name").val();
-    // Do nothing if nothing is searched
-    if(icao == "" && iata == "" && arpt_name ==""){
-    // Update the table if icao code is not empty
-    }else{
-      // Get the data from server
-      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
-        // Render airport table with data
-        $("#airports_table").html(data);
-        updateAirportTable(field_id);
-      });
-    }
-  }
-
-  function updateAirportTable(field_id) {
-    // Initialize table as a datatable
-    airport_table = $('#airports' + field_id).DataTable({
-      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-      "iDisplayLength": 5
-    });
-    // User clicked on a row
-    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
-      // Get the row information
-      var icao = $(this).find("td").eq(0).text();
-      var iata = $(this).find("td").eq(1).text();
-      // Set the value on the form
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
-      resetModal(field_id);
-    });
-  }
-
-  function resetModal(field_id) {
-    // Reset the table, field, and close the modal
-    $("#airports_table").html("");
-    $("#icao").val("");
-    $("#iata").val("");
-    $("#arpt_name").val("");
-    $('#airport_div').hide();
-    $(".airport_modal").modal("hide");
-  }
-
-  function autosave() {
-    $("#is_autosave").val(2);
-    $.ajax({
-      type: "POST",
-      url: $('form').attr('action'),
-      data: new FormData($('form')[0]),
-      enctype: 'multipart/form-data',
-      processData: false,
-      contentType: false,
-      dataType: 'json',
-      success: function(data) {
-        if(data.record_id) {
-          $('#present_id').val(data.record_id);
-        }
-      }
-    });
   }
 
   function update_cb_rb_nested(field, isRadio) {

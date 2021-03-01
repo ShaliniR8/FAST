@@ -30,6 +30,7 @@ class DefaultConfig
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
     cisp_integration:                   false,
+    sabre_integration:                  false,
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
     power_bi_integration:               false,

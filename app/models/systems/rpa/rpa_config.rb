@@ -22,7 +22,21 @@ class RPAConfig < DefaultConfig
     has_verification:             true,
     hazard_root_cause_lock:       true,
     global_admin_default:         false,
+    sabre_integration:            true,
   })
+
+  SABRE_MAPPABLE_FIELD_OPTIONS = {
+    "Flight Date"        => "flight_date",
+    "Flight Number"      => "flight_number",
+    "Tail Number"        => "tail_number",
+    "Departure Airport"  => "departure_airport",
+    "Arrival Airport"    => "arrival_airport",
+    "Landing Airport"    => "landing_airport",
+    "Captain"            => "ca",
+    "First Officer"      => "fo",
+    "Flight Attendant 1" => "fa_1",
+    "Flight Attendant 2" => "fa_2"
+  }
 
   MATRIX_INFO = {
     terminology: {

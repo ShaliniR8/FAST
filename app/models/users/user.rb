@@ -243,11 +243,14 @@ class User < ActiveRecord::Base
 
 
   def self.get_headers
-    {
-      "ID"          => "id",
-      "Name"        => "full_name",
-      "Email"       => "email"
-    }
+    h = Hash.new
+
+    h["ID"] = "id"
+    h["Name"] = "full_name"
+    h["Email"] = "email"
+    h["Employee No."] = "employee_number" if CONFIG::GENERAL[:sabre_integration].present?
+
+    return h
   end
 
 

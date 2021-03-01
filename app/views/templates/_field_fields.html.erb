@@ -26,7 +26,9 @@
 
   <td><%=f.check_box    :required,                                             class: "form-control #{changed}"%>                     </td>
   <td><%=f.check_box    :print,                                                class: "form-control #{changed}"%>                     </td>
-
+  <%if CONFIG::GENERAL[:sabre_integration].present?%>
+    <td><%=f.select     :sabre_map,     CONFIG::SABRE_MAPPABLE_FIELD_OPTIONS, {:include_blank => true}, {:class => "form-control"}%> </td>
+  <%end%>
   <td><%=f.text_area    :options,                                              class: "form-control #{changed}", rows: 3%>            </td>
   <td>
     <%=f.select :custom_option_id,

@@ -166,6 +166,9 @@ class SubmissionsController < ApplicationController
     @action = "new"
     @has_template = false
     if !params[:template].blank?
+      if CONFIG::GENERAL[:sabre_integration].present?
+        prepare_flight_data(current_user.employee_number)
+      end
       @template = Template.find(params[:template])
       @has_template = true
       @record = Submission.build(@template)
@@ -181,6 +184,11 @@ class SubmissionsController < ApplicationController
         @templates.sort_by! {|x| x.name }
       end
     end
+  end
+
+
+  def prepare_flight_data(emp_num)
+    @flights = Sabre.where({flight_date: (Time.now - 15.days).to_date..Time.now.to_date, employee_number: emp_num})
   end
 
 
@@ -531,8 +539,45 @@ class SubmissionsController < ApplicationController
   end
 
 
+  def flight_selected
+    reporting_emp_number = current_user.employee_number
+    selected_flight = Sabre.find(params[:flight_record_id]) rescue nil
+
+    if selected_flight.present?
+      if selected_flight.other_employees.present?
+        other_employees = selected_flight.other_employees.split(",")
+        all_employees = other_employees << reporting_emp_number
+        all_employee_records = Sabre.where({employee_number: all_employees,
+                                            flight_date: selected_flight.flight_date,
+                                            flight_number: selected_flight.flight_number,
+                                            tail_number: selected_flight.tail_number,
+                                            arrival_airport: selected_flight.arrival_airport,
+                                            departure_airport: selected_flight.departure_airport,
+                                            landing_airport: selected_flight.landing_airport,
+                                          })
+        all_employee_data = all_employee_records.map{|rec| {:title => rec.employee_title, :number => rec.employee_number}}
+      end
+    else
+      puts "Very erroneous. Should not happen"
+    end
+
+    render :json => {message: "Flight Data Available",
+                     flight_date: selected_flight.flight_date,
+                     flight_number: selected_flight.flight_number,
+                     tail_number: selected_flight.tail_number,
+                     departure_airport: selected_flight.departure_airport,
+                     arrival_airport: selected_flight.arrival_airport,
+                     landing_airport: selected_flight.landing_airport,
+                     all_employee_data: all_employee_data
+                    }
+  end
+
+
   def continue
     @action="Continue"
+    if CONFIG::GENERAL[:sabre_integration].present?
+      prepare_flight_data(current_user.employee_number)
+    end
     @record=Submission.find(params[:id])
     @template=@record.template
   end
