@@ -2,7 +2,7 @@
   <div class="panel-heading">
     <div class="panel-title">
       <b>Employee Search</b>
-      <%@users = User.find(:all).keep_if{|u| !u.disable}%>
+      <%@users = User.active%>
       <%@headers = User.get_headers%>
       <button type="button"
         class="close pull-right"

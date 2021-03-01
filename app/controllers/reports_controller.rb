@@ -177,12 +177,10 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def new
-    load_options
+    #load_options
     @action = "new"
-    @privileges = Privilege.find(:all)
+    @privileges = Privilege.all
     @report = Report.new
     if params[:base_record].present?
       base = Record.find(params[:base_record])
@@ -195,15 +193,11 @@ class ReportsController < ApplicationController
       @fields = Report.update_event_title_list(template_id: params[:template], fields: @fields)
     end
 
-    @report_fields = Record.get_meta_fields('index')
-    @candidates = Record
-      .find(:all)
-      .select{|x| x.status == "Open" && x.report.blank?} - @report.records
+    @report_fields = Record.get_meta_fields('index', 'meeting_form')
+    @candidates = Record.preload(:template, :occurrences, :created_by).where(status: 'Open').select{|x| x.report.blank?} - @report.records
     @candidates.sort_by!{|x| x.event_date}.reverse!
     load_special_matrix_form('report', 'baseline', @report)
   end
-
-
 
 
   def create
