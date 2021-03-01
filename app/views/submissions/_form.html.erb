@@ -561,6 +561,8 @@
             $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(1).text());
             $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(0).text());
           }
+
+          $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
           $('#emp_div').hide();
           $('.emp_modal').modal('toggle');
         });
@@ -633,7 +635,6 @@
             url: "<%=flight_selected_submissions_path%>" + "?flight_record_id="+id,
             dataType: 'json',
             success: function(data) {
-              console.log(data['usernames']);
               for (let i = 0; i < sabre_fields.length; i++){
                 let attr = $(sabre_fields[i]).attr("sabre-map")
                 let value = fill_sabre_data(data, attr);
