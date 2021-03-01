@@ -522,11 +522,11 @@
         $("tbody tr").on("click", function(){
           if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
             $(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(3).text());
-            $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
           } else {
             $(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(1).text());
-            $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
           }
+
+          $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
           $('#emp_div').hide();
           $('.emp_modal').modal('toggle');
         });
@@ -565,7 +565,6 @@
             "iDisplayLength": 7,
         });
 
-
         $("tr").on('click', function() {
           id = $(this).attr('id');
           swal.close();
@@ -574,7 +573,6 @@
             url: "<%=flight_selected_submissions_path%>" + "?flight_record_id="+id,
             dataType: 'json',
             success: function(data) {
-              console.log(data['message']);
               for (let i = 0; i < sabre_fields.length; i++){
                 value = fill_sabre_data(data, $(sabre_fields[i]).attr("sabre-map"));
                 $(sabre_fields[i]).val(value);
