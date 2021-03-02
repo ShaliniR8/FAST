@@ -485,3 +485,16 @@ javascript:
       employee_table.destroy();
     }
   }
+
+  function build_user_table(){
+    employee_table=$('#users').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  }
+
+  function clear_user_table(){
+    if(employee_table != null) {
+      employee_table.destroy();
+    }
+  }
