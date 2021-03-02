@@ -37,7 +37,7 @@
     });
     finding_chart.draw(google.visualization.arrayToDataTable(data), finding_options);
     google.visualization.events.addListener(finding_chart, 'select', function(){
-      var all_status=<%=raw @findings.keys%>
+      var all_status=<%=raw @grouped_findings.keys%>
       var root_url="<%=findings_path%>?status="
       var selection = finding_chart.getSelection();
       var message = "";

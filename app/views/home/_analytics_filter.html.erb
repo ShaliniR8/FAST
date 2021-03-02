@@ -105,22 +105,17 @@
               <div class="input-group">
                 <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
                   <% options = {} %>
-                  <%= label_tag :all, class: "btn btn-primary analytics-filter no-border time-option active" do %>
-                    <%= radio_button_tag :time_range, :all, true, options %> All
+                  <%= label_tag :all, class: "btn btn-primary analytics-filter no-border time-option" do %>
+                    <%= radio_button_tag :time_range, :all, false, options %> All
                   <% end %>
                   <%= label_tag :last_year, class: "btn btn-primary analytics-filter no-border time-option" do %>
                     <%= radio_button_tag :time_range, :last_year, false, options %> Past Year
                   <% end %>
-                  <%= label_tag :last_month, class: "btn btn-primary analytics-filter no-border time-option" do %>
-                    <%= radio_button_tag :time_range, :last_month, false, options %> Past Month
+                  <%= label_tag :last_month, class: "btn btn-primary analytics-filter no-border time-option active" do %>
+                    <%= radio_button_tag :time_range, :last_month, true, options %> Past Month
                   <% end %>
                   <%= label_tag :last_week, class: "btn btn-primary analytics-filter no-border time-option" do %>
                     <%= radio_button_tag :time_range, :last_week, false, options %> Past Week
-                  <% end %>
-                  <% if false %>
-                    <%= label_tag :last_day, class: "btn btn-primary analytics-filter no-border time-option" do %>
-                      <%= radio_button_tag :time_range, :last_day, false, options %> Past Day
-                    <% end %>
                   <% end %>
                   <%= label_tag :custom, class: "btn btn-primary analytics-filter no-border custom-time-option" do %>
                     <%= radio_button_tag :time_range, :custom, false, options %> Custom

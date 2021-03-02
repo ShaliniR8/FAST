@@ -38,7 +38,7 @@
     });
     risk_control_chart.draw(google.visualization.arrayToDataTable(data), risk_control_options);
     google.visualization.events.addListener(risk_control_chart, 'select', function(){
-      var all_status=<%=raw @risk_controls.keys%>
+      var all_status=<%=raw @grouped_risk_controls.keys%>
       var root_url="<%=risk_controls_path%>?status="
       var selection = risk_control_chart.getSelection();
       var message = "";

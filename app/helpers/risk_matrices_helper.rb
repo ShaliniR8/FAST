@@ -79,9 +79,9 @@ module RiskMatricesHelper
 
     items = case object
     when 'Record'
-      Record.can_be_accessed(current_user)
-            .within_timerange(@start_date, @end_date)
-            .by_emp_groups(params[:emp_groups])
+      @records
+    when 'Report'
+      @reports
     when 'Hazard', 'Sra'
       Object.const_get(object).within_timerange(@start_date, @end_date)
                               .by_departments(params[:departments])

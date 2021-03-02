@@ -26,7 +26,7 @@
 
 <% if type == :all %>
   <% types.each do |type, js_name| %>
-    <% array = instance_variable_get("@#{type}".pluralize) %>
+    <% array = instance_variable_get("@grouped_#{type}".pluralize) %>
     var <%= js_name %>Data = [
       ['Status','Number', { role: 'style' }, {role: 'annotation'}]
       <% if array.present?%>
@@ -45,7 +45,7 @@
 <% else %>
   var <%= types[type] %>Data = [
     ['Status','Number', { role: 'style' }, {role: 'annotation'}]
-    <% array = instance_variable_get("@#{type}".pluralize) %>
+    <% array = instance_variable_get("@grouped_#{type}".pluralize) %>
     <% if array.present? %>
       <% array.each_with_index do |(k,v), index| %>
         <% if type == :submission %>

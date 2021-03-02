@@ -40,7 +40,7 @@
     });
     sra_chart.draw(google.visualization.arrayToDataTable(data), sra_options);
     google.visualization.events.addListener(sra_chart, 'select', function(){
-      var all_status=<%=raw @sras.keys%>
+      var all_status=<%=raw @grouped_sras.keys%>
       var root_url="<%=sras_path%>?status="
       var selection = sra_chart.getSelection();
       var message = "";

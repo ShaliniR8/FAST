@@ -38,7 +38,7 @@
     });
     recommendation_chart.draw(google.visualization.arrayToDataTable(data), rec_options);
     google.visualization.events.addListener(recommendation_chart, 'select', function(){
-      var all_status=<%=raw @recommendations.keys%>
+      var all_status=<%=raw @grouped_recommendations.keys%>
       var root_url="<%=recommendations_path%>?status="
       var selection = recommendation_chart.getSelection();
       var message = "";
