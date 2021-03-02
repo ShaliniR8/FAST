@@ -91,6 +91,16 @@
           <%=hidden_field_tag 'is_autosave', 1%>
           <%=hidden_field_tag 'present_id', ""%>
 
+          <div class="col-xs-12">
+            <%=render "shared/instructions",
+              :instruction =>
+              "<p>
+                Click on the <b>categorical panels</b> to expand accordian and see content.</br>
+                Items in <b>red</b> are required. </br>
+                Scroll to the bottom of the page to <b>Submit/Save</b> the submission.</br>
+              </p>"%>
+          </div>
+
           <%if @template.allow_anonymous%>
             <div class="col-xs-12">
               <div class="col-xs-1">
@@ -144,10 +154,27 @@
 
             <div class="col-xs-12 col-sm-2 mb5">
               <%=label_tag :submitted_by, "Submitted By"%>
+
+              <%if CONFIG::GENERAL[:sabre_integration].present?%>
+                <%if @action == "new"%>
+                  <%submitted_by = current_user.full_name%>
+                  <%if current_user.employee_number.present?%>
+                    <%submitted_by = submitted_by + " (#{current_user.employee_number})"%>
+                  <%end%>
+                <%else%>
+                  <%submitted_by = @record.created_by.full_name%>
+                  <%if @record.created_by.employee_number.present?%>
+                    <%submitted_by = submitted_by + " (#{@record.created_by.employee_number})"%>
+                  <%end%>
+                <%end%>
+              <%else%>
+                <%submitted_by = @action == "new" ? current_user.full_name : @record.created_by.full_name %>
+              <%end%>
+
               <input type="text"
                 readonly
                 class="form-control"
-                value='<%=@action == "new" ? current_user.full_name : @record.created_by.full_name%>'>
+                value="<%=submitted_by%>">
             </div>
 
             <%if CONFIG.sr::GENERAL[:submission_description]%>
@@ -514,25 +541,25 @@
     $(this).find(".emp_button").each(function(index, item){
       $(item).on("click", function(){
         $(window).resize();
-        var field_id = $(this).prop('id');
+        var emp_field_id = $(this).prop('id');
         $(".emp_modal").show();
         clear_user_table();
         $("tbody tr").unbind();
         $(".close").unbind();
         $("tbody tr").on("click", function(){
           if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
-            $(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(3).text());
+            $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(3).text());
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(3).text());
           } else {
-            $(item).parent().parent().find("#emp"+field_id).val($(this).find("td").eq(1).text());
+            $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(1).text());
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(0).text());
           }
-
-          $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
           $('#emp_div').hide();
           $('.emp_modal').modal('toggle');
         });
         $('.close').on('click',function(){
-          $(item).parent().parent().find("#emp"+field_id).val("");
-          $(item).parent().parent().find("#employee-select"+field_id).val("");
+          $(item).parent().parent().find("#emp"+emp_field_id).val("");
+          $(item).parent().parent().find("#employee-select"+emp_field_id).val("");
           $('#emp_div').hide();
         });
         build_user_table();
@@ -574,8 +601,15 @@
             dataType: 'json',
             success: function(data) {
               for (let i = 0; i < sabre_fields.length; i++){
-                value = fill_sabre_data(data, $(sabre_fields[i]).attr("sabre-map"));
+                let attr = $(sabre_fields[i]).attr("sabre-map")
+                let value = fill_sabre_data(data, attr);
                 $(sabre_fields[i]).val(value);
+
+                if (attr == "flight_date" && $(sabre_fields[i]).is('.field-date, .field-datetime')) {
+                  $(sabre_fields[i]).next('.field-date, .field-datetime').val(value);
+                } else {
+                  $(sabre_fields[i]).next(':hidden').val(value);
+                }
               }
             }
           });

@@ -91,7 +91,12 @@
         <%employee = ""%>
         <%if record_field.value.present?%>
           <%if record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-            <%employee = User.find(record_field.value).full_name%>
+            <%if CONFIG::GENERAL[:sabre_integration].present?%>
+              <%#employee = User.where(employee_number: record_field.value).first.full_name rescue nil%>
+              <%employee = record_field.value%>
+            <%else%>
+              <%employee = User.find(record_field.value).full_name%>
+            <%end%>
           <%else%>
             <%employee = record_field.value%>
           <%end%>

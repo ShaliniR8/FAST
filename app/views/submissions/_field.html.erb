@@ -255,7 +255,9 @@
       <%elsif field.display_type == "employee"%>
         <div class="input-group">
           <%if (@record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/) rescue false)%>
-            <%@record_field.value = User.find(@record_field.value).full_name rescue ''%>
+            <%if !CONFIG::GENERAL[:sabre_integration].present?%>
+              <%@record_field.value = User.find(@record_field.value).full_name rescue ''%>
+            <%end%>
           <%end%>
           <%=text_field_tag field.get_label, "",
             {:class => "form-control ml5 emp " + required,

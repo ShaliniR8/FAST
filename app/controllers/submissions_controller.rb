@@ -555,7 +555,10 @@ class SubmissionsController < ApplicationController
                                             departure_airport: selected_flight.departure_airport,
                                             landing_airport: selected_flight.landing_airport,
                                           })
-        all_employee_data = all_employee_records.map{|rec| {:title => rec.employee_title, :number => rec.employee_number}}
+        all_employee_data = all_employee_records.map{|rec| {:title => rec.employee_title,
+                                                            :number => rec.employee_number
+                                                            }
+                                                    }
       end
     else
       puts "Very erroneous. Should not happen"
