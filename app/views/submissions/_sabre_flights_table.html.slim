@@ -52,6 +52,20 @@ ruby:
                 | Arrival Airport
               th.header
                 | Landing Airport
+          tfoot
+            tr
+              th.header
+                | Flight Date
+              th.header
+                | Flight Number
+              th.header
+                | Tail Number
+              th.header
+                | Departure Airport
+              th.header
+                | Arrival Airport
+              th.header
+                | Landing Airport
           tbody
             - flights.order(flight_date: :desc).each do |flt|
               tr.pointer id=flt[:id]
@@ -84,4 +98,4 @@ ruby:
                       | #{flt[:landing_airport]}
 .pull-right
   = label_tag 'Cancel', nil,
-               class: "btn btn-md btn-warning panel-button close_swal_btn"
+               class: "btn btn-md btn-default panel-button close_swal_btn"

@@ -255,7 +255,15 @@
       <%elsif field.display_type == "employee"%>
         <div class="input-group">
           <%if (@record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/) rescue false)%>
-            <%if !CONFIG::GENERAL[:sabre_integration].present?%>
+            <%if CONFIG::GENERAL[:sabre_integration].present?%>
+              <%display_emp = " (#{@record_field.value})"
+                user_name = User.where(employee_number: @record_field.value).first.full_name rescue nil
+                if user_name.present?
+                  display_emp = user_name + display_emp
+                end
+              %>
+              <%@record_field.value = display_emp%>
+            <%else%>
               <%@record_field.value = User.find(@record_field.value).full_name rescue ''%>
             <%end%>
           <%end%>
@@ -319,8 +327,8 @@
         <%=rf.text_field :value, {
           :list => "#{field.id}",
           :class => required + ' form-control ' + field.element_class,
-          :id => field.element_id},
-          "sabre-map" => sabre_map%>
+          :id => field.element_id,
+          "sabre-map" => sabre_map}%>
         <datalist id="<%=field.id%>">
           <%field.getOptions.each do |opt|%>
             <option value="<%=opt%>"></option>

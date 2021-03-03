@@ -556,9 +556,12 @@ class SubmissionsController < ApplicationController
                                             landing_airport: selected_flight.landing_airport,
                                           })
         all_employee_data = all_employee_records.map{|rec| {:title => rec.employee_title,
-                                                            :number => rec.employee_number
-                                                            }
+                                                            :number => rec.employee_number}
                                                     }
+
+        all_employee_usernames = all_employee_records.map{|rec| {:emp_num => rec.employee_number,
+                                                                 :emp_name => (User.where(employee_number: rec.employee_number).first.full_name rescue nil)}
+                                                          }
       end
     else
       puts "Very erroneous. Should not happen"
@@ -571,7 +574,8 @@ class SubmissionsController < ApplicationController
                      departure_airport: selected_flight.departure_airport,
                      arrival_airport: selected_flight.arrival_airport,
                      landing_airport: selected_flight.landing_airport,
-                     all_employee_data: all_employee_data
+                     all_employee_data: all_employee_data,
+                     usernames: all_employee_usernames
                     }
   end
 

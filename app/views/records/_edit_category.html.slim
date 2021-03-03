@@ -224,11 +224,14 @@ javascript:
         $(".close").unbind();
         $("tbody tr").on("click", function(){
           if (#{CONFIG::GENERAL[:sabre_integration].present?.to_json} == true) {
-            console.log("Right Place");
-            $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(3).text());
-            $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(3).text());
+            let display_emp = $(this).find("td").eq(1).text();
+            let emp_no = $(this).find("td").eq(3).text();
+            if (emp_no != null && emp_no != "") {
+              display_emp = display_emp + " (" + emp_no + ")";
+            }
+            $(item).parent().parent().find("#emp"+emp_field_id).val(display_emp);
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val(emp_no);
           } else {
-            console.log("Wrong Place");
             $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(1).text());
             $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(0).text());
           }
@@ -437,11 +440,9 @@ javascript:
       var icao = $(this).find("td").eq(0).text();
       var iata = $(this).find("td").eq(1).text();
       if (#{CONFIG::GENERAL[:sabre_integration].present?.to_json} == true) {
-        console.log("Right Place");
         $("#airport" + field_id).val(iata);
         $("#airport-select" + field_id).val(iata);
       } else {
-        console.log("Wrong Place");
         $("#airport" + field_id).val(icao + ";" + iata);
         $("#airport-select" + field_id).val(icao + ";" + iata);
       }

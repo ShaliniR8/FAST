@@ -524,9 +524,11 @@
         }
       });
 
-      if (sabre_fields.length > 0 && "<%=@action%>" != "Continue") {
+      if (sabre_fields.length > 0) {
         $(".refresh_sabre").show();
-        open_flights_table();
+        if ("<%=@action%>" != "Continue") {
+          open_flights_table();
+        }
         $(".refresh_sabre").on('click', function(){
           open_flights_table();
         });
@@ -548,8 +550,13 @@
         $(".close").unbind();
         $("tbody tr").on("click", function(){
           if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
-            $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(3).text());
-            $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(3).text());
+            let display_emp = $(this).find("td").eq(1).text();
+            let emp_no = $(this).find("td").eq(3).text();
+            if (emp_no != null && emp_no != "") {
+              display_emp = display_emp + " (" + emp_no + ")";
+            }
+            $(item).parent().parent().find("#emp"+emp_field_id).val(display_emp);
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val(emp_no);
           } else {
             $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(1).text());
             $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(0).text());
@@ -581,6 +588,31 @@
     }
   }
 
+  function drawTableCallBack() {
+    addIndividualColumnSearchField();
+    columnSearch();
+  }
+
+  function addIndividualColumnSearchField() {
+    $('#flights_table tfoot th').each(function(index) {
+      $(this).html('<input type="text" class="form-control" />');
+    });
+  }
+
+  function columnSearch() {
+    $('#flights_table').dataTable().api().columns().every(function() {
+      var column = this;
+
+      $('input', this.footer()).on('keyup change', function(e) {
+        // keyCode 13 is 'Enter'
+        if(e.keyCode == 13 && column.search() !== this.value){
+          search_term = this.value
+          column.search(search_term).draw();
+        }
+      });
+    });
+  }
+
   function open_flights_table() {
     swal({
       allowOutsideClick: false,
@@ -590,9 +622,10 @@
       onOpen: function() {
         let flights_table = $('#flights_table').DataTable({
             "iDisplayLength": 7,
+            "drawCallback": drawTableCallBack,
         });
 
-        $("tr").on('click', function() {
+        $("tbody tr").on('click', function() {
           id = $(this).attr('id');
           swal.close();
           $.ajax({
@@ -600,15 +633,34 @@
             url: "<%=flight_selected_submissions_path%>" + "?flight_record_id="+id,
             dataType: 'json',
             success: function(data) {
+              console.log(data['usernames']);
               for (let i = 0; i < sabre_fields.length; i++){
                 let attr = $(sabre_fields[i]).attr("sabre-map")
                 let value = fill_sabre_data(data, attr);
-                $(sabre_fields[i]).val(value);
 
                 if (attr == "flight_date" && $(sabre_fields[i]).is('.field-date, .field-datetime')) {
+                  $(sabre_fields[i]).val(value);
                   $(sabre_fields[i]).next('.field-date, .field-datetime').val(value);
-                } else {
+                } else if ((attr == "ca" || attr == "fo" || attr == "fa_1" || attr == "fa_2")) {
+                  let display_emp = " (" + value +")";
+                  for (let i = 0; i < data['usernames'].length; i++) {
+                    if (data['usernames'][i]['emp_num'] == value) {
+                      if (data['usernames'][i]['emp_name'] != null && data['usernames'][i]['emp_name'] != undefined) {
+                        display_emp = data['usernames'][i]['emp_name'] + display_emp;
+                      }
+                    }
+                  }
+                  if ($(sabre_fields[i]).is('.emp')){
+                    $(sabre_fields[i]).val(display_emp);
+                    $(sabre_fields[i]).next(':hidden').val(value);
+                  } else {
+                    $(sabre_fields[i]).val(display_emp);
+                  }
+                } else if ((attr == "departure_airport" || attr == "landing_airport" || attr == "arrival_airport") && $(sabre_fields[i]).is('.airport')) {
+                  $(sabre_fields[i]).val(value);
                   $(sabre_fields[i]).next(':hidden').val(value);
+                } else {
+                  $(sabre_fields[i]).val(value);
                 }
               }
             }
