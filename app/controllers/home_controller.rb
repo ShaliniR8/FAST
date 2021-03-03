@@ -69,18 +69,23 @@ class HomeController < ApplicationController
 
       @title = "Safety Reporting Dashboard"
 
-      @templates = Template.where(name: @permissions['submitter'].compact)
+      @templates = Template.where(name: (@permissions['submitter'] || []).compact)
 
       # ############################ SUBMISSIONS ########################
       submission_queries = []
 
       # template query
       if params[:emp_groups].present?
-        templates = Template.where(name: @permissions['full'].compact, emp_group: params[:emp_group])
+        templates = Template.where(name: (@permissions['full'] || []).compact, emp_group: params[:emp_group])
       else
-        templates = Template.where(name: @permissions['full'].compact)
+        templates = Template.where(name: (@permissions['full'] || []).compact)
       end
-      submission_queries << "(templates_id in (#{templates.map(&:id).join(',')}) OR user_id = #{current_user.id})"
+      if templates.length > 0
+        submission_queries << "(templates_id in (#{templates.map(&:id).join(',')}) OR user_id = #{current_user.id})"
+      else
+        submission_queries << "(user_id = #{current_user.id})"
+      end
+
 
       # time range
       if @start_date.present? && @end_date.present?
@@ -97,11 +102,11 @@ class HomeController < ApplicationController
 
       # template query
       if params[:emp_groups].present?
-        full_template = Template.where(name: @permissions['full'].compact, emp_group: params[:emp_group])
-        viewer_template = Template.where(name: @permissions['viewer'].compact, emp_group: params[:emp_group])
+        full_template = Template.where(name: (@permissions['full'] || []).compact, emp_group: params[:emp_group])
+        viewer_template = Template.where(name: (@permissions['viewer'] || []).compact, emp_group: params[:emp_group])
       else
-        full_template = Template.where(name: @permissions['full'].compact)
-        viewer_template = Template.where(name: @permissions['viewer'].compact)
+        full_template = Template.where(name: (@permissions['full'] || []).compact)
+        viewer_template = Template.where(name: (@permissions['viewer'] || []).compact)
       end
       template_query = ["(users_id = #{current_user.id})"]
       if full_template.length > 0
