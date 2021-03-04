@@ -101,7 +101,7 @@ class AccessControl < ActiveRecord::Base
       },
 
       "records"=>{
-        "summary"             => "This gives the user access to the \"View Summary\" button on the Meeting page",
+        "summary"             => "This gives the user access to the \"View Narrative\" button on the Meeting page",
         "show"                => generate_desc("Report", "show"),
         "edit"                => generate_desc("Report", "edit"),
         "destroy"             => generate_desc("Report", "destroy"),
@@ -322,7 +322,7 @@ class AccessControl < ActiveRecord::Base
         "Admin"=>"admin"
       },
       "records"=>{
-        "View Summary" => "summary",
+        "View Narrative" => "summary",
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
@@ -543,7 +543,7 @@ class AccessControl < ActiveRecord::Base
     h["Viewer"] = "viewer"
     h["Full"] = "full"
     h["Notifier"] = "notifier"
-    h["View Summary"] = "summary"
+    h["View Narrative"] = "summary"
     h["Submitter"] = "submitter"
     h["Safety Enhancement"] = "enhance"
     h["Summary"] = "summary"
