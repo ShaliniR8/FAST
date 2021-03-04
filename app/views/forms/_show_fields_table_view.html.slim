@@ -10,7 +10,7 @@ table.table.table-striped.table-bordered id="#{table_id}"
   tbody
     - records.each do |record|
 
-      tr
+      tr record="#{record.id}"
         - fields.each do |field|
           td class="#{field[:html_class].present? ? record.send(field[:html_class]) : ''}"
             - case field[:type]
