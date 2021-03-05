@@ -496,6 +496,7 @@ class SubmissionsController < ApplicationController
           end
           if params[:create_copy] == '1'
             converted = @record.convert
+            converted.make_report
             converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
             notify_notifiers(converted, params[:commit])
           end
