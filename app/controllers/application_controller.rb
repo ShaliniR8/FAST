@@ -1037,7 +1037,8 @@ class ApplicationController < ActionController::Base
       # @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
       # render partial: 'records/show_category', locals: {category: category, fields: fields}
       @owner.update_attributes(params[object_name.to_sym])
-      @record = @owner
+      # @record = @owner
+      @record = Object.const_get(class_name).find(params[:id])
       @cat = Category.find(params[:category_id])
       render partial: 'records/category',
              locals: {deid: !current_user.has_template_access(@record.template.name).include?('full'),

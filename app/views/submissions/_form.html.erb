@@ -19,6 +19,10 @@
 
 <%if CONFIG::GENERAL[:has_gmap].present?%>
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDRNvISiW_CO6FTNCdV40Nh19rAncpeLJo"></script>
+  <%=render 'shared/load_gmap'%>
+  <div hidden id="map-container">
+    <div id="map-canvas" style="height:500px;"></div>
+  </div>
 <%end%>
 
 <%if @template.js_link.present?%>
@@ -53,6 +57,7 @@
         </div>
       </div>
 
+      <div id = "map-canvas-hidden" style="display:none;"></div>
       <div class="modal fade bs-example-modal-lg emp_modal"
         tabindex="-1"
         role="dialog"
@@ -280,6 +285,16 @@
 
 <script type="text/javascript">
 
+  var map,
+      mapTypes = {},
+      pointsHolder = {},
+      mapSettings = {},
+      markers = [],
+      centerLat = <%=CONFIG::GENERAL[:lat]%>,
+      centerLng = <%=CONFIG::GENERAL[:lng]%>,
+      mapZoom = <%=CONFIG::GENERAL[:gMapZoom]%>,
+      clicked_map_field_id;
+
   function update_timezones() {
      $('.toplevel_timezone').on('change',function(){
       var timezone = $('.toplevel_timezone').val();
@@ -369,7 +384,6 @@
       return true;
     });
 
-
   var map,
       mapTypes = {},
       pointsHolder = {},
@@ -445,12 +459,15 @@
           title: "Add or Remove Map Marker for Map field",
           allowOutsideClick: false,
           showCancelButton: false,
-          html: "<%= escape_javascript render :partial => 'shared/map_point', layout: false%>",
+          html: '<p id="loading">Loading...</p>',
           onOpen: function() {
+            $('#map-canvas').appendTo('.swal2-content');
             updateMarkers(clicked_map_field_id);
+            $('.swal2-content #loading').remove();
           },
           onClose: function() {
-            cnt = count_visible_markers_for_field(clicked_map_field_id);
+            $('#map-canvas').appendTo('#map-container');
+            let cnt = count_visible_markers_for_field(clicked_map_field_id);
             if (cnt > 0) {
               if (cnt > 1) {
                 str = cnt + " points marked"
@@ -525,12 +542,13 @@
 
 
   function updateMarkers(id) {
-    markers = [];
-    mapTypes = {};
-    pointsHolder = {};
-
-    read_form_points(id);
-    initialize();
+    if(map == null) {
+      markers = [];
+      mapTypes = {};
+      pointsHolder = {};
+      read_form_points(id);
+      initialize();
+    }
   }
 
   function read_form_points(id) {
@@ -700,5 +718,8 @@
   }
   .radio:hover {
     font-weight:bold;
+  }
+  #map-canvas {
+   width: 100%;
   }
 </style>

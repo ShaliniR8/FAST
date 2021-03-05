@@ -54,6 +54,40 @@ javascript:
 
   var airport_table;
 
+  var map,
+        mapTypes = {},
+        pointsHolder = {},
+        mapSettings = {},
+        markers = [],
+        centerLat = #{ CONFIG::GENERAL[:lat] },
+        centerLng = #{ CONFIG::GENERAL[:lng] },
+        mapZoom = #{ CONFIG::GENERAL[:gMapZoom] },
+        clicked_map_field_id;
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+
+    $("[class^=nested_field_]").each(function(){
+      console.log($(this).attr('class'))
+      $(this).hide();
+    });
+    $(".nested_field_" + field_id + "_" + field_value).show();
+  }
+
+  function update_cb_rb_nested(field){
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+
+    if($(field).prop('checked')){
+      // $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).show();
+    } else {
+      // $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).hide();
+    }
+  }
+
   $(document).ready(function(){
 
     $(".required_field").css('border-color', '');
@@ -128,11 +162,16 @@ javascript:
           title: "Add or Remove Map Marker for Map field",
           allowOutsideClick: false,
           showCancelButton: false,
+          // html: '<p id="loading">Loading...</p>',
           html: "#{escape_javascript render :partial => 'shared/map_point', layout: false}",
+          // html: '<p id="loading">Loading...</p>',
           onOpen: function() {
+            // $('#map-canvas').appendTo('.swal2-content');
             updateMarkers(clicked_map_field_id);
+            // $('.swal2-content #loading').remove();
           },
           onClose: function() {
+            // $('#map-canvas').appendTo('#map-container');
             cnt = count_visible_markers_for_field(clicked_map_field_id);
             if (cnt > 0) {
               if (cnt > 1) {
@@ -379,7 +418,6 @@ javascript:
     markers = [];
     mapTypes = {};
     pointsHolder = {};
-
     read_form_points(id);
     initialize();
   }

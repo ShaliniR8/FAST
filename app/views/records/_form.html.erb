@@ -15,6 +15,10 @@
 
 <%if CONFIG::GENERAL[:has_gmap].present?%>
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDRNvISiW_CO6FTNCdV40Nh19rAncpeLJo"></script>
+  <%=render 'shared/load_gmap'%>
+  <div hidden id="map-container">
+    <div id="map-canvas" style="height:500px;"></div>
+  </div>
 <%end%>
 
 <%if @template.js_link.present?%>
@@ -205,7 +209,7 @@
       if ($(this).parents('.nested_field').css('display') != 'none'){
         update_titles($(this));
       }
-    }
+    });
 
     $(this).find(".map_button").each(function(index, item) {
       $(item).on('click', function(){
@@ -214,11 +218,14 @@
           title: "Add or Remove Map Marker for Map field",
           allowOutsideClick: false,
           showCancelButton: false,
-          html: "<%= escape_javascript render :partial => 'shared/map_point', layout: false%>",
+          html: '<p id="loading">Loading...</p>',
           onOpen: function() {
+            $('#map-canvas').appendTo('.swal2-content');
             updateMarkers(clicked_map_field_id);
+            $('.swal2-content #loading').remove();
           },
           onClose: function() {
+            $('#map-canvas').appendTo('#map-container');
             cnt = count_visible_markers_for_field(clicked_map_field_id);
             if (cnt > 0) {
               if (cnt > 1) {
@@ -296,12 +303,13 @@
   }
 
   function updateMarkers(id) {
-    markers = [];
-    mapTypes = {};
-    pointsHolder = {};
-
-    read_form_points(id);
-    initialize();
+    if(map == null) {
+      markers = [];
+      mapTypes = {};
+      pointsHolder = {};
+      read_form_points(id);
+      initialize();
+    }
   }
 
   function read_form_points(id) {

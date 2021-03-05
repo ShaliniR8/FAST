@@ -532,52 +532,30 @@ class AccessControl < ActiveRecord::Base
   end
 
   def self.action_options
-    if CONFIG::GENERAL[:has_confidential_forms].present?
-      {
-        'New'                 => 'new',
-        'View'                => 'show',
-        'Edit'                => 'edit',
-        'Delete'              => 'destroy',
-        'De-Identified'       => 'deid',
-        'Listing'             => 'index',
-        'Query'               => 'query',
-        'Viewer'              => 'viewer',
-        'Full'                => 'full',
-        'Notifier'            => 'notifier',
-        'View Summary'        => 'summary',
-        'Submitter'           => 'submitter',
-        'Confidential'        => 'confidential',
-        'Safety Enhancement'  => 'enhance',
-        'Summary'             => 'summary',
-        'Module'              => 'module',
-        'Tabulation'          => 'tabulation',
-        'Access'              => 'query_all',
-        'Admin'               => 'admin',
-        'Shared'              => 'shared'
-      }
-    else
-      {
-        'New'                 => 'new',
-        'View'                => 'show',
-        'Edit'                => 'edit',
-        'Delete'              => 'destroy',
-        'De-Identified'       => 'deid',
-        'Listing'             => 'index',
-        'Query'               => 'query',
-        'Viewer'              => 'viewer',
-        'Full'                => 'full',
-        'Notifier'            => 'notifier',
-        'View Summary'        => 'summary',
-        'Submitter'           => 'submitter',
-        'Safety Enhancement'  => 'enhance',
-        'Summary'             => 'summary',
-        'Module'              => 'module',
-        'Tabulation'          => 'tabulation',
-        'Access'              => 'query_all',
-        'Admin'               => 'admin',
-        'Shared'              => 'shared'
-      }
-    end
+    h = Hash.new
+
+    h["New"] = "new"
+    h["View"] = "show"
+    h["Edit"] = "edit"
+    h["Delete"] = "destroy"
+    h["De-Identified"] = "deid"
+    h["Listing"] = "index"
+    h["Query"] = "query"
+    h["Viewer"] = "viewer"
+    h["Full"] = "full"
+    h["Notifier"] = "notifier"
+    h["View Summary"] = "summary"
+    h["Submitter"] = "submitter"
+    h["Safety Enhancement"] = "enhance"
+    h["Summary"] = "summary"
+    h["Module"] = "module"
+    h["Tabulation"] = "tabulation"
+    h["Access"] = "query_all"
+    h["Admin"] = "admin"
+    h["Shared"] = "shared"
+    h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
+
+    return h
   end
 
   def self.entry_options
@@ -636,22 +614,15 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.get_template_opts
-    if CONFIG::GENERAL[:has_confidential_forms].present?
-      {
-        "Notifier"=>"notifier",
-        "Viewer"=>"viewer",
-        "Submitter"=>"submitter",
-        "Full"=>"full",
-        "Confidential"=>"confidential"
-      }
-    else
-      {
-        "Notifier"=>"notifier",
-        "Viewer"=>"viewer",
-        "Submitter"=>"submitter",
-        "Full"=>"full"
-      }
-    end
+    h = Hash.new
+
+    h["Notifier"] = "notifier"
+    h["Viewer"] = "viewer"
+    h["Submitter"] = "submitter"
+    h["Full"] = "full"
+    h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
+
+    return h
   end
 
 
