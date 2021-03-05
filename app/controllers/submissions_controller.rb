@@ -504,7 +504,6 @@ class SubmissionsController < ApplicationController
             flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
             format.html { redirect_to submission_path(@record), flash: flash }
             format.json { update_as_json(flash) }
-          end
         end
       end
     end
