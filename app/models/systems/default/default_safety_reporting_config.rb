@@ -405,8 +405,7 @@ class DefaultSafetyReportingConfig
         title: 'Submissions', path: '#',
         display: proc{|user:,**op|
           priv_check.call(Object.const_get('Submission'), user, 'index', true, true) ||
-          priv_check.call(Object.const_get('Submission'), user, 'new', true, true) ||
-          priv_check.call(Object.const_get('Submission'), user, 'full', true, true)
+          priv_check.call(Object.const_get('Submission'), user, 'new', true, true)
         },
         subMenu: [
           {title: 'All', path: 'submissions_path(status: "All")',
