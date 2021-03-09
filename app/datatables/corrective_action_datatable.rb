@@ -3,7 +3,16 @@ class CorrectiveActionDatatable < ApplicationDatatable
   private
 
   def records_total
-    counts = object.group(:status).count
+    search_string = []
+    if !@current_user.has_access('corrective_actions', 'admin', admin: true, strict: true)
+      status_queries = []
+      status_queries << "created_by_id = #{@current_user.id}"
+      status_queries << "responsible_user_id = #{@current_user.id} AND status in ('Assigned', 'Completed')"
+      status_queries << "approver_id = #{@current_user.id} AND status in ('Pending Approval', 'Completed')"
+      search_string << "(#{status_queries.join(' OR ')})"
+    end
+
+    counts = object.where(search_string.join(' AND ')).group(:status).count
 
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
@@ -19,6 +28,15 @@ class CorrectiveActionDatatable < ApplicationDatatable
 
 
   def query_with_search_term(search_string, join_tables,start_date, end_date)
+
+    if !@current_user.has_access('corrective_actions', 'admin', admin: true, strict: true)
+      status_queries = []
+      status_queries << "created_by_id = #{@current_user.id}"
+      status_queries << "responsible_user_id = #{@current_user.id} AND status in ('Assigned', 'Completed')"
+      status_queries << "approver_id = #{@current_user.id} AND status in ('Pending Approval', 'Completed')"
+      search_string << "(#{status_queries.join(' OR ')})"
+    end
+
     has_date_range = start_date.present? && end_date.present?
     case status
     when 'All'
@@ -60,9 +78,19 @@ class CorrectiveActionDatatable < ApplicationDatatable
 
 
   def query_without_search_term(search_string, join_tables,start_date, end_date)
+
+    if !@current_user.has_access('corrective_actions', 'admin', admin: true, strict: true)
+      status_queries = []
+      status_queries << "created_by_id = #{@current_user.id}"
+      status_queries << "responsible_user_id = #{@current_user.id} AND status in ('Assigned', 'Completed')"
+      status_queries << "approver_id = #{@current_user.id} AND status in ('Pending Approval', 'Completed')"
+      search_string << "(#{status_queries.join(' OR ')})"
+    end
+
     case status
     when 'All'
       object.joins(join_tables)
+            .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
             .group("#{object.table_name}.id")
             .limit(params['length'].to_i)
@@ -70,6 +98,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
     else
       object.joins(join_tables)
             .where(status: status)
+            .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
             .group("#{object.table_name}.id")
             .limit(params['length'].to_i)

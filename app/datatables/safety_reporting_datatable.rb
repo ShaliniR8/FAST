@@ -10,7 +10,9 @@ class SafetyReportingDatatable < ApplicationDatatable
     @status_counts = {}
   end
 
+
   private
+
 
   def records_total
     counts = @object_access_filtered.group(:status).count
