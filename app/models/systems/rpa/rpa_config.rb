@@ -38,6 +38,13 @@ class RPAConfig < DefaultConfig
     "Flight Attendant 2" => "fa_2"
   }
 
+  FAA_INFO = {
+    "CHDO"=>"Indianapolis CMO",
+    "Region"=>"Midwest Region",
+    "ASAP MOU Holder Name"=>"Leon Hayes",
+    "ASAP MOU Holder FAA Designator"=>"James Brannon"
+  }
+
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Initial Risk',

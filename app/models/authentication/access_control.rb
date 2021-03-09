@@ -606,7 +606,7 @@ class AccessControl < ActiveRecord::Base
       "SRA(SRM)"                              => "sras",
       "Hazards"                               => "hazards",
       "Risk Controls"                         => "risk_controls",
-      "Safety Plans"                          => "safety_plans",
+      # "Safety Plans"                          => "safety_plans",
       "Verifications"                         => "verifications",
     }.sort.to_h
   end

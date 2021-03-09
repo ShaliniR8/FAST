@@ -20,5 +20,8 @@ module Sa
       self.responsible_user.full_name
     end
 
+    def get_created_by_name
+      self.created_by.full_name
+    end
   end
 end

@@ -560,8 +560,8 @@ class DefaultDictionary
       required: false
     },
     created_by: {
-      field: 'created_by_id', title: 'Created By',
-      num_cols: 6,  type: 'user', visible: 'show',
+      field: 'created_by_id', title: 'Creator',
+      num_cols: 6,  type: 'user', visible: 'show,auto',
       required: false
     },
     viewer_access: {
@@ -581,12 +581,12 @@ class DefaultDictionary
     },
     responsible_user: {
       field: 'responsible_user_id', title: 'Responsible User',
-      num_cols: 6,  type: 'user', visible: 'index,form,show',
+      num_cols: 6,  type: 'user', visible: 'index,form,show,auto',
       required: false, display: 'get_responsible_user_name'
     },
     approver: {
       field: 'approver_id', title: 'Final Approver',
-      num_cols: 6,  type: 'user', visible: 'form,show',
+      num_cols: 6,  type: 'user', visible: 'form,show,auto',
       required: false, display: 'get_approver_name'
     },
     location: {

@@ -34,12 +34,7 @@ class AutomatedNotification < ActiveRecord::Base
   end
 
   def get_audience_fields
-    case object_type.classify
-    when 'Verification', 'Meeting'
-      get_auto_fields(object_type, 'auto', 'user')
-    else
-      get_auto_fields(object_type, 'form', 'user')
-    end
+    get_auto_fields(object_type, 'auto', 'user')
   end
 
 

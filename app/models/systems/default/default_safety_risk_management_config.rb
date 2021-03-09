@@ -40,10 +40,11 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
             required: false, options: "CONFIG.custom_options['Systems/Tasks']"
           },
+          created_by: { default: true },
           responsible_user: { default: true },
           reviewer: {
             field: 'reviewer_id', title: 'Quality Reviewer',
-            num_cols: 6, type: 'user', visible: 'form,show',
+            num_cols: 6, type: 'user', visible: 'form,show,auto',
             required: false
           },
           approver: { default: true },
