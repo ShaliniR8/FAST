@@ -17,7 +17,13 @@ class CorrectiveActionDatatable < ApplicationDatatable
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
         when 'All'
-          counts.values.sum
+          if counts['Overdue'].nil?
+            counts.values.sum
+          else
+            counts.values.sum - counts['Overdue']
+          end
+        when 'Overdue'
+            object.where(search_string.join(' AND ')).select{|x| x.overdue}.size
         else
           counts[status].nil? ? 0 : counts[status]
         end
@@ -55,6 +61,15 @@ class CorrectiveActionDatatable < ApplicationDatatable
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
+
+    when 'Overdue'
+      object.joins(join_tables).joins(join_tables)
+            .where(search_string.join(' and '))
+            .order("#{sort_column} #{sort_direction}")
+            .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
+            .limit(params['length'].to_i)
+            .offset(params['start'].to_i)
+
     else
       if has_date_range
         object.where(status: status)
@@ -95,6 +110,15 @@ class CorrectiveActionDatatable < ApplicationDatatable
             .group("#{object.table_name}.id")
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
+
+    when 'Overdue'
+      object.joins(join_tables)
+            .order("#{sort_column} #{sort_direction}")
+            .where(search_string.join(' AND '))
+            .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
+            .limit(params['length'].to_i)
+            .offset(params['start'].to_i)
+
     else
       object.joins(join_tables)
             .where(status: status)
@@ -105,6 +129,33 @@ class CorrectiveActionDatatable < ApplicationDatatable
             .offset(params['start'].to_i)
     end
   end
+
+
+  def status_counts
+    if @status_count.empty?
+      # when there is no search
+      return @records_total
+    else
+      # when there is a search terms
+      counts = @status_count
+    end
+
+    params[:statuses].reduce({}) { |acc, status|
+      status_count = case status
+        when 'All'
+          if counts['Overdue'].nil?
+            counts.values.sum
+          else
+            counts.values.sum - counts['Overdue']
+          end
+        else
+          counts[status].nil? ? 0 : counts[status]
+        end
+
+      acc.update(status => status_count)
+    }
+  end
+
 
 
   def update_status_count(search_string, join_tables, start_date, end_date)
