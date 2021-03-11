@@ -7,8 +7,8 @@ class CorrectiveActionDatatable < ApplicationDatatable
     if !@current_user.has_access('corrective_actions', 'admin', admin: true, strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id} AND status in ('Assigned', 'Completed')"
-      status_queries << "approver_id = #{@current_user.id} AND status in ('Pending Approval', 'Completed')"
+      status_queries << "responsible_user_id = #{@current_user.id}"
+      status_queries << "approver_id = #{@current_user.id}"
       search_string << "(#{status_queries.join(' OR ')})"
     end
 
