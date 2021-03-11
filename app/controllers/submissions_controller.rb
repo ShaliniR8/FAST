@@ -188,7 +188,7 @@ class SubmissionsController < ApplicationController
 
 
   def prepare_flight_data(emp_num)
-    @flights = Sabre.where({flight_date: (Time.now - 15.days).to_date..Time.now.to_date, employee_number: emp_num})
+    @flights = Sabre.where({flight_date: (Time.now - 30.days).to_date..Time.now.to_date, employee_number: emp_num})
   end
 
 
@@ -504,6 +504,7 @@ class SubmissionsController < ApplicationController
             flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
             format.html { redirect_to submission_path(@record), flash: flash }
             format.json { update_as_json(flash) }
+          end
         end
       end
     end
