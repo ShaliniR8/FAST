@@ -25,6 +25,7 @@
           <tbody>
             <%records.each do |record|%>
               <tr record_id="<%=record.id%>">
+                <%validator_ids = []%>
                 <%Verification.get_meta_fields('index').each do |field|%>
                   <%field_name = field[:field]%>
                   <%field_value = record.send(field_name)%>
@@ -62,8 +63,10 @@
                     <%when "select_multiple"%>
                       <% if field_value.nil? %>
                         <%=record.validator.full_name%>
+                        <%validator_ids << record.validator.id%>
                       <% else %>
                         <%valiators = field_value.map { |validator| User.find(validator).full_name }%>
+                        <%validator_ids = field_value.map { |validator| User.find(validator).id }%>
                         <%=valiators.join(', ')%>
                       <% end%>
                     <%else%>
@@ -72,7 +75,7 @@
                   </td>
                 <%end%>
                 <td>
-                  <%if record.status == "New"%>
+                  <%if record.status == "New" && validator_ids.include?(current_user.id)%>
                     <%=link_to "Edit",
                       "#",
                       :route => edit_verification_path(record),

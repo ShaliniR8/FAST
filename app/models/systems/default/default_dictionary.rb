@@ -101,8 +101,8 @@ class DefaultDictionary
       btn: :hazard,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        owner.status != 'Completed' &&
-        priv_check.call(owner,user,'new',true,true)
+        ['Completed', 'New'].exclude?(owner.status) &&
+        priv_check.call(Object.const_get('Hazard'),user,'new',true,true)
       },
     },
     message_submitter: {

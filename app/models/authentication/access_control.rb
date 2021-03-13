@@ -80,9 +80,9 @@ class AccessControl < ActiveRecord::Base
   def self.module_map
     {
       "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
-      "smsim" => ["SMS IM", "ims", "packages"],
+      "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations'],
-      "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls'],
+      "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings'],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
     }
@@ -563,7 +563,7 @@ class AccessControl < ActiveRecord::Base
       "Reports"                               => "records",
       "Event Reports"                         => "reports",
       "Trackings"                             => "trackings",
-      "Meetings"                              => "meetings",
+      "SR Meetings"                           => "meetings",
       "Corrective Actions(Safety Reporting)"  => "corrective_actions",
       "FAA Reports"                           => "faa_reports",
       "Documents"                             => "documents",
@@ -594,7 +594,7 @@ class AccessControl < ActiveRecord::Base
 
   def self.object_types
     {
-      "Meetings"                              => "meetings",
+      "SR Meetings"                           => "meetings",
       "Corrective Actions(Safety Reporting)"  => "corrective_actions",
       "Audits"                                => "audits",
       "Inspections"                           => "inspections",

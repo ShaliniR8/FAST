@@ -17,7 +17,7 @@ class DefaultSafetyRiskManagementConfig
 
       'Sra' => {
         title: 'SRA',
-        status: ['New', 'Assigned', 'Pending Approval', 'Pending Review', 'Completed', 'Overdue', 'All'],
+        status: ['New', 'Assigned', 'Pending Review', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :verifications,
           :extension_requests],
@@ -173,7 +173,7 @@ class DefaultSafetyRiskManagementConfig
 
         actions: [
           #TOP
-          *%i[delete override_status edit launch deid_pdf pdf view_meeting view_parent viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf view_meeting view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({

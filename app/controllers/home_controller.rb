@@ -493,6 +493,9 @@ class HomeController < ApplicationController
 
   def prepare_special_risk_matrix
     special_matrix
+    row_sz = @risk_table[:row_header].size
+    col_sz = @risk_table[:column_header].size
+
     @frequency = [
       'FREQUENT >4.00',
       'PROBABLE 4.00~3.01',
@@ -510,8 +513,8 @@ class HomeController < ApplicationController
     # Safety Assurance
     if session[:mode] == "SMS"
       # Findings
-      @finding_matrix = Array.new(5){Array.new(5,0)}
-      @finding_after_matrix = Array.new(5){Array.new(5,0)}
+      @finding_matrix = Array.new(row_sz){Array.new(col_sz,0)}
+      @finding_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
       Finding.within_timerange(@start_date, @end_date).each do |finding|
         if finding.severity.present? && finding.likelihood_index.present?
           @finding_matrix[finding.severity.to_i][finding.likelihood_index] =
@@ -523,8 +526,8 @@ class HomeController < ApplicationController
         end
       end
       # Investigations
-      @inv_after_matrix = Array.new(5){Array.new(5,0)}
-      @inv_matrix = Array.new(5){Array.new(5,0)}
+      @inv_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
+      @inv_matrix = Array.new(row_sz){Array.new(col_sz,0)}
       Investigation.within_timerange(@start_date, @end_date).each do |finding|
         if finding.severity.present? && finding.likelihood_index.present?
           @inv_matrix[finding.severity.to_i][finding.likelihood_index] =
@@ -539,8 +542,8 @@ class HomeController < ApplicationController
       @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Findings"
 
       # SmsActions
-      @car_after_matrix = Array.new(5){Array.new(5, 0)}
-      @car_matrix = Array.new(5){Array.new(5, 0)}
+      @car_after_matrix = Array.new(row_sz){Array.new(col_sz, 0)}
+      @car_matrix = Array.new(row_sz){Array.new(col_sz, 0)}
       SmsAction.within_timerange(@start_date, @end_date).each do |x|
         if x.severity.present? && x.likelihood_index.present?
           @car_matrix[x.severity.to_i][x.likelihood_index] =
@@ -555,8 +558,8 @@ class HomeController < ApplicationController
 
     # Safety Reporting Module
     elsif session[:mode] == "ASAP"
-      @record_matrix = Array.new(5){Array.new(5,0)}
-      @record_after_matrix = Array.new(5){Array.new(5,0)}
+      @record_matrix = Array.new(row_sz){Array.new(col_sz,0)}
+      @record_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
 
       @records.each do |record|
         if record.severity_after.present? && record.likelihood_after_index.present?
@@ -569,8 +572,8 @@ class HomeController < ApplicationController
         end
       end
 
-      @report_matrix = Array.new(5){Array.new(5,0)}
-      @report_after_matrix = Array.new(5){Array.new(5,0)}
+      @report_matrix = Array.new(row_sz){Array.new(col_sz,0)}
+      @report_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
       @reports.each do |report|
         if report.severity_after.present? && report.likelihood_after_index.present?
           @report_after_matrix[report.severity_after.to_i][report.likelihood_after_index] =
@@ -587,8 +590,8 @@ class HomeController < ApplicationController
     # Safety Risk Management
     else
 
-      @hazard_matrix = Array.new(5){Array.new(5,0)}
-      @hazard_after_matrix = Array.new(5){Array.new(5,0)}
+      @hazard_matrix = Array.new(row_sz){Array.new(col_sz,0)}
+      @hazard_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
       Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |hazard|
         if hazard.severity_after.present? && hazard.likelihood_after_index.present?
           @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] =
@@ -599,8 +602,8 @@ class HomeController < ApplicationController
             @hazard_matrix[hazard.severity.to_i][hazard.likelihood_index] + 1
         end
       end
-      @sra_matrix = Array.new(5){Array.new(5,0)}
-      @sra_after_matrix = Array.new(5){Array.new(5,0)}
+      @sra_matrix = Array.new(row_sz){Array.new(col_sz,0)}
+      @sra_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
       Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
         if sra.severity_after.present? && sra.likelihood_after_index.present?
           @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] =
