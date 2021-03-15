@@ -48,10 +48,14 @@ class FaaReportsController < ApplicationController
   def print
     @report = FaaReport.find(params[:id])
     @identification = CONFIG::FAA_INFO
+    # asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
+    #   .select{|x|
+    #     (x.template.name.include? "ASAP") &&
+    #     (x.template.name.include? "#{@report.employee_group}")}
     asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
-        (x.template.name.include? "ASAP") &&
-        (x.template.name.include? "#{@report.employee_group}")}
+        (x.template.report_type.present? && x.template.report_type == "asap") &&
+        (x.template.emp_group.present? && x.template.emp_group.downcase == "#{@report.employee_group.downcase}")}
     @statistics = @report.statistics(asap_reports)
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     html = render_to_string(:template=>"/faa_reports/print.html.erb")
@@ -139,10 +143,14 @@ class FaaReportsController < ApplicationController
 
   def show
     @report = FaaReport.find(params[:id])
+    # asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
+    #   .select{|x|
+    #     (x.template.name.include? "ASAP") &&
+    #     (x.template.name.include? "#{@report.employee_group}")}
     asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
-        (x.template.name.include? "ASAP") &&
-        (x.template.name.include? "#{@report.employee_group}")}
+        (x.template.report_type.present? && x.template.report_type == "asap") &&
+        (x.template.emp_group.present? && x.template.emp_group.downcase == "#{@report.employee_group.downcase}")}
     @statistics = @report.statistics(asap_reports)
     @asap_events = asap_reports.map{|x| x.report}.uniq.compact
     @identification = CONFIG::FAA_INFO
