@@ -43,7 +43,7 @@ FFT:
       mitigated:
         title: Residual
 
-RPA:
+RJET:
   core:
     risk:
       baseline:

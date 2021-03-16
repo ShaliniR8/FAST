@@ -1,4 +1,4 @@
-class RPASafetyReportingConfig < DefaultSafetyReportingConfig
+class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     # Airline-Specific Features:

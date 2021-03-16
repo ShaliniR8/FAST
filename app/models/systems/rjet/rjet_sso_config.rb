@@ -1,4 +1,4 @@
-class RPASsoConfig
+class RJETSsoConfig
   SAML_DATA = {
     metadata_link: '',
 
