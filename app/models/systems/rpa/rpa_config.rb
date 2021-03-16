@@ -57,7 +57,7 @@ class RPAConfig < DefaultConfig
 
       orientation: :vertical,
       direction: :down,
-      size: 'col-xs-6',
+      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
       header_style: 'sevHeader',
@@ -114,7 +114,7 @@ class RPAConfig < DefaultConfig
 
       orientation: :horizontal,
       direction: :right,
-      size: 'col-xs-6',
+      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-6',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',
       header_style: 'probHeader',
@@ -148,7 +148,7 @@ class RPAConfig < DefaultConfig
     risk_table: {
       title: 'RISK ASSESSMENT MATRIX',
 
-      size: 'col-xs-6',
+      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-6',
       title_style: 'matrixTitle',
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',

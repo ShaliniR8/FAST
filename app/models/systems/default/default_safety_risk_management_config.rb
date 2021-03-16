@@ -183,7 +183,7 @@ class DefaultSafetyRiskManagementConfig
             access: proc { |owner:,user:,**op|
               form_confirmed = owner.status == 'Pending Approval' || op[:form_conds] || owner.status == 'Pending Review'
               user_confirmed = [owner.created_by_id, owner.approver_id, owner.reviewer_id].include?(user.id) ||
-                priv_check.call(owner,user,'admin',true,true) ||
+                priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
                 op[:user_conds]
               form_confirmed && user_confirmed
             },
@@ -268,7 +268,7 @@ class DefaultSafetyRiskManagementConfig
               next false unless CONFIG::GENERAL[:allow_reopen_report]
               form_confirmed = ['Completed', 'Rejected'].include? owner.status || op[:form_conds]
               user_confirmed = [owner.created_by_id].include?(user.id) ||
-                priv_check.call(owner,user,'admin',true,true) ||
+                priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
                 op[:user_conds]
               form_confirmed && user_confirmed
             },
@@ -340,7 +340,7 @@ class DefaultSafetyRiskManagementConfig
             access: proc { |owner:,user:,**op|
               form_confirmed = ['New', 'Open'].include? owner.status || op[:form_conds]
               user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
-                priv_check.call(owner,user,'admin',true,true) ||
+                priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
                 op[:user_conds]
               form_confirmed && user_confirmed
             },
@@ -470,40 +470,40 @@ class DefaultSafetyRiskManagementConfig
     menu_items: {
       'Sra' => {
         title: 'SRA (SRM)', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'sras_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_sra_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Hazards' => {
         title: 'Hazards', path: 'hazards_path(status: "New")',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Hazard'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Hazard'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
       },
       'Risk Controls' => {
         title: 'Risk Controls', path: 'risk_controls_path(status: "New")',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
       },
       'Safety Plans' => {
         title: 'Safety Plans', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'safety_plans_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_safety_plan_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SafetyPlan'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Meetings' => {
         title: 'Meetings', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'srm_meetings_path(status: "All")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_srm_meeting_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Query Center' => {

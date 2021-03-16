@@ -26,7 +26,7 @@ class DefaultImplementationManagementConfig
           {title: 'All', path: 'ims_path(:type=>"FrameworkIm")',
             display: proc{|user:,**op| true }},
           {title: 'New', path: 'new_im_path(:type=>"FrameworkIm")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Im'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Im'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'Packages', path: '#', header: true,
             display: proc{|user:,**op| true }},
           {title: 'All', path: 'packages_path(:type=>"FrameworkImPackage")',
@@ -36,7 +36,7 @@ class DefaultImplementationManagementConfig
           {title: 'All', path: 'sms_meetings_path(:type=>"FrameworkMeeting")',
             display: proc{|user:,**op| true }},
           {title: 'New', path: 'new_sms_meeting_path(:type=>"FrameworkMeeting")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'VP/Part 5' => {
@@ -48,7 +48,7 @@ class DefaultImplementationManagementConfig
           {title: 'All', path: 'ims_path(:type=>"VpIm")',
             display: proc{|user:,**op| true }},
           {title: 'New', path: 'new_im_path(:type=>"VpIm")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Im'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Im'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'Packages', path: '#', header: true,
             display: proc{|user:,**op| true }},
           {title: 'All', path: 'packages_path(:type=>"VpImPackage")',
@@ -58,7 +58,7 @@ class DefaultImplementationManagementConfig
           {title: 'All', path: 'sms_meetings_path(:type=>"VpMeeting")',
             display: proc{|user:,**op| true }},
           {title: 'New', path: 'new_sms_meeting_path(:type=>"VpMeeting")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Job Aid' => {
@@ -70,7 +70,7 @@ class DefaultImplementationManagementConfig
           {title: 'All', path: 'ims_path(:type=>"JobAid")',
             display: proc{|user:,**op| true }},
           {title: 'New', path: 'new_im_path(:type=>"JobAid")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Im'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Im'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'Packages', path: '#', header: true,
             display: proc{|user:,**op| true }},
           {title: 'All', path: 'packages_path(:type=>"JobAidPackage")',
@@ -80,7 +80,7 @@ class DefaultImplementationManagementConfig
           {title: 'All', path: 'sms_meetings_path(:type=>"JobMeeting")',
             display: proc{|user:,**op| true }},
           {title: 'New', path: 'new_sms_meeting_path(:type=>"JobMeeting")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
     }
