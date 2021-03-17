@@ -32,7 +32,7 @@
                   "ASAP MOU Employee Group",
                   :class => "required"%>
                 <%=f.select :employee_group,
-                  FaaReport.getEmployeeGroup,
+                  options_for_select(FaaReport.getEmployeeGroup),
                   {:include_blank => true},
                   {:class => "form-control required_field"}%>
               </div>

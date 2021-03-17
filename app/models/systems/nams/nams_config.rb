@@ -30,6 +30,17 @@ class NAMSConfig < DefaultConfig
     "ASAP MOU Holder FAA Designator"=>"N/A"
   })
 
+  EMPLOYEE_GROUPS = {
+    "Flight Crew" => "flight-crew",
+    "Inflight" => "inflight",
+    "Ground" => "ground",
+    "Dispatch" => "dispatch",
+    "Maintenance" => "maintenance",
+    "Worker Observation" => "observation",
+    "General" => "general",
+    "Other" => "other",
+  }
+
 
   MATRIX_INFO = {
     terminology: {

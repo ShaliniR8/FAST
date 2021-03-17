@@ -94,6 +94,21 @@ class DefaultConfig
     'ASAP MOU Holder FAA Designator' => 'Holder FAA Designator Not Initialized'
   }
 
+  REPORT_TYPES = {
+    "ASAP" => "asap",
+    "Non-ASAP" => "non-asap",
+  }
+
+  EMPLOYEE_GROUPS = {
+    "Flight Crew" => "flight-crew",
+    "Inflight" => "inflight",
+    "Ground" => "ground",
+    "Dispatch" => "dispatch",
+    "Maintenance" => "maintenance",
+    "General" => "general",
+    "Other" => "other",
+  }
+
   # To access Safety Reporting Configs use the constant defined below (use CONFIG.sr in code)
   def self.sr
     Object.const_get("#{AIRLINE_CODE}SafetyReportingConfig") rescue DefaultSafetyReportingConfig
