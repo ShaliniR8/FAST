@@ -27,7 +27,8 @@
               <% if current_user.username == 'prosafet_admin' %>
                 <%=link_to "Make a Copy",
                 clone_template_path(@template),
-                :class => "btn btn-info"%>
+                :class => "btn btn-info",
+                confirm: 'Are you sure?'%>
 
                 <%=link_to 'Delete',
                 template_path(@template),
