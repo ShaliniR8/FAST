@@ -146,20 +146,54 @@
   <%end%>
 </datalist>
 
+<datalist id="custom_options">
+  <%CustomOption.all.each do |custom_option|%>
+    <option value="<%=(custom_option.options || '')%>">
+      <%=custom_option.title%>
+    </option>
+  <%end%>
+</datalist>
+
+
+<style>
+  table .form-control {
+    font-size: 13px !important;
+    padding: 4px !important;
+  }
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    vertical-align: middle;
+    padding: 4px;
+  }
+</style>
+
+
 <script>
   $(function(){
 
-    $(".archive_btn").on("click", function(){
-      if($(this).text() == "Archive"){
-        $(this).closest("td").find("#delete_field").val(true);
-        $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
-        $(this).text("Unarchive");
-        $(this).removeClass("btn-warning").addClass("btn-default");
-      }else{
+    $(document).on('click', '.drag_and_drop', function(e) {
+      e.preventDefault();
+    });
+
+    $(document).on('click', '.delete-btn', function(e) {
+      e.preventDefault();
+    });
+
+
+    $(".archive_btn").on('click', function(e) {
+      e.preventDefault();
+      if ($(this).hasClass('btn-default')) { // Archived
+        $(this).removeClass('btn-default').addClass('btn-warning');
         $(this).closest("td").find("#delete_field").val(false);
         $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
-        $(this).text("Archive");
-        $(this).removeClass("btn-default").addClass("btn-warning");
+      } else { // Active
+        $(this).removeClass('btn-warning').addClass('btn-default');
+        $(this).closest("td").find("#delete_field").val(true);
+        $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
       }
     });
 
@@ -186,10 +220,13 @@
       }
     });
 
+
     var panelList = $(".draggablePanelList");
     panelList.each(function(){
       $(this).sortable({
+        handle: $(".drag-and-drop"),
         handle: $(this, ".drag_and_drop"),
+        forcePlaceholderSize: true,
         cursor: "move",
         start: function(event, ui){
           ui.placeholder.height(ui.item.height());
