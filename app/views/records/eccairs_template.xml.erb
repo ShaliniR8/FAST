@@ -5,7 +5,7 @@
     <ATTRIBUTES>
       <%attributes.sort_by(&:attribute_sequence).each do |attribute|%>
         <%
-          field_value = field_content[attribute].value rescue nil
+          field_value = field_content[attribute].get_eccairs_value rescue nil
           conversion = DefaultIntegrationConfig::ECCAIRS_Preferences[:datatype_dictionary][attribute.datatype_id]
           field_value = (eval("'#{field_value}'.#{conversion}") rescue nil) if !conversion.nil? && !field_value.nil?
         %>
@@ -35,7 +35,7 @@
         <ATTRIBUTES>
           <%inner_attributes.sort_by(&:attribute_sequence).each do |attribute|%>
             <%
-              field_value = field_content[attribute].value rescue nil
+              field_value = field_content[attribute].get_eccairs_value rescue nil
               conversion = DefaultIntegrationConfig::ECCAIRS_Preferences[:datatype_dictionary][attribute.datatype_id]
               field_value = (eval("'#{field_value}'.#{conversion}") rescue nil) if !conversion.nil? && !field_value.nil?
             %>

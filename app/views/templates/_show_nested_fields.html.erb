@@ -4,8 +4,6 @@
   <%=hidden_field_tag :field_id, @field.id%>
   <%=hidden_field_tag :category_id, @category.id%>
   <%=fields_for :category, @category do |f1|%>
-
-
     <%@field.getOptions.each do |x|%>
       <div class="panel panel-info">
         <div class="panel-heading click-heading">
@@ -50,7 +48,7 @@
 
                     <td>
                       <%=f.select :custom_option_id,
-                        options_for_select(CustomOption.all.map{|x| [x.title, x.id]}.to_h, (field.custom_option_id rescue nil)),
+                        options_for_select(CONFIG.custom_options_arr.map{|x| [x.title, x.id]}.to_h, (field.custom_option_id rescue nil)),
                         {include_blank: ''},
                         {class: "form-control"}%>
                     </td>
@@ -76,22 +74,18 @@
                       </td>
                     <%end%>
 
-
                     <td>
-
-
                       <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
                       <%=f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
 
-                    <%if field.deleted?%>
-                      <a class="btn btn-default archive_btn">Unarchive</a>
-                    <%else%>
-                      <a class="btn btn-warning archive_btn">Archive</a>
-                    <%end%>
-                    <%=f.hidden_field :deleted, :id => "delete_field"%>
-
-
+                      <%if field.deleted?%>
+                        <a class="btn btn-default archive_btn">Unarchive</a>
+                      <%else%>
+                        <a class="btn btn-warning archive_btn">Archive</a>
+                      <%end%>
+                      <%=f.hidden_field :deleted, :id => "delete_field"%>
                     </td>
+
                   </tr>
                 <%end%>
               <%end%>
@@ -104,19 +98,16 @@
               partial: 'field_fields'
             %></br>
 
-
           </table>
         </div>
       </div>
     <%end%>
-
   <%end%>
 
 
   <%=submit_tag "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
   <a class="btn btn-default pull-right mr5" onclick="closeSwal()">Cancel</a>
 <%end%>
-
 
 
 
@@ -128,7 +119,6 @@
     font-size: 14px;
   }
 </style>
-
 
 
 <script>

@@ -29,7 +29,7 @@
   <td><%=f.text_area    :options,                                              class: 'form-control', rows: 3%>            </td>
   <td>
     <%=f.select :custom_option_id,
-      options_for_select(CustomOption.all.map{|x| [x.title, x.id]}.to_h, (field.custom_option_id rescue nil)),
+      options_for_select(CONFIG.custom_options_arr.map{|x| [x.title, x.id]}.to_h, (field.custom_option_id rescue nil)),
       {include_blank: ''},
       {class: "form-control"}%>
   </td>
@@ -86,7 +86,7 @@
       <!-- View Nested btn -->
       <%if CONFIG.sr::GENERAL[:template_nested_fields]%>
         <%=link_to '<i class="glyphicon glyphicon-list"></i>'.html_safe, '#',
-          class: 'btn btn-sm btn-info archive_btn mt5',
+          class: 'btn btn-sm btn-info mt5',
           id: "show_nested_btn_#{field.id}",
           title: 'View Nested'%>
       <%end%>
@@ -98,21 +98,14 @@
         title: 'Remove'%>
     <%end%>
   </td>
-
 </tr>
-
-
 
 
 
 <script type="text/javascript">
   $(function(){
-
-
-
     $(".extra_info").hide();
     $(".deleted_fields").hide();
-
 
     <%if source == 'Existing'%>
       $("#show_nested_btn_<%=field.id%>").on("click", function(){

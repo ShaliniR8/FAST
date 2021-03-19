@@ -9,6 +9,7 @@ class Field < ActiveRecord::Base
   belongs_to :category,         :foreign_key => "categories_id",    :class_name => "Category"
   belongs_to :map_field,        :foreign_key => "map_id",           :class_name => "Field"
   belongs_to :parent_field,     :foreign_key => "nested_field_id",  :class_name => "Field"
+  belongs_to :custom_option,    :foreign_key => 'custom_option_id', :class_name => 'CustomOption'
 
 
   has_many :eccairs_mappings, foreign_key: :field_id, class_name: 'EccairsMapping'
@@ -126,7 +127,7 @@ class Field < ActiveRecord::Base
       if options.present?
         options.split(";")
       elsif custom_option_id.present?
-        CustomOption.find(custom_option_id).options.split(';')
+        CONFIG.custom_options_by_id[custom_option_id].options.split(';')
       else
         []
       end

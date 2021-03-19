@@ -129,6 +129,16 @@ class DefaultConfig
   end
 
 
+  def self.custom_options_arr
+    Rails.application.config.custom_options_arr
+  end
+
+
+  def self.custom_options_by_id
+    Rails.application.config.custom_options_arr.map{|x| [x.id, x]}.to_h
+  end
+
+
   def self.hierarchy
     {
       'ASAP'    => self.sr::HIERARCHY,
