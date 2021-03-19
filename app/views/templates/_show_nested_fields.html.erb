@@ -15,41 +15,73 @@
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th width="5%">Order</th>
-                <th width="10%">Field Name</th>
-                <th width="10%">Field Type</th>
+                <th>Field Name</th>
+                <th>Field Type</th>
                 <th>Data Type</th>
                 <th>Size</th>
-                <th>Show Label</th>
                 <th>Required</th>
                 <th>Print in De-ID</th>
-                <th width="8%">Max Character Count</th>
-                <th width="6%">Min Options Selectable</th>
-                <th>Additional Info?</th>
-                <th width="15%">Options</th>
-                <th>Action</th>
+                <th>Options (split by semicolon)</th>
+                <th>Predefined Options</th>
+                <th class="extra_info">Show Label</th>
+                <th class="extra_info">Max Character Count</th>
+                <th class="extra_info">Min Options Selectable</th>
+                <th class="extra_info">Additional Info?</th>
+                <th class="extra_info">HTML ID</th>
+                <th class="extra_info">HTML CLASS</th>
+                <th class="extra_info">Mapped Field</th>
+                <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
+                  <th class="extra_info">ECCAIRS Attribute Name</th>
+                <%end%>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody class="draggableFieldGroup" id="fields">
               <%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, index|%>
                 <%=f1.fields_for :fields, field do |f|%>
                   <tr>
+                    <td><%=f.text_field :label, {:class => "form-control"}%></td>
+                    <td><%=f.select :display_type, Field.getDisplay_type, {}, {class: "form-control date-type-select"}%></td>
+                    <td><%=f.select :data_type, Field.getData_type, {}, {class: "form-control"}%></td>
+                    <td><%=f.select :display_size, Field.getDisplay_size, {}, {class: "form-control"}%></td>
+                    <td><%=f.check_box :required, class: "form-control"%></td>
+                    <td><%=f.check_box :print, class: "form-control"%></td>
+                    <td><%=f.text_area :options, {class: "form-control", :size => "1"}%></td>
+
                     <td>
+                      <%=f.select :custom_option_id,
+                        options_for_select(CustomOption.all.map{|x| [x.title, x.id]}.to_h, (field.custom_option_id rescue nil)),
+                        {include_blank: ''},
+                        {class: "form-control"}%>
+                    </td>
+
+                    <td class="extra_info"><%=f.check_box :show_label, class: "form-control"%></td>
+                    <td class="extra_info"><%=f.number_field :max_length, {class: "form-control"}%></td>
+                    <td class="extra_info"><%=f.number_field :max_options, {class: "form-control"}%></td>
+                    <td class="extra_info"><%=f.check_box :additional_info, class: "form-control"%></td>
+                    <td class="extra_info"><%=f.text_field :element_id, {class: "form-control"}%></td>
+                    <td class="extra_info"><%=f.text_field :element_class, {class: "form-control"}%></td>
+                    <td class="extra_info"><%=f.text_field :map_id, {class: "form-control"}%></td>
+
+                    <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
+                      <td class='extra_info'>
+                        <%eccairs_mapping = (field.eccairs_mappings.first rescue nil) || (field.eccairs_mappings.build rescue nil)%>
+                        <%eccairs_mapping ||= EccairsMapping.new%>
+                        <%=f.fields_for :eccairs_mappings, eccairs_mapping do |eccairs_form|%>
+                          <%=text_field_tag :eccairs_attribute_name,
+                            (eccairs_mapping.eccairs_attribute.attribute_synonym rescue nil),
+                            list: 'eccairs_attributes_names', class: 'form-control eccairs_attribute_name_field'%>
+                          <%=eccairs_form.hidden_field :eccairs_attribute_id, class: 'eccairs_attribute_id_field'%>
+                        <%end%>
+                      </td>
+                    <%end%>
+
+
+                    <td>
+
+
                       <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
                       <%=f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
-                    </td>
-                    <td><%=f.text_field   :label,                                               {:class => "form-control"}%>                    </td>
-                    <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {:class => "form-control date-type-select"}%>   </td>
-                    <td><%=f.select       :data_type,     Field.getData_type, {},               {:class => "form-control"}%>                    </td>
-                    <td><%=f.select       :display_size,  Field.getDisplay_size, {},            {:class => "form-control"}%>                    </td>
-                    <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-                    <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-                    <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-                    <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
-                    <td><%=f.number_field :max_options,                                         {:class => "form-control"}%>                    </td>
-                    <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
-                    <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
-                    <td>
 
                     <%if field.deleted?%>
                       <a class="btn btn-default archive_btn">Unarchive</a>
