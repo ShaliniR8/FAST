@@ -6,7 +6,7 @@
   <%=fields_for :category, @category do |f1|%>
 
 
-    <%@field.options.split(";").each do |x|%>
+    <%@field.getOptions.each do |x|%>
       <div class="panel panel-info">
         <div class="panel-heading click-heading">
           <div class="panel-title"><font style="color:black"><%=x%></font></div>

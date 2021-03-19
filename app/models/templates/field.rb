@@ -123,7 +123,13 @@ class Field < ActiveRecord::Base
     if self.data_type=="timezone"
       ActiveSupport::TimeZone.all.map(&:name)
     else
-      self.options.split(";")
+      if options.present?
+        options.split(";")
+      elsif custom_option_id.present?
+        CustomOption.find(custom_option_id).options.split(';')
+      else
+        []
+      end
     end
   end
 
