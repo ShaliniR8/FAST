@@ -726,6 +726,7 @@ class DefaultDictionary
       num_cols: 12, type: 'text', visible: 'index,show',
       required: false
     },
+
   }
 
 end

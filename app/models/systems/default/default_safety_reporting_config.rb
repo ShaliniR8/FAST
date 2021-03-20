@@ -161,6 +161,11 @@ class DefaultSafetyReportingConfig
           likelihood_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Likelihood" },
           severity_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Severity" },
           risk_factor_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Risk" },
+          get_additional_info_html: {
+            field: 'get_additional_info_html', title: 'Additional Info',
+            num_cols: 12, type: 'text', visible: 'index',
+            required: false
+          }
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
