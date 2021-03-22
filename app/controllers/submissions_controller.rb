@@ -312,6 +312,7 @@ class SubmissionsController < ApplicationController
           converted.make_report
           converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
+          NotifyMailer.send_submitter_confirmation(current_user, converted)
         end
         @record.make_report
       end
@@ -499,6 +500,7 @@ class SubmissionsController < ApplicationController
             converted.make_report
             converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
             notify_notifiers(converted, params[:commit])
+            NotifyMailer.send_submitter_confirmation(current_user, converted)
           end
           respond_to do |format|
             flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }

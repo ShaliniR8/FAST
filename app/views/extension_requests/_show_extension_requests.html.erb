@@ -66,24 +66,30 @@
                 <%end%>
                 <td>
                   <%if record.owner.status != 'Completed' && record.status == 'New'%>
-                    <%=link_to "Edit",
-                      '#',
-                      :route => edit_extension_request_path(record),
-                      :class => "btn btn-warning mr5 mb5 edit_extension_request_btn",
-                      "data-toggle"=>"modal",
-                      "data-target"=>".bs-example-modal-lg"%>
-                    <%=link_to "Address",
-                      '#',
-                      :route => address_extension_request_path(record),
-                      :class => "btn btn-success mr5 mb5 address_extension_request_btn",
-                      "data-toggle"=>"modal",
-                      "data-target"=>".bs-example-modal-lg"%>
+                    <%if record.requester.id == current_user.id%>
+                      <%=link_to "Edit",
+                        '#',
+                        :route => edit_extension_request_path(record),
+                        :class => "btn btn-warning mr5 mb5 edit_extension_request_btn",
+                        "data-toggle"=>"modal",
+                        "data-target"=>".bs-example-modal-lg"%>
+                    <%end%>
+                    <%if record.approver.id == current_user.id%>
+                      <%=link_to "Address",
+                        '#',
+                        :route => address_extension_request_path(record),
+                        :class => "btn btn-success mr5 mb5 address_extension_request_btn",
+                        "data-toggle"=>"modal",
+                        "data-target"=>".bs-example-modal-lg"%>
+                    <%end%>
                   <%end%>
-                  <%=link_to "Delete",
-                    extension_request_path(record),
-                    :method => :delete,
-                    :confirm=>'Are you sure?',
-                    :class => "btn btn-danger mr5 mb5"%>
+                  <%if record.requester.id == current_user.id%>
+                    <%=link_to "Delete",
+                      extension_request_path(record),
+                      :method => :delete,
+                      :confirm=>'Are you sure?',
+                      :class => "btn btn-danger mr5 mb5"%>
+                  <%end%>
                 </td>
               </tr>
             <%end%>
