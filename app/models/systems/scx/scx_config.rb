@@ -20,6 +20,7 @@ class SCXConfig < DefaultConfig
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,
+    query_processing_in_rake_task:      true,
   })
 
 
