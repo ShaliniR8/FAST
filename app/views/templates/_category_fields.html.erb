@@ -126,6 +126,7 @@
         handle: $(this, ".drag_and_drop"),
         forcePlaceholderSize: true,
         cursor: "move",
+        animation: 100,
         start: function(event, ui){
           ui.placeholder.height(ui.item.height());
           ui.placeholder.width(ui.item.width());
@@ -133,6 +134,7 @@
         update: function(event, ui){
           $('.field_group', this).each(function(index, elem) {
             $('.form-field-order', this).val(index);
+            $(this).closest('.to_delete').find(".form-control-id, .form-field-order").addClass('changed');
           });
         }
       });

@@ -216,7 +216,6 @@
     var panelList = $(".draggablePanelList");
     panelList.each(function(){
       $(this).sortable({
-        handle: $(".drag-and-drop"),
         handle: $(this, ".drag_and_drop"),
         forcePlaceholderSize: true,
         cursor: "move",
@@ -227,6 +226,7 @@
         update: function(event, ui){
           $('.panel', this).each(function(index, elem) {
             $('.form-template-order', this).val(index);
+            $('.form-template-order', this).addClass("changed");
           });
         }
       });

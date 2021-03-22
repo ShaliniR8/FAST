@@ -24,6 +24,28 @@ swal({
         $(this).removeClass("btn-default").addClass("btn-warning");
       }
     });
+
+    var fieldList = $(".draggableFieldGroup");
+    fieldList.each(function(){
+      $(this).sortable({
+        handle: $(this, ".drag_and_drop"),
+        forcePlaceholderSize: true,
+        cursor: "move",
+        animation: 100,
+        start: function(event, ui){
+          ui.placeholder.height(ui.item.height());
+          ui.placeholder.width(ui.item.width());
+        },
+        update: function(event, ui){
+          $('.field_group', this).each(function(index, elem) {
+            console.log(index);
+            $('.form-field-order', this).val(index);
+            // $('.form-field-order', this).addClass("changed");
+          });
+        }
+      });
+    });
+
   }
 }).catch(swal.noop);
 

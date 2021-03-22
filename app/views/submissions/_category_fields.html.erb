@@ -26,7 +26,7 @@
 
                 <%if field.nested_fields.where(:deleted => false).present?%>
 
-                    <%field.nested_fields.where(:deleted => false).group_by(&:nested_field_value).each do |nv, nested_fields|%>
+                    <%field.nested_fields.where(:deleted => false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
 
                       <div class="col-xs-12 nested_field_row">
 

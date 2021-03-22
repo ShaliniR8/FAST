@@ -1,8 +1,8 @@
 <script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
 
 <%=form_tag edit_nested_fields_templates_path, method: :post, remote: true do%>
-  <%=hidden_field_tag :field_id, @field.id%>
-  <%=hidden_field_tag :category_id, @category.id%>
+  <%=hidden_field_tag :field_id, @field.id, {:class => "changed"}%>
+  <%=hidden_field_tag :category_id, @category.id, {:class => "changed"}%>
   <%=fields_for :category, @category do |f1|%>
     <%@field.getOptions.each do |x|%>
       <div class="panel panel-info">
@@ -35,7 +35,7 @@
               </tr>
             </thead>
             <tbody class="draggableFieldGroup" id="fields">
-              <%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, index|%>
+              <%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, ind|%>
                 <%=f1.fields_for :fields, field do |f|%>
                   <tr>
                     <td><%=f.text_field :label, {:class => "form-control"}%></td>
@@ -75,8 +75,12 @@
                     <%end%>
 
                     <td>
+
                       <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
-                      <%=f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
+                      <%=f.hidden_field :field_order, :value => ind, :class => "form-field-order" %>
+
+                      <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
+                      <%=f.hidden_field :field_order, :value => ind, :class => "form-field-order" %>
 
                       <%if field.deleted?%>
                         <a class="btn btn-default archive_btn">Unarchive</a>
@@ -104,11 +108,9 @@
     <%end%>
   <%end%>
 
-
   <%=submit_tag "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
   <a class="btn btn-default pull-right mr5" onclick="closeSwal()">Cancel</a>
 <%end%>
-
 
 
 <style>
@@ -120,25 +122,3 @@
   }
 </style>
 
-
-<script>
-  var fieldList = $(".draggableFieldGroup");
-  fieldList.each(function(){
-    $(this).sortable({
-      handle: $(this, ".drag_and_drop"),
-      forcePlaceholderSize: true,
-      cursor: "move",
-      animation: 100,
-      start: function(event, ui){
-        ui.placeholder.height(ui.item.height());
-        ui.placeholder.width(ui.item.width());
-      },
-      update: function(event, ui){
-        $('.field_group', this).each(function(index, elem) {
-          $('.form-field-order', this).val(index);
-        });
-      }
-    });
-  });
-
-</script>
