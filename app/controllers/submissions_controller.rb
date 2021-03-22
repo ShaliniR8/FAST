@@ -241,11 +241,36 @@ class SubmissionsController < ApplicationController
     params[:submission][:anonymous] = params[:anonymous] == '1'
 
     if params[:submission][:attachments_attributes].present?
-      params[:submission][:attachments_attributes].each do |key, attachment|
-        if attachment[:name].present?
-          params[:submission][:attachments_attributes][key][:name] = attachment[:name]
-        else
-          params[:submission][:attachments_attributes].delete(key)
+      if session[:platform] == Transaction::PLATFORMS[:mobile]
+        params[:submission][:attachments_attributes].each do |key, attachment|
+        # File is a base64 string
+          if attachment[:name].present? && attachment[:name].is_a?(Hash)
+            file_params = attachment[:name]
+
+            temp_file = Tempfile.new('file_upload')
+            temp_file.binmode
+            temp_file.write(Base64.decode64(file_params[:base64]))
+            temp_file.rewind()
+
+            file_name = file_params[:fileName]
+            mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+            uploaded_file = ActionDispatch::Http::UploadedFile.new(
+              :tempfile => temp_file,
+              :filename => file_name,
+              :type     => mime_type)
+
+            # Replace attachment parameter with the created file
+            params[:submission][:attachments_attributes][key][:name] = uploaded_file
+          end
+        end
+      else
+        params[:submission][:attachments_attributes].each do |key, attachment|
+          if attachment[:name].present?
+            params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+          else
+            params[:submission][:attachments_attributes].delete(key)
+          end
         end
       end
     end
@@ -393,9 +418,36 @@ class SubmissionsController < ApplicationController
     end
 
     if params[:submission][:attachments_attributes].present?
-      params[:submission][:attachments_attributes].each do |key, attachment|
-        if attachment[:name].present?
-          params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+      if session[:platform] == Transaction::PLATFORMS[:mobile]
+        params[:submission][:attachments_attributes].each do |key, attachment|
+        # File is a base64 string
+          if attachment[:name].present? && attachment[:name].is_a?(Hash)
+            file_params = attachment[:name]
+
+            temp_file = Tempfile.new('file_upload')
+            temp_file.binmode
+            temp_file.write(Base64.decode64(file_params[:base64]))
+            temp_file.rewind()
+
+            file_name = file_params[:fileName]
+            mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+            uploaded_file = ActionDispatch::Http::UploadedFile.new(
+              :tempfile => temp_file,
+              :filename => file_name,
+              :type     => mime_type)
+
+            # Replace attachment parameter with the created file
+            params[:submission][:attachments_attributes][key][:name] = uploaded_file
+          end
+        end
+      else
+        params[:submission][:attachments_attributes].each do |key, attachment|
+          if attachment[:name].present?
+            params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+          else
+            params[:submission][:attachments_attributes].delete(key)
+          end
         end
       end
     end
