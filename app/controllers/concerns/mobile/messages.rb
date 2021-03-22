@@ -10,7 +10,7 @@ module Concerns
 
         message_access_options = { methods: :getName, only: [:id, :status, :messages_id, :users_id] }
 
-        messages_json = @messages.sort{ |a, b| b.time <=> a.time }.as_json(
+        messages_json = @messages.sort{ |a, b| (b.time.present? && a.time.present?) ? b.time <=> a.time : -1 }.as_json(
           only: [:id, :content, :subject, :time, :owner_type, :owner_id],
           include: {
             send_from: message_access_options,
