@@ -18,6 +18,8 @@ class HomeController < ApplicationController
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
     @departments = params[:departments] ? params[:departments] : nil
 
+    @notices = current_user.notices.where(status: 1).sort_by(&:created_at).reverse.first(6)
+
     prepare_data
     prepare_calendar
     prepare_risk_matrix

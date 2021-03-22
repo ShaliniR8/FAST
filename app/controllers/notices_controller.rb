@@ -2,7 +2,7 @@ class NoticesController < ApplicationController
 
 
   def index
-    @records = current_user.notices.reverse
+    @records = current_user.notices.sort_by(&:created_at).reverse
   end
 
 
