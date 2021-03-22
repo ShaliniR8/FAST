@@ -46,6 +46,12 @@ class DefaultMobileConfig
     rvf_training_dir: { label: 'Training',                      subdomain: 'rvf-training'},
     rvf_dir:          { label: 'General',                       subdomain: 'rvf'},
 
+    #RJET portals
+    rjet_training_dir: { label: 'Training',                      subdomain: 'rjet-training'},
+    rjet_training_sso: { label: 'Training SSO',                  subdomain: 'rjet-training',  sso: true},
+    rjet_dir:          { label: 'Login with ProSafeT',           subdomain: 'rjet'},
+    rjet_sso:          { label: 'SSO',                           subdomain: 'rjet',           sso: true},
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -140,7 +146,22 @@ class DefaultMobileConfig
     },
 
 
-    'Trial Key' => { # 6158-BC31-0338-233B
+    'RJET Beta Key' =>{ # 902A-3488-E2BB-4DE8
+      key_name: 'Republic Airways Mobile Beta',
+      portals: %i[
+        rjet_training_sso
+      ]
+    },
+    'RJET Key' =>{ # 2B6D-181E-AEE7-39AA
+      key_name: 'Republic Airways',
+      portals: %i[
+        rjet_dir
+        rjet_sso
+      ]
+    },
+
+
+    'Trial Key' => { # B0A6-42C4-FFD3-A978
       key_name: 'Trial',
       portals: %i[trial_general]
     },
