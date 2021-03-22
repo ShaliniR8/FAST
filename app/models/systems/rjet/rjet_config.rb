@@ -81,7 +81,7 @@ class RJETConfig < DefaultConfig
           "Limited/localized implication of company, occasional delays, minor increase in costs <250k."
         ],
         [ # Moderate
-          "Finding which results from an non-compliance with Frontier Airlines policy and procedures that reference regulations applicable to the Company (i.e. a requirement derived from a directly applicable rule)",
+          "Finding which results from a non-compliance with Company policy and procedures that reference regulations applicable to the Company (i.e. a requirement derived from a directly applicable rule)",
           "Incident with injury requiring hospitalization; moderate aircraft/property damage.",
           "Event resulting in abnormal conditions with potential to impact safe operation of an aircraft; Safety incident potential.",
           "Regional implication, frequent delays or cancellation, substantial increase in costs <$1M."
