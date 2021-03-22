@@ -40,6 +40,7 @@ PrdgSession::Application.routes.draw do |map|
   end
 
   resources :signatures, only:[:show]
+  resources :airports
 
   resources :errors do
     collection do
