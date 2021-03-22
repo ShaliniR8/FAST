@@ -71,7 +71,7 @@ class RJETConfig < DefaultConfig
         [ # Negligible
           "No Findings.",
           "No incident or damage; injury with no medical treatment.",
-          "Normal Operations; no effect on safety of flight or maintenance.",
+          "Normal Operations; no effect on safety of flight.",
           "No implication of Company, costs <$50k."
         ],
         [ # Minor
