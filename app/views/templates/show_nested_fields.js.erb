@@ -1,13 +1,16 @@
-swal({
+swal.close();
 
+swal({
   title: "<%=@field.label%>",
   html: "<%=escape_javascript render('/templates/show_nested_fields')%>",
   customClass: "custom-swal",
   showCancelButton: false,
   showConfirmButton: false,
-  allowOutsideClick: true,
+  allowOutsideClick: false,
   onOpen: function(){
 
+    $(".extra_info").hide();
+    $(".deleted_fields").hide();
 
     // Archive/Unarchive button
     $(".archive_btn").on("click", function(){
@@ -22,16 +25,35 @@ swal({
       }
     });
 
+    var fieldList = $(".draggableFieldGroup");
+    fieldList.each(function(){
+      $(this).sortable({
+        handle: $(this, ".drag_and_drop"),
+        forcePlaceholderSize: true,
+        cursor: "move",
+        animation: 100,
+        start: function(event, ui){
+          ui.placeholder.height(ui.item.height());
+          ui.placeholder.width(ui.item.width());
+        },
+        update: function(event, ui){
+          $('.field_group', this).each(function(index, elem) {
+            console.log(index);
+            $('.form-field-order', this).val(index);
+            // $('.form-field-order', this).addClass("changed");
+          });
+        }
+      });
+    });
 
   }
-
 }).catch(swal.noop);
-
 
 
 function removeField(deletable){
   $(deletable).closest('.to_delete').remove();
 }
+
 
 //function to add nested attributes
 function add_fields(link, association, content, target) {
@@ -39,6 +61,9 @@ function add_fields(link, association, content, target) {
   var regexp = new RegExp("new_" + association, "g")
   var insertposition="#"+target;
   $(content.replace(regexp, new_id)).appendTo($(link).closest(".panel-body").find(insertposition));
+}
 
 
+function closeSwal() {
+  swal.close();
 }

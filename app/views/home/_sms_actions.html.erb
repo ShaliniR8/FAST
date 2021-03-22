@@ -38,7 +38,7 @@
     });
     action_chart.draw(google.visualization.arrayToDataTable(data), ca_options);
     google.visualization.events.addListener(action_chart, 'select', function(){
-      var all_status=<%=raw @corrective_actions.keys%>
+      var all_status=<%=raw @grouped_corrective_actions.keys%>
       var root_url="<%=sms_actions_path%>?status="
       var selection = action_chart.getSelection();
       var message = "";

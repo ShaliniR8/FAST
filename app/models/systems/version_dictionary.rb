@@ -1,8 +1,55 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.4',
+      title: 'Version 1.2.6',
       tag: 'New',
+      toggle: 'v1_2_6',
+      date: '01/28/2021',
+      sections: {
+        'What\'s New' => [
+          'Added Auto-Save functionality to Submissions. Auto-Saved submissions can be found in the In Progress tab',
+          'Added ability to discard in progress submissions',
+          'Added Included Findings column to Inspections, Evaluations and Investigations \'All\' page',
+          'Added ability to attach PDF in email notification sent from messages',
+          'Added ability to add an Event to a Meeting directly from the event display page',
+          'Added ability to save large pieces of text in Verification Details and Verification comment boxes',
+          'Added a separate page for listing disabled users',
+          'Added Root Cause to Investigations',
+        ],
+        'Optimizations & Fixes' => [
+          'Optimized loading times of index pages containing a lot of records',
+          'Optimized saving and handling of large templates and checklists',
+          'Closed reports will now have a closed tag shown on the Dashboard Calendar',
+          'Updated the simulation label so that it does not cover up the form buttons',
+          'Upon access denial, users will be redirected back to the page they were browsing',
+          'Fixed issue where events having many reports could not be added to meetings',
+          'Addressing Checklist will now open the checklist on the same page to avoid out-of-sync inconsistencies',
+          ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.5',
+      toggle: 'v1_2_5',
+      date: '12/18/2020',
+      sections: {
+        'What\'s New' => [
+          'Added ability to enforce required property on checkboxes and radio button fields',
+          'Added ability to enforce minimum number of options to be selected for checkboxes',
+          'Added ability to add nested fields to radio buttons and checkboxes',
+          'Added ability to edit airport and employee fields from the edit individual category panel',
+          'Added ability to set up automated notifications for Verifications and Meetings',
+        ],
+        'Optimizations & Fixes' => [
+          'Auto-expansion for text-areas to allow for longer narratives',
+          'Placeholder texts added to checklist textboxes so that template creators and addressees can understand the purpose of the field better',
+          'Events listed in any meeting display page will now be sorted from oldest to newest',
+          ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.4',
       toggle: 'v1_2_4',
       date: '11/24/2020',
       sections: {

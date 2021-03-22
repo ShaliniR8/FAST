@@ -15,52 +15,74 @@ ruby:
   end
 
 .col-xs-12
-  = f.label :subject, 'Subject', class: 'control-label col-xs-2'
-  .col-xs-10
+  = f.label :subject, 'Subject', class: 'control-label col-xs-4'
+  .col-xs-8
     = f.text_field :subject, class: 'form-control', value: subject
 
 .col-xs-12.mt10
-  = f.label :to_list, 'TO', class: 'control-label col-xs-2'
-  .col-xs-10
+  = f.label :to_list, 'TO', class: 'control-label col-xs-4'
+  .col-xs-8
     p style='overflow-y:auto' id='to_list'
 
 .col-xs-12.mt10
-  = f.label :cc_list, 'CC', class: 'control-label col-xs-2'
-  .col-xs-10
+  = f.label :cc_list, 'CC', class: 'control-label col-xs-4'
+  .col-xs-8
     p style='overflow-y:auto' id='cc_list'
 
 .col-xs-12.mt10
-  = f.label :distribution_list, 'Distribution List', class: 'control-label col-xs-2'
-  .col-xs-6
+  = f.label :distribution_list, 'Distribution List', class: 'control-label col-xs-4'
+  .col-xs-8
     = select_tag :distribution_list,
       options_for_select(DistributionList.all.collect{|p| [p['title'], p['id']]}),
       {include_blank: true, class: 'form-control distribution_list'}
 
 .col-xs-12.mt10
-  = label_tag 'template', 'Template', class: 'control-label col-xs-2'
-  .col-xs-6
+  = label_tag 'template', 'Template', class: 'control-label col-xs-4'
+  .col-xs-8
     = select_tag 'template',
       options_for_select(CannedMessage.all.collect{|p| [p['name'], p['id']]}),
       include_blank: true, class: 'form-control template'
 
 - if @owner.present?
-  .col-xs-12.mt5
-    = label_tag 'template', 'Attached', class: 'control-label col-xs-2'
+  .col-xs-12.mt10
+    = label_tag 'template', 'Attached', class: 'control-label col-xs-4'
     .col-xs-6
       strong
         - if @owner.present?
           = f.hidden_field :owner_type, value: @owner.class.name
           = f.hidden_field :owner_id, value: @owner.id
-          = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
+          - if @owner.class.name == 'Submission'
+            = link_to "#{@owner.class.name} ##{@owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}", @owner, target: :_blank
+          - else
+            = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
 
-.col-xs-12.mt5
-  .col-xs-12.col-xs-offset-2
-    = check_box_tag :from_anonymous, 1, false
-    = label_tag :from_anonymous, 'Message Anonymously', class: 'control-label ml5'
+.col-xs-12.mt10
+    = label_tag 'template', 'Do you want to send this message anonymously?', class: 'control-label col-xs-4'
+    .col-xs-6
+      .col-xs-3
+        = radio_button_tag :from_anonymous, 1
+        = label_tag :from_anonymous, 'Yes', class: 'control-label ml5'
+      .col-xs-3
+        = radio_button_tag :from_anonymous, 0
+        = label_tag :from_anonymous, 'No', class: 'control-label ml5'
+
+- if @owner.present? && CONFIG::GENERAL[:attach_pdf_in_message].present?
+  .col-xs-12.mt10
+    - if @owner.class.name == 'Submission'
+      = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} with the email?", class: 'control-label col-xs-4'
+    - else
+      = label_tag 'template', "Do you want to attach a Deidentified PDF version of #{@owner.class.name} ##{@owner.id} with the email?", class: 'control-label col-xs-4'
+    .col-xs-6 style="vertical-align:middle;"
+      .col-xs-3
+        = radio_button_tag :attach_pdf, 1
+        = label_tag :attach_pdf, 'Yes', class: 'control-label ml5'
+      .col-xs-3
+        = radio_button_tag :attach_pdf, 0
+        = label_tag :attach_pdf, 'No', class: 'control-label ml5'
 
 .col-xs-12.mt5
   .col-xs-12.mt10
-    = f.text_area :content, class: 'form-control', rows: 15, id: 'content'
+    = f.text_area :content, class: 'form-control', rows: 10, id: 'content'
 
 .col-xs-12.mt5
   #attachments.col-xs-11.row
@@ -87,7 +109,10 @@ javascript:
       });
     });
 
-    recipients_table = $('#recipients').DataTable();
+    // recipients_table = $('#recipients').DataTable();
+    var recipients_table = $('#recipients').DataTable({
+        "iDisplayLength": 5
+    });
 
     $('.distribution_list').on('change', function() {
       var distribution_list_id = $(this).val();
@@ -95,14 +120,19 @@ javascript:
         $.get('#{distribution_lists_path}/' + distribution_list_id, function(data) {
           var dist_users = data.data.user_ids;
           var allPages = recipients_table.cells().nodes();
-          for(var i = 0; i < dist_users.length; i++) {
-            var send_btn = $(allPages).find('.id_' + dist_users[i]);
-            if (!send_btn.hasClass('selected')) {
-              $(send_btn).click();
-              $(send_btn).addClass('selected');
+          if (dist_users.length + recipientCount() > 10){
+            alert("Adding this list will add more than 10 recipients. Please adjust recipients list");
+          } else {
+            for(var i = 0; i < dist_users.length; i++) {
+              var send_btn = $(allPages).find('.id_' + dist_users[i]);
+              if (!send_btn.hasClass('selected')) {
+                $(send_btn).removeClass('btn-transparent').addClass('btn-danger');
+                $(send_btn).next(".cc_btn").removeClass('btn-danger selected').addClass('btn-transparent');
+                $(send_btn).addClass('selected');
+              }
             }
+            renderRecipients(recipients_table);
           }
-          renderRecipients(recipients_table);
         });
       }
     });
@@ -111,13 +141,51 @@ javascript:
       renderRecipients(recipients_table);
 
       $("#recipients").on('click','.send_btn',function() {
-        $(this).toggleClass('selected');
-        renderRecipients(recipients_table);
+        if ($(this).hasClass('selected')){
+          $(this).removeClass('btn-danger').addClass('btn-transparent');
+          $(this).toggleClass('selected');
+          renderRecipients(recipients_table);
+        } else {
+          if ($(this).next('.cc_btn').hasClass('selected')) {
+            $(this).removeClass('btn-transparent').addClass('btn-danger');
+            $(this).next('.cc_btn').removeClass('btn-danger selected').addClass('btn-transparent');
+            $(this).toggleClass('selected');
+            renderRecipients(recipients_table);
+          } else {
+            if (isRecipientListOverLimit()){
+              alert("You can only select 10 recipients for this message");
+            } else {
+              $(this).removeClass('btn-transparent').addClass('btn-danger');
+              $(this).next(".cc_btn").removeClass('btn-danger selected').addClass('btn-transparent');
+              $(this).toggleClass('selected');
+              renderRecipients(recipients_table);
+            }
+          }
+        }
       });
 
       $("#recipients").on('click','.cc_btn',function() {
-        $(this).toggleClass('selected');
-        renderRecipients(recipients_table);
+        if ($(this).hasClass('selected')){
+          $(this).removeClass('btn-danger').addClass('btn-transparent');
+          $(this).toggleClass('selected');
+          renderRecipients(recipients_table);
+        } else {
+          if ($(this).prev('.send_btn').hasClass('selected')) {
+            $(this).removeClass('btn-transparent').addClass('btn-danger');
+            $(this).prev('.send_btn').removeClass('btn-danger selected').addClass('btn-transparent');
+            $(this).toggleClass('selected');
+            renderRecipients(recipients_table);
+          } else {
+            if (isRecipientListOverLimit()){
+              alert("You can only select 10 recipients for this message");
+            } else {
+              $(this).removeClass('btn-transparent').addClass('btn-danger');
+              $(this).prev(".send_btn").removeClass('btn-danger selected').addClass('btn-transparent');
+              $(this).toggleClass('selected');
+              renderRecipients(recipients_table);
+            }
+          }
+        }
       });
 
       var allPages = recipients_table.cells().nodes();
@@ -140,13 +208,64 @@ javascript:
         });
         renderRecipients(recipients_table);
       });
-    });
 
+      $('form').on('submit', function() {
+        var send_count = 0
+        var cc_count = 0
+        var form = $(this)
+        recipients_table.rows().nodes().to$().each(function() {
+          if ($(this).find('.send_btn').hasClass('btn-danger')){
+            form.append("<input type='hidden' name=send_to[" + send_count++ + "] value=" + $(this).attr('user') + ">")
+          }
+
+          if ($(this).find('.cc_btn').hasClass('btn-danger')){
+            form.append("<input type='hidden' name=cc_to[" + cc_count++ + "] value=" + $(this).attr('user') + ">")
+          }
+        })
+
+        if (send_count === 0) {
+          event.preventDefault()
+          swal({
+            title:  'Message has no recipient.',
+            type:   'error',
+          })
+          return false
+        }
+        return true
+      });
+    });
   });
+
+  function recipientCount(){
+    let cc = $("#cc_list").text().split(", ")
+    let to = $("#to_list").text().split(", ")
+    let count = 0;
+    for (let i = 0; i < cc.length; i++) {
+      if (cc[i] != "") {
+        count ++;
+      }
+    }
+
+    for (let i = 0; i < to.length; i++) {
+      if (to[i] != "") {
+        count ++;
+      }
+    }
+    return count;
+  }
+
+  function isRecipientListOverLimit () {
+    if (recipientCount() >= 10) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   function renderRecipients(recipients_table) {
     var to_user_ids = [];
     var cc_user_ids = [];
+
     recipients_table.rows().nodes().to$().each(function() {
       if ($(this).find('.send_btn').hasClass('btn-danger')) {
         to_user_ids.push($(this).attr('name'));
@@ -158,5 +277,3 @@ javascript:
     document.getElementById("to_list").innerHTML = to_user_ids.sort().join(', ');
     document.getElementById("cc_list").innerHTML = cc_user_ids.sort().join(', ');
   }
-
-

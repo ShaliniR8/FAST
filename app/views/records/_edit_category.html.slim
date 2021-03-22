@@ -1,8 +1,21 @@
 = javascript_include_tag "/javascripts/utility/format-builder.js"
 = javascript_include_tag "/javascripts/utility/timezone-control.js"
+= javascript_include_tag "/javascripts/utility/employee_select.js"
 
+// airport selector
+.modal.fade.bs-example-modal-lg.airport_modal tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  .modal-dialog.modal-lg role='document'
+    .airport-select-modal
+      = render 'airports_select'
+
+// employee selector
+.modal.fade.bs-example-modal-lg.emp_modal tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  .modal-dialog.modal-lg role='document'
+    .emp-select-modal
+      = render 'emp'
 
 = form_for record do |f|
+
   = hidden_field_tag :commit, 'Save Fields'
   = hidden_field_tag :category_id, category.id
 
@@ -12,21 +25,24 @@
       - row.each do |field|
         - record_field = (record_fields_hash[field.id] || []).first
         - record_field = RecordField.new(value: '') if !record_field.present?
+
         = render "records/field", field: field, f: f, record_field: record_field, is_nested_field: false
 
         // nested fields
         - if nested_fields.length > 0
-          .col-xs-12.nested_field_row
-            - nested_fields.each do |nested_field|
+          - nested_fields.each do |nested_field|
+            .col-xs-12.nested_field_row
               - record_field = (record_fields_hash[nested_field.id] || []).first
               - record_field = RecordField.new(value: '') if !record_field.present?
-              - if record_field.present? && record_field.value != ''
-                div.nested_field.graybox
-                  = render "records/field",
-                    field: nested_field,
-                    f: f,
-                    record_field: record_field,
-                    is_nested_field: true
+              / - size = calculate_column_size(field: nested_field)
+              - size = "col-xs-12 col-sm-12 col-md-12 col-lg-12"
+              - custom_class = "\"nested_field_#{field.id}_#{nested_field.nested_field_value.parameterize}\""
+              - if field.display_type == 'dropdown' || field.display_type == 'checkbox' || field.display_type == 'radio'
+                - if field.options.include?(nested_field.nested_field_value)
+                  div class="#{size}"
+                    == "<div class=#{custom_class}>#{render 'records/field', field: nested_field, f: f, record_field: record_field, is_nested_field: true}</div>"
+              - else
+                - Rails.logger.debug "Do not render"
     hr
 
   = link_to 'Save Fields', '#',
@@ -35,16 +51,109 @@
 
 
 javascript:
-  // Get listing of all the airport buttons
-  var field_id;
-  $(document).find(".airport_button").each(function(index, item){
-    // Get the button that's being clicked
-    $(item).on("click", function(){
-      console.log('airport btn clicked!');
-      // Get the selected airport's field id
-      field_id = $(this).prop("id");
-      resetModal(field_id);
-      $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
-      $("#search_btn_" + field_id).on("click", {field_id: field_id}, handleSearch);
+
+  var airport_table;
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+
+    $("[class^=nested_field_]").each(function(){
+      console.log($(this).attr('class'))
+      $(this).hide();
+    });
+    $(".nested_field_" + field_id + "_" + field_value).show();
+  }
+
+  function update_cb_rb_nested(field){
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+
+    if($(field).prop('checked')){
+      // $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).show();
+    } else {
+      // $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+      $(".nested_field_" + field_id + "_" + field_value).hide();
+    }
+  }
+
+  $(document).ready(function(){
+
+    $(".required_field").css('border-color', '');
+    $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
+
+    $(".field_select").on("change", function(){
+      update_nested_fields($(this));
+    });
+
+    $(".field_select").each(function(){
+      update_nested_fields($(this));
+    });
+
+    $(".field_cb_select").each( function(){
+      update_cb_rb_nested($(this));
+    });
+
+    $(".field_rb_select").each(function(){
+      update_cb_rb_nested($(this));
+    });
+
+    $(".field_cb_select").on("change", function(){
+      update_cb_rb_nested($(this));
+    });
+
+    $(".field_rb_select").on("change", function(){
+      $(".field_rb_select").each(function(){
+        update_cb_rb_nested($(this));
+      });
+    });
+
+    var field_id;
+    $(this).find(".airport_button").each(function(index, item){
+      $(item).on("click", function(){
+        field_id = $(this).prop("id");
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
+      });
     });
   });
+
+  function handleSearch(event){
+    var field_id = event.data.field_id
+    var icao = $("#icao").val();
+    var iata = $("#iata").val();
+    var arpt_name = $("#arpt_name").val();
+    if(icao == "" && iata == "" && arpt_name =="") {
+    // Update the table if icao code is not empty
+    } else {
+      $.get("#{airport_data_submissions_path}?field_id=" + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+        $("#airports_table").html(data);
+        updateAirportTable(field_id);
+      });
+    }
+  }
+
+  function updateAirportTable(field_id){
+    airport_table = $('#airports' + field_id).DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+      var icao = $(this).find("td").eq(0).text();
+      var iata = $(this).find("td").eq(1).text();
+      $("#airport" + field_id).val(icao + ";" + iata);
+      $("#airport-select" + field_id).val(icao + ";" + iata);
+      resetModal(field_id);
+    });
+  }
+
+  function resetModal(field_id){
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }

@@ -1,0 +1,49 @@
+- users_hash = User.all.map{|x| [x.id, x.full_name]}.to_h
+
+table.table.table-striped.table-bordered id="#{table_id}"
+
+  thead
+    - fields.each do |field|
+      th = field[:title]
+    th Action
+
+  tbody
+    - records.each do |record|
+
+      tr record="#{record.id}"
+        - fields.each do |field|
+          td class="#{field[:html_class].present? ? record.send(field[:html_class]) : ''}"
+            - case field[:type]
+            - when 'boolean'
+              - boolean_options = {true => "Yes", false => "No"}
+              = boolean_options[record.send(field[:field])]
+            - when 'boolean_box'
+              = record.send(field[:field]) ? 'Yes' : ''
+            - when 'date'
+              - if record.class.name == 'Record' && record.event_time_zone.present?
+                - field_value = record.send(field[:field]).in_time_zone(record.event_time_zone)
+              = date_to_string(field_value)
+            - when 'datetime'
+              - event_date_field = field[:name] == 'event_date'
+              - if CONFIG.sr::GENERAL[:submission_time_zone]
+                - if event_date_field && record.event_time_zone.present?
+                  = display_date_time_in_zone(date_time: record.send(field[:field]), time_zone: record.event_time_zone)
+                - elsif event_date_field
+                  = display_date_time_in_zone(date_time: record.send(field[:field]), time_zone: 'UTC')
+                - else
+                  = datetime_to_string(record.send(field[:field]))
+              - else
+                - if event_date_field
+                  = datetime_to_string(record.send(field[:field])) + " #{record.event_time_zone}"
+                - else
+                  = datetime_to_string(record.send(field[:field]))
+            - when 'user'
+              = record.send(field[:field])
+            - when 'select'
+              = field[:field_display].present? ? field[:field_display][record.send(field[:field])] : record.send(field[:field])
+            - else
+              = record.send(field[:field])
+
+        td
+          - btns.each do |btn|
+            = link_to btn[:btn_name].html_safe, btn[:btn_path], class: btn[:btn_class]

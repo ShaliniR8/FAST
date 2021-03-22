@@ -21,8 +21,12 @@
                 <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
                   <div class="col-xs-12">
                     <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
-                      <%sn_field = all_submission_fields[nest_field.id]%>
-                      <%=render "display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
+                      <%if sub_field.present? && sub_field.value.present? && nest_field.nested_field_value.present? &&
+                        ((sub_field.value.parameterize == nest_field.nested_field_value.parameterize) ||
+                        (sub_field.value.include?(";") && sub_field.value.include?(nest_field.nested_field_value)))%>
+                          <%sn_field = all_submission_fields[nest_field.id]%>
+                          <%=render "display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
+                      <%end%>
                     <%end%>
                   </div>
                 <%end%>

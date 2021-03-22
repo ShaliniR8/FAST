@@ -47,12 +47,12 @@
 
   <%elsif field.display_type == 'checkbox'%>
     </br>
-    <div class="<%=field.display_size == 12 && field.show_label ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%>">
+    <div class="<%=field.display_size == 12 && field.show_label ? '' : 'smallselect'%> row <%=field.show_label ? 'mt5' : ''%> <%=required%>">
       <div class="col-xs-12">
         <%field.getOptions.each do |option|%>
           <div class="col-xs-6">
             <label class="checkbox">
-              <%=check_box_tag :value, nil, nil, {class: 'checkbox'}%>
+              <%=check_box_tag :value, nil, nil, {class: "checkbox field_cb_select", "data-id" => field.id, name: "#{option}"}%>
               <%=option%>
             </label>
           </div>
@@ -60,12 +60,12 @@
       </div>
     </div>
   <%elsif field.display_type == "radio"%>
-    <div  class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> <%=field.show_label ? 'mt5' : ''%>">
+    <div  class="<%=field.display_size == 12 && field.show_label  ? '' : 'smallselect'%> <%=field.show_label ? 'mt5' : ''%> <%=required%>">
       <div class="col-xs-12">
         <%field.getOptions.each do |option|%>
           <div class="col-xs-6">
             <label class="radio">
-              <%=radio_button_tag :value, option%>
+              <%=radio_button_tag :value, option, false, :class => "radio field_rb_select", "data-id" => field.id%>
               <%=option%>
             </label>
           </div>

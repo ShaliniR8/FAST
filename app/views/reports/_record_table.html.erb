@@ -47,7 +47,7 @@
             </tr>
           </thead>
           <tbody>
-            <%@records.each do |record|%>
+            <% @records.order('id DESC').each do |record|%>
               <tr record_id="<%=record.id%>">
                 <%Record.get_meta_fields('index').each do |header|%>
                   <%if header[:title] != "Submitted By"%>

@@ -17,16 +17,15 @@ module AnalyticsFilters
           full_access_templates, viewer_access_templates)
     elsif self.to_s == 'Report'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer])
-      reports = Record.preload(:template, :report)
+      records = Record.preload(:template, :report)
         .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
           full_access_templates, viewer_access_templates)
-        .map(&:report).flatten.uniq.compact
-      Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports.map(&:id))
+
+      Report.preload(:occurrences, records: [:template, :created_by]).where(id: records.map(&:reports_id).compact)
     else
       all
     end
   end
-
 
   def within_timerange(start_date, end_date)
     begin

@@ -16,7 +16,7 @@
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
-              <%="#{@record.template.name}"%> Submission #<%=@record.get_id%>: <%="#{@record.get_description}"%>
+              <%="#{@record.template.name}"%> Submission #<%=@record.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])%>: <%="#{@record.get_description}"%>
             </div>
             <div class="top_buttons pull-right">
 
@@ -79,7 +79,7 @@
               <%end%>
 
           <%end%>
-
+          <%=render '/panels/show_panels', :owner => @record%>
           <%=render "/forms/attachments_show", :owner => @record, :show_btn => false%>
           <%=render "/records/transactions", :owner => @record%>
 

@@ -111,6 +111,46 @@ class ReportsController < ApplicationController
   end
 
 
+  def add_to_meeting
+    @report = Report.find(params[:id])
+    if params[:commit].present?
+      case params[:commit]
+      when 'Add'
+        meetings_to_add = params[:meetings_selected].split(',')
+        if meetings_to_add.present? && meetings_to_add.size > 0
+          meetings = Meeting.where("id in (?)", params[:meetings_selected].chomp(',').split(','))
+          added = ""
+          not_added = ""
+          if meetings.present?
+            meetings.each do |meeting|
+              meeting.reports << @report
+              if meeting.save
+                added += meeting.id.to_s + " "
+                if @report.status != "Under Review"
+                  @report.status = "Under Review"
+                  @report.save
+                end
+              else
+                not_added += meeting.id.to_s + " "
+              end
+            end
+            if not_added.present?
+              flash[:error] = "Failed to add event to meeting IDs #{not_added}"
+            else
+              flash[:notice] = "Added event to meeting IDs #{added}"
+            end
+          else
+            flash[:error] = "Meeting not found"
+          end
+        else
+          flash[:notice] = "Event not added to any meeting"
+        end
+      when 'Cancel'
+        flash[:notice] = "Cancelled"
+      end
+      redirect_to report_path(@report)
+    end
+  end
 
 
   def carryover
@@ -137,12 +177,10 @@ class ReportsController < ApplicationController
   end
 
 
-
-
   def new
-    load_options
+    #load_options
     @action = "new"
-    @privileges = Privilege.find(:all)
+    @privileges = Privilege.all
     @report = Report.new
     if params[:base_record].present?
       base = Record.find(params[:base_record])
@@ -150,15 +188,16 @@ class ReportsController < ApplicationController
       @report.records.push(base)
     end
     @fields = Report.get_meta_fields('form', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
-    @report_fields = Record.get_meta_fields('index')
-    @candidates = Record
-      .find(:all)
-      .select{|x| x.status == "Open" && x.report.blank?} - @report.records
+
+    if CONFIG.sr::GENERAL[:dropdown_event_title_list] # FFT
+      @fields = Report.update_event_title_list(template_id: params[:template], fields: @fields)
+    end
+
+    @report_fields = Record.get_meta_fields('index', 'meeting_form')
+    @candidates = Record.preload(:template, :occurrences, :created_by).where(status: 'Open').select{|x| x.report.blank?} - @report.records
     @candidates.sort_by!{|x| x.event_date}.reverse!
     load_special_matrix_form('report', 'baseline', @report)
   end
-
-
 
 
   def create
@@ -200,12 +239,17 @@ class ReportsController < ApplicationController
     @action = "edit"
     @report = Report.find(params[:id])
     @fields = Report.get_meta_fields('form', CONFIG.sr::GENERAL[:event_summary] ? 'event_summary' : '')
+
+    if CONFIG.sr::GENERAL[:dropdown_event_title_list] # FFT
+      @fields = Report.update_event_title_list(template_id: @report.records.first.templates_id, fields: @fields)
+    end
+
     load_special_matrix_form('report', 'baseline', @report)
     if @report.status == "Closed"
       redirect_to report_path(@report)
     end
     @report_fields = Record.get_meta_fields('index')
-    @candidates = Record.where(:status => 'Open') - @report.records
+    @candidates = Record.where(:status => 'Open').select{|x| x.template.present?} - @report.records
   end
 
   def override_status
@@ -235,9 +279,17 @@ class ReportsController < ApplicationController
     if params[:records].present?
       params[:records].each_pair do |index, value|
         record = Record.find(value);
-        record.report = @owner
-        record.status = "Linked"
-        record.save
+        if record.report.present?
+          if record.report.id != @owner.id
+            record.report = @owner
+            record.status = "Linked"
+            record.save
+          end
+        else
+          record.report = @owner
+          record.status = "Linked"
+          record.save
+        end
       end
     end
 
@@ -294,6 +346,7 @@ class ReportsController < ApplicationController
     @headers = Record.get_headers
 
     @records = @report.records
+    @meeting_ids = @report.meetings.map(&:id)
 
     @agenda_headers = AsapAgenda.get_headers
     @action_headers = CorrectiveAction.get_meta_fields('index')
@@ -351,20 +404,20 @@ class ReportsController < ApplicationController
   end
 
 
-  def index
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
-    @default_tab = params[:status]
+  # def index
+  #   object_name = controller_name.classify
+  #   @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+  #   @table = Object.const_get(object_name).preload(@object[:preload])
+  #   @default_tab = params[:status]
 
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    handle_search if params[:advance_search].present?
-    records = @records.to_a & records.to_a if @records.present?
+  #   records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+  #   handle_search if params[:advance_search].present?
+  #   records = @records.to_a & records.to_a if @records.present?
 
-    @records_hash = records.group_by(&:status)
-    @records_hash['All'] = records
-    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
-  end
+  #   @records_hash = records.group_by(&:status)
+  #   @records_hash['All'] = records
+  #   @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  # end
 
 
   # def index_old

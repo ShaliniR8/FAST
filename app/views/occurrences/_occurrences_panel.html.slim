@@ -1,11 +1,11 @@
 ruby:
-  owner_edit_access = current_user.has_access(owner.class.name.downcase.pluralize, 'edit', admin: true)
   if !defined?(show_btns)
-    show_btns = %w[New Assigned Linked].include?(owner.status)
+    show_btns = %w[New Assigned Linked].include?(owner.status) &&
+      current_user.has_access(owner.class, 'Edit', admin: true)
   end
-  show_btns = show_btns && owner_edit_access
   occurrence_label = owner.class.find_top_level_section.label
   show_only_table ||= false
+  owner_id = owner.id
 
 - if show_only_table && !owner.occurrences[0].nil?
   table.table.table-striped.table-bordered width="100%"
@@ -34,7 +34,7 @@ ruby:
             = link_to "Add #{occurrence_label}",
               '#',
               class: 'btn btn-success pull-right mr5',
-              id: 'add_occurrence_btn'
+              id: "add_occurrence_btn_#{owner_id}"
         .row.col-xs-12
           - if !owner.occurrences[0].nil?
             table.table.table-striped.table-bordered width="100%"
@@ -54,11 +54,11 @@ ruby:
                     td = occurrence.value.gsub(/[\r\n]+/, '<br>').html_safe
                     - if show_btns
                       td =link_to 'Delete', '#',
-                      class: 'btn btn-danger delete_occurrence_btn',
+                      class: "btn btn-danger delete_occurrence_btn_#{owner_id}",
                       'data-cid' => occurrence.id
 javascript:
-  $(function(){
-    $('#add_occurrence_btn').on('click', function(){
+  $(document).ready(function(){
+    $("#add_occurrence_btn_#{owner.id}").on('click', function(){
       $.get('#{new_occurrence_path}?owner_id=#{owner.id}&owner_type=#{owner.class.name}',
         function(data){
           $(".modal-content").html(data);
@@ -67,7 +67,7 @@ javascript:
     });
   })
 
-  $('.delete_occurrence_btn').click(function(){
+  $(".delete_occurrence_btn_#{owner.id}").click(function(){
     if(confirm('Are you sure?')){
       btn = $(this)
       $.ajax({

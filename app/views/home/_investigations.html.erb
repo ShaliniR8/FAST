@@ -39,7 +39,7 @@
     });
     investigation_chart.draw(google.visualization.arrayToDataTable(data), inv_options);
     google.visualization.events.addListener(investigation_chart, 'select', function(){
-      var all_status=<%=raw @investigations.keys%>
+      var all_status=<%=raw @grouped_investigations.keys%>
       var root_url="<%=investigations_path%>?status="
       var selection = investigation_chart.getSelection();
       var message = "";

@@ -1,4 +1,4 @@
-<div class="col-sm-12 col-md-12 col-lg-12" %>
+<div class="col-sm-12 col-md-12 col-lg-12">
 
   <!--TR 9/8/18 If the category is deleted then add the deleted_categories class-->
   <%if defined?(category) && category.deleted?%>
@@ -16,9 +16,9 @@
             <%if source == 'Existing'%>
               <%= f.hidden_field :category_order, :value => cat_index, :class => "form-template-order" %>
             <%else%>
-              <%= f.hidden_field :category_order, :value => 10000, :class => "form-template-order" %>
+              <%= f.hidden_field :category_order, :value => 10000, :class => "form-template-order changed" %>
             <%end%>
-            <%= f.text_field :title, {:class=> "form-control", :placeholder=>"Category Title", :style=>"max-width:400px"}%>
+            <%= f.text_field :title, {:class=> "form-control changed", :placeholder=>"Category Title", :style=>"max-width:400px"}%>
           </div>
           <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right">
             <span class="pull-right clickable ">
@@ -30,17 +30,32 @@
     </div>
 
     <div class="panel-body" style="<%= source == 'Existing' ? 'display:none' : 'display:block'%>" >
-
+      <%if source == 'Existing'%>
+        <%= f.hidden_field :id, :class => "changed category-changeable" %>
+      <%end%>
       <div class="col-xs-2">
         <b>Color</b>
-        <%=f.select :panel, Category.getColor, {}, {:class=>"form-control"}%><br/>
+        <%if source == 'Existing'%>
+          <%=f.select :panel, Category.getColor, {}, {:class=>"form-control"}%><br/>
+        <%else%>
+          <%=f.select :panel, Category.getColor, {}, {:class=>"form-control changed"}%><br/>
+        <%end%>
       </div>
       <div class="col-xs-2">
         <b>Print in De-ID</b>
-        <%=f.select :print,[["Yes", true], ["No", false]],{},{:class=>"form-control"}%><br/>
+        <%if source == 'Existing'%>
+          <%=f.select :print, [["Yes", true], ["No", false]], {}, {:class=>"form-control"}%><br/>
+        <%else%>
+          <%=f.select :print, [["Yes", true], ["No", false]], {}, {:class=>"form-control changed"}%><br/>
+        <%end%>
       </div>
       <div class="col-xs-6">
-        <b>Description</b> <%=f.text_area :description, {:class=>"form-control", :size=>"1"}%><br/>
+        <b>Description</b>
+        <%if source == 'Existing'%>
+          <%=f.text_area :description, {:class=>"form-control", :size=>"1"}%><br/>
+        <%else%>
+          <%=f.text_area :description, {:class=>"form-control changed", :size=>"1"}%><br/>
+        <%end%>
       </div>
       <div class="col-xs-2">
         <b>Archive</b><br/><%=f.check_box :deleted%>
@@ -48,24 +63,28 @@
 
       <div class="col-xs-12">
 
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="font-size:13px">
           <thead>
             <tr>
-              <th>Order</th>
-              <th width="10%">Field Name</th>
+              <th>Field Name</th>
               <th>Field Type</th>
               <th>Data Type</th>
               <th>Size</th>
-              <th>Show Lable</th>
               <th>Required</th>
               <th>Print in De-ID</th>
-              <th>Max Character Count</th>
-              <th>Additional Info?</th>
-              <th width="30%">Options (split by semicolon)</th>
-              <th>Action</th>
+              <th>Options (split by semicolon)</th>
+              <th>Predefined Options</th>
+              <th class="extra_info">Show Label</th>
+              <th class="extra_info">Max Character Count</th>
+              <th class="extra_info">Min Options Selectable</th>
+              <th class="extra_info">Additional Info?</th>
               <th class="extra_info">HTML ID</th>
               <th class="extra_info">HTML CLASS</th>
               <th class="extra_info">Mapped Field</th>
+              <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
+                <th class="extra_info">ECCAIRS Attribute Name</th>
+              <%end%>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody class="draggableFieldGroup" id="fields">
@@ -78,11 +97,7 @@
             <%end%>
           </tbody>
         </table>
-        <%= link_to_add_fields 'Add a Field',
-          f,
-          :fields,
-          partial: 'field_fields'
-        %></br>
+        <%=link_to_add_fields 'Add a Field', f, :fields, partial: 'field_fields'%>
       </div>
     </div>
 
@@ -90,39 +105,41 @@
 </div>
 
 
-<style>
-  .drag_and_drop{
-    cursor: move;
-    color: #3498DB;
-  }
-</style>
-
-
 <script type="text/javascript">
   $(function(){
     $(".deleted_categories").hide();
-  });
 
 
+    // Return a helper with preserved width of cells
+    var fixHelper = function(e, ui) {
+      ui.children().each(function() {
+        $(this).width($(this).width());
+      });
+      return ui;
+    };
 
 
-  var fieldList = $(".draggableFieldGroup");
-  fieldList.each(function(){
-    $(this).sortable({
-      handle: $(this, ".drag_and_drop"),
-      forcePlaceholderSize: true,
-      cursor: "move",
-      animation: 100,
-      start: function(event, ui){
-        ui.placeholder.height(ui.item.height());
-        ui.placeholder.width(ui.item.width());
-      },
-      update: function(event, ui){
-        $('.field_group', this).each(function(index, elem) {
-          $('.form-field-order', this).val(index);
-        });
-      }
+    var fieldList = $(".draggableFieldGroup");
+    fieldList.each(function(){
+      $(this).sortable({
+        helper: fixHelper,
+        handle: $(this, ".drag_and_drop"),
+        forcePlaceholderSize: true,
+        cursor: "move",
+        animation: 100,
+        start: function(event, ui){
+          ui.placeholder.height(ui.item.height());
+          ui.placeholder.width(ui.item.width());
+        },
+        update: function(event, ui){
+          $('.field_group', this).each(function(index, elem) {
+            $('.form-field-order', this).val(index);
+            $(this).closest('.to_delete').find(".form-control-id, .form-field-order").addClass('changed');
+          });
+        }
+      });
     });
+
   });
 </script>
 

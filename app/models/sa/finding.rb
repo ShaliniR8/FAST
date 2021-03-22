@@ -39,6 +39,22 @@ class Finding < Sa::SafetyAssuranceBase
     CONFIG.object['Finding'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Finding'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                            .map { |key, _| key.to_s }
+
+    keys[keys.index('get_source')] = 'owner_id' if keys.include? 'get_source'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('approver')] = 'approver#approver.full_name' if keys.include? 'approver'
+    keys[keys.index('occurrences')] = 'occurrences.value' if keys.include? 'occurrences'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
+
+    keys
+  end
+
+
   def get_owner
     "#{self.owner_type.underscore}s"
   end
@@ -104,9 +120,12 @@ class Finding < Sa::SafetyAssuranceBase
       checklist_num = @owner.checklist_cells[0].value
 
 
+      # "<a style='font-weight:bold' href='/#{true_owner_table_name}/#{true_owner.id}'>
+      #   #{true_owner.class.name} ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
+      # </a>".html_safe
+
       "<a style='font-weight:bold' href='/#{true_owner_table_name}/#{true_owner.id}'>
-        #{true_owner.class.name} ##{true_owner.id} > Checklist (#{checklist_title} - ##{checklist_num})
-      </a>".html_safe
+        #{true_owner.class.name} ##{true_owner.id}</a>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end

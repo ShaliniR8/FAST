@@ -35,6 +35,8 @@ class AuditsController < SafetyAssuranceController
     :viewer_access,
   ]
 
+  before_filter :set_table_name
+
   before_filter(only: [:new])    {set_parent_type_id(:audit)}
   before_filter(only: [:create]) {set_parent(:audit)}
   after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @audit)}
@@ -47,27 +49,30 @@ class AuditsController < SafetyAssuranceController
   end
 
 
+  def set_table_name
+    @table_name = "audits"
+  end
+
+
   def index
     respond_to do |format|
       format.html do
-        object_name = controller_name.classify
-        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-        @table = Object.const_get(object_name).preload(@object[:preload])
+        @object_name = controller_name.classify
+        @table_name = controller_name
+
+        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
         @default_tab = params[:status]
 
-        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-        if params[:advance_search].present?
-          handle_search
-        else
-          @records = records
-        end
-        filter_records(object_name, controller_name)
-        records = @records.to_a & records.to_a if @records.present?
+        # Datatable Column Info
+        @columns = get_data_table_columns(@object_name)
+        @column_titles = @columns.map { |col| col[:title] }
+        @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+        }.select(&:present?)
 
-        @records_hash = records.group_by(&:status)
-        @records_hash['All'] = records
-        @records_hash['Overdue'] = records.select{|x| x.overdue}
-        @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+        @advance_search_params = params
+
+        render 'forms/index'
       end
       format.json { index_as_json }
     end

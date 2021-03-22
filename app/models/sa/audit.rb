@@ -46,6 +46,19 @@ class Audit < Sa::SafetyAssuranceBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Audit'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                          .map { |key, _| key.to_s }
+
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('findings')] = 'findings.id' if keys.include? 'findings'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
+
+    keys
+  end
+
+
   def self.user_levels
     {
       0  => 'N/A',

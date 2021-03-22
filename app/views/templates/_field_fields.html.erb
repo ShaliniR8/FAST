@@ -4,8 +4,10 @@
 
 
 <%if source == 'Existing'%>
+  <%changed = ""%>
   <tr class="field_group to_delete <%=deleted%>" style="background-color:#EBF5FB" field="<%=field.id%>">
 <%else%>
+  <%changed = "changed"%>
   <tr class="field_group to_delete" style="background-color:#FEF5E7">
 <%end%>
 
@@ -17,78 +19,105 @@
     <%=f.hidden_field :nested_field_value, :value => (raw locals[:nested_field_value])%>
   <%end%>
 
+
+  <td><%=f.text_field   :label,                                               {class: "form-control #{changed}"}%>                    </td>
+  <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {class: "form-control date-type-select #{changed}"}%>   </td>
+  <td><%=f.select       :data_type,     Field.getData_type, {},               {class: "form-control #{changed}"}%>                    </td>
+  <td><%=f.select       :display_size,  Field.getDisplay_size, {},            {class: "form-control #{changed}"}%>                    </td>
+
+  <td><%=f.check_box    :required,                                             class: "form-control #{changed}"%>                     </td>
+  <td><%=f.check_box    :print,                                                class: "form-control #{changed}"%>                     </td>
+
+  <td><%=f.text_area    :options,                                              class: "form-control #{changed}", rows: 3%>            </td>
   <td>
-    <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
-    <%if source == 'Existing'%>
-      <%= f.hidden_field :field_order, :value => fld_index, :class => "form-field-order" %>
-    <%else%>
-      <%= f.hidden_field :field_order, :value => 10000, :class => "form-field-order" %>
-    <%end%>
+    <%=f.select :custom_option_id,
+      options_for_select(CONFIG.custom_options_arr.map{|x| [x.title, x.id]}.to_h, (field.custom_option_id rescue nil)),
+      {include_blank: ''},
+      {class: "form-control #{changed}"}%>
   </td>
-  <td><%=f.text_field   :label,                                               {:class => "form-control"}%>                    </td>
-  <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {:class => "form-control date-type-select"}%>   </td>
-  <td><%=f.select       :data_type,     Field.getData_type, {},               {:class => "form-control"}%>                    </td>
-  <td><%=f.select       :display_size,  Field.getDisplay_size, {},            {:class => "form-control"}%>                    </td>
-  <td><%=f.select       :show_label,    [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-  <td><%=f.select       :required,      [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-  <td><%=f.select       :print,         [["Yes", true], ["No", false]], {},   {:class => "form-control"}%>                    </td>
-  <% if params[:action] == 'edit' %>
-    <td><%=f.number_field :max_length,                                          {:class => "form-control"}%>                    </td>
-    <td><%=f.select       :additional_info, [["Yes", true], ["No", false]], {}, {:class => "form-control"}%>                    </td>
-  <% end %>
-  <td><%=f.text_area    :options,                                             {:class => "form-control", :size => "1"}%>      </td>
+
+  <td class="extra_info"><%=f.check_box    :show_label,        class: "form-control #{changed}"%>  </td>
+  <td class="extra_info"><%=f.number_field :max_length,       {class: "form-control #{changed}"}%> </td>
+  <td class="extra_info"><%=f.number_field :max_options,      {class: "form-control #{changed}"}%> </td>
+  <td class="extra_info"><%=f.check_box    :additional_info,   class: "form-control #{changed}"%>  </td>
+
+  <td class="extra_info"><%=f.text_field :element_id,         {:class => "form-control #{changed}"}%></td>
+  <td class="extra_info"><%=f.text_field :element_class,      {:class => "form-control #{changed}"}%></td>
+  <td class="extra_info"><%=f.text_field :map_id,             {:class => "form-control #{changed}"}%></td>
+
+  <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
+    <td class='extra_info'>
+      <%eccairs_mapping = (field.eccairs_mappings.first rescue nil) || (field.eccairs_mappings.build rescue nil)%>
+      <%eccairs_mapping ||= EccairsMapping.new%>
+      <%=f.fields_for :eccairs_mappings, eccairs_mapping do |eccairs_form|%>
+        <%=text_field_tag :eccairs_attribute_name,
+          (eccairs_mapping.eccairs_attribute.attribute_synonym rescue nil),
+          list: 'eccairs_attributes_names', class: 'form-control eccairs_attribute_name_field'%>
+        <%=eccairs_form.hidden_field :eccairs_attribute_id, class: "eccairs_attribute_id_field #{changed}"%>
+      <%end%>
+    </td>
+  <%end%>
+
+
   <td>
+    <%if source == 'Existing'%>
+      <%= f.hidden_field :field_order, value: fld_index, class: "form-field-order #{changed}" %>
+      <%= f.hidden_field :id, class: "form-control form-control-id" %>
+    <%else%>
+      <%= f.hidden_field :field_order, value: 10000, class: "form-field-order #{changed}" %>
+    <%end%>
+
+    <!-- Move btn -->
+    <%=link_to '<i class="glyphicon glyphicon-move"></i>'.html_safe, '#',
+      class: 'btn btn-sm btn-lightblue drag_and_drop mt5',
+      title: 'Move'%>
+
+    <!-- Archive/Unarchive btn -->
     <%if source == 'Existing'%>
       <%if field.deleted?%>
-        <a class="btn btn-default archive_btn">Unarchive</a>
+        <%=link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+          class: 'btn btn-sm btn-default archive_btn mt5',
+          title: 'Unarchive'%>
       <%else%>
-        <a class="btn btn-warning archive_btn">Archive</a>
+        <%=link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+          class: 'btn btn-sm btn-warning archive_btn mt5',
+          title: 'Archive'%>
       <%end%>
-      <%if CONFIG.sr::GENERAL[:template_nested_fields]%>
-        <a class="btn btn-info mr5 mt5" id = "show_nested_btn_<%=field.id%>">View Nested</a>
-      <%end%>
+      <%=f.hidden_field :deleted, id: "delete_field", class: "form-control"%>
 
-      <%=f.hidden_field :deleted, :id => "delete_field"%>
+      <!-- View Nested btn -->
+      <%if CONFIG.sr::GENERAL[:template_nested_fields]%>
+        <%=link_to '<i class="glyphicon glyphicon-list"></i>'.html_safe, '#',
+          class: 'btn btn-sm btn-info mt5',
+          id: "show_nested_btn_#{field.id}",
+          title: 'View Nested'%>
+      <%end%>
     <%else%>
-      <button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
+      <!-- Remove btn -->
+      <%=link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+        class: 'btn btn-sm btn-danger mt5 delete-btn',
+        onclick: 'removeField(this)',
+        title: 'Remove'%>
     <%end%>
   </td>
-
-
-  <td class="extra_info"><%=f.text_field :element_id,         {:class => "form-control"}%></td>
-  <td class="extra_info"><%=f.text_field :element_class,      {:class => "form-control"}%></td>
-  <td class="extra_info"><%=f.text_field :map_id,             {:class => "form-control"}%></td>
-
-
-
 </tr>
 
 
 
 <script type="text/javascript">
-
-
-
   $(function(){
-
     $(".extra_info").hide();
     $(".deleted_fields").hide();
-
 
     <%if source == 'Existing'%>
       $("#show_nested_btn_<%=field.id%>").on("click", function(){
         $.get("<%=show_nested_templates_path%>", {"field_id" : <%=field.id%>});
       });
     <%end%>
-
-
-
   });
-
 
 
   function removeField(deletable){
     $(deletable).closest('.to_delete').remove();
   }
-
 </script>

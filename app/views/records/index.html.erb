@@ -13,8 +13,9 @@
       });
     });
 
+
     $('#adv').on('click',function(){
-      $.get("<%=advanced_search_home_index_path(table: @table.name, status: 'All')%>", function(data){
+      $.get("<%=advanced_search_home_index_path(table: @object_name, status: 'All')%>", function(data){
         $(".modal-content").html(data);
         $(window).resize();
       });

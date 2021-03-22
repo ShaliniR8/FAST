@@ -35,7 +35,7 @@ class ChecklistTemplatesController < ApplicationController
   end
 
   def new
-    @title = "New Checlist Template"
+    @title = "New Checklist Template"
     @checklist_template = ChecklistTemplate.new
     @fields = ChecklistTemplate.get_meta_fields('form')
   end
@@ -50,7 +50,7 @@ class ChecklistTemplatesController < ApplicationController
   end
 
   def edit
-    @title = "Edit Checlist Template"
+    @title = "Edit Checklist Template"
     @checklist_template = ChecklistTemplate.find(params[:id])
     @fields = ChecklistTemplate.get_meta_fields('form')
   end

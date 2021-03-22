@@ -17,6 +17,38 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
+  def index
+    @object_name = controller_name.classify
+    @table_name = controller_name
+
+    @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+    @default_tab = params[:status]
+
+    # Datatable Column Info
+    @columns = get_data_table_columns(@object_name)
+    if @object_name == 'Record'
+      if !CONFIG.sr::GENERAL[:show_submitter_name]
+        if !current_user.global_admin?
+          @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      else
+        if !current_user.admin?
+          @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      end
+    end
+
+    @column_titles = @columns.map { |col| col[:title] }
+    @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+      (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+    }.select(&:present?)
+
+    @advance_search_params = params
+
+    render 'forms/index'
+  end
+
+
   def track_activity
     #if Trial or Demo and user is not prosafet_admin then track log
     track_airline_log = CONFIG::GENERAL[:track_log]
@@ -80,7 +112,7 @@ class ApplicationController < ActionController::Base
       if current_user.disable
         redirect_to logout_path
         return false
-      elsif !current_user.has_access(controller_name,action_name,admin:true)
+      elsif !current_user.has_access(controller_name,action_name,admin:true, permissions: (session[:permissions].present? ? JSON.parse(session[:permissions]) : nil))
         unless (action_name == 'show' &&
           current_user.has_access(controller_name,'viewer',strict:strict) &&
           (Object.const_get(controller_name.singularize.titleize).find(params[:id]).viewer_access rescue true))
@@ -471,7 +503,7 @@ class ApplicationController < ActionController::Base
   def get_car_owner(car)
     case car.owner_type
       when 'Finding'
-        return car.owner.get_owner
+        return car.owner.get_owner rescue Finding.where(obj_id: car.owner_obj_id)
       when 'Investigation'
         return 'investigations'
     end
@@ -869,7 +901,11 @@ class ApplicationController < ActionController::Base
       notice = record.notices.create(arg[:notice])
       puts "NOTICE OWNER TYPE NULL" if notice.owner_type.nil?
       if arg[:mailer]
-        NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment])
+        if arg[:extra_attachments].present?
+          NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment], arg[:extra_attachments])
+        else
+          NotifyMailer.notify(notice, arg[:subject], record, arg[:attachment], 0)
+        end
       end
     end
   end
@@ -883,27 +919,24 @@ class ApplicationController < ActionController::Base
   helper_method :airport_admin, :airport_has_access?, :current_airport_admin
 
 
+  def get_dataset
+    object_name =  params[:controller].classify
 
-  # load records on index page
-  def load_records
-    object = CONFIG.hierarchy[session[:mode]][:objects][controller_name.classify]
-    @table = Object.const_get(controller_name.classify).preload(object[:preload])
-
-    ids = JSON.parse params["ids"].gsub('=>', ':')
-    if ids[params["status"]].present?
-      @records = @table.select { |record| ids[params["status"]].include? record.id }
-    else
-      @records = nil
+    case object_name
+    when 'Submission'
+      render json: SubmissionDatatable.new(view_context, current_user)
+    when 'Record', 'Report'
+      render json: SafetyReportingDatatable.new(view_context, current_user)
+    when 'CorrectiveAction'
+      render json: CorrectiveActionDatatable.new(view_context, current_user)
+    else # SA, SRA modules
+      render json: ApplicationDatatable.new(view_context, current_user)
     end
-
-    # records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    # @records = @records.to_a & records.to_a
-    @fields = @table.get_meta_fields('index')
-    render :partial => 'forms/render_index_tab'
   end
 
+
   def filter_records(object_name, controller_name)
-    if %w[Aduit Inspection Evaluation Investigation].include? object_name
+    if %w[Audit Inspection Evaluation Investigation].include? object_name
       @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
       if !current_user.has_access(controller_name,'admin', admin: true, strict: true)
         cars =  Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
@@ -997,12 +1030,20 @@ class ApplicationController < ActionController::Base
         end
       end
 
+      # @owner.update_attributes(params[object_name.to_sym])
+      # @record = @owner
+      # category = Category.find(params[:category_id])
+      # fields = category.fields
+      # @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
+      # render partial: 'records/show_category', locals: {category: category, fields: fields}
       @owner.update_attributes(params[object_name.to_sym])
       @record = @owner
-      category = Category.find(params[:category_id])
-      fields = category.fields
-      @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
-      render partial: 'records/show_category', locals: {category: category, fields: fields}
+      @cat = Category.find(params[:category_id])
+      render partial: 'records/category',
+             locals: {deid: !current_user.has_template_access(@record.template.name).include?('full'),
+             from_record_show: true,
+             record_edit_access: current_user.has_access('records', 'edit', admin: true),
+             hide_panel_head: true}
     else
     end
 

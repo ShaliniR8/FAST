@@ -7,6 +7,7 @@
       <%=field.get_label.present? ? field.get_label.html_safe : nil%>
     </label>
 
+    <% required = field.required? ? "required_field" : "" %>
 
     <%if field.display_type == "text"%>
       <%if field.data_type == 'date'%>
@@ -17,14 +18,14 @@
         <%field_class = 'form-control'%>
       <%end%>
       <%=rf.text_field :value,
-        {:class=> field_class+" "+field.element_class,
+        {:class=> required + " " + field_class+" "+field.element_class,
         :placeholder=>field.label,
         :id=>field.element_id}%>
 
     <%elsif field.display_type == "textarea"%>
       <div class="col-xs-12">
         <%=rf.text_area :value,
-          {:class => "form-control " + field.element_class,
+          {:class => required + " " + "form-control " + field.element_class,
           :rows => 4,
           :id => field.element_id}%>
       </div>
@@ -35,28 +36,32 @@
           <%=rf.select :value,
             field.getOptions,
             {:include_blank=>""},
-            {:class=>'form-control tz atz',
+            {:class=>'form-control tz atz ' + required,
             :selected => record_field.value}%>
           <span class="input-group-addon tc">All</span>
         </div>
       <%else%>
         <%=rf.select :value,
-          field.getOptions,
+          field.getOptions.map { |option| [option, {'data-option' => option.parameterize}]},
           {:include_blank=>""},
-          {:class=>'form-control'+" "+field.element_class,
+          {"data-id" => field.id,
+          :class=> 'field_select' + " " + required + " " + 'form-control'+" "+field.element_class,
           :selected => record_field.value,
           :id => field.element_id}%>
       <%end%>
 
     <%elsif field.display_type == "checkbox"%>
       <%current_options = record_field.value.split(";") rescue ''%>
-      <div class="col-xs-12">
+      <div class="col-xs-12 <%=required%>">
         <%field.getOptions.each do |option|%>
           <div class="col-xs-6">
             <label class="checkbox">
               <%=rf.check_box :value,
                 {:multiple => true,
-                :checked=>current_options.include?(option)},
+                :checked=>current_options.include?(option),
+                :class => "field_cb_select",
+                'data-option' => option.parameterize,
+                'data-id' => field.id},
                 option,
                 nil%>
               <%=option%>
@@ -66,12 +71,15 @@
       </div>
 
     <%elsif field.display_type == "radio"%>
-      <div class="col-xs-12">
+      <div class="col-xs-12 <%=required%>">
         <%field.getOptions.each do |option|%>
           <div class="col-xs-6">
-            <label class="checkbox">
+            <label class="radio">
               <%=rf.radio_button :value,
-                option%>
+                option,
+                :class => "field_rb_select",
+                'data-option' => option.parameterize,
+                'data-id' => field.id%>
               <%=option%>
             </label>
           </div>
@@ -90,7 +98,7 @@
         <%end%>
         <%=text_field_tag field.get_label,
           "",
-          {:class=>"form-control ml5 emp",
+          {:class=>"form-control ml5 emp " + required,
           :readonly=>true,
           :id=>"emp#{field.id}",
           :value => employee}%>
@@ -110,7 +118,7 @@
       <div class="input-group">
         <%=text_field_tag field.get_label,
           "",
-          {:class=>"form-control ml5 airport",
+          {:class=>"form-control ml5 airport " + required,
           :readonly=>true,
           :id=>"airport#{field.id}",
           :value=>record_field.value}%>
@@ -129,7 +137,7 @@
     <%elsif field.display_type == "datalist"%>
       <%= rf.text_field :value,
         {:list=>"#{field.id}",
-        :class=>"form-control",
+        :class=>"form-control " + required,
         :value=>record_field.value}%>
       <datalist id="<%=field.id%>">
         <% field.getOptions.each do |opt|%>

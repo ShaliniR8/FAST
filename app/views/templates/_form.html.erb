@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
 <script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
 <script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dirty-form.js"></script>
 
 
 <div class="item active mt50" style="height:auto;">
@@ -21,15 +22,15 @@
 
         <div class="panel-body" id="form_body">
 
-          <%=form_for @template do |f|%>
+          <%=form_for @template, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|%>
             <%=render "shared/instructions",
               :instruction =>
-              'Use  <span class="glyphicon glyphicon-move"></span>  to reorder Fields and Categories</br>Nested fields can only be added to dropdown fields</br>'%>
+              'Use  <span class="glyphicon glyphicon-move"></span>  to reorder Fields and Categories</br>Nested fields can be added to dropdown, checkbox and radio fields only</br>'%>
 
             <div class="col-xs-12">
               <div class="form-inline col-xs-4">
                 <%=f.label :name, "Template Name"%>
-                <%=f.text_field :name,{:class=>"form-control"}%>
+                <%=f.text_field :name,{:class=>"form-control changed"}%>
               </div>
               <div class="form-inline col-xs-8">
                 <%=f.label :description, "Descriptions"%>
@@ -128,7 +129,7 @@
             <%=link_to "Cancel",
               @action == "new" ? root_url : template_path(@template),
               :id => "cancel-btn",
-              :class => "mr5 btn btn-warning pull-right",
+              :class => "mr5 btn btn-default pull-right",
               :confirm => 'Are you sure?'%>
           <%end%>
         </div>
@@ -139,18 +140,52 @@
 </div>
 
 
+<datalist id="eccairs_attributes_names">
+  <%@eccairs_attributes.each do |attribute|%>
+    <option value="<%=attribute.attribute_synonym%>" data-id="<%=attribute.id%>"></option>
+  <%end%>
+</datalist>
+
+
+<style>
+  table .form-control {
+    font-size: 13px !important;
+    padding: 4px !important;
+  }
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    vertical-align: middle;
+    padding: 4px;
+  }
+</style>
+
+
 <script>
   $(function(){
 
-    $(".archive_btn").on("click", function(){
-      if($(this).text() == "Archive"){
-        $(this).closest("td").find("#delete_field").val(true);
-        $(this).text("Unarchive");
-        $(this).removeClass("btn-warning").addClass("btn-default");
-      }else{
+    $(document).on('click', '.drag_and_drop', function(e) {
+      e.preventDefault();
+    });
+
+    $(document).on('click', '.delete-btn', function(e) {
+      e.preventDefault();
+    });
+
+
+    $(".archive_btn").on('click', function(e) {
+      e.preventDefault();
+      if ($(this).hasClass('btn-default')) { // Archived
+        $(this).removeClass('btn-default').addClass('btn-warning');
         $(this).closest("td").find("#delete_field").val(false);
-        $(this).text("Archive");
-        $(this).removeClass("btn-default").addClass("btn-warning");
+        $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
+      } else { // Active
+        $(this).removeClass('btn-warning').addClass('btn-default');
+        $(this).closest("td").find("#delete_field").val(true);
+        $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
       }
     });
 
@@ -177,10 +212,12 @@
       }
     });
 
+
     var panelList = $(".draggablePanelList");
     panelList.each(function(){
       $(this).sortable({
         handle: $(this, ".drag_and_drop"),
+        forcePlaceholderSize: true,
         cursor: "move",
         start: function(event, ui){
           ui.placeholder.height(ui.item.height());
@@ -189,11 +226,19 @@
         update: function(event, ui){
           $('.panel', this).each(function(index, elem) {
             $('.form-template-order', this).val(index);
+            $('.form-template-order', this).addClass("changed");
           });
         }
       });
     });
 
+
+    // ECCAIRS
+    $(document).on('change', '.eccairs_attribute_name_field', function() {
+      var selected = $(this).val();
+      var attribute_id = $('#eccairs_attributes_names option[value="' + selected +'"]').attr('data-id');
+      $(this).next('.eccairs_attribute_id_field').val(attribute_id);
+    });
 
   });
 </script>

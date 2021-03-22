@@ -101,19 +101,19 @@ javascript:
       // Safety Assurance Module
       if ($(this).hasClass('show_finding')){
         $(this).removeClass("show_finding").addClass("show_inv").text("Corrective Actions");
-        $(this).closest('.panel-title').find('.top_text').html("<b>Substitute Risk Analysis: Investigations</b>");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Investigations</b>");
         $('.finding_after_cell').hide();
         $('.inv_after_cell').show();
       }
       else if($(this).hasClass("show_car")){
         $(this).removeClass("show_car").addClass("show_finding").text("Investigations");
-        $(this).closest('.panel-title').find('.top_text').html("<b>Substitute Risk Analysis: Findings</b>");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Findings</b>");
         $('.car_after_cell').hide();
         $('.finding_after_cell').show();
       }
       else if($(this).hasClass("show_inv")){
         $(this).removeClass("show_inv").addClass("show_car").text("Findings");
-        $(this).closest('.panel-title').find('.top_text').html("<b>Substitute Risk Analysis: Corrective Actions</b>");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Corrective Actions</b>");
         $('.inv_after_cell').hide();
         $('.car_after_cell').show();
 
@@ -121,13 +121,13 @@ javascript:
       }
       else if($(this).hasClass("show_record")){
         $(this).removeClass("show_record").addClass("show_report").text("Reports");
-        $(this).closest('.panel-title').find('.top_text').html("<b>Substitute Risk Analysis: Events</b>");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Events</b>");
         $('.record_after_cell').hide();
         $('.report_after_cell').show();
       }
       else if($(this).hasClass("show_report")){
         $(this).removeClass("show_report").addClass("show_record").text("Events");
-        $(this).closest('.panel-title').find('.top_text').html("<b>Substitute Risk Analysis: Reports</b>");
+        $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Reports</b>");
         $('.report_after_cell').hide();
         $('.record_after_cell').show();
       }

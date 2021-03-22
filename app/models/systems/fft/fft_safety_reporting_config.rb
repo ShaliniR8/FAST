@@ -7,7 +7,7 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
     submission_time_zone:             true,
     submission_description_required:  true,
     configurable_agenda_dispositions: true,
-    attach_pdf_submission:            true,
+    dropdown_event_title_list:        true,
     # Airline-Specific Features:
   })
 
@@ -19,7 +19,12 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
             field: 'name', title: 'Event Title',
             num_cols: 6, type: 'datalist', visible: 'index,form,meeting_form,show',
             required: true, on_newline: true, options: CONFIG.custom_options['Event Titles']
-          }
+          },
+          event_types: {
+            field: 'event_type', title: 'Event Type',
+            num_cols: 12, type: 'text', visible: 'query',
+            required: false
+          },
         },
         print_panels: %w[risk_matrix occurrences records ]
       }

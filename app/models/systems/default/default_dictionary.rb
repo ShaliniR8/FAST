@@ -277,6 +277,12 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
     },
+    causes: {
+      partial: '/causes/all',
+      visible: proc { |owner:,user:,**op| owner.causes.present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { owner: owner }  },
+    },
     checklists: {
       partial: '/panels/checklists',
       visible: proc { |owner:,user:,**op| owner.owner.class.name == "ChecklistRow" },
@@ -634,7 +640,7 @@ class DefaultDictionary
       required: false
     },
     risk_factor: {
-      field: 'risk_factor', title: 'Baseline Risk',
+      field: 'get_risk_classification', title: 'Baseline Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_before_risk_color'
     },
@@ -654,7 +660,7 @@ class DefaultDictionary
       required: false
     },
     risk_factor_after: {
-      field: 'risk_factor_after', title: 'Mitigated Risk',
+      field: 'get_risk_classification_after', title: 'Mitigated Risk',
       num_cols: 12, type: 'text', visible: 'index',
       required: false,  html_class: 'get_after_risk_color'
     },
@@ -681,7 +687,7 @@ class DefaultDictionary
     },
     submitter: {
       field: 'get_submitter_name', title: 'Submitted By',
-      num_cols: 6, type: 'user', visible: 'admin,query', #should include show+form w/ sr::CONFIG[:show_submitter_name]
+      num_cols: 6, type: 'user', visible: 'admin,query,index', #should include show+form w/ sr::CONFIG[:show_submitter_name]
       required: false, censor_deid: true
     },
     event_date: {

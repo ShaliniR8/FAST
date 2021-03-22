@@ -18,7 +18,7 @@ class DefaultConfig
   GENERAL = {
     # AIRLINE-SPECIFIC CONFIGS
       # Please Ensure these are filled out for each airline
-    version:        '1.2.4',                      # Helps to track most recent logged updates
+    version:        '1.2.6',                      # Helps to track most recent logged updates
     name:           'Not Initialized',            # Airline Name- shown throughout site
     time_zone:      'Pacific Time (US & Canada)', # Used in varied locations
 
@@ -32,6 +32,10 @@ class DefaultConfig
     cisp_integration:                   false,
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
+    power_bi_integration:               false,
+
+    # Third Party Integrations:
+    integrations: ['mitre'],
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
@@ -40,11 +44,13 @@ class DefaultConfig
     has_root_causes:                    true,    # Enables the use of root causes - default on
     shared_links:                       false,   # Enables shareable links to be created for forms - default off
     drop_down_risk_selection:           false,
+    query_processing_in_rake_task:      false,
 
     # TO BE REMOVED:
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)
     has_extension:                      true,   # Allows forms to request extensions
     has_verification:                   true,   # Allows forms to be verified (additional step)
+    attach_pdf_in_message:              true,   # Allows option to attach PDF version of the source of Input for email notfication fired by Messages
   }
 
   LAUNCH_OBJECTS = {
@@ -120,6 +126,16 @@ class DefaultConfig
   def self.custom_options
     Rails.application.config.custom_options
     #CustomOption.all.map{|x| [x.title, (x.options.split(';') rescue [''])]}.to_h
+  end
+
+
+  def self.custom_options_arr
+    Rails.application.config.custom_options_arr
+  end
+
+
+  def self.custom_options_by_id
+    Rails.application.config.custom_options_arr.map{|x| [x.id, x]}.to_h
   end
 
 
@@ -271,17 +287,18 @@ class DefaultConfig
       row_header: ['4', '3', '2', '1', '0'],
       column_header_name: 'PROBABILITY',
       column_header: ['A - Improbable','B - Unlikely','C - Remote','D - Probable','E - Frequent'],
+
       rows_color: [
-        ['yellow',    'yellow',     'orange',     'orange',     'orange' ],
-        ['yellow',    'yellow',     'yellow',     'orange',     'orange' ],
-        ['#60FF60',   '#60FF60',    'yellow',     'yellow',     'orange' ],
-        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60'],
-        ['#60FF60',   '#60FF60',    '#60FF60',    '#60FF60',    '#60FF60']
+        ['yellow',      'yellow',       'orange',       'orange',       'orange' ],
+        ['yellow',      'yellow',       'yellow',       'orange',       'orange' ],
+        ['limegreen',   'limegreen',    'yellow',       'yellow',       'orange' ],
+        ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen'],
+        ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen']
       ],
     },
 
     risk_definitions: {
-      '#60FF60' => { rating: 'Green - Acceptable'                   },
+      limegreen:   { rating: 'Green - Acceptable'                   },
       yellow:      { rating: 'Yellow - Acceptable with mitigation'  },
       orange:      { rating: 'Orange - Unacceptable'                },
     },
@@ -291,6 +308,10 @@ class DefaultConfig
       'Yellow - Acceptable with mitigation'  => 'yellow',
       'Green - Acceptable'                   => 'limegreen',
       'Red - Unacceptable'                   => 'red',
+
+      'Orange'   => 'orange',
+      'Yellow'   => 'yellow',
+      'Green'    => 'limegreen',
 
       'Moderate' => 'yellow',
       'Low'      => 'limegreen',
@@ -302,9 +323,8 @@ class DefaultConfig
     },
 
     risk_table_dict: {
-      '#60FF60'   => 'Green - Acceptable',
-      'limegreen' => 'Green - Acceptable',
-      'red'       => 'Red - Unacceptable',
+      limegreen:  'Green - Acceptable',
+      red:        'Red - Unacceptable',
       yellow:        'Yellow - Acceptable with mitigation',
       orange:        'Orange - Unacceptable',
 

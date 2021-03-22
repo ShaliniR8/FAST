@@ -444,10 +444,11 @@ class MeetingsController < ApplicationController
     reports_ids = params[:meeting][:reports_attributes].map { |key, val| val[:id] if val[:cisp_sent] == '1' }.compact rescue nil
     if reports_ids.present?
       test_run = Rails.env.production? ? false : true
-      Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids)
+      timestamp = Time.now.strftime('%Y-%m-%d_%H-%M-%S')
+      Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids, timestamp: timestamp)
       # remove extra line
       path = File.join(Rails.root, "cisp")
-      file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+      file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP_#{timestamp}.xml"])
       original = File.open(file_name, 'r') { |file| file.readlines }
       blankless = original.reject{ |line| line.match(/^$/) }
       File.open(file_name, 'w') do |file|
@@ -456,9 +457,11 @@ class MeetingsController < ApplicationController
 
       begin
         unless test_run
-          system ("curl -X PUT --url \"https://www.atsapsafety.com/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+          system ("curl -X PUT --url \"https://www.atsapsafety.org/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
         end
+
         puts 'SENT events to CISP'
+        FileUtils.rm_rf(file_name)
         @flash_message = { success: 'Event(s) Sent To CISP.' }
       rescue
         puts 'FAILED to send events to CISP'

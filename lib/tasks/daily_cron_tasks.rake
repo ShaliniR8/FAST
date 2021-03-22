@@ -12,6 +12,11 @@ namespace :daily_cron_tasks do
     if defined?(Object.const_get("#{AIRLINE_CODE}Config")::ULTIPRO_DATA)
       Rake::Task['ultipro:update_userbase'].invoke()
     end
+
+
+    if AIRLINE_CODE == 'FFT'
+      Rake::Task['export_query_result'].invoke()
+    end
   end
 
 end

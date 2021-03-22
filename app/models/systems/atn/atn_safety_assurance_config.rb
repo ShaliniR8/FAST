@@ -84,6 +84,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         title: 'Inspection',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -135,6 +136,11 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -152,6 +158,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         title: 'Evaluation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -207,6 +214,11 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -224,6 +236,8 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         title: 'Investigation',
         status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
+          :occurrences,
+          :findings,
           :responsible_user,
           :verifications,
           :extension_requests],
@@ -293,12 +307,22 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             required: false
           },
           final_comment: { default: true },
+          occurrences: {default: true, title: (Investigation.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Investigation.find_top_level_section.label rescue nil}"
+          },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
           likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
           severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
-          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
+          risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" },
+          findings: {
+            field: 'included_findings', title: 'Included Findings',
+            num_cols: 6,  type: 'text', visible: 'index',
+            required: false
+          },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -308,7 +332,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments occurrences source_of_input findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 

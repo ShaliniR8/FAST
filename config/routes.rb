@@ -40,6 +40,7 @@ PrdgSession::Application.routes.draw do |map|
   end
 
   resources :signatures, only:[:show]
+  resources :airports
 
   resources :errors do
     collection do
@@ -137,14 +138,17 @@ PrdgSession::Application.routes.draw do |map|
   resources :recurrences
   resources :queries do
     member do
+      post "refresh_query"
       get "clone"
       post "add_visualization"
       get "remove_visualization"
       post "generate_visualization"
       post "display_chart_result"
+      post "enable"
     end
     collection do
       get 'load_conditions_block'
+      get "get_all_query_result_json"
     end
   end
 
@@ -291,6 +295,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'csap'
       get 'dsap'
       get 'comment'
+      get 'discard'
     end
     collection do
       post 'load_records'
@@ -306,6 +311,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'search'
       get "template_json" #Added by BP Aug 8 render the json of templates accessible to current user
       get "user_submission_json" #Added by BP Aug 15 render the json of submissions of current user
+      post "get_dataset"
     end
   end
   resources :records do
@@ -347,6 +353,8 @@ PrdgSession::Application.routes.draw do |map|
       get "update_hfactor"
       get "airport_data"
       get "draw_chart"
+      post "get_dataset"
+      get 'get_data'
     end
   end
   resources :reports do
@@ -359,6 +367,7 @@ PrdgSession::Application.routes.draw do |map|
       get "summary"
       get "tabulation"
       get 'load_records'
+      post "get_dataset"
     end
     member do
       get 'launch'
@@ -370,6 +379,7 @@ PrdgSession::Application.routes.draw do |map|
       get "add_meeting"
       get "carryover"
       get "meeting_ready"
+      post "add_to_meeting"
       get "get_agenda"
       get "new_attachment"
       get "new_minutes"
@@ -405,6 +415,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'load_records'
       get 'advanced_search'
       get 'get_term'
+      post "get_dataset"
     end
     member do
       get 'new_attachment'
@@ -450,7 +461,7 @@ PrdgSession::Application.routes.draw do |map|
   resources :faa_reports do
     member do
       get "enhance"
-      get "reports_table"
+      post "reports_table"
       get "print"
       get "export_word"
       get "edit_enhancement"
@@ -483,6 +494,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get "advanced_search"
+      post "get_dataset"
     end
   end
   resources :inspections do
@@ -503,6 +515,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get 'advanced_search'
+      post "get_dataset"
     end
   end
   resources :evaluations do
@@ -521,6 +534,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get "advanced_search"
+      post "get_dataset"
     end
   end
   resources :investigations do
@@ -545,6 +559,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'retract_desc_attributes'
       post 'load_records'
       get "advanced_search"
+      post "get_dataset"
     end
   end
   resources :findings do
@@ -565,6 +580,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get 'advanced_search'
+      post "get_dataset"
     end
   end
   resources :sms_actions do
@@ -572,6 +588,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'load_records'
       get 'advanced_search'
       get 'get_term'
+      post "get_dataset"
     end
     member do
       get 'baseline'
@@ -599,6 +616,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get 'advanced_search'
+      post "get_dataset"
     end
   end
 
@@ -637,6 +655,7 @@ PrdgSession::Application.routes.draw do |map|
       post "add_section"
       get 'edit_section'
       post 'update_section'
+      post "get_dataset"
     end
   end
   resources :hazards do
@@ -667,12 +686,14 @@ PrdgSession::Application.routes.draw do |map|
       get "update_listing_table"
       post "add_root_cause"
       get "new_root_cause2"
+      post "get_dataset"
     end
   end
   resources :risk_controls do
     collection do
       post 'load_records'
       get 'advanced_search'
+      post "get_dataset"
     end
     member do
       get 'interpret'
@@ -695,6 +716,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get 'advanced_search'
+      post "get_dataset"
     end
     member do
       get 'interpret'

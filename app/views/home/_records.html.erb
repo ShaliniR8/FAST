@@ -8,7 +8,7 @@
     <div class="panel-body" style="height:300px">
       <div class="row">
         <div class="col-xs-12">
-          <h5>Average Days to Complete: <%=Record.get_avg_complete(current_user)%></h5>
+          <h5>Average Days to Complete: <%=@records_scheduled_completion_date%></h5>
         </div>
       </div>
       <div id="records" style="width: 100%"></div>
@@ -46,7 +46,7 @@
     var dataTable = google.visualization.arrayToDataTable(data);
     records_chart.draw(dataTable, recs_options);
     google.visualization.events.addListener(records_chart, 'select', function(){
-      var all_status = <%=raw @records.keys%>
+      var all_status = <%=raw @grouped_records.keys%>
       var root_url = "<%=records_path%>?status="
       var dateParams = params &&
                         params.startDate &&

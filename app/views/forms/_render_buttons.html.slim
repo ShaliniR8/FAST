@@ -261,10 +261,25 @@ ruby:
   - when :view_parent
     - if owner.parents.present?
       - parent_class = owner.get_parent.class.name
-      = link_to "View #{parent_class.titleize}",
-        eval("#{parent_class.underscore}_path(owner.get_parent)"),
-        class: 'btn btn-info pull-right mr5 mb5',
-        disable_with: 'Redirecting...'
+      - if owner.class.name == 'Investigation'
+        - parent_name = ""
+        - case owner.get_parent.class.name
+        - when 'Record'
+          - parent_name = 'Report'
+        - when 'Report'
+          - parent_name = 'Event'
+        - else
+          - parent_name = parent_class
+
+        = link_to "View #{parent_name.titleize}",
+          eval("#{parent_class.underscore}_path(owner.get_parent)"),
+          class: 'btn btn-info pull-right mr5 mb5',
+          disable_with: 'Redirecting...'
+      - else
+        = link_to "View #{parent_class.titleize}",
+          eval("#{parent_class.underscore}_path(owner.get_parent)"),
+          class: 'btn btn-info pull-right mr5 mb5',
+          disable_with: 'Redirecting...'
     - else
       - parent_class = owner.owner.class.name
       - if parent_class == 'ChecklistRow'

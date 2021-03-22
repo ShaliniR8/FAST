@@ -605,6 +605,7 @@ class AccessControl < ActiveRecord::Base
       "Hazards"                               => "hazards",
       "Risk Controls"                         => "risk_controls",
       "Safety Plans"                          => "safety_plans",
+      "Verifications"                         => "verifications",
     }.sort.to_h
   end
 

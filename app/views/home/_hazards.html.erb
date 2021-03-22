@@ -37,7 +37,7 @@
     });
     hazard_chart.draw(google.visualization.arrayToDataTable(data), hazard_options);
     google.visualization.events.addListener(hazard_chart, 'select', function(){
-      var all_status=<%=raw @hazards.keys%>
+      var all_status=<%=raw @grouped_hazards.keys%>
       var root_url="<%=hazards_path%>?status="
       var selection = hazard_chart.getSelection();
       var message = "";

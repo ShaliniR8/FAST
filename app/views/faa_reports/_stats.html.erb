@@ -37,12 +37,10 @@
 <script>
   $(function(){
     $(".report_link").on("click",function(){
-      $.get("<%=reports_table_faa_report_path(@report)%>?" +
-        "title=" + $(this).data('title') +
-        "&reports=" + $(this).data('reports'), function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
+      $.post("<%=reports_table_faa_report_path(@report)%>", {title: $(this).data('title'), reports: $(this).data('reports')}, function(data){
+          $(".modal-content").html(data);
+          $(window).trigger('resize');
+      })
     });
   });
 </script>

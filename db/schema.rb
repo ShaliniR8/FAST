@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20201102224031) do
+ActiveRecord::Schema.define(:version => 20201125193407) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -519,6 +519,7 @@ ActiveRecord::Schema.define(:version => 20201102224031) do
     t.string   "nested_field_value"
     t.integer  "max_length"
     t.boolean  "additional_info",    :default => false
+    t.integer  "max_options"
   end
 
   create_table "findings", :force => true do |t|
@@ -1037,8 +1038,6 @@ ActiveRecord::Schema.define(:version => 20201102224031) do
     t.text     "narrative"
     t.text     "regulation"
     t.text     "notes"
-    t.boolean  "cisp_ready",            :default => false
-    t.boolean  "cisp_sent",             :default => false
   end
 
   create_table "recurrences", :force => true do |t|

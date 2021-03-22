@@ -21,7 +21,7 @@ end
 
 class RiskControlsController < ApplicationController
 
-  before_filter :login_required
+  before_filter :set_table_name, :login_required
   before_filter :define_owner, only: [:interpret]
 
   before_filter(only: [:new])    {set_parent_type_id(:risk_control)}
@@ -34,32 +34,37 @@ class RiskControlsController < ApplicationController
   end
 
 
-  def index
-    # @table = Object.const_get("RiskControl")
-    # @headers = @table.get_meta_fields('index')
-    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
-    # handle_search
-    # filter_risk_controls
-
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
-    @default_tab = params[:status]
-
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    if params[:advance_search].present?
-      handle_search
-    else
-      @records = records
-    end
-    filter_risk_controls
-    records = @records.to_a & records.to_a if @records.present?
-
-    @records_hash = records.group_by(&:status)
-    @records_hash['All'] = records
-    @records_hash['Overdue'] = records.select{|x| x.overdue}
-    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  def set_table_name
+    @table_name = "risk_controls"
   end
+
+
+  # def index
+  #   # @table = Object.const_get("RiskControl")
+  #   # @headers = @table.get_meta_fields('index')
+  #   # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+  #   # handle_search
+  #   # filter_risk_controls
+
+  #   object_name = controller_name.classify
+  #   @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+  #   @table = Object.const_get(object_name).preload(@object[:preload])
+  #   @default_tab = params[:status]
+
+  #   records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+  #   if params[:advance_search].present?
+  #     handle_search
+  #   else
+  #     @records = records
+  #   end
+  #   filter_risk_controls
+  #   records = @records.to_a & records.to_a if @records.present?
+
+  #   @records_hash = records.group_by(&:status)
+  #   @records_hash['All'] = records
+  #   @records_hash['Overdue'] = records.select{|x| x.overdue}
+  #   @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  # end
 
 
 

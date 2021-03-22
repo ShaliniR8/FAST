@@ -19,67 +19,73 @@
 
       <%=f.text_area :options,
         value: (f.object.options || header_item.options),
+        placeholder: "Enter options for #{header_item.title}",
         class: "form-control #{is_new ? 'changed' : ''}",
         rows: 4%>
 
     <%else%>
 
-    <%case field_type%>
-    <%when 'radio'%>
-      <%if action_name == 'address'%>
-        <div class="col-xs-12 ml5">
-          <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
-            <label class="radio radio-inline">
-              <%=f.radio_button :value, option, class: "#{is_new ? 'changed' : ''}"%>
-              <%=option%>
-            </label><br>
-          <%end%>
-        </div>
-      <%else%>
-        <%=f.text_area :options,
-          value: (f.object.options || header_item.options),
-          class: "form-control #{is_new ? 'changed' : ''}",
-          rows: 4%>
-      <%end%>
+      <%case field_type%>
+      <%when 'radio'%>
+        <%if action_name == 'address'%>
+          <div class="col-xs-12 ml5">
+            <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
+              <label class="radio radio-inline">
+                <%=f.radio_button :value, option, class: "#{is_new ? 'changed' : ''}"%>
+                <%=option%>
+              </label><br>
+            <%end%>
+          </div>
+        <%else%>
+          <%=f.text_area :options,
+            value: (f.object.options || header_item.options),
+            placeholder: "Enter options for #{header_item.title}",
+            class: "form-control #{is_new ? 'changed' : ''}",
+            rows: 4%>
+        <%end%>
 
-    <%when 'checkboxes'%>
-      <%field_value = checklist_cell.value.split(';') rescue []%>
-      <%if action_name == 'address'%>
-        <div class="col-xs-12 ml5">
-          <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
-            <label class="checkbox checkbox-inline">
-              <%=f.check_box :value, {multiple: true, class: "checkbox #{is_new ? 'changed' : ''}", checked:(field_value.include?option)}, option, nil%>
-              <%=option%>
-            </label><br>
-          <%end%>
-        </div>
-      <%else%>
-        <%=f.text_area :options,
-          value: (f.object.options || header_item.options),
-          class: "form-control #{is_new ? 'changed' : ''}",
-          rows: 4%>
-      <%end%>
+      <%when 'checkboxes'%>
+        <%field_value = checklist_cell.value.split(';') rescue []%>
+        <%if action_name == 'address'%>
+          <div class="col-xs-12 ml5">
+            <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
+              <label class="checkbox checkbox-inline">
+                <%=f.check_box :value, {multiple: true, class: "checkbox #{is_new ? 'changed' : ''}", checked:(field_value.include?option)}, option, nil%>
+                <%=option%>
+              </label><br>
+            <%end%>
+          </div>
+        <%else%>
+          <%=f.text_area :options,
+            value: (f.object.options || header_item.options),
+            placeholder: "Enter options for #{header_item.title}",
+            class: "form-control #{is_new ? 'changed' : ''}",
+            rows: 4%>
+        <%end%>
 
-    <%when 'dropdown'%>
-      <%if action_name == 'address'%>
-        <%= f.select :value,
-          header_item.options.split(';'),
-          { include_blank: ''},
-          { class: "form-control field_select #{is_new ? 'changed' : ''}" }
-        %>
-      <%else%>
-        <%= f.text_area :options,
-          value: (f.object.options || header_item.options),
+      <%when 'dropdown'%>
+        <%if action_name == 'address'%>
+          <% opts = checklist_cell.options || header_item.options %>
+          <%= f.select :value,
+            opts.split(';'),
+            { include_blank: ''},
+            { class: "form-control field_select #{is_new ? 'changed' : ''}" }
+          %>
+        <%else%>
+          <%= f.text_area :options,
+            value: (f.object.options || header_item.options),
+            placeholder: "Enter options for #{header_item.title}",
+            class: "form-control #{is_new ? 'changed' : ''}",
+            rows: 4
+          %>
+        <%end%>
+      <%when 'text'%>
+        <%=f.text_area :value,
+          placeholder: "Enter #{header_item.title}",
           class: "form-control #{is_new ? 'changed' : ''}",
           rows: 4
         %>
       <%end%>
-    <%when 'text'%>
-      <%=f.text_area :value,
-        class: "form-control #{is_new ? 'changed' : ''}",
-        rows: 4
-      %>
-    <%end%>
 
 
     <%end%>

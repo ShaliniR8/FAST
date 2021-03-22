@@ -1,8 +1,9 @@
 <%
   field_type = (cell.data_type || item.data_type) rescue item.data_type
   options = (cell.options || item.options) rescue item.options
+  is_header ||= false
 %>
-  
+
 
 <%case owner_type%>
 <%when 'Sample'%>

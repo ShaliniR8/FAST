@@ -15,6 +15,8 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
+require 'yaml'
+
 class QueriesController < ApplicationController
   include QueriesHelper
 
@@ -28,15 +30,108 @@ class QueriesController < ApplicationController
 
   def index
     @headers = @table.get_meta_fields('index')
-    @records = @table.where(:target => @types.values)
+    @records = @table.where(target: @types.values).includes(:created_by)
+  end
+
+
+  def refresh_query
+    @owner = @table.find(params[:id])
+
+    query_file_path = "/public/queries/#{params[:id]}.yml"
+    query_file_full_path = File.join([Rails.root] + [query_file_path])
+    File.delete(query_file_full_path)
+
+    redirect_to @owner
   end
 
 
   def show
+    respond_to do |format|
+      format.html do
+        @query_fields = @table.get_meta_fields('show')
+        @owner = @table.find(params[:id])
+        @chart_types = QueryVisualization.chart_types
+
+        if CONFIG::GENERAL[:query_processing_in_rake_task]
+          apply_query_with_file
+        else
+          apply_query
+        end
+
+        if defined?(params[:eccairs]) && params[:eccairs]
+          call_rake "eccairs:export", email: current_user.email, records: JSON.dump(@records.map(&:id))
+          redirect_to "/queries/#{@owner.id}"
+        end
+
+      end
+      format.json do
+        query_result = {
+          query_detail: {},
+          visualizations:[]
+        }
+
+        @query_fields = @table.get_meta_fields('show')
+        @owner = Query.find(params[:id])
+        @object_type = Object.const_get(@owner.target)
+        apply_query
+        total_records = @records.size
+
+        query_result[:query_detail] = get_query_detail_json(@owner, total_records)
+        query_result[:visualizations] = get_visualizations_json(@owner)
+
+        render :json => query_result
+      end
+    end
+  end
+
+
+  def get_all_query_result_json
+
+    all_queries_result = {}
     @query_fields = @table.get_meta_fields('show')
-    @owner = @table.find(params[:id])
-    @chart_types = QueryVisualization.chart_types
-    apply_query
+
+    Query.all.select { |query| query.is_ready_to_export }.each do |query|
+
+      query_result = {
+        query_detail: {},
+        visualizations:[]
+      }
+
+      @owner = query
+      @object_type = Object.const_get(@owner.target)
+
+      @module_name = case @object_type.name
+      when 'Submission', 'Record', 'Report', 'CorrectiveAction'
+        'ASAP'
+      when 'Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation'
+        'SMS'
+      when 'Sra', 'Hazard', 'RiskControl', 'SafetyPlan'
+        'SRM'
+      end
+
+      records = get_records # get @records
+      total_records = records.size
+
+      query_result[:query_detail] = get_query_detail_json(@owner, total_records)
+      query_result[:visualizations] = get_visualizations_json(@owner)
+
+      all_queries_result[@owner.id] = query_result
+    end
+
+    render :json => all_queries_result
+  end
+
+
+  def enable
+    query = Query.find(params[:id])
+    query.is_ready_to_export = !query.is_ready_to_export
+    query.save
+
+    msg = query.is_ready_to_export ? 'Enabled to Export' : 'Disabled to Export'
+
+    render json: {
+      message: msg,
+    }
   end
 
 
@@ -250,6 +345,114 @@ class QueriesController < ApplicationController
   end
 
 
+  def apply_query_with_file
+    if !session[:mode].present?
+      redirect_to choose_module_home_index_path
+      return
+    end
+    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
+    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
+
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @template_fields = []
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
+      }
+    }
+    @fields = @target_fields + @template_fields
+
+    query_file_path = "/public/queries/#{params[:id]}.yml"
+    query_file_full_path = File.join([Rails.root] + [query_file_path])
+
+    # append 'processing_' to avoid race condition
+    # ex. "/public/queries/processing_1234.yml"
+    query_processing_file_full_path = query_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+
+    first_run_query = (not File.exist? query_processing_file_full_path) && (not File.exist? query_file_full_path)
+
+    # 1) RUN QUERY
+    if first_run_query
+      @records = []
+      @status_msg = 'PROCESSING... (Notification will be sent out once the query is ready)'
+      @query_status = "new"
+
+      call_rake 'save_query_result',
+        title: @title,
+        owner_id: @owner.id,
+        object_type: @object_type,
+        file_path: query_file_full_path,
+        user_id: current_user.id,
+        processing_file_path: query_processing_file_full_path
+
+    # 2) QUERY PROCESSING..
+    elsif File.exist? query_processing_file_full_path
+      @records = []
+      @status_msg = 'STILL PROCESSING... (Please revisit the page later)'
+      @query_status = "new"
+
+    # 3) DISPLAY QUERY RESULT
+    elsif File.exist? query_file_full_path
+      @records = YAML.load(File.read(query_file_full_path))
+
+      file_updated_at = File.mtime(query_file_full_path)
+                          .in_time_zone(CONFIG::GENERAL[:time_zone])
+                          .strftime('%a, %d %b %Y %l:%M %p')
+
+      @status_msg = "Last Updated At #{file_updated_at}"
+      @query_status = "done"
+    end
+  end
+
+
+  def get_records
+    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
+    @title = CONFIG.hierarchy[@module_name][:objects][@owner.target][:title].pluralize
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @template_fields = []
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
+      }
+    }
+    @fields = @target_fields + @template_fields
+
+    if @title == "Submissions"
+      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
+    elsif @title == "Reports"
+      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+    else
+      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
+    end
+
+    @owner.query_conditions.each do |condition|
+      records = records & expand_emit(condition, records)
+    end
+
+    @records = records
+  end
 
   private
 

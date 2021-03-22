@@ -49,6 +49,36 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+
+  def self.update_event_title_list(template_id:, fields:)
+    template_name = Template.find(template_id).name
+    options = CONFIG.custom_options[template_name]
+
+    if options.present? # if there is no option for the template, default "Event Titles" is used
+      fields.each do |field|
+        if field[:field] == 'name'
+          field[:options] = options
+        end
+      end
+    end
+
+    fields
+  end
+
+
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Report'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                           .map { |key, _| key.to_s }
+
+    keys[keys.index('reports')] = 'records.id' if keys.include? 'reports'
+    keys[keys.index('event_description')] = 'narrative' if keys.include? 'event_description'
+    keys[keys.index('occurrences')] = 'occurrences.value' if keys.include? 'occurrences'
+
+    keys
+  end
+
+
   def self.reports_for_meeting
     if CONFIG.sr::GENERAL[:allow_event_reuse]
       Report.preload(:occurrences, records: [:template, :created_by]).where(status: ['Meeting Ready', 'Under Review'])
@@ -170,6 +200,11 @@ class Report < Sr::SafetyReportingBase
 
   def included_reports_types
     records.map{|record| record.get_template}.join(';')
+  end
+
+
+  def event_type
+    records.map{|record| record.get_template}.uniq.first
   end
 
 
@@ -463,10 +498,10 @@ class Report < Sr::SafetyReportingBase
   end
 
 
-  def self.export_all_for_cisp(test_run: false, reports_ids:)
+  def self.export_all_for_cisp(test_run: false, reports_ids:, timestamp:)
     reports = Report.where(id: reports_ids)
     dirname = File.join([Rails.root] + ['cisp'])
-    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP.xml"])
+    temp_file = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP_#{timestamp}.xml"])
     unless File.directory?(dirname)
       FileUtils.mkdir_p(dirname)
     end

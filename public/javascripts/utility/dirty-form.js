@@ -22,4 +22,7 @@ function markAsDirty() {
   changedHiddenInput.addClass('changed');
   $(this).closest('td').find('.cell-id').addClass('changed');
   $(this).closest('tr').find('.row-id').addClass('changed');
+
+  // $(this).closest('.panel-body').find('.category-changeable').addClass('changed');
+  $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
 }

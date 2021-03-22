@@ -22,6 +22,7 @@ class Investigation < Sa::SafetyAssuranceBase
   include Verifiable
   include Childable
   include Parentable
+  include RootCausable
 
 #Associations List
   belongs_to :owner,                    polymorphic: true
@@ -44,6 +45,19 @@ class Investigation < Sa::SafetyAssuranceBase
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)
     CONFIG.object['Investigation'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Investigation'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                                  .map { |key, _| key.to_s }
+
+    keys[keys.index('get_source')] = 'owner_id' if keys.include? 'get_source'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
+
+    keys
   end
 
 
@@ -110,6 +124,29 @@ class Investigation < Sa::SafetyAssuranceBase
 
   def type
     return "Investigation"
+  end
+
+  def included_findings
+    result = ""
+    self.findings.each do |finding|
+      result += "
+        <a style='font-weight:bold' href='/findings/#{finding.id}'>
+          ##{finding.id}
+        </a><br>"
+    end
+
+    self.checklists.each do |checklist|
+      checklist.checklist_rows.each do |checklist_row|
+        checklist_row.findings. each do |finding|
+          result += "
+            <a style='font-weight:bold' href='/findings/#{finding.id}'>
+              ##{finding.id}
+            </a><br>"
+        end
+      end
+    end
+
+    result.html_safe
   end
 
 end

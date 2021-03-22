@@ -12,6 +12,7 @@ class CustomOption < ActiveRecord::Base
 
   def update_custom_option
     Rails.application.config.custom_options = CustomOption.all.map{|x| [x.title, (x.options.split(';') rescue [''])]}.to_h
+    Rails.application.config.custom_options_arr = CustomOption.all.sort_by(&:title)
     Rails.logger.info "[INFO] Custom Options have been updated- custom_options application config updated"
   end
 

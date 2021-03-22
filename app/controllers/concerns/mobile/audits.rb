@@ -74,7 +74,7 @@ module Concerns
                   only: [:id, :is_header],
                   include: {
                     checklist_cells: {
-                      only: [:id, :value, :checklist_header_item_id, :options, :checklist_row_id]
+                      only: [:id, :value, :checklist_header_item_id, :options, :checklist_row_id, :data_type]
                     },
                     attachments: {
                       only: [:id, :caption, :owner_id],

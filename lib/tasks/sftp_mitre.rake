@@ -20,6 +20,7 @@ namespace :wbat_upload do
           path = File.join(Rails.root, "mitre", year, month)
           emp_groups = Dir.entries(path).select {|f| !File.directory? f}
           emp_groups.each do |emp_group|
+            count = 0
             from_path = File.join(path, emp_group)
             @log.info from_path
             target1 = File.join("/#{username}", airline)
@@ -33,12 +34,14 @@ namespace :wbat_upload do
             @log.info "Upload to #{target}"
             @log.info "Upload from #{from_path}"
             Dir.foreach(from_path) do |f|
-              @log.info "Checking #{f}"
               if f.include? "xml"
+                count += 1
+                @log.info "Checking #{f}"
                 sftp.upload!("#{from_path}/#{f}", target+"/"+f)
               end
             end
-            @log.info "Upload successful."
+            @log.info "Upload successful. Total Mitre Reports: #{count}"
+            @log.info "------------------------------------------------"
           end
         rescue StandardError => bang
           @log.info "Upload Failed."

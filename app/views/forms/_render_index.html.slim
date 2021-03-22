@@ -18,7 +18,7 @@
       - @object[:status].each do |status|
         li class="nav-item status-#{status.parameterize}"
           a data-toggle="pill" href="#table" onclick="loadContent('#{status}')"
-            = "#{status} <span class='badge badge-pill badge-info'>#{(@records_hash[status] || []).length}</span>".html_safe
+            = "#{status} <span class='badge badge-pill badge-info'>#{@counts_for_each_status[status]}</span>".html_safe
 
     .tab-content.mt20
       .tab-pane.fade.in.active id='table'
@@ -51,7 +51,9 @@ javascript:
       type: "POST",
       url: '#{eval("load_records_#{controller_name}_path")}?status=' + status,
       data: {
-        ids: "#{escape_javascript(raw @records_id)}"
+        status: status,
+        count: JSON.parse('#{raw @counts_for_each_status.to_json}')[status] || '#{Object.const_get(controller_name.classify).count}',
+        advance_search: JSON.parse('#{raw params.to_json}')
       },
       beforeSend: function(){$(".records-table").css({'opacity':0.5}); $('#loader1').show();},
       success: function(data){$('.records-table').html(data);},

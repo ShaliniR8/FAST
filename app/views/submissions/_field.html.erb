@@ -62,14 +62,14 @@
           <%end%>
         <%end%>
       <%elsif field.display_type == "checkbox"%>
-        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%> <%=required%>" name="<%=field.max_options%>">
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">
                 <label class="checkbox">
                   <%=rf.check_box :value,
-                    {:multiple => true, :class => "checkbox"},
-                    option, nil%>
+                  {:multiple => true, :class => "checkbox_mul field_cb_select", 'data-option' => option.parameterize, 'data-id' => field.id},
+                  option, nil%>
                   <%=option%>
                 </label>
               </div>
@@ -77,12 +77,12 @@
           </div>
         </div>
       <%elsif field.display_type == "radio"%>
-        <div  class="<%=field.display_size == 12%> <%=field.show_label ? 'mt5' : ''%>">
+        <div  class="<%=field.display_size == 12%> <%=field.show_label ? 'mt5' : ''%> <%=required%>">
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <div class="col-xs-6">
                 <label class="radio">
-                  <%=rf.radio_button :value, option%>
+                  <%=rf.radio_button :value, option, :class => "radio_req field_rb_select", 'data-option' => option.parameterize, 'data-id' => field.id%>
                   <%=option%>
                 </label>
               </div>
@@ -178,7 +178,7 @@
         <%end%>
       <%elsif field.display_type == "checkbox"%>
         </br>
-        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%> <%=required%>" name="<%=field.max_options%>">
           <%current_options = @record_field.value.split(";") rescue ''%>
           <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
@@ -187,7 +187,10 @@
                   <%=rf.check_box :value,
                     {
                       :multiple => true,
-                      :checked => current_options.include?(option)
+                      :checked => current_options.include?(option),
+                      :class => "checkbox_mul field_cb_select",
+                      'data-option' => option.parameterize,
+                      'data-id' => field.id
                     },
                     option,
                     nil%>
@@ -201,11 +204,12 @@
 
       <!-- Render Radio button groups -->
       <%elsif field.display_type == "radio"%>
-        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%>">  <div class="col-xs-12">
+        <div class="<%=field.display_size == 12%> row <%=field.show_label ? 'mt5' : ''%> <%=required%>">
+          <div class="col-xs-12">
             <%field.getOptions.each do |option|%>
               <label class="radio">
                 <div class="col-xs-6">
-                  <%=rf.radio_button :value, option%>&nbsp<%=option%>
+                  <%=rf.radio_button :value, option, :class => "radio_req field_rb_select", 'data-option' => option.parameterize, 'data-id' => field.id%>&nbsp<%=option%>
                 </div>
               </label>
             <%end%>

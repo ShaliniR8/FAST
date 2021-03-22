@@ -35,4 +35,14 @@ class RecordField < ActiveRecord::Base
       (self.value.split(";").select{|x| x.present?}.join(",  ") rescue '') :
       (self.value.gsub(/\n/, '<br/>').html_safe rescue '')
   end
+
+
+  def get_eccairs_value
+    if field.custom_option.present? && field.custom_option.eccairs_mapping.present?
+      custom_option = field.custom_option
+      custom_option.eccairs_mapping.split(';')[custom_option.options.split(';').find_index(value)]
+    else
+      value
+    end
+  end
 end

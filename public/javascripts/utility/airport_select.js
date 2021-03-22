@@ -2,7 +2,7 @@
 // 	$(window).resize();
 // 	build_airport_table();
 // 	$(this).find(".airport_button").each(function(index, item){
-// 		$(item).on("click", function(){			
+// 		$(item).on("click", function(){
 // 			var field_id = $(this).prop('id');
 // 			$("#icao_code_select").val("");
 // 			$("#airports_table").html("");
@@ -13,7 +13,6 @@
 // 		});
 // 	});
 // });
-
 function build_airport_table(){
     airport_table=$('#airports').DataTable({
       "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],

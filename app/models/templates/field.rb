@@ -9,6 +9,13 @@ class Field < ActiveRecord::Base
   belongs_to :category,         :foreign_key => "categories_id",    :class_name => "Category"
   belongs_to :map_field,        :foreign_key => "map_id",           :class_name => "Field"
   belongs_to :parent_field,     :foreign_key => "nested_field_id",  :class_name => "Field"
+  belongs_to :custom_option,    :foreign_key => 'custom_option_id', :class_name => 'CustomOption'
+
+
+  has_many :eccairs_mappings, foreign_key: :field_id, class_name: 'EccairsMapping'
+  has_many :eccairs_attributes, :through => :eccairs_mappings
+  accepts_nested_attributes_for :eccairs_mappings, reject_if: proc { |attributes| attributes["eccairs_attribute_id"].blank? }
+
 
   scope :nested, -> {where('nested_field_id is not null').order(category_order: :asc)}
   scope :non_nested, -> {where('nested_field_id is null').order(category_order: :asc)}
@@ -29,7 +36,11 @@ class Field < ActiveRecord::Base
 
   def get_label
     if self.show_label
-      self.label
+      if self.display_type == 'checkbox' && self.required
+        label = self.label + " (Minimum #{self.max_options})"
+      else
+        self.label
+      end
     else
       nil
     end
@@ -49,7 +60,7 @@ class Field < ActiveRecord::Base
       "Employee Select Field"         => "employee",
       "Autocomplete Field"        => "datalist",
       "Text Field"      => "text",
-      #{}"Radio Button"   => "radio",
+      "Radio Button"   => "radio",
       "Drop Down Menu"  => "dropdown",
       "Check Boxes"       => "checkbox",
       "Text Area"       => "textarea"
@@ -113,7 +124,13 @@ class Field < ActiveRecord::Base
     if self.data_type=="timezone"
       ActiveSupport::TimeZone.all.map(&:name)
     else
-      self.options.split(";")
+      if options.present?
+        options.split(";")
+      elsif custom_option_id.present?
+        CONFIG.custom_options_by_id[custom_option_id].options.split(';')
+      else
+        []
+      end
     end
   end
 
@@ -128,7 +145,5 @@ class Field < ActiveRecord::Base
   def get_field_data_type
     "#{custom_id}-#{data_type}"
   end
-
-
 
 end

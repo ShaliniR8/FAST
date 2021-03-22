@@ -8,7 +8,7 @@
     <div class="panel-body" style="height:300px">
       <div class="row">
         <div class="col-xs-12">
-          <h5>Average Days to Complete: <%=CorrectiveAction.get_avg_complete%></h5>
+          <h5>Average Days to Complete: <%=@corrective_actions_scheduled_completion_date%></h5>
         </div>
       </div>
       <div id="cas" style="width: 100%"></div>
@@ -39,7 +39,7 @@
     });
     cas_chart.draw(google.visualization.arrayToDataTable(data), cas_options);
     google.visualization.events.addListener(cas_chart, 'select', function(){
-      var all_status=<%=raw @corrective_actions.keys%>
+      var all_status=<%=raw @grouped_corrective_actions.keys%>
       var root_url="<%=corrective_actions_path%>?status="
       var selection = cas_chart.getSelection();
       var message = "";

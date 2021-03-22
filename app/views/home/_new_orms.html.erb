@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="panel-body" style="overflow-y:auto;overflow-x:hidden">
-      <%@orm_templates.each do |x|%>
+      <%(@orm_templates || []).each do |x|%>
         <div class="col-xs-12 col-lg-4">
           <%=link_to x.name,
                     new_orm_submission_path(:template => x),

@@ -63,19 +63,19 @@ class ProsafetBase < ActiveRecord::Base
 
 
   def get_risk_classification
-    risk_factor.split('-').reject(&:empty?).first rescue risk_factor
+    risk_factor.split('-').reject(&:empty?).first.strip rescue risk_factor
   end
 
   def get_risk_score
-    risk_factor.split('-').reject(&:empty?).second rescue ''
+    risk_factor.split('-').reject(&:empty?).second.strip rescue ''
   end
 
   def get_risk_classification_after
-    risk_factor_after.split('-').reject(&:empty?).first rescue risk_factor_after
+    risk_factor_after.split('-').reject(&:empty?).first.strip rescue risk_factor_after
   end
 
   def get_risk_score_after
-    risk_factor_after.split('-').reject(&:empty?).second rescue ''
+    risk_factor_after.split('-').reject(&:empty?).second.strip rescue ''
   end
 
   # find the occurrence template to match

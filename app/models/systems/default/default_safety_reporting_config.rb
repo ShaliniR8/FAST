@@ -14,15 +14,16 @@ class DefaultSafetyReportingConfig
     template_nested_fields:           true,      # WIP nested smart forms functionality - default off
     enable_dual_report:               true,
     matrix_carry_over:                false,
-    attach_pdf_submission:            false,
     configurable_agenda_dispositions: false,
     share_meeting_agendas:            true,
 
     # Airline-Specific Features:
-    observation_phases_trend: false,     # Specific Feature for BSK - default off
-    event_summary:            false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
-    event_tabulation:         false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
-    allow_event_reuse:        true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
+    attach_pdf_submission:     'ided',    # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
+    observation_phases_trend:  false,     # Specific Feature for BSK - default off
+    event_summary:             false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
+    event_tabulation:          false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
+    allow_event_reuse:         true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
+    dropdown_event_title_list: false,     # Specific Feature for FFT - default off
   }
 
   OBSERVATION_PHASES = [
@@ -44,7 +45,7 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true, field: 'get_id' },
           template: { default: true, title: 'Submission Type' },
-          submitter: { default: true, visible: "admin" },
+          submitter: { default: true, visible: "admin,query,index" },
           event_date: { default: true },
           description: { default: true },
         }.reduce({}) { |acc,(key,data)|
@@ -87,7 +88,7 @@ class DefaultSafetyReportingConfig
             },
           },
         }),
-        panels: %i[]
+        panels: %i[causes].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
 
@@ -99,7 +100,7 @@ class DefaultSafetyReportingConfig
           id: { default: true, field: 'get_id' },
           status: { default: true },
           template: { default: true, title: 'Type' },
-          submitter: { default: true, visible: "admin,query" },
+          submitter: { default: true, visible: "admin,query,index" },
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
@@ -163,14 +164,14 @@ class DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[occurrences sras investigations
+        panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
       'Report' => {
         title: 'Event',
         status: ['New', 'Meeting Ready', 'Under Review', 'Closed', 'All'],
-        preload: [ :attachments, :occurrences, :records => [:created_by]],
+        preload: [ :attachments, :occurrences, :records => [:created_by, :report] ],
         fields: {
           id: { default: true, visible: 'index,meeting_form,show' },
           status: { default: true, visible: 'index,meeting_form,show' },
@@ -263,7 +264,7 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },
-          occurrences: {default: true, title: "(Report.find_top_level_section.label rescue '')"},
+          occurrences: {default: true, title: (Report.find_top_level_section.label rescue '')},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Report.find_top_level_section.label rescue nil}"},
@@ -295,13 +296,13 @@ class DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[occurrences sras investigations
+        panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
         print_panels: %w[risk_matrix occurrences corrective_actions records]
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',
-        status: ['New', 'Assigned', 'Completed', 'Pending Approval', 'All'],
+        status: ['New', 'Assigned', 'Completed', 'Pending Approval', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :verifications,
@@ -360,7 +361,7 @@ class DefaultSafetyReportingConfig
           },
           immediate_action: {
             field: 'immediate_action', title: 'Immediate Action Detail',
-            num_cols: 12, type: 'text', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
           bcomprehensive_action: {
@@ -370,7 +371,7 @@ class DefaultSafetyReportingConfig
           },
           comprehensive_action: {
             field: 'comprehensive_action', title: 'Comprehensive Action Detail',
-            num_cols: 10, type: 'text', visible: 'form,show',
+            num_cols: 10, type: 'textarea', visible: 'form,show',
             required: false
           },
           action: {

@@ -52,6 +52,19 @@ class Record < Sr::SafetyReportingBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Record'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                           .map { |key, _| key.to_s }
+
+    keys[keys.index('submitter')] = 'users.full_name' if keys.include? 'submitter'
+    keys[keys.index('template')] = 'templates.name' if keys.include? 'template'
+    keys[keys.index('occurrences')] = 'occurrences.value' if keys.include? 'occurrences'
+
+    keys
+  end
+
+
   def self.progress
     {
       "New"       => { :score => 25,  :color => "default"},
@@ -380,10 +393,13 @@ class Record < Sr::SafetyReportingBase
   end
 
   def self.export_all
-    date_from = Time.now.at_beginning_of_month
+    date_from = (Time.now - 1.month).at_beginning_of_month
+    date_to = (Time.now - 1.month).end_of_month
+
+    all_records = Record.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).where([
+"event_date >= ? and event_date <= ?", date_from, date_to])
 
     all_record_fields = []
-    all_records = self.includes(template: { categories: :fields }).where(templates:{report_type: 'asap'}).select { |record| record.event_date > date_from rescue false }
     all_records.each { |record| all_record_fields << record.record_fields.map{|sf| [sf.fields_id, sf]} }
     all_record_fields = all_record_fields.flatten(1).to_h
 
@@ -417,5 +433,46 @@ class Record < Sr::SafetyReportingBase
 
     additional_info
   end
+
+
+  def eccairs_export
+
+    field_content = {}
+    self.record_fields.each do |record_field|
+      record_field.field.eccairs_attributes.each do |attribute|
+        field_content[attribute] = record_field
+      end
+    end
+
+    occurrence_content = self.template
+      .fields.map(&:eccairs_attributes)
+      .flatten.compact
+      .group_by{|x| x.entity_synonym}
+
+    attributes = occurrence_content["Occurrence"]
+    occurrence_content.delete("Occurrence")
+    entities = occurrence_content
+
+
+    path = ['integrations', 'eccairs']
+    dirname = File.join([Rails.root] + path)
+    temp_file = File.join([Rails.root] + path + ["Occurrence_#{self.id}.xml"])
+    FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
+    File.open(temp_file, 'w') do |file|
+      file << ApplicationController.new.render_to_string(
+        template: 'records/eccairs_template.xml.erb',
+        locals: {
+          template: self.template,
+          record: self,
+          entities: entities,
+          attributes: attributes,
+          field_content: field_content,
+        }
+      )
+    end
+
+  end
+
+
 
 end

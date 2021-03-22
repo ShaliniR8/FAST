@@ -2,24 +2,26 @@
 # This method is a "monkey patch" that can fix the issue (tested for Rails 3.0.x)
 # Source: https://github.com/rails/rails/issues/11026
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "2.0.0"
-    module ActiveRecord
-        module Associations
-            class AssociationProxy
-                def send(method, *args)
-                    if proxy_respond_to?(method, true)
-                        super
-                    else
-                        load_target
-                        @target.send(method, *args)
-                    end
-                end
-            end
+  module ActiveRecord
+    module Associations
+      class AssociationProxy
+        def send(method, *args)
+          if proxy_respond_to?(method, true)
+            super
+          else
+            load_target
+            @target.send(method, *args)
+          end
         end
+      end
     end
+  end
 end
+
 class TemplatesController < ApplicationController
   # before_filter :login_required
   before_filter :oauth_load # Kaushik Mahorker KM
+
 
   def index
     @title = "Safety Reports Templates"
@@ -29,11 +31,14 @@ class TemplatesController < ApplicationController
     @records = Template.find(:all)
   end
 
+
   def new
-    @all_templates=Template.find(:all)
-    @template=Template.new
-    @action="new"
+    @all_templates = Template.find(:all)
+    @template = Template.new
+    @action = "new"
+    @eccairs_attributes = EccairsAttribute.all
   end
+
 
   def clone
     @owner = Template.find(params[:id])
@@ -43,10 +48,12 @@ class TemplatesController < ApplicationController
 
 
   def edit
-    @all_templates=Template.find(:all)
-    @template=Template.find(params[:id])
-    @action="edit"
+    @all_templates = Template.all
+    @template = Template.find(params[:id])
+    @action = "edit"
+    @eccairs_attributes = EccairsAttribute.all
   end
+
 
   def create
     @template=Template.new(params[:template])
@@ -66,12 +73,14 @@ class TemplatesController < ApplicationController
     end
   end
 
+
   def show
     @template=Template.find(params[:id])
     @users=User.find(:all)
     @users.keep_if{|u| !u.disable }
     @headers=User.get_headers
   end
+
 
   def archive
     @template = Template.find(params[:id])
@@ -88,7 +97,6 @@ class TemplatesController < ApplicationController
   end
 
 
-
   def show_nested(field_id=nil)
     field_id ||= params[:field_id]
     @field = Field.find(field_id)
@@ -99,6 +107,7 @@ class TemplatesController < ApplicationController
       format.js {render "/templates/show_nested_fields", layout: false}
     end
   end
+
 
   def edit_nested_fields
     @field = Field.find(params[:field_id])

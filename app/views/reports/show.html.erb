@@ -127,6 +127,23 @@
                   "data-placement" => "top",
                   :title => "This will mark the Event \"Meeting Ready\" so that it can be added to Meetings"%>
               <%end%>
+              <%is_multiple_addition_allowed = CONFIG.sr::GENERAL[:allow_event_reuse].present?%>
+              <%if %w[New Closed].exclude?(@report.status) && ((!@meeting_ids.present? && !is_multiple_addition_allowed) || (is_multiple_addition_allowed))%>
+                <%if is_multiple_addition_allowed
+                    btn_title = "Add To Meeting(s)"
+                    tooltip_title = "This will open a pop-up allowing you to add this Event directly to one or more open Meetings"
+                  else
+                    btn_title = "Add To Meeting"
+                    tooltip_title = "This will open a pop-up allowing you to add this Event directly to an open Meeting"
+                  end
+                %>
+                <%=link_to btn_title,
+                  "#",
+                  :class=>"btn btn-darkturquoise pull-right mb5 ml5 add_to_meeting_btn",
+                  "data-toggle" => "tooltip",
+                  "data-placement" => "top",
+                  :title => tooltip_title%>
+              <%end%>
               <%if @report.can_close?(current_user)%>
                 <%=link_to 'Close Event', '#',
                   :class => 'btn btn-danger close_event_btn pull-right ml5 mb5',
@@ -148,8 +165,8 @@
 
           <%=render "closing_note"%>
           <%=render "record_table"%>
-          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
           <%=render '/panels/show_panels', owner: @report%>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
 
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>
@@ -212,7 +229,7 @@
 
 
 <script>
-  $(document).ready(function(){
+  $(document).ready(function() {
     $('#launch_btn').on('click',function(){
       $(".modal-content").html('');
       $.get("<%= eval("launch_report_path(@report)")%>", function(data){
@@ -251,6 +268,60 @@
         $(window).trigger('resize');
       });
     });
+
+    $('.add_to_meeting_btn').on('click', function() {
+      swal({
+        allowOutsideClick: false,
+        showCancelButton: false,
+        showConfirmButton: false,
+        html: "<%= escape_javascript render :partial => 'reports/add_to_meeting', :layout => false, :locals => {:meeting_ids => @meeting_ids, :report => @report}%>",
+        onOpen: function() {
+          $("tr").on('click', function() {
+            id = $(this).attr('id');
+            $('.meetings').each(function() {
+              if($(this).attr('id') == id) {
+                if ($(this).is(':checked')) {
+                  $(this).prop('checked', false);
+                  $(this).closest('td').find('strong').first().css("color", "red");
+                  $(this).closest('td').find('strong').first().html("Not Added");
+                } else {
+                  $(this).prop('checked', true);
+                  $(this).closest('td').find('strong').first().css("color", "green");
+                  $(this).closest('td').find('strong').first().html("To be Added");
+                }
+              }
+            });
+          });
+
+          $('.close_modal_btn').on('click', function(){
+            swal.close();
+          });
+        }
+      });
+    });
   });
+
+  function getMeetings() {
+    let multiple_meetings_allowed = <%=CONFIG.sr::GENERAL[:allow_event_reuse]%>;
+    let meeting_items = '';
+    let meeting_elems = $("input.meetings:checked");
+
+    meeting_elems.each(function(index, elem){
+        meeting_items += $(elem).val() + ",";
+    });
+
+    if (multiple_meetings_allowed) {
+      $('#meetings_selected').val(meeting_items);
+      return true;
+    } else {
+      if (meeting_elems.length > 1) {
+        alert('Please select ONE meeting only!');
+        return false;
+      } else {
+        $('#meetings_selected').val(meeting_items);
+        return true;
+      }
+    }
+  }
 </script>
 

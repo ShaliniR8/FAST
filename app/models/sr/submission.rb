@@ -19,8 +19,8 @@ class Submission < Sr::SafetyReportingBase
 
   accepts_nested_attributes_for :submission_fields
 
-  after_create :make_report
-  after_update :make_report
+  # after_create :make_report  # Logic moved to Submissions Controller create & update methods
+  # after_update :make_report
 
   def create_transaction(action: nil, context: nil)
     Transaction.build_for(
@@ -48,8 +48,29 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Submission'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                               .map { |key, _| key.to_s }
+
+    keys[keys.index('submitter')] = 'users.full_name' if keys.include? 'submitter'
+    keys[keys.index('template')] = 'templates.name' if keys.include? 'template'
+
+    keys
+  end
+
+
   def getEventId
     record.report.id rescue nil
+  end
+
+
+  def get_matching_record_id
+    if completed && records_id.present?
+      records_id
+    else
+      id
+    end
   end
 
 

@@ -8,6 +8,7 @@
         </p>
       </div>
     </div>
-    <%=render "/shared/record_table_modal", :create_new => false%>
+    <%eccairs_integrated = CONFIG::GENERAL[:integrations].include?('eccairs')%>
+    <%=render "/shared/record_table_modal", :create_new => eccairs_integrated%>
   </div>
 </div>

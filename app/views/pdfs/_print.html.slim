@@ -5,12 +5,13 @@
   - name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
   - owner_name = name_mapping.present? ? name_mapping : owner_class_name
   - source_of_input = defined?(source_of_input) && source_of_input
+  - owner_title = owner.title rescue ''
   - if source_of_input
     .title Source of Input:
-    .col-xs-12.sub_title = "#{owner_name} ##{owner.get_id}: #{owner.title}"
+    .col-xs-12.sub_title = "#{owner_name} ##{owner.get_id}: #{owner_title}"
   - else
     .title
-      =< "#{owner_name} ##{owner.get_id}: #{owner.title}"
+      =< "#{owner_name} ##{owner.get_id}: #{owner_title}"
   .content
     - fields = Object.const_get(owner.class.to_s).get_meta_fields('show')
     = render '/pdfs/print_fields',

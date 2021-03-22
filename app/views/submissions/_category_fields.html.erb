@@ -25,16 +25,54 @@
                 <%=render "/submissions/field", is_nested_field: false, field: field, f: f%>
 
                 <%if field.nested_fields.where(:deleted => false).present?%>
-                  <div class="col-xs-12 nested_field_row">
-                    <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
-                      <div class="nested_field
-                        nested_field_<%=field.id%>
-                        nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                        style="display:none;">
-                        <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+
+                    <%field.nested_fields.where(:deleted => false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
+
+                      <div class="col-xs-12 nested_field_row">
+
+                        <%nested_fields.each do |nested_field|%>
+
+                          <%size = calculate_column_size(field: nested_field)%>
+                          <%if @record.present?%>
+                            <%record_field = @record.submission_fields.where("fields_id = ?", field.id).first%>
+                            <%if record_field.present? && record_field.value.present?%>
+                              <%if (record_field.value.parameterize == nested_field.nested_field_value.parameterize) ||
+                                   (record_field.value.include?(';') && record_field.value.include?(nested_field.nested_field_value))%>
+                                   <div class="<%=size%> nested_field
+                                      nested_field_<%=field.id%>
+                                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
+                                      <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+                                    </div>
+                              <%else%>
+                                <div class="<%=size%> nested_field
+                                  nested_field_<%=field.id%>
+                                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
+                                  style="display:none;">
+                                  <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+                                </div>
+                              <%end%>
+                            <%else%>
+                              <div class="<%=size%> nested_field
+                                nested_field_<%=field.id%>
+                                nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
+                                style="display:none;">
+                                <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+                              </div>
+                            <%end%>
+                          <%else%>
+                            <div class="<%=size%> nested_field
+                              nested_field_<%=field.id%>
+                              nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
+                              style="display:none;">
+                              <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+                            </div>
+                          <%end%>
+                        <%end%>
                       </div>
+
+
                     <%end%>
-                  </div>
+
                 <%end%>
 
               <%end%>
@@ -61,7 +99,7 @@
   .row.is-flex > [class*='col-'] {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   .row.is-flex > .nested_field_row {
@@ -106,12 +144,53 @@
 
     $(".field_select").on("change", function(){
       update_nested_fields($(this));
+      update_panel_titles($(this));
     });
 
     $(".required_field").css('border-color', '');
-    $(".required_field").closest('.form-group').find('label').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').css("color", "red");
-    $(".required_field").closest('div.category-panel').find('.panel-title').value = "*" ;
+    $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
 
+    $(".field_cb_select").on("change", function(){
+      var field_id = $(this).attr("data-id");
+      var field_value = $(this).attr("data-option");
+      if ($(this).prop('checked')) {
+        $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).show();
+      } else {
+        $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).hide();
+      }
+      update_panel_titles($(this));
+    });
+
+    $(".field_rb_select").on("change", function(){
+      var field_id = $(this).attr("data-id");
+      var field_value = $(this).attr("data-option");
+      $(".nested_field_" + field_id).hide();
+      if ($(this).prop('checked')) {
+        $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).show();
+      } else {
+        $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
+        $(".nested_field_" + field_id + "_" + field_value).hide();
+      }
+      update_panel_titles($(this));
+    });
   });
+
+  function update_panel_titles(target){
+    var count = 0;
+    $(target).closest('div.category-panel').find('.required_field').each(function(){
+      if ($(this).is(':visible')) {
+        count++;
+      }
+    });
+    if (count > 0) {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
+      $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
+    } else {
+      $(target).closest('div.category-panel').find('.panel-title').css("color", "");
+      $(target).closest('div.category-panel').find('.panel-title').value = "" ;
+    }
+  }
 </script>

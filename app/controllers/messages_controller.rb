@@ -1,3 +1,24 @@
+# Current version of Ruby (2.1.1p76) and Rails (3.0.5) defines send s.t. saving nested attributes does not work
+# This method is a "monkey patch" that can fix the issue (tested for Rails 3.0.x)
+# Source: https://github.com/rails/rails/issues/11026
+if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "2.0.0"
+  module ActiveRecord
+    module Associations
+      class AssociationProxy
+        def send(method, *args)
+          if proxy_respond_to?(method, true)
+            super
+          else
+            load_target
+            @target.send(method, *args)
+          end
+        end
+      end
+    end
+  end
+end
+
+
 class MessagesController < ApplicationController
   before_filter :oauth_load
 
@@ -47,6 +68,8 @@ class MessagesController < ApplicationController
       end
     end
 
+    no_of_attachments = params[:message][:attachments_attributes].present? ? params[:message][:attachments_attributes].size : 0
+
     # send messages
     call_rake 'notify',
       messages_id: @message.id,
@@ -55,7 +78,9 @@ class MessagesController < ApplicationController
       subject: params[:message][:subject],
       send_to: params[:send_to],
       cc_to: params[:cc_to],
-      to_anonymous: params[:to_anonymous]
+      to_anonymous: params[:to_anonymous],
+      attach_pdf: (params[:attach_pdf] || false),
+      extra_attachments: no_of_attachments
 
     if @message.owner
       Transaction.build_for(

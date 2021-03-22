@@ -110,7 +110,9 @@
               </div>
             </div>
           </div>
-          <%=render "all_reports"%>
+          <%if !defined? hide_extra%>
+            <%=render "all_reports"%>
+          <%end%>
         </div>
 
         <%=render "/forms/show_comment", :owner => @meeting%>
@@ -141,6 +143,7 @@
             </div>
           </div>
         </div>
+
         <%=render "/forms/attachments_show", :owner => @meeting%>
         <%=render "records/transactions", :owner => @meeting%>
       </div>
@@ -206,5 +209,19 @@
       });
     });
 
+    $(".modal").on("shown.bs.modal", alignModal);
+
+    $(window).on("resize", function(){
+        $(".modal:visible").each(alignModal);
+    });
   });
+
+  function alignModal() {
+    var modalDialog = $(this).find(".modal-dialog");
+    if (parseInt(modalDialog.height()) > parseInt($(window).height())){
+      modalDialog.css("margin-top", Math.max(-250, ($(window).height() - modalDialog.height()) / 2));
+    } else {
+      modalDialog.css("margin-top", -250);
+    }
+  }
 </script>

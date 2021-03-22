@@ -6,7 +6,6 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
     enable_dual_report:       false,
     submission_time_zone:     true,
     matrix_carry_over:        true,
-    attach_pdf_submission:    true,
     share_meeting_agendas:    false,
     # Airline-Specific Features:
   })
@@ -14,9 +13,6 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
     objects:{
       'Submission' => {
-        fields: {
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
-        },
         actions: {
           pdf: {
             access: proc { |owner:,user:,**op|
@@ -27,9 +23,6 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
         },
       },
       'Record' => {
-        fields: {
-          submitter: { default: true, visible: "admin#{GENERAL[:show_submitter_name] ? ',index,show' : ''}" },
-        },
         actions: {
           pdf: {
             access: proc { |owner:,user:,**op|

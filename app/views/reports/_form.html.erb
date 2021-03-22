@@ -27,15 +27,8 @@
       <div class="panel-body" id="form_body">
         <%=form_for @report, :html => {:multipart => true} do |f|%>
 
-          <%=render "shared/privilege_form",
-            :target => "report[privileges][]",
-            :owner => @report,
-            :f => f%>
-
-          <%=render '/forms/form_fields',
-            :fields => @fields,
-            :f => f,
-            :record => @report%>
+          <%=render "shared/privilege_form", target: "report[privileges][]", owner: @report, f: f%>
+          <%=render '/forms/form_fields', fields: @fields, f: f, record: @report%>
 
           <div class="col-xs-12 mt10">
             <div class="panel panel-success">
@@ -43,6 +36,20 @@
                 <div class="panel-title"><b>Included Reports</b></div>
               </div>
               <div class="panel-body">
+
+                <%btns = [
+                  {btn_name: '<span class="glyphicon glyphicon-search"></span>', btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
+                  {btn_name: '<span class="glyphicon glyphicon-remove"></span>', btn_path: '#', btn_class: 'btn btn-danger action-btn mr5'},
+                ]%>
+
+                <%=render 'forms/show_fields_table_view',
+                  fields: @report_fields,
+                  records: @report.records,
+                  table_id: 'included',
+                  btns: btns%>
+
+
+                <%if false%>
                 <div class="table-responsive">
                   <table id="included" class="table table-bordered">
                     <thead>
@@ -85,6 +92,7 @@
                     </tbody>
                   </table>
                 </div>
+                <%end%>
               </div>
             </div>
           </div>
@@ -95,6 +103,23 @@
                 <div class="panel-title"><b>Available Reports</b></div>
               </div>
               <div class="panel-body">
+
+
+                <%btns = [
+                  {btn_name: '<span class="glyphicon glyphicon-search"></span>', btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
+                  {btn_name: '<span class="glyphicon glyphicon-plus"></span>', btn_path: '#', btn_class: 'btn btn-warning action-btn mr5'},
+                ]%>
+
+                <%=render 'forms/show_fields_table_view',
+                  fields: @report_fields,
+                  records: @candidates,
+                  table_id: 'candidates',
+                  btns: btns%>
+
+
+
+
+                <%if false%>
                 <div class="table-responsive">
                   <table id="candidates" class="table table-bordered">
                     <thead>
@@ -137,11 +162,13 @@
                     </tbody>
                   </table>
                 </div>
+                <%end%>
+
+
+
               </div>
             </div>
           </div>
-
-          <%#=render '/root_causes/root_causes_form_panel', f: f, owner: @report %>
 
           <%=render '/forms/attachments_form', :f => f, :owner => @report%>
 
@@ -154,7 +181,7 @@
             <%=link_to "Cancel",
               @action == "new" ? root_url : report_path(@report),
               :id => "cancel-btn",
-              :class => "mr5 btn btn-warning pull-right",
+              :class => "mr5 btn btn-default pull-right",
               :confirm => 'Are you sure?'%>
             <%=link_to "Group Access",
               "#",
@@ -192,6 +219,7 @@
       "aaSorting": [[0, "desc"]],
       "columnDefs": [{ type: 'natural', targets: 0 }],
     });
+
     $("#candidates").dataTable({
       "aaSorting": [[0, "desc"]],
       "columnDefs": [{ type: 'natural', targets: 0 }],

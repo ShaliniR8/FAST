@@ -45,20 +45,36 @@ class SubmissionsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        object_name = controller_name.classify
-        @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-        @table = Object.const_get(object_name).preload(@object[:preload]).where("completed is true")
+        @object_name = controller_name.classify
+        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+
+        @table_name = Object.const_get(@object_name).table_name
         @default_tab = params[:status]
 
-        records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-        handle_search if params[:advance_search].present?
-        records = @records.to_a & records.to_a if @records.present?
+        @columns = get_data_table_columns(controller_name.classify)
+        if !CONFIG.sr::GENERAL[:show_submitter_name]
+          if !current_user.global_admin?
+            @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+          end
+        else
+          if !current_user.admin?
+            @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+          end
+        end
 
-        @records_hash = { 'All' => records }
-        @records_id   = { 'All' => records.map(&:id) }
+        @column_titles = @columns.map { |col| col[:title] }
+
+        @column_date_type = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+        }.select(&:present?)
+
+        @advance_search_params = params
+
+        render 'forms/index'
       end
       format.json { index_as_json }
     end
+  end
 
     # respond_to do |format|
     #   format.html do
@@ -102,7 +118,7 @@ class SubmissionsController < ApplicationController
     #   end
     #   format.json { index_as_json }
     # end
-  end
+  # end
 
 
   def handle_detailed_search
@@ -195,6 +211,13 @@ class SubmissionsController < ApplicationController
   end
 
 
+  def discard
+    @record=Submission.find(params[:id])
+    @record.destroy
+    redirect_to submissions_path(status: 'All'), flash: {danger: "Submission ##{params[:id]} deleted."}
+  end
+
+
   def create
     params[:submission][:submission_fields_attributes].each_value do |field|
       if field[:value].is_a?(Array)
@@ -203,6 +226,12 @@ class SubmissionsController < ApplicationController
       end
     end
 
+    create_notice = true
+    if params[:is_autosave].present? && params[:is_autosave] == "2"
+      params[:commit] = 'Save for Later'
+      params[:submission].delete(:attachments_attributes)
+      create_notice = false
+    end
     # edge case for the mobile app
     # if the user submits a new submission in offline mode,
     # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
@@ -211,42 +240,68 @@ class SubmissionsController < ApplicationController
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
 
-
     if params[:submission][:attachments_attributes].present?
-      params[:submission][:attachments_attributes].each do |key, attachment|
+      if session[:platform] == Transaction::PLATFORMS[:mobile]
+        params[:submission][:attachments_attributes].each do |key, attachment|
         # File is a base64 string
-        if attachment[:name].present? && attachment[:name].is_a?(Hash)
-          file_params = attachment[:name]
+          if attachment[:name].present? && attachment[:name].is_a?(Hash)
+            file_params = attachment[:name]
 
-          temp_file = Tempfile.new('file_upload')
-          temp_file.binmode
-          temp_file.write(Base64.decode64(file_params[:base64]))
-          temp_file.rewind()
+            temp_file = Tempfile.new('file_upload')
+            temp_file.binmode
+            temp_file.write(Base64.decode64(file_params[:base64]))
+            temp_file.rewind()
 
-          file_name = file_params[:fileName]
-          mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+            file_name = file_params[:fileName]
+            mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
 
-          uploaded_file = ActionDispatch::Http::UploadedFile.new(
-            :tempfile => temp_file,
-            :filename => file_name,
-            :type     => mime_type)
+            uploaded_file = ActionDispatch::Http::UploadedFile.new(
+              :tempfile => temp_file,
+              :filename => file_name,
+              :type     => mime_type)
 
-          # Replace attachment parameter with the created file
-          params[:submission][:attachments_attributes][key][:name] = uploaded_file
+            # Replace attachment parameter with the created file
+            params[:submission][:attachments_attributes][key][:name] = uploaded_file
+          end
+        end
+      else
+        params[:submission][:attachments_attributes].each do |key, attachment|
+          if attachment[:name].present?
+            params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+          else
+            params[:submission][:attachments_attributes].delete(key)
+          end
         end
       end
     end
-
     event_date_to_utc
 
-    @record = Submission.new(params[:submission])
+    if params[:present_id].present?
+      saved = false
+      @record = Submission.find(params[:present_id])
+      if !@record.completed
+        sub_fields = SubmissionField.where("submissions_id=?", params[:present_id])
+        sub_fields.map(&:destroy)
+        @record.submission_fields = []
+        @record.save
+        saved = @record.update_attributes(params[:submission])
+      end
+    else
+      @record = Submission.new(params[:submission])
+      saved = @record.save
+    end
 
-    if @record.save
-      notify_notifiers(@record, params[:commit])
+    if saved.present?
+      if create_notice
+        notify_notifiers(@record, params[:commit])
+      end
+
       if params[:commit] == 'Submit'
+        @record.make_report
         @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         if params[:create_copy] == '1'
           converted = @record.convert
+          converted.make_report
           converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
         end
@@ -258,11 +313,12 @@ class SubmissionsController < ApplicationController
           flash = { success: 'Submission submitted.' }
           NotifyMailer.send_submitter_confirmation(current_user, @record)
           format.html { redirect_to submission_path(@record), flash: flash }
+          format.json { update_as_json(flash) }
         else
           flash = { success: 'Submission created in progress.' }
           format.html { redirect_to incomplete_submissions_path, flash: flash }
+          format.json {  render :json => { :result => 'success', :redirect => continue_submission_path(@record.id), :record_id => @record.id } }
         end
-        format.json { update_as_json(flash) }
       end
 
     else
@@ -279,8 +335,12 @@ class SubmissionsController < ApplicationController
     respond_to do |format|
       format.html do
         @meta_field_args = ['show']
-        @meta_field_args << 'admin' if current_user.global_admin?
         @record = Submission.preload(:submission_fields).find(params[:id])
+        if CONFIG.sr::GENERAL[:show_submitter_name] || current_user.global_admin?
+          template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
+          @meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.user_id == current_user.id
+        end
+
         if !@record.completed
           if @record.user_id == current_user.id
             redirect_to continue_submission_path(@record)
@@ -333,7 +393,7 @@ class SubmissionsController < ApplicationController
     pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    filename = "Submission_##{@record.get_id}" + (@deidentified ? '(de-identified)' : '')
+    filename = "Submission_##{@record.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}" + (@deidentified ? '(de-identified)' : '')
     send_data pdf.to_pdf, :filename => "#{filename}.pdf"
   end
 
@@ -349,28 +409,48 @@ class SubmissionsController < ApplicationController
       end
     end
 
+    @record = Submission.find(params[:id])
+    create_notice = true
+    if params[:is_autosave].present? && params[:is_autosave] == "2"
+      params[:commit] = 'Save for Later'
+      params[:submission].delete(:attachments_attributes)
+      create_notice = false
+    end
+
     if params[:submission][:attachments_attributes].present?
-      params[:submission][:attachments_attributes].each do |key, attachment|
+      if session[:platform] == Transaction::PLATFORMS[:mobile]
+        params[:submission][:attachments_attributes].each do |key, attachment|
         # File is a base64 string
-        if attachment[:name].present? && attachment[:name].is_a?(Hash)
-          file_params = attachment[:name]
-          temp_file = Tempfile.new('file_upload')
-          temp_file.binmode
-          temp_file.write(Base64.decode64(file_params[:base64]))
-          temp_file.rewind()
-          file_name = file_params[:fileName]
-          mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
-          uploaded_file = ActionDispatch::Http::UploadedFile.new(
-            :tempfile => temp_file,
-            :filename => file_name,
-            :type     => mime_type)
-          params[:submission][:attachments_attributes][key][:name] = uploaded_file
+          if attachment[:name].present? && attachment[:name].is_a?(Hash)
+            file_params = attachment[:name]
+
+            temp_file = Tempfile.new('file_upload')
+            temp_file.binmode
+            temp_file.write(Base64.decode64(file_params[:base64]))
+            temp_file.rewind()
+
+            file_name = file_params[:fileName]
+            mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+            uploaded_file = ActionDispatch::Http::UploadedFile.new(
+              :tempfile => temp_file,
+              :filename => file_name,
+              :type     => mime_type)
+
+            # Replace attachment parameter with the created file
+            params[:submission][:attachments_attributes][key][:name] = uploaded_file
+          end
+        end
+      else
+        params[:submission][:attachments_attributes].each do |key, attachment|
+          if attachment[:name].present?
+            params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+          else
+            params[:submission][:attachments_attributes].delete(key)
+          end
         end
       end
     end
-
-    @record = Submission.find(params[:id])
-
     # edge case for the mobile app
     # if the user submits an existing in progress submission in offline mode,
     # and also adds notes in offline mode, treat the commit as a Submit rather than Add Notes
@@ -383,30 +463,36 @@ class SubmissionsController < ApplicationController
 
     event_date_to_utc
 
-    if @record.update_attributes(params[:submission])
-      notify_notifiers(@record, params[:commit])
-      if params[:commit] == "Save for Later"
-        respond_to do |format|
-          flash = { success: "Submission ##{@record.id} updated." }
-          format.html { redirect_to incomplete_submissions_path, flash: flash }
-          format.json { update_as_json(flash) }
+    if !@record.completed || params[:commit] == 'Add Notes'
+      if @record.update_attributes(params[:submission])
+        if create_notice
+          notify_notifiers(@record, params[:commit])
         end
-      else
-        if params[:commit] == 'Add Notes'
-          @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+
+        if params[:commit] == "Save for Later"
+          respond_to do |format|
+            flash = { success: "Submission ##{@record.id} updated." }
+            format.html { redirect_to incomplete_submissions_path, flash: flash }
+            format.json { update_as_json(flash) }
+          end
         else
-          @record.create_transaction(action: 'Create', context: 'User Submitted Report')
-          NotifyMailer.send_submitter_confirmation(current_user, @record)
-        end
-        if params[:create_copy] == '1'
-          converted = @record.convert
-          converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
-          notify_notifiers(converted, params[:commit])
-        end
-        respond_to do |format|
-          flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
-          format.html { redirect_to submission_path(@record), flash: flash }
-          format.json { update_as_json(flash) }
+          if params[:commit] == 'Add Notes'
+            @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+          else
+            @record.make_report
+            @record.create_transaction(action: 'Create', context: 'User Submitted Report')
+            NotifyMailer.send_submitter_confirmation(current_user, @record)
+          end
+          if params[:create_copy] == '1'
+            converted = @record.convert
+            converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
+            notify_notifiers(converted, params[:commit])
+          end
+          respond_to do |format|
+            flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
+            format.html { redirect_to submission_path(@record), flash: flash }
+            format.json { update_as_json(flash) }
+          end
         end
       end
     end

@@ -1,7 +1,7 @@
 class Category < ActiveRecord::Base
 	belongs_to :template, foreign_key: "templates_id", class_name: "Template"
 	has_many :fields, foreign_key: "categories_id", class_name: "Field", :dependent => :destroy, :order => 'field_order ASC'
-	accepts_nested_attributes_for :fields
+  accepts_nested_attributes_for :fields, :reject_if => :checkbox_or_radio_invalid?
 
 
   scope :active, -> {where(deleted: 0).order(category_order: :asc)}
@@ -61,14 +61,12 @@ class Category < ActiveRecord::Base
 	def not_empty_for(record)
 		fields_id = fields.map(&:id)
 		if record.class.name.demodulize == 'Record'
-			field_values = RecordField
-				.where("records_id = ? and fields_id in (?) and value <> ?",
+			field_values = RecordField.where("records_id = ? and fields_id in (?) and value <> ?",
 				record.id,
 				fields_id,
 				'')
 		elsif record.class.name.demodulize == 'Submission'
-			field_values = SubmissionField
-				.where("submissions_id = ? and fields_id in (?) and value <> ?",
+			field_values = SubmissionField.where("submissions_id = ? and fields_id in (?) and value <> ?",
 				record.id,
 				fields_id,
 				'')
@@ -120,4 +118,22 @@ class Category < ActiveRecord::Base
 		end
 		false
 	end
+
+  def checkbox_or_radio_invalid?(field)
+    if field[:required] == true
+      case field[:display_type]
+      when 'checkbox'
+        return true unless field[:max_options].present? && field[:max_options].to_i >= 1 && field[:options].present?
+        return false if field[:options].split(';').size().to_i >= field[:max_options].to_i
+        return true
+      when 'radio'
+        return false if field[:options].split(';').size().to_i >= 1
+        return true
+      else
+        return false
+      end
+    else
+      return false
+    end
+  end
 end

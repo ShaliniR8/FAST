@@ -17,12 +17,13 @@ class FFTConfig < DefaultConfig
     login_option:                       'sso',
     has_mobile_app:                     true,
     cisp_integration:                   true,
+    power_bi_integration:               true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
     allow_reopen_forms:                false,
     has_root_causes:                   false,
-    attach_pdf_submission:             true
+    query_processing_in_rake_task:     true,
   })
 
 

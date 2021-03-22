@@ -17,7 +17,7 @@ class DefaultSafetyRiskManagementConfig
 
       'Sra' => {
         title: 'SRA',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Pending Review', 'Completed', 'Overdue', 'All'],
         preload: [
           :verifications,
           :extension_requests],

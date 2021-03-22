@@ -34,6 +34,20 @@ class SmsAction < Sa::SafetyAssuranceBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['SmsAction'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                              .map { |key, _| key.to_s }
+
+    keys[keys.index('get_source')] = 'owner_id' if keys.include? 'get_source'
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('approver')] = 'approver#approver.full_name' if keys.include? 'approver'
+    keys[keys.index('verifications')] = 'verifications.address_comment' if keys.include? 'verifications'
+
+    keys
+  end
+
+
   def get_source
     case self.owner_type
     when 'Investigation'

@@ -16,7 +16,7 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 
 class EvaluationsController < SafetyAssuranceController
-  before_filter :login_required
+  before_filter :set_table_name, :login_required
   before_filter(only: [:show]) { check_group('evaluation') }
   before_filter :define_owner, only: [
     :destroy,
@@ -38,6 +38,12 @@ class EvaluationsController < SafetyAssuranceController
     @class = Object.const_get('Evaluation')
     @owner = Evaluation.find(params[:id])
   end
+
+
+  def set_table_name
+    @table_name = "evaluations"
+  end
+
 
   def new
     @owner = Evaluation.new
@@ -69,26 +75,26 @@ class EvaluationsController < SafetyAssuranceController
   end
 
 
-  def index
-    object_name = controller_name.classify
-    @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
-    @table = Object.const_get(object_name).preload(@object[:preload])
-    @default_tab = params[:status]
+  # def index
+  #   object_name = controller_name.classify
+  #   @object = CONFIG.hierarchy[session[:mode]][:objects][object_name]
+  #   @table = Object.const_get(object_name).preload(@object[:preload])
+  #   @default_tab = params[:status]
 
-    records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
-    if params[:advance_search].present?
-      handle_search
-    else
-      @records = records
-    end
-    filter_records(object_name, controller_name)
-    records = @records.to_a & records.to_a if @records.present?
+  #   records = @table.filter_array_by_emp_groups(@table.can_be_accessed(current_user), params[:emp_groups])
+  #   if params[:advance_search].present?
+  #     handle_search
+  #   else
+  #     @records = records
+  #   end
+  #   filter_records(object_name, controller_name)
+  #   records = @records.to_a & records.to_a if @records.present?
 
-    @records_hash = records.group_by(&:status)
-    @records_hash['All'] = records
-    @records_hash['Overdue'] = records.select{|x| x.overdue}
-    @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
-  end
+  #   @records_hash = records.group_by(&:status)
+  #   @records_hash['All'] = records
+  #   @records_hash['Overdue'] = records.select{|x| x.overdue}
+  #   @records_id = @records_hash.map { |status, record| [status, record.map(&:id)] }.to_h
+  # end
 
 
   def show

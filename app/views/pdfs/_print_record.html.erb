@@ -28,7 +28,7 @@
        <%rf_by_c = owner.record_fields
                         .nonempty
                         .includes(field: :category)
-                        .group_by{ |record_field| record_field.field.category }%>
+                        .group_by{ |record_field| record_field.field.category if record_field.field.present? }%>
        <!-- {category1 => [rf1, rf2], category2 => [rf3, rf4]} -->
 
         <%record_fields = owner.record_fields.includes(:field).group_by(&:fields_id)%>
@@ -50,6 +50,7 @@
                     <%arr_first = arr.first%>
                     <%field_item = record_fields[arr_first.id].first%>
                     <%if field_item.present? && field_item.value.present?%>
+                      <%Rails.logger.debug ""%>
                       <tr>
                         <th><%=arr_first.label%></th>
                         <%arr.each do |x|%>
@@ -69,30 +70,69 @@
               <div class="sub_sub_title">
                 <%=cat.title%>
               </div>
+              <%cat_fields_processed = []%>
               <%cat.fields.each do |field|%>
-                <%if field.print || !deidentified%>
-                  <%value = record_fields[field.id].first rescue nil%>
-                  <%if value.present?%>
-                    <%value = value.print_value%>
-                    <%if value.present?%>
-                      <%if cat.title == "Narratives" %>
-                        <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
-                      <%else%>
-                        <b><%=field.label%>: </b>
-                        <%if field.display_type == "employee"%>
-                          <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                            <%=User.find(value).full_name%>
-                          <%else%>
-                            <%=value%>
-                          <%end%>
+                <%if cat_fields_processed.exclude?(field.id) && field.nested_field_id.nil?%>
+                  <%if field.print || !deidentified%>
+                    <%record_field = record_fields[field.id].first rescue nil%>
+                    <%if record_field.present?%>
+                      <%value = record_field.print_value%>
+                      <%if value.present?%>
+                        <%if cat.title == "Narratives" %>
+                          <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
                         <%else%>
-                          <%if field.data_type == "datetime"%>
-                            <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                          <b><%=field.label%>: </b>
+                          <%if field.display_type == "employee"%>
+                            <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                              <%=User.find(value).full_name%>
+                            <%else%>
+                              <%=value%>
+                            <%end%>
                           <%else%>
-                            <%=value%>
+                            <%if field.data_type == "datetime"%>
+                              <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                            <%else%>
+                              <%=value%>
+                            <%end%>
+                          <%end%>
+                          </br>
+                        <%end%>
+                        <%nested_fields = cat.fields.where("nested_field_id=?", field.id)%>
+                        <%if nested_fields.present?%>
+                          <%nested_fields.each do |nested_field|%>
+                            <%cat_fields_processed << nested_field.id%>
+                            <%rec_field = record_fields[nested_field.id].first rescue nil%>
+                            <%if rec_field. present? && rec_field.value.present?%>
+                              <%value = rec_field.print_value%>
+                              <%if record_field.present? && record_field.value.present?%>
+                                <%if (nested_field.nested_field_value.parameterize == record_field.value.parameterize) ||
+                                     (record_field.value.include?(";") && record_field.value.include?(nested_field.nested_field_value))%>
+                                  <div class="nested_field" style="margin-left:15px;">
+                                    <%if cat.title == "Narratives" %>
+                                      <b><%=nested_field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                                    <%else%>
+                                      <b><%=nested_field.label%>: </b>
+                                      <%if nested_field.display_type == "employee"%>
+                                        <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                                          <%=User.find(value).full_name%>
+                                        <%else%>
+                                          <%=value%>
+                                        <%end%>
+                                      <%else%>
+                                        <%if nested_field.data_type == "datetime"%>
+                                          <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                                        <%else%>
+                                          <%=value%>
+                                        <%end%>
+                                      <%end%>
+                                      </br>
+                                    <%end%>
+                                  </div>
+                                <%end%>
+                              <%end%>
+                            <%end%>
                           <%end%>
                         <%end%>
-                        </br>
                       <%end%>
                     <%end%>
                   <%end%>

@@ -1,8 +1,17 @@
 <div class="panel panel-lightblue">
   <div class="panel-heading">
     <div class="panel-title">
-      <div class="top_text">
-        Query Detail
+      <div>
+        <span class="top_text">Query Detail</span>
+        <% if CONFIG::GENERAL[:query_processing_in_rake_task] %>
+          <%= link_to(refresh_query_query_path(@owner),
+                       method: :post,
+                      :class => 'btn btn-primary pull-right ml10',
+                      :id => 'query-refresh-btn') do %>
+            <span class="glyphicon glyphicon-refresh"></span>
+          <% end %>
+          <span class="pull-right" id="query-processing-status"><%=@status_msg%></span>
+        <% end %>
       </div>
       <div class="top_buttons pull-right"></div>
     </div>
@@ -91,4 +100,23 @@
     border:1px solid #94a0b4;
     color:#000
   }
+  #query-processing-status {
+    color: gray;
+  }
 </style>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    if ("<%=@query_status%>" === "new") {
+      // Disable the refresh page while processing the rake task
+      document.getElementById('query-refresh-btn').classList.add("disabled")
+
+      // queryProcessingStatus = document.getElementById('query-processing-status');
+
+      // setInterval(function() {
+      //   queryProcessingStatus.style.visibility = (queryProcessingStatus.style.visibility == 'hidden' ? '' : 'hidden');
+      // }, 1000);
+    }
+  })
+</script>

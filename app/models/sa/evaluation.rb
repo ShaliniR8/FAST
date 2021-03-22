@@ -45,6 +45,18 @@ class Evaluation < Sa::SafetyAssuranceBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
+    keys = CONFIG.object['Evaluation'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
+                                          .map { |key, _| key.to_s }
+
+    keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
+
+    keys
+  end
+
+
   def self.user_levels
     {
       0  => 'N/A',
@@ -97,5 +109,26 @@ class Evaluation < Sa::SafetyAssuranceBase
       self.items.all?{ |x| x.status == "Completed" }
   end
 
+  def included_findings
+    result = ""
+    self.findings.each do |finding|
+      result += "
+        <a style='font-weight:bold' href='/findings/#{finding.id}'>
+          ##{finding.id}
+        </a><br>"
+    end
 
+    self.checklists.each do |checklist|
+      checklist.checklist_rows.each do |checklist_row|
+        checklist_row.findings. each do |finding|
+          result += "
+            <a style='font-weight:bold' href='/findings/#{finding.id}'>
+              ##{finding.id}
+            </a><br>"
+        end
+      end
+    end
+
+    result.html_safe
+  end
 end

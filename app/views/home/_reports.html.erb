@@ -8,7 +8,7 @@
     <div class="panel-body" style="height:300px">
       <div class="row">
         <div class="col-xs-12">
-          <h5>Average Days to Complete: <%=Report.get_avg_complete%></h5>
+          <h5>Average Days to Complete: <%=@reports_scheduled_completion_date%></h5>
         </div>
       </div>
       <div id="reports" style="width: 100%"></div>
@@ -39,7 +39,7 @@
     reports_chart.draw(google.visualization.arrayToDataTable(data), reps_options);
 
     google.visualization.events.addListener(reports_chart, 'select', function(){
-      var all_status=<%=raw @reports.keys%>
+      var all_status=<%=raw @grouped_reports.keys%>
       var root_url="<%=reports_path%>?status="
       var selection = reports_chart.getSelection();
       var message = "";

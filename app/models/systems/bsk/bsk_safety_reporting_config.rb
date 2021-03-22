@@ -1,9 +1,10 @@
 class BSKSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
-    template_nested_fields:             true,
+    template_nested_fields:          true,
     # Airline-Specific Features:
-    observation_phases_trend:           true,
+    observation_phases_trend:        true,
+    attach_pdf_submission:           'none',      # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
   })
 
   OBSERVATION_PHASES = [

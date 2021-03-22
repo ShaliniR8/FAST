@@ -5,8 +5,8 @@ class NotifyMailer < ApplicationMailer
 
 
   def notify_rake_errors(subject, error, location)
-	    emails = ['blair.li@prodigiq.com', 'taeho.kim@prodigiq.com', 'trevor.ryles@prodigiq.com', 'engineering@prosafet.com']
-	    default = 'noc@prodigiq.com'
+	    emails = ['blair.li@prodigiq.com', 'taeho.kim@prodigiq.com', 'trevor.ryles@prodigiq.com', 'engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com']
+	    default = 'noc@prosafet.com'
 	    @error = error
 	    @location = location
   	if Rails.env.production?
@@ -16,18 +16,24 @@ class NotifyMailer < ApplicationMailer
 	  end
   end
 
-  def notify(notice, subject, record, attachment = nil)
+  def notify(notice, subject, record, attachment = nil, extra_attachments = 0)
     @user = notice.user
     @notice = notice
     @link = g_link(notice.owner)
     @message = record
+    @extra = extra_attachments.to_i
     object_name = record.class.name
     object_id   = record.id
     title       = record.description rescue ''
     if object_name == 'Submission'
+      object_id = record.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])
       submission_type = record.template.name
       filename = "#{object_name}_#{object_id}_#{submission_type}_#{title}"
 
+      attachments["#{filename}.pdf"] = attachment unless attachment.nil?
+    elsif object_name == "Message" && record.owner.present?
+      title = record.owner.description rescue ''
+      filename = "#{record.owner.class.name}_#{record.owner.id}_#{title}"
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?
     end
 
@@ -52,19 +58,33 @@ class NotifyMailer < ApplicationMailer
     @user = user
     @message = message.gsub('\n', '<br>') rescue ''
     @record = record
-    @record_url = g_link(record)
+
+    case @record.class.name.demodulize
+    when 'Verification'
+      @record_url = g_link(record.owner)
+    else
+      @record_url = g_link(record)
+    end
+
     subject = "ProSafeT: #{subject}"
     mail(**to_email(user.email), subject: subject).deliver
   end
 
   def send_submitter_confirmation(user, submission)
     @user = user
-    @submission_id = submission.id
+    @submission_id = submission.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])
     @submission_description = submission.get_description
     @submission_url = g_link(submission)
     @submitter_message = submission.template.submitter_message.gsub("\n", '<br>') rescue nil
-    subject = "ProSafeT: Submission ##{submission.id} Received"
+    subject = "ProSafeT: Submission ##{@submission_id} Received"
     mail(**to_email(user.email), subject: subject).deliver
+  end
+
+
+  def send_export(email, filename, file)
+    email = 'noc@prosafet.com' unless Rails.env.production?
+    attachments[filename] = file
+    mail(to: email, subject: 'Report Export Complete').deliver
   end
 
 end

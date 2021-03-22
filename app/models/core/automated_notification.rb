@@ -23,15 +23,32 @@ class AutomatedNotification < ActiveRecord::Base
   end
 
   def get_anchor_date_fields
-    Object.const_get(object_type.classify).get_meta_fields('form')
-      .select{|header| header[:type] == 'date'}
-      .map{|x| [x[:title], x[:field]]}.to_h
+    case object_type.classify
+    when 'Meeting'
+      get_auto_fields(object_type, 'form', 'datetimez')
+    when 'Verification'
+      get_auto_fields(object_type, 'auto', 'date')
+    else
+      get_auto_fields(object_type, 'form', 'date')
+    end
   end
 
   def get_audience_fields
-    Object.const_get(object_type.classify).get_meta_fields('form')
-      .select{|header| header[:type] == 'user'}
-      .map{|x| [x[:title], x[:field]]}.to_h
+    case object_type.classify
+    when 'Verification', 'Meeting'
+      get_auto_fields(object_type, 'auto', 'user')
+    else
+      get_auto_fields(object_type, 'form', 'user')
+    end
   end
+
+
+  private
+
+    def get_auto_fields(object_type, visibility, field_type)
+      Object.const_get(object_type.classify).get_meta_fields(visibility)
+      .select{|header| header[:type] == field_type}
+      .map{|x| [x[:title], x[:field]]}.to_h
+    end
 
 end
