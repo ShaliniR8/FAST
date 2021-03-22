@@ -249,7 +249,7 @@ class ReportsController < ApplicationController
       redirect_to report_path(@report)
     end
     @report_fields = Record.get_meta_fields('index')
-    @candidates = Record.where(:status => 'Open') - @report.records
+    @candidates = Record.where(:status => 'Open').select{|x| x.template.present?} - @report.records
   end
 
   def override_status
