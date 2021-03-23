@@ -74,7 +74,7 @@
                         "data-toggle"=>"modal",
                         "data-target"=>".bs-example-modal-lg"%>
                     <%end%>
-                    <%if record.approver.id == current_user.id%>
+                    <%if record.approver.present? && record.approver.id == current_user.id%>
                       <%=link_to "Address",
                         '#',
                         :route => address_extension_request_path(record),
