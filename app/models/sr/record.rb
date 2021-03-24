@@ -430,8 +430,12 @@ class Record < Sr::SafetyReportingBase
         additional_info << { label: field.label, value: all_record_fields[field.id].value }
       end
     end
-
     additional_info
+  end
+
+
+  def get_additional_info_html
+    get_additional_info.map{|v| "<b>#{v[:label]}</b>: #{v[:value]}"}.join('<br>').html_safe
   end
 
 

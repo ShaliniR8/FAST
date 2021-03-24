@@ -19,8 +19,8 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :audit} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() {drawChart2(auditData);});
-  function drawChart2(data) {
+  google.charts.setOnLoadCallback(function() {drawChart2(auditData, params);});
+  function drawChart2(data, params) {
     var aud_options = {
       chart: { title: 'Safety Assurance Statistics'},
       legend:'none',
@@ -42,9 +42,10 @@
       var root_url="<%=audits_path%>?status="
       var selection = audit_chart.getSelection();
       var message = "";
+      var dateParams = params ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       for (var i = 0; i < selection.length; i++) {
         var item = selection[i];
-        message= root_url+all_status[item.row];
+        message= root_url+all_status[item.row] + dateParams;
       }
       window.location=message;
     });
@@ -52,6 +53,6 @@
 
 
   $(window).bind('resizeEnd', function() {
-      drawChart2(auditData);
+      drawChart2(auditData, params);
   });
 </script>

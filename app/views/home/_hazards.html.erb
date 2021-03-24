@@ -19,8 +19,8 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :hazard} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() {drawCharthazard(hazardData);});
-  function drawCharthazard(data) {
+  google.charts.setOnLoadCallback(function() {drawCharthazard(hazardData, params);});
+  function drawCharthazard(data, params) {
     var hazard_options = {
       chart: {title: 'Hazards Statistics'},
       legend:'none',
@@ -41,9 +41,10 @@
       var root_url="<%=hazards_path%>?status="
       var selection = hazard_chart.getSelection();
       var message = "";
+      var dateParams = params ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       for (var i = 0; i < selection.length; i++) {
         var item = selection[i];
-        message= root_url+all_status[item.row];
+        message= root_url+all_status[item.row] + dateParams;
       }
       window.location=message;
     });
@@ -51,6 +52,6 @@
 
 
   $(window).bind('resizeEnd', function() {
-    drawCharthazard(hazardData);
+    drawCharthazard(hazardData, params);
   });
 </script>

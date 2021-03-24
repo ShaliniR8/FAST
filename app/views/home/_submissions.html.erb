@@ -16,7 +16,7 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :submission} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() { drawChartsubs(submissionData); });
+  google.charts.setOnLoadCallback(function() { drawChartsubs(submissionData, params); });
   function drawChartsubs(data, params) {
     var subs_data = google.visualization.arrayToDataTable(data);
     var subs_options = {
@@ -49,6 +49,6 @@
   }
 
   $(window).bind('resizeEnd', function() {
-    drawChartsubs(submissionData);
+    drawChartsubs(submissionData, params);
   });
 </script>
