@@ -19,7 +19,7 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :corrective_action} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() {drawChartcas(correctiveActionData);});
+  google.charts.setOnLoadCallback(function() {drawChartcas(correctiveActionData, params);});
 
   function drawChartcas(data, params) {
     var cas_options = {
@@ -53,6 +53,6 @@
   }
 
   $(window).bind('resizeEnd', function() {
-    drawChartcas(correctiveActionData);
+    drawChartcas(correctiveActionData, params);
   });
 </script>

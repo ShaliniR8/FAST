@@ -19,7 +19,7 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :report} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() {drawChartreps(reportData);});
+  google.charts.setOnLoadCallback(function() {drawChartreps(reportData, params);});
 
   function drawChartreps(data, params) {
     var reps_options = {
@@ -53,6 +53,6 @@
   }
 
   $(window).bind('resizeEnd', function() {
-    drawChartreps(reportData);
+    drawChartreps(reportData, params);
   });
 </script>

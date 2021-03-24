@@ -21,8 +21,8 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :sra} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() {drawChartsra(sraData);});
-  function drawChartsra(data) {
+  google.charts.setOnLoadCallback(function() {drawChartsra(sraData, params);});
+  function drawChartsra(data, params) {
     var sra_options = {
       chart: {title: 'Safety Risk Assesment Statistics'},
       legend:'none',
@@ -44,14 +44,15 @@
       var root_url="<%=sras_path%>?status="
       var selection = sra_chart.getSelection();
       var message = "";
+      var dateParams = params ? "&start_date=" + params.startDate + "&end_date=" + params.endDate : "";
       for (var i = 0; i < selection.length; i++) {
         var item = selection[i];
-        message= root_url+all_status[item.row];
+        message= root_url+all_status[item.row] + dateParams;
       }
       window.location=message;
     });
   }
   $(window).bind('resizeEnd', function() {
-    drawChartsra(sraData);
+    drawChartsra(sraData, params);
   });
 </script>

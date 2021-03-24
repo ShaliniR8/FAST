@@ -22,7 +22,7 @@
 <script type="text/javascript">
   <%= render partial: "analytics_data.js.erb", locals: {type: :record} %>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(function() {drawChartrecs(recordData); });
+  google.charts.setOnLoadCallback(function() {drawChartrecs(recordData, params); });
 
   function drawChartrecs(data, params) {
     var recs_options = {
@@ -58,11 +58,11 @@
       var row = selection[0].row + 1;
       var status = data[row][0];
       message = root_url + status + dateParams + empGroupParams;
-      window.location=message;
+      window.location = message;
     });
   }
 
   $(window).bind('resizeEnd', function() {
-    drawChartrecs(recordData);
+    drawChartrecs(recordData, params);
   });
 </script>
