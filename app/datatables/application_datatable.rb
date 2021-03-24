@@ -37,13 +37,17 @@ class ApplicationDatatable
     if !@current_user.has_access(object.table_name, 'admin', admin: true, strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id}"
-      status_queries << "approver_id = #{@current_user.id}"
-      status_queries << "reviewer_id = #{@current_user.id}" if object.table_name == 'sras'
+      status_queries << "responsible_user_id = #{@current_user.id} AND status <> 'New'"
+      status_queries << "approver_id = #{@current_user.id} AND status <> 'New'"
+      status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
 
-    counts = object.where(search_string.join(' AND ')).group(:status).count
+    start_date = params[:advance_search][:start_date]
+    end_date = params[:advance_search][:end_date]
+    counts = object.where(search_string.join(' AND '))
+                   .within_timerange(start_date, end_date)
+                   .group(:status).count
 
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
@@ -236,11 +240,12 @@ class ApplicationDatatable
     if !@current_user.has_access(object.table_name, 'admin', admin: true, strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id} AND status in ('Assigned', 'Completed')"
-      status_queries << "approver_id = #{@current_user.id} AND status in ('Pending Approval', 'Completed')"
-      status_queries << "reviewer_id = #{@current_user.id} AND status in ('Pending Review', 'Completed')"  if object.table_name == 'sras'
+      status_queries << "responsible_user_id = #{@current_user.id} AND status <> 'New'"
+      status_queries << "approver_id = #{@current_user.id} AND status <> 'New'"
+      status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
+
 
     has_date_range = start_date.present? && end_date.present?
     case status
@@ -249,6 +254,7 @@ class ApplicationDatatable
         object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
+              .within_timerange(start_date, end_date)
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
@@ -256,7 +262,6 @@ class ApplicationDatatable
         object.joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
@@ -264,6 +269,7 @@ class ApplicationDatatable
       object.joins(join_tables).joins(join_tables)
             .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
+            .within_timerange(start_date, end_date)
             .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
@@ -274,6 +280,7 @@ class ApplicationDatatable
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
+              .within_timerange(start_date, end_date)
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
@@ -282,7 +289,7 @@ class ApplicationDatatable
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date).group("#{object.table_name}.id")
+              .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
@@ -295,9 +302,9 @@ class ApplicationDatatable
     if !@current_user.has_access(object.table_name, 'admin', admin: true, strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id} AND status in ('Assigned', 'Completed')"
-      status_queries << "approver_id = #{@current_user.id} AND status in ('Pending Approval', 'Completed')"
-      status_queries << "reviewer_id = #{@current_user.id} AND status in ('Pending Review', 'Completed')"  if object.table_name == 'sras'
+      status_queries << "responsible_user_id = #{@current_user.id} AND status <> 'New'"
+      status_queries << "approver_id = #{@current_user.id} AND status <> 'New'"
+      status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
 
@@ -386,6 +393,7 @@ class ApplicationDatatable
     end
 
     @status_count['Overdue'] = object.joins(join_tables)
+                                     .within_timerange(start_date, end_date)
                                      .where(search_string.join(' and '))
                                      .group("#{object.table_name}.id")
                                      .select{ |x| x.overdue }.size
