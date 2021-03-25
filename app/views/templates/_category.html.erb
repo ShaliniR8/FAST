@@ -50,6 +50,7 @@
   </div>
 </div>
 
+
 <style>
   #fields {
     margin: 0 15px;
@@ -61,14 +62,15 @@
   }
 
   .row.is-flex > [class*='col-'] {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 
   .row.is-flex > .nested_field_row {
     flex-direction: row;
     justify-content: flex-start;
+    display: initial;
   }
 
   .graybox {
@@ -85,6 +87,7 @@
   }
 </style>
 
+
 <script>
   $(function(){
     $(".required_field").css('border-color', '');
@@ -96,7 +99,10 @@
       return str.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
     };
 
+
+    // dropdown change
     $(".field_select").on("change", function(){
+      console.log('field_select change');
       var field_id = $(this).attr("data-id");
       var field_value = string_parameterize($(this).val())
       $(".nested_field_" + field_id).hide();
@@ -106,7 +112,10 @@
       update_panel_titles($(this));
     });
 
+
+    // checkbox change
     $(".field_cb_select").on("change", function(){
+      console.log('field_cb_select change');
       var field_id = $(this).attr("data-id");
       var field_value = string_parameterize($(this).attr('name'))
       if ($(this).prop('checked')) {
@@ -119,7 +128,10 @@
       update_panel_titles($(this));
     });
 
+
+    // radio button change
     $(".field_rb_select").on("change", function(){
+      console.log('field_rb_select change');
       var field_id = $(this).attr("data-id");
       var field_value = string_parameterize($(this).val())
       $(".nested_field_" + field_id).hide();
@@ -132,7 +144,9 @@
       }
       update_panel_titles($(this));
     });
+
   });
+
 
   function update_panel_titles(target){
     var count = 0;

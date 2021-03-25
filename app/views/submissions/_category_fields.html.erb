@@ -25,24 +25,32 @@
                 <%=render "/submissions/field", is_nested_field: false, field: field, f: f%>
 
                 <%if field.nested_fields.where(:deleted => false).present?%>
+                  <%field.nested_fields
+                    .where(deleted: false)
+                    .order(:field_order)
+                    .group_by(&:nested_field_value)
+                    .each do |nv, nested_fields|%>
 
-                    <%field.nested_fields.where(:deleted => false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
+                    <%nested_fields_by_rows = group_by_column_size_and_nested_fields(fields: nested_fields)%>
+                    <%nested_fields_by_rows.each do |nested_field_row|%>
 
-                      <div class="col-xs-12 nested_field_row">
+                      <div class="col-xs-12 nested_field_row" style="display:none;">
 
-                        <%nested_fields.each do |nested_field|%>
+                        <%nested_field_row.each do |nested_field|%>
 
                           <%size = calculate_column_size(field: nested_field)%>
                           <%if @record.present?%>
                             <%record_field = @record.submission_fields.where("fields_id = ?", field.id).first%>
                             <%if record_field.present? && record_field.value.present?%>
+
                               <%if (record_field.value.parameterize == nested_field.nested_field_value.parameterize) ||
                                    (record_field.value.include?(';') && record_field.value.include?(nested_field.nested_field_value))%>
-                                   <div class="<%=size%> nested_field
-                                      nested_field_<%=field.id%>
-                                      nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
-                                      <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
-                                    </div>
+                                 <div class="<%=size%> nested_field
+                                    nested_field_<%=field.id%>
+                                    nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
+                                    <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
+                                  </div>
+
                               <%else%>
                                 <div class="<%=size%> nested_field
                                   nested_field_<%=field.id%>
@@ -51,6 +59,7 @@
                                   <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
                                 </div>
                               <%end%>
+
                             <%else%>
                               <div class="<%=size%> nested_field
                                 nested_field_<%=field.id%>
@@ -59,6 +68,7 @@
                                 <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
                               </div>
                             <%end%>
+
                           <%else%>
                             <div class="<%=size%> nested_field
                               nested_field_<%=field.id%>
@@ -68,11 +78,11 @@
                             </div>
                           <%end%>
                         <%end%>
+
                       </div>
 
-
                     <%end%>
-
+                  <%end%>
                 <%end%>
 
               <%end%>
@@ -125,30 +135,22 @@
 
 <script>
 
-  function update_nested_fields(field) {
-    var field_id = $(field).attr("data-id");
-    var field_value = $(field).find('option:selected').attr("data-option");
-    //var field_value = $(field).val().trim().toLowerCase().replace(/[^a-zA-Z0-9 -]/, "").replace(/\s/g, "-");
-    $(".nested_field_" + field_id).hide();
-    $(".nested_field_" + field_id).parent().removeClass("graybox")
-    $(".nested_field_" + field_id + "_" + field_value).show();
-    $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox")
-  }
-
-
   $(document).ready(function(){
 
     $(".field_select").each(function(){
       update_nested_fields($(this));
     });
 
+
     $(".field_select").on("change", function(){
       update_nested_fields($(this));
       update_panel_titles($(this));
     });
 
+
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
+
 
     $(".field_cb_select").on("change", function(){
       var field_id = $(this).attr("data-id");
@@ -156,12 +158,15 @@
       if ($(this).prop('checked')) {
         $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).show();
+        $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
       } else {
         $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).hide();
+        $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').hide();
       }
       update_panel_titles($(this));
     });
+
 
     $(".field_rb_select").on("change", function(){
       var field_id = $(this).attr("data-id");
@@ -170,13 +175,16 @@
       if ($(this).prop('checked')) {
         $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).show();
+        $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
       } else {
         $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
         $(".nested_field_" + field_id + "_" + field_value).hide();
+        $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').hide();
       }
       update_panel_titles($(this));
     });
   });
+
 
   function update_panel_titles(target){
     var count = 0;
@@ -193,4 +201,19 @@
       $(target).closest('div.category-panel').find('.panel-title').value = "" ;
     }
   }
+
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+    //var field_value = $(field).val().trim().toLowerCase().replace(/[^a-zA-Z0-9 -]/, "").replace(/\s/g, "-");
+    $(".nested_field_" + field_id).hide();
+    $(".nested_field_" + field_id).parent().removeClass("graybox")
+    $(".nested_field_" + field_id + "_" + field_value).show();
+    $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox")
+    $(".nested_field_" + field_id).closest('.nested_field_row').hide();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
+  }
+
+
 </script>

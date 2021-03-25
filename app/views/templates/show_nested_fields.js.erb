@@ -25,9 +25,20 @@ swal({
       }
     });
 
+
+    // Return a helper with preserved width of cells
+    var fixHelper = function(e, ui) {
+      ui.children().each(function() {
+        $(this).width($(this).width());
+      });
+      return ui;
+    };
+
+
     var fieldList = $(".draggableFieldGroup");
     fieldList.each(function(){
       $(this).sortable({
+        helper: fixHelper,
         handle: $(this, ".drag_and_drop"),
         forcePlaceholderSize: true,
         cursor: "move",
@@ -40,7 +51,6 @@ swal({
           $('.field_group', this).each(function(index, elem) {
             console.log(index);
             $('.form-field-order', this).val(index);
-            // $('.form-field-order', this).addClass("changed");
           });
         }
       });

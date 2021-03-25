@@ -87,16 +87,6 @@
           <%=hidden_field_tag 'is_autosave', 1%>
           <%=hidden_field_tag 'present_id', ""%>
 
-          <div class="col-xs-12">
-            <%=render "shared/instructions",
-              :instruction =>
-              "<p>
-                Click on the <b>grey panels</b> to expand accordian and see content.</br>
-                Items in <b>red</b> are required. </br>
-                Scroll to the bottom of the page to <b>Submit/Save</b> the submission.</br>
-              </p>"%>
-          </div>
-
           <%if @template.allow_anonymous%>
             <div class="col-xs-12">
               <div class="col-xs-1">
@@ -207,7 +197,13 @@
               <%else%>
                 <%event_time_zone = 'Local' if event_time_zone.blank?%>
                 <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
-                <button id="time-zone-toggle-btn" type="button" class="input-group btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+                <button
+                  id="time-zone-toggle-btn"
+                  type="button"
+                  class="input-group btn btn-primary"
+                  data-toggle="button"
+                  aria-pressed="false"
+                  autocomplete="off">
                   <%=event_time_zone%>
                 </button>
               <%end%>

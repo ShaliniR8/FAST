@@ -37,7 +37,7 @@
             <tbody class="draggableFieldGroup" id="fields">
               <%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, ind|%>
                 <%=f1.fields_for :fields, field do |f|%>
-                  <tr>
+                  <tr class="field_group">
                     <td><%=f.text_field :label, {:class => "form-control"}%></td>
                     <td><%=f.select :display_type, Field.getDisplay_type, {}, {class: "form-control date-type-select"}%></td>
                     <td><%=f.select :data_type, Field.getData_type, {}, {class: "form-control"}%></td>
@@ -75,16 +75,21 @@
                     <%end%>
 
                     <td>
-
-                      <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
-                      <%=f.hidden_field :field_order, :value => ind, :class => "form-field-order" %>
+                      <%=f.hidden_field :field_order, value: ind, class: "form-field-order"%>
+                      <%=link_to '<i class="glyphicon glyphicon-move"></i>'.html_safe, '#',
+                        class: 'btn btn-sm btn-lightblue drag_and_drop mt5',
+                        title: 'Move'%>
 
                       <%if field.deleted?%>
-                        <a class="btn btn-default archive_btn mt5">Unarchive</a>
+                        <%=link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+                          class: 'btn btn-sm btn-default archive_btn mt5',
+                          title: 'Unarchive'%>
                       <%else%>
-                        <a class="btn btn-warning archive_btn mt5">Archive</a>
+                        <%=link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+                          class: 'btn btn-sm btn-warning archive_btn mt5',
+                          title: 'Archive'%>
                       <%end%>
-                      <%=f.hidden_field :deleted, :id => "delete_field"%>
+                      <%=f.hidden_field :deleted, id: "delete_field"%>
                     </td>
 
                   </tr>
@@ -96,8 +101,8 @@
               f1,
               :fields,
               {nested_field_value: x, nested_field_id: @field.id},
-              partial: 'field_fields'
-            %></br>
+              partial: 'field_fields'%>
+            </br>
 
           </table>
         </div>
@@ -112,10 +117,10 @@
 
 <style>
   .custom-swal {
-    width: 70% !important;
+    width: 90% !important;
     max-height: 70% !important;
     font-family: "Quattrocento Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-size: 14px !important;
   }
 </style>
 

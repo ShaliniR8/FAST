@@ -3,7 +3,7 @@ class Field < ActiveRecord::Base
   has_many :record_fields,      :foreign_key => "fields_id",        :class_name => "RecordField"
   has_many :submission_fields,  :foreign_key => "fields_id",        :class_name => "SubmissionField"
   has_many :section_fields,     :foreign_key => "field_id",         :class_name => "SectionField"
-  has_many :nested_fields,      :foreign_key => "nested_field_id",  :class_name => "Field"
+  has_many :nested_fields,      :foreign_key => "nested_field_id",  :class_name => "Field", :order => 'field_order ASC'
 
 
   belongs_to :category,         :foreign_key => "categories_id",    :class_name => "Category"
