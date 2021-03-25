@@ -66,9 +66,15 @@ class ChecklistsController < ApplicationController
     @record = @table.find(params[:id])
 
     # Assignee update
-    if params[:assignee_names].present?
+    if params.key?(:assignee_names)
       user = User.find_by_full_name(params[:assignee_names])
-      params[:checklist][:assignee_ids] = user.id if user.present?
+      if user.present?
+        params[:checklist][:assignee_ids] = user.id if user.present?
+      else
+        params[:checklist][:assignee_ids] = nil
+      end
+    else
+      params[:checklist].delete(:assignee_ids)
     end
 
     # TODO: refactor needed

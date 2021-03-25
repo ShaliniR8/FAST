@@ -77,14 +77,14 @@
                 <td>
                   <%final_user = record.owner.approver.present? ? record.owner.approver : (record.owner.responsible_user.present? ? record.owner.responsible_user : nil)%>
                   <%if record.status == "New"%>
-                    <%if final_user.present? && final_user.id == current_user.id%>
+                    <%#if final_user.present? && final_user.id == current_user.id%>
                       <%=link_to "Edit",
                         "#",
                         :route => edit_verification_path(record),
                         :class => "btn btn-warning mr5 mb5 edit_verification_btn",
                         "data-toggle"=>"modal",
                         "data-target"=>".bs-example-modal-lg"%>
-                    <%end%>
+                    <%#end%>
                     <%if validator_ids.include?(current_user.id)%>
                       <%=link_to "Address",
                         "#",
@@ -94,13 +94,13 @@
                         "data-target"=>".bs-example-modal-lg"%>
                     <%end%>
                   <%end%>
-                  <%if final_user.present? && final_user.id == current_user.id%>
+                  <%#if final_user.present? && final_user.id == current_user.id%>
                     <%=link_to "Delete",
                       verification_path(record),
                       :method => :delete,
                       :confirm=>'Are you sure?',
                       :class => "btn btn-danger mr5 mb5"%>
-                  <%end%>
+                  <%#end%>
                 </td>
               </tr>
             <%end%>

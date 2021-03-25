@@ -34,7 +34,7 @@
                 .col-xs-2.mt5
                   = f.label :assignee_ids, 'Assignees', class: 'pull-right'
                 .col-xs-8
-                  = f.hidden_field :assignee_ids
+                  = f.hidden_field :assignee_ids, class: 'changed'
                   - assignee_name = User.find(@record.assignee_ids).full_name rescue ''
                   = text_field_tag :assignee_names, assignee_name, class: 'form-control pull-left json-user-tags', list: 'assignee_ids'
                   datalist#assignee_ids
