@@ -65,7 +65,7 @@ class Field < ActiveRecord::Base
     h["Check Boxes"] = "checkbox"
     h["Text Area"] = "textarea"
     h["Map Points"] = "map" if CONFIG::GENERAL[:has_gmap].present?
-    return h
+    return h.sort_by{|k, v| k}
   end
 
 
@@ -79,7 +79,7 @@ class Field < ActiveRecord::Base
       # "Numeric (Decimal)"=>"float",
       # "Y/N"  =>"bool",
       "Time Zone"     => "timezone"
-    }
+    }.sort_by{|k, v| k}
   end
 
 
@@ -147,4 +147,8 @@ class Field < ActiveRecord::Base
     "#{custom_id}-#{data_type}"
   end
 
+
+  def allow_nested_fields?
+    ['dropdown', 'checkbox', 'datalist', 'radio'].include? display_type
+  end
 end

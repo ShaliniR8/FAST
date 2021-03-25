@@ -86,10 +86,12 @@
 
       <!-- View Nested btn -->
       <%if CONFIG.sr::GENERAL[:template_nested_fields]%>
-        <%=link_to '<i class="glyphicon glyphicon-list"></i>'.html_safe, '#',
-          class: 'btn btn-sm btn-info mt5',
-          id: "show_nested_btn_#{field.id}",
-          title: 'View Nested'%>
+        <%if field.allow_nested_fields?%>
+          <%=link_to '<i class="glyphicon glyphicon-list"></i>'.html_safe, '#',
+            class: 'btn btn-sm btn-info mt5',
+            id: "show_nested_btn_#{field.id}",
+            title: 'View Nested Fields'%>
+        <%end%>
       <%end%>
     <%else%>
       <!-- Remove btn -->
