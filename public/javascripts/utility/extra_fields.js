@@ -79,7 +79,7 @@ $(document).ready(function(){
             remove_placeholder_point_html();
           }
         }
-      });
+      }
       if (error){
         swal({
           title: "Error",
