@@ -2,6 +2,7 @@
 <%from_rec_show = defined?(from_record_show) ? true : false%>
 <%record_edit_access = defined?(record_edit_access) ? record_edit_access : false%>
 <%hide_panel_head = defined?(hide_panel_head) ? hide_panel_head : false%>
+
 <%if !hide_panel_head%>
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <div class="panel <%=@cat.panel%>">
@@ -58,6 +59,7 @@
       </div>
     </div>
   </div>
+
 <%else%>
   <div class="row" id="fields" style="word-wrap: break-word">
     <%all_record_fields = @record.record_fields.map{|sf| [sf.fields_id, sf] }.to_h%>
@@ -65,18 +67,22 @@
       <%if field.print || !deid%>
         <%if field.nested_field_id.nil?%>
           <%record_field = all_record_fields[field.id]%>
-          <%=render "submissions/display_field", :field => field, :sub_field => record_field, deid:deid%>
+          <%=render "submissions/display_field", field: field, sub_field: record_field, deid:deid%>
+
           <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
-            <div class="col-xs-12">
-              <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
-                <%sn_field = all_record_fields[nest_field.id]%>
-                <%if (nest_field.nested_field_value.parameterize == record_field.value.parameterize) ||
-                    (record_field.value.include?(";") && record_field.value.include?(nest_field.nested_field_value))%>
-                  <%=render "submissions/display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
+            <div class="col-xs-12 mb20">
+              <div class="col-xs-12 graybox">
+                <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
+                  <%sn_field = all_record_fields[nest_field.id]%>
+                  <%if (nest_field.nested_field_value.parameterize == record_field.value.parameterize) ||
+                       (record_field.value.include?(";") && record_field.value.include?(nest_field.nested_field_value))%>
+                    <%=render "submissions/display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
+                  <%end%>
                 <%end%>
-              <%end%>
+              </div>
             </div>
           <%end%>
+
         <%end%>
       <%end%>
     <%end%>
