@@ -532,27 +532,30 @@ class AccessControl < ActiveRecord::Base
   end
 
   def self.action_options
-    {
-      'New'                 => 'new',
-      'View'                => 'show',
-      'Edit'                => 'edit',
-      'Delete'              => 'destroy',
-      'De-Identified'       => 'deid',
-      'Listing'             => 'index',
-      'Query'               => 'query',
-      'Viewer'              => 'viewer',
-      'Full'                => 'full',
-      'Notifier'            => 'notifier',
-      'View Summary'        => 'summary',
-      'Submitter'           => 'submitter',
-      'Safety Enhancement'  => 'enhance',
-      'Summary'             => 'summary',
-      'Module'              => 'module',
-      'Tabulation'          => 'tabulation',
-      'Access'              => 'query_all',
-      'Admin'               => 'admin',
-      'Shared'              => 'shared'
-    }
+    h = Hash.new
+
+    h["New"] = "new"
+    h["View"] = "show"
+    h["Edit"] = "edit"
+    h["Delete"] = "destroy"
+    h["De-Identified"] = "deid"
+    h["Listing"] = "index"
+    h["Query"] = "query"
+    h["Viewer"] = "viewer"
+    h["Full"] = "full"
+    h["Notifier"] = "notifier"
+    h["View Summary"] = "summary"
+    h["Submitter"] = "submitter"
+    h["Safety Enhancement"] = "enhance"
+    h["Summary"] = "summary"
+    h["Module"] = "module"
+    h["Tabulation"] = "tabulation"
+    h["Access"] = "query_all"
+    h["Admin"] = "admin"
+    h["Shared"] = "shared"
+    h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
+
+    return h
   end
 
   def self.entry_options
@@ -611,12 +614,15 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.get_template_opts
-    {
-      "Notifier"=>"notifier",
-      "Viewer"=>"viewer",
-      "Submitter"=>"submitter",
-      "Full"=>"full"
-    }
+    h = Hash.new
+
+    h["Notifier"] = "notifier"
+    h["Viewer"] = "viewer"
+    h["Submitter"] = "submitter"
+    h["Full"] = "full"
+    h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
+
+    return h
   end
 
 
@@ -663,6 +669,8 @@ class AccessControl < ActiveRecord::Base
       "Users with this access rule will receive an email notification when a new #{template_name} Submission is submitted."
     when "full"
       "This gives the user full access to #{template_name} and allows the user to create or edit Submissions/Reports. Please note that access to creating/editing Submissions/Reports is also required."
+    when "confidential"
+      "This gives the user access to view the #{template_name} that are confidential."
     else
       ""
     end

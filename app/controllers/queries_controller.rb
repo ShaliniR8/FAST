@@ -74,6 +74,7 @@ class QueriesController < ApplicationController
         @owner = Query.find(params[:id])
         @object_type = Object.const_get(@owner.target)
         apply_query
+
         total_records = @records.size
 
         query_result[:query_detail] = get_query_detail_json(@owner, total_records)
@@ -349,6 +350,37 @@ class QueriesController < ApplicationController
     end
     @records = records
   end
+
+  def get_records
+    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
+    @title = CONFIG.hierarchy[@module_name][:objects][@owner.target][:title].pluralize
+    @object_type = Object.const_get(@owner.target)
+    @table_name = @object_type.table_name
+    @headers = @object_type.get_meta_fields('index')
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @template_fields = []
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
+      }
+    }
+    @fields = @target_fields + @template_fields
+
+    if @title == "Submissions"
+      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
+    elsif @title == "Reports"
+      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+    else
+      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
+    end
 
 
   def apply_query_with_file

@@ -134,6 +134,37 @@
         </span>
       </div>
 
+    <!-- Render Map fields -->
+    <%elsif field.display_type == "map"%>
+      <div class="input-group">
+        <%=text_field_tag field.get_label, "",
+          {:class=>"form-control ml5 map ",
+            :readonly => true,
+            :id => "map#{field.id}",
+            :value => record_field.value}%>
+        <%=rf.hidden_field :value, :id=>"map-select#{field.id}"%>
+        <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info map_button", :id=>"#{field.id}"%></span>
+        <div hidden id="pin-template" name="<%=field.id%>">
+          <%=rf.fields_for :points, Point.new do |pf|%>
+            <div class="pin-container unsaved">
+              <%=pf.hidden_field :lat, class: 'pin-lat'%>
+              <%=pf.hidden_field :lng, class: 'pin-lng'%>
+              <%=pf.hidden_field :map_type, class: 'pin-map-type'%>
+            </div>
+          <%end%>
+        </div>
+        <div hidden id="pin-holder" name="<%=field.id%>">
+          <%=rf.fields_for :points, rf.object.points do |pf|%>
+            <div class="pin-container" data-id=<%=pf.object.id%>>
+              <%=pf.hidden_field :_destroy, class: 'pin-destroy'%>
+              <%=pf.hidden_field :lat, class: 'pin-lat'%>
+              <%=pf.hidden_field :lng, class: 'pin-lng'%>
+              <%=pf.hidden_field :map_type, class: 'pin-map-type'%>
+            </div>
+          <%end%>
+        </div>
+      </div>
+
     <%elsif field.display_type == "datalist"%>
       <%= rf.text_field :value,
         {:list=>"#{field.id}",

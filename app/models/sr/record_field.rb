@@ -3,6 +3,9 @@ class RecordField < ActiveRecord::Base
   belongs_to :record,foreign_key: "records_id",class_name: "Record"
   after_update :create_transaction
 
+  has_many :points, as: :owner, dependent: :destroy,  foreign_key: 'owner_id', class_name: 'Point'
+  accepts_nested_attributes_for :points, allow_destroy: true, reject_if: :invalid_point?
+
 
   scope :nonempty, where('value <> ?', '')
 
@@ -44,5 +47,10 @@ class RecordField < ActiveRecord::Base
     else
       value
     end
+  end
+
+
+  def invalid_point?(pt)
+    pt[:lat].blank? || pt[:lng].blank?
   end
 end

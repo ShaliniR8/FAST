@@ -4,24 +4,25 @@ module AnalyticsFilters
   def can_be_accessed(current_user)
     is_admin = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: true, strict: true)
     full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:full])
+    confidential_access_templates = Template.where(name: current_user.get_all_templates_hash[:confidential])
 
     if self.to_s == "Submission"
       shared_user = current_user.has_access(self.name.downcase.pluralize, 'shared', admin: false, strict: true)
       preload(:template)
-        .where("submissions.templates_id IN (?) #{shared_user ? '' : " OR submissions.user_id = #{current_user.id}"}",
-          full_access_templates)
+        .where("(submissions.templates_id IN (?) AND confidential = false) #{shared_user ? '' : " OR submissions.user_id = #{current_user.id}"}  OR (submissions.templates_id IN (?) AND confidential = true)",
+          full_access_templates, confidential_access_templates)
     elsif self.to_s == 'Record'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer])
       preload(:template)
-        .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
-          full_access_templates, viewer_access_templates)
+        .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
+          full_access_templates, viewer_access_templates, confidential_access_templates)
     elsif self.to_s == 'Report'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer])
-      records = Record.preload(:template, :report)
-        .where("records.templates_id IN (?) OR (records.templates_id IN (?) AND viewer_access = true)",
-          full_access_templates, viewer_access_templates)
-
-      Report.preload(:occurrences, records: [:template, :created_by]).where(id: records.map(&:reports_id).compact)
+      reports = Record.preload(:template, :report)
+        .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
+          full_access_templates, viewer_access_templates, confidential_access_templates)
+        .map(&:report).flatten.uniq.compact
+      Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports.map(&:id))
     else
       all
     end

@@ -19,7 +19,6 @@
     <%=f.hidden_field :nested_field_value, :value => (raw locals[:nested_field_value])%>
   <%end%>
 
-
   <td><%=f.text_field   :label,                                               {class: "form-control #{changed}"}%>                    </td>
   <td><%=f.select       :display_type,  Field.getDisplay_type, {},            {class: "form-control date-type-select #{changed}"}%>   </td>
   <td><%=f.select       :data_type,     Field.getData_type, {},               {class: "form-control #{changed}"}%>                    </td>
@@ -58,7 +57,6 @@
     </td>
   <%end%>
 
-
   <td>
     <%if source == 'Existing'%>
       <%= f.hidden_field :field_order, value: fld_index, class: "form-field-order #{changed}" %>
@@ -73,6 +71,7 @@
       title: 'Move'%>
 
     <!-- Archive/Unarchive btn -->
+
     <%if source == 'Existing'%>
       <%if field.deleted?%>
         <%=link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',

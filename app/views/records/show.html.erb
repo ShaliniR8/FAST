@@ -9,6 +9,11 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 
+<%if CONFIG::GENERAL[:has_gmap].present?%>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDRNvISiW_CO6FTNCdV40Nh19rAncpeLJo"></script>
+  <%#=render 'shared/load_gmap'%>
+<%end%>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 
@@ -32,7 +37,7 @@
         <div class="panel-heading">
           <div class="panel-title">
             <div class="top_text">
-              Report #<%=@record.get_id%>: <%=@record.template.name%>
+              Report #<%=@record.get_id%>: <%=@record.template.name%> <b style="color:darkred; font-size:18px"><%=@record.confidential? ? "(This Report is CONFIDENTIAL)" : ''%></b>
             </div>
             <div class="top_buttons pull-right">
 

@@ -431,7 +431,8 @@ class RecordsController < ApplicationController
     access_level = current_user.has_template_access(@template.name)
     redirect_to errors_path unless current_user.has_access('records', 'admin', admin: true, strict: true) ||
                               access_level.split(';').include?('full') ||
-                              (access_level.split(';').include?('viewer') && @record.viewer_access)
+                              (access_level.split(';').include?('viewer') && @record.viewer_access) ||
+                              (access_level.split(';').include?('confidential') && @record.confidential)
 
 
     @corrective_actions = @record.corrective_actions

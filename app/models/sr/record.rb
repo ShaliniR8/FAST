@@ -211,7 +211,8 @@ class Record < Sr::SafetyReportingBase
           :likelihood_after => self.likelihood_after,
           :severity_after => self.severity_after,
           :risk_factor_after => self.risk_factor_after,
-          :anonymous => self.submission.present? ? self.submission.anonymous : self.anonymous
+          :anonymous => self.submission.present? ? self.submission.anonymous : self.anonymous,
+          :confidential => self.submission.present? ? self.submission.confidential : self.confidential
         })
         self.record_fields.each do |f|
           if f.map_field.present?

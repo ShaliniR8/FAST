@@ -79,13 +79,10 @@
                       <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
                       <%=f.hidden_field :field_order, :value => ind, :class => "form-field-order" %>
 
-                      <center><span class="drag_and_drop glyphicon glyphicon-move"></span></center>
-                      <%=f.hidden_field :field_order, :value => ind, :class => "form-field-order" %>
-
                       <%if field.deleted?%>
-                        <a class="btn btn-default archive_btn">Unarchive</a>
+                        <a class="btn btn-default archive_btn mt5">Unarchive</a>
                       <%else%>
-                        <a class="btn btn-warning archive_btn">Archive</a>
+                        <a class="btn btn-warning archive_btn mt5">Archive</a>
                       <%end%>
                       <%=f.hidden_field :deleted, :id => "delete_field"%>
                     </td>

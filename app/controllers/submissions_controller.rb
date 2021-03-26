@@ -18,9 +18,7 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
   end
 end
 
-
 class SubmissionsController < ApplicationController
-
   before_filter :set_table_name, :oauth_load # Kaushik Mahorker KM
   before_filter :define_owner
   include Concerns::Mobile # used for [method]_as_json
@@ -239,6 +237,7 @@ class SubmissionsController < ApplicationController
 
     params[:submission][:completed] = params[:commit] != 'Save for Later'
     params[:submission][:anonymous] = params[:anonymous] == '1'
+    params[:submission][:confidential] = params[:confidential] == '1'
 
     if params[:submission][:attachments_attributes].present?
       if session[:platform] == Transaction::PLATFORMS[:mobile]
@@ -353,7 +352,8 @@ class SubmissionsController < ApplicationController
         @template_access = @record.user_id == current_user.id ||
           current_user.has_access('submissions', 'admin', admin: true, strict: true) ||
           current_user.has_access(@template.name, 'full', admin: true) ||
-          current_user.has_access(@template.name, 'viewer', admin: true)
+          current_user.has_access(@template.name, 'viewer', admin: true) ||
+          current_user.has_access(@template.name, 'confidential', admin: true, strict: true)
 
         redirect_to errors_path unless @template_access
 
@@ -459,6 +459,7 @@ class SubmissionsController < ApplicationController
     if params[:commit] != 'Add Notes'
       params[:submission][:completed] = params[:commit] != 'Save for Later'
       params[:submission][:anonymous] = params[:anonymous] == '1'
+      params[:submission][:confidential] = params[:confidential] == '1'
     end
 
     event_date_to_utc
@@ -596,8 +597,15 @@ class SubmissionsController < ApplicationController
     end
 
     def notify_notifiers(owner, commit)
+      action =
+          if owner.confidential.present?
+            'confidential'
+          else
+            'notifier'
+          end
+
       mailer_privileges = AccessControl.where(
-        :action => 'notifier',
+        :action => action,
         :entry => owner.template.name)
         .map{|x| x.privileges.map(&:id)}.flatten
       notifiers = User.preload(:privileges)

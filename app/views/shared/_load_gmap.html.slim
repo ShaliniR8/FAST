@@ -1,0 +1,58 @@
+ruby:
+= javascript_include_tag 'maps/geolocation'
+= javascript_include_tag 'maps/markerclusterer'
+= javascript_include_tag 'fontawesome-markers.min.js'
+
+- if CONFIG::GENERAL[:gis_layers]
+  - %w[marker shape connection painter connector].each do |file|
+    = javascript_include_tag "gis/#{file}"
+
+/ shared functions for Custom Maps
+javascript:
+  $.ajaxSetup({
+    beforeFilter: function(xhr) {
+      xhr.setRequestHeader('X-CSRF-Token', '#{form_authenticity_token}');
+    }
+  });
+
+  // CTC - Function below used for custom maps
+  // Normalizes the coords that tiles repeat across the x axis (horizontally)
+  // like the standard Google map tiles.
+  var getNormalizedCoord = function(coord, zoom, originalBounds, maxZoom) {
+    //Amount of total tiles:
+    // MIN_ZOOM    ->     1 tile
+    // MIN_ZOOM+1  ->     2 tiles
+    // MIN_ZOOM+2  ->     4 tiles
+    var zoomPow = zoom - mapZoom;
+    if(zoomPow > maxZoom){
+      return null;
+    }
+    var totalTiles = 1 << zoomPow,//2^zoom-MIN_ZOOM tiles
+        y = coord.y,
+        x = coord.x;
+    var originx = originalBounds[0] * (Math.pow(2, zoom - mapZoom)),
+        originy = originalBounds[1] * (Math.pow(2, zoom - mapZoom));
+    if (y < originy || y >= originy + totalTiles ||
+        x < originx || x >= originx + totalTiles) {
+      return null;
+    }
+
+    x -= originx;
+    y -= originy;
+
+    return { x:x, y:y };
+  }
+
+  function generateTileGetter (mapInfo) {
+    return function (coord, zoom) {
+      var normalizedCoord = getNormalizedCoord(coord, zoom, mapInfo.bounds, mapInfo.zoom_max);
+
+      if (normalizedCoord) {
+        return customMapInfo.base_directory +
+               mapInfo.directory +
+               mapInfo.format.replace(/Z/g, zoom - mapZoom).replace(/X/g, normalizedCoord.x).replace(/Y/g, normalizedCoord.y);
+      } else {
+        return null
+      }
+    }
+  }

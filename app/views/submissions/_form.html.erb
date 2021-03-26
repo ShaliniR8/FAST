@@ -16,8 +16,14 @@
 
 <!-- This calculate  "#total_duty_time" based on "#duty_on_time" and "#duty_off_time". Fields need to have exact HTML ID -->
 <script type="text/javascript" src="/javascripts/templates/total_duty_time_calculation.js"></script>
-<!-- <script type="text/javascript" src="/javascripts/utility/dirty-form.js"></script> -->
 
+<%if CONFIG::GENERAL[:has_gmap].present?%>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDRNvISiW_CO6FTNCdV40Nh19rAncpeLJo"></script>
+  <%=render 'shared/load_gmap'%>
+  <div hidden id="map-container">
+    <div id="map-canvas" style="height:500px;"></div>
+  </div>
+<%end%>
 
 <%if @template.js_link.present?%>
   <script type="text/javascript" src="/javascripts/templates/<%=@template.js_link%>"></script>
@@ -30,7 +36,7 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            <%=@action.titleize + " " + @record.template.name%> Submission
+            <%=@action.titleize + " " + @record.template.name%> Submission <%=@action != "new" ? (@record.confidential? ? "(Confidential)" : '') : ''%>
           </div>
           <div class="top_buttons pull-right">
             <h5 id="auto-save" class="pull-right ml10" style="visibility:hidden">Auto Save Enabled</h5>
@@ -51,6 +57,7 @@
         </div>
       </div>
 
+      <div id = "map-canvas-hidden" style="display:none;"></div>
       <div class="modal fade bs-example-modal-lg emp_modal"
         tabindex="-1"
         role="dialog"
@@ -100,6 +107,20 @@
               <div class="col-xs-10 mt5">
                 <%=label_tag :anonymous,
                   "Do you want to submit anonymously?"%>
+              </div>
+            </div>
+          <%end%>
+
+          <%if CONFIG::GENERAL[:has_confidential_forms].present?%>
+            <div class="col-xs-12 mt5">
+              <div class="col-xs-1">
+                <%=select_tag :confidential,
+                  options_for_select({"Yes" => 1, "No" => 0}, @record.confidential || 0),
+                  {:class => "form-control"}%>
+              </div>
+              <div class="col-xs-10 mt5">
+                <%=label_tag :confidential,
+                  "Do you want this submission to be confidential?"%>
               </div>
             </div>
           <%end%>
@@ -262,87 +283,21 @@
   </div>
 </div>
 
-
 <script type="text/javascript">
 
-  function update_timezones() {
-     $('.toplevel_timezone').on('change',function(){
-      var timezone = $('.toplevel_timezone').val();
-      $(".timezone_field").val(timezone);
-    });
-  }
-
-  // Updata airport table
-  function handleSearch(event) {
-    // Get field id
-    var field_id = event.data.field_id
-    // Get the keywords user searched for
-    var icao = $("#icao").val();
-    var iata = $("#iata").val();
-    var arpt_name = $("#arpt_name").val();
-    // Do nothing if nothing is searched
-    if(icao == "" && iata == "" && arpt_name ==""){
-    // Update the table if icao code is not empty
-    }else{
-      // Get the data from server
-      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
-        // Render airport table with data
-        $("#airports_table").html(data);
-        updateAirportTable(field_id);
-      });
-    }
-  }
-
-  function updateAirportTable(field_id) {
-    // Initialize table as a datatable
-    airport_table = $('#airports' + field_id).DataTable({
-      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-      "iDisplayLength": 5
-    });
-    // User clicked on a row
-    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
-      // Get the row information
-      var icao = $(this).find("td").eq(0).text();
-      var iata = $(this).find("td").eq(1).text();
-      // Set the value on the form
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
-      resetModal(field_id);
-    });
-  }
-
-  function resetModal(field_id) {
-    // Reset the table, field, and close the modal
-    $("#airports_table").html("");
-    $("#icao").val("");
-    $("#iata").val("");
-    $("#arpt_name").val("");
-    $('#airport_div').hide();
-    $(".airport_modal").modal("hide");
-  }
-
   var airport_table;
+  var map,
+      mapTypes = {},
+      pointsHolder = {},
+      mapSettings = {},
+      markers = [],
+      centerLat = <%=CONFIG::GENERAL[:lat]%>,
+      centerLng = <%=CONFIG::GENERAL[:lng]%>,
+      mapZoom = <%=CONFIG::GENERAL[:gMapZoom]%>,
+      clicked_map_field_id;
 
   $(document).ready(function() {
     autoSaveText = document.getElementById('auto-save');
-
-    function autosave() {
-      $("#is_autosave").val(2);
-      $.ajax({
-        type: "POST",
-        url: $('form').attr('action'),
-        data: new FormData($('form')[0]),
-        enctype: 'multipart/form-data',
-        processData: false,
-        contentType: false,
-        dataType: 'json',
-        success: function(data) {
-          if(data.record_id) {
-            $('#present_id').val(data.record_id);
-          }
-        }
-      });
-    }
 
     runAutosave = setInterval(autosave, 60000);
     setInterval(function() {
@@ -409,6 +364,40 @@
       }
     });
 
+    $(this).find(".map_button").each(function(index, item) {
+      $(item).on('click', function(){
+        clicked_map_field_id = $(this).prop("id");
+        swal ({
+          title: "Add or Remove Map Marker for Map field",
+          allowOutsideClick: false,
+          showCancelButton: false,
+          html: '<p id="loading">Loading...</p>',
+          onOpen: function() {
+            $('#map-canvas').appendTo('.swal2-content');
+            updateMarkers(clicked_map_field_id);
+            $('.swal2-content #loading').remove();
+          },
+          onClose: function() {
+            $('#map-canvas').appendTo('#map-container');
+            let cnt = count_visible_markers_for_field(clicked_map_field_id);
+            if (cnt > 0) {
+              if (cnt > 1) {
+                str = cnt + " points marked"
+              } else {
+                str = "1 point marked"
+              }
+
+              $("#map" + clicked_map_field_id).val(str);
+              $("#map-select" + clicked_map_field_id).val(str);
+            } else {
+              $("#map" + clicked_map_field_id).val("");
+              $("#map-select" + clicked_map_field_id).val("");
+            }
+          }
+        }).catch(swal.noop);
+      });
+    });
+
     $("form").on('submit', function() {
       if(isValidationReq) {
         $("div.category-panel").find('.panel-body').slideUp();
@@ -463,6 +452,241 @@
     $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
 
+
+  function updateMarkers(id) {
+    if(map == null) {
+      markers = [];
+      mapTypes = {};
+      pointsHolder = {};
+      read_form_points(id);
+      initialize();
+    }
+  }
+
+  function read_form_points(id) {
+    action = "<%=@action%>";
+    $('.pin-container').each(function(){
+      if ($(this).closest("#pin-holder").attr("name") == id) {
+        if($(this).hasClass("unsaved")) {
+          if ($(this).find(".pin-lat").val()){
+            var mark = {id:$(this).attr("data-id"), map_type:$(this).find(".pin-map-type").val(), lat:$(this).find(".pin-lat").val(), lng:$(this).find(".pin-lng").val()};
+            markers.push(mark);
+          }
+        } else {
+          if (action != "new") {
+            if($(this).find(".pin-destroy").val() == "false"){
+              if ($(this).find(".pin-lat").val()){
+                var mark = {id:$(this).attr("data-id"), map_type:$(this).find(".pin-map-type").val(), lat:$(this).find(".pin-lat").val(), lng:$(this).find(".pin-lng").val()};
+                markers.push(mark);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function count_visible_markers_for_field(id) {
+    action = "<%=@action%>";
+    count = 0;
+    $('.pin-container').each(function(){
+      if ($(this).closest("#pin-holder").attr("name") == id) {
+        if($(this).hasClass("unsaved")) {
+          if ($(this).find(".pin-lat").val()){
+            count ++;
+          }
+        } else {
+          if (action != "new") {
+            if($(this).find(".pin-destroy").val() == "false"){
+              if ($(this).find(".pin-lat").val()){
+                count ++;
+              }
+            }
+          }
+        }
+      }
+    });
+    return count;
+  }
+
+  function remove_placeholder_point_html() {
+    $('.pin-container.unsaved').each(function(){
+      if($(this).find(".pin-lat").val() == ""){
+        $(this).remove();
+      }
+    });
+  }
+
+  function initialize() {
+    mapSettings[google.maps.MapTypeId.SATELLITE] = {
+      center: new google.maps.LatLng(parseFloat(centerLat), parseFloat(centerLng)),
+      zoom: mapZoom
+    };
+
+    var mapOptions = {
+      zoom: mapZoom,
+      center: new google.maps.LatLng(centerLat, centerLng),
+      mapTypeId: google.maps.MapTypeId.SATELLITE,
+      keyboardShortcuts: false,
+      scrollwheel: false,
+      disableDoubleClickZoom: false,
+      zoomControl: true,
+      streetViewControl: false,
+      disableDefaultUI: false,
+      minZoom: mapZoom
+    };
+
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    map.setTilt(0);
+
+    google.maps.event.addListener(map, 'click', function(event){
+      var id = moment().valueOf(); // get new id
+
+      var marker = new google.maps.Marker({
+        id: id,
+        position: event.latLng,
+        map: map,
+        mapType: map.getMapTypeId(),
+      });
+
+      pointsHolder[id] = marker;
+
+      var newPinContainer = $('#pin-template[name="'+clicked_map_field_id+'"]').html().replace(/\[points\_attributes\]\[\d+\]/g, '[points_attributes]['+id+']')
+      $('#pin-holder[name="'+clicked_map_field_id+'"]').append(newPinContainer);
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last').attr('data-id', id);
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last .pin-lat').val(event.latLng.lat());
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last .pin-lng').val(event.latLng.lng());
+      $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container:last .pin-map-type').val(map.getMapTypeId());
+
+      marker.addListener('click', function(){
+        delMarker(this.id);
+      })
+    });
+
+    // Draw existing pins
+    if (markers.length > 0) {
+      for(var i = 0, len = markers.length; i < len; i++){
+        if (i == 0) {
+          map.setMapTypeId(markers[i].map_type);
+        }
+
+        console.log("Existing Marker ID: " + markers[i].id);
+
+        var marker = new google.maps.Marker({
+          id: markers[i].id,
+          position: new google.maps.LatLng(markers[i].lat, markers[i].lng),
+          map: map,
+          mapType: markers[i].map_type,
+          visible: markers[i].map_type === map.getMapTypeId(),
+        });
+
+        pointsHolder[markers[i].id] = marker;
+
+        marker.addListener('click', function(){
+          delMarker(this.id);
+        });
+      }
+    }
+  }
+
+  function setMapType(mapType) {
+    map.setZoom(mapSettings[mapType].zoom);
+    map.setCenter(mapSettings[mapType].center);
+
+    for (var id in pointsHolder) {
+      pointsHolder[id].setVisible(pointsHolder[id].mapType === mapType);
+    }
+  }
+
+  function delMarker(id) {
+    console.log("Deleting Marker ID: " + id);
+    var pinContainer = $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container[data-id="'+id+'"]');
+
+    var pinDestroy = $('.pin-destroy', pinContainer)
+    if (pinContainer.hasClass("unsaved"))
+      pinContainer.remove();
+    else
+      pinDestroy.val(1);
+
+    marker = pointsHolder[id];
+    marker.setMap(null);
+    delete pointsHolder[id];
+  }
+
+  function update_timezones() {
+     $('.toplevel_timezone').on('change',function(){
+      var timezone = $('.toplevel_timezone').val();
+      $(".timezone_field").val(timezone);
+    });
+  }
+
+  // Updata airport table
+  function handleSearch(event) {
+    // Get field id
+    var field_id = event.data.field_id
+    // Get the keywords user searched for
+    var icao = $("#icao").val();
+    var iata = $("#iata").val();
+    var arpt_name = $("#arpt_name").val();
+    // Do nothing if nothing is searched
+    if(icao == "" && iata == "" && arpt_name ==""){
+    // Update the table if icao code is not empty
+    }else{
+      // Get the data from server
+      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+        // Render airport table with data
+        $("#airports_table").html(data);
+        updateAirportTable(field_id);
+      });
+    }
+  }
+
+  function updateAirportTable(field_id) {
+    // Initialize table as a datatable
+    airport_table = $('#airports' + field_id).DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+    // User clicked on a row
+    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+      // Get the row information
+      var icao = $(this).find("td").eq(0).text();
+      var iata = $(this).find("td").eq(1).text();
+      // Set the value on the form
+      $("#airport" + field_id).val(icao + ";" + iata);
+      $("#airport-select" + field_id).val(icao + ";" + iata);
+      resetModal(field_id);
+    });
+  }
+
+  function resetModal(field_id) {
+    // Reset the table, field, and close the modal
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }
+
+  function autosave() {
+    $("#is_autosave").val(2);
+    $.ajax({
+      type: "POST",
+      url: $('form').attr('action'),
+      data: new FormData($('form')[0]),
+      enctype: 'multipart/form-data',
+      processData: false,
+      contentType: false,
+      dataType: 'json',
+      success: function(data) {
+        if(data.record_id) {
+          $('#present_id').val(data.record_id);
+        }
+      }
+    });
+  }
+
 </script>
 
 
@@ -482,14 +706,7 @@
   .radio:hover {
     font-weight:bold;
   }
+  #map-canvas {
+   width: 100%;
+  }
 </style>
-
-
-
-
-
-
-
-
-
-

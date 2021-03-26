@@ -3,6 +3,9 @@ class SubmissionField < ActiveRecord::Base
   belongs_to :submission,       foreign_key: "submissions_id",      class_name: "Submission"
 
   has_one :category,      :through => :field
+  has_many :points, as: :owner, dependent: :destroy,  foreign_key: 'owner_id', class_name: 'Point'
+
+  accepts_nested_attributes_for :points, allow_destroy: true, reject_if: :invalid_point?
 
 
   def export
@@ -38,6 +41,10 @@ class SubmissionField < ActiveRecord::Base
     (self.display_type == "checkbox" || self.display_type == "radio") ?
       (self.value.split(";").select{|x| x.present?}.join(",  ") rescue '') :
       (self.value.gsub(/\n/, '<br/>').html_safe rescue '')
+  end
+
+  def invalid_point?(pt)
+    pt[:lat].blank? || pt[:lng].blank?
   end
 
 end

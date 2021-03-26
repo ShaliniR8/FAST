@@ -26,37 +26,18 @@
                 = User.find(value).full_name
               - else
                 = value
+            - when 'map'
+              - if record_field.points.present?
+                = render :partial => 'shared/static_map',  locals: {points: record_field.points}
+              - else
+                b = "No Points Selected"
             - else
               - case field.data_type
               - when 'datetime'
                 = datetime_to_string(DateTime.parse value) rescue ''
               - else
                 = value
-        - else
-          div class="#{size}"
-            b = "#{field.label.html_safe}: "
-            - value = record_field.value.present? ? record_field.value : ""
 
-            - case field.display_type
-            - when 'checkbox', 'radio'
-              - value.split(';').each do |val|
-                .col-xs-12
-                  span.glyphicon.glyphicon-check aria-hidden='true' class='mr5'
-                  = val
-            - when 'textarea'
-              br
-              = value.gsub(/\n/, '<br/>').html_safe
-            - when 'employee'
-              - if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)
-                = User.find(value).full_name
-              - else
-                = value
-            - else
-              - case field.data_type
-              - when 'datetime'
-                = datetime_to_string(DateTime.parse value) rescue ''
-              - else
-                = value
     - if @record.status == 'Open' || @record.status == 'Linked'
       .col-xs-12
         = link_to 'Edit', '#',
