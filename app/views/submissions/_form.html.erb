@@ -286,6 +286,15 @@
 <script type="text/javascript">
 
   var airport_table;
+  var map,
+      mapTypes = {},
+      pointsHolder = {},
+      mapSettings = {},
+      markers = [],
+      centerLat = <%=CONFIG::GENERAL[:lat]%>,
+      centerLng = <%=CONFIG::GENERAL[:lng]%>,
+      mapZoom = <%=CONFIG::GENERAL[:gMapZoom]%>,
+      clicked_map_field_id;
 
   $(document).ready(function() {
     autoSaveText = document.getElementById('auto-save');
@@ -299,16 +308,6 @@
       clearInterval(runAutosave);
       return true;
     });
-
-    var map,
-        mapTypes = {},
-        pointsHolder = {},
-        mapSettings = {},
-        markers = [],
-        centerLat = <%=CONFIG::GENERAL[:lat]%>,
-        centerLng = <%=CONFIG::GENERAL[:lng]%>,
-        mapZoom = <%=CONFIG::GENERAL[:gMapZoom]%>,
-        clicked_map_field_id;
 
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
     if (timeZoneToggleBtn != null) {
