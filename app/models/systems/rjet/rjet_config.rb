@@ -57,7 +57,7 @@ class RJETConfig < DefaultConfig
 
       orientation: :vertical,
       direction: :down,
-      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-6',
+      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
       header_style: 'sevHeader',
@@ -66,37 +66,42 @@ class RJETConfig < DefaultConfig
       row_header_name: 'SEVERITY',
       row_header: ['1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Moderate','4&nbsp;Critical','5&nbsp;Catastrophic'],
       column_header_name: 'CATEGORY',
-      column_header: ['Regulatory',"Accident/Incident,</br>A/C Damage,OSHA",'Operational Events','Systemic Impact'],
+      column_header: ['Regulatory',"Accident/Incident,</br>A/C Damage,OSHA",'Operational Events','Systemic Impact','Reactive Only'],
       rows: [
         [ # Negligible
           "No Findings.",
           "No incident or damage; injury with no medical treatment.",
           "Normal Operations; no effect on safety of flight.",
-          "No implication of Company, costs <$50k."
+          "No implication of Company, costs <$50k.",
+          "Negligible"
         ],
         [ # Minor
           "General safety concern that may lead to non-compliance with Company policy or procedure(s).",
           "Incident with minor injury requiring minor medical treatment; minor aircraft/property damage.",
           "Event resulting in normal conditions with potential to impact safe operation of an aircraft, safety margin degraded.",
-          "Limited/localized implication of company, occasional delays, minor increase in costs <250k."
+          "Limited/localized implication of company, occasional delays, minor increase in costs <250k.",
+          "Minor"
         ],
         [ # Moderate
           "Finding which results from a non-compliance with Company policy and procedures that reference regulations applicable to the Company (i.e. a requirement derived from a directly applicable rule)",
           "Incident with injury requiring hospitalization; moderate aircraft/property damage.",
           "Event resulting in abnormal conditions with potential to impact safe operation of an aircraft; Safety incident potential.",
-          "Regional implication, frequent delays or cancellation, substantial increase in costs <$1M."
+          "Regional implication, frequent delays or cancellation, substantial increase in costs <$1M.",
+          "Moderate"
         ],
         [ # Critical
           "Finding which results from a direct non-compliance with regulations applicable to the company that could affect safety of flight.",
           "Serious incident with serious injuries; substantial aircraft/property damage.",
           "Event resulting in abnormal conditions, impacting the continued safe operation of an aircraft, serious incident potential.",
-          "National implication, partial regional schedule impact, major increase in costs <$10M."
+          "National implication, partial regional schedule impact, major increase in costs <$10M.",
+          "Critical"
         ],
         [ # Catastrophic
           "Serious safety concern attributable to a direct non-compliance with regulations that will affect safety of flight.",
           "Accident with serious injuries/fatalitites; catastrophic damage to aircraft/property.",
           "State of emergency for an operational condition, impacting the immediate safe operation of an aircraft; Accident potential.",
-          "International implication, systemwide impact on schedules, massive in costs >$10M."
+          "International implication, systemwide impact on schedules, massive in costs >$10M.",
+          "Catastrophic"
         ]
       ]
     },
@@ -114,7 +119,7 @@ class RJETConfig < DefaultConfig
 
       orientation: :horizontal,
       direction: :right,
-      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-6',
+      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',
       header_style: 'probHeader',
@@ -126,12 +131,12 @@ class RJETConfig < DefaultConfig
       column_header: ['1&nbsp;Reactive Only','2&nbsp;Remote','3&nbsp;Seldom','4&nbsp;Occasional','5&nbsp;Probable','6&nbsp;Frequent'],
       rows: [
         [
-          "Reactive Only; therefore there is no predetermined likelihood",
-          "A remote likelihood, being almost inconceivable that event will occur</br><1 occurrence in 10 years at the Company",
-          "Very unlikely to occur</br>An activity or event that occurs intermittently</br>Regulator/Auditor have low likelihood of issue identification during any general or focused review</br>≥1 occurrence in 10 years, but <1 occurrence in 2 years",
-          "Unlikely, but possible to occur</br>Potential for infrequent occurrence. Events are sporadic in nature</br>Auditor/Regulator have potential of issue discovery during focused or specialized review</br>≥1 occurrence in 2 years, but <1 occurrence every year",
-          "Likely to occur sometimes</br>Will occur often if events follow normal patterns of process or procedure. The event is repeatable and less sporadic</br>Auditor/Regulator likely to identify issue with minimal audit activity</br>≥1 occurrence every a year, but <1 occurrence every month",
-          "Likely to occur many times</br>Will be continuously experienced unless action is taken to change events</br>>12 times a year (more than once a month)"
+          "<b>Reactive Only</b>",
+          "<ul><li>A remote likelihood, being almost inconceivable that event will occur</li><li><1 occurrence in 10 years at the Company</li></ul>",
+          "<ul><li>Very unlikely to occur</li><li>An activity or event that occurs intermittently</li><li>Regulator/Auditor have low likelihood of issue identification during any general or focused review</li><li>≥1 occurrence in 10 years, but <1 occurrence in 2 years</li></ul>",
+          "<ul><li>Unlikely, but possible to occur</li><li>Potential for infrequent occurrence. Events are sporadic in nature</li><li>Auditor/Regulator have potential of issue discovery during focused or specialized review</li><li>≥1 occurrence in 2 years, but <1 occurrence every year</li></ul>",
+          "<ul><li>Likely to occur sometimes</li><li>Will occur often if events follow normal patterns of process or procedure. The event is repeatable and less sporadic</li><li>Auditor/Regulator likely to identify issue with minimal audit activity</li><li>≥1 occurrence every a year, but <1 occurrence every month</li></ul>",
+          "<ul><li>Likely to occur many times</li><li>Will be continuously experienced unless action is taken to change events</li><li>>12 times a year (more than once a month)</li></ul>"
         ]
       ]
     },
@@ -148,7 +153,7 @@ class RJETConfig < DefaultConfig
     risk_table: {
       title: 'RISK ASSESSMENT MATRIX',
 
-      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-6',
+      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
       title_style: 'matrixTitle',
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',
