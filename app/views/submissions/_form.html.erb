@@ -436,6 +436,7 @@
     });
   });
 
+
   function prop_up_errors(target) {
     $(target).css('border-color', 'red');
     $(target).closest('div.category-panel').removeClass('collapsed');
@@ -443,11 +444,85 @@
     $(target).closest('div.category-panel').find('.panel-body').slideDown();
   }
 
+
   function update_titles(target) {
     $(target).closest('div.category-panel').find('.panel-title').css("color", "red");
     $(target).closest('div.category-panel').find('.panel-title').value = "*" ;
   }
 
+  function update_timezones() {
+     $('.toplevel_timezone').on('change',function(){
+      var timezone = $('.toplevel_timezone').val();
+      $(".timezone_field").val(timezone);
+    });
+  }
+
+  // Updata airport table
+  function handleSearch(event) {
+    // Get field id
+    var field_id = event.data.field_id
+    // Get the keywords user searched for
+    var icao = $("#icao").val();
+    var iata = $("#iata").val();
+    var arpt_name = $("#arpt_name").val();
+    // Do nothing if nothing is searched
+    if(icao == "" && iata == "" && arpt_name ==""){
+    // Update the table if icao code is not empty
+    }else{
+      // Get the data from server
+      $.get('<%=airport_data_submissions_path%>?field_id=' + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+        // Render airport table with data
+        $("#airports_table").html(data);
+        updateAirportTable(field_id);
+      });
+    }
+  }
+
+  function updateAirportTable(field_id) {
+    // Initialize table as a datatable
+    airport_table = $('#airports' + field_id).DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+    // User clicked on a row
+    $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+      // Get the row information
+      var icao = $(this).find("td").eq(0).text();
+      var iata = $(this).find("td").eq(1).text();
+      // Set the value on the form
+      $("#airport" + field_id).val(icao + ";" + iata);
+      $("#airport-select" + field_id).val(icao + ";" + iata);
+      resetModal(field_id);
+    });
+  }
+
+  function resetModal(field_id) {
+    // Reset the table, field, and close the modal
+    $("#airports_table").html("");
+    $("#icao").val("");
+    $("#iata").val("");
+    $("#arpt_name").val("");
+    $('#airport_div').hide();
+    $(".airport_modal").modal("hide");
+  }
+
+  function autosave() {
+    $("#is_autosave").val(2);
+    $.ajax({
+      type: "POST",
+      url: $('form').attr('action'),
+      data: new FormData($('form')[0]),
+      enctype: 'multipart/form-data',
+      processData: false,
+      contentType: false,
+      dataType: 'json',
+      success: function(data) {
+        if(data.record_id) {
+          $('#present_id').val(data.record_id);
+        }
+      }
+    });
+  }
 
   function updateMarkers(id) {
     if(map == null) {
@@ -683,6 +758,35 @@
     });
   }
 
+  function update_cb_rb_nested(field, isRadio){
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+    if (isRadio){
+      $(".nested_field_" + field_id).hide();
+    }
+    if ($(field).prop('checked')) {
+      $(".nested_field_" + field_id + "_" + field_value).show();
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').find('.nested_field_header').show();
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
+    } else {
+      $(".nested_field_" + field_id + "_" + field_value).hide();
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').hide();
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').find('.nested_field_header').hide();
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').removeClass('graybox');
+    }
+  }
+
+
+  function update_nested_fields(field) {
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+    $(".nested_field_" + field_id).hide();
+    $(".nested_field_" + field_id + "_" + field_value).show();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').find('.nested_field_header').show();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
+  }
 </script>
 
 

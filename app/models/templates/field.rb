@@ -128,7 +128,7 @@ class Field < ActiveRecord::Base
       if options.present?
         options.split(";")
       elsif custom_option_id.present?
-        CONFIG.custom_options_by_id[custom_option_id].options.split(';')
+        CONFIG.custom_options_by_id[custom_option_id].options.split(';') rescue []
       else
         []
       end
