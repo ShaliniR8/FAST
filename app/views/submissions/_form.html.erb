@@ -281,18 +281,20 @@
 
 <script type="text/javascript">
 
-  var airport_table;
-  var map,
-      mapTypes = {},
-      pointsHolder = {},
-      mapSettings = {},
-      markers = [],
-      centerLat = <%=CONFIG::GENERAL[:lat]%>,
-      centerLng = <%=CONFIG::GENERAL[:lng]%>,
-      mapZoom = <%=CONFIG::GENERAL[:gMapZoom]%>,
-      clicked_map_field_id;
-
   $(document).ready(function() {
+
+    var airport_table;
+    var map,
+        mapTypes = {},
+        pointsHolder = {},
+        mapSettings = {},
+        markers = [],
+        centerLat = "<%=CONFIG::GENERAL[:lat]%>",
+        centerLng = "<%=CONFIG::GENERAL[:lng]%>",
+        mapZoom = "<%=CONFIG::GENERAL[:gMapZoom]%>",
+        clicked_map_field_id;
+
+
     autoSaveText = document.getElementById('auto-save');
 
     runAutosave = setInterval(autosave, 60000);
@@ -322,9 +324,8 @@
     $('#submission_description, textarea').keyup(function() {
       len = $(this).val().length;
       max = $(this).attr('maxlength');
-
       $(this).siblings('h6').text(len + '/' + max);
-    })
+    });
 
     update_timezones();
 
@@ -758,7 +759,8 @@
     });
   }
 
-  function update_cb_rb_nested(field, isRadio){
+  function update_cb_rb_nested(field, isRadio) {
+    console.log('update_cb_rb_nested');
     var field_id = $(field).attr("data-id");
     var field_value = $(field).attr("data-option");
     if (isRadio){
@@ -766,20 +768,18 @@
     }
     if ($(field).prop('checked')) {
       $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
-      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
     } else {
       $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').hide();
-      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').removeClass('graybox');
     }
   }
 
 
   function update_nested_fields(field) {
+    console.log('update_nested_fields');
     var field_id = $(field).attr("data-id");
     var field_value = $(field).find('option:selected').attr("data-option");
     $(".nested_field_" + field_id).closest('.nested_field_area').hide();
     $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
-    //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
   }
 </script>
 

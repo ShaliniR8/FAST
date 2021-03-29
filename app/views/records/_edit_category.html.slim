@@ -72,24 +72,20 @@ css:
     display: flex;
     flex-wrap: wrap;
   }
-
   .row.is-flex > [class*='col-'] {
     display: flex;
     flex-direction: column;
     justify-content: flex-start !important;
   }
-
   .row.is-flex > .nested_field_row {
     flex-direction: row;
     justify-content: flex-start !important;
   }
-
   .graybox {
     padding: 15px 0;
     background-color: rgb(211,211,211, 0.15);
     border-radius: 5px;
   }
-
   .row.is-flex > .nested_field_row > .nested_field > .form-group {
     height: 100%;
     display: flex;
@@ -105,7 +101,6 @@ css:
     margin: 10px 0 20px;
     color: grey;
   }
-
   h4 span {
     background:#fff;
     padding:0 10px;
@@ -113,8 +108,7 @@ css:
   .tc {
     cursor: pointer;
   }
-  .checkbox,
-  .radio{
+  .checkbox, .radio {
     cursor: pointer;
     margin-top: 2px;
     margin-bottom: 2px;
@@ -124,24 +118,26 @@ css:
   }
   .radio:hover {
     font-weight:bold;
-
+  }
 
 
 javascript:
 
-  var airport_table;
-
-  var map,
-      mapTypes = {},
-      pointsHolder = {},
-      mapSettings = {},
-      markers = [],
-      centerLat = #{ CONFIG::GENERAL[:lat] },
-      centerLng = #{ CONFIG::GENERAL[:lng] },
-      mapZoom = #{ CONFIG::GENERAL[:gMapZoom] },
-      clicked_map_field_id;
-
   $(document).ready(function(){
+
+    var airport_table;
+
+    var map,
+        mapTypes = {},
+        pointsHolder = {},
+        mapSettings = {},
+        markers = [],
+        centerLat = "#{ CONFIG::GENERAL[:lat] }",
+        centerLng = "#{ CONFIG::GENERAL[:lng] }",
+        mapZoom = "#{ CONFIG::GENERAL[:gMapZoom] }",
+        clicked_map_field_id;
+
+
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
 
@@ -280,14 +276,6 @@ javascript:
         $(this).remove();
       }
     });
-
-  function update_nested_fields(field) {
-    console.log('update nested fields');
-    var field_id = $(field).attr("data-id");
-    var field_value = $(field).find('option:selected').attr("data-option");
-    $(".nested_field_" + field_id).closest('.nested_field_area').hide();
-    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
-    //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
   }
 
   function initialize() {
@@ -425,17 +413,15 @@ javascript:
   }
 
   function update_nested_fields(field) {
+    console.log('update nested fields');
     var field_id = $(field).attr("data-id");
     var field_value = $(field).find('option:selected').attr("data-option");
-
-    $("[class^=nested_field_]").each(function(){
-      console.log($(this).attr('class'))
-      $(this).hide();
-    });
-    $(".nested_field_" + field_id + "_" + field_value).show();
+    $(".nested_field_" + field_id).closest('.nested_field_area').hide();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
   }
 
   function update_cb_rb_nested(field, isRadio){
+    console.log('update_cb_rb_nested');
     var field_id = $(field).attr("data-id");
     var field_value = $(field).attr("data-option");
     if (isRadio){
@@ -443,10 +429,8 @@ javascript:
     }
     if ($(field).prop('checked')) {
       $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
-      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
     } else {
       $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').hide();
-      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').removeClass('graybox');
     }
   }
 
