@@ -381,6 +381,7 @@ class QueriesController < ApplicationController
     else
       records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
     end
+  end
 
 
   def apply_query_with_file

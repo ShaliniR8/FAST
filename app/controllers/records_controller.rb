@@ -644,7 +644,6 @@ class RecordsController < ApplicationController
   end
 
 
-
   def close
     @fields = Record.get_meta_fields('close')
     @owner = Record.find(params[:id])

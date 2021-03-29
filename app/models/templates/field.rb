@@ -3,7 +3,7 @@ class Field < ActiveRecord::Base
   has_many :record_fields,      :foreign_key => "fields_id",        :class_name => "RecordField"
   has_many :submission_fields,  :foreign_key => "fields_id",        :class_name => "SubmissionField"
   has_many :section_fields,     :foreign_key => "field_id",         :class_name => "SectionField"
-  has_many :nested_fields,      :foreign_key => "nested_field_id",  :class_name => "Field"
+  has_many :nested_fields,      :foreign_key => "nested_field_id",  :class_name => "Field", :order => 'field_order ASC'
 
 
   belongs_to :category,         :foreign_key => "categories_id",    :class_name => "Category"
@@ -65,7 +65,7 @@ class Field < ActiveRecord::Base
     h["Check Boxes"] = "checkbox"
     h["Text Area"] = "textarea"
     h["Map Points"] = "map" if CONFIG::GENERAL[:has_gmap].present?
-    return h
+    return h.sort_by{|k, v| k}
   end
 
 
@@ -79,7 +79,7 @@ class Field < ActiveRecord::Base
       # "Numeric (Decimal)"=>"float",
       # "Y/N"  =>"bool",
       "Time Zone"     => "timezone"
-    }
+    }.sort_by{|k, v| k}
   end
 
 
@@ -128,7 +128,7 @@ class Field < ActiveRecord::Base
       if options.present?
         options.split(";")
       elsif custom_option_id.present?
-        CONFIG.custom_options_by_id[custom_option_id].options.split(';')
+        CONFIG.custom_options_by_id[custom_option_id].options.split(';') rescue []
       else
         []
       end
@@ -147,4 +147,8 @@ class Field < ActiveRecord::Base
     "#{custom_id}-#{data_type}"
   end
 
+
+  def allow_nested_fields?
+    ['dropdown', 'checkbox', 'datalist', 'radio'].include? display_type
+  end
 end

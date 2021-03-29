@@ -85,6 +85,15 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def get_id
+    if CONFIG.sr::GENERAL[:match_submission_record_id]
+      get_matching_record_id
+    else
+      custom_id || id
+    end
+  end
+
+
   def get_field(id)
     submission_fields.find_by_fields_id(id).present? ? f.value : ''
   end
@@ -211,11 +220,14 @@ class Submission < Sr::SafetyReportingBase
         anonymous:        self.anonymous,
         confidential:     self.confidential,
         templates_id:     temp_id,
-        description:      self.description + ' -- dual report',
+        description:      self.description + " -- dual submission of ##{self.get_id}",
         event_date:       self.event_date,
         user_id:          self.user_id,
         event_time_zone:  self.event_time_zone,
       })
+
+      self.description = self.description + " -- dual submission of ##{converted.get_id}"
+      self.save
 
       mapped_fields = self.submission_fields.map{|x| [x.field.map_id, x.value]}.to_h
 

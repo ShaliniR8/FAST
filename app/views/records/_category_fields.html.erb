@@ -26,47 +26,44 @@
         <%category_fields_by_rows.each do |row|%>
           <div class="row is-flex">
             <%row.each do |field|%>
+
               <%record_field = (@record_fields_hash[field.id] || []).first%>
               <%record_field = RecordField.new(value: '') if !record_field.present?%>
               <%=render "records/field", field: field, f: f, record_field: record_field, is_nested_field:false%>
 
               <%nested_fields = @nested_fields_hash[field.id]%>
+
               <%if nested_fields.present?%>
                 <%nested_fields.group_by(&:nested_field_value).each do |nv, nfs|%>
-                  <div class="col-xs-12 nested_field_row">
-                    <%nfs.each do |nested_field|%>
-                      <%size = calculate_column_size(field: nested_field)%>
-                      <%record_field = (@record_fields_hash[nested_field.id] || []).first%>
-                      <%record_field = RecordField.new(value: '') if !record_field.present?%>
-                      <%if record_field.value.present?%>
-                        <%if nested_field.options.include?(record_field.value)%>
-                          <div class="<%=size%> nested_field
-                            nested_field_<%=field.id%>
-                            nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
-                            <%=render "records/field", field: nested_field, f: f, record_field: record_field, is_nested_field: true%>
+
+                  <div class="col-xs-12 nested_field_area" style="display:none">
+                    <h4 class="nested_field_header"><span><b><%=nv%></b></span></h4>
+
+                    <%nested_fields_by_rows = group_by_column_size_and_nested_fields(fields: nfs)%>
+
+                    <%nested_fields_by_rows.each_with_index do |nested_field_row, index|%>
+
+                      <div class="col-xs-12 nested_field_row graybox">
+                        <%nested_field_row.each do |nested_field|%>
+
+                          <%nested_record_field = (@record_fields_hash[nested_field.id] || []).first%>
+                          <%nested_record_field = RecordField.new(value: '') if !nested_record_field.present?%>
+                          <%record_val = nested_record_field.value || ''%>
+                          <%size = calculate_column_size(field: nested_field)%>
+
+                          <div class="<%=size%> nested_field nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nv.parameterize%>">
+                            <%= render 'records/field', field: nested_field, f: f, record_field: nested_record_field, is_nested_field: true%>
                           </div>
-                        <%else%>
-                          <div class="<%=size%> nested_field
-                            nested_field_<%=field.id%>
-                            nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                            style="display:none;">
-                            <%=render "records/field", field: nested_field, f: f, record_field: record_field, is_nested_field: true%>
-                          </div>
+
                         <%end%>
-                      <%else%>
-                        <div class="<%=size%> nested_field
-                          nested_field_<%=field.id%>
-                          nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                          style="display:none">
-                          <%=render "records/field", field: nested_field, f: f, record_field: record_field, is_nested_field: true%>
-                        </div>
-                      <%end%>
+                      </div>
                     <%end%>
                   </div>
                 <%end%>
               <%end%>
             <%end%>
           </div>
+          <hr>
         <%end%>
       </div>
     </div>
@@ -81,15 +78,21 @@
     top: 50%;
     transform: translateY(-50%);
   }
+  .row.is-flex > .nested_field_row > .nested_field > .form-group {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
   .row.is-flex {
     display: flex;
     flex-wrap: wrap;
   }
-
   .row.is-flex > [class*='col-'] {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   .row.is-flex > .nested_field_row {
@@ -102,43 +105,24 @@
     background-color: rgb(211,211,211, 0.15);
     border-radius: 5px;
   }
-
-  .row.is-flex > .nested_field_row > .nested_field > .form-group {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  h4 {
+    color: ;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid silver;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+    color: grey;
   }
 
+  h4 span {
+    background:#fff;
+    padding:0 10px;
+  }
 </style>
 
+
 <script type="text/javascript">
-
-  function update_nested_fields(field) {
-    var field_id = $(field).attr("data-id");
-    var field_value = $(field).find('option:selected').attr("data-option");
-    //var field_value = $(field).val().trim().toLowerCase().replace(/[^a-zA-Z0-9 -]/, "").replace(/\s/g, "-");
-    $(".nested_field_" + field_id).hide();
-    $(".nested_field_" + field_id).parent().removeClass("graybox")
-    $(".nested_field_" + field_id + "_" + field_value).show();
-    $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox")
-  }
-
-  function update_cb_rb_nested(field, isRadio){
-    var field_id = $(field).attr("data-id");
-    var field_value = $(field).attr("data-option");
-    if (isRadio){
-      $(".nested_field_" + field_id).hide();
-    }
-    if($(field).prop('checked')){
-      $(".nested_field_" + field_id + "_" + field_value).parent().addClass("graybox");
-      $(".nested_field_" + field_id + "_" + field_value).show();
-    } else {
-      $(".nested_field_" + field_id + "_" + field_value).parent().removeClass("graybox");
-      $(".nested_field_" + field_id + "_" + field_value).hide();
-    }
-  }
-
   $(document).ready(function(){
 
     $(".field_select").on("change", function(){
@@ -172,6 +156,7 @@
     });
   });
 
+
   function update_panel_titles(target){
     var count = 0;
     $(target).closest('div.category-panel').find('.required_field').each(function(){
@@ -185,6 +170,33 @@
     } else {
       $(target).closest('div.category-panel').find('.panel-title').css("color", "");
       $(target).closest('div.category-panel').find('.panel-title').value = "" ;
+    }
+  }
+
+
+  function update_nested_fields(field) {
+    console.log('update_nested_fields');
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+    $(".nested_field_" + field_id).closest('.nested_field_area').hide();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
+    //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
+  }
+
+
+  function update_cb_rb_nested(field, isRadio){
+    console.log('update_cb_rb_nested');
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+    if (isRadio){
+      $(".nested_field_" + field_id).closest('.nested_field_area').hide();
+    }
+    if ($(field).prop('checked')) {
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
+      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
+    } else {
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').hide();
+      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').removeClass('graybox');
     }
   }
 
