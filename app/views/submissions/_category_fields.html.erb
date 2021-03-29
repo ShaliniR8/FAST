@@ -27,13 +27,13 @@
                 <%if field.nested_fields.where(deleted: false).present?%>
                   <%field.nested_fields.where(deleted: false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
 
-                    <div class="col-xs-12 nested_field_area">
-                      <h4 class="nested_field_header" style="display:none"><span><b><%=nv%></b></span></h4>
+                    <div class="col-xs-12 nested_field_area" style="display:none">
+                      <h4 class="nested_field_header"><span><b><%=nv%></b></span></h4>
 
                       <%nested_fields_by_rows = group_by_column_size_and_nested_fields(fields: nested_fields)%>
                       <%nested_fields_by_rows.each do |nested_field_row|%>
 
-                        <div class="col-xs-12 nested_field_row" style="display:none;">
+                        <div class="col-xs-12 nested_field_row graybox">
 
                           <%nested_field_row.each do |nested_field|%>
 
@@ -53,8 +53,7 @@
                                 <%else%>
                                   <div class="<%=size%> nested_field
                                     nested_field_<%=field.id%>
-                                    nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                                    style="display:none;">
+                                    nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
                                     <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
                                   </div>
                                 <%end%>
@@ -62,8 +61,7 @@
                               <%else%>
                                 <div class="<%=size%> nested_field
                                   nested_field_<%=field.id%>
-                                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                                  style="display:none;">
+                                  nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
                                   <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
                                 </div>
                               <%end%>
@@ -71,8 +69,7 @@
                             <%else%>
                               <div class="<%=size%> nested_field
                                 nested_field_<%=field.id%>
-                                nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>"
-                                style="display:none;">
+                                nested_field_<%=field.id%>_<%=nested_field.nested_field_value.parameterize%>">
                                 <%=render "/submissions/field", is_nested_field: true, field: nested_field, f: f%>
                               </div>
                             <%end%>
@@ -159,7 +156,7 @@
     });
 
     $(".field_rb_select").each(function(){
-      update_cb_rb_nested($(this), false);
+      update_cb_rb_nested($(this), true);
     });
 
 

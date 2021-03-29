@@ -762,18 +762,14 @@
     var field_id = $(field).attr("data-id");
     var field_value = $(field).attr("data-option");
     if (isRadio){
-      $(".nested_field_" + field_id).hide();
+      $(".nested_field_" + field_id).closest('.nested_field_area').hide();
     }
     if ($(field).prop('checked')) {
-      $(".nested_field_" + field_id + "_" + field_value).show();
-      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
-      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').find('.nested_field_header').show();
-      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
+      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
     } else {
-      $(".nested_field_" + field_id + "_" + field_value).hide();
-      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').hide();
-      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').find('.nested_field_header').hide();
-      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').removeClass('graybox');
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').hide();
+      //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').removeClass('graybox');
     }
   }
 
@@ -781,11 +777,9 @@
   function update_nested_fields(field) {
     var field_id = $(field).attr("data-id");
     var field_value = $(field).find('option:selected').attr("data-option");
-    $(".nested_field_" + field_id).hide();
-    $(".nested_field_" + field_id + "_" + field_value).show();
-    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_row').show();
-    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').find('.nested_field_header').show();
-    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
+    $(".nested_field_" + field_id).closest('.nested_field_area').hide();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
+    //$(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').addClass('graybox');
   }
 </script>
 
