@@ -24,6 +24,7 @@ class DefaultSafetyReportingConfig
     event_tabulation:          false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
     allow_event_reuse:         true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
     dropdown_event_title_list: false,     # Specific Feature for FFT - default off
+    match_submission_record_id: false,    # Display Record's ID on Submission pages (currently applied: ATN)
   }
 
   OBSERVATION_PHASES = [
