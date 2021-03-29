@@ -123,7 +123,8 @@ class SmsMeetingsController < ApplicationController
     @action = "new"
     @timezones = Meeting.get_timezones
     @headers = User.invite_headers
-    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    # rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    rules = AccessControl.preload(:privileges).where(entry: 'sms_meetings', action: ['show'])
     privileges = rules.map(&:privileges).flatten
     users = privileges.map(&:users).flatten.uniq
     @available_participants = User.preload(:invitations).where(id: users.map(&:id))

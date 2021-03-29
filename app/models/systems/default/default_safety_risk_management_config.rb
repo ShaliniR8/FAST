@@ -498,7 +498,9 @@ class DefaultSafetyRiskManagementConfig
       },
       'Meetings' => {
         title: 'Meetings', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('SrmMeeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+          priv_check.call(Object.const_get('SrmMeeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'srm_meetings_path(status: "All")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('SrmMeeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},

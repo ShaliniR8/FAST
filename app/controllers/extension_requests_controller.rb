@@ -51,7 +51,15 @@ class ExtensionRequestsController < ApplicationController
 
   def destroy
     @extension_request = ExtensionRequest.find(params[:id])
+    @owner = @extension_request.owner
+    transaction_content = @extension_request.detail
     @extension_request.destroy
+    Transaction.build_for(
+        @owner,
+        "Delete Extension Request",
+        current_user.id,
+        transaction_content
+      )
     redirect_to @extension_request.owner, flash: {success: 'Extension Request deleted.'}
   end
 

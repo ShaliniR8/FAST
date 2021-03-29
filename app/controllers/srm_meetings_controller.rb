@@ -111,7 +111,8 @@ class SrmMeetingsController < ApplicationController
     # @users = User.find(:all) - [current_user]
     # @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
 
-    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    # rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    rules = AccessControl.preload(:privileges).where(entry: 'srm_meetings', action: ['show'])
     privileges = rules.map(&:privileges).flatten
     users = privileges.map(&:users).flatten.uniq
     @available_participants = User.preload(:invitations).where(id: users.map(&:id))

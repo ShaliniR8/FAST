@@ -75,7 +75,7 @@
                   </td>
                 <%end%>
                 <td>
-                  <%final_user = record.owner.approver.present? ? record.owner.approver : (record.owner.responsible_user.present? ? record.owner.responsible_user : nil)%>
+                  <%#final_user = record.owner.approver.present? ? record.owner.approver : (record.owner.responsible_user.present? ? record.owner.responsible_user : nil)%>
                   <%if record.status == "New"%>
                     <%#if final_user.present? && final_user.id == current_user.id%>
                       <%=link_to "Edit",

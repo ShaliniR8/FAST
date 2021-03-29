@@ -101,7 +101,7 @@ class DefaultDictionary
       btn: :hazard,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        ['Completed', 'New'].exclude?(owner.status) &&
+        ['Completed'].exclude?(owner.status) &&
         priv_check.call(Object.const_get('Hazard'),user,'new',CONFIG::GENERAL[:global_admin_default],true)
       },
     },
