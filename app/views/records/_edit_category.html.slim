@@ -122,19 +122,18 @@ css:
 
 
 javascript:
+  var map,
+    mapTypes = {},
+    pointsHolder = {},
+    mapSettings = {},
+    markers = [],
+    centerLat = #{ CONFIG::GENERAL[:lat] },
+    centerLng = #{ CONFIG::GENERAL[:lng] },
+    mapZoom = #{ CONFIG::GENERAL[:gMapZoom] },
+    clicked_map_field_id;
 
   $(document).ready(function(){
     var airport_table;
-
-    var map,
-        mapTypes = {},
-        pointsHolder = {},
-        mapSettings = {},
-        markers = [],
-        centerLat = "#{ CONFIG::GENERAL[:lat] }",
-        centerLng = "#{ CONFIG::GENERAL[:lng] }",
-        mapZoom = "#{ CONFIG::GENERAL[:gMapZoom] }",
-        clicked_map_field_id;
 
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
@@ -314,7 +313,7 @@ javascript:
   function initialize() {
     mapSettings[google.maps.MapTypeId.SATELLITE] = {
       center: new google.maps.LatLng(parseFloat(centerLat), parseFloat(centerLng)),
-      zoom: mapZoom
+      zoom: parseFloat(mapZoom)
     };
 
     var mapOptions = {

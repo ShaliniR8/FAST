@@ -34,6 +34,14 @@ class DefaultConfig
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
     power_bi_integration:               false,
+    has_confidential_forms:             false,
+
+    # Map Configs. Needed in default config to avoid javascript undefined errors
+    has_gmap:                           false,
+    gis_layers:                         false,
+    lat:                                0.0,
+    lng:                                0.0,
+    gMapZoom:                           14,
 
     # Third Party Integrations:
     integrations: ['mitre'],

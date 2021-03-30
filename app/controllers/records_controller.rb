@@ -432,7 +432,7 @@ class RecordsController < ApplicationController
     redirect_to errors_path unless current_user.has_access('records', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: false) &&
                               (access_level.split(';').include?('full') ||
                               (access_level.split(';').include?('viewer') && @record.viewer_access) ||
-                              (access_level.split(';').include?('confidential') && @record.confidential)
+                              (access_level.split(';').include?('confidential') && @record.confidential))
 
     @corrective_actions = @record.corrective_actions
     @corrective_actions << @record.report.corrective_actions if @record.report.present?

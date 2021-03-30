@@ -67,35 +67,36 @@ ruby:
               th.header
                 | Landing Airport
           tbody
-            - flights.order(flight_date: :desc).each do |flt|
-              tr.pointer id=flt[:id]
-                td.special-cell
-                  .col-xs-12
-                    strong
-                      | #{flt[:flight_date]}
-                td.cell
-                  .col-xs-12
-                    strong
-                      | #{flt[:flight_number]}
-                td.cell
-                  .col-xs-12
-                    strong
-                      | #{flt[:tail_number]}
+            - if flights.present?
+              - flights.order(flight_date: :desc).each do |flt|
+                tr.pointer id=flt[:id]
+                  td.special-cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:flight_date]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:flight_number]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:tail_number]}
 
-                td.cell
-                  .col-xs-12
-                    strong
-                      | #{flt[:departure_airport]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:departure_airport]}
 
-                td.cell
-                  .col-xs-12
-                    strong
-                      | #{flt[:arrival_airport]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:arrival_airport]}
 
-                td.cell
-                  .col-xs-12
-                    strong
-                      | #{flt[:landing_airport]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:landing_airport]}
 .pull-right
   = label_tag 'Cancel', nil,
                class: "btn btn-md btn-default panel-button close_swal_btn"
