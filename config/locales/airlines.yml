@@ -42,3 +42,29 @@ FFT:
         title: Initial
       mitigated:
         title: Residual
+
+RJET:
+  core:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual
+  sr:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual
+  srm:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual
+  sa:
+    risk:
+      baseline:
+        title: Initial
+      mitigated:
+        title: Residual

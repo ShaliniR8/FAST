@@ -1,0 +1,102 @@
+css:
+  .pointer{
+    cursor:pointer;
+  }
+
+  .header{
+    font-size:16px;
+  }
+
+  .cell{
+    font-size:15px;
+    width:15%;
+    text-align:center;
+  }
+
+  .special-cell{
+    font-size:14px;
+    width:25%;
+    text-align:center;
+  }
+
+  .align-left{
+    text-align:left;
+  }
+
+ruby:
+  title = "Which Flight is this Submission for?"
+  instruction = "<p> Click on the <b>ROW</b> of the flight.</p>"
+
+.col-lg-12
+  .panel.panel-primary
+    .panel-heading
+      .panel-title
+        strong
+          | #{title}
+
+    .panel-body.header.align-left
+      = render "shared/instructions", :instruction => instruction
+      .col-xs-12
+        table id="flights_table" class="table table-bordered table-striped table-responsive"
+          thead
+            tr
+              th.header
+                | Flight Date
+              th.header
+                | Flight Number
+              th.header
+                | Tail Number
+              th.header
+                | Departure Airport
+              th.header
+                | Arrival Airport
+              th.header
+                | Landing Airport
+          tfoot
+            tr
+              th.header
+                | Flight Date
+              th.header
+                | Flight Number
+              th.header
+                | Tail Number
+              th.header
+                | Departure Airport
+              th.header
+                | Arrival Airport
+              th.header
+                | Landing Airport
+          tbody
+            - if flights.present?
+              - flights.order(flight_date: :desc).each do |flt|
+                tr.pointer id=flt[:id]
+                  td.special-cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:flight_date]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:flight_number]}
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:tail_number]}
+
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:departure_airport]}
+
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:arrival_airport]}
+
+                  td.cell
+                    .col-xs-12
+                      strong
+                        | #{flt[:landing_airport]}
+.pull-right
+  = label_tag 'Cancel', nil,
+               class: "btn btn-md btn-default panel-button close_swal_btn"

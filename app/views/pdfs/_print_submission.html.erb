@@ -66,7 +66,20 @@
                         <b><%=field.label%>: </b>
                         <%if field.display_type == "employee"%>
                           <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                            <%=User.find(value).full_name%>
+                            <%if CONFIG::GENERAL[:sabre_integration].present?%>
+                              <%#=User.where(employee_number: value).first.full_name rescue nil%>
+                              <%#=value%>
+                              <%if value.present?%>
+                                <%user_name = User.where(employee_number: value).first.full_name rescue nil%>
+                                <%value = "(#{value})"%>
+                                <%if user_name.present?%>
+                                  <%value = user_name + " #{value}" %>
+                                <%end%>
+                                <%=value%>
+                              <%end%>
+                            <%else%>
+                              <%=User.find(value).full_name%>
+                            <%end%>
                           <%else%>
                             <%=value%>
                           <%end%>
@@ -92,19 +105,42 @@
                           <%end%>
                           </br>
                         <%end%>
-                        <%nested_fields = cat.fields.where("nested_field_id=?", field.id)%>
-                        <%if nested_fields.present?%>
-                          <%nested_fields.each do |nested_field|%>
-                            <%cat_fields_processed << nested_field.id%>
-                            <%rec_field = owner.submission_fields.where("fields_id = ?", nested_field.id).first%>
-                            <%if rec_field.present? && rec_field.value.present?%>
-                              <%value = rec_field.print_value%>
-                              <%if record_field.present? && record_field.value.present?%>
-                                <%if (nested_field.nested_field_value.parameterize == record_field.value.parameterize) ||
-                                     (record_field.value.include?(";") && record_field.value.include?(nested_field.nested_field_value))%>
-                                  <div class="nested_field" style="margin-left:15px;">
-                                    <%if cat.title == "Narratives" %>
-                                      <b><%=nested_field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                        </br>
+                      <%end%>
+                      <%nested_fields = cat.fields.where("nested_field_id=?", field.id)%>
+                      <%if nested_fields.present?%>
+                        <%nested_fields.each do |nested_field|%>
+                          <%cat_fields_processed << nested_field.id%>
+                          <%rec_field = owner.submission_fields.where("fields_id = ?", nested_field.id).first%>
+                          <%if rec_field.present? && rec_field.value.present?%>
+                            <%value = rec_field.print_value%>
+                            <%if record_field.present? && record_field.value.present?%>
+                              <%if (nested_field.nested_field_value.parameterize == record_field.value.parameterize) ||
+                                   (record_field.value.include?(";") && record_field.value.include?(nested_field.nested_field_value))%>
+                                <div class="nested_field" style="margin-left:15px;">
+                                  <%if cat.title == "Narratives" %>
+                                    <b><%=nested_field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                                  <%else%>
+                                    <b><%=nested_field.label%>: </b>
+                                    <%if nested_field.display_type == "employee"%>
+                                      <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                                        <%if CONFIG::GENERAL[:sabre_integration].present?%>
+                                          <%#=User.where(employee_number: value).first.full_name rescue nil%>
+                                          <%#=value%>
+                                          <%if value.present?%>
+                                            <%user_name = User.where(employee_number: value).first.full_name rescue nil%>
+                                            <%value = "(#{value})"%>
+                                            <%if user_name.present?%>
+                                              <%value = user_name + " #{value}" %>
+                                            <%end%>
+                                            <%=value%>
+                                          <%end%>
+                                        <%else%>
+                                          <%=User.find(value).full_name%>
+                                        <%end%>
+                                      <%else%>
+                                        <%=value%>
+                                      <%end%>
                                     <%else%>
                                       <b><%=nested_field.label%>: </b>
                                       <%if nested_field.display_type == "employee"%>

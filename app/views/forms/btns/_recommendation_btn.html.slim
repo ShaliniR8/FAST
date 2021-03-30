@@ -1,6 +1,6 @@
 - if owner.status == 'Assigned' &&\
   ([owner.responsible_user, owner.approver].include?(current_user) ||\
-  current_user.has_access(permission, 'admin', admin: true, strict: true))
+  current_user.has_access(permission, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true))
   = link_to 'Add Recommendation',
     new_recommendation_path(\
       owner_id: owner.id,

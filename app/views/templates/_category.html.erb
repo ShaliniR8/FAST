@@ -28,7 +28,7 @@
 
                 <%if field.nested_fields.where(:deleted => false).present?%>
                   <div class='col-xs-12 nested_field_row'>
-                    <%field.nested_fields.where(:deleted => false).each do |nested_field|%>
+                    <%field.nested_fields.where(:deleted => false).order(:field_order).each do |nested_field|%>
                       <%size = calculate_column_size(field: nested_field)%>
                       <div class="<%=size%> nested_field
                         nested_field_<%=field.id%>
@@ -83,7 +83,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 </style>
 

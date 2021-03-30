@@ -5,11 +5,13 @@
         <div class="panel-title">
           <div class="top_text">Access Control Rules</div>
           <div class="top_buttons pull-right">
-            <%=link_to "New",
-              "#",
-              :class => "btn btn-success pull-right mb5 new_rule_btn",
-              "data-toggle" => "modal",
-              "data-target" => ".bs-example-modal-lg"%>
+            <%if current_user.full_name == "ProSafeT Engineering"%>
+              <%=link_to "New",
+                "#",
+                :class => "btn btn-success pull-right mb5 new_rule_btn",
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
           </div>
         </div>
       </div>

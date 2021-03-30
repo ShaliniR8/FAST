@@ -1,5 +1,5 @@
-<% sra_new = current_user.has_access('sras', 'new', admin: true) %>
-<% sra_index = current_user.has_access('sras', 'index', admin: true) %>
+<% sra_new = current_user.has_access('sras', 'new', admin: CONFIG::GENERAL[:global_admin_default]) %>
+<% sra_index = current_user.has_access('sras', 'index', admin: CONFIG::GENERAL[:global_admin_default]) %>
 <% if sra_new || sra_index %>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">SRA (SRM)<b class="caret"></b></a>
@@ -15,7 +15,7 @@
 <%end%>
 
 
-<%if current_user.has_access('hazards', 'index', admin: true) %>
+<%if current_user.has_access('hazards', 'index', admin: CONFIG::GENERAL[:global_admin_default]) %>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Hazards<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">
@@ -34,12 +34,12 @@
 
 
 
-<%if current_user.has_access('risk_controls', 'index', admin: true) %>
+<%if current_user.has_access('risk_controls', 'index', admin: CONFIG::GENERAL[:global_admin_default]) %>
   <li><a href=<%=risk_controls_path%>>Risk Controls</a></li>
 <%end%>
 
-<% safety_plans_index = current_user.has_access('safety_plans', 'index', admin: true) %>
-<% safety_plans_new = current_user.has_access('safety_plans', 'new', admin: true) %>
+<% safety_plans_index = current_user.has_access('safety_plans', 'index', admin: CONFIG::GENERAL[:global_admin_default]) %>
+<% safety_plans_new = current_user.has_access('safety_plans', 'new', admin: CONFIG::GENERAL[:global_admin_default]) %>
 <% if safety_plans_index || safety_plans_new %>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Safety Plans<b class="caret"></b></a>
@@ -54,8 +54,8 @@
   </li>
 <%end%>
 
-<% srm_meetings_index = current_user.has_access('srm_meetings', 'index', admin: true) %>
-<% srm_meetings_new = current_user.has_access('srm_meetings', 'new', admin: true) %>
+<% srm_meetings_index = current_user.has_access('srm_meetings', 'index', admin: CONFIG::GENERAL[:global_admin_default]) %>
+<% srm_meetings_new = current_user.has_access('srm_meetings', 'new', admin: CONFIG::GENERAL[:global_admin_default]) %>
 <% if srm_meetings_index || srm_meetings_new %>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Meetings<b class="caret"></b></a>
@@ -71,7 +71,7 @@
 <%end%>
 
 
-<%if current_user.has_access('home','query_all', admin: true) %>
+<%if current_user.has_access('home','query_all', admin: CONFIG::GENERAL[:global_admin_default]) %>
   <li class="dropdown">
     <a href="#" data-toggle="dropdown">Query Center<b class="caret"></b></a>
     <ul class="dropdown-menu dropdown-notification" role="menu">

@@ -29,7 +29,11 @@
                   <%@reports.each do |a|%>
                     <tr id="<%=a.id%>">
                       <%@headers.each do |header|%>
-                        <td><%=a.send(header[:field])%></td>
+                        <%if header[:field] == "employee_group"%>
+                          <td><%=a.send(header[:field]).titleize%></td>
+                        <%else%>
+                          <td><%=a.send(header[:field])%></td>
+                        <%end%>
                       <%end%>
                     </tr>
                   <%end%>

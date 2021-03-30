@@ -23,7 +23,7 @@
               </div>
               <div class="form-group form-inline col-sm-12">
                 <%=f.label :employee_group, "ASAP MOU Employee Group", :class=>"required"%>
-                <%=f.select :employee_group, FaaReport.getEmployeeGroup, {:selected => @report.employee_group, include_blank: true}, {:class=>"form-control required_field"}%>
+                <%=f.select :employee_group, options_for_select(FaaReport.getEmployeeGroup, @report.employee_group), {include_blank: true}, {:class=>"form-control required_field"}%>
               </div>
             <%end%>
 

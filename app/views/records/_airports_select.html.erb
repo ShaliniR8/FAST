@@ -118,8 +118,13 @@
       var icao = $(this).find("td").eq(0).text();
       var iata = $(this).find("td").eq(1).text();
       // Set the value on the form
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
+      if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
+        $("#airport" + field_id).val(iata);
+        $("#airport-select" + field_id).val(iata);
+      } else {
+        $("#airport" + field_id).val(icao + ";" + iata);
+        $("#airport-select" + field_id).val(icao + ";" + iata);
+      }
       resetModal(field_id);
     });
   }

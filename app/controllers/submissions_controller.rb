@@ -166,19 +166,29 @@ class SubmissionsController < ApplicationController
     @action = "new"
     @has_template = false
     if !params[:template].blank?
+      if CONFIG::GENERAL[:sabre_integration].present?
+        prepare_flight_data(current_user.employee_number)
+      end
       @template = Template.find(params[:template])
       @has_template = true
       @record = Submission.build(@template)
       @record.submission_fields.build
     else
-      @templates = Template.find(:all)
-      unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+      # @templates = Template.find(:all)
+      templates = current_user.get_all_submitter_templates
+      @templates = Template.where(:name => templates)
+      unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         @templates.keep_if{|x|
             (current_user.has_template_access(x.name).include? 'full') ||
             (current_user.has_template_access(x.name).include? 'submitter')}
         @templates.sort_by! {|x| x.name }
       end
     end
+  end
+
+
+  def prepare_flight_data(emp_num)
+    @flights = Sabre.where({flight_date: (Time.now - 30.days).to_date..Time.now.to_date, employee_number: emp_num})
   end
 
 
@@ -302,6 +312,7 @@ class SubmissionsController < ApplicationController
           converted.make_report
           converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
+          NotifyMailer.send_submitter_confirmation(current_user, converted)
         end
         @record.make_report
       end
@@ -350,10 +361,10 @@ class SubmissionsController < ApplicationController
         @template = @record.template
 
         @template_access = @record.user_id == current_user.id ||
-          current_user.has_access('submissions', 'admin', admin: true, strict: true) ||
-          current_user.has_access(@template.name, 'full', admin: true) ||
-          current_user.has_access(@template.name, 'viewer', admin: true) ||
-          current_user.has_access(@template.name, 'confidential', admin: true, strict: true)
+          (current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) &&
+          (current_user.has_access(@template.name, 'full', admin: CONFIG::GENERAL[:global_admin_default]) ||
+          current_user.has_access(@template.name, 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) ||
+          current_user.has_access(@template.name, 'confidential', admin: CONFIG::GENERAL[:global_admin_default], strict: true)))
 
         redirect_to errors_path unless @template_access
 
@@ -486,8 +497,10 @@ class SubmissionsController < ApplicationController
           end
           if params[:create_copy] == '1'
             converted = @record.convert
+            converted.make_report
             converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
             notify_notifiers(converted, params[:commit])
+            NotifyMailer.send_submitter_confirmation(current_user, converted)
           end
           respond_to do |format|
             flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
@@ -529,8 +542,52 @@ class SubmissionsController < ApplicationController
   end
 
 
+  def flight_selected
+    reporting_emp_number = current_user.employee_number
+    selected_flight = Sabre.find(params[:flight_record_id]) rescue nil
+
+    if selected_flight.present?
+      if selected_flight.other_employees.present?
+        other_employees = selected_flight.other_employees.split(",")
+        all_employees = other_employees << reporting_emp_number
+        all_employee_records = Sabre.where({employee_number: all_employees,
+                                            flight_date: selected_flight.flight_date,
+                                            flight_number: selected_flight.flight_number,
+                                            tail_number: selected_flight.tail_number,
+                                            arrival_airport: selected_flight.arrival_airport,
+                                            departure_airport: selected_flight.departure_airport,
+                                            landing_airport: selected_flight.landing_airport,
+                                          })
+        all_employee_data = all_employee_records.map{|rec| {:title => rec.employee_title,
+                                                            :number => rec.employee_number}
+                                                    }
+
+        all_employee_usernames = all_employee_records.map{|rec| {:emp_num => rec.employee_number,
+                                                                 :emp_name => (User.where(employee_number: rec.employee_number).first.full_name rescue nil)}
+                                                          }
+      end
+    else
+      puts "Very erroneous. Should not happen"
+    end
+
+    render :json => {message: "Flight Data Available",
+                     flight_date: selected_flight.flight_date,
+                     flight_number: selected_flight.flight_number,
+                     tail_number: selected_flight.tail_number,
+                     departure_airport: selected_flight.departure_airport,
+                     arrival_airport: selected_flight.arrival_airport,
+                     landing_airport: selected_flight.landing_airport,
+                     all_employee_data: all_employee_data,
+                     usernames: all_employee_usernames
+                    }
+  end
+
+
   def continue
     @action="Continue"
+    if CONFIG::GENERAL[:sabre_integration].present?
+      prepare_flight_data(current_user.employee_number)
+    end
     @record=Submission.find(params[:id])
     @template=@record.template
   end

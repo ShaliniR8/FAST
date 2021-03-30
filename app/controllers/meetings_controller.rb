@@ -195,7 +195,7 @@ class MeetingsController < ApplicationController
     @headers = Meeting.get_meta_fields('index')
     @action = 'meeting'
     @records = @table.includes(:invitations, :host).where('meetings.type is null')
-    unless current_user.has_access('meetings', 'admin', admin: true, strict: true )
+    unless current_user.has_access('meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true )
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end

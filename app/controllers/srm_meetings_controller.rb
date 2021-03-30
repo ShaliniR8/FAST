@@ -111,7 +111,8 @@ class SrmMeetingsController < ApplicationController
     # @users = User.find(:all) - [current_user]
     # @users.keep_if{|u| !u.disable && u.has_access('meetings', 'index')}
 
-    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    # rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+    rules = AccessControl.preload(:privileges).where(entry: 'srm_meetings', action: ['show'])
     privileges = rules.map(&:privileges).flatten
     users = privileges.map(&:users).flatten.uniq
     @available_participants = User.preload(:invitations).where(id: users.map(&:id))
@@ -139,7 +140,7 @@ class SrmMeetingsController < ApplicationController
 
   def index
     @records=SrmMeeting.includes(:invitations, :host)
-    unless current_user.has_access('srm_meetings', 'admin', admin: true, strict: true)
+    unless current_user.has_access('srm_meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
         current_user.id, ['Pending', 'Accepted'], current_user.id)
     end

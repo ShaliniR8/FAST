@@ -15,7 +15,20 @@
       </br><%=value.gsub(/\n/, '<br/>').html_safe%>
     <%elsif field.display_type == "employee"%>
       <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-        <%=User.find(value).full_name%>
+        <%if CONFIG::GENERAL[:sabre_integration].present?%>
+          <%#=User.where(employee_number: value).first.full_name rescue nil%>
+          <%#=value%>
+          <%if value.present?%>
+            <%user_name = User.where(employee_number: value).first.full_name rescue nil%>
+            <%value = "(#{value})"%>
+            <%if user_name.present?%>
+              <%value = user_name + " #{value}" %>
+            <%end%>
+            <%=value%>
+          <%end%>
+        <%else%>
+          <%=User.find(value).full_name%>
+        <%end%>
       <%else%>
         <%=value%>
       <%end%>

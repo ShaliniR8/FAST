@@ -161,7 +161,7 @@ class DefaultMobileConfig
     },
 
 
-    'Trial Key' => { # B0A6-42C4-FFD3-A978
+    'Trial Key' => { # 6158-BC31-0338-233B
       key_name: 'Trial',
       portals: %i[trial_general]
     },

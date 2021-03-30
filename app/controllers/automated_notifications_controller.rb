@@ -45,13 +45,7 @@ class AutomatedNotificationsController < ApplicationController
     else
       @anchor_date_fields = get_fields(@object_class, 'form', 'date')
     end
-
-    case @object_type.classify
-    when 'Verification', 'Meeting'
-      @audience_fields = get_fields(@object_class, 'auto', 'user')
-    else
-      @audience_fields = get_fields(@object_class, 'form', 'user')
-    end
+    @audience_fields = get_fields(@object_class, 'auto', 'user')
 
     @anchor_status = @object_class.progress.keys
     render :partial => "form"
@@ -92,13 +86,7 @@ class AutomatedNotificationsController < ApplicationController
     else
       @anchor_date_fields = get_fields(@object_class, 'form', 'date')
     end
-
-    case @object_type.classify
-    when 'Verification', 'Meeting'
-      @audience_fields = get_fields(@object_class, 'auto', 'user')
-    else
-      @audience_fields = get_fields(@object_class, 'form', 'user')
-    end
+    @audience_fields = get_fields(@object_class, 'auto', 'user')
 
     @anchor_status = @object_class.progress.keys
     render :partial => "automated_notifications/form_extra"

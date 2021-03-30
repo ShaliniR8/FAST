@@ -66,9 +66,15 @@ class ChecklistsController < ApplicationController
     @record = @table.find(params[:id])
 
     # Assignee update
-    if params[:assignee_names].present?
+    if params.key?(:assignee_names)
       user = User.find_by_full_name(params[:assignee_names])
-      params[:checklist][:assignee_ids] = user.id if user.present?
+      if user.present?
+        params[:checklist][:assignee_ids] = user.id if user.present?
+      else
+        params[:checklist][:assignee_ids] = nil
+      end
+    else
+      params[:checklist].delete(:assignee_ids)
     end
 
     # TODO: refactor needed
@@ -164,10 +170,10 @@ class ChecklistsController < ApplicationController
 
   def upload_csv(upload, owner)
     checklist_header_items = owner.checklist_header.checklist_header_items
-    has_header_col = checklist_header_items.length < CSV.read(upload, headers: true).headers.length
+    has_header_col = checklist_header_items.length < CSV.read(upload, headers: true, encoding: "ISO8859-1:UTF-8").headers.length
     begin
       Checklist.transaction do
-        CSV.foreach(upload, headers: true) do |csv_row|
+        CSV.foreach(upload, headers: true, encoding: "ISO8859-1:UTF-8") do |csv_row|
           csv_row = csv_row.fields
           is_header = csv_row.last
           checklist_row = ChecklistRow.create({
@@ -178,6 +184,9 @@ class ChecklistsController < ApplicationController
 
           checklist_header_items.each_with_index do |header_item, index|
             csv_cell_value = csv_row[index]
+            if csv_cell_value.present?
+              csv_cell_value.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+            end
             cell = ChecklistCell.new({
               checklist_header_item_id: checklist_header_items[index].id
             })

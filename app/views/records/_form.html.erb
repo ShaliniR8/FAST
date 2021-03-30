@@ -8,7 +8,7 @@
 <script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="/javascripts/utility/employee_select.js"></script>
+<!-- <script type="text/javascript" src="/javascripts/utility/employee_select.js"></script> -->
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
@@ -82,9 +82,16 @@
               <%=label_tag :submitted_by, "Submitted By"%>
               <%#integrate @record.get_user_id in the future?%>
               <%submitter_display = @record.anonymous? ? 'Anonymous' : @record.created_by.full_name%>
+              <%submitted_by = submitter_display%>
+              <%if !@record.anonymous? && CONFIG::GENERAL[:sabre_integration].present?%>
+                <%if @record.created_by.employee_number.present?%>
+                  <%submitted_by = submitted_by + " (#{@record.created_by.employee_number})"%>
+                <%end%>
+              <%end%>
+
               <input type="text"
                 readonly class="form-control"
-                value='<%=@action == "new" ? current_user.full_name : submitter_display%>'>
+                value="<%=submitted_by%>">
             </div>
 
             <%if CONFIG.sr::GENERAL[:submission_description]%>
@@ -243,7 +250,42 @@
           }
         }).catch(swal.noop);
       });
+    });
 
+    employee_table = null;
+    clear_user_table();
+    build_user_table();
+    $(this).find(".emp_button").each(function(index, item){
+      $(item).on("click", function(){
+        $(window).resize();
+        var emp_field_id = $(this).prop('id');
+        $(".emp_modal").show();
+        clear_user_table();
+        $("tbody tr").unbind();
+        $(".close").unbind();
+        $("tbody tr").on("click", function(){
+          if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
+            let display_emp = $(this).find("td").eq(1).text();
+            let emp_no = $(this).find("td").eq(3).text();
+            if (emp_no != null && emp_no != "") {
+              display_emp = display_emp + " (" + emp_no + ")";
+            }
+            $(item).parent().parent().find("#emp"+emp_field_id).val(display_emp);
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val(emp_no);
+          } else {
+            $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(1).text());
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(0).text());
+          }
+          $('#emp_div').hide();
+          $('.emp_modal').modal('toggle');
+        });
+        $('.close').on('click',function(){
+          $(item).parent().parent().find("#emp"+emp_field_id).val("");
+          $(item).parent().parent().find("#employee-select"+emp_field_id).val("");
+          $('#emp_div').hide();
+        });
+        build_user_table();
+      });
     });
 
   });
@@ -281,8 +323,13 @@
       var icao = $(this).find("td").eq(0).text();
       var iata = $(this).find("td").eq(1).text();
       // Set the value on the form
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
+      if (<%=CONFIG::GENERAL[:sabre_integration]%> == true) {
+        $("#airport" + field_id).val(iata);
+        $("#airport-select" + field_id).val(iata);
+      } else {
+        $("#airport" + field_id).val(icao + ";" + iata);
+        $("#airport-select" + field_id).val(icao + ";" + iata);
+      }
       resetModal(field_id);
     });
   }
@@ -295,6 +342,19 @@
     $("#arpt_name").val("");
     $('#airport_div').hide();
     $(".airport_modal").modal("hide");
+  }
+
+  function build_user_table(){
+    employee_table=$('#users').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  }
+
+  function clear_user_table(){
+    if(employee_table != null) {
+      employee_table.destroy();
+    }
   }
 
   function update_titles(target){

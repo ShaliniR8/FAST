@@ -100,7 +100,7 @@ class EvaluationsController < SafetyAssuranceController
   def show
     load_options
     @fields = Evaluation.get_meta_fields('show')
-    if !@owner.viewer_access && !current_user.has_access('evaluations', 'viewer', admin: true)
+    if !@owner.viewer_access && !current_user.has_access('evaluations', 'viewer', admin: CONFIG::GENERAL[:global_admin_default])
       redirect_to errors_path
       return
     end

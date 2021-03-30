@@ -19,13 +19,13 @@
 
 <%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
 <%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer'%>
-<%submission_show_access = current_user.has_access('submissions','show', admin: true)%>
-<%record_edit_access = current_user.has_access('records', 'edit', admin: true)%>
-<%record_delete_access = current_user.has_access('records','destroy', admin: true, strict: true)%>
-<%report_show_access = current_user.has_access('reports','show', admin: true)%>
-<%report_admin_access = current_user.has_access('reports', 'admin', admin: true, strict: true)%>
-<%sa_module_access = current_user.has_access('Safety Assurance','module', admin: true, strict: true)%>
-<%sra_module_access = current_user.has_access('Safety Risk Management','module', admin: true, strict: true)%>
+<%submission_show_access = current_user.has_access('submissions','show', admin: CONFIG::GENERAL[:global_admin_default])%>
+<%record_edit_access = current_user.has_access('records', 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
+<%record_delete_access = current_user.has_access('records','destroy', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+<%report_show_access = current_user.has_access('reports','show', admin: CONFIG::GENERAL[:global_admin_default])%>
+<%report_admin_access = current_user.has_access('reports', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+<%sa_module_access = current_user.has_access('Safety Assurance','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+<%sra_module_access = current_user.has_access('Safety Risk Management','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
 
 <div class='item active mt50' style="height:auto;">
   <div class="grid per90 center-block">

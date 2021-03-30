@@ -77,13 +77,12 @@ class AccessControl < ActiveRecord::Base
   end
 
 
-
   def self.module_map
     {
       "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
-      "smsim" => ["SMS IM", "ims", "packages"],
+      "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations'],
-      "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls'],
+      "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings'],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
     }
@@ -98,11 +97,11 @@ class AccessControl < ActiveRecord::Base
         "show"                => generate_desc("Submission", "show"),
         "destroy"             => generate_desc("Submission", "destroy"),
         "index"               => generate_desc("Submission", "index"),
-        "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from access any previous submissions.",
+        "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from accessing any previous submissions.",
       },
 
       "records"=>{
-        "summary"             => "This gives the user access to the \"View Summary\" button on the Meeting page",
+        "summary"             => "This gives the user access to the \"View Narrative\" button on the Meeting page",
         "show"                => generate_desc("Report", "show"),
         "edit"                => generate_desc("Report", "edit"),
         "destroy"             => generate_desc("Report", "destroy"),
@@ -214,12 +213,12 @@ class AccessControl < ActiveRecord::Base
       },
 
       'sras'=>{
-        "new"                 => generate_desc("SRA", "new"),
-        "show"                => generate_desc("SRA", "show"),
-        "edit"                => generate_desc("SRA", "edit"),
-        "destroy"             => generate_desc("SRA", "destroy"),
-        "index"               => generate_desc("SRA", "index"),
-        "viewer"              => generate_desc("SRA", "viewer"),
+        "new"                 => generate_desc("SRA(SRM)", "new"),
+        "show"                => generate_desc("SRA(SRM)", "show"),
+        "edit"                => generate_desc("SRA(SRM)", "edit"),
+        "destroy"             => generate_desc("SRA(SRM)", "destroy"),
+        "index"               => generate_desc("SRA(SRM)", "index"),
+        "viewer"              => generate_desc("SRA(SRM)", "viewer"),
       },
 
       'hazards'=>{
@@ -250,12 +249,12 @@ class AccessControl < ActiveRecord::Base
       },
 
       'srm_meetings'=>{
-        "new"                 => generate_desc("SRM Meeting", "new"),
-        "show"                => generate_desc("SRM Meeting", "show"),
-        "edit"                => generate_desc("SRM Meeting", "edit"),
-        "destroy"             => generate_desc("SRM Meeting", "destroy"),
-        "index"               => generate_desc("SRM Meeting", "index"),
-        "viewer"              => generate_desc("SRM Meeting", "viewer"),
+        "new"                 => generate_desc("SRA(SRM) Meeting", "new"),
+        "show"                => generate_desc("SRA(SRM) Meeting", "show"),
+        "edit"                => generate_desc("SRA(SRM) Meeting", "edit"),
+        "destroy"             => generate_desc("SRA(SRM) Meeting", "destroy"),
+        "index"               => generate_desc("SRA(SRM) Meeting", "index"),
+        "viewer"              => generate_desc("SRA(SRM) Meeting", "viewer"),
       },
 
       'ims'=>{
@@ -285,7 +284,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("SMS IM Meeting", "viewer"),
        },
 
-       'ASAP'=>{
+       'ASAP' =>{
         'module'              => generate_desc("Safety Reporting", "module"),
        },
 
@@ -307,7 +306,7 @@ class AccessControl < ActiveRecord::Base
        },
 
        'home'=>{
-        'query_all'           =>'This gives the user access to the Query Center for Safety Reporting, Safety Assurance, and SRA modules should they have access to them.'
+        'query_all'           =>'This gives the user access to the Query Center for Safety Reporting, Safety Assurance, and SRA(SRM) modules should they have access to them.'
        }
     }
   end
@@ -323,7 +322,7 @@ class AccessControl < ActiveRecord::Base
         "Admin"=>"admin"
       },
       "records"=>{
-        "View Summary" => "summary",
+        "View Narrative" => "summary",
         "New"=>"new",
         "View"=>"show",
         "Edit"=>"edit",
@@ -544,7 +543,7 @@ class AccessControl < ActiveRecord::Base
     h["Viewer"] = "viewer"
     h["Full"] = "full"
     h["Notifier"] = "notifier"
-    h["View Summary"] = "summary"
+    h["View Narrative"] = "summary"
     h["Submitter"] = "submitter"
     h["Safety Enhancement"] = "enhance"
     h["Summary"] = "summary"
@@ -564,8 +563,8 @@ class AccessControl < ActiveRecord::Base
       "Reports"                               => "records",
       "Event Reports"                         => "reports",
       "Trackings"                             => "trackings",
-      "Meetings"                              => "meetings",
-      "Corrective Actions(ASAP)"              => "corrective_actions",
+      "SR Meetings"                           => "meetings",
+      "Corrective Actions(Safety Reporting)"  => "corrective_actions",
       "FAA Reports"                           => "faa_reports",
       "Documents"                             => "documents",
       "Audits"                                => "audits",
@@ -582,11 +581,11 @@ class AccessControl < ActiveRecord::Base
       "SMS IM Meetings"                       => "sms_meetings",
       "IM Plans"                              => "ims",
       "IM Packages"                           => "packages",
-      "SRM Meetings"                          => "srm_meetings",
-      "ASAP"                                  => "ASAP",
+      "SRA(SRM) Meetings"                     => "srm_meetings",
+      "Safety Reporting"                      => "ASAP",
       "SMS IM"                                => "SMS IM",
       "Safety Assurance"                      => "Safety Assurance",
-      "Safety Risk Management"                => "Safety Risk Management",
+      "SRA(SRM)"                              => "Safety Risk Management",
       "Query Center"                          => "home",
     }.sort.to_h
   end
@@ -595,8 +594,8 @@ class AccessControl < ActiveRecord::Base
 
   def self.object_types
     {
-      "Meetings"                              => "meetings",
-      "Corrective Actions(ASAP)"              => "corrective_actions",
+      "SR Meetings"                           => "meetings",
+      "Corrective Actions(Safety Reporting)"  => "corrective_actions",
       "Audits"                                => "audits",
       "Inspections"                           => "inspections",
       "Evaluations"                           => "evaluations",
@@ -604,10 +603,10 @@ class AccessControl < ActiveRecord::Base
       "Findings"                              => "findings",
       "Corrective Actions(Safety Assurance)"  => "sms_actions",
       "Recommendations"                       => "recommendations",
-      "SRAs"                                  => "sras",
+      "SRA(SRM)"                              => "sras",
       "Hazards"                               => "hazards",
       "Risk Controls"                         => "risk_controls",
-      "Safety Plans"                          => "safety_plans",
+      # "Safety Plans"                          => "safety_plans",
       "Verifications"                         => "verifications",
     }.sort.to_h
   end
@@ -668,7 +667,7 @@ class AccessControl < ActiveRecord::Base
     when "notifier"
       "Users with this access rule will receive an email notification when a new #{template_name} Submission is submitted."
     when "full"
-      "This gives the user full access to #{template_name} and allows the user to create or edit Submissions/Reports. Please note that access to creating/editing Submissions/Reports is also required."
+      "This gives the user full access to #{template_name} and allows the user to create Submissions/Reports and edit Reports. Please note that access to creating/editing Submissions/Reports is also required."
     when "confidential"
       "This gives the user access to view the #{template_name} that are confidential."
     else

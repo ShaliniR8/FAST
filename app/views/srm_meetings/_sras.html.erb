@@ -32,7 +32,7 @@
               <td><%if sra.minutes.present?%><%=sra.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
               <td>
                 <%=link_to "View", sra_path(sra), :class => "btn btn-info mb5", :disable_with => "Redirecting..."%>
-                <%if current_user.has_access('sms_meetings','edit', admin: true) && @meeting.status == 'Open' && @meeting.has_user(current_user)%>
+                <%if current_user.has_access('sms_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && @meeting.status == 'Open' && @meeting.has_user(current_user)%>
                   <%if @meeting.status != "Closed" && sra.srm_agendas.blank?%>
                     <%=link_to "Carryover", "#",:class => "btn btn-danger carryover_btn mb5",:route => carryover_sra_path(sra.id)%>
                   <%end%>

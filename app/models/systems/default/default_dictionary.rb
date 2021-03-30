@@ -15,7 +15,7 @@ class DefaultDictionary
       access: proc { |owner:,user:,**op|
         form_confirmed = owner.status == 'Pending Approval' || op[:form_conds]
         user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
-          priv_check.call(owner,user,'admin',true,true) ||
+          priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
       },
@@ -26,7 +26,7 @@ class DefaultDictionary
       access: proc { |owner:,user:,**op|
         form_confirmed = owner.status == 'New' || op[:form_conds]
         user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
-          priv_check.call(owner,user,'admin',true,true) ||
+          priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
       },
@@ -47,7 +47,7 @@ class DefaultDictionary
       access: proc { |owner:,user:,**op|
         form_confirmed = owner.status == 'Assigned' || op[:form_conds]
         user_confirmed = [owner.created_by_id, owner.responsible_user_id].include?(user.id) ||
-          priv_check.call(owner,user,'admin',true,true) ||
+          priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
       },
@@ -75,7 +75,7 @@ class DefaultDictionary
     edit: {
       btn: :edit,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| owner.status != 'Completed' && priv_check.call(owner,user,'edit',true,true) },
+      access: proc { |owner:,user:,**op| owner.status != 'Completed' && priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true) },
     },
     evaluate: {
       btn: :evaluate,
@@ -95,14 +95,14 @@ class DefaultDictionary
     launch: {
       btn: :launch,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? && priv_check.call(owner,user,'edit',true,true) },
+      access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? && priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true) },
     },
     hazard: {
       btn: :hazard,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        owner.status != 'Completed' &&
-        priv_check.call(owner,user,'new',true,true)
+        ['Completed'].exclude?(owner.status) &&
+        priv_check.call(Object.const_get('Hazard'),user,'new',CONFIG::GENERAL[:global_admin_default],true)
       },
     },
     message_submitter: {
@@ -113,18 +113,18 @@ class DefaultDictionary
     override_status: {
       btn: :override_status,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',true,true) },
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) },
     },
     pdf: {
       btn: :pdf,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',true,true) },
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) },
     },
     private_link: {
       btn: :private_link,
       btn_loc: [:top],
       access: proc { |owner:,user:,**op|
-        CONFIG::GENERAL[:shared_links] && priv_check.call(owner,user,'admin',true,true)
+        CONFIG::GENERAL[:shared_links] && priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true)
       },
     },
     recommendation: {
@@ -133,7 +133,7 @@ class DefaultDictionary
       access: proc { |owner:,user:,**op|
         form_confirmed = owner.status == 'Assigned' || op[:form_conds]
         user_confirmed = [owner.created_by_id, owner.responsible_user_id].include?(user.id) ||
-          priv_check.call(owner,user,'admin',true,true) ||
+          priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
       },
@@ -150,7 +150,7 @@ class DefaultDictionary
         next false unless CONFIG::GENERAL[:allow_reopen_report]
         form_confirmed = owner.status == 'Completed' || op[:form_conds]
         user_confirmed = [owner.created_by_id].include?(user.id) ||
-          priv_check.call(owner,user,'admin',true,true) ||
+          priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
       },
@@ -197,7 +197,7 @@ class DefaultDictionary
       access: proc { |owner:,user:,**op|
         form_confirmed = ['Assigned'].include?(owner.status) || op[:form_conds]
         user_confirmed = [owner.responsible_user, owner.approver].include?(user) ||
-          priv_check.call(owner,user,'admin',true,true) ||
+          priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
       }
@@ -240,7 +240,7 @@ class DefaultDictionary
     viewer_access: {
       btn: :viewer_access,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'edit',true,true)
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true)
       },
     },
   }
@@ -538,7 +538,7 @@ class DefaultDictionary
       data: proc { |owner:,user:,**op| {
         owner: owner,
         cause_type: 'description',
-        can_change: owner.status == 'New' && priv_check.call(owner,user,'edit',true)
+        can_change: owner.status == 'New' && priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default])
       }},
     },
   }
@@ -560,8 +560,8 @@ class DefaultDictionary
       required: false
     },
     created_by: {
-      field: 'created_by_id', title: 'Created By',
-      num_cols: 6,  type: 'user', visible: 'show',
+      field: 'created_by_id', title: 'Creator',
+      num_cols: 6,  type: 'user', visible: 'show,auto',
       required: false
     },
     viewer_access: {
@@ -581,12 +581,12 @@ class DefaultDictionary
     },
     responsible_user: {
       field: 'responsible_user_id', title: 'Responsible User',
-      num_cols: 6,  type: 'user', visible: 'index,form,show',
+      num_cols: 6,  type: 'user', visible: 'index,form,show,auto',
       required: false, display: 'get_responsible_user_name'
     },
     approver: {
       field: 'approver_id', title: 'Final Approver',
-      num_cols: 6,  type: 'user', visible: 'form,show',
+      num_cols: 6,  type: 'user', visible: 'form,show,auto',
       required: false, display: 'get_approver_name'
     },
     location: {

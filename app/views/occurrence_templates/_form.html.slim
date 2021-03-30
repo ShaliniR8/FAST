@@ -17,12 +17,13 @@
           .col-sm-8
             = f.text_field :title,
               class: 'form-control'
-        .form-group.col-sm-6
-          = f.label :title, 'Label',
-            class: 'col-sm-4 col-form-label'
-          .col-sm-8
-            = f.text_field :label,
-              class: 'form-control'
+        - if current_user.full_name == 'ProSafeT Engineering' || (controller.action_name != 'new' && @owner.parent_id.nil?)
+          .form-group.col-sm-6
+            = f.label :title, 'Label',
+              class: 'col-sm-4 col-form-label'
+            .col-sm-8
+              = f.text_field :label,
+                class: 'form-control'
         .form-group.col-sm-6
           = f.label :format, 'Format',
             class: 'col-sm-4 col-form-label'

@@ -224,7 +224,7 @@ private
 
     @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
 
-    if !current_user.has_access('risk_controls', 'admin', admin: true, strict: true)
+    if !current_user.has_access('risk_controls', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       rcs = RiskControl.includes(hazard: :sra)
       cars = rcs.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Approval', 'Completed'], current_user.id)

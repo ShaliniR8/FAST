@@ -112,7 +112,7 @@ class ApplicationController < ActionController::Base
       if current_user.disable
         redirect_to logout_path
         return false
-      elsif !current_user.has_access(controller_name,action_name,admin:true, permissions: (session[:permissions].present? ? JSON.parse(session[:permissions]) : nil))
+      elsif !current_user.has_access(controller_name,action_name,admin:CONFIG::GENERAL[:global_admin_default], permissions: (session[:permissions].present? ? JSON.parse(session[:permissions]) : nil))
         unless (action_name == 'show' &&
           current_user.has_access(controller_name,'viewer',strict:strict) &&
           (Object.const_get(controller_name.singularize.titleize).find(params[:id]).viewer_access rescue true))
@@ -151,7 +151,7 @@ class ApplicationController < ActionController::Base
     end
 
     report = Object.const_get(form.titleize.gsub(/\s+/, '')).find(params[:id])
-    if current_user.has_access("#{form}s", 'admin', admin: true, strict: true)
+    if current_user.has_access("#{form}s", 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       true
     else
       group_validation = false #to reduce calculation of whether user is part of the group if present
@@ -804,7 +804,8 @@ class ApplicationController < ActionController::Base
   def load_controller_list
     @sms_list=['sms_actions','findings','audits','inspections','recommendations','investigations','evaluations']
     @sms_im_list=['ims']
-    @asap_list=['reports','records','corrective_actions','trackings','faa_reports','templates','fields']
+    # @asap_list=['reports','records','corrective_actions','trackings','faa_reports','templates','fields']
+    @asap_list=['reports','records','corrective_actions','trackings','faa_reports']
     @srm_list=['sras','hazards','risk_controls','safety_plans']
   end
 
@@ -938,7 +939,7 @@ class ApplicationController < ActionController::Base
   def filter_records(object_name, controller_name)
     if %w[Audit Inspection Evaluation Investigation].include? object_name
       @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
-      if !current_user.has_access(controller_name,'admin', admin: true, strict: true)
+      if !current_user.has_access(controller_name,'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         cars =  Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
           ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
         cars +=  Object.const_get(object_name).where('approver_id = ?',  current_user.id)
@@ -958,7 +959,7 @@ class ApplicationController < ActionController::Base
         @records = @records & cars
       end
     else # Findings, Corrective Actions, Recommendations
-      if !current_user.has_access(controller_name, 'admin', admin: true, strict: true)
+      if !current_user.has_access(controller_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         cars = Object.const_get(object_name).where('status in (?) and responsible_user_id = ?',
           ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
         cars += Object.const_get(object_name).where('approver_id = ?', current_user.id)
@@ -1043,7 +1044,7 @@ class ApplicationController < ActionController::Base
       render partial: 'records/category',
              locals: {deid: !current_user.has_template_access(@record.template.name).include?('full'),
              from_record_show: true,
-             record_edit_access: current_user.has_access('records', 'edit', admin: true),
+             record_edit_access: current_user.has_access('records', 'edit', admin: CONFIG::GENERAL[:global_admin_default]),
              hide_panel_head: true}
     else
     end

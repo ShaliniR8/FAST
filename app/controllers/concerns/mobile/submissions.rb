@@ -138,7 +138,7 @@ module Concerns
         # Get templates the user has access to
         templates = Template.includes({ categories: :fields }).all
 
-        unless current_user.has_access('submissions', 'admin', admin: true, strict: true)
+        unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           templates.keep_if do |template|
             current_user.has_template_access(template.name).match /full|submitter/
           end

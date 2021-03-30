@@ -316,7 +316,7 @@ private
     @records = @records.select{|rec| params[:departments].include?(rec.departments)} if params[:departments].present?
     @headers = @table.get_meta_fields('index')
     @table_name = "hazards"
-    if !current_user.has_access('hazards', 'admin', admin: true, strict: true)
+    if !current_user.has_access('hazards', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       hazards = Hazard.includes(:sra)
       cars = hazards.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'], current_user.id)

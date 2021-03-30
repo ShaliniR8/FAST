@@ -1,6 +1,6 @@
 = javascript_include_tag "/javascripts/utility/format-builder.js"
 = javascript_include_tag "/javascripts/utility/timezone-control.js"
-= javascript_include_tag "/javascripts/utility/employee_select.js"
+/ = javascript_include_tag "/javascripts/utility/employee_select.js"
 
 // airport selector
 .modal.fade.bs-example-modal-lg.airport_modal tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
@@ -122,21 +122,18 @@ css:
 
 
 javascript:
+  var map,
+    mapTypes = {},
+    pointsHolder = {},
+    mapSettings = {},
+    markers = [],
+    centerLat = #{ CONFIG::GENERAL[:lat] },
+    centerLng = #{ CONFIG::GENERAL[:lng] },
+    mapZoom = #{ CONFIG::GENERAL[:gMapZoom] },
+    clicked_map_field_id;
 
   $(document).ready(function(){
-
     var airport_table;
-
-    var map,
-        mapTypes = {},
-        pointsHolder = {},
-        mapSettings = {},
-        markers = [],
-        centerLat = "#{ CONFIG::GENERAL[:lat] }",
-        centerLng = "#{ CONFIG::GENERAL[:lng] }",
-        mapZoom = "#{ CONFIG::GENERAL[:gMapZoom] }",
-        clicked_map_field_id;
-
 
     $(".required_field").css('border-color', '');
     $(".required_field").closest('.form-group').find('label').not('.checkbox').not('.radio').css("color", "red");
@@ -177,7 +174,6 @@ javascript:
       });
     });
 
-
     $(document).find(".map_button").each(function(index, item){
       $(item).on('click', function(){
         clicked_map_field_id = $(this).prop("id");
@@ -211,6 +207,42 @@ javascript:
             }
           }
         }).catch(swal.noop);
+      });
+    });
+
+    employee_table = null;
+    clear_user_table();
+    build_user_table();
+    $(this).find(".emp_button").each(function(index, item){
+      $(item).on("click", function(){
+        $(window).resize();
+        var emp_field_id = $(this).prop('id');
+        $(".emp_modal").show();
+        clear_user_table();
+        $("tbody tr").unbind();
+        $(".close").unbind();
+        $("tbody tr").on("click", function(){
+          if (#{CONFIG::GENERAL[:sabre_integration].present?.to_json} == true) {
+            let display_emp = $(this).find("td").eq(1).text();
+            let emp_no = $(this).find("td").eq(3).text();
+            if (emp_no != null && emp_no != "") {
+              display_emp = display_emp + " (" + emp_no + ")";
+            }
+            $(item).parent().parent().find("#emp"+emp_field_id).val(display_emp);
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val(emp_no);
+          } else {
+            $(item).parent().parent().find("#emp"+emp_field_id).val($(this).find("td").eq(1).text());
+            $(item).parent().parent().find("#employee-select"+emp_field_id).val($(this).find("td").eq(0).text());
+          }
+          $('#emp_div').hide();
+          $('.emp_modal').modal('toggle');
+        });
+        $('.close').on('click',function(){
+          $(item).parent().parent().find("#emp"+emp_field_id).val("");
+          $(item).parent().parent().find("#employee-select"+emp_field_id).val("");
+          $('#emp_div').hide();
+        });
+        build_user_table();
       });
     });
   });
@@ -281,7 +313,7 @@ javascript:
   function initialize() {
     mapSettings[google.maps.MapTypeId.SATELLITE] = {
       center: new google.maps.LatLng(parseFloat(centerLat), parseFloat(centerLng)),
-      zoom: mapZoom
+      zoom: parseFloat(mapZoom)
     };
 
     var mapOptions = {
@@ -406,8 +438,13 @@ javascript:
     $("body").on("click", "#airports" + field_id + " tbody tr", function(){
       var icao = $(this).find("td").eq(0).text();
       var iata = $(this).find("td").eq(1).text();
-      $("#airport" + field_id).val(icao + ";" + iata);
-      $("#airport-select" + field_id).val(icao + ";" + iata);
+      if (#{CONFIG::GENERAL[:sabre_integration].present?.to_json} == true) {
+        $("#airport" + field_id).val(iata);
+        $("#airport-select" + field_id).val(iata);
+      } else {
+        $("#airport" + field_id).val(icao + ";" + iata);
+        $("#airport-select" + field_id).val(icao + ";" + iata);
+      }
       resetModal(field_id);
     });
   }
@@ -419,6 +456,7 @@ javascript:
     $(".nested_field_" + field_id).closest('.nested_field_area').hide();
     $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
   }
+
 
   function update_cb_rb_nested(field, isRadio){
     console.log('update_cb_rb_nested');
@@ -434,3 +472,28 @@ javascript:
     }
   }
 
+  function build_user_table(){
+    employee_table=$('#users').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  }
+
+  function clear_user_table(){
+    if(employee_table != null) {
+      employee_table.destroy();
+    }
+  }
+
+  function build_user_table(){
+    employee_table=$('#users').DataTable({
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+  }
+
+  function clear_user_table(){
+    if(employee_table != null) {
+      employee_table.destroy();
+    }
+  }

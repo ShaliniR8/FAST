@@ -312,6 +312,7 @@ PrdgSession::Application.routes.draw do |map|
       get "template_json" #Added by BP Aug 8 render the json of templates accessible to current user
       get "user_submission_json" #Added by BP Aug 15 render the json of submissions of current user
       post "get_dataset"
+      get 'flight_selected'
     end
   end
   resources :records do

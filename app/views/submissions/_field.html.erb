@@ -6,6 +6,8 @@
     <%=field.get_label.present? ? field.get_label.html_safe : nil%>
   </label>
 
+  <%sabre_map = field.sabre_map.present? ? "#{field.sabre_map}" : ""%>
+
   <% required = field.required? ? "required_field" : "" %>
 
   <%if @action == "new"%>
@@ -23,14 +25,16 @@
         <%=rf.text_field :value,
           {:class => required + " " + field_class + " " + field.element_class,
           :placeholder => field.label,
-          :id=>field.element_id}%>
+          :id=>field.element_id,
+          "sabre-map" => sabre_map}%>
       <%elsif field.display_type == "textarea"%>
         <%=rf.text_area :value,
           {:class => required + " form-control " + field.element_class,
           :rows => 4,
           :maxlength => field.max_length,
           :placeholder => field.max_length.present? ? "please limit to #{field.max_length} characters" : '',
-          :id => field.element_id}%>
+          :id => field.element_id,
+          "sabre-map" => sabre_map}%>
         <% if field.max_length.present? %>
           <h6 id="countchar" class="pull-right">0/<%= field.max_length %></h6>
         <% end %>
@@ -91,7 +95,7 @@
         </div>
       <%elsif field.display_type == "employee"%>
         <div class="input-group">
-          <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp "+required,:readonly=>true,:id=>"emp#{field.id}"}%>
+          <%=text_field_tag field.get_label, "", {:class=>"form-control ml5 emp "+required,:readonly=>true,:id=>"emp#{field.id}","sabre-map" => sabre_map}%>
           <%=rf.hidden_field :value, :id=>"employee-select#{field.id}"%>
           <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info emp_button","data-toggle"=>"modal","data-target"=>".emp_modal", :id=>"#{field.id}"%></span>
         </div>
@@ -100,7 +104,8 @@
           <%=text_field_tag field.get_label, "",
             {:class => "form-control ml5 airport " + required,
               :readonly => true,
-              :id => "airport#{field.id}"}%>
+              :id => "airport#{field.id}",
+              "sabre-map" => sabre_map}%>
           <%=rf.hidden_field :value, :id => "airport-select#{field.id}"%>
           <span class="input-group-btn">
             <%=link_to "...", "#",
@@ -140,7 +145,8 @@
         <%= rf.text_field :value,
           {:list => "#{field.id}",
           :class => "field_select form-control " + required,
-          "data-id" => field.id}%>
+          "data-id" => field.id,
+          "sabre-map" => sabre_map}%>
         <datalist id="<%=field.id%>">
           <% field.getOptions.each do |opt|%>
             <option value="<%=opt%>"></option>
@@ -173,7 +179,8 @@
             <%=rf.text_field :value,
               {:class=> "field-" + field.data_type + ' form-control ' + field.element_class + ' ' + required,
                 :placeholder=>field.label,
-                :id=>field.element_id}%>
+                :id=>field.element_id,
+                "sabre-map" => sabre_map}%>
           </td>
         <%end%>
 
@@ -182,7 +189,8 @@
           {:class => required + " form-control " + field.element_class,
           :rows => 4,
           :placeholder=>field.label,
-          :id=>field.element_id}%>
+          :id=>field.element_id,
+          "sabre-map" => sabre_map}%>
 
       <%elsif field.display_type == "dropdown"%>
         <%if field.data_type == "timezone"%>
@@ -247,12 +255,23 @@
       <%elsif field.display_type == "employee"%>
         <div class="input-group">
           <%if (@record_field.value.match(/\A[+-]?\d+?(\.\d+)?\Z/) rescue false)%>
-            <%@record_field.value = User.find(@record_field.value).full_name rescue ''%>
+            <%if CONFIG::GENERAL[:sabre_integration].present?%>
+              <%display_emp = " (#{@record_field.value})"
+                user_name = User.where(employee_number: @record_field.value).first.full_name rescue nil
+                if user_name.present?
+                  display_emp = user_name + display_emp
+                end
+              %>
+              <%@record_field.value = display_emp%>
+            <%else%>
+              <%@record_field.value = User.find(@record_field.value).full_name rescue ''%>
+            <%end%>
           <%end%>
           <%=text_field_tag field.get_label, "",
             {:class => "form-control ml5 emp " + required,
               :readonly => true,
               :id => "emp#{field.id}",
+              "sabre-map" => sabre_map,
               :value =>  @record_field.value}%>
           <%=rf.hidden_field :value, :id=>"employee-select#{field.id}"%>
           <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info emp_button","data-toggle"=>"modal","data-target"=>".emp_modal", :id=>"#{field.id}"%></span>
@@ -266,6 +285,7 @@
             {:class=>"form-control ml5 airport " + required,
               :readonly => true,
               :id => "airport#{field.id}",
+              "sabre-map" => sabre_map,
               :value => @record_field.value}%>
           <%=rf.hidden_field :value, :id=>"airport-select#{field.id}"%>
           <span class="input-group-btn"><%=link_to "...","#",:class=>"btn btn-info airport_button","data-toggle"=>"modal","data-target"=>".airport_modal", :id=>"#{field.id}"%></span>
@@ -307,7 +327,8 @@
         <%=rf.text_field :value, {
           :list => "#{field.id}",
           :class => required + ' form-control ' + field.element_class,
-          :id => field.element_id}%>
+          :id => field.element_id,
+          "sabre-map" => sabre_map}%>
         <datalist id="<%=field.id%>">
           <%field.getOptions.each do |opt|%>
             <option value="<%=opt%>"></option>

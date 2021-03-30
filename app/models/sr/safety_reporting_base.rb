@@ -48,7 +48,18 @@ module Sr
 
 
     def get_submitter_name
-      anonymous ? 'Anonymous' : created_by.full_name
+      val = nil
+      if anonymous
+        val = 'Anonymous'
+      else
+        val = created_by.full_name
+        if CONFIG::GENERAL[:sabre_integration].present?
+          if created_by.employee_number.present?
+            val = val + " (#{created_by.employee_number})"
+          end
+        end
+      end
+      val
     end
 
     def get_submitter_id

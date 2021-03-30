@@ -17,7 +17,7 @@
             Meeting #<%=@meeting.get_id%>
           </div>
           <div class="top_buttons pull-right">
-            <%if current_user.has_access('meetings', 'destroy', admin: true)%>
+            <%if current_user.has_access('meetings', 'destroy', admin: CONFIG::GENERAL[:global_admin_default])%>
               <%=link_to 'Delete',
                 meeting_path(@meeting),
                 :method => "delete",
@@ -33,7 +33,7 @@
                 "data-target" => ".bs-example-modal-lg"%>
             <%end%>
 
-            <% if current_user.has_access('meetings', 'edit', admin: true) &&
+            <% if current_user.has_access('meetings', 'edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
               @meeting.has_user(current_user) &&
               @meeting.status != 'Closed' %>
               <%=link_to "Edit",
@@ -55,7 +55,7 @@
       <div class="panel-body">
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
-            <% if current_user.has_access('meetings','edit', admin: true) &&
+            <% if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
               @meeting.has_user(current_user) %>
               <%if @meeting.status == "Open"%>
                 <%=link_to 'Close Meeting', '#',

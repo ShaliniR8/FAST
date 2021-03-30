@@ -655,8 +655,13 @@ class QueriesController < ApplicationController
       else
         case field[:field_type]
         when 'employee'
-          matching_users = User.where("full_name = ?", search_value).map(&:id).map(&:to_s) |
+          if CONFIG::GENERAL[:sabre_integration].present?
+            matching_users = User.where("employee_number = ?", "%#{search_value}%").map(&:id).map(&:to_s) |
+            User.where("employee_number = ?", search_value).map(&:employee_number).map(&:to_s)
+          else
+            matching_users = User.where("full_name = ?", search_value).map(&:id).map(&:to_s) |
             User.where("full_name = ?", search_value).map(&:full_name).map(&:to_s)
+          end
           result = related_fields.select{|x| xor ^ (matching_users.include? x.value)}
         else
           result = related_fields.select{|x| xor ^ (x.value.to_s.downcase == search_value.to_s.downcase)}
@@ -672,8 +677,13 @@ class QueriesController < ApplicationController
       else
         case field[:field_type]
         when 'employee'
-          matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:id).map(&:to_s) |
+          if CONFIG::GENERAL[:sabre_integration].present?
+            matching_users = User.where("employee_number LIKE ?", "%#{search_value}%").map(&:id).map(&:to_s) |
+            User.where("employee_number LIKE ?", "%#{search_value}%").map(&:employee_number).map(&:to_s)
+          else
+            matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:id).map(&:to_s) |
             User.where("full_name LIKE ?", "%#{search_value}%").map(&:full_name).map(&:to_s)
+          end
           result = related_fields.select{|x| xor ^ (matching_users.include? x.value)}
         else
           result = related_fields.select{|x| xor ^ (x.value.to_s.downcase.include? search_value.to_s.downcase)}

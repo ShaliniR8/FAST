@@ -117,7 +117,7 @@ class SafetyAssuranceController < ApplicationController
   end
 
   def override_status
-    if !current_user.has_access(@owner.class.name.downcase.underscore, 'admin', admin: true, strict: true)
+    if !current_user.has_access(@owner.class.name.downcase.underscore, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       redirect_to errors_path
       return false
     end

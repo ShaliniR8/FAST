@@ -49,7 +49,15 @@ class VerificationsController < ApplicationController
 
   def destroy
     @verification = Verification.find(params[:id])
+    @owner = @verification.owner
+    transaction_content = @verification.detail
     @verification.destroy
+    Transaction.build_for(
+        @owner,
+        "Delete Verification",
+        current_user.id,
+        transaction_content
+      )
     redirect_to @verification.owner, flash: {success: 'Verification deleted.'}
   end
 

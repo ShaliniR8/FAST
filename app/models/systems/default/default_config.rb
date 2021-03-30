@@ -30,9 +30,18 @@ class DefaultConfig
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
     cisp_integration:                   false,
+    sabre_integration:                  false,
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
     power_bi_integration:               false,
+    has_confidential_forms:             false,
+
+    # Map Configs. Needed in default config to avoid javascript undefined errors
+    has_gmap:                           false,
+    gis_layers:                         false,
+    lat:                                0.0,
+    lng:                                0.0,
+    gMapZoom:                           14,
 
     # Third Party Integrations:
     integrations: ['mitre'],
@@ -51,6 +60,7 @@ class DefaultConfig
     has_extension:                      true,   # Allows forms to request extensions
     has_verification:                   true,   # Allows forms to be verified (additional step)
     attach_pdf_in_message:              true,   # Allows option to attach PDF version of the source of Input for email notfication fired by Messages
+    global_admin_default:               true,   # Default value to use for admin parameter when calling has_access in user.rb
   }
 
   LAUNCH_OBJECTS = {
@@ -90,6 +100,21 @@ class DefaultConfig
     'Region'                         => 'Region Not Initialized',
     'ASAP MOU Holder Name'           => 'Holder Name Not Initialized',
     'ASAP MOU Holder FAA Designator' => 'Holder FAA Designator Not Initialized'
+  }
+
+  REPORT_TYPES = {
+    "ASAP" => "asap",
+    "Non-ASAP" => "non-asap",
+  }
+
+  EMPLOYEE_GROUPS = {
+    "Flight Crew" => "flight-crew",
+    "Inflight" => "inflight",
+    "Ground" => "ground",
+    "Dispatch" => "dispatch",
+    "Maintenance" => "maintenance",
+    "General" => "general",
+    "Other" => "other",
   }
 
   # To access Safety Reporting Configs use the constant defined below (use CONFIG.sr in code)

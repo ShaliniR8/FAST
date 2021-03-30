@@ -56,7 +56,7 @@ module StandardWorkflow
   end
 
   def has_admin_rights?(user)
-    user.has_access(self.permission, 'admin', admin: true, strict: true)
+    user.has_access(self.permission, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
   end
 
   # Used to print debug information in the above functions. Use the following line to execute:

@@ -159,7 +159,7 @@ class FaaReport < ActiveRecord::Base
 
 
   def self.getEmployeeGroup
-    Template.select(:emp_group).map(&:emp_group).compact.uniq.map!(&:titleize)
+    CONFIG::EMPLOYEE_GROUPS
   end
 
 

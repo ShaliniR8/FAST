@@ -156,24 +156,57 @@ class SrasController < ApplicationController
         transaction_content = 'Rejected by the Final Approver'
       end
     when 'Approve'
-      if !@owner.approver #Approved by reviewer with absent approver case
-        update_status = 'Completed'
+      # if !@owner.approver #Approved by reviewer with absent approver case
+      #   update_status = 'Completed'
+      #   @owner.close_date = Time.now
+      #   notify(@owner,
+      #     notice: {
+      #       users_id: @owner.responsible_user.id,
+      #       content: "SRA ##{@owner.id} was Approved by the Quality Reviewer."},
+      #     mailer: true,
+      #     subject: 'SRA Approved') if @owner.responsible_user
+      #   transaction_content = 'Approved by the Quality Reviewer'
+      # elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
+      #   update_status = 'Pending Approval'
+      #   notify(@owner,
+      #     notice: {
+      #       users_id: @owner.responsible_user.id,
+      #       content: "SRA ##{@owner.id} needs your Approval."},
+      #     mailer: true,
+      #     subject: 'SRA Pending Approval') if @owner.responsible_user
+      #   transaction_content = 'Approved by the Quality Reviewer'
+      # else
+      #   @owner.close_date = Time.now
+      #   notify(@owner,
+      #     notice: {
+      #       users_id: @owner.responsible_user.id,
+      #       content: "SRA ##{@owner.id} was Approved by the Final Approver."},
+      #     mailer: true,
+      #     subject: 'SRA Approved')
+      #   transaction_content = 'Approved by the Final Approver'
+      # end
+
+
+      if @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
+        send_notice = false
         @owner.close_date = Time.now
+        if @owner.approver
+          send_notice = true
+          next_user_id = @owner.approver.id
+          update_status = 'Pending Approval'
+          notice_content = "SRA ##{@owner.id} needs your Approval."
+        else
+          next_user_id = @owner.responsible_user.id if @owner.responsible_user
+          send_notice = true if @owner.responsible_user
+          update_status = 'Completed'
+          notice_content = "SRA ##{@owner.id} was approved by the Quality Reviewer."
+        end
         notify(@owner,
           notice: {
-            users_id: @owner.responsible_user.id,
-            content: "SRA ##{@owner.id} was Approved by the Quality Reviewer."},
+            users_id: next_user_id,
+            content: notice_content},
           mailer: true,
-          subject: 'SRA Approved') if @owner.responsible_user
-        transaction_content = 'Approved by the Quality Reviewer'
-      elsif @owner.status == 'Pending Review' #We update status after the switch case; this is the old status we compare
-        update_status = 'Pending Approval'
-        notify(@owner,
-          notice: {
-            users_id: @owner.responsible_user.id,
-            content: "SRA ##{@owner.id} needs your Approval."},
-          mailer: true,
-          subject: 'SRA Pending Approval') if @owner.responsible_user
+          subject: 'SRA Approved') if send_notice
         transaction_content = 'Approved by the Quality Reviewer'
       else
         @owner.close_date = Time.now
@@ -182,7 +215,7 @@ class SrasController < ApplicationController
             users_id: @owner.responsible_user.id,
             content: "SRA ##{@owner.id} was Approved by the Final Approver."},
           mailer: true,
-          subject: 'SRA Approved')
+          subject: 'SRA Approved') if @owner.responsible_user
         transaction_content = 'Approved by the Final Approver'
       end
     when 'Override Status'
@@ -463,7 +496,7 @@ private
       }
     end
 
-    if !current_user.has_access('sras','admin', admin: true, strict: true)
+    if !current_user.has_access('sras','admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       cars = Sra.where('status in (?) and responsible_user_id = ?',
         ['Assigned', 'Pending Review', 'Pending Approval', 'Completed'],
         current_user.id)

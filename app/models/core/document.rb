@@ -75,7 +75,7 @@ class Document < ActiveRecord::Base
           {name: 'Dashboard Walkthrough',       href: 'standard_video',   class: 'tv', content: ['sra_dashboard'],  },
           {name: 'SRAs',                        href: 'standard_video',   class: 'tv', content: ['sra_new', 'sra_edit'],},
           {name: 'Hazards',                     href: 'standard_video',   class: 'tv', content: ['hazard_new'],},
-          {name: 'Root Cause Trend Analysis',   href: 'standard_video',   class: 'tv', content: ['root_cause_analysis'],},
+          # {name: 'Root Cause Trend Analysis',   href: 'standard_video',   class: 'tv', content: ['root_cause_analysis'],},
           {name: 'Risk Controls',               href: 'standard_video',   class: 'tv', content: ['risk_control_new', 'risk_control_assign'],},
           {name: 'Safety Plans',                href: 'standard_video',   class: 'tv', content: ['safety_plan_new', 'safety_plan_evaluate'],},
           {name: 'Advanced Search',             href: 'standard_video',   class: 'tv', content: ['sra_advanced_search'],},
