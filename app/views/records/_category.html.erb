@@ -25,17 +25,17 @@
 
                 <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
                   <div class="col-xs-12 mb20">
-                    <div class="col-xs-12 graybox">
-                      <%if record_field.present? && record_field.value.present?%>
-                        <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
-                          <%sn_field = all_record_fields[nest_field.id]%>
-                          <%if (nest_field.nested_field_value.parameterize == record_field.value.parameterize) ||
-                              (record_field.value.include?(";") && record_field.value.include?(nest_field.nested_field_value))%>
+                    <%if record_field.present? && record_field.value.present?%>
+                      <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
+                        <%sn_field = all_record_fields[nest_field.id]%>
+                        <%if (nest_field.nested_field_value.parameterize == record_field.value.parameterize) ||
+                            (record_field.value.include?(";") && record_field.value.include?(nest_field.nested_field_value))%>
+                          <div class="col-xs-12 graybox">
                             <%=render "submissions/display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
-                          <%end%>
+                          </div>
                         <%end%>
                       <%end%>
-                    </div>
+                    <%end%>
                   </div>
                 <%end%>
 
@@ -68,15 +68,15 @@
 
           <%if (field.nested_fields.where(:deleted => false).length > 0 rescue false)%>
             <div class="col-xs-12 mb20">
-              <div class="col-xs-12 graybox">
-                <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
-                  <%sn_field = all_record_fields[nest_field.id]%>
-                  <%if (nest_field.nested_field_value.parameterize == record_field.value.parameterize) ||
-                       (record_field.value.include?(";") && record_field.value.include?(nest_field.nested_field_value))%>
+              <%field.nested_fields.where(:deleted => false).each do |nest_field|%>
+                <%sn_field = all_record_fields[nest_field.id]%>
+                <%if (nest_field.nested_field_value.parameterize == record_field.value.parameterize) ||
+                     (record_field.value.include?(";") && record_field.value.include?(nest_field.nested_field_value))%>
+                  <div class="col-xs-12 graybox">
                     <%=render "submissions/display_field", :field => nest_field, :sub_field => sn_field, deid:deid%>
-                  <%end%>
+                  </div>
                 <%end%>
-              </div>
+              <%end%>
             </div>
           <%end%>
 

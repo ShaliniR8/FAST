@@ -34,6 +34,7 @@ class OccurrencesController < ApplicationController
   end
 
   def update
+    byebug
     Occurrence.transaction do
       (params[:occurrences] || []).each do |template_id, occurrence|
         next unless occurrence[:value].present?
@@ -41,7 +42,7 @@ class OccurrencesController < ApplicationController
           template_id: template_id,
           owner_type: params[:owner_type],
           owner_id: params[:owner_id],
-          value: occurrence[:value]
+          value: occurrence[:value].strip
         })
       end
     end

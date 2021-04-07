@@ -13,15 +13,16 @@ swal({
     $(".deleted_fields").hide();
 
     // Archive/Unarchive button
-    $(".archive_btn").on("click", function(){
-      if($(this).text() == "Archive"){
-        $(this).closest("td").find("#delete_field").val(true);
-        $(this).text("Unarchive");
-        $(this).removeClass("btn-warning").addClass("btn-default");
-      }else{
+    $(".archive_btn").on('click', function(e) {
+      e.preventDefault();
+      if ($(this).hasClass('btn-default')) { // Archived
+        $(this).removeClass('btn-default').addClass('btn-warning');
         $(this).closest("td").find("#delete_field").val(false);
-        $(this).text("Archive");
-        $(this).removeClass("btn-default").addClass("btn-warning");
+        $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
+      } else { // Active
+        $(this).removeClass('btn-warning').addClass('btn-default');
+        $(this).closest("td").find("#delete_field").val(true);
+        $(this).closest('.to_delete').find(".form-control, .form-field-order").addClass('changed');
       }
     });
 
@@ -54,26 +55,26 @@ swal({
     };
 
 
-    var fieldList = $(".draggableFieldGroup");
-    fieldList.each(function(){
-      $(this).sortable({
-        helper: fixHelper,
-        handle: $(this, ".drag_and_drop"),
-        forcePlaceholderSize: true,
-        cursor: "move",
-        animation: 100,
-        start: function(event, ui){
-          ui.placeholder.height(ui.item.height());
-          ui.placeholder.width(ui.item.width());
-        },
-        update: function(event, ui){
-          $('.field_group', this).each(function(index, elem) {
-            console.log(index);
-            $('.form-field-order', this).val(index);
-          });
-        }
-      });
-    });
+    // var fieldList = $(".draggableFieldGroup");
+    // fieldList.each(function(){
+    //   $(this).sortable({
+    //     helper: fixHelper,
+    //     handle: $(this, ".drag_and_drop"),
+    //     forcePlaceholderSize: true,
+    //     cursor: "move",
+    //     animation: 100,
+    //     start: function(event, ui){
+    //       ui.placeholder.height(ui.item.height());
+    //       ui.placeholder.width(ui.item.width());
+    //     },
+    //     update: function(event, ui){
+    //       $('.field_group', this).each(function(index, elem) {
+    //         console.log(index);
+    //         $('.form-field-order', this).val(index);
+    //       });
+    //     }
+    //   });
+    // });
 
   }
 }).catch(swal.noop);

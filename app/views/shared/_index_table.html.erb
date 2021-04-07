@@ -106,9 +106,9 @@
                         <% is_number = true if Float(field_value) rescue false %>
 
                         <% if is_number %>
-                          <%user = User.find(field_value)%>
+                          <%user = User.find(field_value) rescue nil%>
                         <% else %>
-                          <%user = User.find_by_full_name(field_value)%>
+                          <%user = User.find_by_full_name(field_value) rescue nil%>
                         <% end %>
 
                         <%if user.present?%>

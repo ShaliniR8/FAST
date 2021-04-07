@@ -49,22 +49,22 @@ RJET:
       baseline:
         title: Initial
       mitigated:
-        title: Residual
+        title: Mitigated
   sr:
     risk:
       baseline:
         title: Initial
       mitigated:
-        title: Residual
+        title: Mitigated
   srm:
     risk:
       baseline:
         title: Initial
       mitigated:
-        title: Residual
+        title: Mitigated
   sa:
     risk:
       baseline:
         title: Initial
       mitigated:
-        title: Residual
+        title: Mitigated

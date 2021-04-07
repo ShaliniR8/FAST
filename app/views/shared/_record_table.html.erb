@@ -120,20 +120,65 @@
       initComplete: function(){
         this.api().columns().every(function(){
           var column = this;
-          rand_num=new Date().getTime();
-          var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
-              .appendTo( $(column.footer()).empty() )
-              .on( 'keyup change input', function(){
-                if( column.search() !== this.value ){
-                  column.search( this.value ).draw();
-                }
-          });
-          column.data().unique().sort().each(function(d, j){
-            if(d != "" && d != undefined){
-              $('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
-            }
-          });
+
+          // rand_num=new Date().getTime();
+          // var select = $('<input class=\'form-control\' list=\''+rand_num+'\'><datalist id=\''+rand_num+'\'><option value=""></option></datalist>')
+          //     .appendTo( $(column.footer()).empty() )
+          // $('input', this.footer()).on( 'keyup change input', function(){
+          //       if( column.search() !== this.value ){
+          //         column.search( this.value ).draw();
+          //       }
+          // });
+          // column.data().unique().sort().each(function(d, j){
+          //   if(d != "" && d != undefined){
+          //     $('#'+rand_num).append( '<option value="'+d+'">'+d+'</option>' );
+          //   }
+          // });
+
+          // $('input', this.footer()).on('keyup change', function(e) {
+          //   // keyCode 13 is 'Enter'
+          //   if(e.keyCode == 13 && column.search() !== this.value){
+          //     search_term = this.value
+          //     column.search(search_term).draw();
+          //   }
+          // });
+          addIndividualColumnSearchField();
+          columnSearch();
         });
       },
   });
+
+  function addIndividualColumnSearchField() {
+    $('#records_table tfoot th').each(function(index) {
+
+      isDateField = "#{@date_type_column_indices}".includes(index)
+      if (isDateField) {
+        $(this).html('<input type="date" class="form-control" />');
+      } else {
+        $(this).html('<input type="text" class="form-control" />');
+      }
+    });
+  }
+
+  function hideActionColumnSearchField() {
+    $('#records_table tfoot tr th:last-child').children().hide();
+  }
+
+  function columnSearch() {
+    $('#records_table').dataTable().api().columns().every(function() {
+      var column = this;
+
+      $('input', this.footer()).on('keyup change', function(e) {
+        // keyCode 13 is 'Enter'
+        if(e.keyCode == 13 && column.search() !== this.value){
+          search_term = this.value
+
+          // reset the filters
+          // $('#records_table').dataTable().api().columns().search('')
+
+          column.search(search_term).draw();
+        }
+      });
+    });
+  }
 </script>

@@ -123,6 +123,7 @@ class CorrectiveActionsController < ApplicationController
   def update
     transaction = true
     @owner = CorrectiveAction.find(params[:id])
+    old_status = @owner.status
     @owner.update_attributes(params[:corrective_action])
     send_notification(@owner, params[:commit])
     case params[:commit]
@@ -137,7 +138,7 @@ class CorrectiveActionsController < ApplicationController
     when 'Approve'
       @owner.close_date = Time.now
     when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:corrective_action][:status]}"
+      transaction_content = "Status overriden from #{old_status} to #{params[:corrective_action][:status]}"
       params[:corrective_action][:close_date] = params[:corrective_action][:status] == 'Completed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false

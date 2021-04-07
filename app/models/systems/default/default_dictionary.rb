@@ -166,7 +166,8 @@ class DefaultDictionary
       btn: :risk_control,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        !['Completed', 'Rejected'].include?(owner.status) && !owner.occurrence_lock?
+        # !['Completed', 'Rejected'].include?(owner.status) && !owner.occurrence_lock?
+        !['Completed', 'Rejected'].include?(owner.status)
       },
     },
     schedule_verification:{

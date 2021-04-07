@@ -16,7 +16,8 @@ class AsapAgenda < Agenda
   end
 
   def disposition
-    accepted == 1 ? 'Yes' : (accepted == 0 ? 'No' : accepted)
+    accepted == "true" ? 'Accepted' : 'Declined'
+    CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ? accepted : (accepted == "true" ? 'Accepted' : 'Declined')
   end
 
   def discuss

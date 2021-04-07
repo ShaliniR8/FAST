@@ -49,7 +49,7 @@ ruby:
 
               - if owner.status != 'Completed' && current_user.has_access(owner.class.table_name,'edit', admin: CONFIG::GENERAL[:global_admin_default])
 
-                = link_to "Update", '#',
+                = link_to "Edit", '#',
                   :class => 'btn btn-warning pull-right mr5 update_btn',
                   'data-path' => edit_checklist_path(checklist),
                   'data-toggle' => 'modal',
