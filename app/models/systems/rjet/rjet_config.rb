@@ -24,6 +24,10 @@ class RJETConfig < DefaultConfig
     sabre_integration:            true,
   })
 
+  # CISP INTEGRATION
+  P_CODE = 'RPA574'   # for RPA (Republic)
+  # P_CODE = 'L8T5A3 '# for LTA (Lift)
+
   SABRE_MAPPABLE_FIELD_OPTIONS = {
     "Flight Date"        => "flight_date",
     "Flight Number"      => "flight_number",

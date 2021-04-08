@@ -362,7 +362,7 @@ class User < ActiveRecord::Base
 
 
   def self.get_levels
-    ['Global Admin', 'Admin', 'Staff']
+    ['Global Admin', 'Admin', 'Staff', 'External']
   end
 
 

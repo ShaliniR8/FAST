@@ -83,9 +83,9 @@
 
                     <% if CONFIG::GENERAL[:enable_sso] %>
                       <div class="form-group row">
-                        <%= f.label :sso_id, 'SSO Identifying Value', :class => "col-sm-4 col-form-label required_label" %>
+                        <%= f.label :sso_id, 'SSO Identifying Value', :class => "col-sm-4 col-form-label" %>
                         <div class="col-sm-8">
-                          <%= f.text_field :sso_id, {:class=> "form-control required_field"}%>
+                          <%= f.text_field :sso_id, {:class=> "form-control"}%>
                         </div>
                       </div>
                     <%end%>

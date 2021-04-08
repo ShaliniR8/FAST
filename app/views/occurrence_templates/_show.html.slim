@@ -52,9 +52,11 @@ css:
           a href="#list_#{owner.id}" class="cat_#{owner.id} glyphicon glyphicon-chevron-right" data-toggle="collapse"
 
         - if owner.title == 'Record'
-          b = "Report"
+          b = "Safety Reporting"
         - elsif owner.title == 'Report'
-          b = "Event"
+          b = "Safety Reporting"
+        - elsif owner.title == 'Report,Record'
+          b = "Safety Reporting"
         - else
           b = owner.title
         small = (owner.parent_id.nil? ? " (#{owner.label})" : '')
