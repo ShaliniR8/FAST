@@ -38,7 +38,8 @@
               </tr>
             </thead>
             <tbody class="draggableFieldGroup" id="fields">
-              <%@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, ind|%>
+              <%#@nested_fields.where(:deleted => false, :nested_field_value => x).order(:field_order).each_with_index do |field, ind|%>
+              <%@nested_fields.where(:nested_field_value => x).order(:field_order).each_with_index do |field, ind|%>
                 <%=f1.fields_for :fields, field do |f|%>
                   <tr class="field_group">
                     <td><%=f.text_field :label, {:class => "form-control"}%></td>

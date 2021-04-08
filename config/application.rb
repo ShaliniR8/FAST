@@ -54,7 +54,7 @@ module PrdgSession
     address: 'smtp.1and1.com',
     port: 587,
     user_name: 'noc@prosafet.com',
-    password: 'Cookie2021!',
+    password: 'Cupcakes2021!',
     authentication: 'plain',
   }
   config.action_mailer.raise_delivery_errors = false

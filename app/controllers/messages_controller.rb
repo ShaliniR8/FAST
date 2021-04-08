@@ -133,7 +133,7 @@ class MessagesController < ApplicationController
 
 
   def sent
-    @messages = current_user.sent_messages.select{|x| x.visible && x.message.present?}.map{|x| x.message}
+    @messages = current_user.sent_messages.select{|x| x.visible && x.message.present?}.map{|x| x.message}.uniq.sort_by {|m| m.time.present? ? m.time : ""}.reverse
     @title = "Sent"
   end
 
@@ -148,7 +148,8 @@ class MessagesController < ApplicationController
         cc: :user
       ]).select(&:visible).map(&:message)
     }.flatten.compact
-    @messages.uniq!
+    # @messages.uniq!
+    @messages = @messages.uniq.sort_by {|m| m.time.present? ? m.time : ""}.reverse
 
     respond_to do |format|
       format.html

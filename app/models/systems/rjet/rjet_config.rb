@@ -47,9 +47,9 @@ class RJETConfig < DefaultConfig
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Initial Risk',
-      mitigate_btn: 'Residual Risk',
+      mitigate_btn: 'Mitigated Risk',
       'Baseline' => 'Initial',
-      'Mitigate' => 'Residual'
+      'Mitigate' => 'Mitigated'
     },
 
     severity_table: {

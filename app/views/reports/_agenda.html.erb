@@ -23,11 +23,11 @@
                   <%=f.fields_for :agendas,a do |x|%>
                     <tr id="agends_<%= a.id %>">
                       <td><%=x.text_field :title,:class=>"form-control"%></td>
-                      <td><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
+                      <td width=8%><%=x.select :status,options_for_select(@status,a.status),{:include_blank=>""},:class=>"form-control"%></td>
                       <td><%=a.get_user%></td>
                       <td><%=a.get_created%></td>
                       <td><%=a.get_updated%></td>
-                      <td><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
+                      <td width=8%><%=x.select :discussion,options_for_select(@tof,a.discussion),{:include_blank=>""},:class=>"form-control"%></td>
 
                       <td>
                         <%=x.select :accepted,
@@ -46,12 +46,12 @@
                 <%else%>
                   <tr>
                     <td><%=a.title%></td>
-                    <td><%=a.status%></td>
+                    <td width=8%><%=a.status%></td>
                     <td><%=a.get_user%></td>
                     <td><%=a.get_created%></td>
                     <td><%=a.get_updated%></td>
-                    <td><%=a.discussion ? "Yes" : "No"%></td>
-                    <td><%=a.accepted ? "Accepted" : "Declined"%></td>
+                    <td width=8%><%=a.discussion ? "Yes" : "No"%></td>
+                    <td><%=CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ? a.accepted : (a.accepted == "true" ? 'Accepted' : 'Declined')%></td>
                     <td><%=a.comment.gsub(/\n/, '<br/>').html_safe%></td>
                     <td></td>
                   </tr>

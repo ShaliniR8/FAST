@@ -4,23 +4,30 @@ css:
   }
 
   .header{
-    font-size:16px;
+    font-size:15px;
   }
 
   .cell{
-    font-size:15px;
+    font-size:14px;
     width:15%;
     text-align:center;
   }
 
   .special-cell{
-    font-size:14px;
+    font-size:13px;
     width:25%;
     text-align:center;
   }
 
   .align-left{
     text-align:left;
+  }
+
+  #flights_table {
+    overflow-x: scroll;
+    max-width: 40%;
+    display: block;
+    white-space: nowrap;
   }
 
 ruby:
@@ -37,7 +44,7 @@ ruby:
     .panel-body.header.align-left
       = render "shared/instructions", :instruction => instruction
       .col-xs-12
-        table id="flights_table" class="table table-bordered table-striped table-responsive"
+        table id="flights_table" class="table table-bordered table-striped"
           thead
             tr
               th.header

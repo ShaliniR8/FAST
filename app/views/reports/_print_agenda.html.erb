@@ -76,7 +76,7 @@ table{
               <td><%=a.get_user%></td>
               <td><%=a.get_created%></td>
               <td><%=a.discussion ? "Yes" : "No"%></td>
-              <td><%=a.accepted ? "Accepted" : "Declined"%></td>
+              <td><%=CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ? a.accepted : (a.accepted == "true" ? 'Accepted' : 'Declined')%></td>
               <td><%=a.comment%></td>
             </tr>
           <%end%>
