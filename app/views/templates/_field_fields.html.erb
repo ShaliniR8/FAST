@@ -41,8 +41,8 @@
   <td class="extra_info"><%=f.number_field :max_options,      {class: "form-control #{changed}"}%> </td>
   <td class="extra_info"><%=f.check_box    :additional_info,   class: "form-control #{changed}"%>  </td>
 
-  <td class="extra_info"><%=f.text_field :element_id,         {:class => "form-control #{changed}"}%></td>
-  <td class="extra_info"><%=f.text_field :element_class,      {:class => "form-control #{changed}"}%></td>
+  <td style="display:none;"><%=f.text_field :element_id,         {:class => "form-control #{changed}"}%></td>
+  <td style="display:none;"><%=f.text_field :element_class,      {:class => "form-control #{changed}"}%></td>
   <td class="extra_info"><%=f.text_field :map_id,             {:class => "form-control #{changed}"}%></td>
   <%if CONFIG::GENERAL[:integrations].include?('eccairs')%>
     <td class='extra_info'>
