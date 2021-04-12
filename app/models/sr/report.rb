@@ -509,7 +509,7 @@ class Report < Sr::SafetyReportingBase
     File.open(temp_file, 'w') do |file|
       file << ApplicationController.new.render_to_string(
         template: 'reports/export_component_cisp.xml.erb',
-        locals:   { test_run: test_run, reports: reports, p_code: CONFIG::P_CODE })
+        locals:   { test_run: test_run, reports: reports })
     end
   end
 

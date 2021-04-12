@@ -15,6 +15,7 @@ class RJETConfig < DefaultConfig
     has_mobile_app:               true,
     enable_sso:                   true,
     login_option:                 'dual',
+    cisp_integration:             true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,
@@ -25,9 +26,62 @@ class RJETConfig < DefaultConfig
   })
 
   # CISP INTEGRATION
-  P_CODE = 'RPA574'   # for RPA (Republic)
+  # P_CODE = 'RPA574' # for RPA (Republic)
   # P_CODE = 'L8T5A3 '# for LTA (Lift)
 
+  P_CODE = {
+    'Flight Ops ASAP' => 'RPA574',
+    'Dispatch ASAP'   => 'RPA574',
+    'LIFT Pilot VSRP' => 'L8T5A3'
+  }
+
+  AIRLINE_ID = {
+    'Flight Ops ASAP' => 'RPA',
+    'Dispatch ASAP'   => 'RPA',
+    'LIFT Pilot VSRP' => 'LTA'
+  }
+
+  CISP_TITLE_PARSE = {
+    'Flight Ops ASAP' => 'flightcrew',
+    'Dispatch ASAP'   => 'dispatch',
+    'LIFT Pilot VSRP' => 'pilot vsrp',
+  }
+
+  CISP_FIELD_PARSE = {
+    'Flight Ops ASAP' => {
+      'Event Details - Provide the facts about the events or hazard here.' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Destination Airport',
+        'flightPhase'   => 'Operational Phase'
+      },
+      "Narrative - Provide the facts about 'WHAT' happened here." => {
+        'eventDescription' => '',
+      }
+    },
+    'Dispatch ASAP' => {
+      'Details' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Destination Airport',
+      },
+      'Description of the Event or Safety Concern' => {
+        'eventDescription' => '',
+      },
+    },
+    'LIFT Pilot VSRP' => {
+      'Event Details' => {
+        'flightNumber'  => 'Flight Number',
+        'aircraftType'  => 'Tail Number',
+        'location'  => 'Location',
+      },
+      'Description' => {
+        'eventDescription' => '',
+      },
+    },
+  }
+
+  # SABRE INTEGRATION
   SABRE_MAPPABLE_FIELD_OPTIONS = {
     "Flight Date"        => "flight_date",
     "Flight Number"      => "flight_number",

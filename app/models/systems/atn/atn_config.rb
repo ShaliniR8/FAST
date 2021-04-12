@@ -20,7 +20,15 @@ class ATNConfig < DefaultConfig
     base_risk_matrix:                   false,
   })
 
-  P_CODE = 'A9T2N7'
+
+  P_CODE = {
+    'Flight Crew ASAP' => 'A9T2N7'
+  }
+
+  AIRLINE_ID = {
+    'Flight Crew ASAP' => 'ATN',
+  }
+
   CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
   CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({
     'Flight Crew ASAP' => {

@@ -1,5 +1,9 @@
+<%record = reports.first.records.includes(:template).first%>
+<%pCode = CONFIG::P_CODE[record.template.name] %>
+<%airlineId = CONFIG::AIRLINE_ID[record.template.name] %>
+
 <?xml version="1.0" encoding="iso-8859-1"?>
-<cispReports xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cisp-data-exchange-schema.xsd" airlineId="<%=AIRLINE_CODE%>" pCode="<%=p_code%>">
+<cispReports xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cisp-data-exchange-schema.xsd" airlineId="<%=airlineId%>" pCode="<%=pCode%>">
 
   <%reports.each_with_index do |report, index|%>
     <%# only include records that are ASAP%>
@@ -48,7 +52,7 @@
           <%next if tag_name == 'eventDescription'%>
 
           <%# add station code and other location to location field%>
-          <%if tag_name == 'location'%>
+          <%if tag_name == 'location' && AIRLINE_CODE != "RJET"%>
             <%station_code_field = category.fields.select { |f| f.label.include? "Station Code"}.first%>
             <%other_location_field = category.fields.select { |f| f.label.include? "Specify Other Location"}.first%>
             <%station_code = all_record_fields[station_code_field.id].value rescue ''%>
@@ -78,15 +82,28 @@
       <%all_record_fields = record.record_fields.map{|rf| [rf.fields_id, rf]}.to_h%>
       <%# narrative and duty fields are obtained by panel title and field label%>
       <%# separate narrative by Record ID - Submitter Title%>
-      <%narrative_field = record.categories.select { |category| category.title == 'Narratives'}.first.fields.select { |f| f.label.include? "Please provide a narrative about the event" }.first%>
-      <%overview_category_fields = record.categories.select { |category| category.title == 'Overview'}.first.fields%>
-      <%primary_duty_field = overview_category_fields.select { |f| f.label.include? "Primary Duties at the Time of Event" }.first%>
-      <%other_duty_field = overview_category_fields.select { |f| f.label.include? "Specify Other Primary Duties" }.first%>
-      <%narrative = all_record_fields[narrative_field.id].value rescue ''%>
-      <%duty = all_record_fields[primary_duty_field.id].value rescue ''%>
-      <%other_duty = all_record_fields[other_duty_field.id].value rescue ''%>
-      <%if narrative.present?%>
-        <%narratives = narratives + "Record ID #{record.id} " + (duty.present? ? "- #{duty} " : '') + "#{other_duty.present? ? "and #{other_duty}" : ''}" + "<br/>".html_safe + narrative + "<br/><br/>".html_safe%>
+
+      <%if AIRLINE_CODE == "RJET"%>
+        <%narrative_category_name = CONFIG::CISP_FIELD_PARSE[record.template.name].keys.select { |category_name| ["Narrative", "Description"].any? { |word| category_name.include? word } }.first%>
+
+        <%narrative_label_name = CONFIG::CISP_FIELD_PARSE[record.template.name][narrative_category_name]["eventDescription"]%>
+
+        <%narrative_field = record.categories.select { |category| category.title == narrative_category_name}.first.fields.select { |f| f.label.include? narrative_label_name }.first rescue byebug %>
+
+        <%narrative = all_record_fields[narrative_field.id].value rescue ''%>
+
+        <%narratives = narratives + "Record ID #{record.id} " + "<br/>".html_safe + narrative + "<br/><br/>".html_safe%>
+      <%else%>
+        <%narrative_field = record.categories.select { |category| category.title == 'Narratives'}.first.fields.select { |f| f.label.include? "Please provide a narrative about the event" }.first%>
+        <%overview_category_fields = record.categories.select { |category| category.title == 'Overview'}.first.fields%>
+        <%primary_duty_field = overview_category_fields.select { |f| f.label.include? "Primary Duties at the Time of Event" }.first%>
+        <%other_duty_field = overview_category_fields.select { |f| f.label.include? "Specify Other Primary Duties" }.first%>
+        <%narrative = all_record_fields[narrative_field.id].value rescue ''%>
+        <%duty = all_record_fields[primary_duty_field.id].value rescue ''%>
+        <%other_duty = all_record_fields[other_duty_field.id].value rescue ''%>
+        <%if narrative.present?%>
+          <%narratives = narratives + "Record ID #{record.id} " + (duty.present? ? "- #{duty} " : '') + "#{other_duty.present? ? "and #{other_duty}" : ''}" + "<br/>".html_safe + narrative + "<br/><br/>".html_safe%>
+        <%end%>
       <%end%>
     <%end%>
     <eventDescription>

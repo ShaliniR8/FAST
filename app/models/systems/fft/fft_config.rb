@@ -40,7 +40,20 @@ class FFTConfig < DefaultConfig
   end
 
 
-  P_CODE = 'FFT671'
+  P_CODE = {
+    'Flight Crew ASAP' => 'FFT671',
+    'Maintenance ASAP' => 'FFT671',
+    'Inflight ASAP'    => 'FFT671',
+    'Dispatch ASAP'    => 'FFT671'
+  }
+
+  AIRLINE_ID = {
+    'Flight Crew ASAP' => 'FFT',
+    'Maintenance ASAP' => 'FFT',
+    'Inflight ASAP'    => 'FFT',
+    'Dispatch ASAP'    => 'FFT'
+  }
+
   CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({
     'Maintenance ASAP'   => 'maintenance',
     'Inflight ASAP'      => 'inflight',
