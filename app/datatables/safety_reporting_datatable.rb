@@ -57,39 +57,85 @@ class SafetyReportingDatatable < ApplicationDatatable
     case status
     when 'All'
       if has_date_range
-        @object_access_filtered.joins(join_tables)
-              .where(search_string.join(' and '))
-              .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date)
-              .group("#{object.table_name}.id")
-              .limit(params['length'].to_i)
-              .offset(params['start'].to_i)
+        # TODO: REFACTOR
+        # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
+        if object.table_name == "reports" && search_string.first.include?("records.id like")
+          find_term = search_string.first.match /%(?<term>.*)%/
+          search_term = find_term[:term].downcase
+          template_serach_result = @object_access_filtered
+                                    .order("#{sort_column} #{sort_direction}")
+                                    .within_timerange(start_date, end_date)
+                                    .select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
+          template_serach_result[params['start'].to_i, params['length'].to_i]
+        else
+          @object_access_filtered.joins(join_tables)
+                .where(search_string.join(' and '))
+                .order("#{sort_column} #{sort_direction}")
+                .within_timerange(start_date, end_date)
+                .group("#{object.table_name}.id")
+                .limit(params['length'].to_i)
+                .offset(params['start'].to_i)
+        end
       else
-        @object_access_filtered.joins(join_tables)
-              .where(search_string.join(' and '))
-              .order("#{sort_column} #{sort_direction}")
-              .group("#{object.table_name}.id")
-              .limit(params['length'].to_i)
-              .offset(params['start'].to_i)
+        # TODO: REFACTOR
+        # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
+        if object.table_name == "reports" && search_string.first.include?("records.id like")
+          find_term = search_string.first.match /%(?<term>.*)%/
+          search_term = find_term[:term].downcase
+          template_serach_result = @object_access_filtered
+                                    .order("#{sort_column} #{sort_direction}")
+                                    .select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
+          template_serach_result[params['start'].to_i, params['length'].to_i]
+        else
+          @object_access_filtered.joins(join_tables)
+                .where(search_string.join(' and '))
+                .order("#{sort_column} #{sort_direction}")
+                .group("#{object.table_name}.id")
+                .limit(params['length'].to_i)
+                .offset(params['start'].to_i)
+        end
       end
     else
       if has_date_range
-        @object_access_filtered.where(status: status)
-              .joins(join_tables)
-              .where(search_string.join(' and '))
-              .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date)
-              .group("#{object.table_name}.id")
-              .limit(params['length'].to_i)
-              .offset(params['start'].to_i)
+        # TODO: REFACTOR
+        # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
+        if object.table_name == "reports" && search_string.first.include?("records.id like")
+          find_term = search_string.first.match /%(?<term>.*)%/
+          search_term = find_term[:term].downcase
+          template_serach_result = @object_access_filtered.where(status: status)
+                                    .within_timerange(start_date, end_date)
+                                    .order("#{sort_column} #{sort_direction}")
+                                    .select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
+          template_serach_result[params['start'].to_i, params['length'].to_i]
+        else
+          @object_access_filtered.where(status: status)
+                .joins(join_tables)
+                .where(search_string.join(' and '))
+                .order("#{sort_column} #{sort_direction}")
+                .within_timerange(start_date, end_date)
+                .group("#{object.table_name}.id")
+                .limit(params['length'].to_i)
+                .offset(params['start'].to_i)
+        end
       else
-        @object_access_filtered.where(status: status)
+        # TODO: REFACTOR
+        # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
+        if object.table_name == "reports" && search_string.first.include?("records.id like")
+          find_term = search_string.first.match /%(?<term>.*)%/
+          search_term = find_term[:term].downcase
+          template_serach_result = @object_access_filtered.where(status: status)
+                                    .order("#{sort_column} #{sort_direction}")
+                                    .select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
+          template_serach_result[params['start'].to_i, params['length'].to_i]
+        else
+          @object_access_filtered.where(status: status)
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
+        end
       end
     end
   end
@@ -116,14 +162,33 @@ class SafetyReportingDatatable < ApplicationDatatable
 
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
-      @object_access_filtered.joins(join_tables)
-            .where(search_string.join(' and '))
-            .group("#{object.table_name}.status").count
+      # TODO: REFACTOR
+      # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
+      if object.table_name == "reports" && search_string.first.include?("records.id like")
+        find_term = search_string.first.match /%(?<term>.*)%/
+        search_term = find_term[:term].downcase
+        template_serach_result = @object_access_filtered.select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
+        template_serach_result.each_with_object({}) { |v, h| h[v.status].present? ? h[v.status] +=1 : h[v.status] = 1 }
+      else
+        @object_access_filtered.joins(join_tables)
+              .where(search_string.join(' and '))
+              .group("#{object.table_name}.status").count
+      end
+
     else
-      @object_access_filtered.joins(join_tables)
-            .where(search_string.join(' and '))
-            .within_timerange(start_date, end_date)
-            .group("#{object.table_name}.status").count
+      # TODO: REFACTOR
+      # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
+      if object.table_name == "reports" && search_string.first.include?("records.id like")
+        find_term = search_string.first.match /%(?<term>.*)%/
+        search_term = find_term[:term].downcase
+        template_serach_result = @object_access_filtered.within_timerange(start_date, end_date).select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
+        template_serach_result.each_with_object({}) { |v, h| h[v.status].present? ? h[v.status] +=1 : h[v.status] = 1 }
+      else
+        @object_access_filtered.joins(join_tables)
+              .where(search_string.join(' and '))
+              .within_timerange(start_date, end_date)
+              .group("#{object.table_name}.status").count
+      end
     end
   end
 
