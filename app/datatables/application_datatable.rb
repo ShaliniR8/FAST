@@ -45,6 +45,9 @@ class ApplicationDatatable
 
     start_date = params[:advance_search][:start_date]
     end_date = params[:advance_search][:end_date]
+
+    start_date, end_date = handle_time_zone(start_date, end_date)
+
     counts = object.where(search_string.join(' AND '))
                    .within_timerange(start_date, end_date)
                    .group(:status).count
@@ -153,7 +156,19 @@ class ApplicationDatatable
       end_date = params[:advance_search][:end_date].to_datetime rescue nil
     end
 
-    [start_date, end_date]
+    handle_time_zone(start_date, end_date)
+  end
+
+
+  def handle_time_zone(start_date, end_date)
+    if start_date.present? && end_date.present?
+      offset = (start_date.in_time_zone(CONFIG::GENERAL[:time_zone]).utc_offset / 3600).hours
+
+      start_date = start_date - offset
+      end_date = end_date - offset
+    end
+
+    return [start_date, end_date]
   end
 
 
