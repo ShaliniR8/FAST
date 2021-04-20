@@ -26,6 +26,7 @@ class ApplicationController < ActionController::Base
 
     # Datatable Column Info
     @columns = get_data_table_columns(@object_name)
+    @columns.delete_if {|x| x[:data] == 'get_additional_info_html'}
     if @object_name == 'Record'
       if !CONFIG.sr::GENERAL[:show_submitter_name]
         if !current_user.global_admin?
