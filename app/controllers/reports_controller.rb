@@ -153,6 +153,48 @@ class ReportsController < ApplicationController
   end
 
 
+  def send_cisp
+    report = Report.find(params[:id])
+    reports_ids = []
+    reports_ids << params[:id]
+
+    test_run = Rails.env.production? ? false : true
+    timestamp = Time.now.strftime('%Y-%m-%d_%H-%M-%S')
+    Report.export_all_for_cisp(test_run: test_run, reports_ids: reports_ids, timestamp: timestamp)
+    # remove extra line
+    path = File.join(Rails.root, "cisp")
+    file_name = File.join([Rails.root] + ['cisp'] + ["#{AIRLINE_CODE}_CISP_#{timestamp}.xml"])
+    original = File.open(file_name, 'r') { |file| file.readlines }
+    blankless = original.reject{ |line| line.match(/^$/) }
+    File.open(file_name, 'w') do |file|
+      blankless.each { |line| file.puts line }
+    end
+
+    begin
+      unless test_run
+        system ("curl -X PUT --url \"https://www.atsapsafety.org/services/cisp/transfer?user=" + AIRLINE_CODE + "\" -k -d @#{file_name}")
+      end
+
+      FileUtils.rm_rf(file_name)
+      message = "Event sent To CISP"
+      success = true
+      report.update_attribute('cisp_sent', true)
+
+      Transaction.build_for(
+        report,
+        "Send to CISP",
+        current_user.id,
+        "Event ASAP report(s) sent to CISP"
+      )
+    rescue
+      message = "FAILED to send Event to CISP"
+      success = false
+    end
+
+    render :json => {:message => message, :success => success}
+  end
+
+
   def carryover
     report = Report.find(params[:id])
     meeting = Meeting.find(params[:meeting_id])
@@ -346,6 +388,13 @@ class ReportsController < ApplicationController
     @headers = Record.get_headers
 
     @records = @report.records
+    @asap_found = false
+    if @records.present?
+      @records.each do |rec|
+        @asap_found = true if CONFIG::CISP_TITLE_PARSE[rec.template.name]
+        break if @asap_found
+      end
+    end
     @meeting_ids = @report.meetings.map(&:id)
 
     @agenda_headers = AsapAgenda.get_headers

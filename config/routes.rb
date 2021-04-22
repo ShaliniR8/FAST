@@ -369,6 +369,7 @@ PrdgSession::Application.routes.draw do |map|
       get "tabulation"
       get 'load_records'
       post "get_dataset"
+      post "send_cisp"
     end
     member do
       get 'launch'
