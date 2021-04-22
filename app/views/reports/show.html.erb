@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascripts/utility/delete.js"></script>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
@@ -151,7 +152,13 @@
                   'data-target' => '.bs-example-modal-lg',
                   :route => close_report_path(@report, :redirect_path => report_path(@report))%>
               <%end%>
-
+              <%if CONFIG::GENERAL[:cisp_integration] && @asap_found &&!@report.cisp_sent.present?%>
+                <%=link_to "Send CISP Reports",
+                  "#",
+                  :class => "btn btn-success pull-right ml5 mr5 mb5",
+                  :disable_with => "Sending to CISP...",
+                  :id => "send_cisp_btn"%>
+              <%end%>
             <%end%>
 
             <%=link_to "Add Comment", "#",
@@ -259,6 +266,27 @@
       $.get("<%=override_status_report_path(@report)%>", function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
+      });
+    });
+    $("#send_cisp_btn").on("click",function(){
+      $.ajax({
+        type: "POST",
+        url: "<%=send_cisp_reports_path%>"+ "?id=" + <%=@report.id%>,
+        dataType: 'json',
+        success: function(data) {
+          let icon = 'error';
+          if(data['success'] == true) {
+            $("#send_cisp_btn").hide();
+            icon = 'success';
+          }
+          Swal.fire({
+            position: 'top-end',
+            icon: icon,
+            title: data['message'],
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
       });
     });
     $(".close_event_btn").on('click',function(){
