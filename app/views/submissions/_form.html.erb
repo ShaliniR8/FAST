@@ -423,7 +423,7 @@
     });
 
     $('.required_field').each(function() {
-      if ($(this).parents('.nested_field').css('display') != 'none'){
+      if ($(this).parents('.nested_field_area').css('display') != 'none'){
         update_titles($(this));
       }
     });
@@ -483,33 +483,35 @@
         $(this).find('.required_field').each(function() {
           var cboxes = $(this).find('.checkbox_mul').get();
           var radios = $(this).find('.radio_req').get();
-
-          if (radios == null || radios.length == 0) {
-            if (cboxes == null || cboxes.length == 0) {
-              if ($(this).val() == "") {
-                prop_up_errors(this);
+          if($(this).closest('div.nested_field_area').css('display') != 'none') {
+            console.log("Not getting in here");
+            if (radios == null || radios.length == 0) {
+              if (cboxes == null || cboxes.length == 0) {
+                if ($(this).val() == "") {
+                  prop_up_errors(this);
+                }
+              } else {
+                var lim = $(this).attr('name');
+                count = 0;
+                $(this).find('.checkbox_mul').each(function() {
+                  if ($(this).prop('checked')) {
+                    count ++;
+                  }
+                });
+                if (count < lim) {
+                  prop_up_errors(this);
+                }
               }
             } else {
-              var lim = $(this).attr('name');
               count = 0;
-              $(this).find('.checkbox_mul').each(function() {
-                if ($(this).prop('checked')) {
-                  count ++;
-                }
+              $(this).find('.radio_req').each(function() {
+                  if ($(this).prop('checked')) {
+                    count ++;
+                  }
               });
-              if (count < lim) {
+              if (count < 1) {
                 prop_up_errors(this);
               }
-            }
-          } else {
-            count = 0;
-            $(this).find('.radio_req').each(function() {
-                if ($(this).prop('checked')) {
-                  count ++;
-                }
-            });
-            if (count < 1) {
-              prop_up_errors(this);
             }
           }
         });
