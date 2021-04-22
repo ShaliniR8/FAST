@@ -1,4 +1,4 @@
-= render 'shared/instructions', instruction: "Select <b>#{CONFIG::MATRIX_INFO[:terminology][risk_type]} Probability</b> and <b>#{CONFIG::MATRIX_INFO[:terminology][risk_type]} Severity</b> from the table to assess risk.<br>Assess the risk in place and then click the Save Risk button at the bottom."
+= render 'shared/instructions', instruction: "Select <b>#{CONFIG::MATRIX_INFO[:terminology][risk_type]} Likelihood</b> and <b>#{CONFIG::MATRIX_INFO[:terminology][risk_type]} Severity</b> from the table to assess risk.<br>Assess the risk in place and then click the Save Risk button at the bottom."
 
 - unless CONFIG::GENERAL[:drop_down_risk_selection]
   .form-group.col-xs-12

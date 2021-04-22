@@ -12,13 +12,13 @@ $(document).ready(function(){
     }else {
       if (!$('div').hasClass('ignore_validation')) {
         $(this).find('.required_field').each(function(){
-          if($(this).closest("div.nested_field").css("display") == "none"){
+          if($(this).closest("div.nested_field_area").css("display") == "none"){
             $(this).switchClass("required_field", "required_field_hidden")
           }
         });
 
         $(this).find('.required_field_hidden').each(function(){
-          if($(this).closest("div.nested_field").css("display") != "none"){
+          if($(this).closest("div.nested_field_area").css("display") != "none"){
             $(this).switchClass("required_field_hidden", "required_field")
           }
         });
@@ -31,38 +31,39 @@ $(document).ready(function(){
         $(this).find('.required_field').each(function(){
           var cboxes = $(this).find('.checkbox_mul').get();
           var radios = $(this).find('.radio_req').get();
-
-          if (radios == null || radios.length == 0) {
-            if (cboxes == null || cboxes.length == 0) {
-              if ($(this).val() == ""){
-                error = true;
-                result = false;
-                $(this).css('border-color', 'red');
-                event.preventDefault();
+          if($(this).closest("div.nested_field_area").css("display") != "none"){
+            if (radios == null || radios.length == 0) {
+              if (cboxes == null || cboxes.length == 0) {
+                if ($(this).val() == ""){
+                  error = true;
+                  result = false;
+                  $(this).css('border-color', 'red');
+                  event.preventDefault();
+                }
+              } else {
+                var lim = $(this).attr('name');
+                count = 0;
+                $(this).find('.checkbox_mul').each(function(){
+                  if ($(this).prop('checked')) {
+                    count ++;
+                  }
+                });
+                if (count < lim){
+                  error = true;
+                  result = false;
+                }
               }
             } else {
-              var lim = $(this).attr('name');
               count = 0;
-              $(this).find('.checkbox_mul').each(function(){
-                if ($(this).prop('checked')) {
-                  count ++;
-                }
+              $(this).find('.radio_req').each(function() {
+                  if ($(this).prop('checked')) {
+                    count ++;
+                  }
               });
-              if (count < lim){
+              if (count < 1) {
                 error = true;
                 result = false;
               }
-            }
-          } else {
-            count = 0;
-            $(this).find('.radio_req').each(function() {
-                if ($(this).prop('checked')) {
-                  count ++;
-                }
-            });
-            if (count < 1) {
-              error = true;
-              result = false;
             }
           }
         });

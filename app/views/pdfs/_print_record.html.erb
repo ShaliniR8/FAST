@@ -137,9 +137,9 @@
                             <%rec_field = record_fields[nested_field.id].first rescue nil%>
                             <%if rec_field. present? && rec_field.value.present?%>
                               <%value = rec_field.print_value%>
-                              <%if record_field.present? && record_field.value.present?%>
-                                <%if (nested_field.nested_field_value.parameterize == record_field.value.parameterize) ||
-                                     (record_field.value.include?(";") && record_field.value.include?(nested_field.nested_field_value))%>
+                              <%if rec_field.present? && rec_field.value.present?%>
+                                <%if (nested_field.nested_field_value.parameterize == rec_field.value.parameterize) ||
+                                     (rec_field.value.include?(";") && rec_field.value.include?(nested_field.nested_field_value))%>
                                   <div class="nested_field" style="margin-left:15px;">
                                     <%if cat.title == "Narratives" %>
                                       <b><%=nested_field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>

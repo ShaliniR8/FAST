@@ -120,6 +120,24 @@ class TemplatesController < ApplicationController
   def update
     @template=Template.find(params[:id])
     updated_name = params[:template][:name]
+
+    if params[:template][:categories_attributes].present?
+      params[:template][:categories_attributes].each do |pkey, pcat|
+        if pcat[:fields_attributes].present?
+          pcat[:fields_attributes].each do |fkey, pfld|
+            if !pfld[:required].present?
+              pfld[:required] = false
+            end
+            if !pfld[:print].present?
+              pfld[:print] = false
+            end
+            if !pfld[:show_label].present?
+              pfld[:show_label] = false
+            end
+          end
+        end
+      end
+    end
     if @template[:name] != updated_name
       AccessControl.where(entry: @template[:name]).update_all(entry: updated_name)
     end

@@ -188,7 +188,8 @@ class SubmissionsController < ApplicationController
 
 
   def prepare_flight_data(emp_num)
-    @flights = Sabre.where({flight_date: (Time.now - 30.days).to_date..Time.now.to_date, employee_number: emp_num})
+    # @flights = Sabre.where({flight_date: (Time.now - 30.days).to_date..Time.now.to_date, employee_number: emp_num})
+    @flights = Sabre.where({employee_number: emp_num})
   end
 
 

@@ -20,7 +20,7 @@ class RJETConfig < DefaultConfig
     # TO BE REMOVED
     base_risk_matrix:             false,
     has_verification:             true,
-    hazard_root_cause_lock:       true,
+    hazard_root_cause_lock:       false,
     global_admin_default:         false,
     sabre_integration:            true,
   })
