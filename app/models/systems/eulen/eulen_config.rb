@@ -10,7 +10,7 @@ class EULENConfig < DefaultConfig
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                               'Grupo Eulen',
-    time_zone:                          'Mountain Time (US & Canada)',
+    time_zone:                          'Eastern Time (US & Canada)',
 
     # SYSTEM CONFIGS
     # enable_sso:                         true,
