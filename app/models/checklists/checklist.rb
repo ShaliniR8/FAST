@@ -37,4 +37,13 @@ class Checklist < ActiveRecord::Base
     contents
   end
 
+  def assign_row_orders
+    count = 1
+    self.checklist_rows.order(:id).each do |checklist_row|
+      checklist_row.row_order = count
+      count += 1
+      checklist_row.save
+    end
+  end
+
 end

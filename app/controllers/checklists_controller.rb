@@ -48,6 +48,8 @@ class ChecklistsController < ApplicationController
       else
         upload_csv(@upload, @record)
       end
+      @record.assign_row_orders
+
     end
     redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @owner
   end
