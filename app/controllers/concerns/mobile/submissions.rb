@@ -13,7 +13,7 @@ module Concerns
         fetch_months = current_user.mobile_fetch_months
 
         @complete_records, @incomplete_records = [true, false].map do |completed|
-          records = Submission.where(completed: completed).includes(:template)
+          records = Submission.where({completed: completed, user_id: current_user.id}).includes(:template)
           records = completed ? records.can_be_accessed(current_user) : records.where(user_id: current_user.id)
           records = records.where('created_at > ?', Time.now - fetch_months.months) if fetch_months > 0
           records
@@ -77,6 +77,12 @@ module Concerns
 
         # Get id map of all users
         json[:users] = array_to_id_map User.active.as_json(only: [:id, :full_name, :email])
+
+        if CONFIG::GENERAL[:sabre_integration].present?
+          # flights = Sabre.where({flight_date: (Time.now - 30.days).to_date..Time.now.to_date, employee_number: current_user.employee_number})
+          flights = Sabre.where({employee_number: current_user.employee_number})
+          json[:sabreData] = array_to_id_map flights
+        end
 
         render :json => json
       end
@@ -166,6 +172,7 @@ module Concerns
                     :element_class,
                     :element_id,
                     :deleted,
+                    :sabre_map,
                   ]
                 }
               }
