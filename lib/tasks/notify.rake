@@ -24,6 +24,7 @@ task :submission_notify => [:environment] do |t|
   owner = Object.const_get(owner_type).find(owner_id)
   content = owner.template.notifier_message.gsub("\n", '<br>') rescue nil
   content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} " + "#{owner.description})") if !content.present?
+  subject = "#{owner.template.name}  Submission ##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} dated #{owner.event_date} has been Submitted (#{owner.description})"
   users.each do |user_id|
     if attach_pdf == 'none'
       controller.notify(
@@ -33,7 +34,8 @@ task :submission_notify => [:environment] do |t|
           content: content
         },
         mailer: true,
-        subject: "New #{owner.template.name} Submission",
+        # subject: "New #{owner.template.name} Submission",
+        subject: subject,
       )
     else
       is_deidentified = attach_pdf == 'deid'
@@ -51,7 +53,8 @@ task :submission_notify => [:environment] do |t|
           content: content
         },
         mailer: true,
-        subject: "New #{owner.template.name} Submission",
+        # subject: "New #{owner.template.name} Submission",
+        subject: subject,
         attachment: attachment
       )
     end
