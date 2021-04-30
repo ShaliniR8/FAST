@@ -86,6 +86,9 @@
       "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
       "iDisplayLength": 500,
       "aaSorting": [[1, "asc"]],
+      "aoColumnDefs": [
+        { "aTargets": [0], "orderDataType": "dom-text", type:'string' },
+      ],
       initComplete: function(){
         this.api().columns().every(function(){
           var column = this;

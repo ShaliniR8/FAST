@@ -92,13 +92,15 @@
           <%=hidden_field_tag 'present_id', ""%>
 
           <div class="col-xs-12">
-            <%=render "shared/instructions",
-              :instruction =>
-              "<p>
+            <%instruction = "<p>
                 Click on the <b>categorical panels</b> to expand accordian and see content.</br>
                 Items in <b>red</b> are required. </br>
-                Scroll to the bottom of the page to <b>Submit/Save</b> the submission.</br>
-              </p>"%>
+                Scroll to the bottom of the page to <b>Submit/Save</b> the submission.</br>"
+              instruction = instruction + "<br/> <b>#{@record.template.name} Instructions:</b> <br/>" + @record.template.description if @record.template.description.present?
+              instruction = instruction + "</p>"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
           </div>
 
           <%if @template.allow_anonymous%>
