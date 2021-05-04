@@ -123,6 +123,9 @@ class TemplatesController < ApplicationController
 
     if params[:template][:categories_attributes].present?
       params[:template][:categories_attributes].each do |pkey, pcat|
+        if !pcat[:deleted].present?
+          pcat[:deleted] = false
+        end
         if pcat[:fields_attributes].present?
           pcat[:fields_attributes].each do |fkey, pfld|
             if !pfld[:required].present?

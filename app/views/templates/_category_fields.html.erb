@@ -57,8 +57,8 @@
           <%=f.text_area :description, {:class=>"form-control changed", :size=>"1"}%><br/>
         <%end%>
       </div>
-      <div class="col-xs-2">
-        <b>Archive</b><br/><%=f.check_box :deleted%>
+      <div class="col-xs-2" style="text-align:center;">
+        <b>Archive</b><br/><%=f.check_box :deleted, class: "form-control changed"%>
       </div>
 
       <div class="col-xs-12">
