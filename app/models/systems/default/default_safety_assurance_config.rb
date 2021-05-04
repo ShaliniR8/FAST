@@ -486,12 +486,8 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
-              if owner.owner.class.name == "ChecklistRow"
-                true
-              else
-                DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
+              DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
                 (owner.immediate_action || owner.owner.status == 'Completed')
-              end
             },
           },
         }),

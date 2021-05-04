@@ -22,6 +22,7 @@ class EULENConfig < DefaultConfig
     base_risk_matrix:                  false,
     allow_reopen_forms:                false,
     has_root_causes:                   false,
+    global_admin_default:              false,
   })
 
 
