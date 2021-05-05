@@ -72,7 +72,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
+          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
@@ -146,7 +146,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
@@ -224,7 +224,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
@@ -328,7 +328,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
+          *%i[delete override_status edit launch sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
