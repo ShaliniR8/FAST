@@ -57,9 +57,9 @@ class FFTSsoConfig
 
   def self.digest_response(response)
     Rails.logger.debug "######## SSO IMPLEMENTATION DATA ########\n nameid: #{response.nameid}\n attributes: #{response.attributes.to_h}"
-    user = User.where(sso_id: response.nameid).first
+    user = User.active.where(sso_id: response.nameid).first
     if user.nil?
-      Rails.logger.info "SSO ERROR: Could not find user with Email address #{response.nameid}"
+      Rails.logger.info "SSO ERROR: Could not find user with Employee Number #{response.nameid}"
     end
     user
   end
