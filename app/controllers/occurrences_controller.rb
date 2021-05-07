@@ -34,7 +34,6 @@ class OccurrencesController < ApplicationController
   end
 
   def update
-    byebug
     Occurrence.transaction do
       (params[:occurrences] || []).each do |template_id, occurrence|
         next unless occurrence[:value].present?
