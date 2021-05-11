@@ -76,12 +76,20 @@ module Concerns
 
 
         # Get id map of all users
-        json[:users] = array_to_id_map User.active.as_json(only: [:id, :full_name, :email])
+        json[:users] = array_to_id_map User.active.as_json(only: [:id, :full_name, :email, :employee_number])
 
         if CONFIG::GENERAL[:sabre_integration].present?
-          flights = Sabre.where({flight_date: (Time.now - 3.days).to_date..Time.now.to_date, employee_number: current_user.employee_number})
-          # flights = Sabre.where({employee_number: current_user.employee_number})
+          # flights = Sabre.where({flight_date: (Time.now - 3.days).to_date..Time.now.to_date, employee_number: current_user.employee_number})
+          flights = Sabre.where({employee_number: current_user.employee_number})
+
+          pertinent_employees = flights.map(&:other_employees).join(',').split(',').uniq
+          pertinent_employees << current_user.employee_number
+
+          # flights_all = Sabre.where({flight_date: (Time.now - 3.days).to_date..Time.now.to_date, employee_number: pertinent_employees})
+          flights_all = Sabre.where({employee_number: pertinent_employees})
+
           json[:sabreData] = array_to_id_map flights
+          json[:sabreAll] = array_to_id_map flights_all
         end
 
         render :json => json
@@ -152,7 +160,7 @@ module Concerns
 
         # Get json data for templates
         templates_json = templates.as_json(
-          only: [:id, :name, :allow_anonymous],
+          only: [:id, :name, :allow_anonymous, :map_template_id],
           include: {
             categories: {
               only: [:id, :title, :category_order, :description, :deleted],

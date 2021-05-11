@@ -33,6 +33,11 @@ class HomeController < ApplicationController
       emp_groups: @emp_groups,
       departments: @departments,
     }
+
+    respond_to do |format|
+      format.html
+      format.json {render :json => { :result => 'Possible error handled - Index'}}
+    end
   end
 
 
@@ -650,6 +655,11 @@ class HomeController < ApplicationController
     when 4
       @size="col-xs-12 col-sm-6 col-md-3"
     end
+
+    # respond_to do |format|
+    #   format.html
+    #   format.json {render :json => { :result => 'Possible error handled - ChooseModule'}}
+    # end
   end
 
 

@@ -8,7 +8,7 @@ module Concerns
       def current_json
         # Get only the data that we need from the user
         mobile_user_info = current_user.as_json(only: [
-          :id, :full_name, :email, :mobile_fetch_months,
+          :id, :full_name, :email, :employee_number, :mobile_fetch_months,
         ])
 
         ##### Legacy, delete later
