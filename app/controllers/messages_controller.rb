@@ -46,6 +46,12 @@ class MessagesController < ApplicationController
 
 
   def create
+    external = ""
+    if params[:message][:external].present?
+      external = params[:message][:external]
+      params[:message].delete('external')
+    end
+
     @message = Message.new(params[:message])
     @message.time = Time.now
     @message.save
@@ -53,6 +59,10 @@ class MessagesController < ApplicationController
       messages_id: @message.id,
       users_id: current_user.id,
       anonymous: (params[:from_anonymous] || false))
+
+    if external.present?
+      send_external_emails(external, params[:message])
+    end
 
     if params[:reply_to].present?
       @reply_to = Message.find(params[:reply_to])
@@ -96,6 +106,15 @@ class MessagesController < ApplicationController
       format.html {redirect_to @message.owner || message_path(@message), flash: { success: 'Message Sent' }}
     end
 
+  end
+
+
+  def send_external_emails(externals, message)
+    if message[:owner_type] == 'Record' || message[:owner_type] == 'Submission'
+      table = Object.const_get(message[:owner_type])
+      emails = externals.split(',').map{|email| email.strip}
+      NotifyMailer.send_external(current_user, emails, message[:subject], message[:content], table.find(message[:owner_id]))
+    end
   end
 
 
