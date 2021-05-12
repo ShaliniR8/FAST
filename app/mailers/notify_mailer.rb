@@ -70,6 +70,19 @@ class NotifyMailer < ApplicationMailer
     mail(**to_email(user.email), subject: subject).deliver
   end
 
+
+  def send_external(user, emails, subject, message, record)
+    @user = user
+    @message = message.gsub('\n', '<br>') rescue ''
+    @record = record
+
+    @record_url = g_link(record)
+
+    subject = "ProSafeT Analyst to Submitter: #{subject}"
+    mail(bcc: emails, subject: subject).deliver
+  end
+
+
   def send_submitter_confirmation(user, submission)
     @user = user
     @submission_id = submission.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])
