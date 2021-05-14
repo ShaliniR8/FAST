@@ -76,7 +76,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -150,7 +150,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -228,7 +228,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen task cost contact finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
