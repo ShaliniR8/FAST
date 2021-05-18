@@ -308,7 +308,7 @@ class DefaultSafetyReportingConfig
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',
-        status: ['New', 'Assigned', 'Completed', 'Pending Approval', 'Overdue', 'All'],
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
         preload: [
           :responsible_user,
           :verifications,

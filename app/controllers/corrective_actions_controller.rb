@@ -126,6 +126,7 @@ class CorrectiveActionsController < ApplicationController
     old_status = @owner.status
     @owner.update_attributes(params[:corrective_action])
     send_notification(@owner, params[:commit])
+    transaction_content = params[:corrective_action][:final_comment] rescue nil
     case params[:commit]
     when 'Assign'
       @owner.assigned_date = Time.now
@@ -149,7 +150,10 @@ class CorrectiveActionsController < ApplicationController
         @owner,
         params[:commit],
         current_user.id,
-        transaction_content
+        transaction_content,
+        nil,
+        current_user,
+        session[:platform]
       )
     end
     @owner.save

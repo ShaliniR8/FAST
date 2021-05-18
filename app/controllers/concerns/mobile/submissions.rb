@@ -180,6 +180,7 @@ module Concerns
                     :element_class,
                     :element_id,
                     :deleted,
+                    :custom_option_id,
                     :sabre_map,
                   ]
                 }
@@ -286,9 +287,13 @@ module Concerns
               category['required'] = true if field['required']
 
               # replace options string with an array, and remove empty values
-              field['options'] = field['options']
-                .split(';')
-                .delete_if{ |option| option.empty? }
+              if field['custom_option_id'].present?
+                field['options'] = CONFIG.custom_options_by_id[field['custom_option_id']].options.split(';') rescue []
+              else
+                field['options'] = field['options']
+                                  .split(';')
+                                  .delete_if{ |option| option.empty? }
+              end
 
               field.delete_if do |key, value|
                 case key

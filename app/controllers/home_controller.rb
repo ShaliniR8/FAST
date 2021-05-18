@@ -501,6 +501,12 @@ class HomeController < ApplicationController
     row_sz = @risk_table[:row_header].size
     col_sz = @risk_table[:column_header].size
 
+    if row_sz > col_sz
+      col_sz = row_sz
+    else
+      row_sz = col_sz
+    end
+
     @frequency = [
       'FREQUENT >4.00',
       'PROBABLE 4.00~3.01',
