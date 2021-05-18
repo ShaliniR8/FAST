@@ -63,12 +63,13 @@ class SafetyAssuranceController < ApplicationController
     current_status = @owner.status
     @owner.update_attributes(params[object_name.to_sym])
     send_notification(@owner, params[:commit])
+    transaction_content = params[:sms_action][:final_comment] rescue nil
     case params[:commit]
     when 'Assign'
       @owner.open_date = Time.now
     when 'Complete'
       if @owner.approver
-        transaction_content ='Pending Approval'
+        transaction_content ||= 'Pending Approval'
       else
         @owner.close_date = Time.now
       end
