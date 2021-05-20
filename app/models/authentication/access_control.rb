@@ -82,7 +82,7 @@ class AccessControl < ActiveRecord::Base
       "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
       "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations'],
-      "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings'],
+      "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings', 'Safety Risk Management'],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
     }

@@ -298,7 +298,13 @@ class SubmissionsController < ApplicationController
       end
     else
       @record = Submission.new(params[:submission])
-      saved = @record.save
+      if session[:platform] == Transaction::PLATFORMS[:mobile] # edge case to handle duplicate offline sync calls from mobile app
+        if @record.check_immediate_duplicate
+          saved = @record.save
+        end
+      else
+        saved = @record.save
+      end
     end
 
     if saved.present?
@@ -328,7 +334,7 @@ class SubmissionsController < ApplicationController
         else
           flash = { success: 'Submission created in progress.' }
           format.html { redirect_to incomplete_submissions_path, flash: flash }
-          format.json {  render :json => { :result => 'success', success: 'Submission submitted.', :redirect => continue_submission_path(@record.id),
+          format.json {  render :json => { :result => 'success', success: 'Submission created in progress.', :redirect => continue_submission_path(@record.id),
                                            :record_id => @record.id, :record => @record, sub_fields: @record.submission_fields, :attach => @record.attachments,
                                            :comms => @record.comments } }
         end
@@ -338,7 +344,7 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         flash = { danger: @record.errors.full_messages.first }
         format.html { redirect_to new_submission_path(:template => @record.template), flash: flash }
-        format.json
+        format.json { render :json => { :result => 'success', success: '' } }
       end
     end
   end
@@ -511,6 +517,12 @@ class SubmissionsController < ApplicationController
             format.json { update_as_json(flash) }
           end
         end
+      end
+    else
+      respond_to do |format|
+        flash = { success: '' }
+        format.html { redirect_to incomplete_submissions_path, flash: flash }
+        format.json { update_as_json(flash) }
       end
     end
   end
