@@ -327,10 +327,10 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         flash = {}
         if params[:commit] == 'Submit'
-          flash = { success: 'Submission submitted.', record_id: @record.id, sub_fields: @record.submission_fields, attach: @record.attachments, comms: @record.comments }
+          flash = { success: 'Submission submitted.' }
           NotifyMailer.send_submitter_confirmation(current_user, @record)
           format.html { redirect_to submission_path(@record), flash: flash }
-          format.json { update_as_json(flash) }
+          format.json { render :json => { success: 'Submission submitted.', record_id: @record.id, sub_fields: @record.submission_fields, attach: @record.attachments, comms: @record.comments }}
         else
           flash = { success: 'Submission created in progress.' }
           format.html { redirect_to incomplete_submissions_path, flash: flash }
