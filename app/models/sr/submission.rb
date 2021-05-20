@@ -124,6 +124,26 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def check_immediate_duplicate
+    h = Hash.new
+
+    h[:templates_id] = templates_id
+    h[:description] = description
+    h[:event_date] = event_date
+    # h[:created_at] = Time.zone.now - 30.seconds..Time.now
+    h[:user_id] = user_id
+    h[:anonymous] = anonymous
+    h[:confidential] = confidential
+    h[:event_time_zone] = event_time_zone
+
+    arr = Submission.where(h)
+    if arr.length > 0
+      return false
+    end
+    return true
+  end
+
+
   def make_report
     if completed && records_id.blank?
       self.record = Record.create(
