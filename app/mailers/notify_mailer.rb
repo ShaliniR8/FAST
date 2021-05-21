@@ -16,6 +16,18 @@ class NotifyMailer < ApplicationMailer
 	  end
   end
 
+  def notify_user_errors(subject, body)
+    emails = ['pia.wetzel@prodigiq.com']
+    default = 'noc@prosafet.com'
+    if Rails.env.production?
+      mail(to: emails, subject: subject, body: body).deliver
+    else
+      mail(to: emails, subject: subject, body: body).deliver
+    end
+  end
+
+
+
   def notify(notice, subject, record, attachment = nil, extra_attachments = 0)
     @user = notice.user
     @notice = notice

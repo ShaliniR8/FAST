@@ -298,4 +298,10 @@ class RJETConfig < DefaultConfig
       30 => 'High - 30',
     }
   }
+
+  RJET_DATA = {
+    #add filepath
+    upload_path: './lib/tasks/RepublicUserAccountsMaster.csv'
+    #'/var/sftp/rjetsftpuser/',
+  }
 end
