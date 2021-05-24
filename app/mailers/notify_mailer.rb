@@ -17,13 +17,12 @@ class NotifyMailer < ApplicationMailer
   end
 
   def notify_user_errors(subject, body)
-    #,'engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com'
-    emails = ['pia.wetzel@prodigiq.com']
+    emails = ['pia.wetzel@prodigiq.com','engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com']
     default = 'noc@prosafet.com'
     if Rails.env.production?
       mail(to: emails, subject: subject, body: body).deliver
     else
-      mail(to: emails, subject: subject, body: body).deliver
+      mail(to: default, subject: subject, body: body).deliver
     end
   end
 
