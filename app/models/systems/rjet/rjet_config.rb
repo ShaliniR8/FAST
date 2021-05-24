@@ -16,6 +16,7 @@ class RJETConfig < DefaultConfig
     enable_sso:                   true,
     login_option:                 'dual',
     cisp_integration:             true,
+    csv_user_import:             true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,
@@ -299,9 +300,12 @@ class RJETConfig < DefaultConfig
     }
   }
 
-  RJET_DATA = {
+  CSV_FILE_USER_IMPORT = {
     #add filepath
-    upload_path: './lib/tasks/RepublicUserAccountsMaster.csv'
+    name: "RJET",
+    destination_file_path:'./lib/tasks/RepublicUserAccountsMaster.csv',
+    destination_file_path_prev_file: './lib/tasks/RepublicUserAccountsMaster_prior.csv',
+    target_file_path: './lib/tasks/RepublicUserAccountsMaster.csv',
     #'/var/sftp/rjetsftpuser/',
   }
 end

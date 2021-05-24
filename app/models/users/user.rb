@@ -362,7 +362,12 @@ class User < ActiveRecord::Base
 
 
   def self.get_levels
-    ['Global Admin', 'Admin', 'Staff', 'External']
+    if CONFIG::GENERAL[:csv_user_import]
+      ['Global Admin', 'Admin', 'Staff', 'External']
+    else
+      ['Global Admin', 'Admin', 'Staff']
+    end
+    
   end
 
 
