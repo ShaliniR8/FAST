@@ -315,13 +315,13 @@ namespace :csv_user_import do
     end
   end
 
-  logger.info email_body + log_body
-  logger.info '###################################'
-  logger.info '### UPDATING USERBASE COMPLETED ###'
-  logger.info '###################################'
+    logger.info email_body + log_body
+    logger.info '###################################'
+    logger.info '### UPDATING USERBASE COMPLETED ###'
+    logger.info '###################################'
 
-  #send email
-  NotifyMailer.notify_user_errors(email_subject, email_body + log_body)
+    #send email
+    NotifyMailer.notify_user_errors(email_subject, email_body + log_body)
   end
 
   def assign_configs
