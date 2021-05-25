@@ -111,7 +111,7 @@ class Meeting < ProsafetBase
 
 
   def has_user(user)
-    if user.global_admin?
+    if CONFIG::GENERAL[:global_admin_default] && user.global_admin?
       true
     elsif self.host.present? && (self.host.users_id == user.id)
       true

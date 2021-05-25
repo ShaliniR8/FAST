@@ -104,6 +104,14 @@ class SrasController < ApplicationController
     @owner = Sra.find(params[:id]).becomes(Sra)
     sra_meeting = @owner.meeting
     meeting_redirect = false
+    transaction_content = params[:sra][:closing_comment] rescue nil
+    if transaction_content.nil?
+      if params[:sra][:comments_attributes].present?
+        params[:sra][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
 
     case params[:commit]
     when 'Assign'
@@ -207,7 +215,7 @@ class SrasController < ApplicationController
             content: notice_content},
           mailer: true,
           subject: 'SRA Approved') if send_notice
-        transaction_content = 'Approved by the Quality Reviewer'
+        transaction_content = "Approved by the Quality Reviewer with comment #{transaction_content = params[:sra][:closing_comment] rescue ""}"
       else
         @owner.close_date = Time.now
         notify(@owner,
@@ -216,7 +224,7 @@ class SrasController < ApplicationController
             content: "SRA ##{@owner.id} was Approved by the Final Approver."},
           mailer: true,
           subject: 'SRA Approved') if @owner.responsible_user
-        transaction_content = 'Approved by the Final Approver'
+        transaction_content = "Approved by the Final Approver with comment #{transaction_content = params[:sra][:closing_comment] rescue ""}"
       end
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:sra][:status]}"

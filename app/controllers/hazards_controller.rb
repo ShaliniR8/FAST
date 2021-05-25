@@ -96,6 +96,14 @@ class HazardsController < ApplicationController
 
     transaction = true
     @owner = Hazard.find(params[:id])
+    transaction_content = params[:hazard][:final_comment] rescue nil
+    if transaction_content.nil?
+      if params[:hazard][:comments_attributes].present?
+        params[:hazard][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
 
     case params[:commit]
     when 'Assign'
