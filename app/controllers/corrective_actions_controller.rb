@@ -127,6 +127,14 @@ class CorrectiveActionsController < ApplicationController
     @owner.update_attributes(params[:corrective_action])
     send_notification(@owner, params[:commit])
     transaction_content = params[:corrective_action][:final_comment] rescue nil
+    if transaction_content.nil?
+      if params[:corrective_action][:comments_attributes].present?
+        params[:corrective_action][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
+
     case params[:commit]
     when 'Assign'
       @owner.assigned_date = Time.now

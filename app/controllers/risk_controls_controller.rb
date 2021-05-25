@@ -124,6 +124,14 @@ class RiskControlsController < ApplicationController
   def update
     transaction = true
     @owner = RiskControl.find(params[:id]).becomes(RiskControl)
+    transaction_content = params[:risk_control][:final_comment] rescue nil
+    if transaction_content.nil?
+      if params[:risk_control][:comments_attributes].present?
+        params[:risk_control][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
 
     case params[:commit]
     when 'Assign'
