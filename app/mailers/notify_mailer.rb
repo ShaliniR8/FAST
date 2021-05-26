@@ -5,7 +5,7 @@ class NotifyMailer < ApplicationMailer
 
 
   def notify_rake_errors(subject, error, location)
-	    emails = ['blair.li@prodigiq.com', 'taeho.kim@prodigiq.com', 'trevor.ryles@prodigiq.com', 'engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com']
+	    emails = ['engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com']
 	    default = 'noc@prosafet.com'
 	    @error = error
 	    @location = location
@@ -15,6 +15,18 @@ class NotifyMailer < ApplicationMailer
 	    mail(to: default, subject: subject).deliver
 	  end
   end
+
+  def notify_user_import_result(subject, body)
+    emails = ['pia.wetzel@prodigiq.com','engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com'] + CONFIG::CSV_FILE_USER_IMPORT[:client_emails]
+    default = 'noc@prosafet.com'
+    if Rails.env.production?
+      mail(to: emails, subject: subject, body: body).deliver
+    else
+      mail(to: default, subject: subject, body: body).deliver
+    end
+  end
+
+
 
   def notify(notice, subject, record, attachment = nil, extra_attachments = 0)
     @user = notice.user

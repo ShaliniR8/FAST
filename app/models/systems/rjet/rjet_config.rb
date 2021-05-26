@@ -16,6 +16,7 @@ class RJETConfig < DefaultConfig
     enable_sso:                   true,
     login_option:                 'dual',
     cisp_integration:             true,
+    csv_user_import:             true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,
@@ -297,5 +298,15 @@ class RJETConfig < DefaultConfig
       25 => 'High - 25',
       30 => 'High - 30',
     }
+  }
+
+  CSV_FILE_USER_IMPORT = {
+    filename: 'RepublicUserAccountsMaster.csv',
+    prev_filename: 'RepublicUserAccountsMaster_prior.csv',
+    destination_file_path:'lib/tasks',
+    target_file_path: '/var/sftp/rjetsftpuser',
+
+    # Please add clients emails
+    client_emails: []
   }
 end

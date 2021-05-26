@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
     :module_access, :email_notification, :role, :airline,
     :job_title, :address, :city, :state, :zipcode, :mobile_number,
     :work_phone_number, :employee_number, :access_levels_attributes,
-    :android_version, :disable, :sso_id, :updated_at, :departments
+    :android_version, :disable, :sso_id, :updated_at, :departments, :ignore_updates
 
 
 
@@ -362,7 +362,12 @@ class User < ActiveRecord::Base
 
 
   def self.get_levels
-    ['Global Admin', 'Admin', 'Staff', 'External']
+    if CONFIG::GENERAL[:csv_user_import]
+      ['Global Admin', 'Admin', 'Staff', 'External']
+    else
+      ['Global Admin', 'Admin', 'Staff']
+    end
+    
   end
 
 

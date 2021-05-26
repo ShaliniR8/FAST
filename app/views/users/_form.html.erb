@@ -55,9 +55,7 @@
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                 <hr>
                 <h4><b>ACCOUNT INFORMATION</b></h4>
-
                 <div class="col-xs-10 mt10">
-
                   <div class="form-group row">
                     <%=f.label :username, :class => "col-sm-4 col-form-label required_label"%>
                     <div class="col-sm-8">
@@ -117,6 +115,14 @@
                         <%=f.label :password, "Confirm New Password", :class => "col-sm-4 col-form-label"%>
                         <div class="col-sm-8">
                           <%=f.password_field :password_confirmation, {:class=>"form-control password pass_confirm"}%>
+                        </div>
+                      </div>
+                    <%end%>
+                    <%if CONFIG::GENERAL[:csv_user_import]%>
+                      <div class = "form-group row">
+                        <%= f.label :ignore_updates, "Do Not Update By CSV", :class => 'col-xs-4 col-form-label' %>
+                        <div class="col-sm-8" style = "float: right;">
+                        <%=f.check_box :ignore_updates %>
                         </div>
                       </div>
                     <%end%>
