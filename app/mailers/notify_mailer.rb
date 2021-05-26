@@ -16,8 +16,8 @@ class NotifyMailer < ApplicationMailer
 	  end
   end
 
-  def notify_user_errors(subject, body)
-    emails = ['pia.wetzel@prodigiq.com','engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com']
+  def notify_user_import_result(subject, body)
+    emails = ['pia.wetzel@prodigiq.com','engineering@prosafet.com', 'saptarshi.chatterjee@prodigiq.com'] + CONFIG::CSV_FILE_USER_IMPORT[:client_emails]
     default = 'noc@prosafet.com'
     if Rails.env.production?
       mail(to: emails, subject: subject, body: body).deliver

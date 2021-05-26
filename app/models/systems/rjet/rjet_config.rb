@@ -301,11 +301,12 @@ class RJETConfig < DefaultConfig
   }
 
   CSV_FILE_USER_IMPORT = {
-    #add filepath
-    name: "RJET",
-    destination_file_path:'./lib/tasks/RepublicUserAccountsMaster.csv',
-    destination_file_path_prev_file: './lib/tasks/RepublicUserAccountsMaster_prior.csv',
-    target_file_path: './lib/tasks/RepublicUserAccountsMaster.csv',
-    #'/var/sftp/rjetsftpuser/',
+    filename: 'RepublicUserAccountsMaster.csv',
+    prev_filename: 'RepublicUserAccountsMaster_prior.csv',
+    destination_file_path:'lib/tasks',
+    target_file_path: '/var/sftp/rjetsftpuser'
+
+    # Please add clients emails
+    client_emails: []
   }
 end

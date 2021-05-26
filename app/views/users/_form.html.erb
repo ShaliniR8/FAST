@@ -120,7 +120,7 @@
                     <%end%>
                     <%if CONFIG::GENERAL[:csv_user_import]%>
                       <div class = "form-group row">
-                        <%= f.label :ignore_updates, "DO NOT UPDATE THE USER FROM THE DAILY USER IMPORT FILES", :class => 'col-xs-12 col-form-label' %>
+                        <%= f.label :ignore_updates, "Do Not Update By CSV", :class => 'col-xs-4 col-form-label' %>
                         <div class="col-sm-8" style = "float: right;">
                         <%=f.check_box :ignore_updates %>
                         </div>
