@@ -27,7 +27,7 @@ namespace :csv_user_import do
     @logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
     @email_subject       = "Your Daily #{AIRLINE_CODE} User Import Was Successfully Executed"
-    @email_subject_error = "Some Errors Occurred While Executing. The #{AIRLINE_CODE} Daily User Onboarding Rake Task"
+    @email_subject_error = "Some Errors Occurred While Executing. The #{AIRLINE_CODE} Daily User Onboarding Task"
 
     fetch_csv_file
     exit unless valid_csv_file?

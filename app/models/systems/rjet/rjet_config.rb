@@ -304,7 +304,7 @@ class RJETConfig < DefaultConfig
     filename: 'RepublicUserAccountsMaster.csv',
     prev_filename: 'RepublicUserAccountsMaster_prior.csv',
     destination_file_path:'lib/tasks',
-    target_file_path: '/var/sftp/rjetsftpuser'
+    target_file_path: '/var/sftp/rjetsftpuser',
 
     # Please add clients emails
     client_emails: []
