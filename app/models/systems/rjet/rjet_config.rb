@@ -307,6 +307,6 @@ class RJETConfig < DefaultConfig
     target_file_path: '/var/sftp/rjetsftpuser',
 
     # Please add clients emails
-    client_emails: []
+    client_emails: ['WIT@rjet.com', 'Jennifer.Hoagland@rjet.com', 'Haley.Myers@rjet.com', 'Kayse.Calton@rjet.com']
   }
 end
