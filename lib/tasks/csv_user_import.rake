@@ -1,24 +1,37 @@
 namespace :csv_user_import do
   require 'roo'
 
+  USERNAME_COL          = 0
+  ACCOUNT_PRIVILEGE_COL = 1
+  EMPLOYEENUMBER_COL    = 2
+  FIRSTNAME_COL         = 3
+  LASTNAME_COL          = 4
+  EMAIL_COL             = 5
+  JOBTITLE_COL          = 6
+  ACCOUNTTYPE_COL       = 7
+  ADDRESS_COL           = 8
+  CITY_COL              = 9
+  STATE_COL             = 10
+  ZIPCODE_COL           = 11
+  MOBILENUMBER_COL      = 12
+  WORKNUMBER_COL        = 13
+  COLUMN_NUMBER         = 14
+
   task :update_userbase => :environment do
-    USERNAME_COL          = 0
-    ACCOUNT_PRIVILEGE_COL = 1
-    EMPLOYEENUMBER_COL    = 2
-    FIRSTNAME_COL         = 3
-    LASTNAME_COL          = 4
-    EMAIL_COL             = 5
-    JOBTITLE_COL          = 6
-    ACCOUNTTYPE_COL       = 7
-    ADDRESS_COL           = 8
-    CITY_COL              = 9
-    STATE_COL             = 10
-    ZIPCODE_COL           = 11
-    MOBILENUMBER_COL      = 12
-    WORKNUMBER_COL        = 13
+    begin_log
+    assign_config
+    exit unless fetch_csv_file
+    exit unless valid_csv_file?
+    exit unless open_csv_file
+    upload_users
+    update_historical_file
+    disable_users # who are not on the csv files
+    send_user_import_result
+    end_log
+  end #END update_userbase
 
-    COLUMN_NUMBER         = 14
 
+  def begin_log
     @logger = Logger.new("log/csv_user_import.log")
 
     @logger.info '##############################'
@@ -28,20 +41,14 @@ namespace :csv_user_import do
 
     @email_subject       = "Your Daily #{AIRLINE_CODE} User Import Was Successfully Executed"
     @email_subject_error = "Some Errors Occurred While Executing. The #{AIRLINE_CODE} Daily User Onboarding Task"
+  end
 
-    fetch_csv_file
-    exit unless valid_csv_file?
-    exit unless open_csv_file
-    update_users
-    update_historical_file
-    disable_users
-    send_user_import_result
 
+  def end_log
     @logger.info '###################################'
     @logger.info '### UPDATING USERBASE COMPLETED ###'
     @logger.info "###################################\n\n"
-
-  end #END update_userbase
+  end
 
 
   def log_and_notify_user(email_subject:, msg:)
@@ -53,55 +60,49 @@ namespace :csv_user_import do
 
 
   def assign_config
-    filename              = CONFIG::CSV_FILE_USER_IMPORT[:filename]
-    prev_filename         = CONFIG::CSV_FILE_USER_IMPORT[:prev_filename]
-    destination_file_path = CONFIG::CSV_FILE_USER_IMPORT[:destination_file_path]
-    target_file_path      = CONFIG::CSV_FILE_USER_IMPORT[:target_file_path]
+    @filename              = CONFIG::CSV_FILE_USER_IMPORT[:filename]
+    @prev_filename         = CONFIG::CSV_FILE_USER_IMPORT[:prev_filename]
+    @destination_file_path = CONFIG::CSV_FILE_USER_IMPORT[:destination_file_path]
+    @target_file_path      = CONFIG::CSV_FILE_USER_IMPORT[:target_file_path]
 
-    {
-      filename: filename,
-      prev_filename: prev_filename,
-      destination_file_path: destination_file_path,
-      target_file_path: target_file_path
-    }
+    @target           = "#{@target_file_path}/#{@filename}"
+    @destination      = "#{@destination_file_path}/#{@filename}"
+    @prev_destination = "#{@destination_file_path}/#{@prev_filename}"
   end
 
 
   def fetch_csv_file
-    config = assign_config
-    target      = "#{config[:target_file_path]}/#{config[:filename]}"
-    destination = "#{config[:destination_file_path]}/#{config[:filename]}"
-    `cp #{target} #{destination}`
+    unless system("cp #{@target} #{@destination}")
+      error_msg = "[ERROR] #{DateTime.now}: #{@target} could not be fetched. Please check the file name and the path.\n"
+      log_and_notify_user(email_subject: @email_subject_error, msg: error_msg)
+      end_log
+      return false
+    end
+    true
   end
 
 
   def valid_csv_file?
-    config = assign_config
-    destination = "#{config[:destination_file_path]}/#{config[:filename]}"
-    prev_destination = "#{config[:destination_file_path]}/#{config[:prev_filename]}"
-
-    if File.exist?(destination) &&
-       compare_file(destination, prev_destination)
+    if File.exist?(@destination) &&
+       compare_file(@destination, @prev_destination)
     then
       error_msg = "[INFO] Historical data was identical - no update necessary\n"
       log_and_notify_user(email_subject: @email_subject, msg: error_msg)
+      end_log
       return false
     end
-
     true
   end
 
 
   def open_csv_file
-    config = assign_config
-    destination = "#{config[:destination_file_path]}/#{config[:filename]}"
-
     begin
-      @table = CSV.parse(File.read(destination), headers: false)
-      @workbook = Roo::Spreadsheet.open(destination);
+      @table = CSV.parse(File.read(@destination), headers: false)
+      @workbook = Roo::Spreadsheet.open(@destination);
     rescue
-      error_msg = "[ERROR] #{DateTime.now}: #{destination} could not be opened\n"
+      error_msg = "[ERROR] #{DateTime.now}: #{@destination} could not be opened\n"
       log_and_notify_user(email_subject: @email_subject_error, msg: error_msg)
+      end_log
       return false
     end
     true
@@ -151,8 +152,8 @@ namespace :csv_user_import do
   end
 
 
-  def update_users
-    @users_in_csv        = []
+  def upload_users
+    @users_in_csv         = []
     @num_created_users    = 0
     @num_re_enabled_users = 0
 
@@ -163,7 +164,7 @@ namespace :csv_user_import do
     @no_last_name_error                = []
     @wrong_num_of_col_error            = []
     @unknown_privilege_error           = []
-    @unexpected_create_privilege_error = []
+    @unexpected_assign_privilege_error = []
     @unexpected_update_user_error      = []
     @unexpected_create_user_error      = []
 
@@ -203,6 +204,29 @@ namespace :csv_user_import do
   end
 
 
+  def update_user_privileges(user, privileges)
+    privileges.each do |priv|
+      privilege =  Privilege.find_by_name(priv)
+      if privilege.present?
+        unless user.privileges.include? privilege
+          begin
+            Role.create!(
+              users_id: user.id,
+              privileges_id: privilege.id
+            )
+          rescue => e
+            puts "#{e} at row ##{@row_num}"
+            @logger.info "#{e} at row ##{@row_num}"
+            @unexpected_assign_privilege_error << @row_num
+          end
+        end
+      else
+        @unknown_privilege_error << @row_num
+      end
+    end
+  end
+
+
   def update_user(user, user_params, privileges)
     begin
       user.update_attributes!(user_params)
@@ -225,29 +249,6 @@ namespace :csv_user_import do
         @no_last_name_error << @row_num
       else
         @unexpected_update_user_error << @row_num
-      end
-    end
-  end
-
-
-  def update_user_privileges(user, privileges)
-    privileges.each do |priv|
-      privilege =  Privilege.find_by_name(priv)
-      if privilege.present?
-        unless user.privileges.include? privilege
-          begin
-            Role.create!(
-              users_id: user.id,
-              privileges_id: privilege.id
-            )
-          rescue => e
-            puts "#{e} at row ##{@row_num}"
-            @logger.info "#{e} at row ##{@row_num}"
-            @unexpected_create_privilege_error << @row_num
-          end
-        end
-      else
-        @unknown_privilege_error << @row_num
       end
     end
   end
@@ -283,9 +284,9 @@ namespace :csv_user_import do
       puts "#{e} at row ##{@row_num}"
       @logger.info "#{e} at row ##{@row_num}"
 
-      usrer_name = user_params[:username].strip rescue ''
+      usrer_name = user_params[:username].strip   rescue ''
       first_name = user_params[:first_name].strip rescue ''
-      last_name = user_params[:last_name].strip rescue ''
+      last_name  = user_params[:last_name].strip  rescue ''
 
       if usrer_name.empty?
         @no_username_error << @row_num
@@ -301,19 +302,16 @@ namespace :csv_user_import do
 
 
   def update_historical_file
-    config = assign_config
-    destination = "#{config[:destination_file_path]}/#{config[:filename]}"
-    prev_destination = "#{config[:destination_file_path]}/#{config[:prev_filename]}"
-    IO.copy_stream(destination, prev_destination)
+    IO.copy_stream(@destination, @prev_destination)
   end
 
 
   def disable_users
     # Get all users that will be disabled
     all_deletable_users = User.where('ignore_updates = ? AND level != ? AND disable = ?', false, 'External', false)
+    # Disable users that were not in CSV file
     users_to_be_disabled = all_deletable_users - @users_in_csv
 
-    # Disable users that were not in CSV file
     @num_deleted_users = users_to_be_disabled.size
 
     users_to_be_disabled.each do |u|
@@ -328,13 +326,14 @@ namespace :csv_user_import do
 
 
   def summary
-    content = "\nSUMMARY OF THE DAILY USER IMPORT\n"
+    content =  "\nSUMMARY OF THE DAILY USER IMPORT\n"
+
     content += "\nBEFORE UPDATE:"
-    content += "\n\tTotal Active Users: " + @active_users_before_update.size.to_s
+    content += "\n\tTotal Active Users:   " + @active_users_before_update.size.to_s
     content += "\n\tTotal Disabled Users: " + @disabled_users_before_update.size.to_s
 
     content += "\n\nAFTER UPDATE:"
-    content += "\n\tTotal Active Users: " + @active_users_after_update.size.to_s
+    content += "\n\tTotal Active Users:   " + @active_users_after_update.size.to_s
     content += "\n\tTotal Disabled Users: " + @disabled_users_after_update.size.to_s
 
     content += "\n\nUPDATE:"
@@ -348,26 +347,26 @@ namespace :csv_user_import do
 
 
   def get_error_messages
-    @duplicate_username_error_msg = "Duplicated users found in row(s): #{@duplicate_username_error}\n\n"
-    @no_username_error_msg = "Empty username in row(s): #{@no_username_error}\n\n"
-    @no_first_name_error_msg = "Empty first name in row(s): #{@no_first_name_error}\n\n"
-    @no_last_name_error_msg = "Empty last name in row(s): #{@no_last_name_error}\n\n"
-    @wrong_num_of_col_error_msg ="Wrong numbers of column in row(s): #{@wrong_num_of_col_error}\n\n"
-    @unknown_privilege_error_msg = "Unknown user privilege for user(s) in row(s): #{@unknown_privilege_error}\n\n"
-    @unexpected_create_privilege_error_msg = "Failed to assign privileges for user(s) in row(s): #{@unexpected_create_privilege_error}\n\n"
-    @unexpected_update_user_error_msg = "Failed to update user(s) in row(s): #{@unexpected_update_user_error}\n\n"
-    @unexpected_create_user_error_msg = "Failed to create user(s) in row(s): #{@unexpected_create_user_error}\n\n"
+    @duplicate_username_error_msg          = "Duplicated users found in row(s): #{@duplicate_username_error}\n\n"
+    @no_username_error_msg                 = "Empty username in row(s): #{@no_username_error}\n\n"
+    @no_first_name_error_msg               = "Empty first name in row(s): #{@no_first_name_error}\n\n"
+    @no_last_name_error_msg                = "Empty last name in row(s): #{@no_last_name_error}\n\n"
+    @wrong_num_of_col_error_msg            = "Wrong numbers of column in row(s): #{@wrong_num_of_col_error}\n\n"
+    @unknown_privilege_error_msg           = "Unknown user privilege for user(s) in row(s): #{@unknown_privilege_error}\n\n"
+    @unexpected_assign_privilege_error_msg = "Failed to assign privileges for user(s) in row(s): #{@unexpected_assign_privilege_error}\n\n"
+    @unexpected_update_user_error_msg      = "Failed to update user(s) in row(s): #{@unexpected_update_user_error}\n\n"
+    @unexpected_create_user_error_msg      = "Failed to create user(s) in row(s): #{@unexpected_create_user_error}\n\n"
 
     log_content = ''
-    log_content += @duplicate_username_error_msg if @duplicate_username_error.present?
-    log_content += @no_username_error_msg if @no_username_error.present?
-    log_content += @no_first_name_error_msg if @no_first_name_error.present?
-    log_content += @no_last_name_error_msg if @no_last_name_error.present?
-    log_content += @wrong_num_of_col_error_msg if @wrong_num_of_col_error.present?
-    log_content += @unknown_privilege_error_msg if @unknown_privilege_error.present?
-    log_content += @unexpected_create_privilege_error_msg if @unexpected_create_privilege_error.present?
-    log_content += @unexpected_update_user_error_msg if @unexpected_update_user_error.present?
-    log_content += @unexpected_create_user_error_msg if @unexpected_create_user_error.present?
+    log_content += @duplicate_username_error_msg          if @duplicate_username_error.present?
+    log_content += @no_username_error_msg                 if @no_username_error.present?
+    log_content += @no_first_name_error_msg               if @no_first_name_error.present?
+    log_content += @no_last_name_error_msg                if @no_last_name_error.present?
+    log_content += @wrong_num_of_col_error_msg            if @wrong_num_of_col_error.present?
+    log_content += @unknown_privilege_error_msg           if @unknown_privilege_error.present?
+    log_content += @unexpected_assign_privilege_error_msg if @unexpected_assign_privilege_error.present?
+    log_content += @unexpected_update_user_error_msg      if @unexpected_update_user_error.present?
+    log_content += @unexpected_create_user_error_msg      if @unexpected_create_user_error.present?
 
     log_content
   end
@@ -378,5 +377,4 @@ namespace :csv_user_import do
     email_subject = error_messages.present? ? @email_subject_error : @email_subject
     log_and_notify_user(email_subject: email_subject, msg: summary + error_messages)
   end
-
 end
