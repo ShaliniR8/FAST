@@ -288,10 +288,11 @@ module Concerns
 
               # replace options string with an array, and remove empty values
               if field['custom_option_id'].present?
-                field['options'] = CONFIG.custom_options_by_id[field['custom_option_id']].options.split(';') rescue []
+                field['options'] = CONFIG.custom_options_by_id[field['custom_option_id']].options.split(';').map {|opt| opt.strip if opt.present?} rescue []
               else
                 field['options'] = field['options']
                                   .split(';')
+                                  .map {|opt| opt.strip if opt.present?}
                                   .delete_if{ |option| option.empty? }
               end
 

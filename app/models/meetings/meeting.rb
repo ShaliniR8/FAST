@@ -113,6 +113,8 @@ class Meeting < ProsafetBase
   def has_user(user)
     if CONFIG::GENERAL[:global_admin_default] && user.global_admin?
       true
+    elsif user.has_access('meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+      true
     elsif self.host.present? && (self.host.users_id == user.id)
       true
     else

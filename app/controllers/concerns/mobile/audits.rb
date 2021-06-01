@@ -14,8 +14,29 @@ module Concerns
         @records = fetch_months > 0 ? Audit.where('created_at > ?', Time.now - fetch_months.months)
           : Audit.all
 
+        @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
+        cars =  Object.const_get('Audit').where('status in (?) and responsible_user_id = ?',
+          ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+        cars +=  Object.const_get('Audit').where('status in (?) and approver_id = ?',
+          ['Assigned', 'Pending Approval', 'Completed'], current_user.id)
+        if current_user.has_access('audits','viewer')
+           Object.const_get('Audit').where('viewer_access = true').each do |viewable|
+            if viewable.privileges.blank?
+              cars += [viewable]
+            else
+              viewable.privileges.each do |privilege|
+                current_user.privileges.include? privilege
+                cars += [viewable]
+              end
+            end
+          end
+        end
+        cars +=  Object.const_get('Audit').where('created_by_id = ?', current_user.id)
+        @records = @records & cars
+
+
         # filter_audits
-        filter_records('Audit', 'audits')
+        # filter_records('Audit', 'audits')
 
         json = {}
 
