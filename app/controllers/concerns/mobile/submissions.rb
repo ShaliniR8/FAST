@@ -292,7 +292,6 @@ module Concerns
               else
                 field['options'] = field['options']
                                   .split(';')
-                                  .map {|opt| opt.strip if opt.present?}
                                   .delete_if{ |option| option.empty? }
               end
 
