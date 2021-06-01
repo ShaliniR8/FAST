@@ -128,9 +128,7 @@ class Submission < Sr::SafetyReportingBase
     h = Hash.new
 
     h[:templates_id] = templates_id
-    h[:description] = description
     h[:event_date] = event_date
-    # h[:created_at] = Time.zone.now - 30.seconds..Time.now
     h[:user_id] = user_id
     h[:anonymous] = anonymous
     h[:confidential] = confidential
@@ -138,7 +136,17 @@ class Submission < Sr::SafetyReportingBase
 
     arr = Submission.where(h)
     if arr.length > 0
-      return false
+      arr.each do |sub|
+        if sub.description.include?('-- dual submission of')
+          if description == sub.description.split('-- dual submission of')[0].strip
+            return false
+          end
+        else
+          if description == sub.description
+            return false
+          end
+        end
+      end
     end
     return true
   end
