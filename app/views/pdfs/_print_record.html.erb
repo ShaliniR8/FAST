@@ -25,6 +25,10 @@
       :owner => owner,
       :deidentified => deidentified%>
 
+    <%=render 'pdfs/print_causes',
+       owner: owner,
+       deidentified: deidentified%>
+
     <%if !(defined?(source_of_input) && source_of_input)%>
 
       <div class="col-xs-12">

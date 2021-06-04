@@ -1,0 +1,22 @@
+- causes = Cause.where(obj_id: owner.obj_id)
+- if causes.present?
+  .col-xs-12.wrap
+    .title = 'Causes'
+    .col-xs-12
+      .content
+        table.table.table-striped.table-bordered width="100%"
+          thead
+            tr
+              th ="Label"
+              th ="Value"
+          tbody
+            - causes.each do |cause|
+              - next if cause.value.empty? || cause.value == "\"\""
+              tr
+                td ="#{cause.category.titleize} > #{cause.attr.titleize}"
+                - if cause.value == '0'
+                  td = 'No'
+                - elsif cause.value == '1'
+                  td = 'Yes'
+                - else
+                  td = "#{cause.value}".gsub('"','')
