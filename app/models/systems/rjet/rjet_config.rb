@@ -301,6 +301,7 @@ class RJETConfig < DefaultConfig
   }
 
   CSV_FILE_USER_IMPORT = {
+    sso_id: :email,
     filename: 'RepublicUserAccountsMaster.csv',
     prev_filename: 'RepublicUserAccountsMaster_prior.csv',
     destination_file_path:'lib/tasks',

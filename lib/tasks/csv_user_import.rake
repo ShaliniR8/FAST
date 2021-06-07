@@ -18,8 +18,9 @@ namespace :csv_user_import do
   COLUMN_NUMBER         = 14
 
   task :update_userbase => :environment do
-    begin_log
     assign_config
+
+    begin_log
     exit unless fetch_csv_file
     exit unless valid_csv_file?
     exit unless open_csv_file
@@ -32,15 +33,10 @@ namespace :csv_user_import do
 
 
   def begin_log
-    @logger = Logger.new("log/csv_user_import.log")
-
     @logger.info '##############################'
     @logger.info '### UPDATING USER DATABASE ###'
     @logger.info '##############################'
     @logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
-
-    @email_subject       = "Your Daily #{AIRLINE_CODE} User Import Was Successfully Executed"
-    @email_subject_error = "Some Errors Occurred While Executing. The #{AIRLINE_CODE} Daily User Onboarding Task"
   end
 
 
@@ -64,10 +60,15 @@ namespace :csv_user_import do
     @prev_filename         = CONFIG::CSV_FILE_USER_IMPORT[:prev_filename]
     @destination_file_path = CONFIG::CSV_FILE_USER_IMPORT[:destination_file_path]
     @target_file_path      = CONFIG::CSV_FILE_USER_IMPORT[:target_file_path]
+    @sso_id                = CONFIG::CSV_FILE_USER_IMPORT[:sso_id]
 
     @target           = "#{@target_file_path}/#{@filename}"
     @destination      = "#{@destination_file_path}/#{@filename}"
     @prev_destination = "#{@destination_file_path}/#{@prev_filename}"
+
+    @logger = Logger.new("log/csv_user_import.log")
+    @email_subject       = "Your Daily #{AIRLINE_CODE} User Import Was Successfully Executed"
+    @email_subject_error = "Some Errors Occurred While Executing. The #{AIRLINE_CODE} Daily User Onboarding Task"
   end
 
 
@@ -109,6 +110,18 @@ namespace :csv_user_import do
   end
 
 
+  def sso_id_col_in(row)
+    case @sso_id
+    when :email
+      row[EMAIL_COL] rescue nil
+    when :employee_number
+      row[EMPLOYEENUMBER_COL]
+    else
+      ''
+    end
+  end
+
+
   def get_user_params(row)
     {
       username:           row[USERNAME_COL],
@@ -119,7 +132,7 @@ namespace :csv_user_import do
       full_name:          "#{row[FIRSTNAME_COL]} #{row[LASTNAME_COL]}",
       employee_number:    row[EMPLOYEENUMBER_COL],
       password:           '1rDte@p9q657UtfH&4wQ!',
-      sso_id:             row[EMAIL_COL], # THIS CAN BE DIFFERENT BY AIRLINES
+      sso_id:             sso_id_col_in(row), # THIS CAN BE DIFFERENT BY AIRLINES
       job_title:          row[JOBTITLE_COL],
       address:            row[ADDRESS_COL],
       city:               row[CITY_COL],
@@ -132,12 +145,43 @@ namespace :csv_user_import do
   end
 
 
-  def is_duplicated_username(row)
-    usrer_name = row[USERNAME_COL].strip rescue ''
-    if @users_in_csv.map(&:username).include? usrer_name
+  def is_duplicated_username_in_csv(row)
+    user_name = row[USERNAME_COL].strip rescue ''
+    if @users_in_csv.map(&:username).include? user_name
       @duplicate_username_error << @row_num
       return true
     end
+    false
+  end
+
+
+  def is_duplicated_sso_id(row)
+    sso_id = sso_id_col_in(row)
+    result = false
+
+    if @users_in_csv.map(&:sso_id).include? sso_id
+      @duplicate_sso_id_in_csv_error << @row_num
+      result =  true
+    end
+
+    if check_duplicated_sso_id_in_db(row)
+      @duplicate_sso_id_in_portal_error << @row_num
+      result = true
+    end
+
+    result
+  end
+
+
+  def check_duplicated_sso_id_in_db(row)
+    user_name = row[USERNAME_COL].strip rescue ''
+    users = User.where(sso_id: sso_id_col_in(row))
+    return true if users.size > 1
+
+    users.each do |user|
+      return true if user.username != user_name
+    end
+
     false
   end
 
@@ -159,6 +203,8 @@ namespace :csv_user_import do
 
     # Errors
     @duplicate_username_error          = []
+    @duplicate_sso_id_in_csv_error     = []
+    @duplicate_sso_id_in_portal_error  = []
     @no_username_error                 = []
     @no_first_name_error               = []
     @no_last_name_error                = []
@@ -179,13 +225,15 @@ namespace :csv_user_import do
       row = @workbook.row(index)
 
       # Handle duplicated username
-      next if is_duplicated_username(row)
+      next if is_duplicated_username_in_csv(row)
+      # Handle duplicated sso_id
+      next if is_duplicated_sso_id(row)
       # Handle wrong number of columns
       next if have_wrong_num_of_col
 
       user = User.find_by_username(row[USERNAME_COL])
       user_params = get_user_params(row)
-      privileges = row[ACCOUNT_PRIVILEGE_COL].split(';').map(&:strip)
+      privileges = row[ACCOUNT_PRIVILEGE_COL].split(';').map(&:strip) rescue []
 
       if should_user_be_updated? (user)
         update_user(user, user_params, privileges)
@@ -237,11 +285,11 @@ namespace :csv_user_import do
       puts "#{e} at row ##{@row_num}"
       @logger.info "#{e} at row ##{@row_num}"
 
-      usrer_name = user_params[:username].strip rescue ''
+      user_name = user_params[:username].strip rescue ''
       first_name = user_params[:first_name].strip rescue ''
       last_name = user_params[:last_name].strip rescue ''
 
-      if usrer_name.empty?
+      if user_name.empty?
         @no_username_error << @row_num
       elsif first_name.empty?
         @no_first_name_error << @row_num
@@ -284,11 +332,11 @@ namespace :csv_user_import do
       puts "#{e} at row ##{@row_num}"
       @logger.info "#{e} at row ##{@row_num}"
 
-      usrer_name = user_params[:username].strip   rescue ''
+      user_name  = user_params[:username].strip   rescue ''
       first_name = user_params[:first_name].strip rescue ''
       last_name  = user_params[:last_name].strip  rescue ''
 
-      if usrer_name.empty?
+      if user_name.empty?
         @no_username_error << @row_num
       elsif first_name.empty?
         @no_first_name_error << @row_num
@@ -307,15 +355,16 @@ namespace :csv_user_import do
 
 
   def disable_users
-    # Get all users that will be disabled
+    # Get all users who can be disabled
     all_deletable_users = User.where('ignore_updates = ? AND level != ? AND disable = ?', false, 'External', false)
-    # Disable users that were not in CSV file
+    # Disable users who were not in CSV file
     users_to_be_disabled = all_deletable_users - @users_in_csv
 
     @num_deleted_users = users_to_be_disabled.size
 
     users_to_be_disabled.each do |u|
       u.disable = true
+      u.sso_id  = nil
       u.save
     end
 
@@ -347,7 +396,9 @@ namespace :csv_user_import do
 
 
   def get_error_messages
-    @duplicate_username_error_msg          = "Duplicated users found in row(s): #{@duplicate_username_error}\n\n"
+    @duplicate_username_error_msg          = "Duplicated users (in CSV file) found in row(s): #{@duplicate_username_error}\n\n"
+    @duplicate_sso_id_in_csv_error_msg     = "Duplicated SSO ID(#{@sso_id}) (in CSV file) found in row(s): #{@duplicate_sso_id_in_csv_error}\n\n"
+    @duplicate_sso_id_in_portal_error_msg  = "Duplicated SSO ID(#{@sso_id}) (in portal) found in row(s): #{@duplicate_sso_id_in_portal_error}\n\n"
     @no_username_error_msg                 = "Empty username in row(s): #{@no_username_error}\n\n"
     @no_first_name_error_msg               = "Empty first name in row(s): #{@no_first_name_error}\n\n"
     @no_last_name_error_msg                = "Empty last name in row(s): #{@no_last_name_error}\n\n"
@@ -359,6 +410,8 @@ namespace :csv_user_import do
 
     log_content = ''
     log_content += @duplicate_username_error_msg          if @duplicate_username_error.present?
+    log_content += @duplicate_sso_id_in_csv_error_msg     if @duplicate_sso_id_in_csv_error.present?
+    log_content += @duplicate_sso_id_in_portal_error_msg  if @duplicate_sso_id_in_portal_error.present?
     log_content += @no_username_error_msg                 if @no_username_error.present?
     log_content += @no_first_name_error_msg               if @no_first_name_error.present?
     log_content += @no_last_name_error_msg                if @no_last_name_error.present?
