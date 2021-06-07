@@ -383,7 +383,8 @@ class DefaultSafetyReportingConfig
           action: {
             field: 'action', title: 'Action',
             num_cols: 6,  type: 'datalist', visible: 'index,form,show',
-            required: false, options: CorrectiveAction.action_options, on_newline: true # for form and show
+            required: false, options: "CONFIG.custom_options['Actions List for Corrective Actions']",
+            on_newline: true # for form and show
           },
           description: { default: true, title: 'Description', type: 'textarea', visible: 'index,form,show' },
           response: {
