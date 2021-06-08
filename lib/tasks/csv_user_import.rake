@@ -110,6 +110,17 @@ namespace :csv_user_import do
   end
 
 
+  def sso_id_column
+    case @sso_id
+    when :email
+      EMAIL_COL
+    when :employee_number
+      EMPLOYEENUMBER_COL
+    end
+
+  end
+
+
   def sso_id_col_in(row)
     case @sso_id
     when :email
@@ -157,6 +168,7 @@ namespace :csv_user_import do
 
   def is_duplicated_sso_id(row)
     sso_id = sso_id_col_in(row)
+    return false if sso_id.nil?
     result = false
 
     if @users_in_csv.map(&:sso_id).include? sso_id
@@ -277,10 +289,11 @@ namespace :csv_user_import do
 
   def update_user(user, user_params, privileges)
     begin
+      was_disabled = user.disable
       user.update_attributes!(user_params)
       update_user_privileges(user, privileges)
       @users_in_csv << user
-      @num_re_enabled_users += 1 if user.disable
+      @num_re_enabled_users += 1 if was_disabled
     rescue => e
       puts "#{e} at row ##{@row_num}"
       @logger.info "#{e} at row ##{@row_num}"
@@ -361,7 +374,6 @@ namespace :csv_user_import do
     users_to_be_disabled = all_deletable_users - @users_in_csv
 
     @num_deleted_users = users_to_be_disabled.size
-
     users_to_be_disabled.each do |u|
       u.disable = true
       u.sso_id  = nil
@@ -395,10 +407,21 @@ namespace :csv_user_import do
   end
 
 
+  def append_user_id(error_row_array)
+    error_row_array.map do |row|
+      result  = row.to_s
+      users = User.where(sso_id: @table[row-1][sso_id_column])
+      user_id = users.reduce('') { |txt, user| txt + "##{user.id}, "}[0...-2]
+      result += " (#{user_id})" if user_id.present?
+      result
+    end
+  end
+
+
   def get_error_messages
     @duplicate_username_error_msg          = "Duplicated users (in CSV file) found in row(s): #{@duplicate_username_error}\n\n"
     @duplicate_sso_id_in_csv_error_msg     = "Duplicated SSO ID(#{@sso_id}) (in CSV file) found in row(s): #{@duplicate_sso_id_in_csv_error}\n\n"
-    @duplicate_sso_id_in_portal_error_msg  = "Duplicated SSO ID(#{@sso_id}) (in portal) found in row(s): #{@duplicate_sso_id_in_portal_error}\n\n"
+    @duplicate_sso_id_in_portal_error_msg  = "Duplicated SSO ID(#{@sso_id}) (in portal) found in rows (please find the user #id that has the duplicated sso id in parenthesis): #{append_user_id(@duplicate_sso_id_in_portal_error)}\n\n"
     @no_username_error_msg                 = "Empty username in row(s): #{@no_username_error}\n\n"
     @no_first_name_error_msg               = "Empty first name in row(s): #{@no_first_name_error}\n\n"
     @no_last_name_error_msg                = "Empty last name in row(s): #{@no_last_name_error}\n\n"

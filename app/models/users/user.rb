@@ -41,6 +41,7 @@ class User < ActiveRecord::Base
   validates_presence_of :first_name,  :message => " cannot be empty."
   validates_presence_of :last_name,   :message => " cannot be empty."
   # validates_presence_of :password, :message => " cannot be empty."
+  validates_uniqueness_of :sso_id, :case_sensitive => false, :message => " has already been taken.", :allow_blank => true
   validates_uniqueness_of :username, :case_sensitive => false, :message => " has already been taken."
   validates_format_of :username, :with => /^[-\w\._@]+$/i, :allow_blank => true, :message => "should only contain letters, numbers, or .-_@"
   # validates_presence_of :password, :on => :create
@@ -367,7 +368,7 @@ class User < ActiveRecord::Base
     else
       ['Global Admin', 'Admin', 'Staff']
     end
-    
+
   end
 
 
