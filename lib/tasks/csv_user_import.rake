@@ -124,7 +124,7 @@ namespace :csv_user_import do
   def sso_id_col_in(row)
     case @sso_id
     when :email
-      row[EMAIL_COL] rescue nil
+      row[EMAIL_COL].downcase rescue nil
     when :employee_number
       row[EMPLOYEENUMBER_COL]
     else
@@ -171,7 +171,7 @@ namespace :csv_user_import do
     return false if sso_id.nil?
     result = false
 
-    if @users_in_csv.map(&:sso_id).include? sso_id
+    if @users_in_csv.map(&:sso_id).map(&:downcase).include? sso_id
       @duplicate_sso_id_in_csv_error << @row_num
       result =  true
     end
@@ -191,7 +191,7 @@ namespace :csv_user_import do
     return true if users.size > 1
 
     users.each do |user|
-      return true if user.username != user_name
+      return true if user.username.downcase != user_name.downcase
     end
 
     false
