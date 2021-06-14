@@ -31,6 +31,9 @@
           <%if params[:record].present?%>
             <%=f.hidden_field :records_id, :value => @record.id%>
           <%end%>
+          <%if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present? && params[:submission].present?%>
+            <%=f.hidden_field :submissions_id, :value => @submission.id%>
+          <%end%>
 
           <%=render "/forms/form_fields", :f => f, :fields => @fields, :record => @corrective_action%>
           <%=render '/forms/attachments_form', :f => f, :owner => @corrective_action%>

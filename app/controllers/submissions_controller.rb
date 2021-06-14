@@ -188,8 +188,8 @@ class SubmissionsController < ApplicationController
 
 
   def prepare_flight_data(emp_num)
-    # @flights = Sabre.where({flight_date: (Time.now - 30.days).to_date..Time.now.to_date, employee_number: emp_num})
-    @flights = Sabre.where({employee_number: emp_num})
+    @flights = Sabre.where({flight_date: (Time.now - 15.days).to_date..Time.now.to_date, employee_number: emp_num})
+    # @flights = Sabre.where({employee_number: emp_num})
   end
 
 
@@ -355,9 +355,14 @@ class SubmissionsController < ApplicationController
       format.html do
         @meta_field_args = ['show']
         @record = Submission.preload(:submission_fields).find(params[:id])
-        if CONFIG.sr::GENERAL[:show_submitter_name] || current_user.global_admin?
+        if CONFIG.sr::GENERAL[:show_submitter_name] || (CONFIG::GENERAL[:global_admin_default] && current_user.global_admin?)
           template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
           @meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.user_id == current_user.id
+        end
+
+        if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present?
+          @corrective_actions = @record.corrective_actions
+          # @corrective_actions << @record.record.corrective_actions
         end
 
         if !@record.completed

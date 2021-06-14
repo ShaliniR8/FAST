@@ -410,7 +410,7 @@ class DefaultDictionary
       partial: '/occurrences/occurrences_panel',
       print_partial: '/pdfs/print_occurrences',
       visible: proc { |owner:,user:,**op| true },
-      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status rescue true },
       data: proc { |owner:,user:,**op| { owner: owner } },
     },
     participants: {

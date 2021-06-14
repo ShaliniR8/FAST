@@ -51,11 +51,13 @@ css:
         - if owner.children.present?
           a href="#list_#{owner.id}" class="cat_#{owner.id} glyphicon glyphicon-chevron-right" data-toggle="collapse"
 
-        - if owner.title == 'Record'
-          b = "Safety Reporting"
-        - elsif owner.title == 'Report'
-          b = "Safety Reporting"
-        - elsif owner.title == 'Report,Record'
+        / - if owner.title == 'Record'
+        /   b = "Safety Reporting"
+        / - elsif owner.title == 'Report'
+        /   b = "Safety Reporting"
+        / - elsif owner.title == 'Report,Record'
+        /   b = "Safety Reporting"
+        - if owner.title.include?('Submission') || owner.title.include?('Record') || owner.title.include?('Report')
           b = "Safety Reporting"
         - else
           b = owner.title

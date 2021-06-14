@@ -19,7 +19,8 @@
 
 <%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
 <%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer'%>
-<%submission_show_access = current_user.has_access('submissions','show', admin: CONFIG::GENERAL[:global_admin_default])%>
+<%submission_show_access = current_user.has_access('submissions','show', admin: CONFIG::GENERAL[:global_admin_default]) && ((@record.submission.present? && @record.submission.user_id == current_user.id) ||
+        (current_user.has_template_access(@record.template.name).include? 'full'))%>
 <%record_edit_access = current_user.has_access('records', 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
 <%record_delete_access = current_user.has_access('records','destroy', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
 <%report_show_access = current_user.has_access('reports','show', admin: CONFIG::GENERAL[:global_admin_default])%>
@@ -51,7 +52,7 @@
                     :class=>"btn btn-danger pull-right mr5 mb5 "%>
                 <%end%>
 
-                <%if current_user.global_admin?%>
+                <%if (CONFIG::GENERAL[:global_admin_default] && current_user.global_admin?) || current_user.has_access('records','admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
                   <%=link_to 'Override Status', '#',
                     :class => 'btn btn-danger pull-right mr5 mb5',
                     :id => 'override_status_btn',

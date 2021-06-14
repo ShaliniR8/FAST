@@ -654,6 +654,7 @@ class HomeController < ApplicationController
     when 1
       single_landing_page = module_display_to_mode(accessible_modules.first)
       redirect_to choose_module_home_index_path(:mode => single_landing_page)
+      return
     when 2
       @size="col-xs-12 col-sm-6"
     when 3
