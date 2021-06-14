@@ -43,6 +43,15 @@ class OccurrencesController < ApplicationController
           owner_id: params[:owner_id],
           value: occurrence[:value].strip
         })
+
+        if params[:owner_type] == 'Submission'
+          Occurrence.create({
+            template_id: template_id,
+            owner_type: 'Record',
+            owner_id: Submission.find(params[:owner_id]).records_id,
+            value: occurrence[:value].strip
+          })
+        end
       end
     end
     begin

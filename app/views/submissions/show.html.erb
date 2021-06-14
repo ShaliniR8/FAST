@@ -42,6 +42,15 @@
                   :title => "Add additional notes. Analysts will be notified when new notes are added."%>
               </span>
             <%end%>
+            <%if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present?%>
+              <%show_ca_btn = @record.record.status != 'Closed'%>
+              <%=link_to 'Add Corrective Action',
+                new_corrective_action_path(submission: @record.id, record: @record.records_id),
+                id: 'ca-btn',
+                :class => 'btn btn-success pull-right mr5 mb5',
+                disable_with: 'Redirecting...',
+                style: "display: #{show_ca_btn ? 'block' : 'none'}"%>
+            <%end%>
           </div>
 
           <%= render "forms/show_fields",
@@ -79,6 +88,30 @@
               <%end%>
 
           <%end%>
+
+          <%if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present?%>
+            <%if @record.corrective_actions.present?%>
+              <div class="col-xs-12 col-lg-12">
+                <div class="panel panel-info">
+                  <div class="panel-heading click-heading collapsed">
+                    <div class="panel-title">
+                      <b>Corrective Actions</b>
+                      <span class="pull-right clickable">
+                        <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="panel-body" style="display:none">
+                    <div class="row">
+                      <%@no_footer = true%>
+                      <%=render "/corrective_actions/actions"%>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <%end%>
+          <%end%>
+
           <%=render '/panels/show_panels', :owner => @record%>
           <%=render "/forms/attachments_show", :owner => @record, :show_btn => false%>
           <%=render "/records/transactions", :owner => @record%>

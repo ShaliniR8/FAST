@@ -32,10 +32,12 @@
 							</td>
 						<%end%>
 						<td>
-							<%=link_to 'View',
-								corrective_action_path(c),
-								:disable_with => 'Redirecting...',
-								:class => 'btn btn-info'%>
+              <%if current_user.has_access('corrective_actions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+  							<%=link_to 'View',
+  								corrective_action_path(c),
+  								:disable_with => 'Redirecting...',
+  								:class => 'btn btn-info'%>
+              <%end%>
 						</td>
 					</tr>
 				<%end%>

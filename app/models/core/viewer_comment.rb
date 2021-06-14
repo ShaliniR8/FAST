@@ -13,7 +13,7 @@ class ViewerComment < ActiveRecord::Base
 
 
   def get_content
-    self.content.gsub(/\n/, '<br/>').html_safe rescue nil
+    self.content.gsub(/\n/, '<br/>').html_safe rescue ""
   end
 
   def get_submission_time

@@ -9,6 +9,7 @@ class Submission < Sr::SafetyReportingBase
   include Attachmentable
   include Commentable
   include Transactionable
+  include RootCausable
 
 #Association List
   belongs_to :template,   foreign_key: 'templates_id',  class_name: 'Template'
@@ -16,6 +17,7 @@ class Submission < Sr::SafetyReportingBase
   belongs_to :record,     foreign_key: 'records_id',    class_name: 'Record'
 
   has_many :submission_fields,    foreign_key: 'submissions_id',  class_name: 'SubmissionField',  dependent: :destroy
+  has_many :corrective_actions,  foreign_key: 'submissions_id',   class_name: 'CorrectiveAction',   dependent: :destroy
 
   accepts_nested_attributes_for :submission_fields
 

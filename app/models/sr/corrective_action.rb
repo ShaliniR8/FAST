@@ -12,6 +12,7 @@ class CorrectiveAction < ProsafetBase
 #Associations List
   belongs_to  :report,                foreign_key: 'reports_id',          class_name: 'Report'
   belongs_to  :record,                foreign_key: 'records_id',          class_name: 'Record'
+  belongs_to  :submission,            foreign_key: 'submissions_id',      class_name: 'Submission'
   belongs_to  :responsible_user,      foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to  :approver,              foreign_key: 'approver_id',         class_name: 'User'
   belongs_to  :created_by,            foreign_key: 'created_by_id',       class_name: 'User'

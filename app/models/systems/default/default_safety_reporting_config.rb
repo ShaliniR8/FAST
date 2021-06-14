@@ -25,6 +25,7 @@ class DefaultSafetyReportingConfig
     allow_event_reuse:         true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
     dropdown_event_title_list: false,     # Specific Feature for FFT - default off
     match_submission_record_id: false,    # Display Record's ID on Submission pages (currently applied: ATN)
+    submission_corrective_action_root_cause:    false    # Flag for corrective action and root causes at submission level
   }
 
   OBSERVATION_PHASES = [

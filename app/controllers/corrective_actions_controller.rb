@@ -43,6 +43,9 @@ class CorrectiveActionsController < ApplicationController
     if params[:record].present?
       @record = Record.find(params[:record])
     end
+    if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present? && params[:submission].present?
+      @submission = Submission.find(params[:submission])
+    end
     @fields = CorrectiveAction.get_meta_fields('form')
   end
 
@@ -76,7 +79,11 @@ class CorrectiveActionsController < ApplicationController
     @owner = CorrectiveAction.new(params[:corrective_action])
     @owner.status = "New"
     if @owner.save
-      redirect_to corrective_action_path(@owner), flash: {success: "Corrective Action created."}
+      if @owner.submissions_id.present?
+        redirect_to submission_path(Submission.find(@owner.submissions_id)), flash: {success: "Corrective Action created."}
+      else
+        redirect_to corrective_action_path(@owner), flash: {success: "Corrective Action created."}
+      end
     else
       redirect_to new_corrective_action_path
     end
@@ -176,6 +183,9 @@ class CorrectiveActionsController < ApplicationController
     @corrective_action = CorrectiveAction.find(params[:id])
     @report = @corrective_action.report
     @record = @corrective_action.record
+    if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present?
+      @submission = @corrective_action.submission
+    end
     @fields = CorrectiveAction.get_meta_fields('form')
   end
 
