@@ -415,7 +415,7 @@ class Record < Sr::SafetyReportingBase
       File.open(temp_file, 'w') do |file|
         file << ApplicationController.new.render_to_string(
           template: 'records/export_component.xml.erb',
-          locals:   { template: s.template, record: s, all_record_fields: all_record_fields})
+          locals:   { template: s.template, record: s })
       end
     end
   end

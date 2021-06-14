@@ -14,7 +14,7 @@
           <category name="<%=c.title%>">
             <%c.fields.each do |f|%>
               <%if f.print%>
-                <%result = all_record_fields[f.id]%>
+                <%result=record.record_fields.where('fields_id=?',f.id).first%>
                 <%if result.present?%>
                   <attribute name="<%=f.export_label%>" value="<%=result.value%>"></attribute>
                 <%end%>
