@@ -404,7 +404,7 @@ class Record < Sr::SafetyReportingBase
   end
 
 
-  def create_asrs_report(path, template_prefix)
+  def create_asrs_report(path)
     template_prefix = CONFIG::NASA_ASRS[:templates][template.name]
     main_tag = "Airline#{CONFIG::NASA_ASRS[:airline_number]}_#{template_prefix.upcase}"
     reporter_fields = %i(employee_number full_name email job_title address city state zipcode mobile_number work_phone_number)
@@ -429,6 +429,7 @@ class Record < Sr::SafetyReportingBase
 
     @log = Logger.new("log/asrs_#{Rails.env}.log")
     @log.level = Logger::INFO
+    @log.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
     begin
       Net::SFTP.start(host, username,
@@ -438,30 +439,15 @@ class Record < Sr::SafetyReportingBase
         to = "/#{username}/"
         sftp.upload!(from, to)
       end
+
+      @log.info "Report ##{id} is sent to NASA successfully."
     rescue => error
       # NotifyMailer.notify_rake_errors(subject, error_message, location)
+      @log.info error + "  - (Report ##{id})"
       false
     end
     # false if failed
     true
-
-
-    # Net::SFTP.start(ftp_host, user,
-    #   key_data: [],
-    #   keys: "tmp/some-certs/privatekey.pem",
-    #   keys_only: true)
-
-     # begin
-    #   Net::SFTP.start(host, username, :password => password) do |sftp|
-    #     to = "/#{username}/"
-    #     sftp.upload!(from, to)
-    #   end
-    # rescue => error
-    #   # NotifyMailer.notify_rake_errors(subject, error_message, location)
-    #   false
-    # end
-    # # false if failed
-    # true
   end
 
 
@@ -474,41 +460,6 @@ class Record < Sr::SafetyReportingBase
     path = get_asrs_path
     create_asrs_report(path)
     remove_asrs_report(path) if send_asrs_report(from: path)
-  end
-
-
-  def self.export_all_nasa_asrs
-    if CONFIG::GENERAL[:asrs_integration]
-
-      # TODO: handle frequency
-      # TODO: error handling
-      template_ids = CONFIG::NASA_ASRS[:templates].keys.map { |template_name| Template.find_by_name(template_name).id rescue nil }.compact
-
-      all_records = Record
-        .includes(template: { categories: :fields })
-        .where(templates:{id: template_ids})
-
-      all_record_fields = []
-      all_records.each { |record| all_record_fields << record.record_fields.map{|sf| [sf.id, sf]} } #CHECK MITRE
-      all_record_fields = all_record_fields.flatten(1).to_h
-
-      all_records.each do |record|
-        template_prefix = CONFIG::NASA_ASRS[:templates][record.template.name]
-        main_tag = "Airline#{CONFIG::NASA_ASRS[:airline_number]}_#{template_prefix.upcase}"
-
-        path = ['asrs']
-        dirname = File.join([Rails.root] + path)
-        temp_file = File.join([Rails.root] + path + ["#{template_prefix}_#{record.id}.xml"])
-
-        FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
-
-        File.open(temp_file, 'w') do |file|
-          file << ApplicationController.new.render_to_string(
-            template: 'records/export_components_nasa_asrs.xml.erb',
-            locals:   { main_tag: main_tag, template: record.template, record: record, all_record_fields: all_record_fields})
-        end
-      end
-    end
   end
 
 
@@ -537,6 +488,13 @@ class Record < Sr::SafetyReportingBase
           locals:   { template: s.template, record: s })
       end
     end
+  end
+
+
+
+  def can_send_to_asrs?
+    CONFIG::GENERAL[:asrs_integration] &&
+    CONFIG::NASA_ASRS[:templates].keys.include?(template.name)
   end
 
 

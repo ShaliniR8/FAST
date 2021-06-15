@@ -402,7 +402,6 @@ class RecordsController < ApplicationController
     @record = Record.new(params[:record])
     @record.status = "New"
     if @record.save
-      @record.export_nasa_asrs if can_send_to_asrs?(@record)
       redirect_to record_path(@record)
     end
   end

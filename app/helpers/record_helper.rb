@@ -5,12 +5,7 @@ module RecordHelper
 
 
   def get_field_tag(field)
+    return 'no_name' if field.export_label.blank?
     field.export_label.gsub('&amp;', 'and').gsub(/[^0-9A-Za-z_]/, '')
-  end
-
-
-  def can_send_to_asrs?(record)
-    CONFIG::GENERAL[:asrs_integration] &&
-    CONFIG::NASA_ASRS[:templates].keys.include?(record.template.name)
   end
 end

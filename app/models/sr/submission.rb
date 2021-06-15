@@ -192,6 +192,7 @@ class Submission < Sr::SafetyReportingBase
           points: points)
       end
       record.handle_anonymous_reports
+      record.export_nasa_asrs if record.can_send_to_asrs?
     end
   end
 
