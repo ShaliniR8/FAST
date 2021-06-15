@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<<%=main_tag%>>
+    <reporter_info>
+      <%reporter_info.each do |field, value|%>
+        <<%=field%>><%=value%></<%=field%>>
+      <%end%>
+    </reporter_info>
+    <report_info>
+        <event_title><%=record.title%></event_title>
+        <event_date><%=record.event_date.strftime("%Y-%m-%d %H:%M")%></event_date>
+    </report_info>
+<%template.categories.each do |category|%>
+  <%if category.print && category.fields.present? %>
+    <<%=get_category_tag(category)%>>
+    <%category.fields.each do |field|%>
+      <%record_field = record.record_fields.select { |record_field| record_field.fields_id == field.id }.first rescue nil%>
+      <%if field.print && record_field.present? && record_field.value.present?%>
+        <<%=get_field_tag(field)%>><%=record_field.value%></<%=get_field_tag(field)%>>
+       <%end%>
+    <%end%>
+    </<%=get_category_tag(category)%>>
+  <%end%>
+<%end%>
+</<%=main_tag%>>

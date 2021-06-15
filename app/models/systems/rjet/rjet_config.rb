@@ -16,7 +16,8 @@ class RJETConfig < DefaultConfig
     enable_sso:                   true,
     login_option:                 'dual',
     cisp_integration:             true,
-    csv_user_import:             true,
+    csv_user_import:              true,
+    asrs_integration:             true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,
@@ -297,6 +298,24 @@ class RJETConfig < DefaultConfig
       24 => 'High - 24',
       25 => 'High - 25',
       30 => 'High - 30',
+    }
+  }
+
+  # NASA_ASRS = {
+  #   templates: [
+  #     'LIFT Pilot VSRP'
+  #   ]
+  # }
+
+  NASA_ASRS = {
+    airline_number: 313,
+    templates: {
+      'Flight Ops ASAP'       => :fosap,
+      'Dispatch ASAP'         => :dsap,
+      'Maintenance ASAP'      => :msap,
+      'Inflight ASAP'         => :isap,
+      'LIFT Pilot VSRP'       => :lpvsrp,
+      'LIFT Maintenance VSRP' => :lmvsrp
     }
   }
 
