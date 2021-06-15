@@ -432,18 +432,18 @@ class Record < Sr::SafetyReportingBase
     @log.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
     begin
-      Net::SFTP.start(host, username,
-        key_data: [],
-        keys: private_key_path,
-        keys_only: true) do |sftp|
-        to = "/#{username}/"
+      Net::SFTP.start(host, username, keys: [private_key_path]) do |sftp|
+        filename = from[from.index('asrs/')+5..-1]
+        to = "/home/#{username}/#{filename}"
+
         sftp.upload!(from, to)
       end
 
       @log.info "Report ##{id} is sent to NASA successfully."
     rescue => error
       # NotifyMailer.notify_rake_errors(subject, error_message, location)
-      @log.info error + "  - (Report ##{id})"
+      @log.info error
+      @log.info "   - (Report ##{id})"
       false
     end
     # false if failed
