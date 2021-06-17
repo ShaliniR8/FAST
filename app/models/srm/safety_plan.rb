@@ -8,6 +8,9 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
   include Occurrenceable
   include Transactionable
   include Noticeable
+  include Contactable
+  include SmsTaskable
+  include Costable
   include Childable
   include Parentable
 

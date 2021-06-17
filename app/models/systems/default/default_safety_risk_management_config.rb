@@ -30,6 +30,11 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           title: { default: true, title: 'SRA Title', on_newline: true },
+          sra_type: {
+            field: 'sra_type', title: "Level of SRA",
+            num_cols: 6, type: 'text', visible: '',
+            required: false
+          },
           type_of_change: {
             field: 'type_of_change', title: 'Type of Change',
             num_cols: 6, type: 'datalist', visible: 'index,form,show',
@@ -170,12 +175,11 @@ class DefaultSafetyRiskManagementConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-
         actions: [
           #TOP
           *%i[delete override_status edit launch deid_pdf pdf view_meeting view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment],
+          *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment contact task cost],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           approve_reject: {
             btn: :approve_reject,
@@ -188,8 +192,23 @@ class DefaultSafetyRiskManagementConfig
               form_confirmed && user_confirmed
             },
           },
+          contact: {
+            access: proc { |owner:,user:,**op|
+              owner.sra_type == 'Level 2'
+            },
+          },
+          task: {
+            access: proc { |owner:,user:,**op|
+              owner.sra_type == 'Level 2'
+            },
+          },
+          cost: {
+            access: proc { |owner:,user:,**op|
+              owner.sra_type == 'Level 2'
+            },
+          },
         }),
-        panels: %i[agendas comments source_of_input hazards extension_requests verifications attachments transaction_log
+        panels: %i[agendas comments source_of_input hazards contacts costs tasks extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
@@ -357,7 +376,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[costs comments extension_requests verifications attachments transaction_log
+        panels: %i[costs comments occurrences safety_plans extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'SafetyPlan' => {
@@ -428,9 +447,9 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit pdf attach_in_message expand_all],
+          *%i[delete override_status edit pdf view_parent attach_in_message expand_all],
           #INLINE
-          *%i[complete_safety_plan evaluate reopen comment],
+          *%i[complete_safety_plan evaluate reopen comment contact task cost],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           complete_safety_plan: {
             btn: :complete_safety_plan,
@@ -446,7 +465,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[comments attachments transaction_log
+        panels: %i[comments source_of_input contacts costs tasks attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Meeting' => {

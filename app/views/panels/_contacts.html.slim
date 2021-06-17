@@ -20,7 +20,7 @@
                     fields: fields
 
                   .col-xs-12
-                    - if !['Pending Approval', 'Completed'].include? @owner.status
+                    - if @owner.present? && !['Pending Approval', 'Completed'].include?(@owner.status)
                       = link_to 'Edit', '#',
                         class: 'edit-contact-btn btn btn-warning pull-right mr5',
                         'data-path' => edit_contact_path(contact),

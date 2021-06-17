@@ -30,6 +30,21 @@ class RUHConfig < DefaultConfig
     has_confidential_forms:             true
   })
 
+  # LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
+  #   sra: []
+  # })
+
+  LAUNCH_OBJECTS = {
+    records: ['Sra', 'Investigation'],
+    reports: ['Sra', 'Investigation'],
+    audits: ['Sra'],
+    inspections: ['Sra'],
+    evaluations: ['Sra'],
+    investigations: ['Sra'],
+    sras: ['Record'],
+    risk_controls: ['SafetyPlan']
+  }
+
 
   def self.getTimeFormat
     {

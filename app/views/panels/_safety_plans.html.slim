@@ -1,0 +1,19 @@
+.col-xs-12
+  .panel.clickable.panel-info
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        b Safety Plans
+        span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+    .panel-body style='display:none'
+      .row
+        - safety_plans.each do |safety_plan|
+          .col-xs-12
+            .panel.panel-info
+              .panel-heading.click-heading.collapsed
+                .panel-title
+                  = link_to "Safety Plan ##{safety_plan.id}: #{safety_plan.title}", safety_plan
+                  span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
+              .panel-body style='display:none'
+                = render 'safety_plans/show',
+                  owner: safety_plan,
+                  show_btn: show_btns

@@ -8,12 +8,12 @@ class Audit < Sa::SafetyAssuranceBase
   include Attachmentable
   include Commentable
   include Contactable
+  include SmsTaskable
   include Costable
   include Findingable
   include Noticeable
   include Occurrenceable
   include Signatureable
-  include SmsTaskable
   include Transactionable
   include ExtensionRequestable
   include Verifiable

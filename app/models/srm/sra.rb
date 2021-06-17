@@ -12,6 +12,9 @@ class Sra < Srm::SafetyRiskManagementBase
   include Transactionable
   include ExtensionRequestable
   include Verifiable
+  include Contactable
+  include SmsTaskable
+  include Costable
   include Childable
   include Parentable
 

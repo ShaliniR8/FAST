@@ -406,6 +406,16 @@ class DefaultDictionary
         risk_controls: owner.risk_controls
       }},
     },
+    safety_plans: {
+      partial: '/panels/safety_plans',
+      print_partial: '/pdfs/print_safety_plans',
+      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'SafetyPlan').present? },
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| {
+        owner: owner,
+        safety_plans: owner.get_children(child_type: 'SafetyPlan')
+      }},
+    },
     occurrences: {
       partial: '/occurrences/occurrences_panel',
       print_partial: '/pdfs/print_occurrences',
@@ -726,7 +736,11 @@ class DefaultDictionary
       num_cols: 12, type: 'text', visible: 'index,show',
       required: false
     },
-
+    sra_type: {
+      field: 'sra_type', title: "Level of SRA",
+      num_cols: 6, type: 'text', visible: 'show,form',
+      required: false
+    },
   }
 
 end
