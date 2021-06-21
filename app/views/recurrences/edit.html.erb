@@ -1,1 +1,104 @@
-<%= render 'form' %>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/timezone-control.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/validate-form.js"></script>
+<script type="text/javascript" src="/javascripts/utility/delete.js"></script>
+<script type="text/javascript" src="/javascripts/utility/extra_fields.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%= render "shared/alerts" %>
+    <%=render "access_controls/new_modal"%>
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <%="#{action_name.titleize} Recurrent #{@type.titleize}"%>
+        </div>
+      </div>
+      <div class="panel-body" id="form_body">
+        <div class="col-xs-12">
+          <a class="btn"
+            data-toggle="collapse"
+            data-target="#view_instructions">
+            View Instructions &raquo;
+          </a>
+          <div class="collapse well" id="view_instructions">
+            <b>Recurrence Instructions</b>
+            <br>
+            To create a Recurrent item, fill in the Recurrence information and Template information.
+            <br>
+            <br>
+            <b>Recurrence Information</b>
+            <br>
+              These fields determine information about the recurrence
+            <ol>
+              <li>
+                Next Creation Date: determine when the next recurrent item will be created
+              </li>
+              <li>
+                Frequency: select a frequency interval for the recurrence
+              </li>
+              <li>
+                End Date: choose a date upon which the recurrence ends
+              </li>
+            </ol>
+            <b>Template Information</b>
+            <br>
+            These fields will be mapped over from the template when the item is generated.
+            <ol>
+              <li>
+                Scheduled Completion Date: select a date for the recurrent item to be scheduled for completion
+                <ul>
+                  <li>
+                    This field is updated by the selected interval upon each recurrence
+                  </li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <%=form_for @recurrence, html: {multipart: true} do |f|%>
+          <%=render '/forms/form_fields', f: f, fields: @fields, record: @recurrence %>
+          <div class="col-xs-12 mb15">
+            <div class ="panel panel-lightskyblue">
+              <div class="panel-heading click-heading">
+                <div class="panel-title">
+                  <b><%="#{@recurrence.form_type} Template"%></b>
+                  <span class="pull-right clickable">
+                    <i class="mt5 glyphicon glyphicon-chevron-up"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="panel-body">
+                <%=fields_for @template, html: {multipart: true} do |f|%>
+                  <%=render "shared/privilege_form",
+                  target: "#{@type}[privileges][]",:owner => @template,:f => f%>
+                  <%=render '/forms/form_fields', :f => f, :fields => @template_fields, :record => @template %>                 
+                  <% if CONFIG.sa::GENERAL[:recurring_item_checklist] %>      
+                    <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
+                  <%end%>   
+                  <%=render '/forms/attachments_form', :f => f, :owner => @template%>                 
+                <%end%>               
+              </div>
+            </div>
+          </div>
+          <div class="mt10 mr10">
+            <%= f.submit "#{action_name == 'new' ? 'Submit' : 'Update'}",
+              :class => "btn btn-success pull-right",
+              :disable_with => "Saving..."%>
+            <%=link_to "Cancel",
+              action_name == 'new' ? recurrences_path : recurrences_path(@recurrence),
+              :id => "cancel-btn",
+              :class => "mr5 btn btn-default pull-right",
+              :confirm => 'Are you sure?'%>
+          </div>
+        <%end%>
+      </div>
+    </div>
+  </div>
+</div>

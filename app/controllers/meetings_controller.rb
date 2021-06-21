@@ -161,8 +161,7 @@ class MeetingsController < ApplicationController
     rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
     privileges = rules.map(&:privileges).flatten
     users = privileges.map(&:users).flatten.uniq
-    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
-
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id)).active
     @report_headers = Report.get_meta_fields('meeting_form')
     @reports = Report.reports_for_meeting
   end

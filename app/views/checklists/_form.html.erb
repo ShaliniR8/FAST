@@ -93,6 +93,7 @@
 
 <script>
   var owner_type = '<%= @owner.present? ? @owner.class.name : 'ChecklistHeader' %>'
+  
   var owner_id = '<%= @owner.id if @owner.present? %>'
 
   function retract_header_form(checklist_header) {

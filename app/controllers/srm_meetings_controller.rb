@@ -115,7 +115,7 @@ class SrmMeetingsController < ApplicationController
     rules = AccessControl.preload(:privileges).where(entry: 'srm_meetings', action: ['show'])
     privileges = rules.map(&:privileges).flatten
     users = privileges.map(&:users).flatten.uniq
-    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id)).active
 
     @sra_headers = Sra.get_meta_fields('index')
     @sras = Sra.where('meeting_id is ?', nil)
@@ -153,8 +153,7 @@ class SrmMeetingsController < ApplicationController
     @owner = Meeting.find(params[:id])
     render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
   end
-
-
+  
 
   def update
     @owner = Meeting.find(params[:id])

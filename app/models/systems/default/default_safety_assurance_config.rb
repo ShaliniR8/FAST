@@ -7,8 +7,11 @@ class DefaultSafetyAssuranceConfig
 
   GENERAL = {
     # General Module Features:
-    checklist_version:            '3',   # Determines which version of the checklist is being used - default 3
-    enable_recurrence:            true,  # Enables recurrent audits, evaluations, and inspections - default on
+    checklist_version:                  '3',   # Determines which version of the checklist is being used - default 3
+    enable_recurrence:                  true,  # Enables recurrent audits, evaluations, and inspections - default on
+    recurring_item_checklist:           false,
+    days_to_complete_instead_of_date:   false,
+    daily_weekly_recurrence_frequecies: false,
   }
 
   HIERARCHY = {

@@ -49,7 +49,6 @@ class ChecklistsController < ApplicationController
         upload_csv(@upload, @record)
       end
       @record.assign_row_orders
-
     end
     redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @owner
   end
@@ -66,7 +65,6 @@ class ChecklistsController < ApplicationController
 
   def update
     @record = @table.find(params[:id])
-
     # Assignee update
     if params.key?(:assignee_names)
       user = User.find_by_full_name(params[:assignee_names])
