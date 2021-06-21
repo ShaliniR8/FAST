@@ -1,4 +1,9 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+
+
 <%=form_for @owner do |x|%>
   <%=x.fields_for :tasks,@task do |f|%>
     <div class="panel-warning">
@@ -25,6 +30,11 @@
 
 <script>
   $(document).ready(function(){
-
+    $(".close").click(function() {
+      console.log('reload')
+      document.body.style.cursor = "wait";
+      location.reload();
+      return false;
+    })
   });
 </script>
