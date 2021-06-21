@@ -4,6 +4,7 @@ class RJETSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
     # General Module Features:
     checklist_version:                  '3',
     days_to_complete_instead_of_date:   true,
+    daily_weekly_recurrence_frequecies: true,
   })
 
 
