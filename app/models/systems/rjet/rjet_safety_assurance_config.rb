@@ -1,5 +1,12 @@
 class RJETSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
+  GENERAL = DefaultSafetyAssuranceConfig::GENERAL.merge({
+    # General Module Features:
+    checklist_version:                  '3',
+    days_to_complete_instead_of_date:   true,
+  })
+
+
   HIERARCHY = DefaultSafetyAssuranceConfig::HIERARCHY.deep_merge({
     objects:{
       'Investigation' => {

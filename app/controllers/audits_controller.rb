@@ -62,16 +62,13 @@ class AuditsController < SafetyAssuranceController
 
         @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
         @default_tab = params[:status]
-
         # Datatable Column Info
         @columns = get_data_table_columns(@object_name)
         @column_titles = @columns.map { |col| col[:title] }
         @date_type_column_indices = @column_titles.map.with_index { |val, inx|
           (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
         }.select(&:present?)
-
         @advance_search_params = params
-
         render 'forms/index'
       end
       format.json { index_as_json }

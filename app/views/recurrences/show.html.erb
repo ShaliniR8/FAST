@@ -29,9 +29,7 @@
           </div> <!-- End top_buttons -->
         </div>
       </div>
-
       <div class="panel-body">
-
         <div class="col-xs-12">
           <a class="btn"
             data-toggle="collapse"
@@ -77,7 +75,7 @@
                 </div>
               </div>
               <div class="panel-body">
-                <%=render 'forms/show_fields', fields: @template_fields, record: @template%>
+                <%=render 'forms/show_fields', fields: @template_fields, record: @template %>
               </div>
             </div>
           </div>
@@ -91,15 +89,18 @@
                       <i class="mt5 glyphicon glyphicon-chevron-down"></i>
                     </span>
                   </div>
-                </div>
+                </div>               
                 <div class="panel-body" style="display:none">
+                <% if @recurrence && CONFIG.sa::GENERAL[:recurring_item_checklist] %>  
+                  <%= render 'forms/display_spawned_audits' %>
+                <% else %>
                   <%@children.each do |child| %>
                     <div class="col-xs-12 mb15">
                       <div class="panel panel-lightskyblue">
                         <div class="panel-heading click-heading collapsed">
-                          <div class="panel-title">
+                          <div class="panel-title">                                                           
                             <b><%=link_to "#{@recurrence.form_type} ##{child.id}: #{child.title}",
-                              child.becomes(Object.const_get(@recurrence.form_type))%></b>
+                              child.becomes(Object.const_get(@recurrence.form_type))%></b>                                                  
                             <span class="pull-right clickable">
                               <i class="mt5 glyphicon glyphicon-chevron-down"></i>
                             </span>
@@ -110,6 +111,7 @@
                         </div>
                       </div>
                     </div>
+                  <%end%>
                   <%end%>
                 </div>
               </div>

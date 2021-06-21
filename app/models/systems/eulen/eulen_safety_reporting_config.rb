@@ -1,22 +1,448 @@
 class EULENSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
-    # Flag for corrective action and root causes at submission level
+    # General Module Features:
+
+    # Airline-Specific Features:
     submission_corrective_action_root_cause:    true
   })
 
-  HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
-    objects:{
+  HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.merge( {
+    display_name: 'ASAP',
+    objects: {
+
       'Submission' => {
+        title: 'Submission',
+        status: ['All'],
+        preload: [:created_by, :template, :submission_fields],
         fields: {
+          id: { default: true, field: 'get_id' },
+          template: { default: true, title: 'Submission Type' },
+          submitter: { default: true, visible: "admin,query,index" },
+          event_date: { default: true },
+          description: { default: true },
           # occurrences: {default: true, title: (Submission.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
             title: "Full #{Submission.find_top_level_section.label rescue nil}"},
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[causes occurrences].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
-      }
+        actions: [
+          #TOP
+          *%i[delete pdf deid_pdf view_report attach_in_message message_submitter expand_all],
+          #INLINE
+          *%i[comment],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
+          delete: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:delete][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          pdf: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:pdf][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          deid_pdf: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:deid_pdf][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          view_report: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:view_report][:access].call(owner:owner,user:user,**op) &&
+                op[:template_access]
+            }
+          },
+          comment: {
+            access: proc { |owner:,user:,**op|
+              DICTIONARY::ACTION[:comment][:access].call(owner:owner,user:user,**op) &&
+                (owner.user_id == user.id || user.has_access('submissions','admin',admin:CONFIG::GENERAL[:global_admin_default],strict:true))
+            },
+          },
+        }),
+        panels: %i[causes occurrences].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+
+
+      'Record' => {
+        title: 'Report',
+        status: ['New', 'Open', 'Linked', 'Closed', 'All'],
+        preload: [:created_by, :template, :occurrences, :record_fields],
+        fields: {
+          id: { default: true, field: 'get_id' },
+          status: { default: true },
+          template: { default: true, title: 'Type' },
+          submitter: { default: true, visible: "admin,query,index" },
+          viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
+          event_date: { default: true, visible: 'form,index,show' },
+          description: { default: true, visible: 'form,index,show' },
+          final_comment: { default: true },
+          eir: {
+            field: 'eir', title: 'EIR Number',
+            num_cols: 6, type: 'text', visible: 'close',
+            required: false
+          },
+          scoreboard: {
+            field: 'scoreboard', title: 'Exclude from Scoreboard',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: false
+          },
+          asap: {
+            field: 'asap', title: 'Accepted Into ASAP',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: true
+          },
+          sole: {
+            field: 'sole', title: 'Sole Source',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: true
+          },
+          disposition: {
+            field: 'disposition', title: 'Disposition',
+            num_cols: 6, type: 'datalist', visible: 'close',
+            required: false,  options: "CONFIG.custom_options['Dispositions']"
+          },
+          company_disposition: {
+            field: 'company_disposition', title: 'Company Disposition',
+            num_cols: 6, type: 'datalist', visible: 'close',
+            required: false,  options: "CONFIG.custom_options['Company Dispositions']"
+          },
+          narrative: {
+            field: 'narrative', title: 'Narrative',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
+          regulation: {
+            field: 'regulation', title: 'Regulation',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
+          notes: {
+            field: 'notes', title: 'Closing Notes',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
+          occurrences: {default: true, title: (Record.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Record.find_top_level_section.label rescue nil}"},
+          likelihood: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Likelihood" },
+          severity: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Risk" },
+
+          likelihood_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Risk" },
+          get_additional_info_html: {
+            field: 'get_additional_info_html', title: 'Additional Info',
+            num_cols: 12, type: 'text', visible: 'index',
+            required: false
+          }
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        panels: %i[causes occurrences sras investigations
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+
+      'Report' => {
+        title: 'Event',
+        status: ['New', 'Meeting Ready', 'Under Review', 'Closed', 'All'],
+        preload: [ :attachments, :occurrences, :records => [:created_by, :report] ],
+        fields: {
+          id: { default: true, visible: 'index,meeting_form,show' },
+          status: { default: true, visible: 'index,meeting_form,show' },
+          name: {
+            field: 'name', title: 'Event Title',
+            num_cols: 6, type: 'text', visible: 'index,form,meeting_form,show',
+            required: true, on_newline: true
+          },
+          event_station: {
+            field: 'event_station', title: 'Event Station',
+            num_cols: 4, type: 'text', visible: '',
+          },
+          event_date: {
+            default: true, title: 'Event Date',
+            num_cols: 6, type: 'date', visible: 'index,form,meeting_form,show',
+            required: true
+          },
+          reports: {
+            field: 'included_reports', title: 'Included Reports',
+            num_cols: 6, type: 'text', visible: 'index,meeting_form',
+            required: false, on_newline: true
+          },
+          event_label: {
+            field: 'event_label', title: 'Event Type',
+            num_cols: 6, type: 'select', visible: 'event_summary',
+            required: false,  options: "CONFIG.custom_options['Event Types']"
+          },
+          venue: {
+            field: 'venue', title: 'Venue',
+            num_cols: 6, type: 'select', visible: 'event_summary',
+            required: false,  options: "CONFIG.custom_options['Event Venues']"
+          },
+          icao: {
+            field: 'icao', title: 'ICAO',
+            num_cols: 6, type: 'text', visible: 'event_summary',
+            required: false
+          },
+          event_description: {
+            field: 'narrative', title: 'Event Description',
+            num_cols: 12, type: 'textarea', visible: 'index,form,meeting_form,show',
+            required: true
+          },
+          minutes: {
+            field: 'minutes', title: 'Meeting Minutes',
+            num_cols: 12, type: 'textarea', visible: 'show,form',
+            required: false
+          },
+          eir: {
+            field: 'eir', title: 'EIR Number',
+            num_cols: 6, type: 'text', visible: 'asap',
+            required: false
+          },
+          scoreboard: {
+            field: 'scoreboard', title: 'Exclude from Scoreboard',
+            num_cols: 6, type: 'boolean', visible: 'asap',
+            required: false
+          },
+          asap: {
+            field: 'asap', title: 'Accepted Into ASAP',
+            num_cols: 6, type: 'boolean', visible: 'asap',
+            required: true
+          },
+          sole: {
+            field: 'sole', title: 'Sole Source',
+            num_cols: 6, type: 'boolean', visible: 'asap',
+            required: true
+          },
+          disposition: {
+            field: 'disposition', title: 'Disposition',
+            num_cols: 6, type: 'datalist', visible: 'asap',
+            required: false,  options: "CONFIG.custom_options['Dispositions']"
+          },
+          company_disposition: {
+            field: 'company_disposition', title: 'Company Disposition',
+            num_cols: 6, type: 'datalist', visible: 'asap',
+            required: false,  options: "CONFIG.custom_options['Company Dispositions']"
+          },
+          narrative: {
+            field: 'narrative', title: 'Narrative',
+            num_cols: 12, type: 'textarea', visible: 'asap',
+            required: false
+          },
+          regulation: {
+            field: 'regulation', title: 'Regulation',
+            num_cols: 12, type: 'textarea', visible: 'asap',
+            required: false
+          },
+          notes: {
+            field: 'notes', title: 'Final Comment',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
+          occurrences: {default: true, title: (Report.find_top_level_section.label rescue '')},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{Report.find_top_level_section.label rescue nil}"},
+          likelihood: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Likelihood" },
+          severity: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t("sr.risk.baseline.title")} Risk",
+            visible: 'index,meeting_form'
+          },
+          likelihood_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t("sr.risk.mitigated.title")} Risk",
+            visible: 'index,meeting_form'
+          },
+          minutes_agenda: {
+            field: 'get_minutes_agenda', title: 'Meeting Minutes & Agendas',
+            num_cols: 12, type: 'text', visible: 'meeting',
+            required: false
+          }, #Gets overridden in view- see included_events.html.erb
+          additional_info: {
+            field: 'additional_info', title: 'Attachments',
+            num_cols: 12, type: 'text', visible: 'meeting_form,meeting',
+            required: false
+          },
+          included_reports_types: {
+            field: 'included_reports_types', title: 'Included Reports Types',
+            num_cols: 12, type: 'checkbox', visible: 'query',
+            required: false
+          },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        panels: %i[causes occurrences sras investigations
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        print_panels: %w[risk_matrix occurrences corrective_actions records]
+      },
+      'CorrectiveAction' => {
+        title: 'Corrective Action',
+        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        preload: [
+          :responsible_user,
+          :verifications,
+          :extension_requests],
+        fields: {
+          id: { default: true },
+          status: { default: true, type: 'select', options: CorrectiveAction.getStatusOptions },
+          created_by: { default: true },
+          recommendation: {
+            field: 'recommendation', title: 'Is this only a recommendation',
+            num_cols: 6,  type: 'boolean', visible: 'form,show',
+            required: false
+          },
+          due_date: { default: true, field: 'due_date' },
+          close_date: { default: true },
+          opened_date: {
+            field: 'opened_date', title: 'Date Opened',
+            num_cols: 6,  type: 'date', visible: 'show',
+            required: false
+          },
+          assigned_date: {
+            field: 'assigned_date', title: 'Date Assigned',
+            num_cols: 6,  type: 'date', visible: 'show',
+            required: false
+          },
+          decision_date: {
+            field: 'decision_date', title: 'Date Completed/Rejected',
+            num_cols: 6,  type: 'date', visible: 'show',
+            required: false
+          },
+          department: {
+            field: 'department', title: 'Department',
+            num_cols: 6,  type: 'select', visible: 'form,show',
+            required: false, options: "CONFIG.custom_options['Departments']"
+          },
+          responsible_user: { default: true, on_newline: true }, # for form and show
+          approver: { default: true },
+          faa_approval: {
+            field: 'faa_approval', title: 'Requires FAA Approval',
+            num_cols: 6,  type: 'boolean_box', visible: 'none',
+          },
+          company: {
+            field: 'company', title: 'Company Corrective Action',
+            num_cols: 6,  type: 'boolean', visible: 'form,show',
+            required: false, on_newline: true # for form and show
+          },
+          employee: {
+            field: 'employee', title: 'Employee Corrective Action',
+            num_cols: 6,  type: 'boolean', visible: 'form,show',
+            required: false
+          },
+          bimmediate_action: {
+            field: 'bimmediate_action', title: 'Immediate Action',
+            num_cols: 2,  type: 'boolean', visible: 'form,show',
+            required: false
+          },
+          immediate_action: {
+            field: 'immediate_action', title: 'Immediate Action Detail',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          bcomprehensive_action: {
+            field: 'bcomprehensive_action', title: 'Comprehensive Action',
+            num_cols: 2,  type: 'boolean', visible: 'form,show',
+            required: false, on_newline: true
+          },
+          comprehensive_action: {
+            field: 'comprehensive_action', title: 'Comprehensive Action Detail',
+            num_cols: 10, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          action: {
+            field: 'action', title: 'Action',
+            num_cols: 6,  type: 'datalist', visible: 'index,form,show',
+            required: false, options: CorrectiveAction.action_options, on_newline: true # for form and show
+          },
+          description: { default: true, title: 'Description', type: 'textarea', visible: 'index,form,show' },
+          response: {
+            field: 'response', title: 'Response',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          final_comment: { default: true },
+          verifications: { default: true },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        panels: %i[occurrences
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      },
+    },
+    menu_items: {
+      'Submissions' => {
+        title: 'Submissions', path: '#',
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('Submission'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+          priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)
+        },
+        subMenu: [
+          {title: 'All', path: 'submissions_path(status: "All")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'In Progress', path: 'incomplete_submissions_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'New', path: 'new_submission_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'ORMs', path: '#',  header: true,
+            display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
+          {title: 'All', path: 'orm_submissions_path',
+            display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
+          {title: 'New', path: 'new_orm_submission_path',
+            display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
+        ]
+      },
+      'Reports' => {
+        title: 'Reports', path: 'records_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Record'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}
+      },
+      'Events' => {
+        title: 'Events',  path: '#',
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('Report'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)
+        },
+        subMenu: [
+          {title: 'All', path: 'reports_path(status: "New")',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'Summary', path: 'summary_reports_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true) && CONFIG.sr::GENERAL[:event_summary]}},
+          {title: 'Tabulation', path: 'tabulation_reports_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Report'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true) && CONFIG.sr::GENERAL[:event_tabulation]}},
+        ]
+      },
+      'Meetings' => {
+        title: 'Meetings', path: '#',
+        display: proc{|user:,**op|
+          priv_check.call(Object.const_get('Meeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+          priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)
+        },
+        subMenu: [
+          {title: 'All', path: 'meetings_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'New', path: 'new_meeting_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
+        ]
+      },
+      'Corrective Actions' => {
+        title: 'Corrective Actions', path: 'corrective_actions_path(status: "New")',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('CorrectiveAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}
+      },
+      'Query Center' => {
+        title: 'Query Center', path: '#',
+        display: proc{|user:,**op| user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])},
+        subMenu: [
+          {title: 'All', path: 'queries_path',
+            display: proc{|user:,**op| true}},
+          {title: 'New', path: 'new_query_path',
+            display: proc{|user:,**op| true}},
+        ]
+      },
     }
   })
-
 end

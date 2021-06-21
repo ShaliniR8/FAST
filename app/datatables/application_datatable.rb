@@ -42,16 +42,15 @@ class ApplicationDatatable
       status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
-
     start_date = params[:advance_search][:start_date]
     end_date = params[:advance_search][:end_date]
 
     start_date, end_date = handle_time_zone(start_date, end_date)
 
+    test_1 = object.where(search_string.join(' AND '))
     counts = object.where(search_string.join(' AND '))
                    .within_timerange(start_date, end_date)
                    .group(:status).count
-
     params[:statuses].reduce({}) { |acc, status|
       status_count = case status
         when 'All'
@@ -125,7 +124,15 @@ class ApplicationDatatable
 
 
   def object
-    Object.const_get(params[:controller].classify)
+    if params[:controller] == 'audits'
+      return Object.const_get(params[:controller].classify).where("id not in (?)", Recurrence.where(form_type: "Audit").map(&:template_id))
+    elsif params[:controller] == 'inspections'
+      return Object.const_get(params[:controller].classify).where("id not in (?)", Recurrence.where(form_type: "Inspection").map(&:template_id))
+    elsif params[:controller] == 'evaluations'
+      return Object.const_get(params[:controller].classify).where("id not in (?)", Recurrence.where(form_type: "Evaluation").map(&:template_id))
+    else
+      return Object.const_get(params[:controller].classify)
+    end
   end
 
 
@@ -232,7 +239,7 @@ class ApplicationDatatable
         column.split('.').first.to_sym
       end
     }
-
+    
     join_tables
   end
 
@@ -260,7 +267,6 @@ class ApplicationDatatable
       status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
-
 
     has_date_range = start_date.present? && end_date.present?
     case status
@@ -374,7 +380,7 @@ class ApplicationDatatable
           .where(search_string.join(' and '))
           .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
           .limit(params['length'].to_i)
-          .offset(params['start'].to_i)
+          .offset(params['start'].to_i)   
   end
 
 
