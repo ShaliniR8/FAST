@@ -81,11 +81,14 @@ class MessagesController < ApplicationController
     no_of_attachments = params[:message][:attachments_attributes].present? ? params[:message][:attachments_attributes].size : 0
 
     # send messages
+    pattern = /(\'|\"|\.|\*|\/|\-|\\|\)|\$|\+|\(|\^|\?|\!|\~|\`)/
+    subject_line = params[:message][:subject].gsub(pattern){|match| ""}
+
     call_rake 'notify',
       messages_id: @message.id,
       owner_type: params[:message][:owner_type],
       owner_id: params[:message][:owner_id],
-      subject: params[:message][:subject],
+      subject: subject_line,
       send_to: params[:send_to],
       cc_to: params[:cc_to],
       to_anonymous: params[:to_anonymous],
