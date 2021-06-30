@@ -8,7 +8,7 @@
           tr
             - report_headers = Report.get_meta_fields('index', 'meeting')
             - report_headers.each do |h|
-              th = eval(h[:title]) rescue h[:title]
+              th = h[:title] rescue ""
 
         tbody
           - owner.reports.sort_by{|x| x.id}.each do |event|

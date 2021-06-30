@@ -15,7 +15,7 @@
         <thead>
           <tr>
             <%@report_headers.each do |h|%>
-              <th><%=eval(h[:title]) rescue h[:title]%></th>
+              <th><%=h[:title] rescue ""%></th>
             <%end%>
             <th>Action</th>
           </tr>
