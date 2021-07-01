@@ -50,6 +50,8 @@ class MessagesController < ApplicationController
     if params[:message][:external].present?
       external = params[:message][:external]
       params[:message].delete('external')
+    else
+      params[:message].delete('external')
     end
 
     @message = Message.new(params[:message])
