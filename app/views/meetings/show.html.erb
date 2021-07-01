@@ -25,7 +25,7 @@
                 :class => "btn btn-danger pull-right"%>
             <%end%>
 
-            <%if current_user.global_admin?%>
+            <%if current_user.has_access('meetings', 'override', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',

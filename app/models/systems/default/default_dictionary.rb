@@ -13,8 +13,8 @@ class DefaultDictionary
       btn: :approve_reject,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        form_confirmed = owner.status == 'Pending Approval' || op[:form_conds]
-        user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
+        form_confirmed = owner.status == 'Pending Approval' || op[:form_conds] 
+        user_confirmed = [owner.approver_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
@@ -46,7 +46,7 @@ class DefaultDictionary
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
         form_confirmed = owner.status == 'Assigned' || op[:form_conds]
-        user_confirmed = [owner.created_by_id, owner.responsible_user_id].include?(user.id) ||
+        user_confirmed = [owner.responsible_user_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed
@@ -113,7 +113,7 @@ class DefaultDictionary
     override_status: {
       btn: :override_status,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) },
+      access: proc { |owner:,user:,**op| priv_check.call(owner,user,'override',CONFIG::GENERAL[:global_admin_default],true) },
     },
     pdf: {
       btn: :pdf,
@@ -578,6 +578,11 @@ class DefaultDictionary
       field: 'viewer_access', title: 'Viewer Access',
       num_cols: 6,  type: 'boolean_box', visible: 'show',
       required: false
+    },
+    days_to_complete: {
+      field: 'days_to_complete', title: 'Days to Complete',
+      num_cols: 6,  type: 'text', visible: 'index,form,show',
+      required: true
     },
     due_date: {
       field: 'due_date', title: 'Scheduled Completion Date',

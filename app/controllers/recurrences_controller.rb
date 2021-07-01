@@ -83,7 +83,7 @@ class RecurrencesController < ApplicationController
   
   def index
     if params.key? :form_type
-      child_access_validation(params[:form_type].downcase.pluralize,'admin')
+      child_access_validation(params[:form_type].downcase.pluralize,'index')
       @table = Recurrence.where(form_type: Object.const_get(params[:form_type]))
     else
       redirect_to errors_path unless current_user.global_admin?
@@ -155,7 +155,7 @@ class RecurrencesController < ApplicationController
   def destroy
     recurrence = Recurrence.find(params[:id])
     @type = Object.const_get(recurrence.form_type)
-    child_access_validation(@type.name,'admin')
+    child_access_validation(@type.name,'destroy')
     template = @type.find(recurrence.template_id)
     template.destroy
     recurrence.destroy
@@ -221,7 +221,7 @@ class RecurrencesController < ApplicationController
 
   def create_custom_checklist(owner, header, title, checklist_upload)
     new_checklist = Checklist.create()
-    new_checklist.owner_type = 'Audit'
+    new_checklist.owner_type = owner.class.name
     new_checklist.owner_id = owner.id
     new_checklist.created_by_id = current_user.id
     new_checklist.checklist_header_id = header
@@ -237,7 +237,6 @@ class RecurrencesController < ApplicationController
       end
       new_checklist.assign_row_orders
     end
-
     new_checklist.save!
   end
 

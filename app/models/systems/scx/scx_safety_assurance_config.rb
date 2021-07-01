@@ -1,5 +1,10 @@
 class SCXSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
+  GENERAL = DefaultSafetyAssuranceConfig::GENERAL.merge({
+    # General Module Features:
+    non_recurring_item_checklist:       true,
+  })
+
   HIERARCHY = DefaultSafetyAssuranceConfig::HIERARCHY.deep_merge({
     objects: {
       'Investigation' => {

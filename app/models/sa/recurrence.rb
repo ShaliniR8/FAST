@@ -20,7 +20,7 @@ class Recurrence < ActiveRecord::Base
       {field: 'title',                                  title: 'Recurrence Title',                            num_cols: 6, type: 'text',          visible: 'index,form,show',  required: true},
       {field: 'form_type',                              title: 'Type',                                        num_cols: 6, type: 'text',          visible: 'show',             required: false},
       {field: 'frequency',                              title: 'Frequency',                                   num_cols: 6, type: 'select',        visible: 'index,form,show',  required: true, options: CONFIG.sa::GENERAL[:daily_weekly_recurrence_frequecies] ? "Recurrence.get_frequency_daily_weekly" : "Recurrence.get_frequency"},
-      {field: 'number_of_recurrencies_per_interval',    title: 'Number of Recurrencies per Interval',         num_cols: 6, type: 'select',        visible: 'index,form,show',  required: true, options: (1..10).to_a},
+      {field: 'number_of_recurrencies_per_interval',    title: 'Number of Recurrences per Interval',          num_cols: 6, type: 'select',        visible: 'index,form,show',  required: true, options: (1..10).to_a},
       {field: 'next_date',                              title: 'Next Creation Date',                          num_cols: 6, type: 'date',          visible: 'index,form,show',  required: true},
       {field: 'end_date',                               title: 'End Date',                                    num_cols: 6, type: 'date',          visible: 'index,form,show',  required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
