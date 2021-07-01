@@ -27,6 +27,7 @@
             data-target="#view_instructions">
             View Instructions &raquo;
           </a>
+          
           <div class="collapse well" id="view_instructions">
             <b>Recurrence Instructions</b>
             <br>
@@ -52,12 +53,16 @@
             These fields will be mapped over from the template when the item is generated.
             <ol>
               <li>
-                Scheduled Completion Date: select a date for the recurrent item to be scheduled for completion
-                <ul>
-                  <li>
-                    This field is updated by the selected interval upon each recurrence
-                  </li>
-                </ul>
+                <% if CONFIG.sa::GENERAL[:days_to_complete_instead_of_date] %> 
+                  Days to Complete: select the number of days for the recurrent item to be scheduled for completion
+                <%else%>
+                  Scheduled Completion Date: select a date for the recurrent item to be scheduled for completion
+                  <ul>
+                    <li>
+                      This field is updated by the selected interval upon each recurrence
+                    </li>
+                  </ul>
+                <%end%>               
               </li>
             </ol>
           </div>
@@ -104,39 +109,36 @@
 </div>
 
 <script>
-$(document).ready(function(){
-  var user_id = '<%= @user_id %>'
+  $(document).ready(function(){
+    var user_id = '<%= @user_id %>'
 
-  var datatable_ = $('#datatable').DataTable({
-      order: [[1, 'desc']],
-      "columnDefs":
-        [
-          {"orderable" : false, "targets": 0}
-        ]
-    });
+    var datatable_ = $('#datatable').DataTable({
+        order: [[1, 'desc']],
+        "columnDefs":
+          [
+            {"orderable" : false, "targets": 0}
+          ]
+      });
 
-    $('#checklist_header_select').change(function() {
-      $('#checklist_title').val('');
-      if ($(this).val() != '') {
-        $('#customChecklistTitle').removeClass('hidden');
-        $('#checklist_title').addClass('required_field');
-      }
-      else {
-        $('#customChecklistTitle').addClass('hidden')
-        $('#checklist_title').removeClass('required_field');
-      }
-      
+      $('#checklist_header_select').change(function() {
+        $('#checklist_title').val('');
+        if ($(this).val() != '') {
+          $('#customChecklistTitle').removeClass('hidden');
+          $('#checklist_title').addClass('required_field');
+        }
+        else {
+          $('#customChecklistTitle').addClass('hidden')
+          $('#checklist_title').removeClass('required_field');
+        }
+
+      })
+
+      $('.att_btn_checklist_row').click(function() {
+      var checklist_row_id = $(this).data('id')
+      $.get(`/checklist_rows/${checklist_row_id}/new_attachment`, function(data) {
+        $('.modal-content').html(data)
+        $(window).trigger('resize')
+      })
     })
-
-    $('.att_btn_checklist_row').click(function() {
-    var checklist_row_id = $(this).data('id')
-    $.get(`/checklist_rows/${checklist_row_id}/new_attachment`, function(data) {
-      $('.modal-content').html(data)
-      $(window).trigger('resize')
-    })
-  })
-
-
-
-});
+  });
 </script>

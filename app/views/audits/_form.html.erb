@@ -31,6 +31,9 @@
           <%=render "shared/privilege_form",
             :target => "audit[privileges][]", :owner => @owner, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
+          <% if CONFIG.sa::GENERAL[:non_recurring_item_checklist] %>      
+            <%=render '/forms/checklist_templates'%>
+          <%end%>  
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
 
           <div class="mt10 mr10">
@@ -56,3 +59,5 @@
     </div>
   </div>
 </div>
+
+

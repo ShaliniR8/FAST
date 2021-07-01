@@ -19,6 +19,7 @@ class AccessControlsController < ApplicationController
       rules = AccessControl.module_map[module_name]
       @access = @access.keep_if{|x| rules.include?(x.entry)}
     end
+    #byebug
     render :partial => "rule_table"
   end
 

@@ -56,4 +56,38 @@
       </div>
     </div>
   </div>
-</div>
+
+<script>
+  $(document).ready(function(){
+    var user_id = '<%= @user_id %>'
+
+    var datatable_ = $('#datatable').DataTable({
+        order: [[1, 'desc']],
+        "columnDefs":
+          [
+            {"orderable" : false, "targets": 0}
+          ]
+      });
+
+      $('#checklist_header_select').change(function() {
+        $('#checklist_title').val('');
+        if ($(this).val() != '') {
+          $('#customChecklistTitle').removeClass('hidden');
+          $('#checklist_title').addClass('required_field');
+        }
+        else {
+          $('#customChecklistTitle').addClass('hidden')
+          $('#checklist_title').removeClass('required_field');
+        }
+
+      })
+
+      $('.att_btn_checklist_row').click(function() {
+      var checklist_row_id = $(this).data('id')
+      $.get(`/checklist_rows/${checklist_row_id}/new_attachment`, function(data) {
+        $('.modal-content').html(data)
+        $(window).trigger('resize')
+      })
+    })
+  });
+</script>

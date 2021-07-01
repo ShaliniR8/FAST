@@ -21,6 +21,9 @@
         <%=form_for @owner, :html => {:multipart => true} do |f|%>
           <%=render "/shared/privilege_form", :target => "inspection[privileges][]", :owner => @owner, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
+          <% if CONFIG.sa::GENERAL[:non_recurring_item_checklist] %>      
+            <%=render '/forms/checklist_templates'%>
+          <%end%>
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
@@ -47,3 +50,4 @@
     </div>
   </div>
 </div>
+

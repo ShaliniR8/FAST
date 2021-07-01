@@ -4,7 +4,6 @@
   is_header ||= false
 %>
 
-
 <%case owner_type%>
 <%when 'Sample'%>
   <%case field_type%>
@@ -46,30 +45,36 @@
       <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
     <%end%>
   <%when 'dropdown'%>
-    <select class="form-control field_select" id="preview_select" name="preview_select">
-      <option></option>
-      <%options.split(';').each do |option|%>
-        <option data-id="<%=item.id%>"><%=option%></option>
-      <%end%>
-    </select>
+    <%if is_header == false%>
+      <select class="form-control field_select" id="preview_select" name="preview_select">
+        <option></option>
+        <%options.split(';').each do |option|%>
+          <option data-id="<%=item.id%>"><%=option%></option>
+        <%end%>
+      </select>
+    <%end%>
   <%when 'radio'%>
-    <div class="col-xs-12 ml5">
-      <%options.split(";").each do |option|%>
-        <label class="radio radio-inline">
-          <%=radio_button_tag "value_#{cell.id}", option, option == cell.value%>
-          <%=option%>
-        </label><br>
-      <%end%>
-    </div>
+    <%if is_header == false%>
+      <div class="col-xs-12 ml5">
+        <%options.split(";").each do |option|%>
+          <label class="radio radio-inline">
+            <%=radio_button_tag "value_#{cell.id}", option, option == cell.value%>
+            <%=option%>
+          </label><br>
+        <%end%>
+      </div>
+    <%end%>
   <%when 'checkboxes'%>
-    <div class="col-xs-12 ml5">
-      <%options.split(";").each do |option|%>
-        <label class="checkbox checkbox-inline">
-          <%=check_box_tag "value_#{cell.id}", option, option == cell.value%>
-          <%=option%>
-        </label><br>
-      <%end%>
-    </div>
+    <%if is_header == false%>
+      <div class="col-xs-12 ml5">
+        <%options.split(";").each do |option|%>
+          <label class="checkbox checkbox-inline">
+            <%=check_box_tag "value_#{cell.id}", option, option == cell.value%>
+            <%=option%>
+          </label><br>
+        <%end%>
+      </div>
+    <%end%>
   <%end%>
 
 <%else%>

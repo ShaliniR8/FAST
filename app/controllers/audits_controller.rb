@@ -80,11 +80,29 @@ class AuditsController < SafetyAssuranceController
     @owner = Audit.new
     load_options
     @fields = Audit.get_meta_fields('form')
+    @checklist_templates = Checklist.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
+    @checklist_headers = ChecklistHeader.where(:status => 'Published').map{|x| [x.title, x.id]}.to_h
   end
 
 
   def create
     @audit = Audit.create(params[:audit])
+    @audit.save
+    if CONFIG.sa::GENERAL[:non_recurring_item_checklist]
+      @selected_checklists = params[:checklist_templates]
+      @checklist_header = params[:checklist_header]
+      @checklist_title = params[:checklist_title]
+      @checklist_upload = params[:checklist_upload]
+
+      if @selected_checklists
+        add_checklist_template_to_item(@selected_checklists, @audit)   
+      end 
+
+      if @checklist_header.present?
+        create_custom_checklist(@audit, @checklist_header, @checklist_title, @checklist_upload)
+      end
+
+    end
     redirect_to audit_path(@audit), flash: {success: "Audit created."}
   end
 
@@ -197,6 +215,82 @@ class AuditsController < SafetyAssuranceController
     @findings =  ChecklistRow.find(params[:"checklist_row_id"]).findings
 
     render :partial=>"show_finding"
+  end
+
+  private
+
+  def add_checklist_template_to_item(selected_checklists, template)
+    selected_checklists.each do |id|
+      checklist_template = Checklist.preload(checklist_rows: :checklist_cells).find(id)
+      Checklist.transaction do
+        new_checklist = checklist_template.clone
+        template.checklists << new_checklist
+        checklist_template.checklist_rows.each do |row|
+          new_row = row.clone
+          new_checklist.checklist_rows << new_row
+          row.checklist_cells.each{ |cell| new_row.checklist_cells << cell.clone }
+        end
+      end
+    end
+  end
+
+
+  def create_custom_checklist(owner, header, title, checklist_upload)
+    new_checklist = Checklist.create()
+    new_checklist.owner_type = owner.class.name
+    new_checklist.owner_id = owner.id
+    new_checklist.created_by_id = current_user.id
+    new_checklist.checklist_header_id = header
+    new_checklist.title = title
+    new_checklist.table_view = 1
+    if checklist_upload.present?
+      @upload = File.open(checklist_upload.tempfile)
+      case checklist_upload.tempfile.content_type
+      when "application/xml", "text/xml"
+        #upload_xml(@upload, @record)
+      else
+        upload_csv(@upload, new_checklist)
+      end
+      new_checklist.assign_row_orders
+    end
+    new_checklist.save!
+  end
+
+  def upload_csv(upload, owner)
+    checklist_header_items = owner.checklist_header.checklist_header_items
+    has_header_col = checklist_header_items.length < CSV.read(upload, headers: true, encoding: "ISO8859-1:UTF-8").headers.length
+    begin
+      Checklist.transaction do
+        CSV.foreach(upload, headers: true, encoding: "ISO8859-1:UTF-8") do |csv_row|
+          csv_row = csv_row.fields
+          is_header = csv_row.last
+          checklist_row = ChecklistRow.create({
+            checklist_id: owner.id,
+            created_by_id: current_user.id,
+            is_header: has_header_col && is_header && (is_header.upcase == 'Y' || is_header.upcase == 'YES')
+          })
+
+          checklist_header_items.each_with_index do |header_item, index|
+            csv_cell_value = csv_row[index]
+            if csv_cell_value.present?
+              csv_cell_value.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+            end
+            cell = ChecklistCell.new({
+              checklist_header_item_id: checklist_header_items[index].id
+            })
+            if header_item.data_type.match /radio|dropdown/
+              cell.options = csv_cell_value || checklist_header_items[index].options
+            else
+              cell.value = csv_cell_value
+            end
+            cell.data_type = header_item.data_type
+            checklist_row.checklist_cells << cell
+          end
+        end
+      end
+    rescue Exception => e
+      Rails.logger.info e
+    end
   end
 
 end

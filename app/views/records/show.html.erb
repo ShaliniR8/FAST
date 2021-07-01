@@ -52,7 +52,7 @@
                     :class=>"btn btn-danger pull-right mr5 mb5 "%>
                 <%end%>
 
-                <%if (CONFIG::GENERAL[:global_admin_default] && current_user.global_admin?) || current_user.has_access('records','admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+                <%if current_user.has_access('records', 'override', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
                   <%=link_to 'Override Status', '#',
                     :class => 'btn btn-danger pull-right mr5 mb5',
                     :id => 'override_status_btn',

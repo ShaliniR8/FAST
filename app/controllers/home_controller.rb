@@ -80,7 +80,7 @@ class HomeController < ApplicationController
 
       # ############################ SUBMISSIONS ########################
       submission_queries = []
-
+      submission_queries << "(completed = true)"
       # template query
       if params[:emp_groups].present?
         templates = Template.where(name: (@permissions['full'] || []).compact, emp_group: params[:emp_group])

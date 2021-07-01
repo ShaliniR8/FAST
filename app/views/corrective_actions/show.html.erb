@@ -21,7 +21,7 @@
                 :class => "pull-right btn btn-danger mb5"%>
             <%end%>
 
-            <% if current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
+            <% if current_user.has_access('corrective_actions', 'override', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
               <%=link_to 'Override Status', '#',
                 :class => 'btn btn-danger pull-right mr5 mb5',
                 :id => 'override_status_btn',

@@ -55,7 +55,7 @@ namespace :recurring do
   end
 
   def attach_checklists_to_audit(recurrence, next_form)
-    associated_checklists = Checklist.where(owner_id: recurrence.template_id) rescue nil
+    associated_checklists = Checklist.where(owner_id: recurrence.template_id).where(owner_type: Object.const_get(recurrence.form_type)) rescue nil
     associated_checklists.each do |id|
       checklist_template = Checklist.preload(checklist_rows: :checklist_cells).find(id)
       Checklist.transaction do

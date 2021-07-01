@@ -25,6 +25,7 @@ class MeetingsController < ApplicationController
   before_filter :check_group,:only=>[:show]
 
 
+
   def check_group
     report = Meeting.find(params[:id]).becomes(Meeting)
     if (report.privileges.reject(&:blank?).present? rescue false)
