@@ -102,7 +102,8 @@ class ApplicationDatatable
 
   def sort_column
     column = columns[params[:order]['0'][:column].to_i]
-    column.include?('#') ? column.split('#').second : column
+    column = column.nil? ? "id" : column 
+    column = column.include?('#') ? column.split('#').second : column
     column == 'id' ? "#{object.table_name}.#{column}" : column
   end
 
@@ -125,11 +126,11 @@ class ApplicationDatatable
 
   def object
     if params[:controller] == 'audits'
-      return Object.const_get(params[:controller].classify).where("id not in (?)", Recurrence.where(form_type: "Audit").map(&:template_id))
+      return Object.const_get(params[:controller].classify).where("audits.id not in (?)", Recurrence.where(form_type: "Audit").map(&:template_id).size == 0 ? [0] : Recurrence.where(form_type: "Audit").map(&:template_id))
     elsif params[:controller] == 'inspections'
-      return Object.const_get(params[:controller].classify).where("id not in (?)", Recurrence.where(form_type: "Inspection").map(&:template_id))
+      return Object.const_get(params[:controller].classify).where("inspections.id not in (?)", Recurrence.where(form_type: "Inspection").map(&:template_id).size == 0 ? [0] : Recurrence.where(form_type: "Inspection").map(&:template_id))
     elsif params[:controller] == 'evaluations'
-      return Object.const_get(params[:controller].classify).where("id not in (?)", Recurrence.where(form_type: "Evaluation").map(&:template_id))
+      return Object.const_get(params[:controller].classify).where("evaluations.id not in (?)", Recurrence.where(form_type: "Evaluation").map(&:template_id).size == 0 ? [0] : Recurrence.where(form_type: "Evaluation").map(&:template_id))
     else
       return Object.const_get(params[:controller].classify)
     end
@@ -140,7 +141,6 @@ class ApplicationDatatable
     start_date, end_date = update_adv_search_columns_and_get_start_end_date
     search_params = handle_search
     join_tables = prepare_join_tables(search_params)
-
     if dashboard_risk_matrix_link
       adv_params = params[:advance_search]
       query_records_for_risk(search_params, adv_params, join_tables)
@@ -228,18 +228,19 @@ class ApplicationDatatable
       when 'templates.name'
         :template
       when 'responsible_user#responsible_user.full_name'
-        "INNER JOIN users AS responsible_user ON #{object.table_name}.responsible_user_id = responsible_user.id"
+        "LEFT JOIN users AS responsible_user ON #{object.table_name}.responsible_user_id = responsible_user.id"
       when 'approver#approver.full_name'
-        "INNER JOIN users AS approver ON #{object.table_name}.approver_id = approver.id"
+        "LEFT JOIN users AS approver ON #{object.table_name}.approver_id = approver.id"
       when 'occurrences.value'
         "LEFT JOIN occurrences ON #{object.table_name}.id = occurrences.owner_id and occurrences.owner_type = '#{object_name}'"
       when 'verifications.status'
         "LEFT JOIN verifications ON #{object.table_name}.id = verifications.owner_id and verifications.owner_type = '#{object_name}'"
+      when 'findings.id'
+        "LEFT JOIN findings ON #{object.table_name}.id = findings.owner_id and findings.owner_type = '#{object_name}'"
       else
         column.split('.').first.to_sym
       end
     }
-    
     join_tables
   end
 
@@ -247,7 +248,6 @@ class ApplicationDatatable
   def query_records(search_params, join_tables, start_date, end_date)
     search_string = search_params[:search_string]
     has_no_search_term = search_string.empty? && start_date.nil? && end_date.nil?
-
     if has_no_search_term
       query_without_search_term(search_string, join_tables,start_date, end_date)
     else # has search_term
@@ -291,7 +291,7 @@ class ApplicationDatatable
             .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
             .within_timerange(start_date, end_date)
-            .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
+            .where(["#{params[:controller]}.due_date < :today and #{params[:controller]}.status != :status", {today: Time.now.to_date, status: 'Completed'}])
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
 
@@ -319,7 +319,6 @@ class ApplicationDatatable
 
 
   def query_without_search_term(search_string, join_tables, start_date, end_date)
-
     if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
@@ -341,7 +340,7 @@ class ApplicationDatatable
     when 'Overdue'
       object.joins(join_tables).order("#{sort_column} #{sort_direction}")
                                .where(search_string.join(' AND '))
-                               .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
+                               .where(["#{params[:controller]}.due_date < :today and #{params[:controller]}.status != :status", {today: Time.now.to_date, status: 'Completed'}])
                                .limit(params['length'].to_i)
                                .offset(params['start'].to_i)
     else
