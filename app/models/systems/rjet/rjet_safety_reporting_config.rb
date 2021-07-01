@@ -2,7 +2,7 @@ class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     # Airline-Specific Features:
-    attach_pdf_submission:           'deid',      # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
+    attach_pdf_submission:           'ided',      # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
   })
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
