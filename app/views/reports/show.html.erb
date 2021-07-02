@@ -120,7 +120,7 @@
                   :disable_with => "Adding..."%>
               <%end%>
               <%if @report.can_meeting_ready?(current_user)%>
-                <%=link_to 'ERC Meeting Ready',
+                <%=link_to 'Meeting Ready',
                   meeting_ready_report_path(@report),
                   :class=>"btn btn-warning pull-right mb5 ml5",
                   :disable_with => "Preparing...",
