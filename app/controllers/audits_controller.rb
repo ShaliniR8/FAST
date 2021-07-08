@@ -87,6 +87,7 @@ class AuditsController < SafetyAssuranceController
 
   def create
     @audit = Audit.create(params[:audit])
+    @audit.privileges = [] # Group access feature. Done this so that privileges array does not contain any empty list items.
     @audit.save
     if CONFIG.sa::GENERAL[:non_recurring_item_checklist]
       @selected_checklists = params[:checklist_templates]

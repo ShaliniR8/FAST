@@ -16,12 +16,21 @@ class AsapAgenda < Agenda
   end
 
   def disposition
-    accepted == "true" ? 'Accepted' : 'Declined'
-    CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ? accepted : (accepted == "true" ? 'Accepted' : 'Declined')
+    if CONFIG.sr::GENERAL[:configurable_agenda_dispositions]
+      accepted
+    else
+      if accepted == "true"
+        'Accepted'
+      elsif accepted == "false"
+        'Declined'
+      else
+        ""
+      end
+    end
   end
 
   def discuss
-    self.discussion ? 'Yes' : 'No'
+    self.discussion ? 'Yes' : (self.discussion.nil? ? "" : 'No')
   end
 
   def get_created
