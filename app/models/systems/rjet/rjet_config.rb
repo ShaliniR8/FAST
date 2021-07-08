@@ -329,4 +329,10 @@ class RJETConfig < DefaultConfig
     # Please add clients emails
     client_emails: ['WIT@rjet.com', 'Jennifer.Hoagland@rjet.com', 'Haley.Myers@rjet.com', 'Kayse.Calton@rjet.com']
   }
+
+  SABRE_FILE_IMPORT = {
+    prev_filename: 'sabre_prior.csv',
+    destination_file_path:'lib/tasks',
+    target_file_path: '/var/sftp/rjetsftpuser',
+  }
 end
