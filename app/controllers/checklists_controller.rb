@@ -195,6 +195,7 @@ class ChecklistsController < ApplicationController
             else
               cell.value = csv_cell_value
             end
+            cell.data_type = header_item.data_type
             checklist_row.checklist_cells << cell
           end
         end

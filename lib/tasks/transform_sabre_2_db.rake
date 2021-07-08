@@ -10,9 +10,30 @@ namespace :sabre do
         @logger.info "SERVER DATE+TIME: #{DateTime.now.strftime("%F %R")}\n"
 
         begin
-          flight_schedules = File.read('lib/tasks/sample_sabre.xml').sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
-        rescue
-          @logger.info "[ERROR] #{DateTime.now}: #{'lib/tasks/sample_sabre.xml'} could not be opened"
+          @prev_filename         = CONFIG::SABRE_FILE_IMPORT[:prev_filename]
+          @destination_file_path = CONFIG::SABRE_FILE_IMPORT[:destination_file_path]
+          @target_file_path      = CONFIG::SABRE_FILE_IMPORT[:target_file_path]
+
+          @filename = "#{Time.now.in_time_zone('America/Los_Angeles').strftime("%Y%m%d")}-sabre.xml"
+          # @filename = "20210707-sabre.xml"
+
+          @target           = "#{@target_file_path}/#{@filename}"
+          @destination      = "#{@destination_file_path}/#{@filename}"
+          @prev_destination = "#{@destination_file_path}/#{@prev_filename}"
+
+          unless system("cp #{@target} #{@destination}")
+            @logger.info "[ERROR] #{DateTime.now}: #{@target} could not be fetched. Please check the file name and the path.\n"
+            next #Abort
+          end
+
+          if File.exist?(@destination) && File.exist?(@prev_destination) && compare_file(@destination, @prev_destination)
+            @logger.info "[INFO] Historical data was identical - no update necessary\n"
+            next #Abort
+          end
+
+          flight_schedules = File.read(@destination).sub(/^\<\?.*\?\>$/, '').sub(/\<\/xml\>/, '')
+        rescue => e
+          @logger.info "#{e.inspect}"
           next #Abort
         end
 
@@ -56,6 +77,8 @@ namespace :sabre do
             end
           end
 
+          IO.copy_stream(@destination, @prev_destination) #Update Historical File
+
           @logger.info "TOTAL number of Flight Schedules: #{@total_sched_count}"
           @logger.info "Number of NEW Records Saved: #{@records_saved}"
           @logger.info "Number of Records REJECTED: #{@records_rejected}"
@@ -76,12 +99,6 @@ namespace :sabre do
         error_message = error.message
         NotifyMailer.notify_rake_errors(subject, error_message, location)
       end
-    end
-
-
-    # Helper Methods
-    def fetch_file
-      `cp #{@upload_path} lib/tasks/sample_sabre.xml`
     end
 
 
