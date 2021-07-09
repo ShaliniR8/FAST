@@ -237,7 +237,7 @@ class ReportsController < ApplicationController
 
     @report_fields = Record.get_meta_fields('index', 'meeting_form')
     @candidates = Record.preload(:template, :occurrences, :created_by).where(status: 'Open').select{|x| x.report.blank?} - @report.records
-    @candidates.sort_by!{|x| x.event_date}.reverse!
+    @candidates.sort_by!{|x| x.event_date.present? ? x.event_date : Time.now - 10.years}.reverse!
     load_special_matrix_form('report', 'baseline', @report)
   end
 

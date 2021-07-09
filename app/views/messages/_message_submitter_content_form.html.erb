@@ -11,18 +11,20 @@
   <%=hidden_field_tag 'send_to[0]', @send_to%>
 <%end%>
 
-<div class="col-xs-12">
-  <%=f.label 'instructions', "Type emails separated by commas - Leave blank if only submitter needs to get this message", :style => "font-weight:bold;color:red"%>
-</div>
-
-<div class="col-xs-12 mt5">
-  <%=f.label 'external', "External Email(s)", :class => "control-label col-xs-2"%>
-  <div class="col-xs-10">
-    <%=f.text_field 'external',
-      {:class => "form-control",
-      :value => "" }%>
+<%if CONFIG.sr::GENERAL[:enable_external_email].present?%>
+  <div class="col-xs-12">
+    <%=f.label 'instructions', "Type emails separated by commas - Leave blank if only submitter needs to get this message", :style => "font-weight:bold;color:red"%>
   </div>
-</div>
+
+  <div class="col-xs-12 mt5">
+    <%=f.label 'external', "External Email(s)", :class => "control-label col-xs-2"%>
+    <div class="col-xs-10">
+      <%=f.text_field 'external',
+        {:class => "form-control",
+        :value => "" }%>
+    </div>
+  </div>
+<%end%>
 
 <div class="col-xs-12 mt10">
   <%=f.label :subject, "Subject", :class => "control-label col-xs-2"%>
