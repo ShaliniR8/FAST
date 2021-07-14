@@ -55,7 +55,7 @@ class DefaultSafetyRiskManagementConfig
           approver: { default: true },
           due_date: { default: true,
             field: 'due_date',
-            required: false
+            required: true
           },
           close_date: { default: true },
           description: {
@@ -246,7 +246,7 @@ class DefaultSafetyRiskManagementConfig
           approver: { default: true },
           due_date: { default: true,
             field: 'due_date',
-            required: false
+            required: true
           },
           description: {
             field: 'description', title: 'Description',
@@ -314,7 +314,7 @@ class DefaultSafetyRiskManagementConfig
           },
           due_date: { default: true,
             field: 'due_date',
-            required: false
+            required: true
           },
           follow_up_date: {
             field: 'follow_up_date', title: 'Date for Follow-Up/Monitor Plan',

@@ -66,7 +66,7 @@ class HomeController < ApplicationController
       "Closed"                => "#008B00",
       "Completed"             => '#008B00',
     }
-    @employee_groups = Template.select("distinct emp_group").map(&:emp_group)
+    @employee_groups = Template.select("distinct emp_group").map(&:emp_group).keep_if{|emp_grp| emp_grp.present?}
     @departments_list = CONFIG.custom_options['Departments']
 
 

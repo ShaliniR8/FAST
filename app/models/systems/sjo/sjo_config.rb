@@ -110,11 +110,11 @@ class SJOConfig < DefaultConfig
     },
 
     severity_table_dict: {
-      0 => '1 - Negligible',
-      1 => '2 - Minor',
-      2 => '3 - Moderate',
-      3 => '4 - Critical',
-      4 => '5 - Catastrophic'
+      0 => 'A - Catastrophic',
+      1 => 'B - Hazardous',
+      2 => 'C - Major',
+      3 => 'D - Minor',
+      4 => 'E - Negligible'
     },
 
     probability_table: {
@@ -152,12 +152,11 @@ class SJOConfig < DefaultConfig
     },
 
     probability_table_dict: {
-      0 => '1 - Reactive Only',
-      1 => '2 - Remote',
-      2 => '3 - Seldom',
-      3 => '4 - Occasional',
-      4 => '5 - Probable',
-      5 => '6 - Frequent'
+      0 => '5 - Frequent',
+      1 => '4 - Occasional',
+      2 => '3 - Remote',
+      3 => '2 - Improbable',
+      4 => '1 - Extremely Improbable',
     },
 
     risk_table: {
@@ -204,15 +203,26 @@ class SJOConfig < DefaultConfig
     #double check this one
 
     risk_table_index: {
-      'low' => 'limegreen',
+      'Low - 1' => 'limegreen',
+      'Low - 2' => 'limegreen',
+      'Low' =>  'limegreen',
+      'LOW' =>  'limegreen',
+      'Medium - 2' => 'yellow',
+      'Medium - 3' => 'yellow',
       'Medium' => 'yellow',
-      'High'  => 'red'
+      'MEDIUM' => 'yellow',
+      'High - 4' => 'red',
+      'High - 5' => 'red',
+      'High' => 'red',
+      'HIGH' => 'red',
     },
 
     risk_table_dict: {
-      1 => 'Low',
-      2 => 'Medium',
-      3 => 'High',
+      1 => 'Low - 1',
+      2 => 'Low - 2',
+      3 => 'Medium - 3',
+      4 => 'High - 4',
+      5 => 'High - 5',
     }
   }
 
