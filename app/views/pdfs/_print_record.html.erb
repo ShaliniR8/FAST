@@ -89,9 +89,9 @@
                       <%value = value.print_value%>
                       <%if value.present?%>
                         <%if cat.title == "Narratives" %>
-                          <b><%=field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                          <b><%=field.label.present? ? (field.label + ":") : ""%></br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
                         <%else%>
-                          <b><%=field.label%>: </b>
+                          <b><%=field.label.present? ? (field.label + ":") : ""%></b>
                           <%if field.display_type == "employee"%>
                             <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
                               <%if CONFIG::GENERAL[:sabre_integration].present?%>
@@ -116,7 +116,6 @@
                               <%=render :partial => 'shared/static_map', locals: {points: valueCopy.points}%>
                             <%end%>
                           <%else%>
-                            <b><%=field.label%>: </b>
                             <%if field.display_type == "employee"%>
                               <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
                                 <%=User.find(value).full_name%>
@@ -134,65 +133,65 @@
                           <%end%>
                           </br>
                         <%end%>
-                        <%nested_fields = cat.fields.where("nested_field_id=?", field.id)%>
-                        <%if nested_fields.present?%>
-                          <%nested_fields.each do |nested_field|%>
-                            <%cat_fields_processed << nested_field.id%>
-                            <%rec_field = record_fields[nested_field.id].first rescue nil%>
-                            <%if rec_field. present? && rec_field.value.present?%>
-                              <%value = rec_field.print_value%>
-                              <%if rec_field.present? && rec_field.value.present?%>
-                                <%if (nested_field.nested_field_value.parameterize == rec_field.value.parameterize) ||
-                                     (rec_field.value.include?(";") && rec_field.value.include?(nested_field.nested_field_value))%>
-                                  <div class="nested_field" style="margin-left:15px;">
-                                    <%if cat.title == "Narratives" %>
-                                      <b><%=nested_field.label%>:</br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
-                                    <%else%>
-                                      <b><%=nested_field.label%>: </b>
-                                      <%if nested_field.display_type == "employee"%>
-                                        <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                                          <%if CONFIG::GENERAL[:sabre_integration].present?%>
-                                            <%#=User.where(employee_number: value).first.full_name rescue nil%>
-                                            <%#=value%>
-                                            <%if value.present?%>
-                                              <%user_name = User.where(employee_number: value).first.full_name rescue nil%>
-                                              <%value = "(#{value})"%>
-                                              <%if user_name.present?%>
-                                                <%value = user_name + " #{value}" %>
-                                              <%end%>
-                                              <%=value%>
-                                            <%end%>
-                                          <%else%>
-                                            <%=User.find(value).full_name%>
+                      <%end%>
+                    <%end%>
+                    <%nested_fields = cat.fields.where("nested_field_id=?", field.id)%>
+                    <%if nested_fields.present?%>
+                      <%nested_fields.each do |nested_field|%>
+                        <%cat_fields_processed << nested_field.id%>
+                        <%rec_field = record_fields[nested_field.id].first rescue nil%>
+                        <%if rec_field.present? && rec_field.value.present?%>
+                          <%value = rec_field.print_value%>
+                          <%if rec_field.present? && rec_field.value.present?%>
+                            <%if (nested_field.nested_field_value.strip == rec_field.value.strip) ||
+                                 (field.options.include?(";") && field.options.include?(nested_field.nested_field_value.strip))%>
+                              <div class="nested_field" style="margin-left:15px;">
+                                <%if cat.title == "Narratives" %>
+                                  <b><%=nested_field.label.present? ? (nested_field.label + ":") : ""%></br> </b><%=value.gsub(/\n/, '<br/>').html_safe%></br>
+                                <%else%>
+                                  <b><%=nested_field.label.present? ? (nested_field.label + ":") : ""%></b>
+                                  <%if nested_field.display_type == "employee"%>
+                                    <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                                      <%if CONFIG::GENERAL[:sabre_integration].present?%>
+                                        <%#=User.where(employee_number: value).first.full_name rescue nil%>
+                                        <%#=value%>
+                                        <%if value.present?%>
+                                          <%user_name = User.where(employee_number: value).first.full_name rescue nil%>
+                                          <%value = "(#{value})"%>
+                                          <%if user_name.present?%>
+                                            <%value = user_name + " #{value}" %>
                                           <%end%>
-                                        <%else%>
                                           <%=value%>
                                         <%end%>
                                       <%else%>
-                                        <b><%=nested_field.label%>: </b>
-                                        <%if nested_field.display_type == "employee"%>
-                                          <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                                            <%=User.find(value).full_name%>
-                                          <%else%>
-                                            <%=value%>
-                                          <%end%>
-                                        <%elsif field.display_type == "map"%>
-                                          <%if valueCopy.points.present?%>
-                                            <%=render :partial => 'shared/static_map', locals: {points: valueCopy.points}%>
-                                          <%end%>
-                                        <%else%>
-                                          <%if nested_field.data_type == "datetime"%>
-                                            <%=datetime_to_string(DateTime.parse value) rescue ''%>
-                                          <%else%>
-                                            <%=value%>
-                                          <%end%>
-                                        <%end%>
-                                        </br>
+                                        <%=User.find(value).full_name%>
                                       <%end%>
-                                    </div>
+                                    <%else%>
+                                      <%=value%>
+                                    <%end%>
+                                  <%else%>
+                                    <%if nested_field.display_type == "employee"%>
+                                      <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
+                                        <%=User.find(value).full_name%>
+                                      <%else%>
+                                        <%=value%>
+                                      <%end%>
+                                    <%elsif field.display_type == "map"%>
+                                      <%if valueCopy.points.present?%>
+                                        <%=render :partial => 'shared/static_map', locals: {points: valueCopy.points}%>
+                                      <%end%>
+                                    <%else%>
+                                      <%if nested_field.data_type == "datetime"%>
+                                        <%=datetime_to_string(DateTime.parse value) rescue ''%>
+                                      <%else%>
+                                        <%=value%>
+                                      <%end%>
+                                    <%end%>
+                                    </br>
                                   <%end%>
                                 <%end%>
-                              <%end%>
+                              </div>
+                              </br>
                             <%end%>
                           <%end%>
                         <%end%>

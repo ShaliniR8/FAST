@@ -78,12 +78,6 @@
 
                 <%if record_edit_access%>
                   <%record_status = @record.status%>
-                  <%=link_to  'Open Report', '#',
-                    'data-path' => open_record_path(@record),
-                    :class => 'open-btn btn btn-warning pull-right mr5 mb5',
-                    confirm: 'Are you sure?',
-                    disable_with: 'Opening...',
-                    style: "display: #{record_status == 'New' ? 'block' : 'none'}"%>
                   <%=link_to  'Edit',
                     edit_record_path(@record),
                     id: 'edit-btn',
@@ -92,14 +86,14 @@
                     style: "display: #{record_status != 'Closed' ? 'block' : 'none'}"%>
                 <%end%>
 
-              <%if record_edit_access%>
-                <%=link_to 'Launch',
-                  '#',
-                  :id => "launch_btn",
-                  :class => "btn btn-warning pull-right mr5 mb5",
-                  'data-toggle' => 'modal',
-                  'data-target' => '.bs-example-modal-lg'%>
-              <%end%>
+                <%if record_edit_access%>
+                  <%=link_to 'Launch',
+                    '#',
+                    :id => "launch_btn",
+                    :class => "btn btn-warning pull-right mr5 mb5",
+                    'data-toggle' => 'modal',
+                    'data-target' => '.bs-example-modal-lg'%>
+                <%end%>
 
                 <%if @record.submission.present? && submission_show_access%>
                   <%=link_to "View Submission",
@@ -154,6 +148,15 @@
 
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12">
+            <%if (template_full_access || template_viewer_access || report_admin_access) && record_edit_access%>
+              <%record_status = @record.status%>
+              <%=link_to  'Open Report', '#',
+                'data-path' => open_record_path(@record),
+                :class => 'open-btn btn btn-warning pull-right mr5 mb5',
+                confirm: 'Are you sure?',
+                disable_with: 'Opening...',
+                style: "display: #{record_status == 'New' ? 'block' : 'none'}"%>
+            <%end%>
             <%if template_full_access || report_admin_access%>
               <%if @record.status == "Closed"%>
                 <%=link_to "Reopen",
