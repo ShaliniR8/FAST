@@ -65,6 +65,10 @@ class DefaultConfig
     global_admin_default:               true,   # Default value to use for admin parameter when calling has_access in user.rb
   }
 
+  LABELS = {
+
+  }
+
   LAUNCH_OBJECTS = {
     records: ['Sra', 'Investigation'],
     reports: ['Sra', 'Investigation'],

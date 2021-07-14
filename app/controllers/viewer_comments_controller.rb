@@ -3,7 +3,8 @@ class ViewerCommentsController < ApplicationController
   def edit
     @record = ViewerComment.find(params[:id])
     @fields = ViewerComment.get_meta_fields('form')
-    @title = "Task"
+    owner_name_sym = @record.owner.class.name.underscore.pluralize.to_sym
+    @title = "#{CONFIG::LABELS[owner_name_sym] || 'Comment'}s"
     render partial: '/forms/additional_forms/form'
   end
 

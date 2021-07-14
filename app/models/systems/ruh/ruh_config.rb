@@ -30,9 +30,10 @@ class RUHConfig < DefaultConfig
     has_confidential_forms:             true
   })
 
-  # LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
-  #   sra: []
-  # })
+  LABELS = {
+    corrective_actions: 'Response',
+    sms_actions: 'Response'
+  }
 
   LAUNCH_OBJECTS = {
     records: ['Sra', 'Investigation'],

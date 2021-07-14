@@ -3,7 +3,7 @@
     .panel.panel-lightskyblue
       .panel-heading.click-heading.collapsed
         .panel-title
-          b Comments
+          b ="#{CONFIG::LABELS[params[:controller].to_sym] || 'Comment'}s"
           span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
       .panel-body style='display:none'
         .row

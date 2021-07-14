@@ -10,5 +10,15 @@ class RUHSafetyReportingConfig < DefaultSafetyReportingConfig
     # Airline-Specific Features:
   })
 
-
+  HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
+    objects: {
+      'CorrectiveAction' => {
+          fields: {
+            response: {
+              visible: '',
+          },
+        }
+      },
+    }
+  })
 end

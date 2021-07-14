@@ -205,7 +205,7 @@
             <%end%>
 
             <div class="col-xs-12 col-sm-4 mb5">
-              <%date_value = @record.event_date.present? ? @record.event_date.in_time_zone(@record.event_time_zone) : nil%>
+              <%date_value = @record.event_date.present? ? @record.event_date.in_time_zone(@record.event_time_zone) : DateTime.current%>
               <%if !CONFIG.sr::GENERAL[:submission_time_zone]%>
                 <%date_value = @record.event_date%>
               <%end%>

@@ -36,7 +36,7 @@ ruby:
       disable_with: 'Redirecting...'
 
   - when :comment
-    = link_to 'Add Comment',
+    = link_to "Add #{CONFIG::LABELS[params[:controller].to_sym] || 'Comment'}",
       '#',
       class: 'btn btn-success pull-right mr5 mb5',
       id: 'comment_btn',

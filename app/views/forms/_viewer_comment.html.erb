@@ -3,7 +3,7 @@
     <div class="panel-warning">
       <div class="panel-heading">
         <div class="panel-title">
-          New Comment
+          <%="New #{CONFIG::LABELS[params[:controller].to_sym]|| 'Comment'}"%>
           <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
             <span class="glyphicon glyphicon-remove"></span>
           </button>
@@ -12,13 +12,13 @@
       <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
 
         <div class="form-group col-xs-12 mb10">
-          <%=f.label :content,"Comment"%>
+          <%=f.label :content, "#{CONFIG::LABELS[params[:controller].to_sym]|| 'Comment'}"%>
           <%=f.text_area :content, :class => "form-control", :rows => 5%>
           <%=f.hidden_field :user_id, :value => current_user.id%>
           <%=f.hidden_field :alt_user, :value => "#{current_user.username} - #{current_user.email}"%>
         </div>
 
-        <%=x.submit "Add Comment",
+        <%=x.submit "Add #{CONFIG::LABELS[params[:controller].to_sym]|| 'Comment'}",
           :class => "btn btn-success pull-right mr10",
           :disable_with => "Adding..."%>
 

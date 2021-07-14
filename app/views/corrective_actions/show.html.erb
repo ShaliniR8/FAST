@@ -30,12 +30,11 @@
             <%end%>
 
             <%if current_user.has_access('corrective_actions','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
-                @corrective_action.status != "Completed"%>
+              @corrective_action.status != "Completed"%>
               <%=link_to "Edit",
                 edit_corrective_action_path(@corrective_action),
                 :class => "btn btn-warning pull-right mr5 mb5",
-                :disable_with => "Editing..."
-              %>
+                :disable_with => "Editing..." %>
             <%end%>
 
             <%=link_to "De-ID PDF",
@@ -123,7 +122,7 @@
                 'data-toggle' => 'modal',
                 'data-target' => '.bs-example-modal-lg'%>
             <%end%>
-            <%=link_to "Add Comment", "#",
+            <%=link_to "Add #{CONFIG::LABELS[:corrective_actions] || 'Comment'}", "#",
               :class => "btn btn-success pull-right mr5 mb5",
               :id => 'comment_btn',
               "data-toggle" => "modal",
