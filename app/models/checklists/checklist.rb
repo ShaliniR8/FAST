@@ -46,4 +46,24 @@ class Checklist < ActiveRecord::Base
     end
   end
 
+  def row_orders_updated?
+    checklist_rows.map(&:row_order).uniq != [1000]
+  end
+
+  def update_row_orders
+    if row_orders_updated?
+      # get last row_order
+      orders = checklist_rows.select { |row| row.row_order != 1000}.map(&:row_order)
+      count = orders.max + 1
+      # assign row order
+      checklist_rows.where(row_order: 1000).order(:id).each do |row|
+        row.row_order = count
+        count += 1
+        row.save
+      end
+    else
+      assign_row_orders
+    end
+  end
+
 end
