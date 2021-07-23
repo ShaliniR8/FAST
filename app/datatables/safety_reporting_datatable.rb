@@ -164,7 +164,7 @@ class SafetyReportingDatatable < ApplicationDatatable
     if start_date.nil? && end_date.nil?
       # TODO: REFACTOR
       # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
-      if object.table_name == "reports" && search_string.first.include?("records.id like")
+      if object.table_name == "reports" && search_string.first.present? && search_string.first.include?("records.id like")
         find_term = search_string.first.match /%(?<term>.*)%/
         search_term = find_term[:term].downcase
         template_serach_result = @object_access_filtered.select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
@@ -178,7 +178,7 @@ class SafetyReportingDatatable < ApplicationDatatable
     else
       # TODO: REFACTOR
       # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
-      if object.table_name == "reports" && search_string.first.include?("records.id like")
+      if object.table_name == "reports" && search_string.first.present? && search_string.first.include?("records.id like")
         find_term = search_string.first.match /%(?<term>.*)%/
         search_term = find_term[:term].downcase
         template_serach_result = @object_access_filtered.within_timerange(start_date, end_date).select { |report| report.records.any? { |record| record.template.name.downcase.include? search_term } }
