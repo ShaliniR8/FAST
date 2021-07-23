@@ -152,7 +152,7 @@ class SrasController < ApplicationController
             content: "SRA ##{@owner.id} was Rejected by the Quality Reviewer."},
           mailer: true,
           subject: 'SRA Rejected') if @owner.responsible_user
-        transaction_content = 'Rejected by the Quality Reviewer'
+        transaction_content = "Rejected by the Quality Reviewer with comment #{params[:sra][:reviewer_comment] rescue ""}"
       else
         update_status = 'Assigned'
         notify(@owner,
@@ -161,7 +161,7 @@ class SrasController < ApplicationController
             content: "SRA ##{@owner.id} was Rejected by the Final Approver."},
           mailer: true,
           subject: 'SRA Rejected') if @owner.responsible_user
-        transaction_content = 'Rejected by the Final Approver'
+        transaction_content = "Rejected by the Final Approver with comment #{params[:sra][:approver_comment] rescue ""}"
       end
     when 'Approve'
       # if !@owner.approver #Approved by reviewer with absent approver case
