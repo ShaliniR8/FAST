@@ -69,17 +69,17 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           closing_comment: {
-            field: 'closing_comment', title: "Responsible User's Closing Comments",
+            field: 'closing_comment', title: "Responsible User's Comments",
             num_cols: 12, type: 'text', visible: 'show',
             required: false
           },
           reviewer_comment: {
-            field: 'reviewer_comment', title: "Quality Reviewer's Closing Comments",
+            field: 'reviewer_comment', title: "Quality Reviewer's Comments",
             num_cols: 12, type: 'text', visible: 'show',
             required: false
           },
           approver_comment: {
-            field: 'approver_comment', title: "Final Approver's Closing Comments",
+            field: 'approver_comment', title: "Final Approver's Comments",
             num_cols: 12, type: 'text', visible: 'show',
             required: false
           },
@@ -253,7 +253,12 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          closing_comment: {
+            field: 'closing_comment', title: "Responsible User's Comments",
+            num_cols: 12, type: 'text', visible: 'show',
+            required: false
+          },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
           occurrences: {default: true, title: (Hazard.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
@@ -344,7 +349,12 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          closing_comment: {
+            field: 'closing_comment', title: "Responsible User's Comments",
+            num_cols: 12, type: 'text', visible: 'show',
+            required: false
+          },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20210325201446) do
+ActiveRecord::Schema.define(:version => 20210716215503) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -107,14 +107,14 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.integer  "obj_id"
     t.text     "auditor_comment"
     t.text     "privileges"
-    t.integer  "recurrence_id"
     t.text     "final_comment"
     t.integer  "created_by_id"
     t.boolean  "template",            :default => false
+    t.integer  "recurrence_id"
     t.datetime "close_date"
-    t.date     "completion"
     t.integer  "auditor_poc_id"
     t.integer  "approver_poc_id"
+    t.integer  "spawn_id",            :default => 0
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -296,7 +296,8 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.datetime "updated_at"
   end
 
-  create_table "client_applications", :force => true do |t|
+  create_table "client_applications", :id => false, :force => true do |t|
+    t.integer  "id",                         :default => 0, :null => false
     t.string   "name"
     t.string   "url"
     t.string   "support_url"
@@ -307,8 +308,6 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "client_applications", ["key"], :name => "index_client_applications_on_key", :unique => true
 
   create_table "connections", :force => true do |t|
     t.integer "owner_id",                      :null => false
@@ -370,9 +369,11 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.integer  "approver_id"
     t.text     "final_comment"
     t.integer  "created_by_id"
-    t.boolean  "faa_approval",          :default => false
+    t.boolean  "faa_approval",               :default => false
     t.integer  "user_poc_id"
     t.integer  "approver_poc_id"
+    t.integer  "submissions_id"
+    t.text     "corrective_actions_comment"
   end
 
   create_table "costs", :force => true do |t|
@@ -483,6 +484,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.boolean  "template",              :default => false
     t.integer  "recurrence_id"
     t.datetime "close_date"
+    t.integer  "spawn_id",              :default => 0
   end
 
   create_table "expectations", :force => true do |t|
@@ -559,6 +561,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.integer  "max_length"
     t.boolean  "additional_info",    :default => false
     t.integer  "max_options",        :default => 1
+    t.string   "sabre_map"
     t.integer  "custom_option_id"
   end
 
@@ -649,6 +652,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.integer  "responsible_user_id"
     t.integer  "approver_id"
     t.text     "final_comment"
+    t.text     "closing_comment"
   end
 
   create_table "ims", :force => true do |t|
@@ -708,6 +712,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.boolean  "template",              :default => false
     t.integer  "recurrence_id"
     t.datetime "close_date"
+    t.integer  "spawn_id",              :default => 0
   end
 
   create_table "investigations", :force => true do |t|
@@ -833,16 +838,16 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
 
   add_index "notices", ["users_id", "status"], :name => "index_notices_on_users_id_and_status"
 
-  create_table "oauth_nonces", :force => true do |t|
+  create_table "oauth_nonces", :id => false, :force => true do |t|
+    t.integer  "id",         :default => 0, :null => false
     t.string   "nonce"
     t.integer  "timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "oauth_nonces", ["nonce", "timestamp"], :name => "index_oauth_nonces_on_nonce_and_timestamp", :unique => true
-
-  create_table "oauth_tokens", :force => true do |t|
+  create_table "oauth_tokens", :id => false, :force => true do |t|
+    t.integer  "id",                                  :default => 0, :null => false
     t.integer  "user_id"
     t.string   "type",                  :limit => 20
     t.integer  "client_application_id"
@@ -857,18 +862,6 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "oauth_tokens", ["token"], :name => "index_oauth_tokens_on_token", :unique => true
-
-  create_table "object_links", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "parentable_id"
-    t.integer  "childable_id"
-  end
-
-  add_index "object_links", ["childable_id"], :name => "index_object_links_on_childable_id"
-  add_index "object_links", ["parentable_id"], :name => "index_object_links_on_parentable_id"
 
   create_table "occurrence_templates", :force => true do |t|
     t.integer  "parent_id"
@@ -970,6 +963,16 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.string  "comment"
     t.integer "obj_id"
     t.integer "poc_id"
+  end
+
+  create_table "points", :force => true do |t|
+    t.decimal  "lat",        :precision => 11, :scale => 8
+    t.decimal  "lng",        :precision => 11, :scale => 8
+    t.string   "map_type"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "private_links", :force => true do |t|
@@ -1091,11 +1094,11 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.string   "risk_factor_after"
     t.datetime "close_date"
     t.boolean  "anonymous"
+    t.string   "event_time_zone",       :default => "UTC"
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
-    t.string   "event_time_zone"
     t.text     "final_comment"
     t.string   "eir"
     t.boolean  "scoreboard"
@@ -1106,6 +1109,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.text     "narrative"
     t.text     "regulation"
     t.text     "notes"
+    t.boolean  "confidential",          :default => false
   end
 
   add_index "records", ["reports_id"], :name => "index_records_on_reports_id"
@@ -1125,6 +1129,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.integer  "newest_id"
     t.date     "next_date"
     t.date     "end_date"
+    t.integer  "number_of_recurrencies_per_interval", :default => 1
   end
 
   create_table "report_meetings", :force => true do |t|
@@ -1162,15 +1167,15 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.text     "minutes"
     t.datetime "close_date"
     t.text     "privileges"
-    t.string   "severity_extra"
-    t.string   "probability_extra"
-    t.string   "mitigated_severity"
-    t.string   "mitigated_probability"
     t.string   "venue"
     t.string   "crew"
     t.string   "icao"
     t.string   "event_label"
     t.datetime "event_date"
+    t.string   "severity_extra"
+    t.string   "probability_extra"
+    t.string   "mitigated_severity"
+    t.string   "mitigated_probability"
     t.string   "event_station"
     t.boolean  "cisp_sent",             :default => false
   end
@@ -1211,6 +1216,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.datetime "close_date"
     t.string   "departments"
     t.boolean  "faa_approval",        :default => false
+    t.text     "closing_comment"
   end
 
   create_table "risk_matrix_cells", :force => true do |t|
@@ -1243,6 +1249,7 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.integer  "privileges_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "poc_id"
   end
 
   create_table "root_causes", :force => true do |t|
@@ -1254,6 +1261,26 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "sabres", :force => true do |t|
+    t.date     "flight_date"
+    t.string   "employee_number"
+    t.string   "flight_number"
+    t.string   "tail_number"
+    t.string   "employee_title"
+    t.string   "departure_airport"
+    t.string   "arrival_airport"
+    t.string   "landing_airport"
+    t.text     "other_employees"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "sabres", ["employee_number"], :name => "index_sabres_on_employee_number"
+  add_index "sabres", ["employee_title"], :name => "index_sabres_on_employee_title"
+  add_index "sabres", ["flight_date"], :name => "index_sabres_on_flight_date"
+  add_index "sabres", ["flight_number"], :name => "index_sabres_on_flight_number"
+  add_index "sabres", ["tail_number"], :name => "index_sabres_on_tail_number"
 
   create_table "safety_plans", :force => true do |t|
     t.string   "title"
@@ -1422,9 +1449,11 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+    t.datetime "followup_date"
     t.integer  "created_by_id"
     t.string   "owner_type"
     t.datetime "close_date"
+    t.string   "sra_type"
   end
 
   create_table "submission_fields", :force => true do |t|
@@ -1452,9 +1481,10 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.boolean  "completed"
     t.integer  "custom_id"
     t.boolean  "anonymous"
-    t.string   "event_time_zone"
+    t.string   "event_time_zone", :default => "UTC"
     t.integer  "owner_id"
     t.string   "type"
+    t.boolean  "confidential",    :default => false
   end
 
   add_index "submissions", ["completed"], :name => "index_submissions_on_completed"
@@ -1550,9 +1580,10 @@ ActiveRecord::Schema.define(:version => 20210325201446) do
     t.datetime "last_seen_at"
     t.string   "sso_id"
     t.datetime "privileges_last_updated"
-    t.integer  "mobile_fetch_months",                  :default => 3, :null => false
+    t.integer  "mobile_fetch_months",                  :default => 3,     :null => false
     t.text     "departments"
     t.integer  "poc_id"
+    t.boolean  "ignore_updates",                       :default => false
   end
 
   create_table "verifications", :force => true do |t|

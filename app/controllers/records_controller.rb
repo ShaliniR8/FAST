@@ -492,8 +492,17 @@ class RecordsController < ApplicationController
       end
     end
 
+    transaction_content = params[:record][:final_comment] rescue nil
+    if transaction_content.nil?
+      if params[:record][:comments_attributes].present?
+        params[:record][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
+
     case params[:commit]
-    when 'Close'
+    when 'Close', 'Close Report'
       if @owner.submission.present?
         notify(@owner.submission, notice: {
           users_id: @owner.created_by.id,

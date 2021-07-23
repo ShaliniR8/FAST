@@ -327,8 +327,24 @@ class ApplicationController < ActionController::Base
     when :complete # was complete route
       status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
       case @class.name
-      when 'Sra'
+      when 'Sra', 'Hazard', 'RiskControl'
         render partial: '/forms/workflow_forms/process', locals: {status: status, field: :closing_comment}
+      when 'Audit'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :comment}
+      when 'Inspection'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :inspector_comment}
+      when 'Evaluation'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :evaluator_comment}
+      when 'Investigation'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :investigator_comment}
+      when 'Finding'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :findings_comment}
+      when 'SmsAction'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :sms_actions_comment}
+      when 'Recommendation'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :recommendations_comment}
+      when 'CorrectiveAction'
+        render partial: '/forms/workflow_forms/process', locals: {status: status, field: :corrective_actions_comment}
       else
         render partial: '/forms/workflow_forms/process', locals: {status: status}
       end

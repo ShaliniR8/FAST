@@ -64,6 +64,28 @@ class SafetyAssuranceController < ApplicationController
     @owner.update_attributes(params[object_name.to_sym])
     send_notification(@owner, params[:commit])
     transaction_content = params[object_name.to_sym][:final_comment] rescue nil
+
+    if transaction_content.nil?
+      case @owner.class.name
+      when 'Audit'
+        transaction_content = params[object_name.to_sym][:comment] rescue nil
+      when 'Inspection'
+        transaction_content = params[object_name.to_sym][:inspector_comment] rescue nil
+      when 'Evaluation'
+        transaction_content = params[object_name.to_sym][:evaluator_comment] rescue nil
+      when 'Investigation'
+        transaction_content = params[object_name.to_sym][:investigator_comment] rescue nil
+      when 'Finding'
+        transaction_content = params[object_name.to_sym][:findings_comment] rescue nil
+      when 'SmsAction'
+        transaction_content = params[object_name.to_sym][:sms_actions_comment] rescue nil
+      when 'Recommendation'
+        transaction_content = params[object_name.to_sym][:recommendations_comment] rescue nil
+      else
+        transaction_content = params[object_name.to_sym][:final_comment] rescue nil
+      end
+    end
+
     if transaction_content.nil?
       if params[object_name.to_sym][:comments_attributes].present?
         params[object_name.to_sym][:comments_attributes].each do |key, val|

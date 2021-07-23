@@ -34,7 +34,7 @@ class DefaultSafetyAssuranceConfig
           created_by: { default: true },
           due_date: {default: true, on_newline: true },
           close_date: { default: true },
-          responsible_user: { default: true },
+          responsible_user: { default: true, title: "Auditor" },
           approver: { default: true },
           department: {
             field: 'department', title: 'Auditing Department',
@@ -68,8 +68,8 @@ class DefaultSafetyAssuranceConfig
           objective: { default: true },
           reference: { default: true },
           instruction: { default: true, title: 'Audit Instructions' },
-          comment: { default: true, title: 'Auditor Comment' },
-          final_comment: { default: true },
+          comment: { default: true, title: "Auditor's Comments" },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           findings: {
             field: 'included_findings', title: 'Included Findings',
             num_cols: 6,  type: 'text', visible: 'index',
@@ -140,11 +140,11 @@ class DefaultSafetyAssuranceConfig
           reference: { default: true },
           instruction: { default: true, title: 'Inspection Instructions' },
           inspector_comment: {
-            field: 'inspector_comment', title: 'Inspector Comment',
+            field: 'inspector_comment', title: "Lead Inspector's Comments",
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
           findings: {
             field: 'included_findings', title: 'Included Findings',
@@ -218,11 +218,11 @@ class DefaultSafetyAssuranceConfig
           reference: { default: true },
           instruction: { default: true, title: 'Evaluation Instructions' },
           evaluator_comment: {
-            field: 'evaluator_comment', title: 'Evaluator Comment',
+            field: 'evaluator_comment', title: "Lead Evaluator's Comments",
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
           findings: {
             field: 'included_findings', title: 'Included Findings',
@@ -312,11 +312,11 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           investigator_comment: {
-            field: 'investigator_comment', title: 'Investigator Comment',
+            field: 'investigator_comment', title: "Investigator's Comments",
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           occurrences: {default: true, title: (Investigation.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
@@ -456,7 +456,7 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           findings_comment: {
-            field: 'findings_comment', title: 'Finding Comment',
+            field: 'findings_comment', title: "Responsible User's Comments",
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
@@ -465,7 +465,7 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6, type: 'text', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true, type: 'text' },
+          final_comment: { default: true, title: "Final Approver's Comments" },
 
           occurrences: {default: true, title: (Finding.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
@@ -571,11 +571,11 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           sms_actions_comment: {
-            field: 'sms_actions_comment', title: 'Corrective Action Comment',
+            field: 'sms_actions_comment', title: "Responsible User's Comments",
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
@@ -651,11 +651,11 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           recommendations_comment: {
-            field: 'recommendations_comment', title: 'Recommendation Comment',
+            field: 'recommendations_comment', title: "Responsible User's Comments",
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc

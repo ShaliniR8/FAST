@@ -117,7 +117,7 @@ class CorrectiveActionsController < ApplicationController
   def complete
     @owner = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
     status = @owner.approver.present? ? 'Pending Approval' : 'Completed'
-    render :partial => '/forms/workflow_forms/process', locals: {status: status}
+    render :partial => '/forms/workflow_forms/process', locals: {status: status, field: :corrective_actions_comment}
   end
 
   def approve
@@ -133,7 +133,10 @@ class CorrectiveActionsController < ApplicationController
     old_status = @owner.status
     @owner.update_attributes(params[:corrective_action])
     send_notification(@owner, params[:commit])
-    transaction_content = params[:corrective_action][:final_comment] rescue nil
+    transaction_content = params[:corrective_action][:corrective_actions_comment] rescue nil
+    if transaction_content.nil?
+      transaction_content = params[:corrective_action][:final_comment] rescue nil
+    end
     if transaction_content.nil?
       if params[:corrective_action][:comments_attributes].present?
         params[:corrective_action][:comments_attributes].each do |key, val|

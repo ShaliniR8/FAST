@@ -140,11 +140,11 @@ class EULENConfig < DefaultConfig
     },
 
     severity_table_dict: {
-      0 => '1',
-      1 => '2',
+      0 => '5',
+      1 => '4',
       2 => '3',
-      3 => '4',
-      4 => '5'
+      3 => '2',
+      4 => '1'
     },
 
     probability_table: {
@@ -186,11 +186,11 @@ class EULENConfig < DefaultConfig
     },
 
     probability_table_dict: {
-      0 => '1 - Improbable',
-      1 => '2 - Remote',
+      0 => '5 - Frequent',
+      1 => '4 - Probable',
       2 => '3 - Occasional',
-      3 => '4 - Probable',
-      4 => '5 - Frequent'
+      3 => '2 - Remote',
+      4 => '1 - Improbable'
     },
 
     risk_table: {
@@ -251,23 +251,50 @@ class EULENConfig < DefaultConfig
 
     risk_table_index: {
       'LOW' => 'mediumseagreen',
-      'MINOR' => 'steelblue',
       'MODERATE' => 'yellow',
-      'SERIOUS' => 'coral',
       'HIGH' => 'crimson',
       'Low' => 'mediumseagreen',
-      'Minor' => 'steelblue',
+      'Low - 1' => 'mediumseagreen',
+      'Low - 2' => 'mediumseagreen',
+      'Low - 3' => 'mediumseagreen',
       'Moderate' => 'yellow',
-      'Serious' => 'coral',
+      'Moderate - 4' => 'yellow',
+      'Moderate - 5' => 'yellow',
+      'Moderate - 6' => 'yellow',
+      'Moderate - 8' => 'yellow',
+      'Moderate - 9' => 'yellow',
       'High' => 'crimson',
+      'High - 10' => 'crimson',
+      'High - 12' => 'crimson',
+      'High - 15' => 'crimson',
+      'High - 16' => 'crimson',
+      'High - 20' => 'crimson',
+      'High - 25' => 'crimson',
     },
 
+    # risk_table_dict: {
+    #   'mediumseagreen' => 'Low',
+    #   'steelblue' => 'Minor',
+    #   'yellow' => 'Moderate',
+    #   'coral' => 'Serious',
+    #   'crimson' => 'High',
+    # }
+
     risk_table_dict: {
-      'mediumseagreen' => 'Low',
-      'steelblue' => 'Minor',
-      'yellow' => 'Moderate',
-      'coral' => 'Serious',
-      'crimson' => 'High',
+      1 => 'Low - 1',
+      2 => 'Low - 2',
+      3 => 'Low - 3',
+      4 => 'Moderate - 4',
+      5 => 'Moderate - 5',
+      6 => 'Moderate - 6',
+      8 => 'Moderate - 8',
+      9 => 'Moderate - 9',
+      10 => 'High - 10',
+      12 => 'High - 12',
+      15 => 'High - 15',
+      16 => 'High - 16',
+      20 => 'High - 20',
+      25 => 'High - 25',
     }
   }
 

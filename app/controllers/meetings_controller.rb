@@ -241,6 +241,15 @@ class MeetingsController < ApplicationController
       end
     end
 
+    transaction_content = params[:meeting][:final_comment] rescue nil
+    if transaction_content.nil?
+      if params[:meeting][:comments_attributes].present?
+        params[:meeting][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
+
     case params[:commit]
     when 'Override Status'
       transaction_content = "Status overriden from #{@owner.status} to #{params[:meeting][:status]}"
