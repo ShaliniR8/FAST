@@ -142,7 +142,7 @@
                     record.status != "Closed" &&
                     current_user.has_access('corrective_actions', 'new')%>
                     <%=link_to "<i class='glyphicon glyphicon-paperclip'></i>".html_safe,
-                      new_corrective_action_path(:record => record.id),
+                      new_corrective_action_path(:record => record.id, :report => @report.id),
                       :class => "btn btn-success ml5 mt5",
                       :disable_with => "Redirecting..."%>
                   <%end%>

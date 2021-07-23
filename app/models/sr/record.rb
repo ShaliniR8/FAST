@@ -52,10 +52,20 @@ class Record < Sr::SafetyReportingBase
   end
 
 
-  def self.get_meta_fields_keys(*args)
+  def self.get_meta_fields_keys(args, current_user)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)
     keys = CONFIG.object['Record'][:fields].select { |key,val| (val[:visible].split(',') & visible_fields).any? }
                                            .map { |key, _| key.to_s }
+
+    if !CONFIG.sr::GENERAL[:show_submitter_name]
+      if !current_user.global_admin?
+        keys.delete_if {|key| key == "submitter"}
+      end
+    else
+      if !current_user.admin?
+        keys.delete_if {|key| key == "submitter"}
+      end
+    end
 
     keys[keys.index('submitter')] = 'users.full_name' if keys.include? 'submitter'
     keys[keys.index('template')] = 'templates.name' if keys.include? 'template'

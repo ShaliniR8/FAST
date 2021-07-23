@@ -96,7 +96,11 @@ class ApplicationDatatable
 
 
   def columns
-    object.get_meta_fields_keys('index')
+    if ["Record", "Submission"].include? (object.name)
+      object.get_meta_fields_keys(['index'], @current_user)
+    else
+      object.get_meta_fields_keys('index')
+    end
   end
 
 
@@ -152,7 +156,7 @@ class ApplicationDatatable
 
   def dashboard_risk_matrix_link
     adv_params = params[:advance_search]
-    adv_params[:advance_search] && %w[severity likelihood].include?(adv_params[:searchterm_1])
+    adv_params[:advance_search] && %w[severity likelihood severity_after likelihood_after].include?(adv_params[:searchterm_1])
   end
 
 
@@ -169,6 +173,12 @@ class ApplicationDatatable
 
   def handle_time_zone(start_date, end_date)
     if start_date.present? && end_date.present?
+      if start_date.is_a?(String)
+        start_date = start_date.to_datetime
+      end
+      if end_date.is_a?(String)
+        end_date = end_date.to_datetime
+      end
       offset = (start_date.in_time_zone(CONFIG::GENERAL[:time_zone]).utc_offset / 3600).hours
 
       start_date = start_date - offset
@@ -358,28 +368,100 @@ class ApplicationDatatable
   def query_records_for_risk(search_params, adv_params, join_tables)
     search_string = search_params[:search_string]
 
-    if adv_params[:searchterm_1] == 'severity'
+    if adv_params[:searchterm_1] == 'severity' || adv_params[:searchterm_1] == 'severity_after'
+      if adv_params[:searchterm_1] == 'severity_after'
+        sev_text = 'severity_after'
+        lik_text = 'likelihood_after'
+      else
+        sev_text = 'severity'
+        lik_text = 'likelihood'
+      end
       sev = adv_params[:field_1]
       like = adv_params[:field_2]
     else
+      if adv_params[:searchterm_1] == 'likelihood_after'
+        sev_text = 'severity_after'
+        lik_text = 'likelihood_after'
+      else
+        sev_text = 'severity'
+        lik_text = 'likelihood'
+      end
       sev = adv_params[:field_2]
       like = adv_params[:field_1]
     end
 
-    @status_count = object.joins(join_tables)
+    if ['Record', 'Report'].include?(object.name)
+      is_admin = @current_user.has_access(object.name.downcase.pluralize, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+      full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:full])
+      confidential_access_templates = Template.where(name: @current_user.get_all_templates_hash[:confidential])
+      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer])
+
+      if object.name == 'Record'
+        @status_count = object.joins(join_tables)
                           .order("#{sort_column} #{sort_direction}")
+                          .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)", full_access_templates, viewer_access_templates, confidential_access_templates)
                           .where(search_string.join(' and '))
-                          .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
+                          .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
                           .group("#{object.table_name}.status").count
+      else
+        reports = Record.preload(:template, :report)
+          .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
+            full_access_templates, viewer_access_templates, confidential_access_templates)
+          .map(&:report).flatten.uniq.compact
+        @status_count = object.joins(join_tables)
+                          .order("#{sort_column} #{sort_direction}")
+                          .where(id: reports.map(&:id))
+                          .where(search_string.join(' and '))
+                          .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
+                          .group("#{object.table_name}.status").count
+      end
+    else
+      @status_count = object.joins(join_tables)
+                        .order("#{sort_column} #{sort_direction}")
+                        .where(search_string.join(' and '))
+                        .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
+                        .group("#{object.table_name}.status").count
+    end
 
     dashboard_risk_matrix_link_status_counts_update
 
-    object.joins(join_tables)
+
+    if ['Record', 'Report'].include?(object.name)
+      is_admin = @current_user.has_access(object.name.downcase.pluralize, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+      full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:full])
+      confidential_access_templates = Template.where(name: @current_user.get_all_templates_hash[:confidential])
+      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer])
+
+      if object.name == 'Record'
+        object.joins(join_tables)
           .order("#{sort_column} #{sort_direction}")
+          .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)", full_access_templates, viewer_access_templates, confidential_access_templates)
           .where(search_string.join(' and '))
-          .where("#{object.table_name}.severity = ? and #{object.table_name}.likelihood = ?", sev, like)
+          .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
           .limit(params['length'].to_i)
-          .offset(params['start'].to_i)   
+          .offset(params['start'].to_i)
+      else
+        reports = Record.preload(:template, :report)
+          .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
+            full_access_templates, viewer_access_templates, confidential_access_templates)
+          .map(&:report).flatten.uniq.compact
+
+        object.joins(join_tables)
+          .order("#{sort_column} #{sort_direction}")
+          .where(id: reports.map(&:id))
+          .where(search_string.join(' and '))
+          .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
+          .limit(params['length'].to_i)
+          .offset(params['start'].to_i)
+      end
+    else
+      object.joins(join_tables)
+        .order("#{sort_column} #{sort_direction}")
+        .where(search_string.join(' and '))
+        .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
+        .limit(params['length'].to_i)
+        .offset(params['start'].to_i)
+    end
   end
 
 

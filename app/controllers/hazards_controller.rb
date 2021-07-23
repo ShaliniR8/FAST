@@ -1,3 +1,24 @@
+# Current version of Ruby (2.1.1p76) and Rails (3.0.5) defines send s.t. saving nested attributes does not work
+# This method is a "monkey patch" that can fix the issue (tested for Rails 3.0.x)
+# Source: https://github.com/rails/rails/issues/11026
+if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "2.0.0"
+  module ActiveRecord
+    module Associations
+      class AssociationProxy
+        def send(method, *args)
+          if proxy_respond_to?(method, true)
+            super
+          else
+            load_target
+            @target.send(method, *args)
+          end
+        end
+      end
+    end
+  end
+end
+
+
 class HazardsController < ApplicationController
 
   before_filter :set_table_name,:login_required
@@ -96,7 +117,10 @@ class HazardsController < ApplicationController
 
     transaction = true
     @owner = Hazard.find(params[:id])
-    transaction_content = params[:hazard][:final_comment] rescue nil
+    transaction_content = params[:hazard][:closing_comment] rescue nil
+    if transaction_content.nil?
+      transaction_content = params[:hazard][:final_comment] rescue nil
+    end
     if transaction_content.nil?
       if params[:hazard][:comments_attributes].present?
         params[:hazard][:comments_attributes].each do |key, val|

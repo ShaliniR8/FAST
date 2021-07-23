@@ -306,6 +306,15 @@ class ReportsController < ApplicationController
     transaction = true
     @owner = Report.find(params[:id])
 
+    transaction_content = params[:report][:notes] rescue nil
+    if transaction_content.nil?
+      if params[:report][:comments_attributes].present?
+        params[:report][:comments_attributes].each do |key, val|
+          transaction_content = val[:content] rescue nil
+        end
+      end
+    end
+
     if !params[:privileges].present?
       @owner.privileges = nil
     end
@@ -381,6 +390,10 @@ class ReportsController < ApplicationController
     @action = "show"
     @title = "Included Reports"
     @table_name = "reports"
+
+    has_access = current_user.has_access(@table_name, @action, admin: CONFIG::GENERAL[:global_admin_default]) ||
+                 current_user.has_access(@table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    redirect_to errors_path unless has_access
 
     @i18nbase = 'sr.event'
     @report = Report.preload(records: [:attachments, :occurrences]).find(params[:id])

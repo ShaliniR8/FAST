@@ -19,6 +19,8 @@ class RJETConfig < DefaultConfig
     csv_user_import:              true,
     asrs_integration:             true,
 
+    has_pdf_footer:               false,
+
     # TO BE REMOVED
     base_risk_matrix:             false,
     has_verification:             true,

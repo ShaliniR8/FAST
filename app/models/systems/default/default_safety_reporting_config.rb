@@ -107,7 +107,6 @@ class DefaultSafetyReportingConfig
           viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
-          final_comment: { default: true },
           eir: {
             field: 'eir', title: 'EIR Number',
             num_cols: 6, type: 'text', visible: 'close',
@@ -148,11 +147,17 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'close',
             required: false
           },
-          notes: {
-            field: 'notes', title: 'Closing Notes',
-            num_cols: 12, type: 'textarea', visible: 'close',
+          final_comment: {
+            default: true,
+            field: 'final_comment', title: 'Final Comment',
+            num_cols: 12, type: 'textarea', visible: 'close,show',
             required: false
           },
+          # notes: {
+          #   field: 'notes', title: 'Closing Notes',
+          #   num_cols: 12, type: 'textarea', visible: 'close',
+          #   required: false
+          # },
           occurrences: {default: true, title: (Record.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',
@@ -269,7 +274,7 @@ class DefaultSafetyReportingConfig
           },
           notes: {
             field: 'notes', title: 'Final Comment',
-            num_cols: 12, type: 'textarea', visible: 'close',
+            num_cols: 12, type: 'textarea', visible: 'close,asap',
             required: false
           },
           occurrences: {default: true, title: (Report.find_top_level_section.label rescue '')},
@@ -394,7 +399,12 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { default: true },
+          corrective_actions_comment: {
+            field: 'corrective_actions_comment', title: "Responsible User's Comments",
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
+          },
+          final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
