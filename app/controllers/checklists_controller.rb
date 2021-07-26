@@ -74,7 +74,7 @@ class ChecklistsController < ApplicationController
         params[:checklist][:assignee_ids] = nil
       end
     else
-      params[:checklist].delete(:assignee_ids)
+      params[:checklist].delete(:assignee_ids) if params[:checklist].present? && params[:checklist].key?(:assignee_ids)
     end
 
     # TODO: refactor needed
