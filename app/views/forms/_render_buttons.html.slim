@@ -261,7 +261,7 @@ ruby:
   - when :view_parent
     - if owner.parents.present?
       - parent_class = owner.get_parent.class.name
-      - if owner.class.name == 'Investigation'
+      - if ['Investigation', 'Sra'].include?(owner.class.name)
         - parent_name = ""
         - case owner.get_parent.class.name
         - when 'Record'
