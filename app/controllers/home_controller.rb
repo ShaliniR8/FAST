@@ -109,25 +109,25 @@ class HomeController < ApplicationController
 
       # template query
       if params[:emp_groups].present?
-        full_template = Template.where(name: (@permissions['full'] || []).compact, emp_group: params[:emp_group])
-        viewer_template = Template.where(name: (@permissions['viewer'] || []).compact, emp_group: params[:emp_group])
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:full] || []).compact, emp_group: params[:emp_group])
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer] || []).compact, emp_group: params[:emp_group])
       else
-        full_template = Template.where(name: (@permissions['full'] || []).compact)
-        viewer_template = Template.where(name: (@permissions['viewer'] || []).compact)
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:full] || []).compact)
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer] || []).compact)
       end
       template_query = ["(users_id = #{current_user.id})"]
       if full_template.length > 0
         template_query << "(templates_id in (#{full_template.map(&:id).join(',')}))"
       end
       if viewer_template.length > 0
-        template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = 1)"
+        template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = true)"
       end
       record_queries << "(#{template_query.join(' OR ')})"
 
       # time range
       if @start_date.present? && @end_date.present?
-        record_queries << "event_date >= '#{@start_date.strftime('%Y-%m-%d %H:%M:%S')}'"
-        record_queries << "event_date <= '#{@end_date.strftime('%Y-%m-%d %H:%M:%S')}'"
+        record_queries << "event_date >= '#{@start_date.utc.strftime('%Y-%m-%d %H:%M:%S')}'"
+        record_queries << "event_date <= '#{@end_date.utc.strftime('%Y-%m-%d %H:%M:%S')}'"
       end
 
       @records = Record.preload(:created_by, :template, :report).where(record_queries.join(' AND '))

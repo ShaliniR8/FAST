@@ -2,13 +2,15 @@ ruby:
   risk_table     = CONFIG::MATRIX_INFO[:risk_table]
   severity_pos   = risk_table[:severity_pos]
   likelihood_pos = risk_table[:likelihood_pos]
+  baseline_txt = "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} RISK".upcase
+  mitigate_txt = "#{CONFIG::MATRIX_INFO[:terminology]['Mitigate']} RISK".upcase
 
 hr
 h4
   b = 'RISK ASSESSMENT'
 .col-xs-6
   h5
-    b = 'BASELINE RISK'
+    b = baseline_txt
     br
     br
   P
@@ -22,7 +24,7 @@ h4
     = owner.risk_factor
 .col-xs-6
   h5
-    b = 'MITIGATED RISK'
+    b = mitigate_txt
     br
     br
   P
