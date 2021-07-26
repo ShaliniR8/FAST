@@ -59,7 +59,7 @@ class SafetyReportingDatatable < ApplicationDatatable
       if has_date_range
         # TODO: REFACTOR
         # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
-        if object.table_name == "reports" && search_string.first.include?("records.id like")
+        if object.table_name == "reports" && search_string.first.present? && search_string.first.include?("records.id like")
           find_term = search_string.first.match /%(?<term>.*)%/
           search_term = find_term[:term].downcase
           template_serach_result = @object_access_filtered
@@ -79,7 +79,7 @@ class SafetyReportingDatatable < ApplicationDatatable
       else
         # TODO: REFACTOR
         # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
-        if object.table_name == "reports" && search_string.first.include?("records.id like")
+        if object.table_name == "reports" && search_string.first.present? && search_string.first.include?("records.id like")
           find_term = search_string.first.match /%(?<term>.*)%/
           search_term = find_term[:term].downcase
           template_serach_result = @object_access_filtered
@@ -99,7 +99,7 @@ class SafetyReportingDatatable < ApplicationDatatable
       if has_date_range
         # TODO: REFACTOR
         # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
-        if object.table_name == "reports" && search_string.first.include?("records.id like")
+        if object.table_name == "reports" && search_string.first.present? && search_string.first.include?("records.id like")
           find_term = search_string.first.match /%(?<term>.*)%/
           search_term = find_term[:term].downcase
           template_serach_result = @object_access_filtered.where(status: status)
@@ -120,7 +120,7 @@ class SafetyReportingDatatable < ApplicationDatatable
       else
         # TODO: REFACTOR
         # HANDLE SEARCHGING "Included Reports" COLUMN IN EVENT INDEX PAGE
-        if object.table_name == "reports" && search_string.first.include?("records.id like")
+        if object.table_name == "reports" && search_string.first.present? && search_string.first.include?("records.id like")
           find_term = search_string.first.match /%(?<term>.*)%/
           search_term = find_term[:term].downcase
           template_serach_result = @object_access_filtered.where(status: status)
