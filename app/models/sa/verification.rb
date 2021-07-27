@@ -47,7 +47,7 @@ class Verification < ProsafetBase
   end
 
   def self.get_user_list
-    User.all.map { |user| [user.full_name, user.id] }
+    User.active.map { |user| [user.full_name, user.id] }
   end
 
   def self.get_result_options
