@@ -88,6 +88,7 @@ class EvaluationsController < SafetyAssuranceController
     end
 
     if @evaluation.save
+      notify_on_object_creation(@evaluation)
       redirect_to evaluation_path(@evaluation), flash: {success: "Evaluation created."}
     end
   end

@@ -68,7 +68,7 @@ class FindingsController < SafetyAssuranceController
     else # from Launch Object
       @finding = @parent.findings.create(params[:finding])
     end
-
+    notify_on_object_creation(@finding)
     redirect_to @finding, flash: {success: 'Finding created.'}
   end
 

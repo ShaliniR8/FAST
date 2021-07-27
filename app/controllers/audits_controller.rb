@@ -104,6 +104,7 @@ class AuditsController < SafetyAssuranceController
       end
 
     end
+    notify_on_object_creation(@audit)
     redirect_to audit_path(@audit), flash: {success: "Audit created."}
   end
 

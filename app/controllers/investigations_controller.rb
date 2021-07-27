@@ -91,6 +91,7 @@ class InvestigationsController < SafetyAssuranceController
 
     end
     if @investigation.save
+      notify_on_object_creation(@investigation)
       redirect_to investigation_path(@investigation), flash: {success: "Investigation created."}
     end
   end
