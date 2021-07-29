@@ -1,5 +1,6 @@
 class Recurrence < ActiveRecord::Base
   extend AnalyticsFilters
+  include Noticeable
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)

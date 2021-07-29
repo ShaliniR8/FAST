@@ -59,6 +59,7 @@ class RecurrencesController < ApplicationController
     @recurrence.created_by_id = current_user.id
     @recurrence.form_type = @table.name
     @recurrence.save!
+    notify_on_object_creation(@recurrence)
     child_access_validation(@table.name,'admin')
     redirect_to recurrence_path(@recurrence), flash: {success: "Recurrent #{@table} created."}
   end
