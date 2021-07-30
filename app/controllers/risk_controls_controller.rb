@@ -85,6 +85,7 @@ class RiskControlsController < ApplicationController
     @risk_control = RiskControl.create(params[:risk_control])
     @risk_control.status = 'New'
     @risk_control.save
+    notify_on_object_creation(@risk_control)
     redirect_to @risk_control
   end
 

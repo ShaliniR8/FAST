@@ -50,6 +50,7 @@ class SafetyPlansController < ApplicationController
 
   def create
     @safety_plan = SafetyPlan.create(params[:safety_plan])
+    notify_on_object_creation(@safety_plan)
     redirect_to @safety_plan, flash: {success: "Safety Plan created."}
   end
 

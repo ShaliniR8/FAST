@@ -44,13 +44,7 @@ class AccessControl < ActiveRecord::Base
     when "new"
       "This gives the user access to create new #{type}s"
     when "show"
-      #TR 8/21/18 Adds a grammar check
-      firstChar = type[0]
-      if firstChar.downcase == "a" ||
-        firstChar.downcase == "e"  ||
-        firstChar.downcase == "i"  ||
-        firstChar.downcase == "o"  ||
-        firstChar.downcase == "u"
+      if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
         "This gives the user access to view details about an #{type}."
       else
         "This gives the user access to view details about a #{type}."
@@ -73,6 +67,12 @@ class AccessControl < ActiveRecord::Base
       "This gives the user full access to viewing, editing, and creating #{type}s."
     when 'override'
       "This gives the user access to see the \"Override\" button on the #{type} page and the ability to delete the #{type}."
+    when 'notify'
+      if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
+        "Users with this access rule will be notified when an #{type} is created."
+      else
+        "Users with this access rule will be notified when a #{type} is created."
+      end
     else
       ""
     end
@@ -146,6 +146,7 @@ class AccessControl < ActiveRecord::Base
         "destroy"             => generate_desc("Safety Reporting Corrective Action", "destroy"),
         "index"               => generate_desc("Safety Reporting Corrective Action", "index"),
         "override"            => generate_desc("Safety Reporting Corrective Action", "override"),
+        "notify"              => generate_desc("Safety Reporting Corrective Action", "notify"),
       },
 
       "documents"=>{
@@ -162,6 +163,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Audit", "index"),
         "viewer"              => generate_desc("Audit", "viewer"),
         "override"            => generate_desc("Audit", "override"),
+        "notify"              => generate_desc("Audit", "notify"),
       },
 
       "inspections"=>{
@@ -172,6 +174,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Inspection", "index"),
         "viewer"              => generate_desc("Inspection", "viewer"),
         "override"            => generate_desc("Inspection", "override"),
+        "notify"              => generate_desc("Inspection", "notify"),
       },
 
       "evaluations"=>{
@@ -182,6 +185,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Evaluation", "index"),
         "viewer"              => generate_desc("Evaluation", "viewer"),
         "override"            => generate_desc("Evaluation", "override"),
+        "notify"              => generate_desc("Evaluation", "notify"),
       },
 
       "investigations"=>{
@@ -192,6 +196,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Investigation", "index"),
         "viewer"              => generate_desc("Investigation", "viewer"),
         "override"            => generate_desc("Investigation", "override"),
+        "notify"              => generate_desc("Investigation", "notify"),
       },
 
       "findings"=>{
@@ -202,6 +207,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Finding", "index"),
         "viewer"              => generate_desc("Finding", "viewer"),
         "override"            => generate_desc("Finding", "override"),
+        "notify"              => generate_desc("Finding", "notify"),
       },
 
       "sms_actions"=>{
@@ -212,6 +218,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Safety Assurance Corrective Action", "index"),
         "viewer"              => generate_desc("Safety Assurance Corrective Action", "viewer"),
         "override"            => generate_desc("Safety Assurance Corrective Action", "override"),
+        "notify"              => generate_desc("Safety Assurance Corrective Action", "notify"),
       },
 
       "recommendations"=>{
@@ -223,6 +230,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Recommendation", "viewer"),
         'admin'               => generate_desc('Recommendation', 'admin'),
         "override"            => generate_desc("Recommendation", "override"),
+        "notify"              => generate_desc("Recommendation", "notify"),
       },
 
       'sras'=>{
@@ -233,6 +241,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("SRA(SRM)", "index"),
         "viewer"              => generate_desc("SRA(SRM)", "viewer"),
         "override"            => generate_desc("SRA(SRM)", "override"),
+        "notify"              => generate_desc("SRA(SRM)", "notify"),
       },
 
       'hazards'=>{
@@ -243,6 +252,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Hazard", "index"),
         "viewer"              => generate_desc("Hazard", "viewer"),
         "override"            => generate_desc("Hazard", "override"),
+        "notify"              => generate_desc("Hazard", "notify"),
       },
 
       'risk_controls'=>{
@@ -253,6 +263,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Risk Control", "index"),
         "viewer"              => generate_desc("Risk Control", "viewer"),
         "override"            => generate_desc("Risk Control", "override"),
+        "notify"              => generate_desc("Risk Control", "notify"),
       },
 
       'safety_plans'=>{
@@ -263,6 +274,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Safety Plan", "index"),
         "viewer"              => generate_desc("Safety Plan", "viewer"),
         "override"            => generate_desc("Safety Plan", "override"),
+        "notify"              => generate_desc("Safety Plan", "notify"),
       },
 
       'srm_meetings'=>{
@@ -395,7 +407,8 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "documents"=>{
         "New"=>"new",
@@ -410,7 +423,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "inspections"=>{
         "New"=>"new",
@@ -420,8 +434,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
-
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "evaluations"=>{
         "New"=>"new",
@@ -431,7 +445,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "investigations"=>{
         "New"=>"new",
@@ -441,7 +456,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "findings"=>{
         "New"=>"new",
@@ -451,7 +467,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "sms_actions"=>{
         "New"=>"new",
@@ -461,7 +478,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       "recommendations"=>{
         "New"=>"new",
@@ -471,7 +489,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       'sras'=>{
         "New"=>"new",
@@ -481,7 +500,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       'hazards'=>{
         "New"=>"new",
@@ -491,7 +511,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         "Admin"=>"admin",
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       'risk_controls'=>{
         "New"=>"new",
@@ -501,7 +522,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         'Admin'=>'admin',
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       'safety_plans'=>{
         "New"=>"new",
@@ -511,7 +533,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Viewer"=>"viewer",
         "Admin"=>"admin",
-        "Override" => 'override'
+        "Override" => 'override',
+        "Notify" => 'notify'
       },
       'srm_meetings'=>{
         "New"=>"new",
@@ -594,6 +617,7 @@ class AccessControl < ActiveRecord::Base
     h["Admin"] = "admin"
     h["Shared"] = "shared"
     h["Override"] = "override"
+    h["Notify"] = "notify"
     h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
 
     return h

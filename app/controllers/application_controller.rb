@@ -238,6 +238,36 @@ class ApplicationController < ActionController::Base
   end
 
 
+  def notify_on_object_creation(owner)
+    name_of_controller = controller_name
+    if owner.class.name == 'SmsAction'
+      object_title = 'Corrective Action (Safety Assurance)'
+    elsif owner.class.name == 'CorrectiveAction'
+      object_title = 'Corrective Action (Safety Reporting)'
+    elsif owner.class.name == 'Recurrence'
+      object_title = "Recurring #{owner.form_type}"
+      name_of_controller = owner.form_type.downcase.pluralize
+    else
+      object_title = owner.class.name
+    end
+
+    notify_privileges = AccessControl.where(
+      :action => 'notify',
+      :entry  => name_of_controller)
+      .map{|x| x.privileges.map(&:id)}.flatten
+    notifiers = User.preload(:privileges)
+      .where("disable is null or disable = 0")
+      .keep_if{|x| x.privileges.map(&:id) & notify_privileges != []}
+
+    notifiers.each do |user|
+      notify(owner, notice: {
+        users_id: user.id,
+        content: "A new #{object_title} has been created with ID ##{owner.id}."},
+        mailer: true, subject: "New #{object_title} created in ProSafeT")
+    end
+  end
+
+
   #############################
   ####    SHARED FORMS     ####
   #############################

@@ -95,6 +95,7 @@ class HazardsController < ApplicationController
     @hazard = Hazard.create(params[:hazard])
     @hazard.status = 'New'
     @hazard.save
+    notify_on_object_creation(@hazard)
     redirect_to @hazard
   end
 

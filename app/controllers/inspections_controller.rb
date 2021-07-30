@@ -87,6 +87,7 @@ class InspectionsController < SafetyAssuranceController
 
     end
     if @inspection.save
+      notify_on_object_creation(@inspection)
       redirect_to inspection_path(@inspection),  flash: {success: "Inspection created."}
     end
   end

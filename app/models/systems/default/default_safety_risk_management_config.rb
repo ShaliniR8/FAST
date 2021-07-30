@@ -457,7 +457,7 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit pdf view_parent attach_in_message expand_all],
+          *%i[delete override_status edit pdf attach_in_message expand_all],
           #INLINE
           *%i[complete_safety_plan evaluate reopen comment contact task cost],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({

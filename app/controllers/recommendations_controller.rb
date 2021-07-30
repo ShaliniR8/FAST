@@ -90,7 +90,7 @@ class RecommendationsController < SafetyAssuranceController
     else # from Launch Object
       @recommendation = @parent.recommendations.create(params[:recommendation])
     end
-
+    notify_on_object_creation(@recommendation)
     redirect_to @recommendation, flash: {success: "Recommendation created."}
   end
 

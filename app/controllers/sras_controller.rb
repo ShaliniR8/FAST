@@ -93,6 +93,7 @@ class SrasController < ApplicationController
       connection.save
     end
     if @sra.save
+      notify_on_object_creation(@sra)
       redirect_to sra_path(@sra), flash: {success: "SRA (SRM) created."}
     end
   end

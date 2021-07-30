@@ -79,6 +79,7 @@ class CorrectiveActionsController < ApplicationController
     @owner = CorrectiveAction.new(params[:corrective_action])
     @owner.status = "New"
     if @owner.save
+      notify_on_object_creation(@owner)
       if @owner.submissions_id.present?
         redirect_to submission_path(Submission.find(@owner.submissions_id)), flash: {success: "Corrective Action created."}
       else
