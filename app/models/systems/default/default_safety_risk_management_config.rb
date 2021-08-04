@@ -312,6 +312,11 @@ class DefaultSafetyRiskManagementConfig
           status: { default: true },
           created_by: { default: true },
           title: { default: true },
+          source: {
+            field: 'get_source', title: 'Source of Input',
+            num_cols: 6, type: 'text', visible: 'index,show',
+            required: false
+          },
           departments: {
             field: 'departments', title: 'Department',
             num_cols: 6, type: 'select', visible: 'form,index,show',
@@ -391,7 +396,7 @@ class DefaultSafetyRiskManagementConfig
       },
       'SafetyPlan' => {
         title: 'Safety Plan',
-        status: ['New', 'Assigned', 'Pending Approval', 'Completed', 'Overdue', 'All'],
+        status: ['New', 'Evaluated', 'Completed', 'All'],
         fields: {
           id: { default: true,
             required: true
@@ -499,7 +504,8 @@ class DefaultSafetyRiskManagementConfig
     menu_items: {
       'Sra' => {
         title: 'SRA (SRM)', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('Sra'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'sras_path(status: "New")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Sra'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},

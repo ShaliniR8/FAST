@@ -9,7 +9,7 @@ class Signature < ActiveRecord::Base
     visible_fields = (args.empty? ? ['form', 'show'] : args)
     [
       {field: 'id',           title: 'ID',              num_cols: 6,    type: 'text',   visible: 'index',     required: false },
-      {field: 'signee_name',  title: 'Signee Name',     num_cols: 6,    type: 'text',   visible: 'show,form', required: true },
+      {field: 'signee_name',  title: 'Signee Name',     num_cols: 6,    type: 'text',   visible: 'show,form', required: true, censor_deid: true },
       {field: 'created_at',   title: 'Date Signed',     num_cols: 6,    type: 'date',   visible: 'show',      required: false }
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end

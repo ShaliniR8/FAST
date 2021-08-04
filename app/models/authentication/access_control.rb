@@ -136,7 +136,8 @@ class AccessControl < ActiveRecord::Base
         "show"                => generate_desc("FAA Report", "show"),
         "edit"                => generate_desc("FAA Report", "edit"),
         "index"               => generate_desc("FAA Report", "index"),
-        "enhance" => "This gives the user access to add and edit Safety Enhancements in the FAA Report.",
+        "destroy"             => generate_desc("FAA Report", "destroy"),
+        "enhance"             => "This gives the user access to add and edit Safety Enhancements in the FAA Report.",
       },
 
       "corrective_actions"=>{
@@ -397,8 +398,8 @@ class AccessControl < ActiveRecord::Base
         "View"=>"show",
         "Edit"=>"edit",
         "Listing"=>"index",
-        "Safety Enhancement"=>"enhance",
-        "Admin"=>"admin"
+        "Delete"=>"destroy",
+        "Safety Enhancement"=>"enhance"
       },
       "corrective_actions"=>{
         "New"=>"new",

@@ -12,7 +12,9 @@
             <b>FAA Quarterly Reports</b>
           </div>
           <div class="top_buttons pull-right">
-          <%=link_to "New",new_faa_report_path,:class=>"btn btn-success pull-right new_faa_report"%>
+          <%if current_user.has_access('faa_reports', 'new', admin: CONFIG::GENERAL[:global_admin_default])%>
+            <%=link_to "New",new_faa_report_path,:class=>"btn btn-success pull-right new_faa_report"%>
+          <%end%>
         </div>
         </div>
       </div>

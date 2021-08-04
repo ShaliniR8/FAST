@@ -101,6 +101,14 @@ javascript:
     });
   }
 
+  function hideSourceColumnSearchField() {
+    $('#records_table tfoot tr th').each(function(index){
+      if ("#{@source_column_indices}".includes(index)){
+        $(this).children().hide();
+      }
+    })
+  }
+
   function hideActionColumnSearchField() {
     $('#records_table tfoot tr th:last-child').children().hide();
   }
@@ -146,6 +154,7 @@ javascript:
   function drawTableCallBack() {
     addIndividualColumnSearchField();
     hideActionColumnSearchField();
+    // hideSourceColumnSearchField()
     alignExportBtns();
     loadMatrixColor();
     $('#loader1').hide();

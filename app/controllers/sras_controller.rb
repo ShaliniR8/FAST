@@ -262,6 +262,25 @@ class SrasController < ApplicationController
     @description_headers = Cause.get_meta_fields('show')
     @agenda_headers = SrmAgenda.get_headers
     @sra = Sra.find(params[:id])
+
+    related_user_ids = []
+    related_user_ids << @sra.created_by_id
+    if @sra.responsible_user_id.present?
+      related_user_ids << @sra.responsible_user_id
+    end
+    if @sra.reviewer_id.present?
+      related_user_ids << @sra.reviewer_id
+    end
+    if @sra.approver_id.present?
+      related_user_ids << @sra.approver_id
+    end
+
+    has_access = (current_user.has_access('sras', 'show', admin: CONFIG::GENERAL[:global_admin_default]) &&
+                 related_user_ids.include?(current_user.id)) ||
+                 current_user.has_access('sras', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    redirect_to errors_path unless has_access
+
+
     @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
     @owner = @sra
     load_options

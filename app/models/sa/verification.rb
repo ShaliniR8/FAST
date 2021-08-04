@@ -16,11 +16,11 @@ class Verification < ProsafetBase
     [
       {field: 'verify_date',            title: 'Verification Date',   num_cols: 6,  type: 'date',            visible: 'index,form,show,auto',     required: true},
       {field: 'detail',                 title: 'Verification Detail', num_cols: 12, type: 'textarea',        visible: 'index,form,show',          required: true},
-      {field: 'additional_validators',  title: 'Validators',          num_cols: 12, type: 'select_multiple', visible: 'index,form,show',          required: true,  options: get_user_list, print_field: 'get_validators_names'},
+      {field: 'additional_validators',  title: 'Validators',          num_cols: 12, type: 'select_multiple', visible: 'index,form,show',          required: true,  options: get_user_list, print_field: 'get_validators_names', censor_deid: true},
       {field: 'status',                 title: 'Status',              num_cols: 6,  type: 'select',          visible: 'index,show,address',       required: false, options: get_result_options},
       {field: 'address_date',           title: 'Date Addressed',      num_cols: 6,  type: 'date',            visible: 'index,show,auto',          required: false},
       {field: 'address_comment',        title: 'Comment',             num_cols: 12, type: 'textarea',        visible: 'index,show,address',       required: false},
-      {field: 'get_all_validators',         title: 'Validators',          num_cols: 12, type: 'user',            visible: 'auto',                     required: false},
+      {field: 'get_all_validators',     title: 'Validators',          num_cols: 12, type: 'user',            visible: 'auto',                     required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

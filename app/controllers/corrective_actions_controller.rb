@@ -93,6 +93,21 @@ class CorrectiveActionsController < ApplicationController
   def show
     @fields = CorrectiveAction.get_meta_fields('show')
     @corrective_action = CorrectiveAction.find(params[:id])
+
+    related_user_ids = []
+    related_user_ids << @corrective_action.created_by_id
+    if @corrective_action.responsible_user_id.present?
+      related_user_ids << @corrective_action.responsible_user_id
+    end
+    if @corrective_action.approver_id.present?
+      related_user_ids << @corrective_action.approver_id
+    end
+
+    has_access = (current_user.has_access('corrective_actions', 'show', admin: CONFIG::GENERAL[:global_admin_default]) &&
+                 related_user_ids.include?(current_user.id)) ||
+                 current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    redirect_to errors_path unless has_access
+
     @report = ''
     @record = ''
     if @corrective_action.report.present?

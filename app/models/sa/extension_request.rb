@@ -14,7 +14,7 @@ class ExtensionRequest < ActiveRecord::Base
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
       {field: 'request_date',     title: 'Date Requested',  num_cols: 6,  type: 'date',     visible: 'index,show',          required: true},
-      {field: 'requester_id',     title: 'Requested By',    num_cols: 6,  type: 'user',     visible: 'index,show',          required: true},
+      {field: 'requester_id',     title: 'Requested By',    num_cols: 6,  type: 'user',     visible: 'index,show',          required: true, censor_deid: true},
       {field: 'detail',           title: 'Request Detail',  num_cols: 12, type: 'textarea', visible: 'index,form,show',     required: true},
       {field: 'status',           title: 'Status',          num_cols: 6,  type: 'select',   visible: 'index,show,address',  required: false, options: get_result_options},
       {field: 'address_date',     title: 'Date Addressed',  num_cols: 6,  type: 'date',     visible: 'index,show',          required: false},

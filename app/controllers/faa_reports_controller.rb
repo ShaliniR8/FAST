@@ -139,6 +139,10 @@ class FaaReportsController < ApplicationController
 
   def show
     @report = FaaReport.find(params[:id])
+
+    report_access = current_user.has_access('faa_reports', 'show', admin: CONFIG::GENERAL[:global_admin_default])
+    redirect_to errors_path unless report_access
+
     asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.report_type.present? && x.template.report_type == "asap") &&

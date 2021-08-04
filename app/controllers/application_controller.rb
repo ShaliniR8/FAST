@@ -44,6 +44,10 @@ class ApplicationController < ActionController::Base
       (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
     }.select(&:present?)
 
+    @source_column_indices = @column_titles.map.with_index { |val, inx|
+      (val.downcase.include?('source of input')) ? inx : nil
+    }.select(&:present?)
+
     @advance_search_params = params
 
     render 'forms/index'
