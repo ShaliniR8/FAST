@@ -21,7 +21,7 @@
         <td><%= child.spawn_id > 0 ? child.spawn_id : nil %> </td>
         <td><%= child.responsible_user == nil ? 'Unassigned' :  child.responsible_user.full_name %></td> 
         <td><%= child.due_date%></td> 
-        <td><%= child.close_date %></td> 
+        <td><%= child.close_date.present? ? child.close_date.in_time_zone(CONFIG::GENERAL[:time_zone]).strftime("%D %T") : '' %></td>
       </tr>
     <%end%>          
   </tbody>

@@ -16,7 +16,7 @@
               Year <%=@report.year%>, <%=@report.get_fiscal_quarter%>
             </div>
             <div class="top_buttons pull-right">
-              <%if current_user.has_access('faa_reports', 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
+              <%if current_user.has_access('faa_reports', 'destroy', admin: CONFIG::GENERAL[:global_admin_default])%>
                 <%=link_to "Delete",
                   faa_report_path(@report),
                   :method => "delete",

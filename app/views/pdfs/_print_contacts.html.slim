@@ -3,7 +3,8 @@
     hr
     .title
       = "Contact ##{contact.id}"
-      = contact.contact_name
+      / = contact.contact_name
+      = defined?(deidentified) ? (deidentified.present? && (deidentified == "true" || deidentified == '(de-identified)')) ? '' : contact.contact_name : contact.contact_name
     .content
       - fields = Contact.get_meta_fields('show')
       = render '/pdfs/print_fields',

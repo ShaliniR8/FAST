@@ -391,16 +391,26 @@ class ReportsController < ApplicationController
     @title = "Included Reports"
     @table_name = "reports"
 
-    has_access = current_user.has_access(@table_name, @action, admin: CONFIG::GENERAL[:global_admin_default]) ||
-                 current_user.has_access(@table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
-    redirect_to errors_path unless has_access
-
     @i18nbase = 'sr.event'
     @report = Report.preload(records: [:attachments, :occurrences]).find(params[:id])
     @owner = @report
     @headers = Record.get_headers
-
     @records = @report.records
+
+    template_access = true
+    all_templates = (current_user.get_all_templates_hash[:full] + current_user.get_all_templates_hash[:viewer]).uniq
+    report_record_templates = @records.map{|r| r.template.present? ? r.template.name : nil}
+    report_record_templates.each do |rtemp|
+      if all_templates.exclude?(rtemp)
+        template_access = false
+        break
+      end
+    end
+
+    has_access = (current_user.has_access(@table_name, @action, admin: CONFIG::GENERAL[:global_admin_default]) && template_access) ||
+                 current_user.has_access(@table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    redirect_to errors_path unless has_access
+
     @asap_found = false
     if @records.present?
       @records.each do |rec|

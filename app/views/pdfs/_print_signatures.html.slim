@@ -6,8 +6,12 @@
         ul.content
           - fields = Signature.get_meta_fields('show')
           li
-            b Signee Name:
-            =< signature.signee_name
-            br
-            b Date Signed:
-            =< date_to_string(signature.created_at)
+            / b Signee Name:
+            / =< signature.signee_name
+            / br
+            / b Date Signed:
+            / =< date_to_string(signature.created_at)
+            = render '/pdfs/print_fields',
+              fields: fields,
+              owner: signature,
+              deidentified: deidentified

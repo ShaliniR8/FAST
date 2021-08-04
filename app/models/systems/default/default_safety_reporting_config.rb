@@ -472,12 +472,13 @@ class DefaultSafetyReportingConfig
       },
       'FAA Reports' => {
         title: 'FAA Reports', path: '#',
-        display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: CONFIG::GENERAL[:global_admin_default])},
+        display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: CONFIG::GENERAL[:global_admin_default]) ||
+                                   user.has_access('faa_reports', 'new', admin: CONFIG::GENERAL[:global_admin_default])},
         subMenu: [
           {title: 'All', path: 'faa_reports_path',
-            display: proc{|user:,**op| true}},
+            display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: CONFIG::GENERAL[:global_admin_default])}},
           {title: 'New', path: 'new_faa_report_path',
-            display: proc{|user:,**op| true}},
+            display: proc{|user:,**op| user.has_access('faa_reports', 'new', admin: CONFIG::GENERAL[:global_admin_default])}},
         ]
       },
       'Query Center' => {
