@@ -14,8 +14,8 @@
         .panel.panel-warning
           .panel-heading
             .panel-title
-              = "#{action_name.titleize} Checklist"
-              h5.pull-right#auto-save style="visibility: hidden;" = "Auto Save enabled"
+              = "Address Checklist to be tied-in to Audit"
+              = hidden_field_tag 'commit', 'Create Audit', class: 'changed'
 
           .panel-body style="height: calc(85vh - 210px);overflow-y:auto"
             .col-xs-12
@@ -79,8 +79,6 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
-    autoSaveText = document.getElementById('auto-save');
-
     $("#table-view-#{@record.id}").DataTable({
       "paging":   false,
       /* Disable initial sort */
@@ -96,29 +94,4 @@ javascript:
       "aLengthMenu": [[1, -1], [1, "All"]],
       "iDisplayLength": -1,
     })
-
-    function autosave() {
-      $.ajax({
-        type: "POST",
-        url: $('form').attr('action'),
-        data: $('form').serialize(),
-        dataType: "script"
-      });
-    }
-
-    runAutosave = setInterval(autosave, 60000);
-    setInterval(function() {
-      autoSaveText.style.visibility = (autoSaveText.style.visibility == 'hidden' ? '' : 'hidden');
-    }, 1000);
-
-    $(window).on('beforeunload', function(){
-      clearInterval(runAutosave)
-      return true;
-    });
-
-    $(document).on("submit", "form", function(event){
-        // disable unload warning
-        $(window).off('beforeunload');
-    });
-
   })

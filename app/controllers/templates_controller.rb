@@ -92,7 +92,9 @@ class TemplatesController < ApplicationController
 
   def destroy
     template = Template.find(params[:id])
+    template_name = template.name
     template.destroy
+    AccessControl.where(entry: template_name).map(&:destroy)
     redirect_to templates_path
   end
 

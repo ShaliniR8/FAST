@@ -21,7 +21,7 @@
             </thead>
             <tbody>
               <%@report.issues.each do |i|%>
-                <tr data-toggle='modal'
+                <tr data-toggle='<%=@data_toggle%>'
                   data-target='.bs-example-modal-lg'
                   route='<%=edit_enhancement_faa_report_path(@report, :enhancement => i.id)%>'>
                   <%Issue.get_meta_fields('show').each do |header|%>
@@ -44,18 +44,20 @@
 
     $("#enhancement_table").dataTable();
 
-    $("#enhancement_table tbody").on('click', 'tr', function(){
-      $.get($(this).attr('route'),function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
+    if (<%=@report_edit_access%> == true) {
+      $("#enhancement_table tbody").on('click', 'tr', function(){
+        $.get($(this).attr('route'),function(data){
+          $(".modal-content").html(data);
+          $(window).trigger('resize');
+        });
       });
-    });
 
-    $(".edit_se_btn").on("click", function(){
-      $.get($(this).attr("route"), function(data){
-        $(".modal-content").html(data);
-        $(window).trigger("resize");
+      $(".edit_se_btn").on("click", function(){
+        $.get($(this).attr("route"), function(data){
+          $(".modal-content").html(data);
+          $(window).trigger("resize");
+        });
       });
-    });
+    }
   });
 </script>

@@ -52,6 +52,9 @@ class DefaultMobileConfig
     rjet_dir:          { label: 'Login with ProSafeT',           subdomain: 'rjet'},
     rjet_sso:          { label: 'SSO',                           subdomain: 'rjet',           sso: true},
 
+    #Eulen Portals
+    eulen_general_dir:    { label: 'Login with ProSafeT', subdomain: 'eulen' },
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -157,6 +160,14 @@ class DefaultMobileConfig
       portals: %i[
         rjet_dir
         rjet_sso
+      ]
+    },
+
+
+    'EULEN Key' =>{ # 8DD7-B9B3-F409-3A49
+      key_name: 'Grupo Eulen',
+      portals: %i[
+        eulen_general_dir
       ]
     },
 

@@ -20,6 +20,8 @@ class ChecklistsController < ApplicationController
 
   before_filter :login_required, :set_table
 
+  include Concerns::Mobile # used for [method]_as_json
+
   def set_table
     @table = Object.const_get('Checklist')
   end
@@ -31,26 +33,197 @@ class ChecklistsController < ApplicationController
   end
 
   def new
-    @checklist_templates = @table.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
+    if params[:owner_type].present? && params[:owner_type] != 'ChecklistHeader'
+      has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+      if has_admin_access
+        @checklist_templates = @table.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
+      else
+        addressable_templates = current_user.get_all_checklist_addressable_templates
+        @checklist_templates = @table.where(:owner_type => 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}.map{|x| [x.title, x.id]}.to_h
+      end
+    else
+      @checklist_templates = @table.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
+    end
     @checklist_headers = ChecklistHeader.where(:status => 'Published').map{|x| [x.title, x.id]}.to_h
     @owner = Object.const_get("#{params[:owner_type]}").find(params[:owner_id]) rescue nil
     render :partial => 'form'
   end
 
   def create
-    @owner = Object.const_get("#{params[:checklist][:owner_type]}").find(params[:checklist][:owner_id])
-    @record = @table.create(params[:checklist])
-    if params[:checklist_upload].present?
-      @upload = File.open(params[:checklist_upload].tempfile)
-      case params[:checklist_upload].tempfile.content_type
-      when "application/xml", "text/xml"
-        upload_xml(@upload, @record)
-      else
-        upload_csv(@upload, @record)
+    if params[:commit].present? && params[:commit] == 'CreateChecklist'
+      create_audit_from_checklist(params, true)
+    else
+      @owner = Object.const_get("#{params[:checklist][:owner_type]}").find(params[:checklist][:owner_id])
+      @record = @table.create(params[:checklist])
+
+      if params[:checklist][:owner_type] == 'ChecklistHeader'
+        AccessControl.get_checklist_template_opts.map { |disp, db_val|
+          AccessControl.new({
+            list_type: 1,
+            action: db_val,
+            entry: @record[:title],
+            viewer_access: 1
+          }).save
+        }
       end
-      @record.assign_row_orders
+
+      if params[:checklist_upload].present?
+        @upload = File.open(params[:checklist_upload].tempfile)
+        case params[:checklist_upload].tempfile.content_type
+        when "application/xml", "text/xml"
+          upload_xml(@upload, @record)
+        else
+          upload_csv(@upload, @record)
+        end
+        @record.assign_row_orders
+      end
+      redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @owner
     end
-    redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @owner
+  end
+
+
+  def create_audit_from_checklist(params, from_mobile_app)
+    if from_mobile_app
+      param_sym = 'checklists_attributes'.to_sym
+    else
+      param_sym = 'checklist'.to_sym
+    end
+
+    if params[param_sym].present?
+      if params[param_sym][:id].present?
+        params[param_sym].delete(:id)
+      end
+
+      params[param_sym][:checklist_rows_attributes].each do |row_key, row_attributes|
+
+        if row_attributes[:attachments_attributes].present?
+
+          row_attributes[:attachments_attributes].each do |att_key, attachment|
+
+            # File is a base64 string
+            if attachment[:name].present? && attachment[:name].is_a?(Hash)
+              file_params = attachment[:name]
+
+              temp_file = Tempfile.new('file_upload')
+              temp_file.binmode
+              temp_file.write(Base64.decode64(file_params[:base64]))
+              temp_file.rewind()
+
+              file_name = file_params[:fileName]
+              mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+              uploaded_file = ActionDispatch::Http::UploadedFile.new(
+                :tempfile => temp_file,
+                :filename => file_name,
+                :type     => mime_type)
+
+              # Replace attachment parameter with the created file
+              params[param_sym][:checklist_rows_attributes][row_key][:attachments_attributes][att_key][:name] = uploaded_file
+            end
+          end
+        end
+      end
+    end
+
+    attributes = params[param_sym]
+    old_checklist = Checklist.find(params[:id])
+    new_checklist = old_checklist.dup
+    new_checklist.id = nil
+    new_checklist.owner_type = 'Audit'
+    saved = new_checklist.save
+    if saved
+      new_checklist.checklist_rows = []
+      old_checklist.checklist_rows.each do |row|
+        new_row = row.dup
+        new_row.id = nil
+        new_row.checklist_id = new_checklist.id
+        row_saved = new_row.save
+        if row_saved
+          new_row.checklist_cells = []
+          row.checklist_cells.each do |cell|
+            new_cell = cell.dup
+            new_cell.id = nil
+            new_cell.checklist_row_id = new_row.id
+            cell_saved = new_cell.save
+            if cell_saved
+              new_row.checklist_cells << new_cell
+            else
+              render :json => { success: 'Could not create audit from checklist' }
+            end
+          end
+          new_row.save
+        else
+          render :json => { success: 'Could not create audit from checklist' }
+        end
+        new_checklist.checklist_rows << new_row if new_row.checklist_cells.size > 0
+      end
+      final_save = new_checklist.save
+      if final_save
+        param_row_keys = attributes[:checklist_rows_attributes].keys
+
+        new_checklist.checklist_rows.each_with_index do |row, row_index|
+          attributes[:checklist_rows_attributes][row.id.to_s] = attributes[:checklist_rows_attributes].delete(param_row_keys[row_index].to_s)
+          attributes[:checklist_rows_attributes][row.id.to_s][:id] = row.id.to_s
+        end
+
+        new_checklist.checklist_rows.each do |row|
+          attributes[:checklist_rows_attributes].each do |key, value|
+            if key.to_s == row.id.to_s
+              param_cell_keys = value[:checklist_cells_attributes].keys rescue nil
+              if param_cell_keys.present?
+                new_cell_keys = row.checklist_cells.map(&:id)
+                new_cell_keys.each_with_index do |new_cell_key, cell_index|
+                  if from_mobile_app
+                    value[:checklist_cells_attributes][new_cell_key.to_s] = value[:checklist_cells_attributes].delete(param_cell_keys[cell_index].to_s)
+                    value[:checklist_cells_attributes][new_cell_key.to_s][:id] = new_cell_key.to_s
+                    if value[:checklist_cells_attributes][new_cell_key.to_s][:value].is_a?(Array)
+                      value[:checklist_cells_attributes][new_cell_key.to_s][:value] = value[:checklist_cells_attributes][new_cell_key.to_s][:value].join(';')
+                    end
+                  else
+                    if param_cell_keys.include?(cell_index.to_s)
+                      value[:checklist_cells_attributes][new_cell_key.to_s] = value[:checklist_cells_attributes].delete(cell_index.to_s)
+                      value[:checklist_cells_attributes][new_cell_key.to_s][:id] = new_cell_key.to_s
+                      if value[:checklist_cells_attributes][new_cell_key.to_s][:value].is_a?(Array)
+                        value[:checklist_cells_attributes][new_cell_key.to_s][:value] = value[:checklist_cells_attributes][new_cell_key.to_s][:value].join(';')
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        new_checklist.update_attributes(attributes)
+
+        audit_title = "Audit created on #{Time.now.to_date} to address checklist #{new_checklist.title} BY #{current_user.full_name}"
+        audit = Audit.create({title: audit_title, responsible_user_id: current_user.id, created_by_id: current_user.id, status: 'Assigned', open_date: Time.now})
+        new_checklist.owner_id = audit.id
+
+        audit.checklists = []
+        new_checklist.save
+        audit.checklists << new_checklist
+        audit.save
+
+        if from_mobile_app
+          render :json => { success: 'Created Audit' }
+        else
+          redirect_to audit_path(audit), flash: {success: 'Created Audit'}
+        end
+      else
+        if from_mobile_app
+          render :json => { success: 'Could not create audit from checklist' }
+        else
+          redirect_to checklists_path, flash: {danger: 'Could not create audit from checklist'}
+        end
+      end
+    else
+      if from_mobile_app
+        render :json => { success: 'Could not create audit from checklist' }
+      else
+        redirect_to checklists_path, flash: {danger: 'Could not create audit from checklist'}
+      end
+    end
   end
 
 
@@ -64,46 +237,58 @@ class ChecklistsController < ApplicationController
 
 
   def update
-    @record = @table.find(params[:id])
-    # Assignee update
-    if params.key?(:assignee_names)
-      user = User.find_by_full_name(params[:assignee_names])
-      if user.present?
-        params[:checklist][:assignee_ids] = user.id if user.present?
-      else
-        params[:checklist][:assignee_ids] = nil
-      end
+    if params[:commit].present? && params[:commit] == 'Create Audit'
+      create_audit_from_checklist(params, false)
     else
-      params[:checklist].delete(:assignee_ids) if params[:checklist].present? && params[:checklist].key?(:assignee_ids)
-    end
+      @record = @table.find(params[:id])
+      updated_name = params[:checklist][:title]
+      # Assignee update
+      if params.key?(:assignee_names)
+        user = User.find_by_full_name(params[:assignee_names])
+        if user.present?
+          params[:checklist][:assignee_ids] = user.id if user.present?
+        else
+          params[:checklist][:assignee_ids] = nil
+        end
+      else
+        params[:checklist].delete(:assignee_ids) if params[:checklist].present? && params[:checklist].key?(:assignee_ids)
+      end
 
-    # TODO: refactor needed
-    if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
-      params[:checklist][:checklist_rows_attributes].each do |x, y|
-        next if y[:checklist_cells_attributes].nil? # when update only attachments
-        y[:checklist_cells_attributes].each do |m, n|
-          n.each do |key, value|
-            if value.is_a?(Array)
-              n[:value].delete("")
-              n[:value] = n[:value].join(";")
+      # TODO: refactor needed
+      if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+        params[:checklist][:checklist_rows_attributes].each do |x, y|
+          next if y[:checklist_cells_attributes].nil? # when update only attachments
+          y[:checklist_cells_attributes].each do |m, n|
+            n.each do |key, value|
+              if value.is_a?(Array)
+                n[:value].delete("")
+                n[:value] = n[:value].join(";")
+              end
             end
           end
         end
       end
+      if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
+        AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
+      end
+      @record.update_attributes(params[:checklist])
+      @record.update_row_orders
+      redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner
     end
-
-    @record.update_attributes(params[:checklist])
-    @record.update_row_orders
-    redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner
   end
 
 
   def show
-    @fields = @table.get_meta_fields('show')
-    @record = @table.includes(
-      checklist_rows: { checklist_cells: :checklist_header_item },
-      checklist_header: :checklist_header_items,
-    ).find(params[:id])
+    respond_to do |format|
+      format.html do
+        @fields = @table.get_meta_fields('show')
+        @record = @table.includes(
+          checklist_rows: { checklist_cells: :checklist_header_item },
+          checklist_header: :checklist_header_items,
+        ).find(params[:id])
+      end
+      format.json { show_as_json }
+    end
   end
 
 
@@ -112,6 +297,25 @@ class ChecklistsController < ApplicationController
       checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
       checklist_header: :checklist_header_items,
     ).find(params[:id])
+  end
+
+
+  def select_checklists_raw
+    has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    if has_admin_access
+      @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader')
+    else
+      addressable_templates = current_user.get_all_checklist_addressable_templates
+      @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}
+    end
+  end
+
+
+  def address_raw
+    @record = @table.includes(
+      checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
+      checklist_header: :checklist_header_items,
+    ).find(params[:template])
   end
 
 
@@ -134,7 +338,9 @@ class ChecklistsController < ApplicationController
   def destroy
     checklist = @table.preload(:checklist_rows => :checklist_cells).find(params[:id])
     owner = checklist.owner
+    checklist_name = checklist.title
     checklist.destroy
+    AccessControl.where(entry: checklist_name).map(&:destroy)
     redirect_to owner.class.name == 'ChecklistHeader' ? checklists_path : owner
   end
 

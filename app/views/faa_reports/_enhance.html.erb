@@ -13,7 +13,7 @@
       <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
         <div class="row">
           <%=f.hidden_field :user_id, :value => current_user.id%>
-          <%=render "/forms/form_fields", :f => f, :fields => Issue.get_meta_fields('form')%>
+          <%=render "/forms/form_fields", :f => f, :fields => Issue.get_meta_fields('form'), :record => @issue%>
         </div>
         <%=f.submit "Save", :class => "btn btn-success pull-right mt5", :disable_with => "Saving..."%>
       </div>

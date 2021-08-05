@@ -13,10 +13,11 @@ namespace :recurring do
         freq_num = (Recurrence.month_count[recurrence.frequency])[:number]
         recurrence_interval = get_recurrence_interval(frequency, recurrence)
         template = type.find(recurrence.template_id) rescue nil
+        controller = ApplicationController.new
         if template.present?
           number_of_spawns = recurrence.number_of_recurrencies_per_interval rescue 1
           (1..number_of_spawns).each do |i|
-            @next_form = clone_template(template, recurrence)
+            @next_form = clone_template(template, recurrence, controller)
             if CONFIG.sa::GENERAL[:recurring_item_checklist] 
               @next_form.spawn_id = i
               @next_form.save!  
@@ -70,12 +71,24 @@ namespace :recurring do
     end
   end
 
-  def clone_template(template, recurrence)
+  def clone_template(template, recurrence, controller)
     next_form = template.clone
     next_form.due_date = template.due_date
     next_form.recurrence_id = recurrence.id
     next_form.template = false;
+    if recurrence.carryover_responsible_user.present?
+      next_form.status = 'Assigned'
+      next_form.open_date = Time.now
+    end
     next_form.save!
+    if recurrence.carryover_responsible_user.present?
+      controller.notify(next_form,
+        notice: {
+          users_id: next_form.responsible_user_id,
+          content: "#{recurrence.form_type} ##{next_form.id} has been assigned to you."},
+        mailer: true,
+        subject: "#{recurrence.form_type} Assigned")
+    end
     return next_form
   end
 end

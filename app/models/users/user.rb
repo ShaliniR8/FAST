@@ -99,6 +99,13 @@ class User < ActiveRecord::Base
   end
 
 
+  def get_all_checklist_addressable_templates
+    result = privileges.map(&:access_controls).flatten.select{ |x|
+      x[:action] == "all" || x[:action] == "address"
+    }.map{|x| x[:entry]}.uniq
+  end
+
+
   def has_template_access(template_name)
     all_access = self.get_all_access
     all_access = all_access.select{|x| x.entry==template_name}
@@ -127,10 +134,26 @@ class User < ActiveRecord::Base
           }
           accesses.update(accesses) { |key, val| val.uniq }
           session[:permissions] = accesses.to_json
+
+          return (admin && accesses.key?(con_name) && accesses[con_name].include?('admin')) ||
+            (accesses.key?(con_name) && accesses[con_name].include?(act_name))
         end
       rescue
-        return false #rescue for if session has expired
+        if permissions.nil?
+          accesses = Hash.new{ |h, k| h[k] = [] }
+          self.privileges.includes(:access_controls).map{ |priv|
+            priv.access_controls.each do |acs|
+              accesses[acs.entry] << acs.action
+            end
+          }
+          accesses.update(accesses) { |key, val| val.uniq }
+          # session[:permissions] = accesses.to_json
+
+          return (admin && accesses.key?(con_name) && accesses[con_name].include?('admin')) ||
+            (accesses.key?(con_name) && accesses[con_name].include?(act_name))
+        end
       end
+
       return (admin && permissions.key?('admin') && permissions['admin'].include?(con_name)) ||
         (permissions.key?(act_name) && permissions[act_name].include?(con_name))
     end
