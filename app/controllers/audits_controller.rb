@@ -80,7 +80,15 @@ class AuditsController < SafetyAssuranceController
     @owner = Audit.new
     load_options
     @fields = Audit.get_meta_fields('form')
-    @checklist_templates = Checklist.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
+
+    has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    if has_admin_access
+      @checklist_templates = Checklist.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
+    else
+      addressable_templates = current_user.get_all_checklist_addressable_templates
+      @checklist_templates = Checklist.where(:owner_type => 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}.map{|x| [x.title, x.id]}.to_h
+    end
+
     @checklist_headers = ChecklistHeader.where(:status => 'Published').map{|x| [x.title, x.id]}.to_h
   end
 
@@ -112,6 +120,15 @@ class AuditsController < SafetyAssuranceController
   def edit
     load_options
     @fields = Audit.get_meta_fields('form')
+  end
+
+
+  def complete
+    record = Audit.find(params[:id])
+    send_notification(record, 'Complete')
+    respond_to do |format|
+      format.json { complete_as_json }
+    end
   end
 
 

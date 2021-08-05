@@ -143,6 +143,8 @@ class FaaReportsController < ApplicationController
     report_access = current_user.has_access('faa_reports', 'show', admin: CONFIG::GENERAL[:global_admin_default])
     redirect_to errors_path unless report_access
 
+    @report_edit_access = current_user.has_access('faa_reports', 'edit', admin: CONFIG::GENERAL[:global_admin_default])
+    @data_toggle = @report_edit_access ? 'modal' : ''
     asap_reports = @report.select_records_in_date_range(@report.get_start_date, @report.get_end_date)
       .select{|x|
         (x.template.report_type.present? && x.template.report_type == "asap") &&

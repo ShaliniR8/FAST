@@ -691,6 +691,9 @@ class DefaultSafetyAssuranceConfig
             display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Audit'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New Recurring Audits', path: "new_recurrence_path(form_type: 'Audit')",
             display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Audit'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'Start Checklist', path: 'select_checklists_raw_checklists_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Checklist'), user, 'add', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Inspections' => {

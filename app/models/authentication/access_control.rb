@@ -40,41 +40,55 @@ class AccessControl < ActiveRecord::Base
 
 
   def self.generate_desc(type, action)
-    case action
-    when "new"
-      "This gives the user access to create new #{type}s"
-    when "show"
-      if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
-        "This gives the user access to view details about an #{type}."
+    case type
+    when 'Checklist'
+      case action
+      when 'add'
+        "This allows the user to add a #{type} to an Audit"
+      when 'edit'
+        "This allows the user to edit a #{type} that has been added to an Audit"
+      when 'destroy'
+        "This allows the user to delete a #{type} that has been added to an Audit"
       else
-        "This gives the user access to view details about a #{type}."
-      end
-    when "edit"
-      "This gives the user access to see the \"Edit\" button on the #{type} page and to edit the #{type}."
-    when "destroy"
-      if type.downcase == "document"
-        "This gives the user access to see the red \"X\" buttons on the #{type} page and to delete a #{type}."
-      else
-        "This gives the user access to see the \"Delete\" button on the #{type} page and to delete the #{type}."
-      end
-    when "index"
-      "This gives the user access to see a listing of all the #{type}s in the #{type} table."
-    when "viewer"
-      "This gives the user access to see all viewer access enabled #{type}s."
-    when "module"
-      "This gives the user access to the #{type} Module from the gateway page."
-    when 'admin'
-      "This gives the user full access to viewing, editing, and creating #{type}s."
-    when 'override'
-      "This gives the user access to see the \"Override\" button on the #{type} page and the ability to delete the #{type}."
-    when 'notify'
-      if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
-        "Users with this access rule will be notified when an #{type} is created."
-      else
-        "Users with this access rule will be notified when a #{type} is created."
+        ""
       end
     else
-      ""
+      case action
+      when "new"
+        "This gives the user access to create new #{type}s"
+      when "show"
+        if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
+          "This gives the user access to view details about an #{type}."
+        else
+          "This gives the user access to view details about a #{type}."
+        end
+      when "edit"
+        "This gives the user access to see the \"Edit\" button on the #{type} page and to edit the #{type}."
+      when "destroy"
+        if type.downcase == "document"
+          "This gives the user access to see the red \"X\" buttons on the #{type} page and to delete a #{type}."
+        else
+          "This gives the user access to see the \"Delete\" button on the #{type} page and to delete the #{type}."
+        end
+      when "index"
+        "This gives the user access to see a listing of all the #{type}s in the #{type} table."
+      when "viewer"
+        "This gives the user access to see all viewer access enabled #{type}s."
+      when "module"
+        "This gives the user access to the #{type} Module from the gateway page."
+      when 'admin'
+        "This gives the user full access to viewing, editing, and creating #{type}s."
+      when 'override'
+        "This gives the user access to see the \"Override\" button on the #{type} page and the ability to delete the #{type}."
+      when 'notify'
+        if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
+          "Users with this access rule will be notified when an #{type} is created."
+        else
+          "Users with this access rule will be notified when a #{type} is created."
+        end
+      else
+        ""
+      end
     end
   end
 
@@ -83,10 +97,11 @@ class AccessControl < ActiveRecord::Base
     {
       "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
       "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
-      "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations'],
+      "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations', 'checklists'],
       "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings', 'Safety Risk Management'],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
+      "checklist_templates" => Checklist.where(owner_type: 'ChecklistHeader').map(&:title),
     }
   end
 
@@ -232,6 +247,12 @@ class AccessControl < ActiveRecord::Base
         'admin'               => generate_desc('Recommendation', 'admin'),
         "override"            => generate_desc("Recommendation", "override"),
         "notify"              => generate_desc("Recommendation", "notify"),
+      },
+
+      "checklists"=>{
+        "add"                 => generate_desc("Checklist", "add"),
+        "edit"                => generate_desc("Checklist", "edit"),
+        "destroy"             => generate_desc("Checklist", "destroy"),
       },
 
       'sras'=>{
@@ -493,6 +514,12 @@ class AccessControl < ActiveRecord::Base
         "Override" => 'override',
         "Notify" => 'notify'
       },
+      "checklists"=>{
+        "Add"=>"add",
+        "Edit"=>"edit",
+        "Delete"=>"destroy",
+        'Admin'=>'admin'
+      },
       'sras'=>{
         "New"=>"new",
         "View"=>"show",
@@ -601,10 +628,14 @@ class AccessControl < ActiveRecord::Base
     h["New"] = "new"
     h["View"] = "show"
     h["Edit"] = "edit"
+    h["Add"] = "add"
     h["Delete"] = "destroy"
     h["De-Identified"] = "deid"
     h["Listing"] = "index"
     h["Query"] = "query"
+    h["Viewable"] = "viewable"
+    h["Address"] = "address"
+    h["All"] = "all"
     h["Viewer"] = "viewer"
     h["Full"] = "full"
     h["Notifier"] = "notifier"
@@ -641,6 +672,7 @@ class AccessControl < ActiveRecord::Base
       "Findings"                              => "findings",
       "Corrective Actions(Safety Assurance)"  => "sms_actions",
       "Recommendations"                       => "recommendations",
+      "Checklists"                            => "checklists",
       "SRAs"                                  => "sras",
       "Hazards"                               => "hazards",
       "Risk Controls"                         => "risk_controls",
@@ -692,6 +724,17 @@ class AccessControl < ActiveRecord::Base
   end
 
 
+  def self.get_checklist_template_opts
+    h = Hash.new
+
+    h["Address"] = "address"
+    h["Viewable"] = "viewable"
+    h["All"] = "all"
+
+    return h
+  end
+
+
 
   def get_type
     self.viewer_access ?  "Form Access" : (self.list_type ? "Allow List" : "Block List")
@@ -719,7 +762,11 @@ class AccessControl < ActiveRecord::Base
     if self.class.get_descriptions[self.entry].present? && self.class.get_descriptions[self.entry][self.action].present?
       self.class.get_descriptions[self.entry][self.action]
     else
-      get_template_desc(self.entry, self.action)
+      if ["address", "viewable", "all"].include?(self.action)
+        get_checklist_template_desc(self.entry, self.action)
+      else
+        get_template_desc(self.entry, self.action)
+      end
     end
   end
 
@@ -737,6 +784,20 @@ class AccessControl < ActiveRecord::Base
       "This gives the user full access to #{template_name} and allows the user to create Submissions/Reports and edit Reports. Please note that access to creating/editing Submissions/Reports is also required."
     when "confidential"
       "This gives the user access to view the #{template_name} that are confidential."
+    else
+      ""
+    end
+  end
+
+
+  def get_checklist_template_desc(checklist_template_name, action)
+    case action
+    when "viewable"
+      "This gives the user access to view a checklist of type #{checklist_template_name} ."
+    when "address"
+      "This gives the user access to address a checklist of type #{checklist_template_name}."
+    when "all"
+      "This gives the user complete access to #{checklist_template_name} and allows the user to view and address any checklist of this type."
     else
       ""
     end

@@ -8,12 +8,22 @@ class Checklist < ActiveRecord::Base
 
   accepts_nested_attributes_for :checklist_rows, allow_destroy: true
 
+  after_save :update_checklist_completion
+
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
       {field: 'id',    title: 'ID',    num_cols: 12,  type: 'text', visible: 'index,show',      required: false},
       {field: 'title', title: 'Title', num_cols: 12,  type: 'text', visible: 'index,form,show', required: true},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
+  end
+
+  def self.rule_name
+    self.name.demodulize.underscore.pluralize
+  end
+
+  def rule_name
+    self.class.name.demodulize.underscore.pluralize
   end
 
   def assignees
@@ -46,9 +56,34 @@ class Checklist < ActiveRecord::Base
     end
   end
 
+
+  def update_checklist_completion
+    all_valid_cells = checklist_rows.map{|row| !row.is_header? ? row.checklist_cells : []}.flatten
+                      .keep_if {|cell| cell.present? && cell.checklist_header_item.present? && cell.checklist_header_item.editable.present?}
+
+    completion_percentage = 0.0
+    if all_valid_cells.count > 0
+      count = 0
+      all_valid_cells.each do |cell|
+        if cell.present? && cell.value.present?
+          count = count + 1
+        end
+      end
+      completion_percentage = (count.to_f/all_valid_cells.count)*100
+      Rails.logger.debug "PERCENTAGE COMPLETED: #{completion_percentage}"
+    end
+    if completion_percentage != 0.0
+      Checklist.skip_callback(:save, :after, :update_checklist_completion)
+      update_attributes({completion_percentage: completion_percentage})
+      Checklist.set_callback(:save, :after, :update_checklist_completion)
+    end
+  end
+
+
   def row_orders_updated?
     checklist_rows.map(&:row_order).uniq != [1000]
   end
+
 
   def update_row_orders
     if row_orders_updated?

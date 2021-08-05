@@ -11,7 +11,7 @@ module Concerns
 
       def index_as_json
         fetch_months = current_user.mobile_fetch_months
-        @records = fetch_months > 0 ? Audit.where('created_at > ?', Time.now - fetch_months.months)
+        @records = fetch_months > 0 ? Audit.where("created_at > ? AND status != ?", Time.now - fetch_months.months, "New")
           : Audit.all
 
         @records = @records.keep_if{|x| x[:template].nil? || !x[:template]}
@@ -42,6 +42,14 @@ module Concerns
 
         # Convert to id map for fast audit lookup
         json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :due_date])
+
+        has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+        if has_admin_access
+          json[:checklists] = array_to_id_map Checklist.where(owner_type: 'ChecklistHeader')
+        else
+          addressable_templates = current_user.get_all_checklist_addressable_templates
+          json[:checklists] = array_to_id_map Checklist.where(owner_type: 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}.as_json
+        end
 
         # Get ids of the 3 most recent assigned audits
         recent_audits = @records.keep_if{ |audit| audit[:status] == 'Assigned' }
@@ -81,7 +89,7 @@ module Concerns
           only: whitelisted_fields,
           include: { # Include checklist data required for mobile
             checklists: {
-              only: [:id, :title],
+              only: [:id, :title, :completion_percentage],
               include: {
                 checklist_header: {
                   only: :id,
@@ -180,6 +188,30 @@ module Concerns
         end
 
         json
+      end
+
+      def complete_as_json
+        record = Audit.find(params[:id])
+        record.comment = params[:auditor_comment][:inputText].to_s
+        if !record.approver
+          record.status = 'Completed'
+          record.close_date = Time.now
+        else
+          record.status = 'Pending Approval'
+        end
+
+        Transaction.build_for(
+          record,
+          'Complete',
+          current_user.id,
+          params[:auditor_comment][:inputText].to_s,
+          nil,
+          current_user,
+          session[:platform]
+        )
+
+        saved = record.save
+        render :json => { :success => saved ? 'Audit Completed.' : 'Audit could not be completed' }, :status => 200
       end
 
     end

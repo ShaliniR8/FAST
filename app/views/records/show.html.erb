@@ -240,7 +240,7 @@
             # show_submitter_name is FALSE and current_user is global admin
             # cond1 = !CONFIG.sr::GENERAL[:show_submitter_name] && current_user.global_admin?
             # show_submitter_name is TRUE and current_user had full access
-            if CONFIG.sr::GENERAL[:show_submitter_name] || current_user.global_admin?
+            if CONFIG.sr::GENERAL[:show_submitter_name] || (CONFIG::GENERAL[:global_admin_default] && current_user.global_admin?)
               template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
               meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.users_id == current_user.id
             end

@@ -216,6 +216,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'export'
     end
     collection do
+      get 'address_raw'
+      get 'select_checklists_raw'
       get 'retract_form_upload'
       get 'retract_form_template'
       post 'add_template'
@@ -497,6 +499,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'load_records'
       get "advanced_search"
       post "get_dataset"
+      post 'complete'
     end
   end
   resources :inspections do

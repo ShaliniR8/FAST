@@ -27,7 +27,7 @@
               .col-xs-2.mt5
                 = f.label :title, 'Checklist Name', class: 'pull-right'
               .col-xs-8
-                = f.text_field :title, class: 'form-control pull-left'
+                = f.text_field :title, class: 'form-control pull-left changed'
 
             - if @record.owner_type != 'ChecklistHeader'
               .col-xs-12.form-group.mb10

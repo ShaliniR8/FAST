@@ -12,7 +12,7 @@
       <div class="row col-xs-12">
         <div class="col-sm-5">
           <%=f.label :entry, "Report Type"%>
-          <%=f.select :entry, (options_for_select(@entry_options) + options_from_collection_for_select(@templates,'name','name')), {:include_blank => ""}, {:class => 'form-control', :id => "module_select"}%>
+          <%=f.select :entry, (options_for_select(@entry_options) + options_from_collection_for_select(@templates,'name','name') + options_from_collection_for_select(@checklist_templates,'title','title')), {:include_blank => ""}, {:class => 'form-control', :id => "module_select"}%>
         </div>
         <div class="col-sm-5">
           <%=f.label :action,"Action"%>

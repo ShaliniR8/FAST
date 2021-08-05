@@ -27,6 +27,7 @@ class AccessControlsController < ApplicationController
 
   def new
     @templates = Template.find(:all)
+    @checklist_templates = Checklist.where(owner_type: 'ChecklistHeader')
     @new_access = AccessControl.new
     @entry_options = AccessControl.entry_options
     @action_options = AccessControl.action_options
@@ -78,8 +79,13 @@ class AccessControlsController < ApplicationController
       @options = meta[params[:opt]]
       @is_temp = "1"
     else
-      @options = AccessControl.get_template_opts
-      @is_temp = "2"
+      if Template.all.map(&:name).include?(params[:opt])
+        @options = AccessControl.get_template_opts
+        @is_temp = "2"
+      else
+        @options = AccessControl.get_checklist_template_opts
+        @is_temp = "3"
+      end
     end
     render :partial => 'options'
   end

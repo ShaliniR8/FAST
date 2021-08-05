@@ -39,7 +39,13 @@ class QueriesController < ApplicationController
 
     query_file_path = "/public/queries/#{params[:id]}.yml"
     query_file_full_path = File.join([Rails.root] + [query_file_path])
-    File.delete(query_file_full_path)
+    query_processing_file_full_path = query_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+
+    if File.exist? query_processing_file_full_path
+      FileUtils.rm_rf(query_processing_file_full_path)
+    elsif File.exist? query_file_full_path
+      FileUtils.rm_rf(query_file_full_path)
+    end
 
     redirect_to @owner
   end
@@ -160,7 +166,11 @@ class QueriesController < ApplicationController
     @owner.update_attributes(params[:query])
     @owner.query_conditions.destroy_all
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
-    redirect_to query_path(@owner)
+    if CONFIG::GENERAL[:query_processing_in_rake_task]
+      refresh_query
+    else
+      redirect_to query_path(@owner)
+    end
   end
 
 

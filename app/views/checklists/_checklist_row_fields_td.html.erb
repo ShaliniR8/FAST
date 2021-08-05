@@ -7,12 +7,12 @@
 <td>
   <%="(##{checklist_cell.id}) " if Rails.env.development?%>
   <%=f.hidden_field :id, value: checklist_cell.id, class: 'cell-id'%>
-  <%if !header_item.editable && action_name == 'address' ||
-        (action_name == 'address' && checklist_cell.checklist_row.is_header rescue true)%>
+  <%if !header_item.editable && ["address", "address_raw"].include?(action_name) ||
+        (["address", "address_raw"].include?(action_name) && checklist_cell.checklist_row.is_header rescue true)%>
     <%=checklist_cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%else%>
 
-    <%if header_item.editable && action_name != 'address'%>
+    <%if header_item.editable && ["address", "address_raw"].exclude?(action_name)%>
       <%=f.select :data_type,
         options_for_select(ChecklistHeaderItem.get_data_types, checklist_cell.data_type || header_item.data_type),
         {}, class: "form-control mb5"%>
@@ -27,7 +27,7 @@
 
       <%case field_type%>
       <%when 'radio'%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
           <div class="col-xs-12 ml5">
             <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
               <label class="radio radio-inline">
@@ -46,7 +46,7 @@
 
       <%when 'checkboxes'%>
         <%field_value = checklist_cell.value.split(';') rescue []%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
           <div class="col-xs-12 ml5">
             <%(checklist_cell.options || header_item.options).split(';').each do |option|%>
               <label class="checkbox checkbox-inline">
@@ -64,7 +64,7 @@
         <%end%>
 
       <%when 'dropdown'%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
           <% opts = checklist_cell.options || header_item.options %>
           <%= f.select :value,
             opts.split(';'),

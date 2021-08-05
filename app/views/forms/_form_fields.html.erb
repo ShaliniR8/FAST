@@ -127,8 +127,8 @@
           <%=f.label(field_name, field_description, :class => field_required_label)%>
           <%val=record.send(field_name) rescue ''%>
           <%=f.text_field field_name,
-            :class => "form-control field-date "  + field_required_field,
             value: val,
+            :class => "form-control field-date "  + field_required_field,
             'data-format' => CONFIG.getTimeFormat[:datepicker]%>
         <%end%>
       <%when 'datetime', 'datetimez'%>
