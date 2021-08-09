@@ -91,15 +91,16 @@
                   </div>
                 </div>               
                 <div class="panel-body" style="display:none">
-                <% if @recurrence && CONFIG.sa::GENERAL[:recurring_item_checklist] %>  
-                  <%= render 'forms/display_spawned_audits' %>
-                <% else %>
-                  <%@children.each do |child| %>
-                    <div class="col-xs-12 mb15">
+                <%= render 'forms/display_spawned_audits' %>
+                <%# if @recurrence && CONFIG.sa::GENERAL[:recurring_item_checklist] %>
+                  <%#= render 'forms/display_spawned_audits' %>
+                <%# else %>
+                  <%#@children.each do |child| %>
+                    <!-- <div class="col-xs-12 mb15">
                       <div class="panel panel-lightskyblue">
                         <div class="panel-heading click-heading collapsed">
                           <div class="panel-title">                                                           
-                            <b><%=link_to "#{@recurrence.form_type} ##{child.id}: #{child.title}",
+                            <b><%#=link_to "#{@recurrence.form_type} ##{child.id}: #{child.title}",
                               child.becomes(Object.const_get(@recurrence.form_type))%></b>                                                  
                             <span class="pull-right clickable">
                               <i class="mt5 glyphicon glyphicon-chevron-down"></i>
@@ -107,12 +108,12 @@
                           </div>
                         </div>
                         <div class="panel-body" style="display:none">
-                          <%=render 'forms/show_fields', fields: @template_fields, record: child%>
+                          <%#=render 'forms/show_fields', fields: @template_fields, record: child%>
                         </div>
                       </div>
-                    </div>
-                  <%end%>
-                  <%end%>
+                    </div> -->
+                  <%#end%>
+                <%#end%>
                 </div>
               </div>
             </div> <!-- end of whole window -->

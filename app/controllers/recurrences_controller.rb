@@ -34,13 +34,11 @@ class RecurrencesController < ApplicationController
         end
     end
 
-    if CONFIG.sa::GENERAL[:recurring_item_checklist]
-      @selected_checklists = params[:checklist_templates]
-      @checklist_header = params[:checklist_header]
-      @checklist_title = params[:checklist_title]
-      @checklist_upload = params[:checklist_upload]
-    end
-  
+    @selected_checklists = params[:checklist_templates]
+    @checklist_header = params[:checklist_header]
+    @checklist_title = params[:checklist_title]
+    @checklist_upload = params[:checklist_upload]
+
     template = @table.create(@template)
     template.created_by_id = current_user.id
     template.template = true

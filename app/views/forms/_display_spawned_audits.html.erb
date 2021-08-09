@@ -6,7 +6,9 @@
       <th> ID </th>
       <th> Status </th>
       <th> Title </th>
-      <th> Item </th>
+      <%if CONFIG.sa::GENERAL[:recurring_item_checklist]%>
+        <th> Item </th>
+      <%end%>
       <th> Responsible User </th>
       <th> Scheduled Completion Date </th>
       <th> Actual Completion Date </th>
@@ -18,7 +20,9 @@
         <td><%= child.id %></td> 
         <td><%= child.status %></td> 
         <td><%=link_to "#{@recurrence.form_type} #{child.title}", child.becomes(Object.const_get(@recurrence.form_type))%></td> 
-        <td><%= child.spawn_id > 0 ? child.spawn_id : nil %> </td>
+        <%if CONFIG.sa::GENERAL[:recurring_item_checklist]%>
+          <td><%= child.spawn_id > 0 ? child.spawn_id : nil %> </td>
+        <%end%>
         <td><%= child.responsible_user == nil ? 'Unassigned' :  child.responsible_user.full_name %></td> 
         <td><%= child.due_date%></td> 
         <td><%= child.close_date.present? ? child.close_date.in_time_zone(CONFIG::GENERAL[:time_zone]).strftime("%D %T") : '' %></td>

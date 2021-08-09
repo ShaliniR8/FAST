@@ -634,7 +634,7 @@ class AccessControl < ActiveRecord::Base
     h["Listing"] = "index"
     h["Query"] = "query"
     h["Viewable"] = "viewable"
-    h["Address"] = "address"
+    h["Attach"] = "address"
     h["All"] = "all"
     h["Viewer"] = "viewer"
     h["Full"] = "full"
@@ -727,7 +727,7 @@ class AccessControl < ActiveRecord::Base
   def self.get_checklist_template_opts
     h = Hash.new
 
-    h["Address"] = "address"
+    h["Attach"] = "address"
     h["Viewable"] = "viewable"
     h["All"] = "all"
 
@@ -793,9 +793,9 @@ class AccessControl < ActiveRecord::Base
   def get_checklist_template_desc(checklist_template_name, action)
     case action
     when "viewable"
-      "This gives the user access to view a checklist of type #{checklist_template_name} ."
+      "This gives the user access to view a checklist of type #{checklist_template_name}."
     when "address"
-      "This gives the user access to address a checklist of type #{checklist_template_name}."
+      "This gives the user access to attach a checklist of type #{checklist_template_name} to an object such as Audit."
     when "all"
       "This gives the user complete access to #{checklist_template_name} and allows the user to view and address any checklist of this type."
     else
