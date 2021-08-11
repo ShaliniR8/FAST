@@ -219,14 +219,48 @@
               <%event_time_zone = @record.event_time_zone%>
               <%=label_tag :event_time_zone, "Time Zone", :style => "color:red"%>
               <%if CONFIG.sr::GENERAL[:submission_time_zone]%>
-                <%event_time_zone = 'UTC' if event_time_zone.blank?%>
-                <div class="input-group">
-                  <%=f.select :event_time_zone,
-                     ActiveSupport::TimeZone.all.map(&:name),
-                    {:selected => event_time_zone},
-                    {:class => 'form-control tz atz toplevel_timezone required_field'}%>
-                  <span class="input-group-addon tc">All</span>
-                </div>
+
+                <%deafult_time_zone = CONFIG.sr::GENERAL[:default_submission_time_zone] %>
+                <%if deafult_time_zone.present? %>
+
+                  <% ustimezone=["Hawaii", "Alaska", "Pacific Time (US & Canada)", "Arizona", "Mountain Time (US & Canada)", "Central Time (US & Canada)", "Eastern Time (US & Canada)", "Indiana (East)"] %>
+
+                  <%
+                    us_options = {
+                      klass: 'ustz',
+                      label: 'US'
+                    }
+
+                    all_options = {
+                      klass: 'atz',
+                      label: 'All'
+                    }
+
+                    timezone_options = ustimezone.include?(deafult_time_zone) ? us_options : all_options
+                  %>
+
+                  <%event_time_zone = deafult_time_zone if event_time_zone.blank?%>
+                  <div class="input-group">
+                    <%=f.select :event_time_zone,
+                       ActiveSupport::TimeZone.all.map(&:name),
+                      {:selected => event_time_zone},
+                      {:class => 'form-control tz toplevel_timezone required_field ' + timezone_options[:klass]}%>
+                    <span class="input-group-addon tc"><%=timezone_options[:label]%></span>
+                  </div>
+
+
+                <%else%>
+
+                  <%event_time_zone = 'UTC' if event_time_zone.blank?%>
+                  <div class="input-group">
+                    <%=f.select :event_time_zone,
+                       ActiveSupport::TimeZone.all.map(&:name),
+                      {:selected => event_time_zone},
+                      {:class => 'form-control tz atz toplevel_timezone required_field'}%>
+                    <span class="input-group-addon tc">All</span>
+                  </div>
+
+                <%end%>
               <%else%>
                 <%event_time_zone = 'Local' if event_time_zone.blank?%>
                 <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
@@ -376,8 +410,28 @@
     });
   }
 
+  function filterUSTimezone() {
+
+    timezone = $('.toplevel_timezone');
+    if (timezone.hasClass('ustz')) {
+      ustimezone=["Hawaii", "Alaska", "Pacific Time (US & Canada)", "Arizona", "Mountain Time (US & Canada)", "Central Time (US & Canada)", "Eastern Time (US & Canada)", "Indiana (East)"]
+
+      timezone.find('option').each(function(){
+        opt=$(this);
+        if (ustimezone.indexOf(opt.text())==-1)
+        {
+          opt.hide();
+          opt.wrap('<span>'); // hide for safari
+        }
+      });
+
+    }
+  }
+
   $(document).ready(function() {
     autoSaveText = document.getElementById('auto-save');
+
+    filterUSTimezone();
 
     runAutosave = setInterval(autosave, 60000);
     setInterval(function() {
