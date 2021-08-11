@@ -18,10 +18,18 @@ class ChecklistHeaderItem < ActiveRecord::Base
 
   def self.get_data_types
     {
-      "Text"        => "text",
-      "Dropdown"    => "dropdown",
-      "Radio"       => "radio",
-      "Checkboxes"  => "checkboxes",
+      "Text"                         => "text",
+      "Dropdown"                     => "dropdown",
+      "Radio"                        => "radio",
+      "Checkboxes"                   => "checkboxes",
+      "Employee"                     => "employee",
+      "Airport"                      => 'airport',
+      "Date"                         => 'date',
+      "Date Time"                    => 'datetime',
+
+      "Dropdown - Custom Options"    => "dropdown-custom",
+      "Radio - Custom Options"       => "radio-custom",
+      "Checkboxes - Custom Options"  => "checkboxes-custom",
     }
   end
 

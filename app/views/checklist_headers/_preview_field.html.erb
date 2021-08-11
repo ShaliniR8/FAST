@@ -81,6 +81,8 @@
   <%case field_type%>
   <%when 'checkboxes', 'radio', 'dropdown'%>
     <%=cell.value.split(';').join('<br>').html_safe rescue ''%>
+  <%when 'employee' %>
+    <%=User.find(cell.value).full_name rescue ''%>
   <%else%>
     <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
   <%end%>

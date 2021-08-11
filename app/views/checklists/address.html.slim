@@ -6,6 +6,24 @@
   'utility/checklist-control',
   'utility/dirty-form'
 
+.modal.fade.emp_modal
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myLargeModalLabel"
+  .modal-dialog.modal-lg
+    role="document"
+    .modal-content
+      =render '/submissions/emp'
+
+.modal.fade.airport_modal
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myLargeModalLabel"
+  .modal-dialog.modal-lg
+    role="document"
+    .modal-content
+      =render '/submissions/airports_select'
+
 = form_for @record, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|
 
   .item.active.mt50
@@ -79,6 +97,118 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
+
+
+    // employ selector
+    var employee_table;
+
+    function build_user_table(){
+      employee_table = $('#users').DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
+    }
+
+    function clear_user_table(){
+      employee_table.destroy();
+    }
+
+    $(window).resize();
+    build_user_table();
+
+    $(this).find(".emp_button").each(function(index, item){
+      $(item).on("click", function(){
+        var field_id = $(this).prop('id');
+        $(".emp_modal").show();
+        clear_user_table();
+        $("#users tbody tr").unbind();
+        // $(".close").unbind();
+        $("#users tbody tr").on("click", function(){
+          $(item).parent().parent().find("#emp" + field_id).val($(this).find("td").eq(1).text());
+          $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
+          $('#emp_div').hide();
+          $('.emp_modal').modal('toggle');
+        });
+        $('.close').on('click',function(){
+          $(item).parent().parent().find("#emp"+field_id).val("");
+          $(item).parent().parent().find("#employee-select"+field_id).val("");
+          $('#emp_div').hide();
+        });
+        build_user_table();
+      });
+    });
+
+
+    // airport selector
+    var airport_table;
+
+    function handleSearch(event) {
+      // Get field id
+      var field_id = event.data.field_id
+      // Get the keywords user searched for
+      var icao = $("#icao").val();
+      var iata = $("#iata").val();
+      var arpt_name = $("#arpt_name").val();
+
+      // Do nothing if nothing is searched
+      if(icao == "" && iata == "" && arpt_name ==""){
+      // Update the table if icao code is not empty
+      }else{
+        // Get the data from server
+        $.get("#{airport_data_submissions_path}?field_id=" + field_id + '&icao=' + icao + "&iata=" + iata + "&arpt_name=" + arpt_name, function(data){
+          // Render airport table with data
+          $("#airports_table").html(data);
+          updateAirportTable(field_id);
+        });
+      }
+    }
+
+    function resetModal(field_id) {
+      // Reset the table, field, and close the modal
+      $("#airports_table").html("");
+      $("#icao").val("");
+      $("#iata").val("");
+      $("#arpt_name").val("");
+      $('#airport_div').hide();
+      $(".airport_modal").modal("hide");
+    }
+
+    function updateAirportTable(field_id) {
+      // Initialize table as a datatable
+      airport_table = $('#airports' + field_id).DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
+      // User clicked on a row
+      $("body").on("click", "#airports" + field_id + " tbody tr", function(){
+        console.log('clicked!')
+        // Get the row information
+        var icao = $(this).find("td").eq(0).text();
+        var iata = $(this).find("td").eq(1).text();
+        // Set the value on the form
+        $("#airport" + field_id).val(icao + ";" + iata);
+        $("#airport-select" + field_id).val(icao + ";" + iata);
+        resetModal(field_id);
+      });
+    }
+
+      // Get listing of all the airport buttons
+    var field_id;
+    $(this).find(".airport_button").each(function(index, item){
+      // Get the button that's being clicked
+      $(item).on("click", function(){
+        // Get the selected airport's field id
+        field_id = $(this).prop("id");
+        console.log(field_id)
+        resetModal(field_id);
+        $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+        $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
+      });
+    });
+
+
+    //
+
     autoSaveText = document.getElementById('auto-save');
 
     $("#table-view-#{@record.id}").DataTable({

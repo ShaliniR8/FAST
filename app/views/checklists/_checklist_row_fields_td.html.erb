@@ -1,3 +1,8 @@
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+
+
+
 <%
   source ||= nil
   is_new = source.blank?
@@ -15,7 +20,14 @@
     <%if header_item.editable && ["address", "address_raw"].exclude?(action_name)%>
       <%=f.select :data_type,
         options_for_select(ChecklistHeaderItem.get_data_types, checklist_cell.data_type || header_item.data_type),
-        {}, class: "form-control mb5"%>
+        {}, class: "form-control mb5 data_type_select"%>
+
+      <% custom_options = Hash.new.tap { |h| CustomOption.all.each { |opt| h[opt.title] = opt.options } } %>
+      <%= f.select :custom_options,
+          options_for_select(custom_options, checklist_cell.options),
+          {},
+          class: "form-control mb5 custom_options_select"
+      %>
 
       <%=f.text_area :options,
         value: (f.object.options || header_item.options),
@@ -24,8 +36,75 @@
         rows: 4%>
 
     <%else%>
-
       <%case field_type%>
+      <%when 'employee'%>
+        <%if action_name == 'address'%>
+
+
+          <div class="input-group">
+            <%=text_field_tag '', "",
+              {
+                :class => "form-control ml5 emp",
+                :readonly => true,
+                :id => "emp#{checklist_cell.id}",
+                :value => checklist_cell.value.present? ? User.find(checklist_cell.value).full_name : "",
+              }%>
+            <%=f.hidden_field :value, :id => "employee-select#{checklist_cell.id}", class: 'changed'%>
+            <%=f.hidden_field :id, value: checklist_cell.id, class: 'changed'%>
+            <span class="input-group-btn">
+              <%=link_to  "...",
+                "#",
+                :class => "btn btn-info emp_button",
+                "data-toggle" => "modal",
+                "data-target" => ".emp_modal",
+                :id => "#{checklist_cell.id}"%>
+            </span>
+          </div>
+
+        <%end%>
+      <%when 'airport'%>
+        <%if action_name == 'address'%>
+
+          <div class="input-group">
+            <%=text_field_tag "", "",
+              {:class=>"form-control ml5 airport",
+                :readonly => true,
+                :id => "airport#{checklist_cell.id}",
+                :value => checklist_cell.value.present? ? checklist_cell.value : "" }%>
+            <%=f.hidden_field :value, :id=>"airport-select#{checklist_cell.id}", class: 'changed' %>
+            <%=f.hidden_field :id, value: checklist_cell.id, class: 'changed'%>
+            <span class="input-group-btn">
+              <%=link_to "...","
+                #",
+                :class=>"btn btn-info airport_button",
+                "data-toggle"=>"modal",
+                "data-target"=>".airport_modal",
+                :id=>"#{checklist_cell.id}"%>
+
+            </span>
+          </div>
+
+        <%end%>
+      <%when 'date'%>
+        <%if action_name == 'address'%>
+
+
+          <%=f.text_field :value,
+          {:class => 'field-date form-control',
+          :placeholder => ''}%>
+
+
+        <%end%>
+      <%when 'datetime'%>
+        <%if action_name == 'address'%>
+
+
+          <%=f.text_field :value,
+          {:class => 'field-datetime form-control',
+          :placeholder => ''}%>
+
+
+        <%end%>
       <%when 'radio'%>
         <%if ["address", "address_raw"].include?(action_name)%>
           <div class="col-xs-12 ml5">
@@ -85,6 +164,37 @@
           class: "form-control #{is_new ? 'changed' : ''}",
           rows: 4
         %>
+      <%when 'dropdown-custom'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
+          <% opts = checklist_cell.custom_options || header_item.options %>
+          <%= f.select :value,
+            opts.split(';'),
+            { include_blank: ''},
+            { class: "form-control field_select #{is_new ? 'changed' : ''}" }
+          %>
+        <%end%>
+      <%when 'radio-custom'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
+          <div class="col-xs-12 ml5">
+            <%(checklist_cell.custom_options || header_item.options).split(';').each do |option|%>
+              <label class="radio radio-inline">
+                <%=f.radio_button :value, option, class: "#{is_new ? 'changed' : ''}"%>
+                <%=option%>
+              </label><br>
+            <%end%>
+          </div>
+        <%end%>
+      <%when 'checkboxes-custom'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
+          <div class="col-xs-12 ml5">
+            <%(checklist_cell.custom_options || header_item.options).split(';').each do |option|%>
+              <label class="checkbox checkbox-inline">
+                <%=f.check_box :value, {multiple: true, class: "checkbox #{is_new ? 'changed' : ''}", checked:(checklist_cell.value.include? option rescue false)}, option, nil%>
+                <%=option%>
+              </label><br>
+            <%end%>
+          </div>
+        <%end%>
       <%end%>
 
 

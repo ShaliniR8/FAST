@@ -69,11 +69,16 @@
 
   $(document).ready(function(){
     $('td').each(function(){
-      $(this).find('select').each(function(){
-        if ($(this).find('option:selected').attr('value') == 'text') {
-          $(this).siblings('textarea').hide()
+      $(this).find('.data_type_select').each(function(){
+        if (['text', 'airport', 'employee', 'date', 'datetime', 'timezone'].includes($(this).find('option:selected').attr('value'))) {
+          $(this).siblings('textarea').hide();
+          $(this).siblings('.custom_options_select').hide();
+        } else if (['dropdown-custom', 'radio-custom', 'checkboxes-custom'].includes($(this).find('option:selected').attr('value'))) {
+            $(this).siblings('textarea').hide();
+            $(this).siblings('.custom_options_select').show();
         } else {
-          $(this).siblings('textarea').show()
+          $(this).siblings('textarea').show();
+          $(this).siblings('.custom_options_select').hide();
         }
       });
     });
@@ -97,12 +102,21 @@
       });
     });
 
-    $('select').on("change", function(){
-      if ($(this).find('option:selected').attr('value') == 'text') {
+    $('.data_type_select').on("change", function(){
+      if (['text', 'airport', 'employee', 'date', 'datetime', 'timezone'].includes($(this).find('option:selected').attr('value'))) {
+        $(this).siblings('textarea').hide();
+        $(this).siblings('.custom_options_select').hide();
+        console.log($(this).siblings('.textarea').attr("id"))
+        console.log($(this).siblings('.custom_options_select').attr("id"))
+      } else if (['dropdown-custom', 'radio-custom', 'checkboxes-custom'].includes($(this).find('option:selected').attr('value'))) {
           $(this).siblings('textarea').hide();
-        } else {
-          $(this).siblings('textarea').show();
-        }
+          $(this).siblings('.custom_options_select').show();
+          console.log($(this).siblings('.textarea').attr("id"))
+          console.log($(this).siblings('.custom_options_select').attr("id"))
+      } else {
+        $(this).siblings('textarea').show();
+        $(this).siblings('.custom_options_select').hide();
+      }
     });
   })
 
