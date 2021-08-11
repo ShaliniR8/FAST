@@ -65,7 +65,7 @@
                         <%=record.validator.full_name%>
                         <%validator_ids << record.validator.id%>
                       <% else %>
-                        <%valiators = field_value.map { |validator| User.find(validator).full_name }%>
+                        <%valiators = field_value.select { |validator| validator.present?}.map { |validator| User.find(validator).full_name }%>
                         <%validator_ids = field_value.map { |validator| User.find(validator).id }%>
                         <%=valiators.join(', ')%>
                       <% end%>
@@ -75,16 +75,13 @@
                   </td>
                 <%end%>
                 <td>
-                  <%#final_user = record.owner.approver.present? ? record.owner.approver : (record.owner.responsible_user.present? ? record.owner.responsible_user : nil)%>
-                  <%if record.status == "New"%>
-                    <%#if final_user.present? && final_user.id == current_user.id%>
-                      <%=link_to "Edit",
-                        "#",
-                        :route => edit_verification_path(record),
-                        :class => "btn btn-warning mr5 mb5 edit_verification_btn",
-                        "data-toggle"=>"modal",
-                        "data-target"=>".bs-example-modal-lg"%>
-                    <%#end%>
+                  <%if ["New", "Overdue"].include? record.status%>
+                    <%=link_to "Edit",
+                      "#",
+                      :route => edit_verification_path(record),
+                      :class => "btn btn-warning mr5 mb5 edit_verification_btn",
+                      "data-toggle"=>"modal",
+                      "data-target"=>".bs-example-modal-lg"%>
                     <%if validator_ids.include?(current_user.id)%>
                       <%=link_to "Address",
                         "#",
@@ -145,4 +142,14 @@
       $(window).trigger('resize');
     });
   });
+
+  $(document).ready(function(){
+    $(".close").click(function() {
+      console.log('reload')
+      document.body.style.cursor = "wait";
+      location.reload();
+      return false;
+    })
+  });
+
 </script>

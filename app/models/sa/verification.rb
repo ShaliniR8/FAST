@@ -28,7 +28,7 @@ class Verification < ProsafetBase
   def get_all_validators
     return [self.validator] if self.additional_validators.nil?
 
-    validators = self.additional_validators.map { |validator_id|
+    validators = self.additional_validators.select { |validator| validator.present?}.map { |validator_id|
       User.find(validator_id)
     }
     # all additional valiators

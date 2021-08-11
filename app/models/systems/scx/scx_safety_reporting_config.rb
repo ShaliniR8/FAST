@@ -5,6 +5,8 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
     show_submitter_name:      false,
     enable_dual_report:       false,
     submission_time_zone:     true,
+    default_submission_time_zone:               'Central Time (US & Canada)',
+
     matrix_carry_over:        true,
     share_meeting_agendas:    false,
     # Airline-Specific Features:

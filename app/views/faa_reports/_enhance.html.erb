@@ -22,3 +22,15 @@
 <%end%>
 
 
+<script>
+
+  $(document).ready(function(){
+    $(".close").click(function() {
+      console.log('reload')
+      document.body.style.cursor = "wait";
+      location.reload();
+      return false;
+    })
+  });
+
+</script>
