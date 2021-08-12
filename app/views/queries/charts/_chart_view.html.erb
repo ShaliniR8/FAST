@@ -361,3 +361,12 @@
   }
 </style>
 
+<script type="text/javascript">
+  $(function() {
+    if (<%= @redirect_page %>) {
+      document.body.style.cursor = "wait";
+      location.reload();
+      return false;
+    }
+  })
+</script>

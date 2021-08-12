@@ -277,6 +277,7 @@ class QueriesController < ApplicationController
 
   # generate indivisual visualization blocks
   def generate_visualization
+
     @visualization = QueryVisualization.find(params[:visualization_id]).tap do |vis|
       vis.x_axis = params[:x_axis]
       vis.series = params[:series]
@@ -317,6 +318,27 @@ class QueriesController < ApplicationController
         @data_ids << ['N/A', 0]
       end
     end
+
+    @redirect_page = false
+
+    if params[:nested_xaxis] == true.to_s
+      @x_axis_field.first.nested_fields.where(deleted: false).map(&:id).each do |nested_field_id|
+        visualization = @owner.visualizations.create(
+          x_axis: Field.find(nested_field_id).label
+        )
+      end
+      @redirect_page = true
+    end
+
+    if params[:nested_series] == true.to_s
+      @series_field.first.nested_fields.where(deleted: false).map(&:id).each do |nested_field_id|
+        visualization = @owner.visualizations.create(
+          x_axis: Field.find(nested_field_id).label
+        )
+      end
+      @redirect_page = true
+    end
+
     @options = { title: title || params[:x_axis] }
     @chart_types = QueryVisualization.chart_types
     render :partial => "/queries/charts/chart_view"

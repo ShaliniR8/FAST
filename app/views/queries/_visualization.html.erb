@@ -29,12 +29,28 @@
             </div>
           </div>
 
+          <div class="col-sm-2 pull-right">
+            <%=check_box_tag :nested_visualization_xaxis, 0, false,
+              id: "nested_visualization_xaxis_#{visualization.id}",
+              class: 'form-control xaxis_nested_vis_checkbox',
+              'data-toggle' => "tooltip",
+              'title' => "Populate all the nested field visualizations for X-axis" %>
+          </div>
+
           <div class="form-group row col-xs-10">
             <%=label_tag :series, 'Series (Optional)', class: "col-sm-4 col-form-label"%>
             <div class="col-sm-8">
               <%=text_field_tag :series, visualization.series,
                 {list: "select_field", class: "form-control ml5", id: "series_#{visualization.id}"}%>
             </div>
+          </div>
+
+          <div class="col-sm-2 pull-right">
+            <%=check_box_tag :nested_visualization_series, 0, false,
+              id: "nested_visualization_series_#{visualization.id}",
+              class: 'form-control series_nested_vis_checkbox',
+              'data-toggle' => "tooltip",
+              'title' => "Populate all the nested field visualizations for Series" %>
           </div>
 
           <div class="form-group row col-xs-10">
@@ -72,6 +88,18 @@
 
 
 
+<style type="text/css">
+  .series_nested_vis_checkbox, .xaxis_nested_vis_checkbox {
+    width: 34px;
+    margin-top: 0px !important;
+  }
+
+  .series_nested_vis_checkbox {
+    margin-bottom: 4px !important;
+  }
+
+</style>
+
 <script type="text/javascript">
   // Generate color interplation
   function colorInterpolation(steps){
@@ -108,6 +136,8 @@
           "visualization_id": visualization_id,
           "x_axis": $("#x_axis_" + visualization_id).val(),
           "series": $('#series_' + visualization_id).val(),
+          "nested_xaxis": $("#nested_visualization_xaxis_" + visualization_id).is(":checked"),
+          "nested_series": $('#nested_visualization_series_' + visualization_id).is(":checked"),
           "default_chart": $('#default_chart_' + visualization_id).val(),
           "records": "<%=records%>",
         },
