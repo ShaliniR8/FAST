@@ -679,6 +679,10 @@ class DefaultSafetyAssuranceConfig
         }),
         panels: %i[comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
+      },
+
+      'Checklist' => {
+        title: 'Checklist',
       }
     },
     menu_items: {
@@ -717,7 +721,7 @@ class DefaultSafetyAssuranceConfig
       },
       'Evaluations' => {
         title: 'Evaluations', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) || 
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Evaluation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) },
         subMenu: [
           {title: 'All', path: 'evaluations_path(status: "New")',
@@ -732,7 +736,7 @@ class DefaultSafetyAssuranceConfig
       },
       'Investigations' => {
         title: 'Investigations', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) || 
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Investigation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'investigations_path(status: "New")',
@@ -759,7 +763,7 @@ class DefaultSafetyAssuranceConfig
       },
       'Corrective Actions' => {
         title: 'Corrective Actions', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) || 
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('SmsAction'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'sms_actions_path(status: "New")',

@@ -18,6 +18,10 @@ class Checklist < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def temp_method
+    # byebug
+  end
+
   def self.rule_name
     self.name.demodulize.underscore
   end

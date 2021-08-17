@@ -144,6 +144,7 @@ class QueriesController < ApplicationController
 
   def new
     @owner = Query.new
+    @types["Checklist"] = "Checklist"
   end
 
 
@@ -197,14 +198,33 @@ class QueriesController < ApplicationController
     @target = params[:target]
     if @target == 'Report'
       @templates = Template.all
+    # elsif @target == 'Checklist'
+
     else
       @templates = Template.where(:id => params[:templates])
     end
 
     @target_display_name = params[:target_display_name]
-    @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
 
-    if @templates.length > 0
+    if @target == 'Checklist'
+      @templates = Checklist.where(id: params[:templates])
+      @fields = []
+      # params[:templates].each do |template_id|
+      #   header = Object.const_get(@target).find(template_id.to_i).checklist_header
+      #   header.checklist_header_items.each do |header_item|
+      #     @fields << {
+      #       field: "temp_method",
+      #       title: header_item.title,
+      #       type: header_item.data_type,
+      #       header_id: header_item.id
+      #     }
+      #   end
+      # end
+    else
+      @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
+    end
+
+    if @templates.length > 0 && @target != 'Checklist'
       @templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
         @fields << {
           title: field.label,
@@ -364,6 +384,7 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
+
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
     @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
     @object_type = Object.const_get(@owner.target)
@@ -374,19 +395,25 @@ class QueriesController < ApplicationController
     end
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
-    Template.preload(:categories, :fields)
-      .where(id:  @owner.templates)
-      .map(&:fields)
-      .flatten
-      .uniq{|field| field.label}
-      .each{|field|
-      @template_fields << {
-        title: field.label,
-        field: field.label,
-        data_type: field.data_type,
-        field_type: field.display_type,
+
+    if @owner.target == "Checklist"
+      # @owner.templates
+    else
+      Template.preload(:categories, :fields)
+        .where(id:  @owner.templates)
+        .map(&:fields)
+        .flatten
+        .uniq{|field| field.label}
+        .each{|field|
+        @template_fields << {
+          title: field.label,
+          field: field.label,
+          data_type: field.data_type,
+          field_type: field.display_type,
+        }
       }
-    }
+    end
+
     @fields = @target_fields + @template_fields
 
     if @title == "Submissions"
@@ -400,6 +427,7 @@ class QueriesController < ApplicationController
     @owner.query_conditions.each do |condition|
       records = records & expand_emit(condition, records)
     end
+
     @records = records
   end
 
@@ -586,6 +614,7 @@ class QueriesController < ApplicationController
     end
     @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
+    @checklists = Checklist.where(owner_type: 'ChecklistHeader').sort_by{|x| x.title}.map{|checklist| [checklist.title, checklist.id]}.to_h
   end
 
 
@@ -607,6 +636,8 @@ class QueriesController < ApplicationController
     else
       if @target_fields.map{|x| x[:title]}.include? condition.field_name
         results = emit(condition, records, false)
+      elsif @owner.target == "Checklist"
+          results = emit(condition, records,  "Checklist")
       else
         if @owner.target == "Submission"
           results = emit(condition, records, "Submission")
@@ -635,7 +666,22 @@ class QueriesController < ApplicationController
 
   # applies basic condition block
   def emit(condition, records, from_template)
+    if from_template == "Checklist"
+      @field = Checklist.where(owner_type: 'ChecklistHeader').each do |template|
+        header = template.checklist_header
+        header.checklist_header_items.each do |header_item|
+          @fields << {
+            field: "temp_method",
+            title: header_item.title,
+            type: header_item.data_type,
+          }
+        end
+      end
+    end
+
     field = @fields.select{|header| header[:title] == condition.field_name}.first
+
+
     if field.present?
       if condition.value.present?
         case condition.logic
@@ -676,7 +722,9 @@ class QueriesController < ApplicationController
 
 
   def emit_helper(search_value, records, field, xor, logic_type, from_template)
-    if from_template == "Submission"
+    if from_template == "Checklist"
+      return emit_helper_checklist(search_value, records, field, xor, logic_type, "Checklist")
+    elsif from_template == "Submission"
       submission_fields = records.map(&:submission_fields).flatten
       return emit_helper_dynamic(search_value, submission_fields, field, xor, logic_type, "Submission")
     elsif from_template == "Record"
@@ -697,6 +745,30 @@ class QueriesController < ApplicationController
     else
       return emit_helper_basic(search_value, records, field, xor, logic_type)
     end
+  end
+
+
+  def emit_helper_checklist(search_value, records, field, xor, logic_type, target_name)
+    headers = ChecklistHeaderItem.where(title: field[:title])
+    related_cells = ChecklistCell.where(checklist_header_item_id: headers.map(&:id))
+    result = []
+
+    case logic_type
+    when "equals"
+    when "contains"
+      records.each do |checklist|
+        checklist.checklist_rows.each do |checklist_row|
+          checklist_row.checklist_cells.each do |checklist_cell|
+            if checklist_cell.value.present? && checklist_cell.value.include?(search_value)
+              result << checklist unless result.include? checklist
+            end
+          end
+        end
+      end
+    when "numeric"
+    end
+
+    return result
   end
 
 

@@ -29,7 +29,11 @@ class Query < ActiveRecord::Base
 
   def get_templates
     if templates.present?
-      Template.where(:id => templates).map(&:name).join(", ")
+      if target == "Checklist"
+        Checklist.where(:id => templates).map(&:title).join(", ")
+      else
+        Template.where(:id => templates).map(&:name).join(", ")
+      end
     else
       "N/A"
     end

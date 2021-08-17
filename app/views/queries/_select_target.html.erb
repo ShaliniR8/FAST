@@ -33,8 +33,14 @@
           </tr>
         </thead>
         <tbody>
-          <%@templates.stringify_keys.each do |k, v|%>
-            <tr><td data-template-id="<%=v%>"><%=k%></td></tr>
+          <% if  session[:mode] == "SMS" %>
+            <%@checklists.stringify_keys.each do |k, v|%>
+              <tr><td data-template-id="<%=v%>"><%=k%></td></tr>
+            <%end%>
+          <%else%>
+            <%@templates.stringify_keys.each do |k, v|%>
+              <tr><td data-template-id="<%=v%>"><%=k%></td></tr>
+            <%end%>
           <%end%>
         </tbody>
       </table>
@@ -132,7 +138,7 @@
       error: function(response){console.log(response);}
     });
 
-    if (target_name == "Submission" || target_name == "Report") {
+    if (target_name == "Submission" || target_name == "Report" || target_name == "Checklist") {
       $("#templates").show();
       $("#templates td").css("background-color", "transparent");
     } else {
