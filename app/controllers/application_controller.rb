@@ -100,7 +100,10 @@ class ApplicationController < ActionController::Base
     if current_token.present?
       oauth_expiration = current_client_application.name == 'prosafet_app_personal' ? 1.week : 3.hours
       oauth_expire_date = Time.now - oauth_expiration
-      redirect_to logout_path if current_token.authorized_at < oauth_expire_date
+      if current_token.authorized_at < oauth_expire_date
+        redirect_to logout_path
+        return false
+      end
     end
 
     if !session[:last_active].present?

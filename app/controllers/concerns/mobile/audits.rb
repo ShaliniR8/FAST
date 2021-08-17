@@ -43,7 +43,7 @@ module Concerns
         # Convert to id map for fast audit lookup
         json[:audits] = array_to_id_map @records.as_json(only: [:id, :status, :title, :due_date])
 
-        has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+        has_admin_access = current_user.has_access(Object.const_get('Checklist').rule_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
         if has_admin_access
           json[:checklists] = array_to_id_map Checklist.where(owner_type: 'ChecklistHeader')
         else

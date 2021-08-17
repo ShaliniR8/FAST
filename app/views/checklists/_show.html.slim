@@ -13,7 +13,7 @@ ruby:
 
     .panel-body style="display:none"
 
-      - if owner.status != 'Completed' && current_user.has_access('checklists','add', admin: CONFIG::GENERAL[:global_admin_default])
+      - if owner.status != 'Completed' && current_user.has_access(Object.const_get('Checklist').rule_name,'add', admin: CONFIG::GENERAL[:global_admin_default])
         = link_to 'Add New Checklist', '#',
           class: 'btn btn-success pull-right mr5 mb10',
           id: 'upload_btn',
@@ -47,7 +47,7 @@ ruby:
                 = link_to "Address", address_checklist_path(checklist),
                   class: 'btn btn-success pull-right mr5'
 
-              - if owner.status != 'Completed' && current_user.has_access('checklists','edit', admin: CONFIG::GENERAL[:global_admin_default])
+              - if owner.status != 'Completed' && current_user.has_access(Object.const_get('Checklist').rule_name,'edit', admin: CONFIG::GENERAL[:global_admin_default])
 
                 = link_to "Edit", '#',
                   :class => 'btn btn-warning pull-right mr5 update_btn',
@@ -55,7 +55,7 @@ ruby:
                   'data-toggle' => 'modal',
                   'data-target' => '.bs-example-modal-lg'
 
-              - if owner.status != 'Completed' && current_user.has_access('checklists','destroy', admin: CONFIG::GENERAL[:global_admin_default])
+              - if owner.status != 'Completed' && current_user.has_access(Object.const_get('Checklist').rule_name,'destroy', admin: CONFIG::GENERAL[:global_admin_default])
                 = link_to "Delete", checklist_path(checklist),
                   :method => 'delete',
                   :confirm => 'Are you sure?',

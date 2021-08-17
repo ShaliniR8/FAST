@@ -97,7 +97,7 @@ class AccessControl < ActiveRecord::Base
     {
       "safety_reporting" => ["reports", "meetings", "records", "faa_reports", "submissions", "ASAP", "corrective_actions"],
       "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
-      "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations', 'checklists'],
+      "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations', 'checklist'],
       "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings', 'Safety Risk Management'],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
@@ -249,7 +249,7 @@ class AccessControl < ActiveRecord::Base
         "notify"              => generate_desc("Recommendation", "notify"),
       },
 
-      "checklists"=>{
+      "checklist"=>{
         "add"                 => generate_desc("Checklist", "add"),
         "edit"                => generate_desc("Checklist", "edit"),
         "destroy"             => generate_desc("Checklist", "destroy"),
@@ -514,7 +514,7 @@ class AccessControl < ActiveRecord::Base
         "Override" => 'override',
         "Notify" => 'notify'
       },
-      "checklists"=>{
+      "checklist"=>{
         "Add"=>"add",
         "Edit"=>"edit",
         "Delete"=>"destroy",
@@ -672,7 +672,7 @@ class AccessControl < ActiveRecord::Base
       "Findings"                              => "findings",
       "Corrective Actions(Safety Assurance)"  => "sms_actions",
       "Recommendations"                       => "recommendations",
-      "Checklists"                            => "checklists",
+      "Checklists"                            => "checklist",
       "SRAs"                                  => "sras",
       "Hazards"                               => "hazards",
       "Risk Controls"                         => "risk_controls",

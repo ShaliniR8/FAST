@@ -19,11 +19,11 @@ class Checklist < ActiveRecord::Base
   end
 
   def self.rule_name
-    self.name.demodulize.underscore.pluralize
+    self.name.demodulize.underscore
   end
 
   def rule_name
-    self.class.name.demodulize.underscore.pluralize
+    self.class.name.demodulize.underscore
   end
 
   def assignees

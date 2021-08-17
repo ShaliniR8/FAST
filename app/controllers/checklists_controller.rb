@@ -34,7 +34,7 @@ class ChecklistsController < ApplicationController
 
   def new
     if params[:owner_type].present? && params[:owner_type] != 'ChecklistHeader'
-      has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+      has_admin_access = current_user.has_access(Object.const_get('Checklist').rule_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
       if has_admin_access
         @checklist_templates = @table.where(:owner_type => 'ChecklistHeader').map{|x| [x.title, x.id]}.to_h
       else
@@ -301,7 +301,7 @@ class ChecklistsController < ApplicationController
 
 
   def select_checklists_raw
-    has_admin_access = current_user.has_access('checklists', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    has_admin_access = current_user.has_access(Object.const_get('Checklist').rule_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
     if has_admin_access
       @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader')
     else
