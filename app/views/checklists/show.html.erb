@@ -14,20 +14,22 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            Checklist Template <%=@record.id%>
+            Checklist <%= @is_template ? 'Template' : ''%> <%=@record.id%>
           </div>
           <div class="top_buttons pull-right">
-            <%=link_to "All Templates", checklists_path, :class => 'btn btn-default'%>
-            <%=link_to "Edit", '#',
-              :class => 'btn btn-warning update_btn',
-              'data-path' => edit_checklist_path(@record),
-              'data-toggle' => 'modal',
-              'data-target' => '.bs-example-modal-lg'%>
-            <%=link_to "Delete",
-              checklist_path(@record),
-              :method => 'delete',
-              :class => 'btn btn-danger',
-              :confirm => 'Are you sure?'%>
+            <%if @is_template %>
+              <%=link_to "All Templates", checklists_path, :class => 'btn btn-default'%>
+              <%=link_to "Edit", '#',
+                :class => 'btn btn-warning update_btn',
+                'data-path' => edit_checklist_path(@record),
+                'data-toggle' => 'modal',
+                'data-target' => '.bs-example-modal-lg'%>
+              <%=link_to "Delete",
+                checklist_path(@record),
+                :method => 'delete',
+                :class => 'btn btn-danger',
+                :confirm => 'Are you sure?'%>
+            <%end%>
           </div>
         </div>
       </div>

@@ -13,13 +13,33 @@ class Checklist < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'id',    title: 'ID',    num_cols: 12,  type: 'text', visible: 'index,show',      required: false},
-      {field: 'title', title: 'Title', num_cols: 12,  type: 'text', visible: 'index,form,show', required: true},
+      {field: 'id',           title: 'ID',    num_cols: 12,  type: 'text', visible: 'index,show',           required: false},
+      {field: 'title',        title: 'Title', num_cols: 12,  type: 'text', visible: 'index,form,show',      required: true},
+      {field: 'get_owner',    title: 'Source of Input', num_cols: 12,  type: 'text', visible: 'index,show', required: false},
+      {field: 'get_template', title: 'Template', num_cols: 12,  type: 'text', visible: 'show', required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
   def temp_method
     # byebug
+  end
+
+  def get_template
+    if template_id.present?
+      "#{Checklist.find(template_id).title} ##{template_id}"
+    else
+      "#{title} ##{id}"
+    end
+  end
+
+  def get_owner
+    if owner_type == "ChecklistHeader"
+      "N/A"
+    else
+      "<a style='font-weight:bold' href='/#{owner_type.underscore}s/#{owner.id}'>
+          #{owner_type.underscore.capitalize} ##{owner.id}
+        </a>".html_safe
+    end
   end
 
   def self.rule_name

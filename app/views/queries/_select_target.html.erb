@@ -34,6 +34,7 @@
         </thead>
         <tbody>
           <% if  session[:mode] == "SMS" %>
+            <tr><td data-template-id="-1">NO TEMPLATE</td></tr>
             <%@checklists.stringify_keys.each do |k, v|%>
               <tr><td data-template-id="<%=v%>"><%=k%></td></tr>
             <%end%>

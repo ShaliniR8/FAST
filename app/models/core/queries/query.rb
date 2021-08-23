@@ -30,7 +30,13 @@ class Query < ActiveRecord::Base
   def get_templates
     if templates.present?
       if target == "Checklist"
-        Checklist.where(:id => templates).map(&:title).join(", ")
+        if templates.include? '-1'
+          templates_id = templates.clone
+          templates_id.delete('-1')
+          Checklist.where(:id => templates_id).map(&:title).join(", ") + ', NO TEMPLATE'
+        else
+          Checklist.where(:id => templates).map(&:title).join(", ")
+        end
       else
         Template.where(:id => templates).map(&:name).join(", ")
       end

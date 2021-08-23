@@ -37,6 +37,7 @@ class DefaultConfig
     power_bi_integration:               false,
     has_confidential_forms:             false,
     csv_user_import:                    false,
+    checklist_query:                    false,
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,

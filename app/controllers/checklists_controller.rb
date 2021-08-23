@@ -30,6 +30,7 @@ class ChecklistsController < ApplicationController
     @title = 'Checklist Templates'
     @records = @table.where(:owner_type => 'ChecklistHeader')
     @headers = Checklist.get_meta_fields('index')
+    @headers.delete({:field=>"get_owner", :title=>"Source of Input", :num_cols=>12, :type=>"text", :visible=>"index,show", :required=>false})
   end
 
   def new
@@ -286,6 +287,7 @@ class ChecklistsController < ApplicationController
           checklist_rows: { checklist_cells: :checklist_header_item },
           checklist_header: :checklist_header_items,
         ).find(params[:id])
+        @is_template = @record.owner_type == "ChecklistHeader"
       end
       format.json { show_as_json }
     end
@@ -358,6 +360,7 @@ class ChecklistsController < ApplicationController
 
     Checklist.transaction do
       new_checklist = template.clone
+      new_checklist.template_id = template.id
       owner.checklists << new_checklist
 
       template.checklist_rows.each do |row|
