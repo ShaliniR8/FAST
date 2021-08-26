@@ -123,7 +123,7 @@ class ApplicationController < ActionController::Base
       elsif !current_user.has_access(controller_name,action_name,admin:CONFIG::GENERAL[:global_admin_default], permissions: (session[:permissions].present? ? JSON.parse(session[:permissions]) : nil))
         unless (action_name == 'show' &&
           current_user.has_access(controller_name,'viewer',strict:strict) &&
-          (Object.const_get(controller_name.singularize.titleize).find(params[:id]).viewer_access rescue true))
+          (Object.const_get(controller_name.singularize.titleize).find(params[:id]).viewer_access rescue false))
           redirect_to errors_path
           return false
         end
