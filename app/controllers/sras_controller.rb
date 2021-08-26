@@ -275,9 +275,15 @@ class SrasController < ApplicationController
       related_user_ids << @sra.approver_id
     end
 
-    has_access = (current_user.has_access('sras', 'show', admin: CONFIG::GENERAL[:global_admin_default]) &&
-                 related_user_ids.include?(current_user.id)) ||
-                 current_user.has_access('sras', 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    has_access = false
+    if current_user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) && @sra.viewer_access.present?
+      has_access = true
+    else
+      has_access = current_user.has_access('sras', 'show', admin: CONFIG::GENERAL[:global_admin_default]) &&
+                   (related_user_ids.include?(current_user.id) ||
+                   current_user.has_access('sras', 'admin', admin: CONFIG::GENERAL[:global_admin_default]))
+    end
+
     redirect_to errors_path unless has_access
 
 

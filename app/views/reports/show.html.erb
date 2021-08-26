@@ -43,14 +43,14 @@
                   :id => "edit-btn",
                   :class => "btn btn-warning pull-right mr5 mb5",
                   :disable_with => "Editing..."%>
-              <%end%>
 
-              <%=link_to 'Launch',
-                '#',
-                :id => "launch_btn",
-                :class => "btn btn-warning pull-right mr5 mb5",
-                'data-toggle' => 'modal',
-                'data-target' => '.bs-example-modal-lg'%>
+                <%=link_to 'Launch',
+                  '#',
+                  :id => "launch_btn",
+                  :class => "btn btn-warning pull-right mr5 mb5",
+                  'data-toggle' => 'modal',
+                  'data-target' => '.bs-example-modal-lg'%>
+              <%end%>
 
               <%if @report.investigation.present? &&
                 current_user.has_access('Safety Assurance','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
