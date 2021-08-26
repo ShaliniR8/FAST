@@ -30,6 +30,7 @@ class DefaultSafetyRiskManagementConfig
             required: false
           },
           title: { default: true, title: 'SRA Title', on_newline: true },
+          viewer_access: { default: true, on_newline: true },
           sra_type: {
             field: 'sra_type', title: "Level of SRA",
             num_cols: 6, type: 'text', visible: '',
@@ -177,7 +178,7 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit launch deid_pdf pdf view_meeting view_parent attach_in_message expand_all],
+          *%i[delete override_status edit launch deid_pdf pdf viewer_access view_meeting view_parent attach_in_message expand_all],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment contact task cost],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({

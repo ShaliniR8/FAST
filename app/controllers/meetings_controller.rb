@@ -181,6 +181,9 @@ class MeetingsController < ApplicationController
       end
     end
 
+    has_access = current_user.has_access('meetings', 'show', admin: CONFIG::GENERAL[:global_admin_default]) && @meeting.has_user(current_user)
+    redirect_to errors_path unless has_access
+
     @fields = Meeting.get_meta_fields('show')
     @headers = User.invite_headers
     @report_headers = Report.get_meta_fields('index', 'meeting')

@@ -407,8 +407,8 @@ class ReportsController < ApplicationController
       end
     end
 
-    has_access = (current_user.has_access(@table_name, @action, admin: CONFIG::GENERAL[:global_admin_default]) && template_access) ||
-                 current_user.has_access(@table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
+    has_access = current_user.has_access(@table_name, @action, admin: CONFIG::GENERAL[:global_admin_default]) && (template_access ||
+                 current_user.has_access(@table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default]))
     redirect_to errors_path unless has_access
 
     @asap_found = false
