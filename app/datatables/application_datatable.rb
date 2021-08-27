@@ -37,9 +37,9 @@ class ApplicationDatatable
     if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id} AND status <> 'New'"
-      status_queries << "approver_id = #{@current_user.id} AND status <> 'New'"
-      status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
+      status_queries << "responsible_user_id = #{@current_user.id}"
+      status_queries << "approver_id = #{@current_user.id}"
+      status_queries << "reviewer_id = #{@current_user.id}"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
     start_date = params[:advance_search][:start_date]
@@ -272,9 +272,9 @@ class ApplicationDatatable
     if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id} AND status <> 'New'"
-      status_queries << "approver_id = #{@current_user.id} AND status <> 'New'"
-      status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
+      status_queries << "responsible_user_id = #{@current_user.id}"
+      status_queries << "approver_id = #{@current_user.id}"
+      status_queries << "reviewer_id = #{@current_user.id}"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
 
@@ -332,9 +332,9 @@ class ApplicationDatatable
     if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
-      status_queries << "responsible_user_id = #{@current_user.id} AND status <> 'New'"
-      status_queries << "approver_id = #{@current_user.id} AND status <> 'New'"
-      status_queries << "reviewer_id = #{@current_user.id} AND status <> 'New'"  if object.table_name == 'sras'
+      status_queries << "responsible_user_id = #{@current_user.id}"
+      status_queries << "approver_id = #{@current_user.id}"
+      status_queries << "reviewer_id = #{@current_user.id}"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
 
