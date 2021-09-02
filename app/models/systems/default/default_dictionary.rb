@@ -25,7 +25,7 @@ class DefaultDictionary
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
         form_confirmed = owner.status == 'New' || op[:form_conds]
-        user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
+        user_confirmed = [owner.created_by_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         form_confirmed && user_confirmed

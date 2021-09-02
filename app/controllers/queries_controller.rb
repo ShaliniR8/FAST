@@ -238,6 +238,9 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
+    if ['Record', 'Submission'].include?(@owner.target)
+      @headers = filter_submitter_name_header(@headers)
+    end
     @records = @results_ids.map do |result_id|
       @object_type.find(result_id)
     end
@@ -320,6 +323,20 @@ class QueriesController < ApplicationController
   end
 
 
+  def filter_submitter_name_header(headers)
+    if !CONFIG.sr::GENERAL[:show_submitter_name]
+      if !current_user.global_admin?
+        headers.delete_if {|x| x[:field] == 'get_submitter_name'}
+      end
+    else
+      if !current_user.admin?
+        headers.delete_if {|x| x[:field] == 'get_submitter_name'}
+      end
+    end
+    headers
+  end
+
+
   def apply_query
     if !session[:mode].present?
       redirect_to choose_module_home_index_path
@@ -330,6 +347,9 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
+    if ['Record', 'Submission'].include?(@owner.target)
+      @headers = filter_submitter_name_header(@headers)
+    end
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
     Template.preload(:categories, :fields)
@@ -367,6 +387,9 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
+    if ['Record', 'Submission'].include?(@owner.target)
+      @headers = filter_submitter_name_header(@headers)
+    end
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
     Template.preload(:categories, :fields)
@@ -404,6 +427,9 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
+    if ['Record', 'Submission'].include?(@owner.target)
+      @headers = filter_submitter_name_header(@headers)
+    end
 
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
@@ -471,6 +497,9 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@owner.target)
     @table_name = @object_type.table_name
     @headers = @object_type.get_meta_fields('index')
+    if ['Record', 'Submission'].include?(@owner.target)
+      @headers = filter_submitter_name_header(@headers)
+    end
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
     Template.preload(:categories, :fields)

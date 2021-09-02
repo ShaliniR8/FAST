@@ -173,7 +173,7 @@ class ApplicationController < ActionController::Base
         group_validation = true
       end
       if (current_user.id == report.approver_id ||
-          (current_user.id == report.responsible_user_id && report.status != 'New')) &&
+          current_user.id == report.responsible_user_id) &&
           current_user.has_access("#{form}s",'view')
         redirect_to errors_path if !group_validation
       elsif defined?(report.viewer_access) &&

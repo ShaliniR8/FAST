@@ -187,9 +187,10 @@ class DefaultSafetyRiskManagementConfig
             btn_loc: [:inline],
             access: proc { |owner:,user:,**op|
               form_confirmed = owner.status == 'Pending Approval' || op[:form_conds] || owner.status == 'Pending Review'
-              user_confirmed = [owner.created_by_id, owner.approver_id, owner.reviewer_id].include?(user.id) ||
-                priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
-                op[:user_conds]
+              user_confirmed = priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
+                               op[:user_conds] ||
+                               (owner.status == "Pending Approval" && owner.approver_id == user.id) ||
+                               (owner.status == "Pending Review" && owner.reviewer_id == user.id)
               form_confirmed && user_confirmed
             },
           },
