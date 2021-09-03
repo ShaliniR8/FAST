@@ -37,6 +37,13 @@ ruby:
             - @record = checklist
             .tab-pane id="checklist-#{checklist.id}" class="#{active}"
 
+              b Checklist Template:
+              - if checklist.template_id.present?
+                = Checklist.find(checklist.template_id).title
+              - else
+                = ' No Template'
+
+              br
 
               b Assignees:
               = checklist.assignees.map(&:full_name).join(', ')
