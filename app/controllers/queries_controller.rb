@@ -449,11 +449,19 @@ class QueriesController < ApplicationController
       records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
     end
 
+    if @owner.target == "Checklist"
+      records = records.map(&:checklist_rows).flatten
+    end
+
     @owner.query_conditions.each do |condition|
       records = records & expand_emit(condition, records)
     end
 
-    @records = records
+    if @owner.target == "Checklist"
+      @records = records.map(&:checklist).flatten.uniq
+    else
+      @records = records
+    end
   end
 
   def get_records
@@ -508,19 +516,26 @@ class QueriesController < ApplicationController
 
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
-    Template.preload(:categories, :fields)
-      .where(id:  @owner.templates)
-      .map(&:fields)
-      .flatten
-      .uniq{|field| field.label}
-      .each{|field|
-      @template_fields << {
-        title: field.label,
-        field: field.label,
-        data_type: field.data_type,
-        field_type: field.display_type,
+    
+
+    if @owner.target == "Checklist"
+      # @owner.templates
+    else
+      Template.preload(:categories, :fields)
+        .where(id:  @owner.templates)
+        .map(&:fields)
+        .flatten
+        .uniq{|field| field.label}
+        .each{|field|
+        @template_fields << {
+          title: field.label,
+          field: field.label,
+          data_type: field.data_type,
+          field_type: field.display_type,
+        }
       }
-    }
+    end
+    
     @fields = @target_fields + @template_fields
 
     query_file_path = "/public/queries/#{params[:id]}.yml"
@@ -707,7 +722,6 @@ class QueriesController < ApplicationController
 
     field = @fields.select{|header| header[:title] == condition.field_name}.first
 
-
     if field.present?
       if condition.value.present?
         case condition.logic
@@ -774,9 +788,9 @@ class QueriesController < ApplicationController
   end
 
 
-  def checklist_equals?(checklist, headers, search_value)
-    cells = checklist
-      .checklist_rows.map(&:checklist_cells).flatten
+  def checklist_equals?(checklist_row, headers, search_value)
+    cells = checklist_row
+      .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
 
@@ -784,9 +798,9 @@ class QueriesController < ApplicationController
   end
 
 
-  def checklist_contains?(checklist, headers, search_value)
-    cells = checklist
-      .checklist_rows.map(&:checklist_cells).flatten
+  def checklist_contains?(checklist_row, headers, search_value)
+    cells = checklist_row
+      .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
 
@@ -797,9 +811,9 @@ class QueriesController < ApplicationController
   end
 
 
-  def checklist_users_contains?(checklist, headers, search_value)
-    cells = checklist
-      .checklist_rows.map(&:checklist_cells).flatten
+  def checklist_users_contains?(checklist_row, headers, search_value)
+    cells = checklist_row
+      .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
     values = values.select(&:present?).map { |value| User.find(value.to_i).full_name.downcase }
@@ -811,9 +825,9 @@ class QueriesController < ApplicationController
   end
 
 
-  def checklist_date_contains?(checklist, headers, start_date, end_date)
-    cells = checklist
-      .checklist_rows.map(&:checklist_cells).flatten
+  def checklist_date_contains?(checklist_row, headers, start_date, end_date)
+    cells = checklist_row
+      .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
 
@@ -825,9 +839,9 @@ class QueriesController < ApplicationController
   end
 
 
-  def checklist_date_compare?(checklist, headers, start_date, end_date)
-    cells = checklist
-      .checklist_rows.map(&:checklist_cells).flatten
+  def checklist_date_compare?(checklist_row, headers, start_date, end_date)
+    cells = checklist_row
+      .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
 
@@ -841,9 +855,9 @@ class QueriesController < ApplicationController
     false
   end
 
-  def checklist_compare?(checklist, headers, search_value)
-    cells = checklist
-      .checklist_rows.map(&:checklist_cells).flatten
+  def checklist_compare?(checklist_row, headers, search_value)
+    cells = checklist_row
+      .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
 
@@ -866,17 +880,17 @@ class QueriesController < ApplicationController
       when 'datetime', 'date'
         start_date = search_value.split("to")[0]
         end_date = search_value.split("to")[1] || search_value.split("to")[0]
-        result = records.select do |checklist|
-          xor ^ checklist_date_contains?(checklist, headers, start_date, end_date)
+        result = records.select do |checklist_row|
+          xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
         end
       when 'employee'
         user = User.find_by_full_name(search_value)
-        result = records.select do |checklist|
-          xor ^ checklist_equals?(checklist, headers, user.id.to_s)
+        result = records.select do |checklist_row|
+          xor ^ checklist_equals?(checklist_row, headers, user.id.to_s)
         end
       else # 'text'
-        result = records.select do |checklist|
-          xor ^ checklist_equals?(checklist, headers, search_value.downcase)
+        result = records.select do |checklist_row|
+          xor ^ checklist_equals?(checklist_row, headers, search_value.downcase)
         end
       end
 
@@ -885,16 +899,16 @@ class QueriesController < ApplicationController
       when 'datetime', 'date'
         start_date = search_value.split("to")[0]
         end_date = search_value.split("to")[1] || search_value.split("to")[0]
-        result = records.select do |checklist|
-          xor ^ checklist_date_contains?(checklist, headers, start_date, end_date)
+        result = records.select do |checklist_row|
+          xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
         end
       when 'employee'
-        result = records.select do |checklist|
-          xor ^ checklist_users_contains?(checklist, headers, search_value.downcase)
+        result = records.select do |checklist_row|
+          xor ^ checklist_users_contains?(checklist_row, headers, search_value.downcase)
         end
       else # 'text'
-        result = records.select do |checklist|
-          xor ^ checklist_contains?(checklist, headers, search_value.downcase)
+        result = records.select do |checklist_row|
+          xor ^ checklist_contains?(checklist_row, headers, search_value.downcase)
         end
       end
 
@@ -904,12 +918,12 @@ class QueriesController < ApplicationController
         start_date = search_value.split("to")[0]
         end_date = search_value.split("to")[1] || nil
 
-        result = records.select do |checklist|
-          xor ^ checklist_date_compare?(checklist, headers, start_date, end_date)
+        result = records.select do |checklist_row|
+          xor ^ checklist_date_compare?(checklist_row, headers, start_date, end_date)
         end
       else
-        result = records.select do |checklist|
-          xor ^ checklist_compare?(checklist, headers, search_value)
+        result = records.select do |checklist_row|
+          xor ^ checklist_compare?(checklist_row, headers, search_value)
         end
       end
     end

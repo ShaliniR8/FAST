@@ -84,7 +84,7 @@
   <%when 'employee' %>
     <%=User.find(cell.value).full_name rescue ''%>
   <%else%>
-    <%=cell.value.gsub(/\n/, '<br/>').html_safe rescue ''%>
+    <%=cell.value.gsub(/\n/, '<br/>').gsub(/\;/, '<br/><br/>').html_safe rescue ''%>
   <%end%>
 <%end%>
 

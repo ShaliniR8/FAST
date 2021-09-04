@@ -1,3 +1,4 @@
+
 def expand_emit(condition, records)
   results = []
   if condition.query_conditions.length > 0
@@ -15,11 +16,27 @@ def expand_emit(condition, records)
   else
     if @target_fields.map{|x| x[:title]}.include? condition.field_name
       results = emit(condition, records, false)
+    elsif @owner.target == "Checklist"
+        results = emit(condition, records,  "Checklist")
     else
       if @owner.target == "Submission"
         results = emit(condition, records, "Submission")
-      elsif @owner.target = "Record"
+      elsif @owner.target == "Record"
         results = emit(condition, records, "Record")
+      elsif @owner.target == "Report"
+        events = emit(condition, records, "Report")
+        results_ids = events.map(&:id)
+        results = []
+        records.each do |rec|
+          if rec.records.present?
+            rec.records.each do |rep|
+              if results_ids.include?(rep.id)
+                results << rec
+                break
+              end
+            end
+          end
+        end
       end
     end
   end
@@ -28,7 +45,21 @@ end
 
 
 def emit(condition, records, from_template)
+  if from_template == "Checklist"
+    @field = Checklist.where(owner_type: 'ChecklistHeader').each do |template|
+      header = template.checklist_header
+      header.checklist_header_items.each do |header_item|
+        @fields << {
+          field: "temp_method",
+          title: header_item.title,
+          type: header_item.data_type,
+        }
+      end
+    end
+  end
+
   field = @fields.select{|header| header[:title] == condition.field_name}.first
+
   if field.present?
     if condition.value.present?
       case condition.logic
@@ -69,15 +100,175 @@ end
 
 
 def emit_helper(search_value, records, field, xor, logic_type, from_template)
-  if from_template == "Submission"
+  if from_template == "Checklist"
+    return emit_helper_checklist(search_value, records, field, xor, logic_type, "Checklist")
+  elsif from_template == "Submission"
     submission_fields = records.map(&:submission_fields).flatten
     return emit_helper_dynamic(search_value, submission_fields, field, xor, logic_type, "Submission")
   elsif from_template == "Record"
     record_fields = records.map(&:record_fields).flatten
     return emit_helper_dynamic(search_value, record_fields, field, xor, logic_type, "Record")
+  elsif from_template == "Report"
+    record_fields = []
+    records.each do |ev|
+      if ev.records.present?
+        ev.records.each do |rep|
+          rep.record_fields.each do |rf|
+            record_fields << rf
+          end
+        end
+      end
+    end
+    return emit_helper_dynamic(search_value, record_fields, field, xor, logic_type, "Report")
   else
     return emit_helper_basic(search_value, records, field, xor, logic_type)
   end
+end
+
+
+def checklist_equals?(checklist_row, headers, search_value)
+  cells = checklist_row
+    .checklist_cells.flatten
+    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
+  values = cells.map(&:value).compact.map(&:downcase)
+
+  values.include? search_value
+end
+
+
+
+def checklist_contains?(checklist_row, headers, search_value)
+  cells = checklist_row
+    .checklist_cells.flatten
+    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
+  values = cells.map(&:value).compact.map(&:downcase)
+
+  values.each do |value|
+    return true if value.include? search_value
+  end
+  false
+end
+
+
+def checklist_users_contains?(checklist_row, headers, search_value)
+  cells = checklist_row
+    .checklist_cells.flatten
+    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
+  values = cells.map(&:value).compact.map(&:downcase)
+  values = values.select(&:present?).map { |value| User.find(value.to_i).full_name.downcase }
+
+  values.each do |value|
+    return true if value.include? search_value
+  end
+  false
+end
+
+
+def checklist_date_contains?(checklist_row, headers, start_date, end_date)
+  cells = checklist_row
+    .checklist_cells.flatten
+    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
+  values = cells.map(&:value).compact.map(&:downcase)
+
+  values.each do |value|
+    found = value.to_date >= start_date.to_date && value.to_date <= end_date.to_date
+    return found if found
+  end
+  false
+end
+
+
+def checklist_date_compare?(checklist_row, headers, start_date, end_date)
+  cells = checklist_row
+    .checklist_cells.flatten
+    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
+  values = cells.map(&:value).compact.map(&:downcase)
+
+  values.each do |value|
+    found = value.to_date >= start_date.to_date
+    found = found && value.to_date <= end_date.to_date if end_date.present?
+
+    return found if found
+  end
+
+  false
+end
+
+
+def checklist_compare?(checklist_row, headers, search_value)
+  cells = checklist_row
+    .checklist_cells.flatten
+    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
+  values = cells.map(&:value).compact.map(&:downcase)
+
+  values.each do |value|
+    found = value.to_f >= search_value.to_f rescue false
+    return found if found
+  end
+
+  false
+end
+
+
+def emit_helper_checklist(search_value, records, field, xor, logic_type, target_name)
+  headers = ChecklistHeaderItem.where(title: field[:title])
+  result = []
+
+  case logic_type
+  when "equals"
+    case field[:type]
+    when 'datetime', 'date'
+      start_date = search_value.split("to")[0]
+      end_date = search_value.split("to")[1] || search_value.split("to")[0]
+      result = records.select do |checklist_row|
+        xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
+      end
+    when 'employee'
+      user = User.find_by_full_name(search_value)
+      result = records.select do |checklist_row|
+        xor ^ checklist_equals?(checklist_row, headers, user.id.to_s)
+      end
+    else # 'text'
+      result = records.select do |checklist_row|
+        xor ^ checklist_equals?(checklist_row, headers, search_value.downcase)
+      end
+    end
+
+  when "contains"
+    case field[:type]
+    when 'datetime', 'date'
+      start_date = search_value.split("to")[0]
+      end_date = search_value.split("to")[1] || search_value.split("to")[0]
+      result = records.select do |checklist_row|
+        xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
+      end
+    when 'employee'
+      result = records.select do |checklist_row|
+        xor ^ checklist_users_contains?(checklist_row, headers, search_value.downcase)
+      end
+    else # 'text'
+      result = records.select do |checklist_row|
+        xor ^ checklist_contains?(checklist_row, headers, search_value.downcase)
+      end
+    end
+
+  when "numeric"
+    case field[:type]
+    when 'date', 'datetime'
+      start_date = search_value.split("to")[0]
+      end_date = search_value.split("to")[1] || nil
+
+      result = records.select do |checklist_row|
+        xor ^ checklist_date_compare?(checklist_row, headers, start_date, end_date)
+      end
+    else
+      result = records.select do |checklist_row|
+        xor ^ checklist_compare?(checklist_row, headers, search_value)
+      end
+    end
+  end
+
+  return result
 end
 
 
@@ -418,7 +609,6 @@ def get_data_visualization(x_axis_field_arr:, records:)
 end
 
 
-
 def get_data(visualization)
   @x_axis_field = get_field(@owner, @object_type, visualization.x_axis)
 
@@ -593,19 +783,25 @@ task save_query_result: :environment do
 
   @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
   @template_fields = []
-  Template.preload(:categories, :fields)
-    .where(id:  @owner.templates)
-    .map(&:fields)
-    .flatten
-    .uniq{|field| field.label}
-    .each{|field|
-    @template_fields << {
-      title: field.label,
-      field: field.label,
-      data_type: field.data_type,
-      field_type: field.display_type,
+
+  if @owner.target == "Checklist"
+    # @owner.templates
+  else
+    Template.preload(:categories, :fields)
+      .where(id:  @owner.templates)
+      .map(&:fields)
+      .flatten
+      .uniq{|field| field.label}
+      .each{|field|
+      @template_fields << {
+        title: field.label,
+        field: field.label,
+        data_type: field.data_type,
+        field_type: field.display_type,
+      }
     }
-  }
+  end
+
   @fields = @target_fields + @template_fields
 
   # Query records
@@ -613,12 +809,29 @@ task save_query_result: :environment do
     records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
   elsif @title == "Reports"
     records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
+  elsif @title == "Checklists"
+    if @owner.templates.include? '-1'
+      records = Checklist.where(template_id: nil).select { |x| x.owner_type != 'ChecklistHeader' }
+      templates_id = @owner.templates.clone
+      templates_id.delete('-1')
+      records +=  Checklist.where(template_id: templates_id)
+    else
+      records =  Checklist.where(template_id: @owner.templates)
+    end
   else
     records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
   end
 
+  if @owner.target == "Checklist"
+    records = records.map(&:checklist_rows).flatten
+  end
+
   @owner.query_conditions.each do |condition|
     records = records & expand_emit(condition, records)
+  end
+
+  if @owner.target == "Checklist"
+    records = records.map(&:checklist).flatten.uniq
   end
 
   @records = @object_type.where(id: records.map(&:id))
