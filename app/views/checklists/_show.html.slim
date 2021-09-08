@@ -39,7 +39,7 @@ ruby:
 
               b Checklist Template:
               - if checklist.template_id.present?
-                = Checklist.find(checklist.template_id).title
+                = " #{Checklist.find(checklist.template_id).title}"
               - else
                 = ' No Template'
 

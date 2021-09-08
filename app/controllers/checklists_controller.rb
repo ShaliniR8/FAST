@@ -237,7 +237,14 @@ class ChecklistsController < ApplicationController
   end
 
 
-  def update
+  def update        
+    if params[:template_names].present?
+      template_id = Checklist.where(owner_type: 'ChecklistHeader').where(title: (params[:template_names])).first.id
+      params[:checklist][:template_id] = template_id
+    else
+      params[:checklist][:template_id] = nil
+    end
+
     if params[:commit].present? && params[:commit] == 'Create Audit'
       create_audit_from_checklist(params, false)
     else

@@ -35,8 +35,8 @@
                   = f.label :template_id, 'Checklist Template', class: 'pull-right'
                 .col-xs-8
                   = f.hidden_field :template_id, class: 'changed'
-                  - template_names = @record.template_id.nil? ? '' : Checklist.find_by_template_id(@record.template_id).title rescue ''
-                  = text_field_tag :template_names, template_names, class: 'form-control pull-left json-user-tags', list: 'template_id'
+                  - template_names = @record.template_id.nil? ? '' : Checklist.find(@record.template_id).title rescue ''
+                  = text_field_tag :template_names, template_names, class: 'form-control pull-left json-user-tags changed', list: 'template_id'
                   datalist#template_id
                     = options_for_select(Checklist.all.select { |checklist| checklist.owner_type == 'ChecklistHeader' }.map(&:title))
 
