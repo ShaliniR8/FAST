@@ -56,6 +56,7 @@ class DefaultConfig
     shared_links:                       false,   # Enables shareable links to be created for forms - default off
     drop_down_risk_selection:           false,
     query_processing_in_rake_task:      false,
+    advanced_checklist_data_type:       false,
 
     # TO BE REMOVED:
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)

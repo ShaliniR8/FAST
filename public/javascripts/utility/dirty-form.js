@@ -5,7 +5,7 @@ $(function() {
   $(dirtyFormSelector).submit(function(event) {
     event.preventDefault()
 
-    var excludes = ['utf8', '_method', 'authenticity_token'].reduce(function(excludeString, name) {
+    var excludes = ['utf8', '_method', 'authenticity_token', 'checklist[table_view]'].reduce(function(excludeString, name) {
         return `${excludeString}:not([name='${name}'])`
     }, '')
 

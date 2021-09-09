@@ -20,6 +20,7 @@ class RJETConfig < DefaultConfig
     asrs_integration:             true,
 
     has_pdf_footer:               false,
+    advanced_checklist_data_type: true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,

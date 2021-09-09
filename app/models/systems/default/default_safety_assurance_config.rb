@@ -68,7 +68,7 @@ class DefaultSafetyAssuranceConfig
           objective: { default: true },
           reference: { default: true },
           instruction: { default: true, title: 'Audit Instructions' },
-          comment: { default: true, title: "Auditor's Comments" },
+          comment: { default: true, title: "Auditor's Comments", visible: 'show' },
           final_comment: { default: true, title: "Final Approver's Comments" },
           findings: {
             field: 'included_findings', title: 'Included Findings',
@@ -141,7 +141,7 @@ class DefaultSafetyAssuranceConfig
           instruction: { default: true, title: 'Inspection Instructions' },
           inspector_comment: {
             field: 'inspector_comment', title: "Lead Inspector's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
@@ -219,7 +219,7 @@ class DefaultSafetyAssuranceConfig
           instruction: { default: true, title: 'Evaluation Instructions' },
           evaluator_comment: {
             field: 'evaluator_comment', title: "Lead Evaluator's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
@@ -313,7 +313,7 @@ class DefaultSafetyAssuranceConfig
           },
           investigator_comment: {
             field: 'investigator_comment', title: "Investigator's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
@@ -457,7 +457,7 @@ class DefaultSafetyAssuranceConfig
           },
           findings_comment: {
             field: 'findings_comment', title: "Responsible User's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           other: {
@@ -572,7 +572,7 @@ class DefaultSafetyAssuranceConfig
           },
           sms_actions_comment: {
             field: 'sms_actions_comment', title: "Responsible User's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
@@ -652,7 +652,7 @@ class DefaultSafetyAssuranceConfig
           },
           recommendations_comment: {
             field: 'recommendations_comment', title: "Responsible User's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },

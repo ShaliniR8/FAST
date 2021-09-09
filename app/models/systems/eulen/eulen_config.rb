@@ -24,6 +24,8 @@ class EULENConfig < DefaultConfig
     allow_reopen_forms:                false,
     has_root_causes:                   false,
     global_admin_default:              false,
+
+    advanced_checklist_data_type:      true
   })
 
 

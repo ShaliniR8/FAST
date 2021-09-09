@@ -401,7 +401,7 @@ class DefaultSafetyReportingConfig
           },
           corrective_actions_comment: {
             field: 'corrective_actions_comment', title: "Responsible User's Comments",
-            num_cols: 12, type: 'textarea', visible: 'form,show',
+            num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },

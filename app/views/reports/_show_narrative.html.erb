@@ -15,6 +15,16 @@
             ((current_user.has_template_access(record.template.name).include? 'viewer') && record.viewer_access)%>
             <%record.record_fields.each do |x|%>
               <%if x.category.present? && x.display_type == 'textarea' && !x.value.nil? && !x.value.empty?%>
+                <%
+                  # NEED TO REFACTOR (MOVE TO MODEL)
+                  nested_field_value = x.field.nested_field_value
+                  parent_field = x.field.parent_field
+
+                  if parent_field.present?
+                    parent_value = record.record_fields.select { |record_field| record_field.field.id == parent_field.id }.first.value
+                    next if nested_field_value != parent_value
+                  end
+                %>
                 <b><%=x.field.label%></b></br>
                 <%=x.value %> </br></br>
               <%end%>

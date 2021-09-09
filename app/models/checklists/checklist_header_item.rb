@@ -17,11 +17,14 @@ class ChecklistHeaderItem < ActiveRecord::Base
 
 
   def self.get_data_types
-    {
+    basic_data_type = {
       "Text"                         => "text",
       "Dropdown"                     => "dropdown",
       "Radio"                        => "radio",
       "Checkboxes"                   => "checkboxes",
+    }
+
+    adv_data_type = {
       "Employee"                     => "employee",
       "Airport"                      => 'airport',
       "Date"                         => 'date',
@@ -31,6 +34,11 @@ class ChecklistHeaderItem < ActiveRecord::Base
       "Radio - Custom Options"       => "radio-custom",
       "Checkboxes - Custom Options"  => "checkboxes-custom",
     }
+    if CONFIG::GENERAL[:advanced_checklist_data_type]
+      basic_data_type.merge(adv_data_type)
+    else
+      basic_data_type
+    end
   end
 
 
