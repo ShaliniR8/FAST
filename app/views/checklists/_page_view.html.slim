@@ -23,13 +23,14 @@ table.table.table-bordered.table-striped.mt10 id="page-view-#{checklist.id}"
             = render 'forms/attachments_show_mini', owner: checklist_row
         td
           - if checklist_row.present?
+            = checklist_row.display_findings
             - if @owner.status != 'Completed'
               = link_to '',
                 new_finding_path( owner_id: checklist_row.id, owner_type: checklist_row.class.name ),
                 class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
                 id: checklist_row.id,
                 "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add Finding"
-            = link_to '',
+            /= link_to '',
               '#',
               class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',
               id: checklist_row.id,
