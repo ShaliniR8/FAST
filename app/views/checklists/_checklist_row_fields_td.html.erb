@@ -38,7 +38,7 @@
     <%else%>
       <%case field_type%>
       <%when 'employee'%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
 
 
           <div class="input-group">
@@ -63,7 +63,7 @@
 
         <%end%>
       <%when 'airport'%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
 
           <div class="input-group">
             <%=text_field_tag "", "",
@@ -86,7 +86,7 @@
 
         <%end%>
       <%when 'date'%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
 
 
           <%=f.text_field :value,
@@ -96,7 +96,7 @@
 
         <%end%>
       <%when 'datetime'%>
-        <%if action_name == 'address'%>
+        <%if ["address", "address_raw"].include?(action_name)%>
 
 
           <%=f.text_field :value,

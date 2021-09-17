@@ -21,7 +21,7 @@
             <%=text_field_tag "name_space[field]", nil, {:list => "select_field", :class => "form-control ml5", :id => "field_select_all"}%>
             <datalist id="select_field">
               <%@fields.each do |field|%>
-                <option data-fieldtype="<%=field[:type]%>" value="<%=field[:title]%>"></option>
+                <option data-fieldtype="<%=field[:type]%>" value="<%=field[:title]%>"><%=field[:header_name]%></option>
               <%end%>
             </datalist>
           </div>

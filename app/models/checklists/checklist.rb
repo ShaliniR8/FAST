@@ -17,11 +17,16 @@ class Checklist < ActiveRecord::Base
       {field: 'title',        title: 'Title', num_cols: 12,  type: 'text', visible: 'index,form,show',      required: true},
       {field: 'get_owner',    title: 'Source of Input', num_cols: 12,  type: 'text', visible: 'index,show', required: false},
       {field: 'get_template', title: 'Template', num_cols: 12,  type: 'text', visible: 'show', required: false},
+      {field: 'get_header',   title: 'Checklist Header', num_cols: 12,  type: 'text', visible: 'show', required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
   def temp_method
     # byebug
+  end
+
+  def get_header
+    "#{checklist_header.title} ##{checklist_header.id}"
   end
 
   def get_template

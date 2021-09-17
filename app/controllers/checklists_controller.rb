@@ -28,7 +28,8 @@ class ChecklistsController < ApplicationController
 
   def index
     @title = 'Checklist Templates'
-    @records = @table.where(:owner_type => 'ChecklistHeader')
+    # @records = Checklist.includes(:checklist_header).where(:owner_type => 'ChecklistHeader').select { |checklist| checklist.checklist_header.status == 'Published' }
+    @records = Checklist.where(:owner_type => 'ChecklistHeader')
     @headers = Checklist.get_meta_fields('index')
     @headers.delete({:field=>"get_owner", :title=>"Source of Input", :num_cols=>12, :type=>"text", :visible=>"index,show", :required=>false})
   end
@@ -237,12 +238,22 @@ class ChecklistsController < ApplicationController
   end
 
 
-  def update        
+  def update
+
+    # reset checklist cell value when data type is changed
+    if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+      params[:checklist][:checklist_rows_attributes].each do |key, checklist_row|
+        if checklist_row[:checklist_cells_attributes].present?
+          checklist_row[:checklist_cells_attributes].each do |key, checklist_cell|
+            ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present?
+          end
+        end
+      end
+    end
+
     if params[:template_names].present?
       template_id = Checklist.where(owner_type: 'ChecklistHeader').where(title: (params[:template_names])).first.id
       params[:checklist][:template_id] = template_id
-    else
-      params[:checklist][:template_id] = nil
     end
 
     if params[:commit].present? && params[:commit] == 'Create Audit'
@@ -279,6 +290,7 @@ class ChecklistsController < ApplicationController
       if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
         AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
       end
+      
       @record.update_attributes(params[:checklist])
       @record.update_row_orders
       redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner
@@ -295,6 +307,11 @@ class ChecklistsController < ApplicationController
           checklist_header: :checklist_header_items,
         ).find(params[:id])
         @is_template = @record.owner_type == "ChecklistHeader"
+
+
+        # Check Access Control
+        template_name = Checklist.find(@record.template_id).title rescue @record.title
+        redirect_to errors_path unless current_user.has_access(template_name, 'viewable')
       end
       format.json { show_as_json }
     end
@@ -325,6 +342,10 @@ class ChecklistsController < ApplicationController
       checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
       checklist_header: :checklist_header_items,
     ).find(params[:template])
+    @record.template_id = params[:template]
+    @record.save
+
+    @record
   end
 
 

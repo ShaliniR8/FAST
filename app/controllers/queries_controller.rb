@@ -218,7 +218,7 @@ class QueriesController < ApplicationController
                 field: "temp_method",
                 title: header_item.title.strip(),
                 type: header_item.data_type,
-                header_id: header_item.id
+                header_name: header.title
               }
             end
           end
@@ -229,15 +229,28 @@ class QueriesController < ApplicationController
               field: "temp_method",
               title: header_item.title.strip(),
               type: header_item.data_type,
-              header_id: header_item.id
+              header_name: header.title
             }
           end
         end
       end
 
-      @fields = @fields.uniq
+
+      # Combine the same header column name
+      @fields = @fields.group_by { |field| field[:title] }.map { |val| val[1] }.map do |fields|
+        header_name = fields.map {|field| field[:header_name] }.join(', ')
+        {
+          field: fields.first[:field],
+          title: fields.first[:title],
+          type: fields.first[:type],
+          header_name: header_name
+        }
+      end
+
+
+      # @fields = @fields.uniq
     else
-      @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
+      @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible', 'close').keep_if{|x| x[:field]}
     end
 
     if @templates.length > 0 && @target != 'Checklist'
@@ -277,6 +290,9 @@ class QueriesController < ApplicationController
     if ['Record', 'Submission'].include?(@owner.target)
       @headers = filter_submitter_name_header(@headers)
     end
+    if ['Record', 'Submission', 'Report'].include?(@owner.target)
+      @headers = filter_event_title_header(@headers)
+    end
     @records = @results_ids.map do |result_id|
       @object_type.find(result_id)
     end
@@ -295,6 +311,7 @@ class QueriesController < ApplicationController
         title: field.label,
         field: field.label,
         type: field.data_type,
+        nested_field_title: field.nested_field_value
       }
     }
     visualization = @owner.visualizations.create
@@ -344,9 +361,12 @@ class QueriesController < ApplicationController
                                                                       series_field_arr: @series_field,
                                                                       records: @records,
                                                                       get_ids: true)
+
     else # when series not present, use default charts
       @data     = get_data_table_for_google_visualization(x_axis_field_arr: @x_axis_field, records: @records)
       @data_ids = get_data_ids_table_for_google_visualization(x_axis_field_arr: @x_axis_field, records: @records)
+
+      # byebug
 
       # to draw empty charts for empty data
       if @data.length == 1 && @data_ids.length == 1
@@ -394,6 +414,19 @@ class QueriesController < ApplicationController
     headers
   end
 
+  def filter_event_title_header(headers)
+    if !CONFIG.sr::GENERAL[:show_event_title_in_query]
+      if !current_user.global_admin?
+        headers.delete_if {|x| x[:field] == 'description'}
+      end
+    else
+      if !current_user.admin?
+        headers.delete_if {|x| x[:field] == 'description'}
+      end
+    end
+    headers
+  end
+
 
   def apply_query
     if !session[:mode].present?
@@ -409,7 +442,10 @@ class QueriesController < ApplicationController
     if ['Record', 'Submission'].include?(@owner.target)
       @headers = filter_submitter_name_header(@headers)
     end
-    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    if ['Record', 'Submission', 'Report'].include?(@owner.target)
+      @headers = filter_event_title_header(@headers)
+    end
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
     @template_fields = []
 
     if @owner.target == "Checklist"
@@ -426,6 +462,7 @@ class QueriesController < ApplicationController
           field: field.label,
           data_type: field.data_type,
           field_type: field.display_type,
+          nested_field_title: field.nested_field_value
         }
       }
     end
@@ -443,7 +480,7 @@ class QueriesController < ApplicationController
         templates_id.delete('-1')
         records +=  Checklist.where(template_id: templates_id)
       else
-        records =  Checklist.where(template_id: @owner.templates)
+        records =  Checklist.where(template_id: @owner.templates).select { |x| x.owner_type != 'ChecklistHeader' }
       end
     else
       records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
@@ -464,6 +501,7 @@ class QueriesController < ApplicationController
     end
   end
 
+
   def get_records
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
     @title = CONFIG.hierarchy[@module_name][:objects][@owner.target][:title].pluralize
@@ -472,6 +510,9 @@ class QueriesController < ApplicationController
     @headers = @object_type.get_meta_fields('index')
     if ['Record', 'Submission'].include?(@owner.target)
       @headers = filter_submitter_name_header(@headers)
+    end
+    if ['Record', 'Submission', 'Report'].include?(@owner.target)
+      @headers = filter_event_title_header(@headers)
     end
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
@@ -513,8 +554,11 @@ class QueriesController < ApplicationController
     if ['Record', 'Submission'].include?(@owner.target)
       @headers = filter_submitter_name_header(@headers)
     end
+    if ['Record', 'Submission', 'Report'].include?(@owner.target)
+      @headers = filter_event_title_header(@headers)
+    end
 
-    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
     @template_fields = []
     
 
@@ -532,6 +576,7 @@ class QueriesController < ApplicationController
           field: field.label,
           data_type: field.data_type,
           field_type: field.display_type,
+          nested_field_title: field.nested_field_value
         }
       }
     end
@@ -589,6 +634,9 @@ class QueriesController < ApplicationController
     @headers = @object_type.get_meta_fields('index')
     if ['Record', 'Submission'].include?(@owner.target)
       @headers = filter_submitter_name_header(@headers)
+    end
+    if ['Record', 'Submission', 'Report'].include?(@owner.target)
+      @headers = filter_event_title_header(@headers)
     end
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
     @template_fields = []
@@ -655,7 +703,7 @@ class QueriesController < ApplicationController
     @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     @types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
-    @checklists = Checklist.where(owner_type: 'ChecklistHeader').sort_by{|x| x.title}.map{|checklist| [checklist.title, checklist.id]}.to_h
+    @checklists = Checklist.includes(:checklist_header).where(owner_type: 'ChecklistHeader').sort_by{|x| x.title}.map{|checklist| ["#{checklist.title} [#{checklist.checklist_header.title}]", checklist.id]}.to_h
   end
 
 
@@ -792,9 +840,15 @@ class QueriesController < ApplicationController
     cells = checklist_row
       .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-    values = cells.map(&:value).compact.map(&:downcase)
 
-    values.include? search_value
+    case cells.map(&:data_type).first 
+    when 'employee'
+      values = cells.map(&:value).compact.map(&:downcase).map(&:strip).map{ |val| User.find(val).full_name rescue '' }.first.downcase
+      values == search_value
+    else
+      values = cells.map(&:value).compact.map(&:downcase).map(&:strip)
+      values.include?  search_value.strip
+    end
   end
 
 
@@ -802,58 +856,21 @@ class QueriesController < ApplicationController
     cells = checklist_row
       .checklist_cells.flatten
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-    values = cells.map(&:value).compact.map(&:downcase)
 
-    values.each do |value|
-      return true if value.include? search_value
+    case cells.map(&:data_type).first 
+    when 'employee'
+      values = cells.map(&:value).compact.map(&:downcase).map{ |val| User.find(val).full_name rescue '' }.first.downcase
+      values.include? search_value
+    else
+      values = cells.map(&:value).compact.map(&:downcase)
+
+      values.each do |value|
+        return true if value.include? search_value
+      end
+      false
     end
-    false
   end
 
-
-  def checklist_users_contains?(checklist_row, headers, search_value)
-    cells = checklist_row
-      .checklist_cells.flatten
-      .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-    values = cells.map(&:value).compact.map(&:downcase)
-    values = values.select(&:present?).map { |value| User.find(value.to_i).full_name.downcase }
-
-    values.each do |value|
-      return true if value.include? search_value
-    end
-    false
-  end
-
-
-  def checklist_date_contains?(checklist_row, headers, start_date, end_date)
-    cells = checklist_row
-      .checklist_cells.flatten
-      .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-    values = cells.map(&:value).compact.map(&:downcase)
-
-    values.each do |value|
-      found = value.to_date >= start_date.to_date && value.to_date <= end_date.to_date
-      return found if found
-    end
-    false
-  end
-
-
-  def checklist_date_compare?(checklist_row, headers, start_date, end_date)
-    cells = checklist_row
-      .checklist_cells.flatten
-      .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-    values = cells.map(&:value).compact.map(&:downcase)
-
-    values.each do |value|
-      found = value.to_date >= start_date.to_date
-      found = found && value.to_date <= end_date.to_date if end_date.present?
-
-      return found if found
-    end
-
-    false
-  end
 
   def checklist_compare?(checklist_row, headers, search_value)
     cells = checklist_row
@@ -861,9 +878,22 @@ class QueriesController < ApplicationController
       .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
     values = cells.map(&:value).compact.map(&:downcase)
 
-    values.each do |value|
-      found = value.to_f >= search_value.to_f rescue false
-      return found if found
+    case cells.map(&:data_type).first 
+    when 'date'
+      values.each do |value|
+        found = value.to_date >= search_value.to_date rescue false
+        return found if found
+      end
+    when 'datetime'
+      values.each do |value|
+        found = value.to_datetime >= search_value.to_datetime rescue false
+        return found if found
+      end
+    else
+      values.each do |value|
+        found = value.to_f >= search_value.to_f rescue false
+        return found if found
+      end
     end
 
     false
@@ -876,56 +906,20 @@ class QueriesController < ApplicationController
 
     case logic_type
     when "equals"
-      case field[:type]
-      when 'datetime', 'date'
-        start_date = search_value.split("to")[0]
-        end_date = search_value.split("to")[1] || search_value.split("to")[0]
-        result = records.select do |checklist_row|
-          xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
-        end
-      when 'employee'
-        user = User.find_by_full_name(search_value)
-        result = records.select do |checklist_row|
-          xor ^ checklist_equals?(checklist_row, headers, user.id.to_s)
-        end
-      else # 'text'
-        result = records.select do |checklist_row|
-          xor ^ checklist_equals?(checklist_row, headers, search_value.downcase)
-        end
+      result = records.select do |checklist_row|
+        xor ^ checklist_equals?(checklist_row, headers, search_value.downcase)
       end
 
     when "contains"
-      case field[:type]
-      when 'datetime', 'date'
-        start_date = search_value.split("to")[0]
-        end_date = search_value.split("to")[1] || search_value.split("to")[0]
-        result = records.select do |checklist_row|
-          xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
-        end
-      when 'employee'
-        result = records.select do |checklist_row|
-          xor ^ checklist_users_contains?(checklist_row, headers, search_value.downcase)
-        end
-      else # 'text'
-        result = records.select do |checklist_row|
-          xor ^ checklist_contains?(checklist_row, headers, search_value.downcase)
-        end
+      result = records.select do |checklist_row|
+        xor ^ checklist_contains?(checklist_row, headers, search_value.downcase)
       end
 
     when "numeric"
-      case field[:type]
-      when 'date', 'datetime'
-        start_date = search_value.split("to")[0]
-        end_date = search_value.split("to")[1] || nil
-
-        result = records.select do |checklist_row|
-          xor ^ checklist_date_compare?(checklist_row, headers, start_date, end_date)
-        end
-      else
-        result = records.select do |checklist_row|
-          xor ^ checklist_compare?(checklist_row, headers, search_value)
-        end
+      result = records.select do |checklist_row|
+        xor ^ checklist_compare?(checklist_row, headers, search_value)
       end
+
     end
 
     return result

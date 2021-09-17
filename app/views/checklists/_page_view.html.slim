@@ -10,11 +10,15 @@ table.table.table-bordered.table-striped.mt10 id="page-view-#{checklist.id}"
         - checklist_row = checklist.checklist_rows.order(:id)[index]
         - display_content = ''
         - @headers.each do |header|
+          - data_type = checklist_row.checklist_cells.where(checklist_header_item_id: header.id).first.data_type
+
           - if content[header.id].present?
-            - if header.data_type == 'checkboxes'
-              - input = content[header.id].gsub(/\;/, "\n")
+            - case data_type 
+            - when 'employee'
+              - input = User.find(content[header.id]).full_name
             - else
               - input = content[header.id]
+              
             - display_content +=  '<strong>' + header.title + '</strong>' + ':<br/>' + input +'<br><br>'
         td
           = display_content.gsub(/\n/, '<br/>').html_safe rescue ''

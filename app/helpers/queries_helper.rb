@@ -38,19 +38,19 @@ module QueriesHelper
   def format_val(value, field_type, field_param=nil)
     case field_type
     when 'user', 'employee'
-      User.find_by_id(value).full_name rescue value
+      User.find_by_id(value).full_name rescue value.strip
     when 'datetime', 'date'
       value.strftime("%Y-%m") rescue 'N/A'
     when 'boolean_box', 'boolean'
       (value ? 'Yes' : 'No') rescue 'No'
     when 'checkbox'
-      value.split(';') rescue nil
+      value.split(';').map(&:strip) rescue nil
     when 'list'
-      value.split('<br>')
+      value.split('<br>').map(&:strip)
     when 'category'
       value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
     else
-      value
+      value.strip
     end
   end
 
@@ -259,6 +259,7 @@ module QueriesHelper
         .inject(Hash.new(0)){|h, e| h[e] += 1; h}
         .sort_by{|k,v| k}
         .each{|pair| data << pair}
+
     end
     return data
   end
@@ -296,18 +297,28 @@ module QueriesHelper
       end
     else
       records.map{|record| [record.id, get_val(record, x_axis_field_arr, x_axis_field_title)] }
-        .reject{ |x| x[1].nil? } # remove empty records
+        .reject{ |x| x[1].nil? || x[1].empty? } # remove empty records
         .inject(Hash.new([])) { |hash, element|
           record_id = element[0]
           x_axis_field_value = element[1]
 
-          if hash[x_axis_field_value].present?
-            hash[x_axis_field_value] << record_id
+          if x_axis_field_value.size > 1
+            x_axis_field_value.each do |x_value|
+              if hash[[x_value]].present?
+                hash[[x_value]] << record_id
+              else
+                hash[[x_value]] = []
+                hash[[x_value]] << record_id
+              end
+            end
           else
-            hash[x_axis_field_value] = []
-            hash[x_axis_field_value] << record_id
+            if hash[x_axis_field_value].present?
+              hash[x_axis_field_value] << record_id
+            else
+              hash[x_axis_field_value] = []
+              hash[x_axis_field_value] << record_id
+            end
           end
-
           ; hash
         }
         .sort_by{|k,v| k}

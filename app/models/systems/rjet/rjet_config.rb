@@ -12,15 +12,18 @@ class RJETConfig < DefaultConfig
     time_zone:                    'Eastern Time (US & Canada)',
 
     # SYSTEM CONFIGS
-    has_mobile_app:               true,
-    enable_sso:                   true,
-    login_option:                 'dual',
-    cisp_integration:             true,
-    csv_user_import:              true,
-    asrs_integration:             true,
-
-    has_pdf_footer:               false,
-    advanced_checklist_data_type: true,
+    has_mobile_app:                             true,
+    enable_sso:                                 true,
+    login_option:                               'dual',
+    cisp_integration:                           true,
+    csv_user_import:                            true,
+    asrs_integration:                           true,
+    
+    has_pdf_footer:                             false,
+    advanced_checklist_data_type:               true,
+    auto_populate_nested_fields_visualizations: true,
+    checklist_query:                            true,
+    query_processing_in_rake_task:              true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,

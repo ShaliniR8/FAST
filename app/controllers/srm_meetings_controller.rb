@@ -250,10 +250,13 @@ class SrmMeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id])
     @action = "edit"
     @headers = User.invite_headers
-    rules = AccessControl.preload(:privileges).where(entry: 'meetings', action: ['show'])
+
+    rules = AccessControl.preload(:privileges).where(entry: 'srm_meetings', action: ['show'])
     privileges = rules.map(&:privileges).flatten
     users = privileges.map(&:users).flatten.uniq
-    @available_participants = User.preload(:invitations).where(id: users.map(&:id))
+    @available_participants = User.preload(:invitations).where(id: users.map(&:id)).active
+
+
     @timezones = Meeting.get_timezones
     @sra_headers = Sra.get_meta_fields('index')
     @sras = @meeting.sras + Sra.where('meeting_id is ?', nil)

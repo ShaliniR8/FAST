@@ -60,7 +60,7 @@
                           td
                             table class='table table-bordered table-striped mt10'
                               thead
-                                = row_form.hidden_field :id
+                                = row_form.hidden_field :id, class: 'row-id changed'
                                 th = "Header"
                                 th = "Content"
                               tbody.checklist_rows

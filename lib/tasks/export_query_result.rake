@@ -1,4 +1,3 @@
-
 def expand_emit(condition, records)
   results = []
   if condition.query_conditions.length > 0
@@ -130,68 +129,35 @@ def checklist_equals?(checklist_row, headers, search_value)
   cells = checklist_row
     .checklist_cells.flatten
     .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-  values = cells.map(&:value).compact.map(&:downcase)
 
-  values.include? search_value
+  case cells.map(&:data_type).first 
+  when 'employee'
+    values = cells.map(&:value).compact.map(&:downcase).map(&:strip).map{ |val| User.find(val).full_name rescue '' }.first.downcase
+    values == search_value
+  else
+    values = cells.map(&:value).compact.map(&:downcase).map(&:strip)
+    values.include?  search_value.strip
+  end
 end
-
 
 
 def checklist_contains?(checklist_row, headers, search_value)
   cells = checklist_row
     .checklist_cells.flatten
     .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-  values = cells.map(&:value).compact.map(&:downcase)
 
-  values.each do |value|
-    return true if value.include? search_value
+  case cells.map(&:data_type).first 
+  when 'employee'
+    values = cells.map(&:value).compact.map(&:downcase).map{ |val| User.find(val).full_name rescue '' }.first.downcase
+    values.include? search_value
+  else
+    values = cells.map(&:value).compact.map(&:downcase)
+
+    values.each do |value|
+      return true if value.include? search_value
+    end
+    false
   end
-  false
-end
-
-
-def checklist_users_contains?(checklist_row, headers, search_value)
-  cells = checklist_row
-    .checklist_cells.flatten
-    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-  values = cells.map(&:value).compact.map(&:downcase)
-  values = values.select(&:present?).map { |value| User.find(value.to_i).full_name.downcase }
-
-  values.each do |value|
-    return true if value.include? search_value
-  end
-  false
-end
-
-
-def checklist_date_contains?(checklist_row, headers, start_date, end_date)
-  cells = checklist_row
-    .checklist_cells.flatten
-    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-  values = cells.map(&:value).compact.map(&:downcase)
-
-  values.each do |value|
-    found = value.to_date >= start_date.to_date && value.to_date <= end_date.to_date
-    return found if found
-  end
-  false
-end
-
-
-def checklist_date_compare?(checklist_row, headers, start_date, end_date)
-  cells = checklist_row
-    .checklist_cells.flatten
-    .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
-  values = cells.map(&:value).compact.map(&:downcase)
-
-  values.each do |value|
-    found = value.to_date >= start_date.to_date
-    found = found && value.to_date <= end_date.to_date if end_date.present?
-
-    return found if found
-  end
-
-  false
 end
 
 
@@ -201,9 +167,22 @@ def checklist_compare?(checklist_row, headers, search_value)
     .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
   values = cells.map(&:value).compact.map(&:downcase)
 
-  values.each do |value|
-    found = value.to_f >= search_value.to_f rescue false
-    return found if found
+  case cells.map(&:data_type).first 
+  when 'date'
+    values.each do |value|
+      found = value.to_date >= search_value.to_date rescue false
+      return found if found
+    end
+  when 'datetime'
+    values.each do |value|
+      found = value.to_datetime >= search_value.to_datetime rescue false
+      return found if found
+    end
+  else
+    values.each do |value|
+      found = value.to_f >= search_value.to_f rescue false
+      return found if found
+    end
   end
 
   false
@@ -216,56 +195,20 @@ def emit_helper_checklist(search_value, records, field, xor, logic_type, target_
 
   case logic_type
   when "equals"
-    case field[:type]
-    when 'datetime', 'date'
-      start_date = search_value.split("to")[0]
-      end_date = search_value.split("to")[1] || search_value.split("to")[0]
-      result = records.select do |checklist_row|
-        xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
-      end
-    when 'employee'
-      user = User.find_by_full_name(search_value)
-      result = records.select do |checklist_row|
-        xor ^ checklist_equals?(checklist_row, headers, user.id.to_s)
-      end
-    else # 'text'
-      result = records.select do |checklist_row|
-        xor ^ checklist_equals?(checklist_row, headers, search_value.downcase)
-      end
+    result = records.select do |checklist_row|
+      xor ^ checklist_equals?(checklist_row, headers, search_value.downcase)
     end
 
   when "contains"
-    case field[:type]
-    when 'datetime', 'date'
-      start_date = search_value.split("to")[0]
-      end_date = search_value.split("to")[1] || search_value.split("to")[0]
-      result = records.select do |checklist_row|
-        xor ^ checklist_date_contains?(checklist_row, headers, start_date, end_date)
-      end
-    when 'employee'
-      result = records.select do |checklist_row|
-        xor ^ checklist_users_contains?(checklist_row, headers, search_value.downcase)
-      end
-    else # 'text'
-      result = records.select do |checklist_row|
-        xor ^ checklist_contains?(checklist_row, headers, search_value.downcase)
-      end
+    result = records.select do |checklist_row|
+      xor ^ checklist_contains?(checklist_row, headers, search_value.downcase)
     end
 
   when "numeric"
-    case field[:type]
-    when 'date', 'datetime'
-      start_date = search_value.split("to")[0]
-      end_date = search_value.split("to")[1] || nil
-
-      result = records.select do |checklist_row|
-        xor ^ checklist_date_compare?(checklist_row, headers, start_date, end_date)
-      end
-    else
-      result = records.select do |checklist_row|
-        xor ^ checklist_compare?(checklist_row, headers, search_value)
-      end
+    result = records.select do |checklist_row|
+      xor ^ checklist_compare?(checklist_row, headers, search_value)
     end
+
   end
 
   return result
@@ -408,6 +351,12 @@ def get_records
   @object_type = Object.const_get(@owner.target)
   @table_name = @object_type.table_name
   @headers = @object_type.get_meta_fields('index')
+  if ['Record', 'Submission'].include?(@owner.target)
+    @headers = filter_submitter_name_header(@headers)
+  end
+  if ['Record', 'Submission', 'Report'].include?(@owner.target)
+    @headers = filter_event_title_header(@headers)
+  end
   @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
   @template_fields = []
   Template.preload(:categories, :fields)
@@ -432,12 +381,6 @@ def get_records
   else
     records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
   end
-
-  @owner.query_conditions.each do |condition|
-    records = records & expand_emit(condition, records)
-  end
-
-  @records = records
 end
 
 def get_field(query, object_type, field_label)
@@ -781,7 +724,7 @@ task save_query_result: :environment do
     file.write("processing...")
   end
 
-  @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+  @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
   @template_fields = []
 
   if @owner.target == "Checklist"
@@ -798,6 +741,7 @@ task save_query_result: :environment do
         field: field.label,
         data_type: field.data_type,
         field_type: field.display_type,
+        nested_field_title: field.nested_field_value
       }
     }
   end
@@ -816,7 +760,7 @@ task save_query_result: :environment do
       templates_id.delete('-1')
       records +=  Checklist.where(template_id: templates_id)
     else
-      records =  Checklist.where(template_id: @owner.templates)
+      records =  Checklist.where(template_id: @owner.templates).select { |x| x.owner_type != 'ChecklistHeader' }
     end
   else
     records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}

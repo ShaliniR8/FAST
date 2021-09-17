@@ -50,14 +50,15 @@ class DefaultConfig
     integrations: ['mitre'],
 
     # SYSTEM-WIDE FORM CONFIGS
-    allow_reopen_forms:                 true,    # Indicates if forms can be reopened  - default on
-    base_risk_matrix:                   false,    # Indicates the use of the default risk matrix - default on
-    configurable_risk_matrices:         false,   # Enables the use of varied risk matrices - default off
-    has_root_causes:                    true,    # Enables the use of root causes - default on
-    shared_links:                       false,   # Enables shareable links to be created for forms - default off
-    drop_down_risk_selection:           false,
-    query_processing_in_rake_task:      false,
-    advanced_checklist_data_type:       false,
+    allow_reopen_forms:                         true,    # Indicates if forms can be reopened  - default on
+    base_risk_matrix:                           false,    # Indicates the use of the default risk matrix - default on
+    configurable_risk_matrices:                 false,   # Enables the use of varied risk matrices - default off
+    has_root_causes:                            true,    # Enables the use of root causes - default on
+    shared_links:                               false,   # Enables shareable links to be created for forms - default off
+    drop_down_risk_selection:                   false,
+    query_processing_in_rake_task:              false,
+    advanced_checklist_data_type:               false,
+    auto_populate_nested_fields_visualizations: false,
 
     # TO BE REMOVED:
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)

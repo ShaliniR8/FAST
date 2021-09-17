@@ -23,19 +23,21 @@
                 {list: "select_field", class: "form-control ml5", id: "x_axis_#{visualization.id}"}%>
               <datalist id="select_field">
                 <%@fields.each do |x|%>
-                  <option value="<%=x[:title]%>" data-field-type="<%=x[:type]%>"></option>
+                  <option value="<%=x[:title]%>" data-field-type="<%=x[:type]%>"><%=x[:nested_field_title]%></option>
                 <%end%>
               </datalist>
             </div>
           </div>
 
-          <div class="col-sm-2 pull-right">
-            <%=check_box_tag :nested_visualization_xaxis, 0, false,
-              id: "nested_visualization_xaxis_#{visualization.id}",
-              class: 'form-control xaxis_nested_vis_checkbox',
-              'data-toggle' => "tooltip",
-              'title' => "Populate all the nested field visualizations for X-axis" %>
-          </div>
+          <% if CONFIG::GENERAL[:auto_populate_nested_fields_visualizations] %>
+            <div class="col-sm-2 pull-right">
+              <%=check_box_tag :nested_visualization_xaxis, 0, false,
+                id: "nested_visualization_xaxis_#{visualization.id}",
+                class: 'form-control xaxis_nested_vis_checkbox',
+                'data-toggle' => "tooltip",
+                'title' => "Populate all the nested field visualizations for X-axis" %>
+            </div>
+          <% end %>
 
           <div class="form-group row col-xs-10">
             <%=label_tag :series, 'Series (Optional)', class: "col-sm-4 col-form-label"%>
@@ -45,13 +47,15 @@
             </div>
           </div>
 
-          <div class="col-sm-2 pull-right">
-            <%=check_box_tag :nested_visualization_series, 0, false,
-              id: "nested_visualization_series_#{visualization.id}",
-              class: 'form-control series_nested_vis_checkbox',
-              'data-toggle' => "tooltip",
-              'title' => "Populate all the nested field visualizations for Series" %>
-          </div>
+          <% if CONFIG::GENERAL[:auto_populate_nested_fields_visualizations] %>
+            <div class="col-sm-2 pull-right">
+              <%=check_box_tag :nested_visualization_series, 0, false,
+                id: "nested_visualization_series_#{visualization.id}",
+                class: 'form-control series_nested_vis_checkbox',
+                'data-toggle' => "tooltip",
+                'title' => "Populate all the nested field visualizations for Series" %>
+            </div>
+          <% end %>
 
           <div class="form-group row col-xs-10">
             <%=label_tag :default_chart, 'Default Chart Type (Optional)', class: "col-sm-4 col-form-label"%>
