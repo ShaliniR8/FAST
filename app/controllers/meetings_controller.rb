@@ -197,12 +197,13 @@ class MeetingsController < ApplicationController
     @table = Object.const_get("Meeting")
     @headers = Meeting.get_meta_fields('index')
     @action = 'meeting'
-    @records = @table.includes(:invitations, :host).where('meetings.type is null')
-    unless current_user.has_access('meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true )
-      @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
-        current_user.id, ['Pending', 'Accepted'], current_user.id)
-    end
-    @records.keep_if{|r| display_in_table(r)}
+    # @records = @table.includes(:invitations, :host).where('meetings.type is null')
+    # unless current_user.has_access('meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true )
+    #   @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+    #     current_user.id, ['Pending', 'Accepted'], current_user.id)
+    # end
+    # @records.keep_if{|r| display_in_table(r)}
+    handle_search
   end
 
 

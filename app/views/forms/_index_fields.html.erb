@@ -38,6 +38,12 @@
             <%end%>
           <%end%>
 
+          <%if defined? from_recurrence%>
+            <%path = "#{request.path}?form_type=#{form_type}"%>
+          <%else%>
+            <%path = request.path%>
+          <%end%>
+
 
           <%=link_to "Advanced Search", '#',
             :class => "btn btn-warning pull-right mr5",
@@ -45,7 +51,7 @@
             "data-toggle" => "modal",
             "data-target" => ".bs-example-modal-lg"%>
           <%=link_to "Reset",
-            request.fullpath,
+            path,
             :disable_with => 'Resetting...',
             :class => "btn btn-default pull-right mr5"%>
           <%if defined? from_user%>
@@ -166,7 +172,7 @@
   $(function(){
 
     $('#adv').on('click',function(){
-      $.get("<%=advanced_search_home_index_path(:table => @table.name)%>", function(data){
+      $.get("<%=advanced_search_home_index_path({:table => @table.name, :path => path})%>", function(data){
         $(".modal-content").html(data);
         $(window).resize();
       });

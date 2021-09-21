@@ -283,24 +283,27 @@ class ApplicationDatatable
     when 'All'
       if has_date_range
         object.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date)
+              .within_timerange(nil, nil)
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       else
         object.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       end
     when 'Overdue'
-      object.joins(join_tables).joins(join_tables)
+      object.joins(join_tables)
+            .where(id: @recs.map(&:id))
             .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
-            .within_timerange(start_date, end_date)
+            .within_timerange(nil, nil)
             .where(["#{params[:controller]}.due_date < :today and #{params[:controller]}.status != :status", {today: Time.now.to_date, status: 'Completed'}])
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
@@ -309,15 +312,17 @@ class ApplicationDatatable
       if has_date_range
         object.where(status: status)
               .joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(start_date, end_date)
+              .within_timerange(nil, nil)
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
       else
         object.where(status: status)
               .joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .group("#{object.table_name}.id")
@@ -485,17 +490,20 @@ class ApplicationDatatable
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
       @status_count = object.joins(join_tables)
+                            .where(id: @recs.map(&:id))
                             .where(search_string.join(' and '))
                             .group("#{object.table_name}.status").count
     else
       @status_count = object.joins(join_tables)
+                            .where(id: @recs.map(&:id))
                             .where(search_string.join(' and '))
-                            .within_timerange(start_date, end_date)
+                            .within_timerange(nil, nil)
                             .group("#{object.table_name}.status").count
     end
 
     @status_count['Overdue'] = object.joins(join_tables)
-                                     .within_timerange(start_date, end_date)
+                                     .within_timerange(nil, nil)
+                                     .where(id: @recs.map(&:id))
                                      .where(search_string.join(' and '))
                                      .group("#{object.table_name}.id")
                                      .select{ |x| x.overdue }.size
@@ -504,7 +512,8 @@ class ApplicationDatatable
 
 
   def records_adv_searched
-    temp = object.can_be_accessed(@current_user)
+    # temp = object.can_be_accessed(@current_user)
+    @recs = object.can_be_accessed(@current_user)
 
     adv_params = params[:advance_search]
 
@@ -575,7 +584,8 @@ class ApplicationDatatable
         elsif field[:start_date].present? && field[:end_date].present?
           start_date = field[:start_date].to_date
           end_date = field[:end_date].to_date
-          handle_search_date(field[:term], start_date, end_date, temp)
+          # handle_search_date(field[:term], start_date, end_date, temp)
+          handle_search_date(field[:term], start_date, end_date, @recs)
         end
       end
     end

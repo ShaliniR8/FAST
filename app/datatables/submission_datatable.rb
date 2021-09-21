@@ -46,6 +46,7 @@ class SubmissionDatatable < ApplicationDatatable
     when 'All'
       if has_date_range
         Submission.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -55,6 +56,7 @@ class SubmissionDatatable < ApplicationDatatable
               .offset(params['start'].to_i)
       else
         Submission.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -65,6 +67,7 @@ class SubmissionDatatable < ApplicationDatatable
     else
       if has_date_range
         Submission.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -74,6 +77,7 @@ class SubmissionDatatable < ApplicationDatatable
               .offset(params['start'].to_i)
       else
         Submission.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -109,6 +113,7 @@ class SubmissionDatatable < ApplicationDatatable
     if start_date.nil? && end_date.nil?
       {
         'All' => Submission.joins(join_tables)
+                       .where(id: @recs.map(&:id))
                        .where(search_string.join(' and '))
                        .can_be_accessed(@current_user)
                        .count
@@ -116,6 +121,7 @@ class SubmissionDatatable < ApplicationDatatable
     else
       {
         'All' => Submission.joins(join_tables)
+                       .where(id: @recs.map(&:id))
                        .where(search_string.join(' and '))
                        .can_be_accessed(@current_user)
                        .within_timerange(start_date, end_date)

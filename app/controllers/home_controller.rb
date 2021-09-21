@@ -735,10 +735,10 @@ class HomeController < ApplicationController
 
   def advanced_search
     @table = Object.const_get(params[:table])
-    @path = eval("#{@table.table_name}_path")
-    meta_field_args = ['show']
-    meta_field_args.push('admin') if current_user.admin?
-    @terms = @table.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present?}
+    @path = params[:path].present? ? params[:path] : eval("#{@table.table_name}_path")
+    meta_field_args = ['index']
+    discard_terms_list = ["viewer_access", "included_reports", "get_additional_info_html", "get_source"]
+    @terms = @table.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present? && discard_terms_list.exclude?(x[:field])}
     @status = params[:status]
     render :partial => '/shared/advanced_search'
   end

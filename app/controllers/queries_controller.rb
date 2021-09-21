@@ -30,7 +30,10 @@ class QueriesController < ApplicationController
 
   def index
     @headers = @table.get_meta_fields('index')
-    @records = @table.where(target: @types.values).includes(:created_by)
+    # @records = @table.where(target: @types.values).includes(:created_by)
+
+    # @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    handle_search
   end
 
 

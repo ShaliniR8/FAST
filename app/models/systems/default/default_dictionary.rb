@@ -80,7 +80,7 @@ class DefaultDictionary
     evaluate: {
       btn: :evaluate,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| owner.status != "Completed" },
+      access: proc { |owner:,user:,**op| owner.status == "New" },
     },
     expand_all: {
       btn: :expand_all,

@@ -13,17 +13,22 @@ class Query < ActiveRecord::Base
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'id',            title: 'ID',         num_cols: 12,  type: 'text', visible: 'index,show'},
-      {field: 'title',         title: 'Title',      num_cols: 12,  type: 'text', visible: 'index,show'},
-      {field: 'created_by',    title: 'Created By', num_cols: 12,  type: 'user', visible: 'index,show'},
-      {field: 'get_target',    title: 'Target',     num_cols: 12,  type: 'text', visible: 'index,show'},
-      {field: 'get_templates', title: 'Templates',  num_cols: 12,  type: 'text', visible: 'show'},
+      {field: 'id',             title: 'ID',         num_cols: 12,  type: 'text', visible: 'index,show'},
+      {field: 'title',          title: 'Title',      num_cols: 12,  type: 'text', visible: 'index,show'},
+      {field: 'get_created_by', title: 'Created By', num_cols: 12,  type: 'text', visible: 'index,show'},
+      {field: 'get_target',     title: 'Target',     num_cols: 12,  type: 'text', visible: 'index,show'},
+      {field: 'get_templates',  title: 'Templates',  num_cols: 12,  type: 'text', visible: 'show'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
 
   def get_target
-    CONFIG.hierarchy.values.map{|x| x[:objects]}.compact.inject(:merge)[target][:title].pluralize
+    CONFIG.hierarchy.values.map{|x| x[:objects]}.compact.inject(:merge)[target][:title].pluralize rescue ""
+  end
+
+
+  def get_created_by
+    created_by.present? ? created_by.full_name : ""
   end
 
 

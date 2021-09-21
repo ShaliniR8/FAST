@@ -31,19 +31,23 @@
   def print_panels(owner, **op)
     hierarchy_object = CONFIG.object[owner.class.name]
     # are custom print_panels defined ? print the custom panels : print the default panels
-    panels = hierarchy_object[:print_panels].present? ? :print_panels : :panels
-    panel_data = hierarchy_object[panels]
-    if panel_data.present?
-      # skip SOI for launch items(sra, investigation)
-      panel_data.delete(:source_of_input) if op[:launch_item]
-      panel_data.values.select{ |data|
-        data[:visible].call(owner: owner, user: current_user, **op) rescue nil
-      }.map { |data|
-        {
-          print_partial: data[:print_partial],
-          **data[:data].call(owner: owner, user: current_user, **op)
+    if hierarchy_object.present?
+      panels = hierarchy_object[:print_panels].present? ? :print_panels : :panels
+      panel_data = hierarchy_object[panels]
+      if panel_data.present?
+        # skip SOI for launch items(sra, investigation)
+        panel_data.delete(:source_of_input) if op[:launch_item]
+        panel_data.values.select{ |data|
+          data[:visible].call(owner: owner, user: current_user, **op) rescue nil
+        }.map { |data|
+          {
+            print_partial: data[:print_partial],
+            **data[:data].call(owner: owner, user: current_user, **op)
+          }
         }
-      }
+      else
+        []
+      end
     else
       []
     end

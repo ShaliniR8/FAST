@@ -188,7 +188,7 @@ class SubmissionsController < ApplicationController
 
 
   def prepare_flight_data(emp_num)
-    @flights = Sabre.where({flight_date: (Time.now - 15.days).to_date..Time.now.to_date, employee_number: emp_num})
+    @flights = Sabre.where({flight_date: (Time.now - 15.days).to_date..Time.now.to_date, employee_number: emp_num}).sort{ |a,b| (a.flight_date == b.flight_date) ? b.created_at <=> a.created_at : b.flight_date <=> a.flight_date }
     # @flights = Sabre.where({employee_number: emp_num})
   end
 

@@ -9,7 +9,11 @@ swal({
   allowOutsideClick: false,
   onOpen: function(){
 
-    $(".extra_info").hide();
+    if($("input[type='checkbox'][name='show_extra_info']").prop('checked')){
+      $(".extra_info").show();
+    }else{
+      $(".extra_info").hide();
+    }
     $(".deleted_fields").hide();
 
     // Archive/Unarchive button

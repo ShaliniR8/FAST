@@ -34,21 +34,21 @@ class Meeting < ProsafetBase
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
-      {field: 'id',               title: 'ID',                num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
-      {field: 'status',           title: 'Status',            num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
-      {field: 'get_host',         title: 'Host',              num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
-      # {field: 'meeting_type',     title: 'Meeting Type',      num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: ['ASAP', 'non-ASAP']},
-      {field: 'meeting_type',     title: 'Meeting Type',      num_cols: 6,  type: 'text',   visible: 'index,show,form', required: false},
-      {field: 'title',            title: 'Title',             num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: CONFIG.custom_options['Meeting Titles']},
-      {                                                                     type: 'newline',    visible: 'form,show'},
-      {field: 'review_start',     title: 'Review Start',      num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
-      {field: 'review_end',       title: 'Review End',        num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
-      {field: 'meeting_start',    title: 'Meeting Start',     num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
-      {field: 'meeting_end',      title: 'Meeting End',       num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
-      {field: 'notes',            title: 'Notes',             num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
-      {field: 'final_comment',    title: 'Final Comment',     num_cols: 12, type: 'textarea',   visible: 'show',            required: false},
-      {field: 'host',             title: 'Host',              num_cols: 12, type: 'user',       visible: 'auto',            required: false},
-      {field: 'participants',     title: 'Participants',      num_cols: 12, type: 'user',       visible: 'auto',            required: false},
+      {field: 'id',               title: 'ID',                 num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
+      {field: 'status',           title: 'Status',             num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
+      {field: 'get_host',         title: 'Host',               num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
+      # {field: 'meeting_type',     title: 'Meeting Type',       num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: ['ASAP', 'non-ASAP']},
+      {field: 'meeting_type',     title: 'Meeting Type',       num_cols: 6,  type: 'text',   visible: 'index,show,form', required: false},
+      {field: 'title',            title: 'Title',              num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: CONFIG.custom_options['Meeting Titles']},
+      {                                                                      type: 'newline',    visible: 'form,show'},
+      {field: 'review_start',     title: 'Review Start Date',  num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'review_end',       title: 'Review End Date',    num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'meeting_start',    title: 'Meeting Start Date', num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'meeting_end',      title: 'Meeting End Date',   num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
+      {field: 'notes',            title: 'Notes',              num_cols: 12, type: 'textarea',   visible: 'form,show',       required: false},
+      {field: 'final_comment',    title: 'Final Comment',      num_cols: 12, type: 'textarea',   visible: 'show',            required: false},
+      {field: 'host',             title: 'Host',               num_cols: 12, type: 'user',       visible: 'auto',            required: false},
+      {field: 'participants',     title: 'Participants',       num_cols: 12, type: 'user',       visible: 'auto',            required: false},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 

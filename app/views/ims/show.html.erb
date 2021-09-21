@@ -32,7 +32,7 @@
               <%=link_to "Reoccur",reoccur_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%end%>
 
-            <%=link_to "Send Message",new_message_path(:link=>im_path(@im), :link_type=>"Im", :link_id=>@im.id),:class=>"btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Send Message",new_message_path(owner_id: @im.id, owner_class: @im.class),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right ml5 mb5"%>
           </div>
         </div>
