@@ -53,6 +53,8 @@ ruby:
           = f.hidden_field :owner_id, value: @owner.id
           - if @owner.class.name == 'Submission'
             = link_to "#{@owner.class.name} ##{@owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}", @owner, target: :_blank
+          - elsif @owner.class.name == 'SmsAction'
+            = link_to "CorrectiveAction ##{@owner.id}", @owner, target: :_blank
           - else
             = link_to "#{@owner.class.name} ##{@owner.id}", @owner, target: :_blank
 

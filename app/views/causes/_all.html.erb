@@ -9,7 +9,11 @@
       </div>
     </div>
 
-    <% causes = Cause.where(obj_id: owner.obj_id) %>
+    <%# causes = Cause.where({obj_id: owner.obj_id}) %>
+    <% causes = Cause.where({owner_type: owner.class.name, owner_id: owner.id}) %>
+    <%if !causes.present?
+      causes = Cause.where({obj_id: owner.obj_id})
+    end%>
 
     <div class="panel-body" style="display:none">
       <div class="row">

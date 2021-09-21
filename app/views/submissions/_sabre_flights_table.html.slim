@@ -75,7 +75,7 @@ ruby:
                 | Landing Airport
           tbody
             - if flights.present?
-              - flights.order(flight_date: :desc).each do |flt|
+              - flights.each do |flt|
                 tr.pointer id=flt[:id]
                   td.special-cell
                     .col-xs-12

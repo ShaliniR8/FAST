@@ -21,6 +21,13 @@
             <% if current_user.has_access('srm_meetings','destroy', admin: CONFIG::GENERAL[:global_admin_default]) %>
               <%=link_to 'Delete',srm_meeting_path(@meeting),:method=>"delete",:confirm=>'Please confirm that you want to cancel this meeting. The cancellation cannot be reverted',:class=>"btn btn-danger pull-right"%>
             <%end%>
+            <%if current_user.has_access('srm_meetings', 'override', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+              <%=link_to 'Override Status', '#',
+                :class => 'btn btn-danger pull-right mr5 mb5',
+                :id => 'override_status_btn',
+                "data-toggle" => "modal",
+                "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
             <% if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
               @meeting.status != "Closed" &&
               @meeting.has_user(current_user) %>
@@ -173,6 +180,12 @@
     $('#close').on('click',function(){
       var commit=$(this).attr('id');
       $.get("<%=close_srm_meeting_path(@meeting)%>?commit="+commit, function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_srm_meeting_path(@meeting)%>", function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });

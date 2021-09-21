@@ -139,19 +139,27 @@ class SrmMeetingsController < ApplicationController
 
 
   def index
-    @records=SrmMeeting.includes(:invitations, :host)
-    unless current_user.has_access('srm_meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
-      @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
-        current_user.id, ['Pending', 'Accepted'], current_user.id)
-    end
+    # @records=SrmMeeting.includes(:invitations, :host)
+    # unless current_user.has_access('srm_meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+    #   @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+    #     current_user.id, ['Pending', 'Accepted'], current_user.id)
+    # end
+    @table = Object.const_get("SrmMeeting")
     @headers=SrmMeeting.get_headers
     @title="Meetings"
+    handle_search
   end
 
 
   def close
     @owner = Meeting.find(params[:id])
     render :partial => '/forms/workflow_forms/process', locals: {status: 'Closed'}
+  end
+
+
+  def override_status
+    @owner = SrmMeeting.find(params[:id]).becomes(SrmMeeting)
+    render :partial => '/forms/workflow_forms/override_status'
   end
   
 
@@ -180,9 +188,11 @@ class SrmMeetingsController < ApplicationController
 
     transaction_content = params[:srm_meeting][:final_comment] rescue nil
     if transaction_content.nil?
-      if params[:meeting][:comments_attributes].present?
-        params[:meeting][:comments_attributes].each do |key, val|
-          transaction_content = val[:content] rescue nil
+      if params[:meeting].present?
+        if params[:meeting][:comments_attributes].present?
+          params[:meeting][:comments_attributes].each do |key, val|
+            transaction_content = val[:content] rescue nil
+          end
         end
       end
     end

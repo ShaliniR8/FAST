@@ -747,6 +747,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'add_sras'
       post 'sras'
       get "reopen"
+      get 'override_status'
     end
     collection do
     end

@@ -560,7 +560,6 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        "Admin"=>"admin",
         "Override" => 'override',
         "Notify" => 'notify'
       },

@@ -55,6 +55,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
     when 'All'
       if has_date_range
         object.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .within_timerange(start_date, end_date)
@@ -63,6 +64,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
               .offset(params['start'].to_i)
       else
        object.joins(join_tables)
+              .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .limit(params['length'].to_i)
@@ -71,6 +73,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
 
     when 'Overdue'
       object.joins(join_tables).joins(join_tables)
+            .where(id: @recs.map(&:id))
             .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
             .where(["due_date < :today and status != :status", {today: Time.now.to_date, status: 'Completed'}])
@@ -80,6 +83,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
     else
       if has_date_range
         object.where(status: status)
+              .where(id: @recs.map(&:id))
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
@@ -89,6 +93,7 @@ class CorrectiveActionDatatable < ApplicationDatatable
               .offset(params['start'].to_i)
       else
         object.where(status: status)
+              .where(id: @recs.map(&:id))
               .joins(join_tables)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
@@ -169,10 +174,12 @@ class CorrectiveActionDatatable < ApplicationDatatable
   def update_status_count(search_string, join_tables, start_date, end_date)
     if start_date.nil? && end_date.nil?
       @status_count = object.joins(join_tables)
+                            .where(id: @recs.map(&:id))
                             .where(search_string.join(' and '))
                             .group("#{object.table_name}.status").count
     else
       @status_count = object.joins(join_tables)
+                            .where(id: @recs.map(&:id))
                             .where(search_string.join(' and '))
                             .within_timerange(start_date, end_date)
                             .group("#{object.table_name}.status").count

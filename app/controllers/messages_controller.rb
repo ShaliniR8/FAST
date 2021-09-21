@@ -33,6 +33,9 @@ class MessagesController < ApplicationController
       @owner = @reply_to.owner
     end
     @owner ||= Object.const_get(params[:owner_class]).find(params[:owner_id]) rescue nil
+    if @owner.class.name == "VpIm"
+      @owner = @owner.becomes(Im)
+    end
     @send_to = params[:send_to].present? ? params[:send_to].to_i : -1
   end
 
@@ -107,8 +110,12 @@ class MessagesController < ApplicationController
     end
 
     respond_to do |format|
+      redirect_object = @message.owner
+      if @message.owner.present? && @message.owner.class.name == 'VpIm'
+        redirect_object = @message.owner.becomes(Im)
+      end
       format.json {render json: {message: 'Message sent.'}}
-      format.html {redirect_to @message.owner || message_path(@message), flash: { success: 'Message Sent' }}
+      format.html {redirect_to redirect_object || message_path(@message), flash: { success: 'Message Sent' }}
     end
 
   end

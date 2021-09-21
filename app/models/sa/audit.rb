@@ -27,9 +27,11 @@ class Audit < Sa::SafetyAssuranceBase
   has_many    :requirements,        foreign_key: 'owner_id',      class_name: 'AuditRequirement',       dependent: :destroy
   has_many    :items,               foreign_key: 'owner_id',      class_name: 'AuditItem',              dependent: :destroy
   has_many    :checklist_records,   foreign_key: 'owner_id',      class_name: 'AuditChecklistRecord',   dependent: :destroy
+  has_many    :causes,              foreign_key: 'owner_id',     class_name: 'RecordCause',        dependent: :destroy
 
   has_many    :checklists, as: :owner, dependent: :destroy
 
+  accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :items
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :checklist_records, :allow_destroy => true

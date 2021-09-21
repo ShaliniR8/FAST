@@ -90,6 +90,7 @@ class RecurrencesController < ApplicationController
     end
     @headers = @table.get_meta_fields('index')
     @terms = @table.get_meta_fields('show').keep_if{|x| x[:field].present?}
+    @form_type = params[:form_type]
     handle_search
   end
 

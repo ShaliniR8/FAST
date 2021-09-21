@@ -150,7 +150,7 @@ class Submission < Sr::SafetyReportingBase
     if arr.length > 0
       arr.each do |sub|
         if sub.description.include?('-- dual submission of')
-          if description == sub.description.split('-- dual submission of')[0].strip
+          if description == sub.description.split('-- dual submission of')[0]
             return false
           end
         else
@@ -262,13 +262,13 @@ class Submission < Sr::SafetyReportingBase
         anonymous:        self.anonymous,
         confidential:     self.confidential,
         templates_id:     temp_id,
-        description:      self.description + "#{new_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? " -- dual submission of ##{self.get_id}" : ""}",
+        description:      self.description + "#{new_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{self.get_id}" : ""}",
         event_date:       self.event_date,
         user_id:          self.user_id,
         event_time_zone:  self.event_time_zone,
       })
 
-      self.description = self.description + "#{original_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? " -- dual submission of ##{converted.get_id}" : ""}"
+      self.description = self.description + "#{original_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{converted.get_id}" : ""}"
       self.save
 
       mapped_fields = self.submission_fields.map{|x| [x.field.map_id, x.value]}.to_h

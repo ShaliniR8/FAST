@@ -763,8 +763,25 @@ class ApplicationController < ActionController::Base
 
   # Deals with Advanced Search for different types of reports, such as Events, Corrective Actions, Audits, SRAs, etc
   def handle_search
-    @terms = @table.get_meta_fields()
-    @records = @table.within_timerange(params[:start_date], params[:end_date])
+    @terms = @table.get_meta_fields('index')
+    if @table == Query
+      @records = @table.where(target: @types.values).includes(:created_by)
+    elsif @table == Meeting
+      @records = @table.includes(:invitations, :host).where('meetings.type is null')
+      unless current_user.has_access('meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true )
+        @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+          current_user.id, ['Pending', 'Accepted'], current_user.id)
+      end
+      @records.keep_if{|r| display_in_table(r)}
+    elsif @table == SrmMeeting
+      @records=SrmMeeting.includes(:invitations, :host)
+      unless current_user.has_access('srm_meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+        @records = @records.where('(participations.users_id = ? AND participations.status in (?)) OR hosts_meetings.users_id = ?',
+          current_user.id, ['Pending', 'Accepted'], current_user.id)
+      end
+    else
+      @records = @table.within_timerange(params[:start_date], params[:end_date])
+    end
     if params[:type].present?
       begin #TODO: Resolve issues with IM not having owner_type defined (non-polymorphic elements in IM); keep begin block and remove rescue at that point
         @records = @records.select{|x| x.owner_type == params[:type]}

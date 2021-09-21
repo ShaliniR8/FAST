@@ -5,7 +5,12 @@ class ErrorsController < ApplicationController
   def index
     notice = "You do not have the privileges required to perform this action. Please contact the admin for more details if you have any questions."
     begin
-      redirect_to :back, :notice => notice
+      url = request.env['HTTP_REFERER'] rescue nil
+      if url.present? && (url.include?('/new') || url.include('/edit'))
+        redirect_to root_url
+      else
+        redirect_to :back, :notice => notice
+      end
     rescue ActionController::RedirectBackError => e
       redirect_to root_url, :notice => notice
     end

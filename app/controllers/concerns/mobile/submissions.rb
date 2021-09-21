@@ -79,7 +79,7 @@ module Concerns
         json[:users] = array_to_id_map User.active.as_json(only: [:id, :full_name, :email, :employee_number])
 
         if CONFIG::GENERAL[:sabre_integration].present?
-          flights = Sabre.where({flight_date: (Time.now - 3.days).to_date..Time.now.to_date, employee_number: current_user.employee_number})
+          flights = Sabre.where({flight_date: (Time.now - 3.days).to_date..Time.now.to_date, employee_number: current_user.employee_number}).sort{ |a,b| (a.flight_date == b.flight_date) ? b.created_at <=> a.created_at : b.flight_date <=> a.flight_date }
           # flights = Sabre.where({employee_number: current_user.employee_number})
 
           pertinent_employees = flights.map(&:other_employees).join(',').split(',').uniq

@@ -681,6 +681,7 @@
         let flights_table = $('#flights_table').DataTable({
             "iDisplayLength": 7,
             "drawCallback": drawTableCallBack,
+            "aaSorting": []
         });
 
         $("tbody tr").on('click', function() {
