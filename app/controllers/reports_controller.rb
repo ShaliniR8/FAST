@@ -632,7 +632,28 @@ class ReportsController < ApplicationController
   def new_minutes
     @owner = Report.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
-    render :partial => "shared/add_minutes"
+    render :partial => "add_minutes"
+  end
+
+
+  def add_meeting_minutes
+    @report = Report.find(params[:id])
+    @meeting = Meeting.find(params[:meeting_id])
+    @report_headers = Report.get_meta_fields('index', 'meeting')
+
+    @report.minutes = params[:minutes]
+    @report.save
+    @reports = @meeting.reports.sort_by{|x| x.id}
+    Transaction.build_for(
+      @report.meetings.first,
+      params[:commit],
+      current_user.id,
+      "Event ##{@report.get_id}"
+    )
+
+    respond_to do |format|
+      format.js
+    end
   end
 
 

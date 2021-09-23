@@ -671,6 +671,16 @@ module ApplicationHelper
 
 
 
+  def link_to_agenda_fields(name, association, field_class, template, insert_location,options={})
+    new_object = Object.const_get(field_class).new
+    fields = fields_for(association,new_object, :child_index => "new_#{association}") do |builder|
+      render template
+    end
+    link_to_function(name, "add_fields(this, \"#{association}\", \"#{escape_javascript(fields)}\",\"#{insert_location}\")", options)
+  end
+
+
+
   def link_to_add_blocks(name, name_space, insert_space)
     link_to_function(name, "add_blocks(this, \"#{name_space}\", \"#{insert_space}\")")
   end

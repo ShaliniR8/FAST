@@ -9,7 +9,10 @@ var params = {
     <% if @feeder_operators.present? %>feederOperators: ['<%= @feeder_operators.join("','") %>'] <% end %>
 }
 
-$("#calendar-parent").html("<%= escape_javascript(render('calendar')) %>");
+// $("#calendar-parent").html("<%= escape_javascript(render('calendar')) %>");
+$('#calendar').fullCalendar('removeEvents');
+$('#calendar').fullCalendar('addEventSource', <%=raw(@calendar_entries.to_json)%>);
+$('#calendar').fullCalendar('rerenderEvents' );
 
 // console.log("params=", params);
 <% if session[:mode] == "ASAP" %>

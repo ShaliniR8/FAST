@@ -6,7 +6,7 @@ class ErrorsController < ApplicationController
     notice = "You do not have the privileges required to perform this action. Please contact the admin for more details if you have any questions."
     begin
       url = request.env['HTTP_REFERER'] rescue nil
-      if url.present? && (url.include?('/new') || url.include('/edit'))
+      if url.present? && (url.include?('/new') || url.include?('/edit'))
         redirect_to root_url
       else
         redirect_to :back, :notice => notice
