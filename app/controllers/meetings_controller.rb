@@ -334,6 +334,66 @@ class MeetingsController < ApplicationController
   end
 
 
+  def save_agenda
+    @meeting = Meeting.find(params[:id])
+    @report_headers = Report.get_meta_fields('index', 'meeting')
+    update_hash = Hash.new
+
+    params.each do |key, value|
+      if ["authenticity_token", "event_id", "user_id"].exclude?(key)
+        key_parts = key.split('_')
+        if key_parts.length == 2
+          agenda_id = key_parts[1].to_i rescue 0
+          if agenda_id > 0
+            if !update_hash.key?(agenda_id)
+              update_hash[agenda_id] = Hash.new
+            end
+            if key_parts[0] == 'destroy'
+              if eval(value)[:value] == 1
+                update_hash[agenda_id][:_destroy] = 1
+              end
+            else
+              update_hash[agenda_id][key_parts[0].to_sym] = value
+            end
+            if key_parts[0] == 'discussion'
+              if value == "true"
+                update_hash[agenda_id][key_parts[0].to_sym] = 1
+              else
+                update_hash[agenda_id][key_parts[0].to_sym] = 0
+              end
+            end
+          end
+        end
+      end
+    end
+
+    update_hash.each do |k, v|
+      ag = AsapAgenda.find(k) rescue nil
+      if ag.nil?
+        v[:user_id] = eval(params[:user_id])[:value]
+        v[:event_id] = params[:event_id]
+        v[:owner_id] = params[:id]
+        v[:type] = "AsapAgenda"
+        AsapAgenda.create(v)
+      else
+        ag.update_attributes(v)
+      end
+    end
+    @reports = @meeting.reports.sort_by{|x| x.id}
+
+    Transaction.build_for(
+      @meeting,
+      "Save Agenda",
+      current_user.id,
+      "Event ##{params[:event_id]}"
+    )
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+
   def edit
     @privileges = Privilege.find(:all)
     @meeting = Meeting.find(params[:id])

@@ -383,6 +383,7 @@ PrdgSession::Application.routes.draw do |map|
       get "add_meeting"
       get "carryover"
       get "meeting_ready"
+      post "add_meeting_minutes"
       post "add_to_meeting"
       get "get_agenda"
       get "new_attachment"
@@ -404,6 +405,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'print'
       get "reopen"
       get "get_reports"
+      post "save_agenda"
       get 'get_cisp_reports'
       post 'send_cisp_reports'
       get 'override_status'

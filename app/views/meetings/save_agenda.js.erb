@@ -1,0 +1,2 @@
+$("#close_agenda_modal").trigger("click");
+$("#all_meeting_events").html("<%= escape_javascript(render '/meetings/included_event', events: @reports, meeting: @meeting)%>");
