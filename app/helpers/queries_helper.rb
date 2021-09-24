@@ -302,7 +302,7 @@ module QueriesHelper
           record_id = element[0]
           x_axis_field_value = element[1]
 
-          if x_axis_field_value.size > 1
+          if x_axis_field_value.class == 'Array' && x_axis_field_value.size > 1
             x_axis_field_value.each do |x_value|
               if hash[[x_value]].present?
                 hash[[x_value]] << record_id
