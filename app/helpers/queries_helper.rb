@@ -38,7 +38,7 @@ module QueriesHelper
   def format_val(value, field_type, field_param=nil)
     case field_type
     when 'user', 'employee'
-      User.find_by_id(value).full_name rescue value.strip
+      User.find_by_id(value).full_name rescue ''
     when 'datetime', 'date'
       value.strftime("%Y-%m") rescue 'N/A'
     when 'boolean_box', 'boolean'
@@ -46,11 +46,11 @@ module QueriesHelper
     when 'checkbox'
       value.split(';').map(&:strip) rescue nil
     when 'list'
-      value.split('<br>').map(&:strip)
+      value.split('<br>').map(&:strip) rescue nil
     when 'category'
       value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
     else
-      value.strip
+      value.strip rescue ''
     end
   end
 
