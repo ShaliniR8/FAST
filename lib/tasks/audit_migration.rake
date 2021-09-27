@@ -37,6 +37,7 @@ namespace :audit_migration do
 
 
     @core_field_mapping["finding"] = Hash.new
+    @core_field_mapping["finding"]["auditing department"] = [:department]
     @core_field_mapping["finding"]["incident number"] = [:title]
     @core_field_mapping["finding"]["codeshare"] = [:created_by_id]
     @core_field_mapping["finding"]["report date"] = [:due_date]
@@ -51,11 +52,12 @@ namespace :audit_migration do
 
 
     @core_field_mapping["enforcement"] = Hash.new
+    @core_field_mapping["enforcement"]["auditing department"] = [:department]
     @core_field_mapping["enforcement"]["case number"] = [:title]
     @core_field_mapping["enforcement"]["addressed to"] = [:created_by_id]
     @core_field_mapping["enforcement"]["assigned to"] = [:approver_id]
     @core_field_mapping["enforcement"]["date of response"] = [:due_date]
-    @core_field_mapping["enforcement"]["closing action date"] = [:close_date]
+    @core_field_mapping["enforcement"]["closing action dated"] = [:close_date]
     @core_field_mapping["enforcement"]["location"] = [:location, :station_code]
     @core_field_mapping["enforcement"]["regulation"] = [:reference]
     @core_field_mapping["enforcement"]["description"] = [:comment]
@@ -63,6 +65,7 @@ namespace :audit_migration do
 
 
     @core_field_mapping["inspection"] = Hash.new
+    @core_field_mapping["inspection"]["auditing department"] = [:department]
     @core_field_mapping["inspection"]["incident number"] = [:title]
     @core_field_mapping["inspection"]["codeshare"] = [:created_by_id]
     @core_field_mapping["inspection"]["report date"] = [:due_date]
@@ -91,6 +94,7 @@ namespace :audit_migration do
     @core_field_mapping["station"]["auditor"] = [:responsible_user_id, :created_by_id]
     @core_field_mapping["station"]["audit type"] = [:audit_type]
     @core_field_mapping["station"]["location"] = [:location]
+    @core_field_mapping["station"]["comments"] = [:comment]
 
 
     @core_field_mapping["planeside"] = Hash.new
@@ -137,6 +141,8 @@ namespace :audit_migration do
     begin
       Dir.glob('lib/tasks/historical_rjet_audits/*.csv') do |csv_filename|
         headers = CSV.foreach("#{csv_filename}", encoding: 'iso-8859-1:utf-8').first
+        # puts "\n\n #{csv_filename}"
+        # puts headers
         CSV.foreach("#{csv_filename}", headers: true, encoding: 'iso-8859-1:utf-8') do |row|
           aud = Audit.new
           if csv_filename.downcase.include?("rsap")
@@ -153,7 +159,7 @@ namespace :audit_migration do
             populate_audit(aud, headers, row, "sam")
           elsif csv_filename.downcase.include?("planeside")
             populate_audit(aud, headers, row, "planeside")
-          elsif csv_filename.downcase.include?("deice")
+          elsif csv_filename.downcase.include?("deicing")
             populate_audit(aud, headers, row, "deice")
           end
         end
@@ -178,16 +184,10 @@ namespace :audit_migration do
   def populate_audit(audit, headers, row, mode)
     if ["enforcement", "finding", "inspection"].include?(mode)
       audit.status = ""
-      if mode == "enforcement"
-        audit.department = "TSA"
-        audit.audit_department = "Security"
-      elsif mode == "finding"
-        audit.department = "DHS/TSA"
-        audit.audit_department = "Security"
+      audit.audit_department = "Security"
+      if mode == "finding"
         audit.audit_type = "Other – DHS Finding"
-      else
-        audit.department = "TSA"
-        audit.audit_department = "Security"
+      elsif mode == "inspection"
         audit.audit_type = "Other – Station Reported"
       end
     else
@@ -207,6 +207,7 @@ namespace :audit_migration do
     when "deice"
       audit.title = "Deice/Anti-Icing Audit"
     end
+    # puts mode
     populate_mapped_fields_and_save_records(audit, headers, row, mode)
   end
 
@@ -221,9 +222,15 @@ namespace :audit_migration do
             if map_hash[header.to_s.strip.downcase].is_a?(Array)
               map_hash[header.to_s.strip.downcase].each do |f|
                 if f.to_s.include?("_date")
-                  value = Date.parse(row[header].to_s) rescue nil
+                  if ["enforcement", "finding", "inspection"].include?(mode)
+                    value = Date.strptime(row[header].to_s, '%Y-%m-%d') rescue nil
+                  else
+                    value = Date.strptime(row[header].to_s, '%m/%d/%Y') rescue nil
+                  end
                 elsif f.to_s.include?("_id")
                   value = find_user_id(row[header].to_s.strip, mode) rescue nil
+                elsif f.to_s == "department" && mode == "finding"
+                  value = "DHS/TSA"
                 else
                   value = row[header].to_s
                 end
@@ -231,10 +238,8 @@ namespace :audit_migration do
               end
             end
           else
-            value = row[header].to_s.strip rescue nil
-            if value.present?
-              causes << Cause.new({owner_type: "Audit", category: mode, attr: header, value: value})
-            end
+            value = row[header].to_s.strip rescue ""
+            causes << Cause.new({owner_type: "Audit", category: mode, attr: header, value: value})
           end
         end
       end

@@ -27,12 +27,25 @@
             </thead>
             <tbody>
               <% causes.each do |cause|%>
-                <% next if cause.value.empty? || cause.value == "\"\"" %>
+                <%# next if cause.value.empty? || cause.value == "\"\"" %>
                 <tr>
-                  <td><%="#{cause.category.titleize} > #{cause.attr.titleize}"%></td>
-                  <% if cause.value == "0"%>
+                  <!-- <td><%#="#{cause.category.titleize} > #{cause.attr.titleize}"%></td> -->
+                  <%cat = cause.category.titleize rescue ""%>
+                  <%if cause.attr.present? && cause.attr =~ /[A-Z]/%>
+                    <%attrib = cause.attr.present? ? cause.attr : ""%>
+                  <%else%>
+                    <%attrib = cause.attr.titleize rescue ""%>
+                  <%end%>
+                  <%if cat.present? && attrib.present?%>
+                    <td><%="#{cat} > #{attrib}"%></td>
+                  <%elsif cat.present?%>
+                    <td><%="#{cat}"%></td>
+                  <%else%>
+                    <td><%="#{attrib}"%></td>
+                  <%end%>
+                  <% if cause.value == "0" && cause.owner_type != "Audit"%>
                     <td><%='No'%></td>
-                  <% elsif cause.value == "1"%>
+                  <% elsif cause.value == "1" && cause.owner_type != "Audit"%>
                     <td><%='Yes'%></td>
                   <% else %>
                     <td><%="#{cause.value}".gsub('"','')%></td>
