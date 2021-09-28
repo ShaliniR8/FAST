@@ -191,7 +191,7 @@ namespace :audit_migration do
         audit.audit_type = "Other – Station Reported"
       end
     else
-      audit.status = "Closed"
+      audit.status = "Completed"
       audit.department = "AO"
     end
 
