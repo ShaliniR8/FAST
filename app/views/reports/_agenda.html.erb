@@ -31,7 +31,7 @@
                     <td>
                       <%=select_tag "accepted_#{a.id}",
                         CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ?
-                          CONFIG.custom_options['Dispositions'] :
+                          options_for_select(CONFIG.custom_options['Dispositions']) :
                           options_for_select(@accept_deline,a.accepted),
                         :include_blank=>true,
                         :class => "form-control"%>

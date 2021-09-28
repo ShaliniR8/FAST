@@ -9,7 +9,7 @@
   <td>
     <%=select_tag "accepted",
       CONFIG.sr::GENERAL[:configurable_agenda_dispositions] ?
-        CONFIG.custom_options['Dispositions'] :
+        options_for_select(CONFIG.custom_options['Dispositions']) :
         options_for_select(@accept_deline),
       :include_blank=>true,
       :class => "form-control agenda_accepted"%>
