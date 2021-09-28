@@ -245,7 +245,7 @@ class ChecklistsController < ApplicationController
       params[:checklist][:checklist_rows_attributes].each do |key, checklist_row|
         if checklist_row[:checklist_cells_attributes].present?
           checklist_row[:checklist_cells_attributes].each do |key, checklist_cell|
-            ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present?
+            ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present? && checklist_cell[:id].present?
           end
         end
       end
