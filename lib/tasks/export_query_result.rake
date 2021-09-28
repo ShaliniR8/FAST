@@ -282,6 +282,22 @@ def emit_helper_dynamic(search_value, records, field, xor, logic_type, target_na
 end
 
 
+def historical_data_compare?(record, field, search_value)
+  values = record.send(field[:field]).map(&:downcase)
+  values.each do |value|
+    value.gsub '\n', ' '
+    return true if value.include? search_value.downcase
+  end
+  false
+end
+
+
+
+def historical_data_equals?(record, field, search_value)
+  values = record.send(field[:field]).map(&:downcase).map{ |x| x.gsub '\n', ' '}
+  values.include?  search_value.strip.downcase
+end
+
 def emit_helper_basic(search_value, records, field, xor, logic_type)
   field_type = field[:type] || field[:field_type]
   case logic_type
@@ -309,7 +325,15 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
       end_date = search_value.split("to")[1] || search_value.split("to")[0]
       return records.select{|x| xor ^ ((x.send(field[:field]).to_date >= start_date.to_date && x.send(field[:field]).to_date <= end_date.to_date) rescue false)}
     else
-      return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.to_s.downcase)}
+      if ['cause_label', 'cause_value'].include? field[:field]
+        result = records.select do |record|
+          xor ^ historical_data_equals?(record, field, search_value.downcase)
+        end
+
+        return result
+      else
+        return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.to_s.downcase)}
+      end
     end
   when "contains"
     case field_type
@@ -323,7 +347,15 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
       end_date = search_value.split("to")[1] || search_value.split("to")[0]
       return records.select{|x| xor ^ ((x.send(field[:field]).to_date >= start_date.to_date && x.send(field[:field]).to_date <= end_date.to_date) rescue false)}
     else
-      return records.select{|record| xor ^ ((record.send(field[:field]).to_s.downcase.include? search_value.downcase) rescue false)}
+      if ['cause_label', 'cause_value'].include? field[:field]
+        result = records.select do |record|
+          xor ^ historical_data_compare?(record, field, search_value.downcase)
+        end
+
+        return result
+      else
+        return records.select{|record| xor ^ ((record.send(field[:field]).to_s.downcase.include? search_value.downcase) rescue false)}
+      end
     end
   when "numeric"
     case field_type
@@ -338,12 +370,19 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
         return records.select{|x| xor ^ ((x.send(field[:field]).to_date >= date.to_date) rescue false)}
       end
     else
-      return records.select{|record| xor ^ ((record.send(field[:field]).to_f >= search_value.to_f) rescue false)}
+      if ['cause_label', 'cause_value'].include? field[:field]
+        result = records.select do |record|
+          xor ^ historical_data_compare?(record, field, search_value.downcase)
+        end
+
+        return result
+      else
+        return records.select{|record| xor ^ ((record.send(field[:field]).to_f >= search_value.to_f) rescue false)}
+      end
     end
   end
   return []
 end
-
 
 def get_records
   adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)

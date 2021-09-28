@@ -11,6 +11,22 @@ class RJETSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
   HIERARCHY = DefaultSafetyAssuranceConfig::HIERARCHY.deep_merge({
     objects:{
+      'Audit' => {
+        fields: {
+          cause_label: {
+            field: 'cause_label',
+            title: "#{CONFIG::CAUSE_LABEL} Label",
+            visible: 'query',
+            required: false
+          },
+          cause_value: {
+            field: 'cause_value',
+            title: "#{CONFIG::CAUSE_LABEL} Value",
+            visible: 'query',
+            required: false
+          },
+        }
+      },
       'Investigation' => {
         fields: {
           likelihood: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Likelihood" },

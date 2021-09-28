@@ -88,6 +88,8 @@ class DefaultConfig
     'Report'    => 'Event'
   }
 
+  CAUSE_LABEL = 'Causes'
+
   def self.getTimeFormat
     {
       :timepicker       => 'H:i',

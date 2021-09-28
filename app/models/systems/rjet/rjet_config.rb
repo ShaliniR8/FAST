@@ -33,6 +33,8 @@ class RJETConfig < DefaultConfig
     sabre_integration:            true,
   })
 
+  CAUSE_LABEL = 'Historical Data'
+
   # CISP INTEGRATION
   # P_CODE = 'RPA574' # for RPA (Republic)
   # P_CODE = 'L8T5A3 '# for LTA (Lift)

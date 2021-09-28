@@ -61,6 +61,24 @@ class Audit < Sa::SafetyAssuranceBase
   end
 
 
+  def cause_label
+    causes.map { |cause| "#{cause.category.titleize} > #{cause.attr.titleize}".downcase }
+  end
+
+
+  def cause_value
+    causes.map { |cause|
+      if cause.value == '0'
+        'No'
+      elsif cause.value == '1'
+        'Yes'
+      else
+        "#{cause.value}".gsub('"','').downcase
+      end
+    }
+  end
+
+
   def self.user_levels
     {
       0  => 'N/A',
