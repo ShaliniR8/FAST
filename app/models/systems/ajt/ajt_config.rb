@@ -17,7 +17,6 @@ class AJTConfig < DefaultConfig
     track_log:                    true,
 
     # SYSTEM-WIDE FORM CONFIGS
-    configurable_risk_matrices:   true,
     drop_down_risk_selection:     false,
   })
 
