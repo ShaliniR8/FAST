@@ -15,6 +15,7 @@ class ATNConfig < DefaultConfig
     # SYSTEM CONFIGS
     has_mobile_app:                     true,
     cisp_integration:                   true,
+    add_attachment_in_any_status:       true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,

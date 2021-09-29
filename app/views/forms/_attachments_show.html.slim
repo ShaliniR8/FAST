@@ -5,7 +5,10 @@ ruby:
   .panel.panel-default
     .panel-heading.click-heading.collapsed
       .panel-title
-        | Attachments
+        span
+          | Attachments
+        span.badge.badge-pill.badge-info.ml10
+          = attachments.size
         span.pull-right.clickable
           i.mt5.glyphicon.glyphicon-chevron-down
     .panel-body style='display: none;'
@@ -16,6 +19,7 @@ ruby:
             id: 'att_btn',
             'data-toggle' => 'modal',
             'data-target' => '.bs-example-modal-lg'
+
         table#attachment_table.table.table-striped.table-bordered
           thead
             tr

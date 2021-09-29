@@ -59,6 +59,8 @@ class DefaultConfig
     query_processing_in_rake_task:              false,
     advanced_checklist_data_type:               false,
     auto_populate_nested_fields_visualizations: false,
+    add_attachment_in_any_status:               false,
+
 
     # TO BE REMOVED:
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)
