@@ -128,14 +128,15 @@ class ChecklistsController < ApplicationController
     end
 
     attributes = params[param_sym]
-    old_checklist = Checklist.find(params[:id])
-    new_checklist = old_checklist.dup
+    checklist_template = Checklist.find(params[:id])
+    new_checklist = checklist_template.dup
     new_checklist.id = nil
+    new_checklist.template_id = checklist_template.id
     new_checklist.owner_type = 'Audit'
     saved = new_checklist.save
     if saved
       new_checklist.checklist_rows = []
-      old_checklist.checklist_rows.each do |row|
+      checklist_template.checklist_rows.each do |row|
         new_row = row.dup
         new_row.id = nil
         new_row.checklist_id = new_checklist.id
@@ -311,7 +312,8 @@ class ChecklistsController < ApplicationController
 
         # Check Access Control
         template_name = Checklist.find(@record.template_id).title rescue @record.title
-        redirect_to errors_path unless current_user.has_access(template_name, 'viewable')
+        has_access = current_user.has_access(template_name, 'viewable') || (current_user.admin? && @is_template)
+        redirect_to errors_path unless has_access
       end
       format.json { show_as_json }
     end
@@ -342,8 +344,8 @@ class ChecklistsController < ApplicationController
       checklist_rows: { checklist_cells: [:checklist_header_item, :checklist_row] },
       checklist_header: :checklist_header_items,
     ).find(params[:template])
-    @record.template_id = params[:template]
-    @record.save
+    # @record.template_id = params[:template]
+    # @record.save
 
     @record
   end

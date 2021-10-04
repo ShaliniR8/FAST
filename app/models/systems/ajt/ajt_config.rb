@@ -18,6 +18,7 @@ class AJTConfig < DefaultConfig
 
     # SYSTEM-WIDE FORM CONFIGS
     drop_down_risk_selection:     false,
+    sms_im_visibility:            false,
   })
 
   MATRIX_INFO = DefaultConfig::MATRIX_INFO.deep_merge({
