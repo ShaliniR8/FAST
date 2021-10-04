@@ -298,6 +298,7 @@ def historical_data_equals?(record, field, search_value)
   values.include?  search_value.strip.downcase
 end
 
+
 def emit_helper_basic(search_value, records, field, xor, logic_type)
   field_type = field[:type] || field[:field_type]
   case logic_type
@@ -317,7 +318,7 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
       if search_value.downcase == "Anonymous".downcase
         return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.downcase)}
       else
-        matching_users = User.where("full_name = ?", search_value).map(&:id)
+        matching_users = User.where("full_name = ?", search_value).map(&:full_name)
         return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
       end
     when 'date', 'datetime'
@@ -340,7 +341,7 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
     when 'boolean_box', 'boolean'
       return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
     when 'user'
-      matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:id)
+      matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:full_name)
       return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
     when 'date', 'datetime'
       start_date = search_value.split("to")[0]
@@ -383,6 +384,7 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
   end
   return []
 end
+
 
 def get_records
   adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
