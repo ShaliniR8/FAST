@@ -66,8 +66,12 @@ class DefaultConfig
     allow_set_alert:                    false,  # Allows forms to use alerts (notifications to users/self)
     has_extension:                      true,   # Allows forms to request extensions
     has_verification:                   true,   # Allows forms to be verified (additional step)
+
+    # Customizable features
     attach_pdf_in_message:              true,   # Allows option to attach PDF version of the source of Input for email notfication fired by Messages
     global_admin_default:               true,   # Default value to use for admin parameter when calling has_access in user.rb
+    sms_im_visibility:                  true,   # Default visibility of SMS IM --> ON
+
   }
 
   LABELS = {

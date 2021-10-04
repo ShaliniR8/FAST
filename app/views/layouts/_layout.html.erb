@@ -417,7 +417,7 @@
                 <%if current_user.has_access('ASAP','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
                   <li class="menu-link"><%= link_to 'Safety Reporting', switch_modes_path(mode: 'ASAP') %></li>
                 <%end%>
-                <% if current_user.has_access('SMS IM','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
+                <% if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
                   <li class="menu-link"><%= link_to 'SMS IM', switch_modes_path(:mode=>"SMS IM") %></li>
                 <%end%>
                 <% if current_user.has_access('Safety Assurance','module', admin: CONFIG::GENERAL[:global_admin_default]) %>

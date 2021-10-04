@@ -10,7 +10,7 @@
             <div id="asap">Safety Reporting</div>
           </div>
         <%end%>
-        <%if current_user.has_access('SMS IM', 'module', admin: CONFIG::GENERAL[:global_admin_default])%>
+        <%if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM', 'module', admin: CONFIG::GENERAL[:global_admin_default])%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/SMSIM.png" width="150" height="150" />

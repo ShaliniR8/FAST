@@ -27,6 +27,7 @@ class EULENConfig < DefaultConfig
     advanced_checklist_data_type:      true,
     checklist_query:                   true,
     query_processing_in_rake_task:     true,
+    sms_im_visibility:                 false,
   })
 
 

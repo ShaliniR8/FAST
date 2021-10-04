@@ -42,13 +42,15 @@
                   Safety Reporting Templates
                 </a>
               </li>
-              <li>
-                <a data-toggle="tab"
-                  href="#table"
-                  onclick="drawTable('smsim');">
-                  SMS IM
-                </a>
-              </li>
+              <%if CONFIG::GENERAL[:sms_im_visibility]%>
+                <li>
+                  <a data-toggle="tab"
+                    href="#table"
+                    onclick="drawTable('smsim');">
+                    SMS IM
+                  </a>
+                </li>
+              <%end%>
               <li>
                 <a data-toggle="tab"
                   href="#table"
