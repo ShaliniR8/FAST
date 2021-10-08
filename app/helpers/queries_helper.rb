@@ -38,7 +38,11 @@ module QueriesHelper
   def format_val(value, field_type, field_param=nil)
     case field_type
     when 'user', 'employee'
-      User.find_by_id(value).full_name rescue ''
+      if value.is_a? Integer
+        User.find_by_id(value).full_name rescue ''
+      else
+        User.find_by_full_name(value).full_name rescue ''
+      end
     when 'datetime', 'date'
       value.strftime("%Y-%m") rescue 'N/A'
     when 'boolean_box', 'boolean'
@@ -50,7 +54,11 @@ module QueriesHelper
     when 'category'
       value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
     else
-      value.strip rescue ''
+      if value.is_a? Integer
+        value
+      else
+        value.strip rescue ''
+      end
     end
   end
 
@@ -297,7 +305,7 @@ module QueriesHelper
       end
     else
       records.map{|record| [record.id, get_val(record, x_axis_field_arr, x_axis_field_title)] }
-        .reject{ |x| x[1].nil? || x[1].empty? } # remove empty records
+        .reject{ |x| x[1].nil? || x[1].empty? rescue true } # remove empty records
         .inject(Hash.new([])) { |hash, element|
           record_id = element[0]
           x_axis_field_value = element[1]

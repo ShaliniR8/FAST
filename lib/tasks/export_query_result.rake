@@ -464,24 +464,34 @@ def strip_html_tag(text)
 end
 
 
+# helper for get_val: formats value based on field type
 def format_val(value, field_type, field_param=nil)
   case field_type
   when 'user', 'employee'
-    User.find_by_id(value).full_name rescue 'N/A'
+    if value.is_a? Integer
+      User.find_by_id(value).full_name rescue ''
+    else
+      User.find_by_full_name(value).full_name rescue ''
+    end
   when 'datetime', 'date'
     value.strftime("%Y-%m") rescue 'N/A'
   when 'boolean_box', 'boolean'
     (value ? 'Yes' : 'No') rescue 'No'
   when 'checkbox'
-    value.split(';') rescue nil
+    value.split(';').map(&:strip) rescue nil
   when 'list'
-    value.split('<br>')
+    value.split('<br>').map(&:strip) rescue nil
   when 'category'
     value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
   else
-    value
+    if value.is_a? Integer
+      value
+    else
+      value.strip rescue ''
+    end
   end
 end
+
 
 
 def create_hash_array(records, x_axis_field, series_field)
