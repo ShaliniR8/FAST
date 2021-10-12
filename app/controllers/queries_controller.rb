@@ -1146,8 +1146,9 @@ class QueriesController < ApplicationController
       .where(id: query.templates)
       .map(&:fields)
       .flatten
-      .select{|x| x.label == label}
-      .first if field.nil?
+      .select{|x| x.label.strip == label}
+      .first if field.nil? 
+
     [field, field_label.split(',').map(&:strip)[1]]
   end
 
