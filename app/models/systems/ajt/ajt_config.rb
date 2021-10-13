@@ -73,7 +73,7 @@ class AJTConfig < DefaultConfig
       title: 'SEVERITY TABLE',
 
       orientation: :vertical,
-      direction: :down,
+      direction: :up,
       size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
@@ -81,41 +81,17 @@ class AJTConfig < DefaultConfig
       cell_name: 'severity_td',
 
       row_header_name: 'SEVERITY',
-      row_header: ['0&nbsp;No Safety Implication','1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Major','4&nbsp;Critical','5&nbsp;Catastrophic'],
+      row_header: ['5&nbsp;Catastrophic','4&nbsp;Critical','3&nbsp;Major','2&nbsp;Minor','1&nbsp;Negligible','0&nbsp;No Safety Implication'],
       column_header_name: 'CATEGORY',
       column_header: ['Injury or Illness','Aircraft, Facility or Terrorism Event','Operational Compliance, Performance','Damage, Fine or Loss of Revenue','Corporate Image','Damage to the Environment'],
-      rows: [
-        [ # No Safety Implication
-          "No Safety Implication",
-          "No Safety Implication",
-          "No Safety Implication",
-          "No Safety Implication",
-          "No Safety Implication",
-          "No Safety Implication"
-        ],
-        [ # Negligible
-          "First Aid treatment",
-          "Negligible incident or damage with extremely limited effect on safety",
-          "Regulatory/Company policy and/or procedure deviation with limited safety implication",
-          "Damage, fines or loss of revenue <$15K",
-          "Negligible effect on Corporate image, little to no potential for negative impact on the AS/QX brand",
-          "Negligible environmental effect"
-        ],
-        [ # Minor
-          "Medical treatment beyond first aid",
-          "NTSB incident or minor property damage",
-          "Regulatory/Company policy and/or procedure deviation with minor safety implication",
-          "Damage, fines or loss of revenue >$15K - $250K",
-          "Minor effect on Corporate image, isolated effect that is easily reversible",
-          "Minor environmental effect"
-        ],
-        [ # Moderate
-          "Single overnight hospitalization",
-          "NTSB incident or accident, partial loss of a facility or a credible security threat",
-          "Regulatory /Company policy and/or procedure deviation with major reduction in safety margin",
-          "Damage, fines or loss of revenue >$250K - $1M",
-          "Major effect on Corporate image, isolated to a single location",
-          "Contained effect to the environment"
+      rows: [        
+        [ # Catastrophic
+          "Multiple fatalities",
+          "Total loss of aircraft or facility",
+          "Potential threat to Operating Certificate",
+          "Damage, fines or loss of revenue >$5M",
+          "Potential for Corporate failure, permanent impact on business system-wide",
+          "Massive environmental effect"
         ],
         [ # Critical
           "Single fatality or multiple overnight hospital admissions",
@@ -125,14 +101,38 @@ class AJTConfig < DefaultConfig
           "Adverse effect on Corporate image, significant impact on a region",
           "Critical environmental effect"
         ],
-        [ # Catastrophic
-          "Multiple fatalities",
-          "Total loss of aircraft or facility",
-          "Potential threat to Operating Certificate",
-          "Damage, fines or loss of revenue >$5M",
-          "Potential for Corporate failure, permanent impact on business system-wide",
-          "Massive environmental effect"
-        ]
+        [ # Moderate
+          "Single overnight hospitalization",
+          "NTSB incident or accident, partial loss of a facility or a credible security threat",
+          "Regulatory /Company policy and/or procedure deviation with major reduction in safety margin",
+          "Damage, fines or loss of revenue >$250K - $1M",
+          "Major effect on Corporate image, isolated to a single location",
+          "Contained effect to the environment"
+        ],
+        [ # Minor
+          "Medical treatment beyond first aid",
+          "NTSB incident or minor property damage",
+          "Regulatory/Company policy and/or procedure deviation with minor safety implication",
+          "Damage, fines or loss of revenue >$15K - $250K",
+          "Minor effect on Corporate image, isolated effect that is easily reversible",
+          "Minor environmental effect"
+        ],
+        [ # Negligible
+          "First Aid treatment",
+          "Negligible incident or damage with extremely limited effect on safety",
+          "Regulatory/Company policy and/or procedure deviation with limited safety implication",
+          "Damage, fines or loss of revenue <$15K",
+          "Negligible effect on Corporate image, little to no potential for negative impact on the AS/QX brand",
+          "Negligible environmental effect"
+        ],
+        [ # No Safety Implication
+          "No Safety Implication",
+          "No Safety Implication",
+          "No Safety Implication",
+          "No Safety Implication",
+          "No Safety Implication",
+          "No Safety Implication"
+        ],
       ]
     },
 
@@ -196,85 +196,53 @@ class AJTConfig < DefaultConfig
       likelihood_pos: 'column',
 
       row_header_name: 'SEVERITY',
-      row_header: ['0&nbsp;No Safety Implication','1&nbsp;Negligible','2&nbsp;Minor','3&nbsp;Major','4&nbsp;Critical','5&nbsp;Catastrophic'],
+      row_header: ['5&nbsp;Catastrophic','4&nbsp;Critical','3&nbsp;Major','2&nbsp;Minor','1&nbsp;Negligible','0&nbsp;No Safety Implication'],
       column_header_name: 'LIKELIHOOD',
       column_header: ['1&nbsp;Extremely Improbable','2&nbsp;Improbable','3&nbsp;Remote','4&nbsp;Occasional','5&nbsp;Frequent','6&nbsp;Repetitive'],
-      rows: [
+      rows: [        
+        ['4',     '4',     '5',    '5',      '5',    '5' ],
+        ['3',     '3',     '4',    '5',      '5',    '5' ],
+        ['2',     '2',     '3',    '3',      '4',    '4' ],
+        ['1',     '1',     '2',    '2',      '2',    '3' ],
+        ['1',     '1',     '1',    '1',      '1',    '2'  ],
         ['0',     '0',     '0',    '0',      '0',    '0'  ],
-        ['1',     '2',     '3',    '4',      '5',    '6'  ],
-        ['2',     '4',     '6',    '8',      '10',   '12' ],
-        ['3',     '6',     '9',    '12',     '15',   '18' ],
-        ['4',     '8',     '12',   '16',     '20',   '24' ],
-        ['5',     '10',    '15',   '20',     '25',   '30' ]
       ],
 
       rows_color: [
-        ["antiquewhite",     "antiquewhite",     "antiquewhite",    "antiquewhite",      "antiquewhite",    "antiquewhite" ],
-        ["aqua",             "aqua",             "aqua",            "aqua",              "aqua",            "limegreen"    ],
-        ["aqua",             "aqua",             "limegreen",       "limegreen",         "limegreen",       "yellow"       ],
-        ["limegreen",        "limegreen",        "yellow",          "yellow",            "orange",          "orange"       ],
+        ["orange",           "orange",           "red",             "red",               "red",             "red"          ],
         ["yellow",           "yellow",           "orange",          "red",               "red",             "red"          ],
-        ["orange",           "orange",           "red",             "red",               "red",             "red"          ]
+        ["limegreen",        "limegreen",        "yellow",          "yellow",            "orange",          "orange"       ],
+        ["aqua",             "aqua",             "limegreen",       "limegreen",         "limegreen",       "yellow"       ],
+        ["aqua",             "aqua",             "aqua",            "aqua",              "aqua",            "limegreen"    ],
+        ["white",            "white",            "white",           "white",             "white",           "white"        ]
       ]
     },
 
     risk_definitions: {
-      antiquewhite:     { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'Risks in this region may be accepted without further action. However, continuous analysis or trending may be appropriate to accurately monitor risk. Manager or higher acceptance is required for all risk determinations or mitigations that fall within Green region.' },
-      aqua:             { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'Risks in this region may be accepted without further action. However, continuous analysis or trending may be appropriate to accurately monitor risk. Manager or higher acceptance is required for all risk determinations or mitigations that fall within Green region.' },
-      limegreen:        { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: 'Risks in this region may be accepted without further action. However, continuous analysis or trending may be appropriate to accurately monitor risk. Manager or higher acceptance is required for all risk determinations or mitigations that fall within Green region.' },
-      yellow:           { rating: 'Medium',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: 'Actual hazards with risks falling in this region are acceptable with risk controls and monitoring. If risk controls are not possible, monitoring must be applied to ensure the risk does not elevate. Director or higher acceptance is required for risks falling within the Yellow region.' },
-      orange:           { rating: 'Serious',   cells: '3/6, 4/5, 5/4',                            description: 'Actual hazards with risks falling in this region are generally unacceptable although operation is allowed to continue while a high priority, systemic mitigation strategy is carried out. An immediate interim mitigation action must be carried out prior to a compressive fix. Designated 14 CFR Part 119 personnel are responsible for mitigation strategies. If the risk cannot be mitigated to a lower risk region, managing directors and above can accept the risk. When senior management accepts a risk in the orange region, 14 CFR Part 119 personnel must monitor to ensure risk does not elevate.' },
-      red:              { rating: 'High',      cells: '4/6, 5/5, 5/6',                            description: 'Actual hazards with risks falling in this region require immediate action to eliminate the hazard or control the factors leading to its higher likelihood or severity. Operation must not begin or continue without mitigation to as low as reasonably practicable (ALARP) risk level, provided it is in a lower risk region. Designated 14 CFR Part 119 personnel are responsible for mitigation strategies; however, the Accountable Executive must review and approve mitigations from the Red region to a lower risk region.' }
+      white:     { rating: 'None',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> N/A<br><br><b>Immediate Notification:</b> N/A<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Management personnel in area of risk' },
+      aqua:      { rating: 'Minimal (Acceptable)',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2', description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> N/A<br><br><b>Immediate Notification:</b> N/A<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Management personnel in area of risk' },
+      limegreen: { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> Monitor, consider actions to further reduce risk<br><br><b>Immediate Notification:</b> Process owner in area of risk<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Management personnel in area of risk' },
+      yellow:    { rating: 'Medium',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> Mitigation strategy required to reduce<br><br><b>Immediate Notification:</b> VP,MD,119, Director in impacted area of risk, Mgr Safety Programs<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Director or above' },
+      orange:    { rating: 'High',   cells: '3/6, 4/5, 5/4',                            description: '<b>Operational Impact:</b> Operation permitted with execution of a high priority, systemic mitigation strategy<br><br><b>Minimum Action:</b> Immediate mitigation and comprehensive mitigation to level 3 minimum required<br><br><b>Immediate Notification:</b> Positions listed for risk level 3 plus COO and President<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> VP/MD in area of risk until mitigation to level 3' },
+      red:       { rating: 'Extreme',      cells: '4/6, 5/5, 5/6',                            description: '<b>Operational Impact:</b> Stop the operation<br><br><b>Minimum Action:</b> Mitigation to level 4 or lower prior to operation<br><br><b>Immediate Notification:</b> Positions listed for risk level 4 plus CEO and BODSC<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> VP(s) in area of risk' }
     },
 
     risk_table_index: {
-      'Low - 0' => 'limegreen',
-      'Low - 1' => 'limegreen',
-      'Low - 2' => 'limegreen',
-      'Low - 3' => 'limegreen',
-      'Low - 4' => 'limegreen',
-      'Low - 5' => 'limegreen',
-      'Low - 6' => 'limegreen',
-      'Low - 8' => 'limegreen',
-      'Low' =>  'limegreen',
-      'LOW' =>  'limegreen',
-      'Medium - 9' => 'yellow',
-      'Medium - 10' => 'yellow',
-      'Medium - 12' => 'yellow',
-      'Medium' => 'yellow',
-      'MEDIUM' => 'yellow',
-      'Serious - 15' => 'orange',
-      'Serious - 16' => 'orange',
-      'Serious - 18' => 'orange',
-      'Serious - 20' => 'orange',
-      'Serious' => 'orange',
-      'SERIOUS' => 'orange',
-      'High - 24' => 'red',
-      'High - 25' => 'red',
-      'High - 30' => 'red',
-      'High' => 'red',
-      'HIGH' => 'red',
+      'None'                 => 'white',
+      'Minimal (Acceptable)' => 'aqua',
+      'Low'                  => 'limegreen',
+      'Medium'               => 'yellow',
+      'High'                 => 'orange',
+      'Extreme'              => 'red',
     },
 
     risk_table_dict: {
-      0 => 'Low - 0',
-      1 => 'Low - 1',
-      2 => 'Low - 2',
-      3 => 'Low - 3',
-      4 => 'Low - 4',
-      5 => 'Low - 5',
-      6 => 'Low - 6',
-      8 => 'Low - 8',
-      9 => 'Medium - 9',
-      10 => 'Medium - 10',
-      12 => 'Medium - 12',
-      15 => 'Serious - 15',
-      16 => 'Serious - 16',
-      18 => 'Serious - 18',
-      20 => 'Serious - 20',
-      24 => 'High - 24',
-      25 => 'High - 25',
-      30 => 'High - 30',
+      0 => 'None',
+      1 => 'Minimal (Acceptable)',
+      2 => 'Low',
+      3 => 'Medium',
+      4 => 'High',
+      5 => 'Extreme',
     }
   }
 
