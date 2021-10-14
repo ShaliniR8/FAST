@@ -44,7 +44,7 @@
         </div>
 
         <div class="col-xs-12"><%=render "conditions"%></div>
-        <%if @owner.target != "Checklist"%>
+        <%if @owner.target != "Checklist" && @is_query_ready%>
           <div class="col-xs-12"><%=render "visualizations"%></div>
         <%end%>
 

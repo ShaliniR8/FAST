@@ -595,11 +595,13 @@ class QueriesController < ApplicationController
     query_processing_file_full_path = query_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
 
     first_run_query = (not File.exist? query_processing_file_full_path) && (not File.exist? query_file_full_path)
+  
+    @is_query_ready = !first_run_query
 
     # 1) RUN QUERY
     if first_run_query
       @records = []
-      @status_msg = 'PROCESSING... (Notification will be sent out once the query is ready)'
+      @status_msg = 'PROCESSING (Please revisit the page. Notification will be sent out once the query is ready)'
       @query_status = "new"
 
       call_rake 'save_query_result',
@@ -613,7 +615,7 @@ class QueriesController < ApplicationController
     # 2) QUERY PROCESSING..
     elsif File.exist? query_processing_file_full_path
       @records = []
-      @status_msg = 'STILL PROCESSING... (Please revisit the page later)'
+      @status_msg = 'STILL PROCESSING (Please revisit the page later)'
       @query_status = "new"
 
     # 3) DISPLAY QUERY RESULT
