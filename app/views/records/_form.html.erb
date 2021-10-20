@@ -97,10 +97,16 @@
             <%if CONFIG.sr::GENERAL[:submission_description]%>
               <div class="col-xs-12 col-sm-4 mb5">
                 <%=label_tag :description, "Event Title"%>
-                <%=f.text_field :description,
-                  {:class=>'form-control',
-                  :maxlength => "30",
-                  :placeholder => "please limit to 30 characters"}%>
+                <%if CONFIG.sr::GENERAL[:limit_reporting_title_length]%>
+                  <%=f.text_field :description,
+                    {:class=>'form-control',
+                    :maxlength => "30",
+                    :placeholder => "please limit to 30 characters"}%>
+                <%else%>
+                  <%=f.text_field :description,
+                    {:class=>'form-control',
+                    :placeholder => "Event Title"}%>
+                <%end%>
               </div>
             <%end%>
 

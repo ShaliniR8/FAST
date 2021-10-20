@@ -8,6 +8,7 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
     submission_description_required:  true,
     configurable_agenda_dispositions: true,
     dropdown_event_title_list:        true,
+    limit_reporting_title_length:     true,
     # Airline-Specific Features:
   })
 
