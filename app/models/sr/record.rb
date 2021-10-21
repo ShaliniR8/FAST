@@ -469,6 +469,7 @@ class Record < Sr::SafetyReportingBase
   def export_nasa_asrs
     path = get_asrs_path
     create_asrs_report(path)
+    update_attribute(:asrs_sent, true)
     remove_asrs_report(path) if send_asrs_report(from: path)
   end
 
