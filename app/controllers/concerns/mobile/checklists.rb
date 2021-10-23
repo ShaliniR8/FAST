@@ -33,7 +33,7 @@ module Concerns
               only: [:id, :is_header],
               include: {
                 checklist_cells: {
-                  only: [:id, :value, :checklist_header_item_id, :options, :checklist_row_id, :data_type]
+                  only: [:id, :value, :checklist_header_item_id, :options, :checklist_row_id, :data_type, :custom_options]
                 },
                 attachments: {
                   only: [:id, :caption, :owner_id],
@@ -69,6 +69,13 @@ module Concerns
           row[:checklist_cells] = row[:checklist_cells].reduce({}) do |checklist_cells, cell|
             if cell['options'].present?
               cell['options'] = cell['options']
+                .split(';')
+                .map!{ |option| option.strip }
+                .delete_if{ |option| option.blank? }
+            end
+
+            if cell['custom_options'].present?
+              cell['custom_options'] = cell['custom_options']
                 .split(';')
                 .map!{ |option| option.strip }
                 .delete_if{ |option| option.blank? }
