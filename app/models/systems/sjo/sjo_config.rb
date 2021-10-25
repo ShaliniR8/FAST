@@ -43,96 +43,79 @@ class SJOConfig < DefaultConfig
 
   MATRIX_INFO = {
     terminology: {
-      baseline_btn: 'Initial Risk',
-      mitigate_btn: 'Mitigated Risk',
-      'Baseline' => 'Initial',
+      baseline_btn: 'Baseline Risk',
+      mitigate_btn: 'Mitigate Risk',
+      'Baseline' => 'Baseline',
       'Mitigate' => 'Mitigated'
     },
 
     severity_table: {
-      title: 'Severity Table',
+      title: 'SEVERITY EXERCISE',
 
-      orientation: :vertical,
-      direction: :down,
-      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+      orientation: :horizontal,
+      direction: :left,
+      size: 'col-xs-8',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
       header_style: 'sevHeader',
       cell_name: 'severity_td',
 
+      column_header_name: '',
+      column_header: ['A&nbsp;Catastrophic','B&nbsp;Hazardous','C&nbsp;Major','D&nbsp;Minor','E&nbsp;Negligible'],
       row_header_name: 'SEVERITY',
-      row_header: ['A&nbsp;Catastrophic','B&nbsp;Hazardous','C&nbsp;Major','D&nbsp;Minor', 'E&nbsp;Negligible'],
-      column_header_name: 'MEANING',
-      column_header: [''],
-
+      row_header: [
+        'MEANING',
+      ],
       rows: [
-        [ #Catastrophic
-          "<div style = 'width: 300px; margin: auto;'>
-              Aircraft/equipment desrtroyed
-              <br><br>
-              Multiple deaths
-            </div>" 
-        ],
-        [ #Hazardous
-          "<div style = 'width: 300px; margin: auto;'>
-            A large reduction in safety margins, physical distress or a workload such that operational personnel cannot be relied upon to perform their tasks accurately or completely.
+        [ 
+          'Aircraft/equipment desrtroyed
+            <br><br>
+            Multiple deaths',
+          'A large reduction in safety margins, physical distress or a workload such that operational personnel cannot be relied upon to perform their tasks accurately or completely.
             <br><br>
             Serious injury 
             <br><br>
-            Major equipment damage
-          </div>" 
-        ],
-        [ # Major
-          "<div style = 'width: 300px; margin: auto;'>
-            A significant reduction in safety margins, a reduction in the ability operational personnel to cope with adverse operating conditions as a result of an increase in workload or as a result of conditions impairing their efficiency.
+            Major equipment damage',
+          'A significant reduction in safety margins, a reduction in the ability operational personnel to cope with adverse operating conditions as a result of an increase in workload or as a result of conditions impairing their efficiency.
             <br><br> 
             Serious incident
             <br><br>
-            Injury to persons
-          </div>" 
-        ],
-        [ # Minor
-          "<div style = 'width: 300px; margin: auto;'>
-            Nuisance 
+            Injury to persons',
+          'Nuisance 
             <br><br> 
             Operating limitations 
             <br><br>
             Use of emergency procedures 
             <br><br>
-            Minor incident
-          </div>"          
-        ],
-        [ # Negligible
-          "<div style = 'width: 300px; margin: auto;'>
-            Few consequences
-          </div>"
+            Minor incident',
+          'Few consequences'
         ]
-      ]     
+      ] #End of rows
     },
 
     severity_table_dict: {
-      0 => 'A - Catastrophic',
-      1 => 'B - Hazardous',
-      2 => 'C - Major',
-      3 => 'D - Minor',
-      4 => 'E - Negligible'
+      0 => '1',
+      1 => '2',
+      2 => '3',
+      3 => '4',
+      4 => '5'
     },
 
     probability_table: {
-      title: 'LIKELIHOOD TABLE',
+      title: 'PROBABILITY EXERCISE',
 
       orientation: :vertical,
-      direction: :down,
-      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+      direction: :up,
+      size: 'col-xs-4',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',
       header_style: 'probHeader',
       cell_name: 'probability_td',
 
-      row_header_name: 'LIKELIHOOD',
+      row_header_name: 'PROBABILITY',
       row_header: ['5&nbsp;Frequent', '4&nbsp;Occasional', '3&nbsp;Remote', '2&nbsp;Improbable', '1&nbsp;Extremely improbable'],
-      column_header_name: 'MEANING',
-      column_header: [''],
+      column_header_name: '',
+      column_header: ['MEANING'],
       rows: [
         [
           "Likely to occur many times (has occurred frequently)"
@@ -149,21 +132,20 @@ class SJOConfig < DefaultConfig
         [
           "Almost inconcievable that the event will occur"
         ]
-      ]
+      ] #End of rows
     },
 
     probability_table_dict: {
-      0 => '5 - Frequent',
-      1 => '4 - Occasional',
-      2 => '3 - Remote',
-      3 => '2 - Improbable',
-      4 => '1 - Extremely Improbable',
+      0 => 'A',
+      1 => 'B',
+      2 => 'C',
+      3 => 'D'
     },
 
     risk_table: {
       title: 'RISK ASSESSMENT MATRIX',
 
-      size: 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+      size: 'col-xs-8',
       title_style: 'matrixTitle',
       main_header_style: 'matrixMainHeader',
       header_style: 'matrixHeader',
@@ -171,61 +153,43 @@ class SJOConfig < DefaultConfig
       cell_style: 'bold',
 
       # maps severity / likelihood attribute to position on table
-      severity_pos: 'row',
-      likelihood_pos: 'column',
+      severity_pos: 'column',
+      likelihood_pos: 'row',
 
-      row_header_name: 'LIKELIHOOD',
-      row_header: ['5&nbsp;Frequent','4&nbsp;Occasional','3&nbsp;Remote','2&nbsp;Improbable','1&nbsp;Extremely improbable'],
       column_header_name: 'SEVERITY',
       column_header: ['A&nbsp;Catastrophic','B&nbsp;Hazardous','C&nbsp;Major','D&nbsp;Minor','E&nbsp;Negligible'],
-      rows: [
-        ['5',     '5',     '5',    '5',      '5' ],
-        ['4',     '4',     '4',    '4',      '4' ],
-        ['3',     '3',     '3',    '3',      '3' ],
-        ['2',     '2',     '2',    '2',      '2' ],
-        ['1',     '1',     '1',    '1',      '1' ]
-      ],
+      row_header_name: 'PROBABILITY',
+      row_header: ['5&nbsp;Frequent', '4&nbsp;Occasional', '3&nbsp;Remote', '2&nbsp;Improbable', '1&nbsp;Extremely improbable'],
 
       rows_color: [
-        ["red",     "red",        "red",      "yellow",    "yellow"   ],
-        ["red",     "red",        "yellow",   "yellow",    "yellow"   ],
-        ["red",     "yellow",     "yellow",   "yellow",    "limegreen"],
-        ["yellow",  "yellow",     "yellow",   "limegreen", "limegreen"],
-        ["yellow",  "limegreen",  "limegreen","limegreen", "limegreen"]
-      ]
+        ["crimson",   "crimson",          "crimson",            "yellow",         "yellow"          ],
+        ["crimson",   "crimson",          "yellow",             "yellow",         "yellow"          ],
+        ["crimson",   "yellow",           "yellow",             "yellow",         "mediumseagreen"  ],
+        ["yellow",    "yellow",           "yellow",             "mediumseagreen", "mediumseagreen"  ],
+        ["yellow",    "mediumseagreen",   "mediumseagreen",     "mediumseagreen", "mediumseagreen"  ],
+      ],
     },
-
-    risk_definitions: {
-      limegreen:        { rating: 'ACCEPTABLE',      cells: '5/2, 5/3, 5/4, 5/5, 4/4, 4/5, 3/5',                                description: 'Acceptable as is. No further safety risk mitigation required.' },
-      yellow:           { rating: 'TOLERABLE',       cells: '1/4, 1/5, 2/3, 2/4, 2/5, 3/2, 3/3, 3/4, 4/1, 4/2, 4/3, 5/1',       description: 'Can be tolerated based on the safety risk mitigation. It may require management decision to accept the risk.' },
-      red:              { rating: 'INTOLERABLE',     cells: '1/1, 1/2, 1/3, 1/4, 1/5, 2/1',                                     description: 'Take immediate action to mitigate the risk or stop the activity. Perform priority safety risk mitigation to ensure additional or enhanced preventative controls are in place to bring down the safety risk index to tolerable.' }
-    },
-
-    #double check this one
 
     risk_table_index: {
-      'Low - 1' => 'limegreen',
-      'Low - 2' => 'limegreen',
-      'Low' =>  'limegreen',
-      'LOW' =>  'limegreen',
-      'Medium - 2' => 'yellow',
-      'Medium - 3' => 'yellow',
-      'Medium' => 'yellow',
-      'MEDIUM' => 'yellow',
-      'High - 4' => 'red',
-      'High - 5' => 'red',
-      'High' => 'red',
-      'HIGH' => 'red',
+      "INTOLERABLE" => 'crimson',
+      "TOLERABLE" => 'yellow',
+      "ACCEPTABLE" => 'mediumseagreen'
     },
 
     risk_table_dict: {
-      1 => 'Low - 1',
-      2 => 'Low - 2',
-      3 => 'Medium - 3',
-      4 => 'High - 4',
-      5 => 'High - 5',
-    }
+      crimson:        "INTOLERABLE",
+      yellow:         "TOLERABLE",
+      mediumseagreen: "ACCEPTABLE",
+    },
+
+    risk_definitions: {
+      crimson:          { rating: 'INTOLERABLE',      cells: 'A/1, A/2, and B/1',                description: 'Acceptable as is. No further safety risk mitigation required.' },
+      yellow:           { rating: 'TOLERABLE',  cells: 'A/4, B/3, and D/1',                      description: 'Can be tolerated based on the safety risk mitigation. It may require management decision to accept the risk.' },
+      mediumseagreen:   { rating: 'Low',       cells: 'A/5, B/5, C/4, C/5, D/3, D/4, and D/5',   description: 'Take immediate action to mitigate the risk or stop the activity. Perform priority safety risk mitigation to ensure additional or enhanced preventative controls are in place to bring down the safety risk index to tolerable.' }
+    },
+
   }
+
 
   def self.print_severity(owner, severity_score)
     self::MATRIX_INFO[:severity_table_dict][severity_score] unless severity_score.nil?
