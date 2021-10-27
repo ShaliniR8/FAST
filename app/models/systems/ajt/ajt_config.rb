@@ -14,6 +14,8 @@ class AJTConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:               false,
+    enable_sso:                   true,
+    login_option:                 'dual',
     track_log:                    true,
 
     # SYSTEM-WIDE FORM CONFIGS

@@ -11,8 +11,8 @@
       <div class="form-group col-xs-12">
         <%@owner.records.each do |record|%>
           <h4><b>Report: #<%=record.id%></b></h4>
-          <%if (current_user.has_template_access(record.template.name).include? 'full') ||
-            ((current_user.has_template_access(record.template.name).include? 'viewer') && record.viewer_access)%>
+          <%if (current_user.has_template_access(record.template.name).include? 'viewer_template_id') ||
+            ((current_user.has_template_access(record.template.name).include? 'viewer_template_deid') && record.viewer_access)%>
             <%record.record_fields.each do |x|%>
               <%if x.category.present? && x.display_type == 'textarea' && !x.value.nil? && !x.value.empty?%>
                 <%

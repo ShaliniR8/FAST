@@ -178,9 +178,7 @@ class SubmissionsController < ApplicationController
       templates = current_user.get_all_submitter_templates
       @templates = Template.where(:name => templates)
       unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
-        @templates.keep_if{|x|
-            (current_user.has_template_access(x.name).include? 'full') ||
-            (current_user.has_template_access(x.name).include? 'submitter')}
+        @templates.keep_if{|x| current_user.has_template_access(x.name).include? 'submitter'}
         @templates.sort_by! {|x| x.name }
       end
     end
@@ -356,7 +354,7 @@ class SubmissionsController < ApplicationController
         @meta_field_args = ['show']
         @record = Submission.preload(:submission_fields).find(params[:id])
         if CONFIG.sr::GENERAL[:show_submitter_name] || (CONFIG::GENERAL[:global_admin_default] && current_user.global_admin?)
-          template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
+          template_full_access = current_user.has_template_access(@record.template.name).include? 'viewer_template_id'
           @meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.user_id == current_user.id
         end
 
@@ -376,8 +374,8 @@ class SubmissionsController < ApplicationController
 
         @template_access = @record.user_id == current_user.id ||
           (current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) &&
-          (current_user.has_access(@template.name, 'full', admin: CONFIG::GENERAL[:global_admin_default]) ||
-          current_user.has_access(@template.name, 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) ||
+          (current_user.has_access(@template.name, 'viewer_template_id', admin: CONFIG::GENERAL[:global_admin_default]) ||
+          current_user.has_access(@template.name, 'viewer_template_deid', admin: CONFIG::GENERAL[:global_admin_default]) ||
           current_user.has_access(@template.name, 'confidential', admin: CONFIG::GENERAL[:global_admin_default], strict: true)))
 
         redirect_to errors_path unless @template_access

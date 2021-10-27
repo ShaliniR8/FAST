@@ -109,7 +109,7 @@ class Record < Sr::SafetyReportingBase
       true
     else
       accesses = current_user.has_template_access(template.name).split(";")
-      if accesses.include?("full") || accesses.include?("viewer")
+      if accesses.include?("viewer_template_id") || accesses.include?("viewer_template_deid")
         true
       end
     end

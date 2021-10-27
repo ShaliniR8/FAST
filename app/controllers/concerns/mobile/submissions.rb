@@ -154,7 +154,7 @@ module Concerns
 
         unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           templates.keep_if do |template|
-            current_user.has_template_access(template.name).match /full|submitter/
+            current_user.has_template_access(template.name).match /submitter/
           end
         end
 
@@ -322,7 +322,7 @@ module Concerns
         #Added by BP Aug 8. render json for templates accessible to the current user
         def template_json
           @templates = Template.find(:all)
-          @templates.keep_if{|x| (current_user.has_template_access(x.name).include? "full")||(current_user.has_template_access(x.name).include? "submitter")}
+          @templates.keep_if{|x| (current_user.has_template_access(x.name).include? "viewer_template_id")||(current_user.has_template_access(x.name).include? "submitter")}
           stream = render_to_string(:template=>"submissions/template_json.js.erb" )
           send_data(stream, :type => "json", :disposition => "inline")
         end

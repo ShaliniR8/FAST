@@ -397,9 +397,9 @@ class ApplicationDatatable
 
     if ['Record', 'Report'].include?(object.name)
       is_admin = @current_user.has_access(object.name.downcase.pluralize, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
-      full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:full])
+      full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer_template_id])
       confidential_access_templates = Template.where(name: @current_user.get_all_templates_hash[:confidential])
-      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer])
+      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer_template_deid])
 
       if object.name == 'Record'
         @status_count = object.joins(join_tables)
@@ -433,9 +433,9 @@ class ApplicationDatatable
 
     if ['Record', 'Report'].include?(object.name)
       is_admin = @current_user.has_access(object.name.downcase.pluralize, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
-      full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:full])
+      full_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer_template_id])
       confidential_access_templates = Template.where(name: @current_user.get_all_templates_hash[:confidential])
-      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer])
+      viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: @current_user.get_all_templates_hash[:viewer_template_deid])
 
       if object.name == 'Record'
         object.joins(join_tables)

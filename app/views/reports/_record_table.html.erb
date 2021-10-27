@@ -147,7 +147,7 @@
                       :disable_with => "Redirecting..."%>
                   <%end%>
 
-                  <%if current_user.has_template_access(record.template.name).include? 'full'%>
+                  <%if current_user.has_template_access(record.template.name).include? 'viewer_template_id'%>
                     <%=link_to "<i class='glyphicon glyphicon-eye-open'></i>".html_safe,
                       record_path(record),
                       :class => "btn btn-info mt5",
@@ -157,7 +157,7 @@
                       "data-toggle" => "modal",
                       "data-target" => ".bs-example-modal-lg",
                       :class => "btn btn-default mt5 view_btn"%>
-                  <%elsif (current_user.has_template_access(record.template.name).include? 'viewer') && record.viewer_access%>
+                  <%elsif (current_user.has_template_access(record.template.name).include? 'viewer_template_deid') && record.viewer_access%>
                     <%=link_to "<i class='glyphicon glyphicon-eye-open'></i>".html_safe,
                       record_path(record),
                       :class => "btn btn-info mt5",
