@@ -3,7 +3,7 @@
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/datepicker.css"/>
 
-<%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
+<%template_full_access = current_user.has_template_access(@record.template.name).include? 'viewer_template_id'%>
 
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">

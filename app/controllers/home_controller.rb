@@ -83,9 +83,9 @@ class HomeController < ApplicationController
       submission_queries << "(completed = true)"
       # template query
       if params[:emp_groups].present?
-        templates = Template.where(name: (@permissions['full'] || []).compact, emp_group: params[:emp_group])
+        templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact, emp_group: params[:emp_group])
       else
-        templates = Template.where(name: (@permissions['full'] || []).compact)
+        templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact)
       end
       if templates.length > 0
         submission_queries << "(templates_id in (#{templates.map(&:id).join(',')}) OR user_id = #{current_user.id})"
@@ -109,11 +109,11 @@ class HomeController < ApplicationController
 
       # template query
       if params[:emp_groups].present?
-        full_template = Template.where(name: (current_user.get_all_templates_hash[:full] || []).compact, emp_group: params[:emp_group])
-        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer] || []).compact, emp_group: params[:emp_group])
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact, emp_group: params[:emp_group])
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact, emp_group: params[:emp_group])
       else
-        full_template = Template.where(name: (current_user.get_all_templates_hash[:full] || []).compact)
-        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer] || []).compact)
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact)
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact)
       end
       template_query = ["(users_id = #{current_user.id})"]
       if full_template.length > 0
@@ -635,7 +635,7 @@ class HomeController < ApplicationController
     templates = current_user.get_all_submitter_templates
     @templates = Template.where(:name => templates)
     @templates.keep_if{|x|
-      (current_user.has_template_access(x.name).include? "full") ||
+      (current_user.has_template_access(x.name).include? "viewer_template_id") ||
       (current_user.has_template_access(x.name).include? "submitter")}
       .sort_by!{|x| x.name}
     @orm_templates = OrmTemplate.order(:name).all

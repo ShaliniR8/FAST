@@ -609,7 +609,7 @@ class ApplicationController < ActionController::Base
 
   def submission_display(report)
     true
-    # if (current_user.has_template_access(report.template.name).include? "full") || (current_user == report.created_by) || (current_user.has_template_access(report.template.name).include? "viewer")
+    # if (current_user.has_template_access(report.template.name).include? "viewer_template_id") || (current_user == report.created_by) || (current_user.has_template_access(report.template.name).include? "viewer_template_deid")
     #   return true
     # else
     #   return false
@@ -618,7 +618,7 @@ class ApplicationController < ActionController::Base
 
   def record_display(report)
     true
-    # if (current_user.has_template_access(report.template.name).include? "full") || (current_user == report.created_by) || ((current_user.has_template_access(report.template.name).include? "viewer") && report.viewer_access)
+    # if (current_user.has_template_access(report.template.name).include? "viewer_template_id") || (current_user == report.created_by) || ((current_user.has_template_access(report.template.name).include? "viewer_template_deid") && report.viewer_access)
     #   return true
     # else
     #   return false
@@ -1113,7 +1113,7 @@ class ApplicationController < ActionController::Base
       @record = Object.const_get(class_name).find(params[:id])
       @cat = Category.find(params[:category_id])
       render partial: 'records/category',
-             locals: {deid: !current_user.has_template_access(@record.template.name).include?('full'),
+             locals: {deid: !current_user.has_template_access(@record.template.name).include?('viewer_template_id'),
              from_record_show: true,
              record_edit_access: current_user.has_access('records', 'edit', admin: CONFIG::GENERAL[:global_admin_default]),
              hide_panel_head: true}

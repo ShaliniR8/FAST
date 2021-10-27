@@ -398,7 +398,7 @@ class ReportsController < ApplicationController
     @records = @report.records
 
     template_access = true
-    all_templates = (current_user.get_all_templates_hash[:full] + current_user.get_all_templates_hash[:viewer]).uniq
+    all_templates = (current_user.get_all_templates_hash[:viewer_template_id] + current_user.get_all_templates_hash[:viewer_template_deid]).uniq
     report_record_templates = @records.map{|r| r.template.present? ? r.template.name : nil}
     report_record_templates.each do |rtemp|
       if all_templates.exclude?(rtemp)
@@ -520,7 +520,7 @@ class ReportsController < ApplicationController
       @title += " : #{params[:status]}"
     end
     handle_search
-    #@records.keep_if{|r|(current_user.has_template_access(r.template.name).include? "full")|| ((current_user.has_template_access(r.template.name).include? "viewer")&&r.viewer_access)}
+    #@records.keep_if{|r|(current_user.has_template_access(r.template.name).include? "viewer_template_id")|| ((current_user.has_template_access(r.template.name).include? "viewer_template_deid")&&r.viewer_access)}
     Rails.logger.debug "records=#{@records.length}"
     Rails.logger.debug "records=#{@records.length}"
     @records.keep_if{|r| display_in_table(r)}

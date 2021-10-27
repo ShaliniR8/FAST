@@ -77,7 +77,7 @@ class AccessControl < ActiveRecord::Base
       when "module"
         "This gives the user access to the #{type} Module from the gateway page."
       when 'admin'
-        "This gives the user full access to viewing, editing, and creating #{type}s."
+        "This gives the user access to #{type}s that they are not associated with."
       when 'override'
         "This gives the user access to see the \"Override\" button on the #{type} page and the ability to delete the #{type}."
       when 'notify'
@@ -114,6 +114,7 @@ class AccessControl < ActiveRecord::Base
         "show"                => generate_desc("Submission", "show"),
         "destroy"             => generate_desc("Submission", "destroy"),
         "index"               => generate_desc("Submission", "index"),
+        "admin"               => generate_desc("Submission", "admin"),
         "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from accessing any previous submissions.",
       },
 
@@ -124,6 +125,7 @@ class AccessControl < ActiveRecord::Base
         "destroy"             => generate_desc("Report", "destroy"),
         "index"               => generate_desc("Report", "index"),
         "override"            => generate_desc("Report", "override"),
+        "admin"               => generate_desc("Report", "admin"),
         "query"               => "This gives the user access to query from reports.",
         "deid"                => "This gives the user access to De-Identified reports",
       },
@@ -135,6 +137,7 @@ class AccessControl < ActiveRecord::Base
         "destroy"             => generate_desc("Event", "destroy"),
         "index"               => generate_desc("Event", "index"),
         "override"            => generate_desc("Event", "override"),
+        "admin"               => generate_desc("Event", "admin"),
       },
 
       "meetings"=>{
@@ -144,6 +147,7 @@ class AccessControl < ActiveRecord::Base
         "destroy"             => generate_desc("Safety Reporting Meeting", "destroy"),
         "index"               => generate_desc("Safety Reporting Meeting", "index"),
         "override"            => generate_desc("Safety Reporting Meeting", "override"),
+        "admin"               => generate_desc("Safety Reporting Meeting", "admin"),
       },
 
       "faa_reports"=>{
@@ -163,6 +167,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Safety Reporting Corrective Action", "index"),
         "override"            => generate_desc("Safety Reporting Corrective Action", "override"),
         "notify"              => generate_desc("Safety Reporting Corrective Action", "notify"),
+        "admin"               => generate_desc("Safety Reporting Corrective Action", "admin"),
       },
 
       "documents"=>{
@@ -180,6 +185,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Audit", "viewer"),
         "override"            => generate_desc("Audit", "override"),
         "notify"              => generate_desc("Audit", "notify"),
+        "admin"               => generate_desc("Audit", "admin"),
       },
 
       "inspections"=>{
@@ -191,6 +197,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Inspection", "viewer"),
         "override"            => generate_desc("Inspection", "override"),
         "notify"              => generate_desc("Inspection", "notify"),
+        "admin"               => generate_desc("Inspection", "admin"),
       },
 
       "evaluations"=>{
@@ -202,6 +209,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Evaluation", "viewer"),
         "override"            => generate_desc("Evaluation", "override"),
         "notify"              => generate_desc("Evaluation", "notify"),
+        "admin"               => generate_desc("Evaluation", "admin"),
       },
 
       "investigations"=>{
@@ -213,6 +221,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Investigation", "viewer"),
         "override"            => generate_desc("Investigation", "override"),
         "notify"              => generate_desc("Investigation", "notify"),
+        "admin"               => generate_desc("Investigation", "admin"),
       },
 
       "findings"=>{
@@ -224,6 +233,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Finding", "viewer"),
         "override"            => generate_desc("Finding", "override"),
         "notify"              => generate_desc("Finding", "notify"),
+        "admin"               => generate_desc("Finding", "admin"),
       },
 
       "sms_actions"=>{
@@ -235,6 +245,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Safety Assurance Corrective Action", "viewer"),
         "override"            => generate_desc("Safety Assurance Corrective Action", "override"),
         "notify"              => generate_desc("Safety Assurance Corrective Action", "notify"),
+        "admin"               => generate_desc("Safety Assurance Corrective Action", "admin"),
       },
 
       "recommendations"=>{
@@ -247,12 +258,14 @@ class AccessControl < ActiveRecord::Base
         'admin'               => generate_desc('Recommendation', 'admin'),
         "override"            => generate_desc("Recommendation", "override"),
         "notify"              => generate_desc("Recommendation", "notify"),
+        "admin"               => generate_desc("Recommendation", "admin"),
       },
 
       "checklist"=>{
         "add"                 => generate_desc("Checklist", "add"),
         "edit"                => generate_desc("Checklist", "edit"),
         "destroy"             => generate_desc("Checklist", "destroy"),
+        "admin"               => "This gives the user access to all checklist templates to be added to Audits, Inspections, Evaluations and Investigations",
       },
 
       'sras'=>{
@@ -264,6 +277,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("SRA(SRM)", "viewer"),
         "override"            => generate_desc("SRA(SRM)", "override"),
         "notify"              => generate_desc("SRA(SRM)", "notify"),
+        "admin"               => generate_desc("SRA(SRM)", "admin"),
       },
 
       'hazards'=>{
@@ -275,6 +289,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Hazard", "viewer"),
         "override"            => generate_desc("Hazard", "override"),
         "notify"              => generate_desc("Hazard", "notify"),
+        "admin"               => generate_desc("Hazard", "admin"),
       },
 
       'risk_controls'=>{
@@ -286,6 +301,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Risk Control", "viewer"),
         "override"            => generate_desc("Risk Control", "override"),
         "notify"              => generate_desc("Risk Control", "notify"),
+        "admin"               => generate_desc("Risk Control", "admin"),
       },
 
       'safety_plans'=>{
@@ -297,6 +313,7 @@ class AccessControl < ActiveRecord::Base
         "viewer"              => generate_desc("Safety Plan", "viewer"),
         "override"            => generate_desc("Safety Plan", "override"),
         "notify"              => generate_desc("Safety Plan", "notify"),
+        "admin"               => generate_desc("Safety Plan", "admin"),
       },
 
       'srm_meetings'=>{
@@ -307,6 +324,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("SRA(SRM) Meeting", "index"),
         "viewer"              => generate_desc("SRA(SRM) Meeting", "viewer"),
         "override"            => generate_desc("SRA(SRM) Meeting", "override"),
+        "admin"               => generate_desc("SRA(SRM) Meeting", "admin"),
       },
 
       'ims'=>{
@@ -317,6 +335,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("IM", "index"),
         "viewer"              => generate_desc("IM", "viewer"),
         "override"            => generate_desc("IM", "override"),
+        "admin"               => generate_desc("IM", "admin"),
        },
 
       'packages'=>{
@@ -327,6 +346,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("Package", "index"),
         "viewer"              => generate_desc("Package", "viewer"),
         "override"            => generate_desc("Package", "override"),
+        "admin"               => generate_desc("Package", "admin"),
        },
 
       'sms_meetings'=>{
@@ -337,6 +357,7 @@ class AccessControl < ActiveRecord::Base
         "index"               => generate_desc("SMS IM Meeting", "index"),
         "viewer"              => generate_desc("SMS IM Meeting", "viewer"),
         "override"            => generate_desc("SMS IM Meeting", "override"),
+        "admin"               => generate_desc("SMS IM Meeting", "admin"),
        },
 
        'ASAP' =>{
@@ -369,7 +390,7 @@ class AccessControl < ActiveRecord::Base
   def self.get_meta
     {
       "submissions"=>{
-        "New"=>"new",
+        # "New"=>"new",
         "View"=>"show",
         "Delete"=>"destroy",
         "Listing"=>"index",
@@ -384,7 +405,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Query"=>"query",
-        "De-Identified" => "deid",
+        # "De-Identified" => "deid",
         "Admin"=>"admin",
         "Override" => 'override'
       },
@@ -635,17 +656,18 @@ class AccessControl < ActiveRecord::Base
     h["Viewable"] = "viewable"
     h["Attach"] = "address"
     h["All"] = "all"
-    h["Viewer"] = "viewer"
-    h["Full"] = "full"
+    h["Viewer Access"] = "viewer"
+    h["View De-Identified"] = "viewer_template_deid"
+    h["View Identified"] = "viewer_template_id"
     h["Notifier"] = "notifier"
     h["View Narrative"] = "summary"
     h["Submitter"] = "submitter"
     h["Safety Enhancement"] = "enhance"
     h["Summary"] = "summary"
-    h["Module"] = "module"
+    h["Module Access"] = "module"
     h["Tabulation"] = "tabulation"
     h["Access"] = "query_all"
-    h["Admin"] = "admin"
+    h["Full Access"] = "admin"
     h["Shared"] = "shared"
     h["Override"] = "override"
     h["Notify"] = "notify"
@@ -714,9 +736,9 @@ class AccessControl < ActiveRecord::Base
     h = Hash.new
 
     h["Notifier"] = "notifier"
-    h["Viewer"] = "viewer"
+    h["View De-Identified"] = "viewer_template_deid"
     h["Submitter"] = "submitter"
-    h["Full"] = "full"
+    h["View Identified"] = "viewer_template_id"
     h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
 
     return h
@@ -773,14 +795,14 @@ class AccessControl < ActiveRecord::Base
 
   def get_template_desc(template_name, action)
     case action
-    when "viewer"
-      "This gives the user access to view #{template_name} Submissions/Reports when the viewer access is enabled. Please note that access to viewing Submissions/Report is also required."
+    when "viewer_template_deid"
+      "This gives the user access to view a de-identified version of #{template_name} Submissions/Reports when the viewer access is enabled. Please note that access to viewing Submissions/Report is also required."
     when "submitter"
-      "This gives the user access to submit a new #{template_name}. Please note that access to creating new Submissions/Reports is also required."
+      "This gives the user access to submit a new Submission for #{template_name}."
     when "notifier"
       "Users with this access rule will receive an email notification when a new #{template_name} Submission is submitted."
-    when "full"
-      "This gives the user full access to #{template_name} and allows the user to create Submissions/Reports and edit Reports. Please note that access to creating/editing Submissions/Reports is also required."
+    when "viewer_template_id"
+      "This gives the user access to view an identified version of #{template_name} Submissions/Reports and also allows the user to edit Reports of type #{template_name}. Please note that access to editing Reports is also required."
     when "confidential"
       "This gives the user access to view the #{template_name} that are confidential."
     else
@@ -814,8 +836,8 @@ class AccessControl < ActiveRecord::Base
 
   def self.get_headers
     [
-      {:field => "find_entry",    :title => "Report Type"},
-      {:field => "find_action",   :title => "Action"},
+      {:field => "find_entry",    :title => "Object"},
+      {:field => "find_action",   :title => "Access"},
     ]
   end
 end

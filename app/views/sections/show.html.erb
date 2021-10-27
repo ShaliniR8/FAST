@@ -12,7 +12,7 @@
             <b><%="#{@record.template.name}"%> Submission #<%=@record.get_id%>: <%="#{@record.get_description}"%> </b>
             <div class="top_buttons pull-right">
               <a class="btn btn-warning expandall mb5">Expand All</a>
-              <%if current_user.has_template_access(@record.template.name).include?("full") || current_user.has_template_access(@record.template.name).include?("viewer")%>
+              <%if current_user.has_template_access(@record.template.name).include?("viewer_template_id") || current_user.has_template_access(@record.template.name).include?("viewer_template_deid")%>
                 <%if !@record.anonymous?%>
                   <%=link_to "Message Submitter", new_message_path(:send_to => @record.created_by.id,:link=>submission_path(@record)), :id=>"index-btn", :class=>"btn btn-warning mb5"%>
                 <%end%>

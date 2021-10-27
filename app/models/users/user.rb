@@ -73,7 +73,7 @@ class User < ActiveRecord::Base
       .preload(:access_controls)
       .map(&:access_controls)
       .flatten
-      .select{|x| x[:action] == "full" || x[:action] == "viewer" || x[:action] == "confidential"}
+      .select{|x| x[:action] == "viewer_template_id" || x[:action] == "viewer_template_deid" || x[:action] == "confidential"}
       .map{|x| x[:entry]}
       .uniq
   end
@@ -81,8 +81,8 @@ class User < ActiveRecord::Base
   def get_all_templates_hash
     rules = privileges.preload(:access_controls).map(&:access_controls).flatten
     {
-      :full => rules.select{|rule| rule[:action] == 'full'}.map{|x| x[:entry]}.uniq,
-      :viewer => rules.select{|rule| rule[:action] == 'viewer'}.map{|x| x[:entry]}.uniq,
+      :viewer_template_id => rules.select{|rule| rule[:action] == 'viewer_template_id'}.map{|x| x[:entry]}.uniq,
+      :viewer_template_deid => rules.select{|rule| rule[:action] == 'viewer_template_deid'}.map{|x| x[:entry]}.uniq,
       :confidential => rules.select{|rule| rule[:action] == 'confidential'}.map{|x| x[:entry]}.uniq
     }
   end
@@ -93,7 +93,7 @@ class User < ActiveRecord::Base
       if CONFIG::GENERAL[:hide_asap_submissions_in_dashboard] && (x[:entry].include? 'ASAP')
         false
       else
-        x[:action] == "full" || x[:action] == "submitter"
+        x[:action] == "submitter"
       end
     }.map{|x| x[:entry]}.uniq
   end

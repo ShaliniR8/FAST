@@ -17,10 +17,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 
-<%template_full_access = current_user.has_template_access(@record.template.name).include? 'full'%>
-<%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer'%>
+<%template_full_access = current_user.has_template_access(@record.template.name).include? 'viewer_template_id'%>
+<%template_viewer_access = current_user.has_template_access(@record.template.name).include? 'viewer_template_deid'%>
 <%submission_show_access = current_user.has_access('submissions','show', admin: CONFIG::GENERAL[:global_admin_default]) && ((@record.submission.present? && @record.submission.user_id == current_user.id) ||
-        (current_user.has_template_access(@record.template.name).include? 'full'))%>
+        (current_user.has_template_access(@record.template.name).include? 'viewer_template_id'))%>
 <%record_edit_access = current_user.has_access('records', 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
 <%record_delete_access = current_user.has_access('records','destroy', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
 <%report_show_access = current_user.has_access('reports','show', admin: CONFIG::GENERAL[:global_admin_default])%>
@@ -241,7 +241,7 @@
             # cond1 = !CONFIG.sr::GENERAL[:show_submitter_name] && current_user.global_admin?
             # show_submitter_name is TRUE and current_user had full access
             if CONFIG.sr::GENERAL[:show_submitter_name] || (CONFIG::GENERAL[:global_admin_default] && current_user.global_admin?)
-              template_full_access = current_user.has_template_access(@record.template.name).include? 'full'
+              template_full_access = current_user.has_template_access(@record.template.name).include? 'viewer_template_id'
               meta_field_args << 'admin' if current_user.admin? || template_full_access || @record.users_id == current_user.id
             end
             meta_field_args.push('close') if @record.status == 'Closed' && @record.is_asap

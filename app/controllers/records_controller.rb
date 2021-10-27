@@ -238,7 +238,7 @@ class RecordsController < ApplicationController
 
 
     access_level = current_user.has_template_access(@template.name)
-    if !(access_level.include? "full")
+    if !(access_level.include? "viewer_template_id")
       redirect_to root_url
       return
     end
@@ -430,8 +430,8 @@ class RecordsController < ApplicationController
 
     access_level = current_user.has_template_access(@template.name)
     redirect_to errors_path unless current_user.has_access('records', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: false) &&
-                              (access_level.split(';').include?('full') ||
-                              (access_level.split(';').include?('viewer') && @record.viewer_access) ||
+                              (access_level.split(';').include?('viewer_template_id') ||
+                              (access_level.split(';').include?('viewer_template_deid') && @record.viewer_access) ||
                               (access_level.split(';').include?('confidential') && @record.confidential))
 
     @corrective_actions = @record.corrective_actions
