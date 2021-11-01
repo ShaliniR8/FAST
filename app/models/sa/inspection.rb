@@ -24,11 +24,13 @@ class Inspection < Sa::SafetyAssuranceBase
   belongs_to :approver,             foreign_key: 'approver_id',         class_name: 'User'
   belongs_to :responsible_user,     foreign_key: 'responsible_user_id', class_name: 'User'
   belongs_to :created_by,           foreign_key: 'created_by_id',       class_name: 'User'
-  has_many :requirements,           foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
-  has_many :items,                  foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
+  has_many   :requirements,         foreign_key: 'owner_id',            class_name: 'InspectionRequirement',    dependent: :destroy
+  has_many   :items,                foreign_key: 'owner_id',            class_name: 'InspectionItem',           dependent: :destroy
+  has_many   :causes,               foreign_key: 'owner_id',            class_name: 'Cause',                    dependent: :destroy
 
   has_many :checklists, as: :owner, dependent: :destroy
 
+  accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :requirements
   accepts_nested_attributes_for :items
 
@@ -52,6 +54,24 @@ class Inspection < Sa::SafetyAssuranceBase
     keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
 
     keys
+  end
+
+
+  def cause_label
+    causes.map { |cause| "#{cause.category.titleize} > #{cause.attr.titleize}".downcase }
+  end
+
+
+  def cause_value
+    causes.map { |cause|
+      if cause.value == '0'
+        'No'
+      elsif cause.value == '1'
+        'Yes'
+      else
+        "#{cause.value}".gsub('"','').downcase
+      end
+    }
   end
 
 

@@ -315,6 +315,7 @@ PrdgSession::Application.routes.draw do |map|
       get "user_submission_json" #Added by BP Aug 15 render the json of submissions of current user
       post "get_dataset"
       get 'flight_selected'
+      get 'asap_library'
     end
   end
   resources :records do
@@ -335,6 +336,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
       put 'ajax_update'
       get 'edit_field'
+      get 'library_deid_pdf'
     end
     collection do
       post 'load_records'
@@ -388,6 +390,8 @@ PrdgSession::Application.routes.draw do |map|
       get "get_agenda"
       get "new_attachment"
       get "new_minutes"
+      get "carryover_another_meeting"
+      post "carryover_to_another_meeting"
       get 'show_narrative'
       get "reopen"
       get 'override_status'

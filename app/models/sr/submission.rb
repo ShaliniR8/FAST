@@ -164,6 +164,23 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def remove_duplicate_submission_comments
+    return false if comments.size <= 1
+
+    last_comment = comments.last.content
+    last_comment_user_id = comments.last.user_id
+
+    comments.first(comments.size - 1).each do |c|
+      if c.user_id == last_comment_user_id && c.content == last_comment
+        ViewerComment.find(c.id).destroy
+        return true
+      end
+    end
+
+    return false
+  end
+
+
   def make_report
     if completed && records_id.blank?
       self.record = Record.create(

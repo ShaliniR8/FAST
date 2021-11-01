@@ -182,6 +182,11 @@ javascript:
           $(".records-table").css({'opacity':0.5});
           $('#loader1').show();
         },
+        error: function (jqXHR, textStatus, errorThrown) {
+          if (textStatus == 'error' && errorThrown == 'Unauthorized') {
+            location.reload(true);
+          }
+        },
         complete: function(data) {
           updateStatusCounts(data.responseJSON['statusCounts'])
           updateSearchTerms(data.responseJSON['searchTerms'])

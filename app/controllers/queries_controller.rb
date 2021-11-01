@@ -29,6 +29,9 @@ class QueriesController < ApplicationController
 
 
   def index
+    has_access = current_user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])
+    redirect_to errors_path unless has_access
+
     @headers = @table.get_meta_fields('index')
     # @records = @table.where(target: @types.values).includes(:created_by)
 

@@ -344,7 +344,8 @@ class DefaultDictionary
             end
           end
         end
-        visible
+        visible && (priv_check.call(Object.const_get('Finding'),user,'show',CONFIG::GENERAL[:global_admin_default],true) ||
+                    priv_check.call(Object.const_get('Finding'),user,'admin',CONFIG::GENERAL[:global_admin_default],true))
       end,
       show_btns: proc { |owner:, user:, **op| false },
       data: proc do |owner:, user:, **op|

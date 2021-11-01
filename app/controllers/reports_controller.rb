@@ -204,18 +204,64 @@ class ReportsController < ApplicationController
     connection = Connection.get(meeting, report).update_attributes(archive: true)
     Transaction.build_for(
       meeting,
-      'Carry Over Event',
+      'Remove Event',
+      current_user.id,
+      "Event ##{report.get_id} Removed"
+    )
+    Transaction.build_for(
+      report,
+      'Remove from Meeting',
+      current_user.id,
+      "Event Removed from Meeting ##{meeting.id}"
+    )
+    report.update_attributes(status: 'Meeting Ready') if report.active_meetings.empty?
+    report.save
+  end
+
+
+  def carryover_another_meeting
+    @owner = Report.preload(:meetings).find(params[:id])
+    @meeting = Meeting.find(params[:meeting])
+    @instruction = "<p> Click anywhere on the <b>ROW</b> of the meeting to which you want to carry this event over.</p>"
+
+    excluded_meeting_ids = @owner.meetings.map(&:id)
+    excluded_meeting_ids << @meeting.id
+    @meetings = Meeting.where('status = ? and id NOT IN (?)', "Open", excluded_meeting_ids)
+    render :partial => 'add_to_another_meeting'
+  end
+
+
+  def carryover_to_another_meeting
+    report = Report.find(params[:id])
+    @meeting = Meeting.find(params[:meeting_id])
+
+    Connection.get(@meeting, report).update_attributes(archive: true)
+
+    @report_headers = Report.get_meta_fields('index', 'meeting')
+    @reports = @meeting.reports.sort_by{|x| x.id}
+
+    Transaction.build_for(
+      @meeting,
+      'Carried Over Event',
       current_user.id,
       "Event ##{report.get_id} Carried Over"
     )
+
+    meetings_added = Meeting.where(id: params[:meetings_selected].chomp(',').split(','))
+    meetings_added.each do |m|
+      Connection.create(owner: m, child: report)
+    end
+
     Transaction.build_for(
       report,
       'Carried Over',
       current_user.id,
-      "Event Carried Over from Meeting ##{meeting.id}"
+      "Event Carried Over from Meeting ##{@meeting.id} to Meetings with IDs ##{params[:meetings_selected].chomp(',')}"
     )
-    report.update_attributes(status: 'Meeting Ready') if report.active_meetings.empty?
-    report.save
+
+    respond_to do |format|
+      format.js
+    end
   end
 
 

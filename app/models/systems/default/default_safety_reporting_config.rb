@@ -28,6 +28,7 @@ class DefaultSafetyReportingConfig
     match_submission_record_id: false,    # Display Record's ID on Submission pages (currently applied: ATN)
     submission_corrective_action_root_cause:    false,    # Flag for corrective action and root causes at submission level
     enable_external_email:     false,      # Enables bcc email to external email IDs from message submitter
+    show_pdf_column_scoreboard: false,
     limit_reporting_title_length:   false
   }
 
@@ -38,6 +39,12 @@ class DefaultSafetyReportingConfig
     'Error', 'Sub Error',
     'Human Factor', 'Comment'
   ]
+
+  ASAP_LIBRARY_FIELD_NAMES = {
+    departure_names:                ["Departure Airport"],
+    arrival_names:                  ["Scheduled Arrival Airport"],
+    actual_names:                   ["Landing Airport"]
+  }
 
   HIERARCHY = {
     display_name: 'ASAP',
@@ -102,11 +109,11 @@ class DefaultSafetyReportingConfig
         status: ['New', 'Open', 'Linked', 'Closed', 'All'],
         preload: [:created_by, :template, :occurrences, :record_fields],
         fields: {
-          id: { default: true, field: 'get_id' },
-          status: { default: true },
-          template: { default: true, title: 'Type' },
+          id: { default: true, field: 'get_id', visible: 'index,query,show,library' },
+          status: { default: true, visible: 'index,query,show,library' },
+          template: { default: true, title: 'Type', visible: 'index,query,show,library' },
           submitter: { default: true, visible: "admin,query,index" },
-          viewer_access: { default: true, type: 'boolean', visible: 'index,show' },
+          viewer_access: { default: true, type: 'boolean', visible: 'index,show,library' },
           event_date: { default: true, visible: 'form,index,show' },
           description: { default: true, visible: 'form,index,show' },
           eir: {
@@ -115,9 +122,9 @@ class DefaultSafetyReportingConfig
             required: false
           },
           scoreboard: {
-            field: 'scoreboard', title: 'Exclude from Scoreboard',
+            field: 'scoreboard', title: 'Exclude from ASAP Library',
             num_cols: 6, type: 'boolean', visible: 'close',
-            required: false
+            required: true
           },
           asap: {
             field: 'asap', title: 'Accepted Into ASAP',
@@ -240,9 +247,9 @@ class DefaultSafetyReportingConfig
             required: false
           },
           scoreboard: {
-            field: 'scoreboard', title: 'Exclude from Scoreboard',
+            field: 'scoreboard', title: 'Exclude from ASAP Library',
             num_cols: 6, type: 'boolean', visible: 'asap',
-            required: false
+            required: true
           },
           asap: {
             field: 'asap', title: 'Accepted Into ASAP',
@@ -420,7 +427,8 @@ class DefaultSafetyReportingConfig
         title: 'Submissions', path: '#',
         display: proc{|user:,**op|
           priv_check.call(Object.const_get('Submission'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
-          user.get_all_submitter_templates.size > 0
+          user.get_all_submitter_templates.size > 0 ||
+          priv_check.call(Object.const_get('Submission'), user, 'library', CONFIG::GENERAL[:global_admin_default], true)
         },
         subMenu: [
           {title: 'All', path: 'submissions_path(status: "All")',
@@ -431,6 +439,8 @@ class DefaultSafetyReportingConfig
           {title: 'New', path: 'new_submission_path',
             # display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
             display: proc{|user:,**op| user.get_all_submitter_templates.size > 0}},
+          {title: 'ASAP Library', path: 'asap_library_submissions_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'library', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'ORMs', path: '#',  header: true,
             display: proc{|user:,**op| CONFIG.sr::GENERAL[:enable_orm]}},
           {title: 'All', path: 'orm_submissions_path',

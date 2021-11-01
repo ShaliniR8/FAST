@@ -32,7 +32,11 @@
         </td>
         <td>
           <i class='glyphicon glyphicon-minus btn btn-sm btn-danger mb5 ml5 mr5'></i>
-          <b>Carryover Event </b>- Remove an Event from the meeting.
+          <b>Remove Event </b>- Remove an Event from the meeting.
+        </td>
+        <td>
+          <i class='glyphicon glyphicon-road btn btn-sm btn-success mb5 ml5 mr5'></i>
+          <b>Carryover Event </b>- Carryover an event to another open meeting.
         </td>
       </tr>
       <tr>
@@ -96,6 +100,12 @@
       });
     });
     $("#reports_table").on('click', ".minutes_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#reports_table").on('click', ".carryover_to_meeting_btn", function(){
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
