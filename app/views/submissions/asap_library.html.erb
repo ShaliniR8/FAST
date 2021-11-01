@@ -1,0 +1,129 @@
+<%= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css" %>
+<%= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js" %>
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+<div class="col-xs-12">
+
+  <%=render "shared/alerts"%>
+
+  <div class="panel panel-primary m25">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <div class="top_text">
+          The ASAP Library
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="table-responsive">
+        <table id="library_table" class="table table-hover table-striped table-bordered index_table">
+          <thead>
+            <tr>
+              <%@headers.each do |header|%>
+                <th><%=header%></th>
+              <%end%>
+              <%if CONFIG.sr::GENERAL[:show_pdf_column_scoreboard]%>
+                <th>De-ID PDF</th>
+              <%end%>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <%@headers.each do |header|%>
+                <th><%=header%></th>
+              <%end%>
+              <%if CONFIG.sr::GENERAL[:show_pdf_column_scoreboard]%>
+                <th>De-ID PDF</th>
+              <%end%>
+            </tr>
+          </tfoot>
+          <tbody>
+            <%@entries.each do |key, value|%>
+              <tr record_id="<%=key%>">
+                <%@headers.each do |header|%>
+                  <td><%=value[header]%></td>
+                <%end%>
+                <%if CONFIG.sr::GENERAL[:show_pdf_column_scoreboard]%>
+                  <td>
+                    <%owner = Record.find(key.to_i)%>
+                    <%=link_to "<i class='glyphicon glyphicon-download-alt'></i>".html_safe,
+                      library_deid_pdf_record_path(owner),
+                      :class=>"btn btn-sm btn-info mb5",
+                      'hover' => 'tooltip',
+                      title: 'Download De-ID PDF'%>
+                  </td>
+                <%end%>
+              </tr>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .index_table > thead > tr > th,
+  .index_table > tbody > tr > th,
+  .index_table > tfoot > tr > th,
+  .index_table > thead > tr > td,
+  .index_table > tbody > tr > td,
+  .index_table > tfoot > tr > td {
+    padding: 5px !important;
+  }
+</style>
+
+
+
+<script>
+  $(function(){
+    $('#library_table').DataTable({
+      dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+           "<'row'<'col-sm-12'tr>>" +
+           "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
+           "<'row'<'col-sm-12'B>>",
+      buttons: ['copy', 'csv', 'excel', 'print'],
+      "aLengthMenu": [[10, 15, 50, 100, -1], [10, 15, 50, 100, "All"]],
+      "iDisplayLength": 10,
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+        initComplete: function(){
+          this.api().columns().every(function(){
+            addIndividualColumnSearchField();
+            hidePDFColumnSearchField();
+            columnSearch();
+          });
+        },
+    });
+  });
+
+  function addIndividualColumnSearchField() {
+    $('#library_table tfoot th').each(function(index) {
+      $(this).html('<input type="text" class="form-control" />');
+    });
+  }
+
+  function hidePDFColumnSearchField() {
+    let is_pdf_column_shown = <%=CONFIG.sr::GENERAL[:show_pdf_column_scoreboard]%>
+    if (is_pdf_column_shown) {
+      $('#library_table tfoot tr th:last-child').children().hide();
+    }
+  }
+
+  function columnSearch() {
+    $('#library_table').dataTable().api().columns().every(function() {
+      var column = this;
+
+      $('input', this.footer()).on('keyup change', function(e) {
+        // keyCode 13 is 'Enter'
+        if(e.keyCode == 13 && column.search() !== this.value){
+          search_term = this.value
+          column.search(search_term).draw();
+        }
+      });
+    });
+  }
+</script>

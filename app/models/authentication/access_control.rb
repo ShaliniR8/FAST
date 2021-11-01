@@ -86,6 +86,8 @@ class AccessControl < ActiveRecord::Base
         else
           "Users with this access rule will be notified when a #{type} is created."
         end
+      when 'library'
+        "This gives the user access to see the ASAP Library"
       else
         ""
       end
@@ -114,6 +116,7 @@ class AccessControl < ActiveRecord::Base
         "show"                => generate_desc("Submission", "show"),
         "destroy"             => generate_desc("Submission", "destroy"),
         "index"               => generate_desc("Submission", "index"),
+        "library"             => generate_desc("Submission", "library"),
         "admin"               => generate_desc("Submission", "admin"),
         "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from accessing any previous submissions.",
       },
@@ -230,7 +233,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("Finding", "edit"),
         "destroy"             => generate_desc("Finding", "destroy"),
         "index"               => generate_desc("Finding", "index"),
-        "viewer"              => generate_desc("Finding", "viewer"),
         "override"            => generate_desc("Finding", "override"),
         "notify"              => generate_desc("Finding", "notify"),
         "admin"               => generate_desc("Finding", "admin"),
@@ -242,7 +244,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("Safety Assurance Corrective Action", "edit"),
         "destroy"             => generate_desc("Safety Assurance Corrective Action", "destroy"),
         "index"               => generate_desc("Safety Assurance Corrective Action", "index"),
-        "viewer"              => generate_desc("Safety Assurance Corrective Action", "viewer"),
         "override"            => generate_desc("Safety Assurance Corrective Action", "override"),
         "notify"              => generate_desc("Safety Assurance Corrective Action", "notify"),
         "admin"               => generate_desc("Safety Assurance Corrective Action", "admin"),
@@ -254,7 +255,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("Recommendation", "edit"),
         "destroy"             => generate_desc("Recommendation", "destroy"),
         "index"               => generate_desc("Recommendation", "index"),
-        "viewer"              => generate_desc("Recommendation", "viewer"),
         'admin'               => generate_desc('Recommendation', 'admin'),
         "override"            => generate_desc("Recommendation", "override"),
         "notify"              => generate_desc("Recommendation", "notify"),
@@ -286,7 +286,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("Hazard", "edit"),
         "destroy"             => generate_desc("Hazard", "destroy"),
         "index"               => generate_desc("Hazard", "index"),
-        "viewer"              => generate_desc("Hazard", "viewer"),
         "override"            => generate_desc("Hazard", "override"),
         "notify"              => generate_desc("Hazard", "notify"),
         "admin"               => generate_desc("Hazard", "admin"),
@@ -298,7 +297,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("Risk Control", "edit"),
         "destroy"             => generate_desc("Risk Control", "destroy"),
         "index"               => generate_desc("Risk Control", "index"),
-        "viewer"              => generate_desc("Risk Control", "viewer"),
         "override"            => generate_desc("Risk Control", "override"),
         "notify"              => generate_desc("Risk Control", "notify"),
         "admin"               => generate_desc("Risk Control", "admin"),
@@ -310,7 +308,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("Safety Plan", "edit"),
         "destroy"             => generate_desc("Safety Plan", "destroy"),
         "index"               => generate_desc("Safety Plan", "index"),
-        "viewer"              => generate_desc("Safety Plan", "viewer"),
         "override"            => generate_desc("Safety Plan", "override"),
         "notify"              => generate_desc("Safety Plan", "notify"),
         "admin"               => generate_desc("Safety Plan", "admin"),
@@ -322,7 +319,6 @@ class AccessControl < ActiveRecord::Base
         "edit"                => generate_desc("SRA(SRM) Meeting", "edit"),
         "destroy"             => generate_desc("SRA(SRM) Meeting", "destroy"),
         "index"               => generate_desc("SRA(SRM) Meeting", "index"),
-        "viewer"              => generate_desc("SRA(SRM) Meeting", "viewer"),
         "override"            => generate_desc("SRA(SRM) Meeting", "override"),
         "admin"               => generate_desc("SRA(SRM) Meeting", "admin"),
       },
@@ -395,6 +391,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Shared"=>"shared",
+        "ASAP Library"=>"library",
         "Admin"=>"admin"
       },
       "records"=>{
@@ -671,6 +668,7 @@ class AccessControl < ActiveRecord::Base
     h["Shared"] = "shared"
     h["Override"] = "override"
     h["Notify"] = "notify"
+    h["ASAP Library"] = "library"
     h["Confidential"] = "confidential" if CONFIG::GENERAL[:has_confidential_forms].present?
 
     return h

@@ -78,7 +78,7 @@ module ControllerAuthentication
   def login_required
     unless logged_in?
       store_target_location
-      redirect_to login_url, :alert => "You need to log in first to access this page."
+      redirect_to login_url, :alert => "Your session may have expired. You need to log in to access this page."
     end
   end
 

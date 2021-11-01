@@ -191,6 +191,50 @@ class SubmissionsController < ApplicationController
   end
 
 
+  def asap_library
+    # is_admin = current_user.has_access(self.name.downcase.pluralize, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+    is_admin = false
+
+    if is_admin
+      all_templates = Template.all.map(&:id)
+    else
+      all_templates = []
+      full_templates = Template.where(name: current_user.get_all_templates_hash[:full]).map(&:id) rescue []
+      viewer_templates = Template.where(name: current_user.get_all_templates_hash[:viewer]).map(&:id) rescue []
+      submitter_templates = Template.where(name: current_user.get_all_submitter_templates).map(&:id) rescue []
+
+      all_templates = full_templates + viewer_templates + submitter_templates
+      all_templates = all_templates.flatten
+      all_templates.uniq!
+    end
+
+    records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ? AND asap = ?", "closed", all_templates, false, true)
+
+    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", "Final Comment", "Narratives"]
+    @entries = Hash.new
+
+    records.each do |record|
+      @entries[record.id] = Hash.new
+
+      @entries[record.id]["Employee Group"] = record.template.emp_group
+      @entries[record.id]["Year/Month"] = record.event_date.strftime("%Y/%m")
+      @entries[record.id]["Final Comment"] = record.final_comment
+      @entries[record.id]["Narratives"] = record.narrative
+
+      field_label_hash = CONFIG.sr::ASAP_LIBRARY_FIELD_NAMES
+      record.record_fields.each do |rf|
+        if rf.field.label.present? && field_label_hash[:departure_names].include?(rf.field.label.strip)
+          @entries[record.id]["Departure"] = rf.value.to_s
+        elsif rf.field.label.present? && field_label_hash[:arrival_names].include?(rf.field.label.strip)
+          @entries[record.id]["Scheduled Landing"] = rf.value.to_s
+        elsif rf.field.label.present? && field_label_hash[:actual_names].include?(rf.field.label.strip)
+          @entries[record.id]["Actual Landing"] = rf.value.to_s
+        end
+      end
+    end
+  end
+
+
   def comment
     @owner = Submission.find(params[:id])
     @comment = @owner.comments.new
@@ -501,7 +545,10 @@ class SubmissionsController < ApplicationController
           end
         else
           if params[:commit] == 'Add Notes'
-            @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+            found_duplicate = @record.remove_duplicate_submission_comments
+            if !found_duplicate
+              @record.create_transaction(action: 'Add Notes', context: 'Additional notes added.')
+            end
           else
             @record.make_report
             @record.create_transaction(action: 'Create', context: 'User Submitted Report')

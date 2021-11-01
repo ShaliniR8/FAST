@@ -70,12 +70,20 @@
                 title: 'Add Meeting Minutes',
                 :route => new_minutes_report_path(event, :meeting => meeting) %>
             <%end%>
-            <!-- Carryover Event -->
+            <!-- Remove Event -->
             <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
               :class=>"btn btn-sm btn-danger mb5",
               :onclick=>"delete_report(#{event.id}, #{meeting.id},this)",
               'hover' => 'tooltip',
-              title: 'Carryover Event'%>
+              title: 'Remove Event'%>
+            <!-- Carryover Event -->
+            <%=link_to "<i class='glyphicon glyphicon-road'></i>".html_safe, "#",
+              :class=>"btn btn-sm btn-success carryover_to_meeting_btn mb5",
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg",
+              'hover' => 'tooltip',
+              title: 'Carryover Event',
+              :route => carryover_another_meeting_report_path(event, :meeting => meeting)%>
           <%end%>
         <%end%>
         <!-- Add Agenda -->

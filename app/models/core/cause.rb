@@ -1,5 +1,6 @@
 class Cause < ActiveRecord::Base
 
+  belongs_to :owner, foreign_key:"owner_id", polymorphic: true
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
