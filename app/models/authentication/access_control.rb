@@ -392,7 +392,7 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Shared"=>"shared",
         "ASAP Library"=>"library",
-        "Admin"=>"admin"
+        "Full Access"=>"admin"
       },
       "records"=>{
         "View Narrative" => "summary",
@@ -403,7 +403,7 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Query"=>"query",
         # "De-Identified" => "deid",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
       },
       "reports"=>{
@@ -412,7 +412,7 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
       },
       "trackings"=>{
@@ -429,7 +429,7 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
       },
       "faa_reports"=>{
@@ -446,7 +446,7 @@ class AccessControl < ActiveRecord::Base
         "Edit"=>"edit",
         "Delete"=>"destroy",
         "Listing"=>"index",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -462,7 +462,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -473,7 +473,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -484,7 +484,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -495,7 +495,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -506,7 +506,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -517,7 +517,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -528,7 +528,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -536,7 +536,7 @@ class AccessControl < ActiveRecord::Base
         "Add"=>"add",
         "Edit"=>"edit",
         "Delete"=>"destroy",
-        'Admin'=>'admin'
+        'Full Access'=>'admin'
       },
       'sras'=>{
         "New"=>"new",
@@ -545,7 +545,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -556,7 +556,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -567,7 +567,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        'Admin'=>'admin',
+        'Full Access'=>'admin',
         "Override" => 'override',
         "Notify" => 'notify'
       },
@@ -588,7 +588,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
       },
       'ims'=>{
@@ -598,7 +598,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
       },
       'packages'=>{
@@ -608,7 +608,7 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
       },
       'sms_meetings'=>{
@@ -618,20 +618,20 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Viewer"=>"viewer",
-        "Admin"=>"admin",
+        "Full Access"=>"admin",
         "Override" => 'override'
        },
        'ASAP'=>{
-        'Module'=>'module'
+        'Module Access'=>'module'
        },
        'SMS IM'=>{
-        "Module"=>'module'
+        "Module Access"=>'module'
        },
        'Safety Assurance'=>{
-        'Module'=>'module'
+        'Module Access'=>'module'
        },
        'Safety Risk Management'=>{
-        'Module'=>'module'
+        'Module Access'=>'module'
        },
        'home' =>{
         'Access'=>'query_all',
