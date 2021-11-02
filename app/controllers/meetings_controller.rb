@@ -377,8 +377,8 @@ class MeetingsController < ApplicationController
       ag = AsapAgenda.find(a_id)
       if ag.present?
         update_hash.delete(a_id)
+        ag.destroy
       end
-      ag.destroy
     end
 
     update_hash.each do |k, v|
