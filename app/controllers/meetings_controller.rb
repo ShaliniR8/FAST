@@ -338,6 +338,7 @@ class MeetingsController < ApplicationController
     @meeting = Meeting.find(params[:id])
     @report_headers = Report.get_meta_fields('index', 'meeting')
     update_hash = Hash.new
+    deleted_agenda_ids = []
 
     params.each do |key, value|
       if ["authenticity_token", "event_id", "user_id"].exclude?(key)
@@ -349,8 +350,12 @@ class MeetingsController < ApplicationController
               update_hash[agenda_id] = Hash.new
             end
             if key_parts[0] == 'destroy'
-              if eval(value)[:value] == 1
-                update_hash[agenda_id][:_destroy] = 1
+              if eval(value) == true
+                deleted_agenda_ids << agenda_id
+              else
+                if eval(value)[:value].present? && eval(value)[:value] == 1
+                  deleted_agenda_ids << agenda_id
+                end
               end
             else
               update_hash[agenda_id][key_parts[0].to_sym] = value
@@ -365,6 +370,15 @@ class MeetingsController < ApplicationController
           end
         end
       end
+    end
+
+    # AsapAgenda.where(id: deleted_agenda_ids).map(&:destroy)
+    deleted_agenda_ids.each do |a_id|
+      ag = AsapAgenda.find(a_id)
+      if ag.present?
+        update_hash.delete(a_id)
+      end
+      ag.destroy
     end
 
     update_hash.each do |k, v|
