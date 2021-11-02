@@ -26,6 +26,8 @@ PrdgSession::Application.routes.draw do |map|
 
   map.resources :sessions
 
+  resources :submission_widgets, only:[:new, :create]
+
 
 # PROSAFET APP
   #Kaushik Mahorker OAuth API

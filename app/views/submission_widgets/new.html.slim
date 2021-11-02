@@ -1,0 +1,125 @@
+= stylesheet_link_tag '/css/bootstrap.css'
+= javascript_include_tag 'https://code.jquery.com/jquery-2.1.1.min.js'
+= javascript_include_tag '/javascripts/utility/collapse-panel2.js'
+= stylesheet_link_tag 'https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css'
+= javascript_include_tag '/javascripts/utility/delete.js'
+
+
+css:
+  body { background: white; }
+  .container { 
+    width: 800px;
+    margin: 0 auto;
+    padding-top: 20px;
+  }
+
+
+.container
+  - if flash[:alert]
+    .alert.alert-danger = flash[:alert]
+  - if flash[:notice]
+    .alert.alert-info = flash[:notice]
+
+  = link_to 'https://www.prodigiq.com', class: 'pull-right' do
+    = image_tag 'ProDIGIQ_powered_by.png',
+                alt: 'Powered By ProDIGIQ',
+                style: 'border-style:none;margin-bottom:10px'
+
+  .pull-left style="font-weight:normal; font-size:20px;color:#000088"
+    | General Safety Report
+  .clearfix
+
+  = form_for @record,
+              url: submission_widgets_path,
+              html: { id: 'sms-widget-form', multipart: true } do |f|
+
+    = f.hidden_field :templates_id, value: @template.id
+    = f.hidden_field :description, value: 'External Submission'
+    = f.hidden_field :event_date, value: DateTime.current
+    = f.hidden_field :event_time_zone, value: 'UTC'
+    = f.hidden_field :completed, value: true
+    = f.hidden_field :user_id, value: User.find_by_username('external_user').id
+
+    .col-xs-12.mt20
+      - @record.categories.where(deleted: false).order(:category_order).each do |category|
+        - @cat = category
+        = render "submissions/category_fields", f: f
+      = render '/forms/attachments_form', f: f, owner: @record
+
+
+    p = f.submit 'Submit', 
+      class: 'btn btn-warning pull-right mb10',
+      disable_with: 'Submitting...',
+      confirm: 'Are you sure?'
+
+
+javascript:
+  window.addEventListener('DOMContentLoaded', (event) => {
+    $("form").on('submit', function() {
+      isValid = true;
+      $("div.category-panel").find('.panel-body').slideUp();
+      $("div.category-panel").closest('div.category-panel').addClass('collapsed');
+      $("div.category-panel").closest('div.category-panel').find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+      $(this).find('.required_field').each(function() {
+        var cboxes = $(this).find('.checkbox_mul').get();
+        var radios = $(this).find('.radio_req').get();
+        if($(this).closest('div.nested_field_area').css('display') != 'none') {
+          if (radios == null || radios.length == 0) {
+            if (cboxes == null || cboxes.length == 0) {
+              if ($(this).val() == "") {
+                prop_up_errors(this);
+                isValid = false;
+              }
+            } else {
+              var lim = $(this).attr('name');
+              count = 0;
+              $(this).find('.checkbox_mul').each(function() {
+                if ($(this).prop('checked')) {
+                  count ++;
+                }
+              });
+              if (count < lim) {
+                prop_up_errors(this);
+                isValid = false;
+              }
+            }
+          } else {
+            count = 0;
+            $(this).find('.radio_req').each(function() {
+              if ($(this).prop('checked')) {
+                count ++;
+              }
+            });
+            if (count < 1) {
+              prop_up_errors(this);
+              isValid = false;
+            }
+          }
+        }
+      });
+      return isValid;
+    });
+  });
+
+
+  function prop_up_errors(target) {
+    $(target).css('border-color', 'red');
+    $(target).closest('div.category-panel').removeClass('collapsed');
+    $(target).closest('div.category-panel').find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+    $(target).closest('div.category-panel').find('.panel-body').slideDown();
+  }
+
+  function update_nested_fields(field) {
+    console.log('update_nested_fields');
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).find('option:selected').attr("data-option");
+    $(".nested_field_" + field_id).closest('.nested_field_area').hide();
+    $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
+  }
+
+  function add_fields(link, association, content, target) {
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    var insertposition="#"+target;
+    $(content.replace(regexp, new_id)).appendTo($(link).closest(".panel-body").find(insertposition));
+  }

@@ -74,6 +74,8 @@ class DefaultConfig
 
   }
 
+  EXTERNAL_SUBMISSION_TEMPLATE = nil
+
   LABELS = {
 
   }
