@@ -86,7 +86,7 @@ class AJTConfig < DefaultConfig
           "Negligible incident or damage with extremely limited effect on safety",
           "Regulatory/Company policy and/or procedure deviation with limited safety implication",
           "Damage, fines or loss of revenue <$15K",
-          "Negligible effect on Corporate image, little to no potential for negative impact on the AS/QX brand",
+          "Negligible effect on Corporate image, little to no potential for negative impact",
           "Negligible environmental effect"
         ],
         [ # No Safety Implication
@@ -126,12 +126,12 @@ class AJTConfig < DefaultConfig
       column_header: ['1&nbsp;Extremely Improbable','2&nbsp;Improbable','3&nbsp;Remote','4&nbsp;Occasional','5&nbsp;Frequent','6&nbsp;Repetitive'],
       rows: [
         [
-          "<b>Once in 10 + years at AS/QX</b>",
-          "<b>Once in 2-10 years at AS/QX</b>",
-          "<b>Once in < 2 years at AS/QX</b>",
-          "<b>2-11 times per year at AS/QX</b>",
-          "<b>1-3 times per month at AS/QX</b>",
-          "<b>4 + times per month at AS/QX</b>"
+          "<b>Once in 10 + years</b>",
+          "<b>Once in 2-10 years</b>",
+          "<b>Once in < 2 years</b>",
+          "<b>2-11 times per year</b>",
+          "<b>1-3 times per month</b>",
+          "<b>4 + times per month</b>"
         ]
       ]
     },
@@ -186,8 +186,8 @@ class AJTConfig < DefaultConfig
       white:     { rating: 'None',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> N/A<br><br><b>Immediate Notification:</b> N/A<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Management personnel in area of risk' },
       aqua:      { rating: 'Minimal (Acceptable)',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2', description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> N/A<br><br><b>Immediate Notification:</b> N/A<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Management personnel in area of risk' },
       limegreen: { rating: 'Low',       cells: '1/2, 1/3, 1/4, 1/5, 1/5, 2/2, 2/3, 3/2',   description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> Monitor, consider actions to further reduce risk<br><br><b>Immediate Notification:</b> Process owner in area of risk<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Management personnel in area of risk' },
-      yellow:    { rating: 'Medium',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> Mitigation strategy required to reduce<br><br><b>Immediate Notification:</b> VP,MD,119, Director in impacted area of risk, Mgr Safety Programs<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Director or above' },
-      orange:    { rating: 'High',   cells: '3/6, 4/5, 5/4',                            description: '<b>Operational Impact:</b> Operation permitted with execution of a high priority, systemic mitigation strategy<br><br><b>Minimum Action:</b> Immediate mitigation and comprehensive mitigation to level 3 minimum required<br><br><b>Immediate Notification:</b> Positions listed for risk level 3 plus COO and President<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> VP/MD in area of risk until mitigation to level 3' },
+      yellow:    { rating: 'Medium',    cells: '2/6, 3/4, 3/5, 4/3, 4/4, 5/3',             description: '<b>Operational Impact:</b> Operation permitted<br><br><b>Minimum Action:</b> Mitigation strategy required to reduce<br><br><b>Immediate Notification:</b> VP,119, Director in impacted area of risk, Mgr Safety Programs<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> Director or above' },
+      orange:    { rating: 'High',   cells: '3/6, 4/5, 5/4',                            description: '<b>Operational Impact:</b> Operation permitted with execution of a high priority, systemic mitigation strategy<br><br><b>Minimum Action:</b> Immediate mitigation and comprehensive mitigation to level 3 minimum required<br><br><b>Immediate Notification:</b> Positions listed for risk level 3 plus COO and President<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> VP in area of risk until mitigation to level 3' },
       red:       { rating: 'Extreme',      cells: '4/6, 5/5, 5/6',                            description: '<b>Operational Impact:</b> Stop the operation<br><br><b>Minimum Action:</b> Mitigation to level 4 or lower prior to operation<br><br><b>Immediate Notification:</b> Positions listed for risk level 4 plus CEO and BODSC<br><br><b>Risk Acceptance and Mitigation Responsibility:</b> VP(s) in area of risk' }
     },
 
