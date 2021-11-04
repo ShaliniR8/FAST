@@ -14,6 +14,10 @@
     <%=f.fields_for :submission_fields do |rf|%>
       <%=rf.hidden_field :fields_id, :value => field.id%>
 
+      <% if widget && field.display_type == "airport" %>
+        <% field.display_type = "text" %>
+      <% end %>
+
       <% if field.display_type == "text"%>
         <%if field.data_type == 'date'%>
           <%field_class = 'field-date form-control'%>

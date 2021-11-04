@@ -13,7 +13,6 @@ css:
     padding-top: 20px;
   }
 
-
 .container
   - if flash[:alert]
     .alert.alert-danger = flash[:alert]
@@ -43,7 +42,7 @@ css:
     .col-xs-12.mt20
       - @record.categories.where(deleted: false).order(:category_order).each do |category|
         - @cat = category
-        = render "submissions/category_fields", f: f
+        = render "submissions/category_fields", f: f, widget: true
       = render '/forms/attachments_form', f: f, owner: @record
 
 
@@ -101,6 +100,20 @@ javascript:
     });
   });
 
+
+  function update_cb_rb_nested(field, isRadio) {
+    console.log('update_cb_rb_nested');
+    var field_id = $(field).attr("data-id");
+    var field_value = $(field).attr("data-option");
+    if (isRadio){
+      $(".nested_field_" + field_id).closest('.nested_field_area').hide();
+    }
+    if ($(field).prop('checked')) {
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').show();
+    } else {
+      $(".nested_field_" + field_id + "_" + field_value).closest('.nested_field_area').hide();
+    }
+  }
 
   function prop_up_errors(target) {
     $(target).css('border-color', 'red');

@@ -27,6 +27,7 @@ PrdgSession::Application.routes.draw do |map|
   map.resources :sessions
 
   resources :submission_widgets, only:[:new, :create]
+  get '/submission_widgets/new/:template_id', to: 'submission_widgets#new'
 
 
 # PROSAFET APP

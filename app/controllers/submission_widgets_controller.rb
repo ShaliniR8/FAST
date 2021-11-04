@@ -19,10 +19,11 @@ class SubmissionWidgetsController < ApplicationController
   skip_before_filter :new, :create
 
   def new
-    if CONFIG::EXTERNAL_SUBMISSION_TEMPLATE.nil?
+    @template = Template.find(params[:template_id])
+
+    if @template.nil?
       redirect_to root_path
     else
-      @template = Template.find(CONFIG::EXTERNAL_SUBMISSION_TEMPLATE)
       @record = Submission.build(@template)
       @record.submission_fields.build
       @action = "new"
@@ -43,10 +44,10 @@ class SubmissionWidgetsController < ApplicationController
 
     if @record.save
       @record.make_report
-      redirect_to new_submission_widget_path,
+      redirect_to new_submission_widget_path(template_id: params[:submission][:templates_id]),
       notice: "Your General Safety Report has been submitted."
     else
-      redirect_to new_submission_widget_path,
+      redirect_to new_submission_widget_path(template_id: params[:submission][:templates_id]),
       alert: "Failed"
     end
 

@@ -23,8 +23,6 @@ class AJTConfig < DefaultConfig
     sms_im_visibility:            false,
   })
 
-  EXTERNAL_SUBMISSION_TEMPLATE = 33
-
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Initial Risk',

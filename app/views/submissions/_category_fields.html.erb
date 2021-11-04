@@ -22,7 +22,7 @@
             <div class="row is-flex">
               <%row.each do |field| %>
 
-                <%=render "/submissions/field", is_nested_field: false, field: field, f: f%>
+                <%=render "/submissions/field", is_nested_field: false, field: field, widget: widget, f: f%>
 
                 <%if field.nested_fields.where(deleted: false).present?%>
                   <%field.nested_fields.where(deleted: false).order(:field_order).group_by(&:nested_field_value).each do |nv, nested_fields|%>
