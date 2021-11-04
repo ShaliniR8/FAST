@@ -14,7 +14,7 @@
     <%=f.fields_for :submission_fields do |rf|%>
       <%=rf.hidden_field :fields_id, :value => field.id%>
 
-      <% if widget && field.display_type == "airport" %>
+      <% if widget && ['employee', 'airport'].include?(field.display_type) %>
         <% field.display_type = "text" %>
       <% end %>
 

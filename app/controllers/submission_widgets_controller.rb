@@ -44,10 +44,10 @@ class SubmissionWidgetsController < ApplicationController
 
     if @record.save
       @record.make_report
-      redirect_to new_submission_widget_path(template_id: params[:submission][:templates_id]),
+      redirect_to new_submission_widget_path + "/#{params[:submission][:templates_id]}",
       notice: "Your General Safety Report has been submitted."
     else
-      redirect_to new_submission_widget_path(template_id: params[:submission][:templates_id]),
+      redirect_to new_submission_widget_path + "/#{params[:submission][:templates_id]}",
       alert: "Failed"
     end
 
