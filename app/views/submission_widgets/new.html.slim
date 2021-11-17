@@ -13,6 +13,10 @@ css:
     padding-top: 20px;
   }
 
+  .basic-info {
+    margin: 10px;
+  }
+
 .container
   - if flash[:alert]
     .alert.alert-danger = flash[:alert]
@@ -33,11 +37,21 @@ css:
               html: { id: 'sms-widget-form', multipart: true } do |f|
 
     = f.hidden_field :templates_id, value: @template.id
-    = f.hidden_field :description, value: 'External Submission'
-    = f.hidden_field :event_date, value: DateTime.current
-    = f.hidden_field :event_time_zone, value: 'UTC'
+    = f.hidden_field :event_time_zone, value: 'Local'
     = f.hidden_field :completed, value: true
     = f.hidden_field :user_id, value: User.find_by_username('external_user').id
+
+    .row.basic-info
+      .col-xs-12.col-sm-4.mb5
+        = label_tag :description, 'Event Title', :style => "color:red"
+        = f.text_field :description, class: 'form-control required_field'
+      .col-xs-12.col-sm-4.mb5
+        = label_tag :event_date, "Date and Time of Event", :style => "color:red"
+        = f.text_field :event_date, class: 'field-datetime form-control required_field', type: 'datetime-local', id: 'event_date', 'data-format' => CONFIG.getTimeFormat[:datetimepicker]
+      .col-xs-12.col-sm-4.mb5
+        = label_tag :event_time_zone, 'Time Zone', :style => "color:red"
+        button.input-group.btn.btn-primary.disabled
+          = 'Local'
 
     .col-xs-12.mt20
       - @record.categories.where(deleted: false).order(:category_order).each do |category|
