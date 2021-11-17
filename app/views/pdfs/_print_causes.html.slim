@@ -1,7 +1,12 @@
-- causes = Cause.where(obj_id: owner.obj_id)
+/ # - causes = Cause.where(obj_id: owner.obj_id)
+- causes = Cause.where({owner_type: owner.class.name, owner_id: owner.id})
+- if !causes.present?
+  - causes = Cause.where({owner_type: 'Record', obj_id: owner.obj_id})
+- cause_label = CONFIG::CAUSE_LABEL
+
 - if causes.present?
   .col-xs-12.wrap
-    .title = 'Causes'
+    .title = cause_label
     .col-xs-12
       .content
         table.table.table-striped.table-bordered width="100%"
@@ -11,12 +16,25 @@
               th ="Value"
           tbody
             - causes.each do |cause|
-              - next if cause.value.empty? || cause.value == "\"\""
+              / - next if cause.value.empty? || cause.value == "\"\""
               tr
-                td ="#{cause.category.titleize} > #{cause.attr.titleize}"
-                - if cause.value == '0'
+                / td ="#{cause.category.titleize} > #{cause.attr.titleize}"
+                - cat = cause.category.titleize rescue ""
+                - if cause.attr.present? && cause.attr =~ /[A-Z]/
+                  - attrib = cause.attr.present? ? cause.attr : ""
+                - else
+                  - attrib = cause.attr.titleize rescue ""
+
+                - if cat.present? && attrib.present?
+                  td = "#{cat} > #{attrib}"
+                - elsif cat.present?
+                  td = "#{cat}"
+                - else
+                  td = "#{attrib}"
+
+                - if cause.value == "0" && ['Audit', 'Inspection'].exclude?(cause.owner_type)
                   td = 'No'
-                - elsif cause.value == '1'
+                - elsif cause.value == "1" && ['Audit', 'Inspection'].exclude?(cause.owner_type)
                   td = 'Yes'
                 - else
                   td = "#{cause.value}".gsub('"','')

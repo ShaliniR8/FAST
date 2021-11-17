@@ -12,7 +12,7 @@
     <%# causes = Cause.where({obj_id: owner.obj_id}) %>
     <% causes = Cause.where({owner_type: owner.class.name, owner_id: owner.id}) %>
     <%if !causes.present?
-      causes = Cause.where({owner_type: owner.class.name, obj_id: owner.obj_id})
+      causes = Cause.where({owner_type: 'Record', obj_id: owner.obj_id})
     end%>
 
     <div class="panel-body" style="display:none">
@@ -36,6 +36,7 @@
                   <%else%>
                     <%attrib = cause.attr.titleize rescue ""%>
                   <%end%>
+
                   <%if cat.present? && attrib.present?%>
                     <td><%="#{cat} > #{attrib}"%></td>
                   <%elsif cat.present?%>
@@ -43,6 +44,7 @@
                   <%else%>
                     <td><%="#{attrib}"%></td>
                   <%end%>
+
                   <% if cause.value == "0" && ['Audit', 'Inspection'].exclude?(cause.owner_type)%>
                     <td><%='No'%></td>
                   <% elsif cause.value == "1" && ['Audit', 'Inspection'].exclude?(cause.owner_type)%>
@@ -50,6 +52,7 @@
                   <% else %>
                     <td><%="#{cause.value}".gsub('"','')%></td>
                   <% end %>
+
                 </tr>
               <% end %>
             </tbody>
