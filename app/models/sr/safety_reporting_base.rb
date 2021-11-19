@@ -52,10 +52,12 @@ module Sr
       if anonymous
         val = 'Anonymous'
       else
-        val = created_by.full_name
-        if CONFIG::GENERAL[:sabre_integration].present?
-          if created_by.employee_number.present?
-            val = val + " (#{created_by.employee_number})"
+        if created_by.present?
+          val = created_by.full_name
+          if CONFIG::GENERAL[:sabre_integration].present?
+            if created_by.employee_number.present?
+              val = val + " (#{created_by.employee_number})"
+            end
           end
         end
       end

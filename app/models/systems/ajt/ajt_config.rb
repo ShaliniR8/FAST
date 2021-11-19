@@ -17,6 +17,7 @@ class AJTConfig < DefaultConfig
     enable_sso:                   true,
     login_option:                 'dual',
     track_log:                    true,
+    global_admin_default:         false,
 
     # SYSTEM-WIDE FORM CONFIGS
     drop_down_risk_selection:     false,

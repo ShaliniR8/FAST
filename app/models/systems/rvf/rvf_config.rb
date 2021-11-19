@@ -17,11 +17,12 @@ class RVFConfig < DefaultConfig
     # login_option:                       'sso',
     has_mobile_app:                     true,
     cisp_integration:                   false,
+    global_admin_default:               false,
 
     # SYSTEM-WIDE FORM CONFIGS
-    base_risk_matrix:                  false,
-    allow_reopen_forms:                false,
-    has_root_causes:                   false,
+    base_risk_matrix:                   false,
+    allow_reopen_forms:                 false,
+    has_root_causes:                    false,
   })
 
 

@@ -15,6 +15,7 @@ class NAMSConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:                     true,
+    global_admin_default:              false,
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_report:                false,
