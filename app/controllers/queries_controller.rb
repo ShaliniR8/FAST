@@ -1145,7 +1145,9 @@ class QueriesController < ApplicationController
 
   # returns the field that matches field_label
   def get_field(query, object_type, field_label)
-    label = field_label.split(',').map(&:strip)[0]
+    # label = field_label.split(',').map(&:strip)[0]
+    label = field_label
+
     # if top level field
     field = object_type.get_meta_fields('show', 'index', 'invisible', 'query')
       .keep_if{|f| f[:title] == label}.first
@@ -1154,10 +1156,10 @@ class QueriesController < ApplicationController
       .where(id: query.templates)
       .map(&:fields)
       .flatten
-      .select{|x| x.label.strip == label}
-      .first if field.nil? 
-
-    [field, field_label.split(',').map(&:strip)[1]]
+      .select{|x| x.label.strip == label.strip}
+      .first if field.nil?
+    # [field, field_label.split(',').map(&:strip)[1]]
+    [field, field_label]
   end
 
 end

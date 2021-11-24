@@ -27,7 +27,7 @@
             <%=value%>
           <%end%>
         <%else%>
-          <%=User.find(value).full_name%>
+          <%=User.find(value).full_name rescue User.find_by_employee_number(value).full_name %>
         <%end%>
       <%else%>
         <%=value%>
