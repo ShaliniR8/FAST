@@ -18,6 +18,7 @@ class FFTConfig < DefaultConfig
     has_mobile_app:                     true,
     cisp_integration:                   true,
     power_bi_integration:               true,
+    global_admin_default:               false,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
