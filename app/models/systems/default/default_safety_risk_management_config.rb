@@ -8,6 +8,8 @@ class DefaultSafetyRiskManagementConfig
     # General Module Features:
 
     # Airline-Specific Features:
+    risk_assess_sras:      false,
+    add_reports_to_sra:    false
   }
 
 
@@ -173,6 +175,12 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 12, type: 'panel_end', visible: 'form,show'
           },
           verifications: { default: true },
+          likelihood: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Likelihood" },
+          severity: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Severity" },
+          risk_factor: { default: true, title: "#{I18n.t('srm.risk.baseline.title')} Risk" },
+          likelihood_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Likelihood" },
+          severity_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Severity" },
+          risk_factor_after: { default: true, title: "#{I18n.t('srm.risk.mitigated.title')} Risk" },
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -180,7 +188,7 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[delete override_status edit launch deid_pdf pdf viewer_access view_meeting view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension schedule_verification approve_reject hazard reopen comment contact task cost],
+          *%i[assign complete request_extension schedule_verification approve_reject add_records hazard reopen comment contact task cost],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           approve_reject: {
             btn: :approve_reject,

@@ -25,4 +25,9 @@
       / skip source of input for launch item panels (sra, investigation)
       - launch_item = defined?(launch_item) ? launch_item : false
       - options = {launch_item: launch_item}
+
+      - if owner.class.name == 'Sra' && owner.children.present?
+        - Record.where(id: owner.children.map(&:child_id)).each do |r|
+          = render '/pdfs/print_record', deidentified: true, owner: r
+
       = render '/pdfs/print_panels', owner: owner, deidentified: deidentified, options: options

@@ -39,6 +39,10 @@ class ApplicationController < ActionController::Base
       end
     end
 
+    if @object_name == 'Sra' && !CONFIG.srm::GENERAL[:risk_assess_sras].present?
+      @columns.delete_if {|x| ["get_risk_classification", "get_risk_classification_after"].include?(x[:data])}
+    end
+
     @column_titles = @columns.map { |col| col[:title] }
     @date_type_column_indices = @column_titles.map.with_index { |val, inx|
       (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
