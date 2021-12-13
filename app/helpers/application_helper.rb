@@ -561,6 +561,8 @@ module ApplicationHelper
       entry_url = safety_plan_url(entry)
     when 'VpIm', "JobAid", "FrameworkIm"
       entry_url = im_url(entry)
+    when 'SmsTask'
+      entry_url = eval("#{entry.owner_type.underscore}_url(entry.owner)")
     else
       entry_url = "N/A"
     end

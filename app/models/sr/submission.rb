@@ -144,6 +144,7 @@ class Submission < Sr::SafetyReportingBase
     h[:user_id] = user_id
     h[:anonymous] = anonymous
     h[:confidential] = confidential
+    h[:completed] = true
     h[:event_time_zone] = event_time_zone
 
     arr = Submission.where(h)

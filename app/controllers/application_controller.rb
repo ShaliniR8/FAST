@@ -182,6 +182,8 @@ class ApplicationController < ActionController::Base
         redirect_to errors_path if !group_validation
       elsif current_user.id == report.created_by_id
         redirect_to errors_path if !group_validation
+      elsif report.respond_to?(:tasks) && is_user_part_of_a_task(report)
+        redirect_to errors_path if !group_validation
       elsif report.respond_to? :verifications
         validators_ids = report.verifications.map { |v| v.additional_validators }.flatten
         if validators_ids.include?(current_user.id.to_s)
@@ -196,6 +198,19 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+
+  def is_user_part_of_a_task(report)
+    if report.tasks.present?
+      report.tasks.each do |t|
+        if t.res == current_user.id || t.app_id == current_user.id
+          return true
+        end
+      end
+    end
+    false
+  end
+
 
   def get_message_link(link_type, link_id)
     if link_type.present?

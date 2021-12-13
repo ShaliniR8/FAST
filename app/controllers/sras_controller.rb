@@ -274,6 +274,16 @@ class SrasController < ApplicationController
     if @sra.approver_id.present?
       related_user_ids << @sra.approver_id
     end
+    if @sra.tasks.present?
+      @sra.tasks.each do |t|
+        if t.res.present?
+          related_user_ids << t.res
+        end
+        if t.app_id.present?
+          related_user_ids << t.app_id
+        end
+      end
+    end
 
     has_access = false
     if current_user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) && @sra.viewer_access.present?

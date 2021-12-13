@@ -317,6 +317,19 @@ class HomeController < ApplicationController
         end
       end
 
+      task_sms_owners = ["Audit", "Inspection", "Evaluation", "Investigation"]
+      tasks = SmsTask.where({status: 'Assigned', res: current_user.id, owner_type: task_sms_owners})
+      tasks << SmsTask.where({status: 'Pending Approval', app_id: current_user.id, owner_type: task_sms_owners})
+      tasks.flatten.each do |x|
+        @calendar_entries.push({
+          :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+          :start => x.due_date,
+          :color => (x.overdue ? "lightcoral" : "skyblue"),
+          :textColor => "darkslategrey",
+          :title => "Task ##{x.id} - #{x.title} (#{x.status})"
+        })
+      end
+
 
     elsif session[:mode] == "ASAP"
       if current_user.has_access("meeting", "index")
@@ -456,6 +469,19 @@ class HomeController < ApplicationController
             })
           end
         end
+      end
+
+      task_srm_owners = ["Sra", "SafetyPlan"]
+      tasks = SmsTask.where({status: 'Assigned', res: current_user.id, owner_type: task_srm_owners})
+      tasks << SmsTask.where({status: 'Pending Approval', app_id: current_user.id, owner_type: task_srm_owners})
+      tasks.flatten.each do |x|
+        @calendar_entries.push({
+          :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+          :start => x.due_date,
+          :color => (x.overdue ? "lightcoral" : "skyblue"),
+          :textColor => "darkslategrey",
+          :title => "Task ##{x.id} - #{x.title} (#{x.status})"
+        })
       end
 
 
