@@ -417,7 +417,7 @@
                 <%if current_user.has_access('ASAP','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
                   <li class="menu-link"><%= link_to 'Safety Reporting', switch_modes_path(mode: 'ASAP') %></li>
                 <%end%>
-                <% if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
+                <% if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
                   <li class="menu-link"><%= link_to 'SMS IM', switch_modes_path(:mode=>"SMS IM") %></li>
                 <%end%>
                 <% if current_user.has_access('Safety Assurance','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
@@ -425,6 +425,9 @@
                 <%end%>
                 <% if current_user.has_access('Safety Risk Management','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
                   <li class="menu-link"><%= link_to 'SRA (SRM)', switch_modes_path(:mode=>"SRM") %></li>
+                <%end%>
+                <% if CONFIG::GENERAL[:safety_promotion_visibility] && current_user.has_access('Safety Promotion','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
+                  <li class="menu-link"><%= link_to 'Safety Promotion', switch_modes_path(:mode=>"SP") %></li>
                 <%end%>
 
                 <li><a href="#" class="dropdown-menu-header">Reference</a></li>
@@ -458,6 +461,8 @@
             "#{prefix}Safety Reporting Module".html_safe
           when 'SRM'
             "#{prefix}SRA (SRM) Module".html_safe
+          when 'SP'
+            "#{prefix}Safety Promotion Module".html_safe
           end
         %>
       </span>

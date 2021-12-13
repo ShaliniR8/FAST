@@ -26,3 +26,6 @@
   = render 'fp' if CONFIG.im::GENERAL[:has_framework]
   = render 'vpp'
   = render 'jap'
+- when 'SP'
+  = render 'newsletters' if current_user.has_access("newsletters","index")
+  = render 'safety_surveys' if current_user.has_access("safety_surveys","index")

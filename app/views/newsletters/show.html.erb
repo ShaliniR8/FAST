@@ -1,0 +1,166 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<script type="text/javascript" src="/javascripts/utility/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <%=render "shared/alerts"%>
+    <%=render "access_controls/new_modal"%>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+           <b>Newsletter #<%=@newsletter.id%>: <%="#{@newsletter.title}"%></b>
+          </div>
+          <div class="top_buttons pull-right">
+            <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "destroy", admin: CONFIG::GENERAL[:global_admin_default])%>
+              <%=link_to "Delete",newsletter_path(@newsletter),:method=>"delete",:confirm=>'Please confirm that you want to delete this Newsletter. The deletion cannot be reverted',:class=>"btn btn-danger pull-right mb5"%>
+            <%end%>
+
+            <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "override", admin: CONFIG::GENERAL[:global_admin_default])%>
+              <%=link_to 'Override Status', '#',
+                    :class => 'btn btn-danger pull-right mr5 mb5',
+                    :id => 'override_status_btn',
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg"%>
+            <%end%>
+
+            <%=link_to "Send Message",new_message_path(:owner_id => @newsletter.id, :owner_class => 'Newsletter'),:class=>"btn btn-warning pull-right mr5 mb5"%>
+            <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right ml5 mb5"%>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-xs-12 mb15">
+
+            <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])%>
+
+              <%if @newsletter.status == "New"%>
+                <%=link_to "Edit",edit_newsletter_path(@newsletter),:class=>"btn btn-warning pull-right mr10 mb5"%>
+                <%=link_to "Publish",publish_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
+              <%end%>
+
+              <%if @newsletter.status == "Published"%>
+                <%=link_to "Unpublish",unpublish_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
+                <%=link_to "Archive",archive_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
+                <%=link_to "Remind Users",remind_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5","data-toggle" => "tooltip","data-placement" => "top","title" => "Send reminder to users within the Distribution Groups that have not read this Newsletter"%>
+              <%end%>
+
+            <%end%>
+
+            <%if @newsletter.my_action(current_user.id) == 'Unread'%>
+              <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
+            <%end%>
+
+            <%=link_to "Add Comment",
+              "#",
+              :class=>"btn btn-success pull-right mr5 mb5 ",
+              :id=>'comment_btn',
+              "data-toggle"=>"modal",
+              "data-target"=>".bs-example-modal-lg"%>
+
+          </div>
+
+          <div class='col-xs-12'>
+            <b>ID: </b><%=@newsletter.id%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>Title: </b><%=@newsletter.title%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>Status: </b><%=@newsletter.status%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>Complete By Date: </b><%=@newsletter.get_complete_by_date%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>Creator: </b><%=@newsletter.get_creator%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>My Newsletter Action: </b><%=@newsletter.my_action(current_user.id)%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>Published Date: </b><%=@newsletter.get_publish_date%>
+          </div>
+          <div class='col-xs-12 mt5'>
+            <b>Archived Date: </b><%=@newsletter.get_archive_date%>
+          </div>
+          <%if @newsletter.user_id != current_user.id%>
+            <div class='col-xs-12 mt5'>
+              <b>My Completion Date: </b><%=@newsletter.get_user_completion_date(current_user.id)%>
+            </div>
+          <%end%>
+
+          <div class='col-xs-12 mt15 mb15'>
+            <%if @newsletter.status == 'New'%>
+              <b>Groups Scheduled for Distribution: </b>
+            <%else%>
+              <b>Distribution Groups: </b>
+            <%end%>
+
+            <%distros = DistributionList.where(id: @newsletter.distribution_list.split(','))%>
+            <%distros.each do |d|%>
+              <div class='col-xs-12'>
+                <%=d.title%>
+              </div>
+            <%end%>
+          </div>
+
+          <!-- Comments -->
+          <%=render '/forms/show_comment',     owner: @newsletter%>
+          <!-- Newsletter Attachments -->
+          <%=render "/newsletters/newsletter_attachments_show", :owner => @newsletter%>
+          <!-- Admin Panel for completion Statistics -->
+          <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "admin", admin: CONFIG::GENERAL[:global_admin_default])%>
+            <%=render "/newsletters/admin_stats", :owner => @newsletter%>
+          <%end%>
+
+          <!-- Attachments -->
+          <%=render "/forms/attachments_show", :owner => @newsletter%>
+          <!-- Transactions -->
+          <%=render "/records/transactions", :owner => @newsletter%>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+ .datepicker{
+  z-index: 1200!important;
+ }
+</style>
+<script>
+  $(document).ready(function(){
+
+    $('#comment_btn').on('click',function(){
+      $.get("<%=comment_newsletter_path(@newsletter)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#override_status_btn').on('click',function(){
+      $.get("<%=override_status_newsletter_path(@newsletter)%>", function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#newsletter_att_btn').on('click',function(){
+      $.get("<%=new_newsletter_attachment_newsletter_path(@newsletter)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+    $('#att_btn').on('click',function(){
+      $.get("<%=new_attachment_newsletter_path(@newsletter)%>",function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
+  });
+</script>

@@ -104,7 +104,7 @@ class MessagesController < ApplicationController
       Transaction.build_for(
         @message.owner,
         params[:commit],
-        params[:from_anonymous] ? nil : (session[:simulated_id] || session[:user_id]),
+        (params[:from_anonymous].present? && params[:from_anonymous].to_i == 1) ? nil : (session[:simulated_id] || session[:user_id]),
         g_link(@message)
       )
     end
