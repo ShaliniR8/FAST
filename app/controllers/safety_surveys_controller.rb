@@ -128,8 +128,8 @@ class SafetySurveysController < ApplicationController
 
 
   def get_responses_distribution
-    checklist_ids = Completion.preload(:checklist).where({owner_id: params[:id], owner_type: 'SafetySurvey'}).map{|c| c.checklist.id}.flatten rescue []
-    user_ids = Completion.where({owner_id: params[:id], owner_type: 'SafetySurvey'}).map{|c| c.user_id} rescue []
+    checklist_ids = Completion.preload(:checklist).where({owner_id: params[:id], owner_type: 'SafetySurvey'}).keep_if{|c| c.checklist.present?}.map{|c| c.checklist.id}.flatten rescue []
+    user_ids = Completion.where({owner_id: params[:id], owner_type: 'SafetySurvey'}).keep_if{|c| c.checklist.present?}.map{|c| c.user_id} rescue []
     checklists = Checklist.preload(:checklist_rows => :checklist_cells).where(id: checklist_ids)
     users = User.where(id: user_ids).map{|u| [u.id, u.full_name]}.to_h
 

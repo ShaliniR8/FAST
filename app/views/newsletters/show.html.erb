@@ -111,7 +111,7 @@
           <!-- Comments -->
           <%=render '/forms/show_comment',     owner: @newsletter%>
           <!-- Newsletter Attachments -->
-          <%=render "/newsletters/newsletter_attachments_show", :owner => @newsletter%>
+          <%=render "/newsletters/newsletter_attachments_show", :owner => @newsletter, show_btn: current_user.has_access(Object.const_get('Newsletter').rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])%>
           <!-- Admin Panel for completion Statistics -->
           <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "admin", admin: CONFIG::GENERAL[:global_admin_default])%>
             <%=render "/newsletters/admin_stats", :owner => @newsletter%>

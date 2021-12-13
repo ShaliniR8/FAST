@@ -73,11 +73,13 @@
                 </a>
               </li>
               <li>
+              <%if CONFIG::GENERAL[:safety_promotion_visibility]%>
                 <a data-toggle="tab"
                   href="#table"
                   onclick="drawTable('safety_promotion');">
                   Safety Promotion
                 </a>
+              <%end%>
               </li>
               <li>
                 <a data-toggle="tab"

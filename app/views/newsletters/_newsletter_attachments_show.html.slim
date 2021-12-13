@@ -5,7 +5,10 @@ ruby:
   .panel.panel-default
     .panel-heading.click-heading.collapsed
       .panel-title
-        | Newsletter Attachments
+        span
+          | Newsletter Attachments
+        span.badge.badge-pill.badge-info.ml10
+          = attachments.size
         span.pull-right.clickable
           i.mt5.glyphicon.glyphicon-chevron-down
     .panel-body style='display: none;'
