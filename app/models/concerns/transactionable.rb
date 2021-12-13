@@ -12,7 +12,8 @@ module Transactionable
       Transaction.build_for(
         self,
         action,
-        defined?(session) ? (session[:simulated_id] || session[:user_id]) : nil,
+        # defined?(session) ? (session[:simulated_id] || session[:user_id]) : nil,
+        defined?(session) ? (session[:simulated_id] || session[:user_id]) : self.created_by_id.present? ? self.created_by_id : nil,
         context || (defined?(session) ? '' : "Recurring #{self.class.name.titleize}"),
         nil,
         nil,

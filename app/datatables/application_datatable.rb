@@ -34,7 +34,7 @@ class ApplicationDatatable
   def records_total
     search_string = []
 
-    if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+    if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && object.table_name != "safety_plans"
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
       status_queries << "responsible_user_id = #{@current_user.id}"
@@ -269,7 +269,7 @@ class ApplicationDatatable
 
   def query_with_search_term(search_string, join_tables, start_date, end_date)
 
-    if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+    if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && object.table_name != "safety_plans"
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
       status_queries << "responsible_user_id = #{@current_user.id}"
@@ -334,7 +334,7 @@ class ApplicationDatatable
 
 
   def query_without_search_term(search_string, join_tables, start_date, end_date)
-    if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+    if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && object.table_name != "safety_plans"
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
       status_queries << "responsible_user_id = #{@current_user.id}"

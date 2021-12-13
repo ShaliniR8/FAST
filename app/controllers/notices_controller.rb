@@ -49,7 +49,7 @@ class NoticesController < ApplicationController
     @owner.status = 2
     @owner.save
     redirection = @owner.owner
-    if redirection.class.name.demodulize == 'Verification'
+    if ["Verification", "SmsTask"].include?(redirection.class.name.demodulize)
       redirection = redirection.owner
     end
     redirect_to redirection || home_index_path
