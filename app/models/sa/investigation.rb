@@ -38,6 +38,7 @@ class Investigation < Sa::SafetyAssuranceBase
   accepts_nested_attributes_for :descriptions
 
   after_create :create_transaction
+  after_save :delete_cached_fragments
 
   scope :templates, -> {where(template: 1)}
   scope :regulars, -> {where(template: 0)}
@@ -147,6 +148,15 @@ class Investigation < Sa::SafetyAssuranceBase
     end
 
     result.html_safe
+  end
+
+
+  def delete_cached_fragments
+    source_fragment_name = "source_investigations_#{id}"
+    show_fragment_name = "show_investigations_#{id}"
+
+    ActionController::Base.new.expire_fragment(source_fragment_name)
+    ActionController::Base.new.expire_fragment(show_fragment_name)
   end
 
 end

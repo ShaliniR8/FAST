@@ -38,6 +38,7 @@ class Audit < Sa::SafetyAssuranceBase
   accepts_nested_attributes_for :checklists
 
   after_create :create_transaction
+  after_save :delete_cached_fragments
 
   scope :templates, -> {where(template: 1)}
   scope :regulars, -> {where(template: 0)}
@@ -177,6 +178,12 @@ class Audit < Sa::SafetyAssuranceBase
   def can_complete?(user, form_conds: false, user_conds: false)
     super(user, form_conds: form_conds, user_conds: user_conds) &&
       self.items.all?{ |x| x.status == "Completed" }
+  end
+
+
+  def delete_cached_fragments
+    fragment_name = "source_audits_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
   end
 
 

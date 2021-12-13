@@ -39,6 +39,7 @@ class Record < Sr::SafetyReportingBase
   accepts_nested_attributes_for :descriptions
 
   after_create -> { create_transaction(context: 'Generated Report From User Submission.') if self.description.present? && !self.description.include?('-- copy')}
+  after_save :delete_cached_fragments
 
 
   def handle_anonymous_reports
@@ -567,5 +568,9 @@ class Record < Sr::SafetyReportingBase
   end
 
 
+  def delete_cached_fragments
+    fragment_name = "source_records_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
+  end
 
 end

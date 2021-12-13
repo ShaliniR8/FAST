@@ -18,6 +18,7 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
   belongs_to :created_by, foreign_key: "created_by_id", class_name: "User"
 
   after_create :create_transaction
+  after_save :delete_cached_fragments
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -43,6 +44,11 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
 
   def self.results
     ['Satisfactory','Unsatisfactory']
+  end
+
+  def delete_cached_fragments
+    fragment_name = "show_safety_plans_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
   end
 
 end

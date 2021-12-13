@@ -29,6 +29,7 @@ class Hazard < Srm::SafetyRiskManagementBase
 
   after_create :create_transaction
   after_create :create_owner_transaction
+  after_save   :delete_cached_fragments
 
 
   def self.get_meta_fields(*args)
@@ -108,5 +109,11 @@ class Hazard < Srm::SafetyRiskManagementBase
 
   def get_due_date
     self.due_date.present? ? self.due_date.strftime("%Y-%m-%d") : ""
+  end
+
+
+  def delete_cached_fragments
+    fragment_name = "show_hazards_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
   end
 end

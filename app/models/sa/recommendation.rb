@@ -25,6 +25,7 @@ class Recommendation < Sa::SafetyAssuranceBase
 
   after_create :create_transaction
   after_create :create_owner_transaction
+  after_save   :delete_cached_fragments
 
 
   def self.get_meta_fields(*args)
@@ -74,4 +75,10 @@ class Recommendation < Sa::SafetyAssuranceBase
       "<b style='color:grey'>N/A</b>".html_safe
     end
   end
+
+  def delete_cached_fragments
+    fragment_name = "show_recommendations_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
+  end
+
 end

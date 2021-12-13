@@ -14,6 +14,7 @@
                   = link_to "Finding ##{finding.id}: #{finding.title}", finding
                   span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
               .panel-body style='display:none'
-                = render 'findings/show',
-                  owner: finding,
-                  show_btn: show_btns
+                - cache("show_findings_#{finding.id}") do
+                  = render 'findings/show',
+                    owner: finding,
+                    show_btn: show_btns

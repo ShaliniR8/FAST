@@ -7,6 +7,7 @@ namespace :daily_cron_tasks do
 
     Rake::Task['notifications:automated_notifications'].invoke()
     Rake::Task['recurring:generate_recurrent_forms'].invoke()
+    Rake::Task['cache_manager:clear_cache'].invoke()
     # track_airline_log = BaseConfig.airline[:track_log]
     # Rake::Task['log:summary'].invoke() if track_airline_log
     if defined?(Object.const_get("#{AIRLINE_CODE}Config")::ULTIPRO_DATA)

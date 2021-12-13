@@ -35,8 +35,9 @@ css:
               .panel-body style='display:none'
                 .row
                   - owner.risk_controls.each do |risk_control|
-                    = render '/hazards/show_risk_control',
-                      risk_control: risk_control
+                    - cache("show_limited_risk_controls_#{risk_control.id}") do
+                      = render '/hazards/show_risk_control',
+                        risk_control: risk_control
         - if owner.has_occurrences?
           .col-xs-12
             .panel.clickable.panel-info

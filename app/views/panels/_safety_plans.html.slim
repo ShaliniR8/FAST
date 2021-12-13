@@ -14,6 +14,7 @@
                   = link_to "Safety Plan ##{safety_plan.id}: #{safety_plan.title}", safety_plan
                   span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
               .panel-body style='display:none'
-                = render 'safety_plans/show',
-                  owner: safety_plan,
-                  show_btn: show_btns
+                - cache("show_safety_plans_#{safety_plan.id}") do
+                  = render 'safety_plans/show',
+                    owner: safety_plan,
+                    show_btn: show_btns

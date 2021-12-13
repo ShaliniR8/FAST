@@ -14,6 +14,7 @@
                   = link_to "SRA ##{sra.id}: #{sra.title}", sra
                   span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
               .panel-body style='display:none'
-                = render 'sras/show',
-                  owner: sra,
-                  show_btn: show_btns
+                - cache("show_sras_#{sra.id}") do
+                  = render 'sras/show',
+                    owner: sra,
+                    show_btn: show_btns

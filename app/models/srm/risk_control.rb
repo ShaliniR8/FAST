@@ -24,6 +24,8 @@ class RiskControl < Srm::SafetyRiskManagementBase
 
   after_create :create_transaction
   after_create :create_owner_transaction
+  after_create :delete_owner_cached_fragments
+  after_save :delete_cached_fragments
 
 
   def self.get_meta_fields(*args)
@@ -74,6 +76,22 @@ class RiskControl < Srm::SafetyRiskManagementBase
 
   def type
     "RiskControl"
+  end
+
+
+  def delete_cached_fragments
+    source_fragment_name = "source_risk_controls_#{id}"
+    show_fragment_name = "show_risk_controls_#{id}"
+    show_limited_fragment_name = "show_limited_risk_controls_#{id}"
+
+    ActionController::Base.new.expire_fragment(source_fragment_name)
+    ActionController::Base.new.expire_fragment(show_fragment_name)
+    ActionController::Base.new.expire_fragment(show_limited_fragment_name)
+  end
+
+
+  def delete_owner_cached_fragments
+    Hazard.find(hazard_id).delete_cached_fragments
   end
 
 end

@@ -26,6 +26,7 @@ class Report < Sr::SafetyReportingBase
 
   before_create :set_priveleges
   after_create :set_name
+  after_save :delete_cached_fragments
 
   extend AnalyticsFilters
 
@@ -524,5 +525,13 @@ class Report < Sr::SafetyReportingBase
     form_confirmed = self.status != 'Closed' || form_conds
     user_confirmed = true
     form_confirmed && user_confirmed && !self.occurrence_lock?
+  end
+
+  def delete_cached_fragments
+    source_fragment_name = "source_reports_#{id}"
+    show_fragment_name = "show_reports_#{id}"
+
+    ActionController::Base.new.expire_fragment(source_fragment_name)
+    ActionController::Base.new.expire_fragment(show_fragment_name)
   end
 end
