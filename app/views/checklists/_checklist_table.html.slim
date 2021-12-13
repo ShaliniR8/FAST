@@ -20,11 +20,12 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
       tr class="#{checklist_row.is_header ? 'header-row' : ''}"
         - checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
           td
-            = render 'checklist_headers/preview_field',
-              is_header: checklist_row.is_header?, 
-              owner_type: checklist.owner_type,
-              cell: checklist_cell,
-              item: checklist_cell.checklist_header_item
+            - cache("show_panel_checklist_cell_#{checklist_cell.id}") do
+              = render 'checklist_headers/preview_field',
+                is_header: checklist_row.is_header?,
+                owner_type: checklist.owner_type,
+                cell: checklist_cell,
+                item: checklist_cell.checklist_header_item
 
         td
           - unless checklist_row.is_header?

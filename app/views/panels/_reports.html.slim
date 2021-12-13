@@ -5,6 +5,7 @@
         = link_to "Event ##{report.id}: #{report.title}", report
         span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
     .panel-body style='display:none'
-      = render 'reports/show',
-                owner: report,
-                show_btn: show_btns
+      - cache("show_reports_#{report.id}") do
+        = render 'reports/show',
+                  owner: report,
+                  show_btn: show_btns

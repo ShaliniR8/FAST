@@ -24,7 +24,9 @@
                   </div>
                 </div>
                 <div class="panel-body" style="display:none">
-                  <%=render '/sms_actions/show', :owner => car, :show_btn => show_btns%>
+                  <%cache("show_sms_actions_#{car.id}") do%>
+                    <%=render '/sms_actions/show', :owner => car, :show_btn => show_btns%>
+                  <%end%>
                 </div>
               </div>
             </div>

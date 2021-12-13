@@ -4,6 +4,10 @@ PrdgSession::Application.configure do
   # The production environment is meant for finished, "live" apps.
   # Code is not reloaded between requests
   config.cache_classes = true
+  airline_code = YAML.load_file("#{::Rails.root}/config/airline_code.yml")
+  path = "/var/opt/prosafet_#{airline_code.downcase}"
+  # path = "/var/opt/#{airline_code.downcase}_prosafet"
+  config.cache_store = :file_store, "#{path}/view_cache"
 
   # Full error reports are disabled and caching is turned on
   config.consider_all_requests_local       = false

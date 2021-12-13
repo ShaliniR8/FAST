@@ -35,6 +35,7 @@ class Inspection < Sa::SafetyAssuranceBase
   accepts_nested_attributes_for :items
 
   after_create :create_transaction
+  after_save :delete_cached_fragments
 
   scope :templates, -> {where(template: 1)}
   scope :regulars, -> {where(template: 0)}
@@ -144,5 +145,10 @@ class Inspection < Sa::SafetyAssuranceBase
     end
 
     result.html_safe
+  end
+
+  def delete_cached_fragments
+    fragment_name = "source_inspections_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
   end
 end

@@ -14,8 +14,9 @@
                 = link_to "#{parent_object_name} ##{parent.id}: #{parent.title}", parent
                 span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
             .panel-body style='display:none'
-                = render "#{parent.class.name.underscore.pluralize}/show",
-                  owner: parent,
-                  show_btn: false,
-                  hide_extra: true
+                - cache("source_#{parent.class.name.underscore.pluralize}_#{parent.id}") do
+                  = render "#{parent.class.name.underscore.pluralize}/show",
+                    owner: parent,
+                    show_btn: false,
+                    hide_extra: true
 

@@ -24,7 +24,9 @@
                   </div>
                 </div>
                 <div class="panel-body" style="display:none">
-                  <%=render '/recommendations/show', :owner => recommendation, :show_btn => show_btns%>
+                  <%cache("show_recommendations_#{recommendation.id}") do%>
+                    <%=render '/recommendations/show', :owner => recommendation, :show_btn => show_btns%>
+                  <%end%>
                 </div>
               </div>
             </div>

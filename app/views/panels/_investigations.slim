@@ -14,6 +14,7 @@
                   = link_to "Investigation ##{investigation.id}: #{investigation.title}", investigation
                   span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
               .panel-body style='display:none'
-                = render 'investigations/show',
-                  owner: investigation,
-                  show_btn: show_btns
+                - cache("show_investigations_#{investigation.id}") do
+                  = render 'investigations/show',
+                    owner: investigation,
+                    show_btn: show_btns

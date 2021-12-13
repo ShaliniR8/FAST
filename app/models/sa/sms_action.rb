@@ -26,6 +26,7 @@ class SmsAction < Sa::SafetyAssuranceBase
 
   after_create :create_transaction
   after_create -> { create_owner_transaction(action:'Add Corrective Action') }
+  after_save :delete_cached_fragments
 
 
   def self.get_meta_fields(*args)
@@ -98,5 +99,10 @@ class SmsAction < Sa::SafetyAssuranceBase
       (self.immediate_action || (self.owner.status == 'Completed' rescue true))
   end
 
+
+  def delete_cached_fragments
+    fragment_name = "show_sms_actions_#{id}"
+    ActionController::Base.new.expire_fragment(fragment_name)
+  end
 
 end

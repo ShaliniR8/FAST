@@ -40,6 +40,7 @@ class Sra < Srm::SafetyRiskManagementBase
   accepts_nested_attributes_for :hazards
 
   after_create :create_transaction
+  after_save :delete_cached_fragments
 
 
   def self.get_meta_fields(*args)
@@ -116,6 +117,15 @@ end
     super(user, form_conds: form_conds, user_conds: user_conds) || (
       self.status == 'Pending Review' && ( self.reviewer_id == user.id || has_admin_rights?(user) )
     )
+  end
+
+
+  def delete_cached_fragments
+    source_fragment_name = "source_sras_#{id}"
+    show_fragment_name = "show_sras_#{id}"
+
+    ActionController::Base.new.expire_fragment(source_fragment_name)
+    ActionController::Base.new.expire_fragment(show_fragment_name)
   end
 
 end

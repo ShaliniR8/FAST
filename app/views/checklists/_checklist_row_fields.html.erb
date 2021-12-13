@@ -7,13 +7,15 @@
 
   <%if source == 'Existing'%>
     <%checklist_row.checklist_cells.each do |checklist_cell|%>
-      <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
-        <%header_item = checklist_cell.checklist_header_item%>
-        <%=render 'checklist_row_fields_td',
-          :source => source,
-          :header_item => header_item,
-          :checklist_cell => checklist_cell,
-          :f => cell_form%>
+      <%cache("#{action_name}_checklist_cell_#{checklist_cell.id}") do%>
+        <%=f.fields_for :checklist_cells, checklist_cell do |cell_form|%>
+          <%header_item = checklist_cell.checklist_header_item%>
+          <%=render 'checklist_row_fields_td',
+            :source => source,
+            :header_item => header_item,
+            :checklist_cell => checklist_cell,
+            :f => cell_form%>
+        <%end%>
       <%end%>
     <%end%>
     <%unless action_name == 'edit' || action_name == 'retract_form_template'%>

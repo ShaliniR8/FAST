@@ -5,4 +5,5 @@
         b Signatures <span class='pull-right clickable'><i class='mt5 glyphicon glyphicon-chevron-down'></i></span>
     .panel-body style='display:none'
       - signatures.each do |x|
-        = render 'forms/signatures/show_signature', owner: x, fields: fields
+        - cache("show_signatures_#{x.id}") do
+          = render 'forms/signatures/show_signature', owner: x, fields: fields
