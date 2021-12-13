@@ -268,6 +268,21 @@ class HomeController < ApplicationController
 
       @safety_plans = SafetyPlan.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
       @grouped_safety_plans = @safety_plans.group_by{|x| x.status}
+
+    when 'SP'
+      @title = "Safety Promotion Dashboard"
+
+      if current_user.has_access(Object.const_get('Newsletter').rule_name, "index", admin: CONFIG::GENERAL[:global_admin_default])
+        @newsletters = Object.const_get('Newsletter').within_timerange(@start_date, @end_date)
+          .sort{|x,y| status_index(x) <=> status_index(y)}
+        @grouped_newsletters = @newsletters.group_by{|x| x.status}
+      end
+
+      if current_user.has_access(Object.const_get('SafetySurvey').rule_name, "index", admin: CONFIG::GENERAL[:global_admin_default])
+        @safety_surveys = Object.const_get('SafetySurvey').within_timerange(@start_date, @end_date)
+          .sort{|x,y| status_index(x) <=> status_index(y)}
+        @grouped_safety_surveys = @safety_surveys.group_by{|x| x.status}
+      end
     end
   end
 
@@ -492,6 +507,36 @@ class HomeController < ApplicationController
           end
         end
       end
+
+    elsif session[:mode] == "SP"
+      if current_user.has_access("newsletters","index")
+        newsletters = Newsletter.where("status=?", "Published")
+        newsletters = newsletters.select{|x| x.has_user(current_user)}
+        newsletters.each do |a|
+          @calendar_entries.push({
+            :url => newsletter_path(a),
+            :start => a.complete_by_date,
+            :title => "Newsletter \##{a.id}",
+            :color => "khaki",
+            :textColor => "darkslategrey",
+            :description => a.get_tooltip
+          })
+        end
+      end
+      if current_user.has_access("safety_surveys","index")
+        safety_surveys = SafetySurvey.where("status=?", "Published")
+        safety_surveys = safety_surveys.select{|x| x.has_user(current_user)}
+        safety_surveys.each do |a|
+          @calendar_entries.push({
+            :url => safety_survey_path(a),
+            :start => a.complete_by_date,
+            :title => "Safety Survey \##{a.id}",
+            :color => "skyblue",
+            :textColor => "darkslategrey",
+            :description => a.get_tooltip
+          })
+        end
+      end
     end
   end
 
@@ -659,7 +704,7 @@ class HomeController < ApplicationController
       @size="col-xs-12 col-sm-6"
     when 3
       @size="col-xs-12 col-sm-4"
-    when 4
+    when 4,5
       @size="col-xs-12 col-sm-6 col-md-3"
     end
 

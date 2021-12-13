@@ -163,7 +163,7 @@ class User < ActiveRecord::Base
 
   def accessible_modules
     modules = AccessControl.where(action: 'module')
-    return modules.map{|rule| rule.entry} if self.global_admin?
+    # return modules.map{|rule| rule.entry} if self.global_admin?
     (modules & get_all_access).map{|rule| rule.entry}
   end
 

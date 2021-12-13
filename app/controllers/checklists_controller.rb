@@ -294,7 +294,7 @@ class ChecklistsController < ApplicationController
       
       @record.update_attributes(params[:checklist])
       @record.update_row_orders
-      redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner
+      redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
     end
   end
 
@@ -390,8 +390,13 @@ class ChecklistsController < ApplicationController
 
     Checklist.transaction do
       new_checklist = template.clone
+
       new_checklist.template_id = template.id
-      owner.checklists << new_checklist
+      if owner.class.name == "SafetySurvey"
+        owner.checklist = new_checklist
+      else
+        owner.checklists << new_checklist
+      end
 
       template.checklist_rows.each do |row|
         new_row = row.clone

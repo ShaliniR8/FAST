@@ -40,6 +40,9 @@ $('#calendar').fullCalendar('rerenderEvents' );
     drawChart(hazardData,           params, "hazards",         "hazards_download",         "<%= hazards_path %>");
     drawChart(riskControlData,          params, "risk_controls",   "risk_controls_download",   "<%= risk_controls_path %>");
     drawChart(safetyPlanData,       params, "safety_plans",    "safety_plans_download",    "<%= safety_plans_path %>");
+<% elsif session[:mode] == "SP" %>
+    drawChart(newsletterData,              params, "newsletters",            "newsletters_download",            "<%= newsletters_path %>");
+    drawChart(safetySurveyData,            params, "safety_surveys",         "safety_surveys_download",         "<%= safety_surveys_path %>");
 <% end %>
 // console.log("start-date=", "<%=@start_date%>");
 <% Rails.logger.debug "before render, start_date=#{@start_date}" %>

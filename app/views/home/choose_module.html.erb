@@ -10,7 +10,7 @@
             <div id="asap">Safety Reporting</div>
           </div>
         <%end%>
-        <%if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM', 'module', admin: CONFIG::GENERAL[:global_admin_default])%>
+        <%if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/SMSIM.png" width="150" height="150" />
@@ -32,6 +32,14 @@
               <img style="border:none" src="/SRA.png" width="150" height="150" />
             </a>
             <div id="srm">SRA (SRM)</div>
+          </div>
+        <%end%>
+        <%if CONFIG::GENERAL[:safety_promotion_visibility] && current_user.has_access('Safety Promotion', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'SP')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/SMSIM.png" width="150" height="150" />
+            </a>
+            <div id="sp">Safety Promotion</div>
           </div>
         <%end%>
       </div>
@@ -99,5 +107,10 @@
     font-size: 180%;
     padding-top: 10px;
     color: #e84e10;
+  }
+  #sp{
+    font-size: 180%;
+    padding-top: 10px;
+    color: #74b1c7;
   }
 </style>

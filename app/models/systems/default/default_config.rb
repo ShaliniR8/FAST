@@ -71,6 +71,7 @@ class DefaultConfig
     attach_pdf_in_message:              true,   # Allows option to attach PDF version of the source of Input for email notfication fired by Messages
     global_admin_default:               true,   # Default value to use for admin parameter when calling has_access in user.rb
     sms_im_visibility:                  true,   # Default visibility of SMS IM --> ON
+    safety_promotion_visibility:        false,  # Default visibility of Safety Promotion --> OFF
 
   }
 
@@ -154,6 +155,11 @@ class DefaultConfig
     Object.const_get("#{AIRLINE_CODE}SafetyRiskManagementConfig") rescue DefaultSafetyRiskManagementConfig
   end
 
+  # To access Safety Promotion Configs use the constant defined below (use CONFIG.sp in code)
+  def self.sp
+    Object.const_get("#{AIRLINE_CODE}SafetyPromotionConfig") rescue DefaultSafetyPromotionConfig
+  end
+
   # To access Mobile Configs use the constant defined below (use CONFIG.mobile)
   def self.mobile
     Object.const_get("#{AIRLINE_CODE}MobileConfig") rescue DefaultMobileConfig
@@ -186,7 +192,8 @@ class DefaultConfig
       'ASAP'    => self.sr::HIERARCHY,
       'SMS IM'  => self.im::HIERARCHY,
       'SMS'     => self.sa::HIERARCHY,
-      'SRM'     => self.srm::HIERARCHY
+      'SRM'     => self.srm::HIERARCHY,
+      'SP'      => self.sp::HIERARCHY
     }
   end
 

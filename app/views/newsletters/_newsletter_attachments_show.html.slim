@@ -1,0 +1,56 @@
+ruby:
+  attachments ||= owner.newsletter_attachments
+
+.col-xs-12.col-lg-12
+  .panel.panel-default
+    .panel-heading.click-heading.collapsed
+      .panel-title
+        | Newsletter Attachments
+        span.pull-right.clickable
+          i.mt5.glyphicon.glyphicon-chevron-down
+    .panel-body style='display: none;'
+      .col-xs-12
+        - if !defined?(show_btn) || show_btn
+          = link_to 'Add Newsletter Attachment', '#',
+            class: 'btn btn-success pull-right mr5 mb5',
+            id: 'newsletter_att_btn',
+            'data-toggle' => 'modal',
+            'data-target' => '.bs-example-modal-lg'
+        table#attachment_table.table.table-striped.table-bordered
+          thead
+            tr
+              th Filename
+              th Caption
+              th Action
+          tbody
+            - attachments.each do |attachment|
+              tr attachment_id=attachment.id
+                td
+                  strong = attachment.document_filename
+                td = attachment.caption
+                td
+                  div id="preview_attachment_#{attachment.id}" style='display: none;'
+                    .panel-lightskyblue
+                      .panel-heading
+                        .panel-title
+                          = attachment.document_filename
+                          button.close.pull-right type='button' data-dismiss='modal' aria-label='Close'
+                            span.glyphicon.glyphicon-remove
+                      .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
+                        .col-xs-12 align='center'
+                          = render 'forms/attachments_preview', attachment: attachment
+                  = link_to 'Preview', '#',
+                    class: 'btn btn-info show_preview_btn',
+                    'data-toggle' => 'modal',
+                    'data-target' => '.bs-example-modal-lg'
+                  = link_to 'Download', attachment.name.url,
+                    class: 'btn btn-success ml5'
+
+javascript:
+  $(function() {
+    $('.show_preview_btn').click(function() {
+      var attachment_id = $(this).closest('tr').attr('attachment_id')
+      $('.modal-content').html($(`#preview_attachment_${attachment_id}`).html())
+      $(window).trigger('resize')
+    })
+  })

@@ -298,6 +298,7 @@ module ApplicationHelper
   def convert_to_utc(date_time:, time_zone:)
     time_zone = 'UTC' if time_zone.blank?
     time_zone = ActiveSupport::TimeZone.new(time_zone)
+    time_zone = ActiveSupport::TimeZone.new('UTC') if time_zone.blank?
     date_time = DateTime.parse(date_time) rescue time_zone.at(Time.now)
     time_zone.local_to_utc(date_time)
   end

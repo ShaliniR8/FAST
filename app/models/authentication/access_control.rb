@@ -101,6 +101,7 @@ class AccessControl < ActiveRecord::Base
       "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations', 'checklist'],
       "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings', 'Safety Risk Management'],
+      "safety_promotion" => ["Safety Promotion", "newsletters", "safety_surveys", 'safety_badges'],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
       "checklist_templates" => Checklist.where(owner_type: 'ChecklistHeader').map(&:title),
@@ -356,6 +357,36 @@ class AccessControl < ActiveRecord::Base
         "admin"               => generate_desc("SMS IM Meeting", "admin"),
        },
 
+       'newsletters'=>{
+        "new"                 => generate_desc("Newsletter", "new"),
+        "show"                => generate_desc("Newsletter", "show"),
+        "edit"                => generate_desc("Newsletter", "edit"),
+        "destroy"             => generate_desc("Newsletter", "destroy"),
+        "index"               => generate_desc("Newsletter", "index"),
+        "override"            => generate_desc("Newsletter", "override"),
+        "notify"              => generate_desc("Newsletter", "notify"),
+       },
+
+       'safety_surveys'=>{
+        "new"                 => generate_desc("Safety Survey", "new"),
+        "show"                => generate_desc("Safety Survey", "show"),
+        "edit"                => generate_desc("Safety Survey", "edit"),
+        "destroy"             => generate_desc("Safety Survey", "destroy"),
+        "index"               => generate_desc("Safety Survey", "index"),
+        "override"            => generate_desc("Safety Survey", "override"),
+        "notify"              => generate_desc("Safety Survey", "notify"),
+       },
+
+       'safety_badges'=>{
+        "new"                 => generate_desc("Safety Badge", "new"),
+        "show"                => generate_desc("Safety Badge", "show"),
+        "edit"                => generate_desc("Safety Badge", "edit"),
+        "destroy"             => generate_desc("Safety Badge", "destroy"),
+        "index"               => generate_desc("Safety Badge", "index"),
+        "override"            => generate_desc("Safety Badge", "override"),
+        "notify"              => generate_desc("Safety Badge", "notify"),
+       },
+
        'ASAP' =>{
         'module'              => generate_desc("Safety Reporting", "module"),
        },
@@ -370,6 +401,10 @@ class AccessControl < ActiveRecord::Base
 
        'Safety Risk Management'=>{
         'module'              => generate_desc("SRA(SRM)", "module"),
+       },
+
+       'Safety Promotion'=>{
+        'module'              => generate_desc("Safety Promotion", "module"),
        },
 
        'trackings'=>{
@@ -621,6 +656,36 @@ class AccessControl < ActiveRecord::Base
         "Full Access"=>"admin",
         "Override" => 'override'
        },
+       'newsletters'=>{
+        "New"=>"new",
+        "View"=>"show",
+        "Edit"=>"edit",
+        "Delete"=>"destroy",
+        "Listing"=>"index",
+        "Admin"=>"admin",
+        "Override" => 'override',
+        "Notify" => 'notify'
+       },
+       'safety_surveys'=>{
+        "New"=>"new",
+        "View"=>"show",
+        "Edit"=>"edit",
+        "Delete"=>"destroy",
+        "Listing"=>"index",
+        "Admin"=>"admin",
+        "Override" => 'override',
+        "Notify" => 'notify'
+       },
+       'safety_badges'=>{
+        "New"=>"new",
+        "View"=>"show",
+        "Edit"=>"edit",
+        "Delete"=>"destroy",
+        "Listing"=>"index",
+        "Admin"=>"admin",
+        "Override" => 'override',
+        "Notify" => 'notify'
+       },
        'ASAP'=>{
         'Module Access'=>'module'
        },
@@ -632,6 +697,9 @@ class AccessControl < ActiveRecord::Base
        },
        'Safety Risk Management'=>{
         'Module Access'=>'module'
+       },
+       'Safety Promotion'=>{
+        'Module'=>'module'
        },
        'home' =>{
         'Access'=>'query_all',
@@ -700,10 +768,14 @@ class AccessControl < ActiveRecord::Base
       "IM Plans"                              => "ims",
       "IM Packages"                           => "packages",
       "SRA(SRM) Meetings"                     => "srm_meetings",
+      "Newsletters"                           => "newsletters",
+      "Safety Surveys"                        => "safety_surveys",
+      "Safety Badges"                         => "safety_badges",
       "Safety Reporting"                      => "ASAP",
       "SMS IM"                                => "SMS IM",
       "Safety Assurance"                      => "Safety Assurance",
       "SRA(SRM)"                              => "Safety Risk Management",
+      "Safety Promotion"                      => "Safety Promotion",
       "Query Center"                          => "home",
     }.sort.to_h
   end

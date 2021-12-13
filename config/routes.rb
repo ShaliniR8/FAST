@@ -822,6 +822,42 @@ PrdgSession::Application.routes.draw do |map|
 
 
 
+  # Safety Promotion Module
+  resources :newsletters do
+    member do
+      get 'publish'
+      get 'complete'
+      get 'unpublish'
+      get 'archive'
+      get 'comment'
+      get 'remind'
+      get 'override_status'
+      get 'new_attachment'
+      get 'new_newsletter_attachment'
+    end
+    collection do
+      get "advanced_search"
+    end
+  end
+  resources :safety_surveys do
+    member do
+      get 'publish'
+      get 'complete'
+      get 'unpublish'
+      get 'archive'
+      get 'comment'
+      get 'remind'
+      get 'override_status'
+      get 'get_user_list'
+      get 'get_responses_distribution'
+      get 'new_attachment'
+    end
+    collection do
+      get "advanced_search"
+    end
+  end
+
+
 
   map.resources :gateway
 

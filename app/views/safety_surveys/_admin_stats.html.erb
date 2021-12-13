@@ -1,0 +1,158 @@
+<%if owner.completions.present?%>
+  <div class="col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading click-heading collapsed">
+        <div class="panel-title">
+          Completion List
+          <span class="pull-right clickable">
+            <i class="mt5 glyphicon glyphicon-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="panel-body" style="display:none;">
+
+        <div class="col-xs-12 mr15 mb15 mt15">
+          <%=label_tag "Choose Completion View"%>
+          <div class="col-xs-12">
+            <%=check_box_tag "by_user", "user", true%>
+            <%="View by User"%>
+            <%=check_box_tag "by_group", "group", false, :class => "ml10"%>
+            <%="View by Group"%>
+          </div>
+        </div>
+
+        <div class="table-responsive user_table">
+          <table style="width:100%"
+            class="table table-bordered table-striped by-user-table">
+            <thead>
+              <tr>
+                <th style="width:10%">Serial</th>
+                <th style="width:45%">User</th>
+                <th style="width:45%">Read Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%owner.completions.reverse!.each_with_index do |c, ind|%>
+                <tr>
+                  <td><%=ind + 1%></td>
+                  <td><%=c.get_user_name%></td>
+                  <td>
+                    <%=c.complete_date.strftime("%Y-%m-%d") rescue "Not Completed"%>
+                  </td>
+                </tr>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+
+
+        <div class="table-responsive group_table" style="display:none;">
+          <table style="width:100%"
+            class="table table-bordered table-striped by-distribution-table">
+            <thead>
+              <tr>
+                <th style="width:10%">Serial</th>
+                <th style="width:30%">Group Name</th>
+                <th style="width:30%"># of Users Completed</th>
+                <th style="width:30%"># of Users Not Completed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%ind = 1%>
+              <%distros = DistributionList.preload(:distribution_list_connections).where(id: owner.distribution_list.split(","))%>
+              <%distro_id_and_title = Hash.new%>
+              <%distro_id_and_user_list = Hash.new%>
+              <%distros.each do |d|%>
+                <%distro_id_and_title[d.id] = d.title%>
+                <%distro_id_and_user_list[d.id] = d.get_user_ids%>
+              <%end%>
+              <%distro_id_and_user_list.each do |k, v|%>
+                <%comps = Completion.where({owner_type: 'SafetySurvey', owner_id: owner.id, user_id: v})%>
+                <%non_completed = comps.select{|c| c.complete_date.nil?}%>
+                <%completed = comps.select{|c| c.complete_date.present?}%>
+                <tr>
+                  <td><%=ind%></td>
+                  <td><%=distro_id_and_title[k]%></td>
+                  <td><%= link_to completed.count,
+                          "#",
+                          class: "user_list_link",
+                          "data-count" => completed.count,
+                          "data-list" => completed.map(&:user_id).join(',') rescue ""%>
+                  </td>
+                  <td><%= link_to non_completed.count,
+                          "#",
+                          class: "user_list_link",
+                          "data-count" => non_completed.count,
+                          "data-list" => non_completed.map(&:user_id).join(',') rescue ""%>
+                  </td>
+                </tr>
+                <%ind = ind + 1%>
+              <%end%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<%end%>
+
+<script type="text/javascript">
+
+  $('.by-user-table').DataTable({
+    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+    "iDisplayLength": 10,
+  });
+
+  $('.by-distribution-table').DataTable({
+    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+    "iDisplayLength": 10,
+  });
+
+  $('#by_user').on('change', function(){
+    if ($("#by_user").is(':checked')){
+      $('.user_table').show();
+      $('.group_table').hide();
+      $('#by_group').prop('checked', false);
+    } else {
+      $('.user_table').hide();
+      $('.group_table').show();
+      $('#by_group').prop('checked', true);
+    }
+  })
+
+  $('#by_group').on('change', function(){
+    if ($("#by_group").is(':checked')){
+      $('.user_table').hide();
+      $('.group_table').show();
+      $('#by_user').prop('checked', false);
+    } else {
+      $('.user_table').show();
+      $('.group_table').hide();
+      $('#by_user').prop('checked', true);
+    }
+  })
+
+  $('.user_list_link').on('click',function(){
+    if ($(this).data("list") != 0){
+      $.get("<%=get_user_list_safety_survey_path%>"+"?list="+$(this).data("list"), function(data){
+        swal({
+          allowOutsideClick: false,
+          showCancelButton: false,
+          showConfirmButton: false,
+          html: data,
+          onOpen: function() {
+            $('.user-list-table').DataTable({
+              "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+              "iDisplayLength": 10,
+            });
+
+            $('.close_user_swal').on('click', function(){
+              swal.close();
+            });
+          }
+        });
+      });
+    }
+  });
+</script>

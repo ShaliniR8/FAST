@@ -28,6 +28,7 @@ class EULENConfig < DefaultConfig
     checklist_query:                   true,
     query_processing_in_rake_task:     true,
     sms_im_visibility:                 false,
+    safety_promotion_visibility:       true,
   })
 
 
