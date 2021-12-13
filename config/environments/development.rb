@@ -7,7 +7,7 @@ PrdgSession::Application.configure do
   config.cache_classes = false
   # config.cache_store = :memory_store
   # config.cache_store = :file_store, "/home/saptarshi/ProSafeTv1.2.6/test_cache"
-  config.cache_store = :null_store
+  # config.cache_store = :null_store
 
   # Log error messages when you accidentally call methods on nil.
   config.whiny_nils = true
