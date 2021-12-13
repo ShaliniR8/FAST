@@ -271,12 +271,12 @@ ruby:
         - else
           - parent_name = parent_class
 
-        = link_to "View #{parent_name.titleize}",
+        = link_to "View Source #{parent_name.titleize}",
           eval("#{parent_class.underscore}_path(owner.get_parent)"),
           class: 'btn btn-info pull-right mr5 mb5',
           disable_with: 'Redirecting...'
       - else
-        = link_to "View #{parent_class.titleize}",
+        = link_to "View Source #{parent_class.titleize}",
           eval("#{parent_class.underscore}_path(owner.get_parent)"),
           class: 'btn btn-info pull-right mr5 mb5',
           disable_with: 'Redirecting...'
@@ -287,7 +287,7 @@ ruby:
       - else
         - parent_path = "#{parent_class.underscore}_path(owner.owner)"
 
-      = link_to "View #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
+      = link_to "View Source #{owner.respond_to?('owner_titleize') ? owner.owner_titleize : parent_class.titleize}",
         eval(parent_path),
         class: 'btn btn-info pull-right mr5 mb5',
         disable_with: 'Redirecting...'
@@ -308,6 +308,14 @@ ruby:
     = link_to owner.viewer_access ? 'Disable Viewer Access' : 'Enable Viewer Access',
       eval("viewer_access_#{owner_class}_path(owner)"),
       class: 'btn btn-warning pull-right mr5 mb5'
+
+  - when :add_records
+    = link_to 'Add Reports',
+      '#',
+      class: 'btn btn-success pull-right mr5 mb6',
+      id: 'add_records_btn',
+      'data-toggle' => 'modal',
+      'data-target' => '.bs-example-modal-lg'
 
     / TODO: add - else statement to handle unique cases/custom buttons for airlines
 

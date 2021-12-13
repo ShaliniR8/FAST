@@ -661,6 +661,9 @@ PrdgSession::Application.routes.draw do |map|
       get 'launch_new_object'
       get 'comment'
       get 'viewer_access'
+      get 'add_record'
+      get 'remove_record'
+      put 'ajax_update'
     end
     collection do
       post 'load_records'
@@ -670,6 +673,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'edit_section'
       post 'update_section'
       post "get_dataset"
+      post 'add_all_records'
     end
   end
   resources :hazards do

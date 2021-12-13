@@ -286,7 +286,7 @@ class SrasController < ApplicationController
 
     redirect_to errors_path unless has_access
 
-
+    @records = @sra.children.present? ? Record.where(id: @sra.children.map(&:child_id)) : []
     @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
     @owner = @sra
     load_options
@@ -294,6 +294,34 @@ class SrasController < ApplicationController
     @fields = Sra.get_meta_fields('show')
   end
 
+
+  def mitigate
+    @owner = Sra.find(params[:id])
+    @risk_type = 'Mitigate'
+
+    # base matrix
+    @frequency = (0..4).to_a.reverse
+    @like = Sra.get_likelihood
+    risk_matrix_initializer
+    # premium matrix
+    load_special_matrix_form('sra', 'mitigate', @owner)
+
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
+  end
+
+
+  def baseline
+    @owner = Sra.find(params[:id])
+    @risk_type = 'Baseline'
+
+    # base matrix
+    @frequency = (0..4).to_a.reverse
+    @like = Sra.get_likelihood
+    risk_matrix_initializer
+    # premium matrix
+    load_special_matrix_form('sra', 'baseline', @owner)
+    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
+  end
 
 
   def edit
@@ -305,6 +333,60 @@ class SrasController < ApplicationController
     form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
   end
 
+
+  def add_record
+    @sra = Sra.find(params[:id])
+    unwanted_ids = @sra.children.map(&:child_id)
+    @records_hash = Record.where({status: ['Open', 'Linked']}).keep_if{|r| unwanted_ids.exclude?(r.id)}.map{|r| [r.id, r.description]}.to_h
+    @instruction = "<p> Click anywhere on the <b>ROW</b> of the Reports you want to add to this SRA.</p>"
+
+    render :partial => 'add_record'
+  end
+
+
+  def add_all_records
+    @sra = Sra.find(params[:sra_id])
+    records_added_ids = params[:records_selected].chomp(',').split(',')
+
+    if records_added_ids.present?
+      records_added_ids.each do |r|
+        c = Child.create({child_type: 'Record', child_id: r.to_i, owner_type: 'Sra', owner_id: @sra.id})
+        @sra.children << c
+      end
+      @sra.save
+      message = "Report IDs #{records_added_ids.join(',')} added to this SRA"
+    else
+      message = "No reports added to this SRA"
+    end
+    flash[:notice] = message
+
+    Transaction.build_for(
+      @sra,
+      'Reports Added',
+      current_user.id,
+      message
+    )
+
+    redirect_to sra_path(@sra)
+  end
+
+
+  def remove_record
+    child = Child.where(owner_type: 'Sra', owner_id: params[:id].to_i, child_id: params[:record_id].to_i, child_type: 'Record').first rescue nil
+    child.destroy if child.present?
+
+    @sra = Sra.find(params[:id])
+    @records = @sra.children.present? ? Record.where(id: @sra.children.map(&:child_id)) : []
+
+    Transaction.build_for(
+      @sra,
+      'Report Removed',
+      current_user.id,
+      "Report ##{params[:record_id]} removed from this SRA"
+    )
+
+    render :json => {success: "Report removed from SRA", code: 200, deleted_id: params[:record_id].to_i}
+  end
 
 
   def new_hazard
@@ -416,27 +498,27 @@ class SrasController < ApplicationController
 
 
 
-  def mitigate
-    @owner = Sra.find(params[:id])
-    @risk_group = @owner.matrix_connection.matrix_group
-    load_options
-    mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
+  # def mitigate
+  #   @owner = Sra.find(params[:id])
+  #   @risk_group = @owner.matrix_connection.matrix_group
+  #   load_options
+  #   mitigate_special_matrix("sra", "mitigated_severity", "mitigated_probability")
 
-    @risk_type = 'Mitigate'
-    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
-  end
+  #   @risk_type = 'Mitigate'
+  #   render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
+  # end
 
 
 
-  def baseline
-    @owner = Sra.find(params[:id])
-    @risk_group = @owner.matrix_connection.matrix_group
-    form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
-    load_options
+  # def baseline
+  #   @owner = Sra.find(params[:id])
+  #   @risk_group = @owner.matrix_connection.matrix_group
+  #   form_special_matrix(@sra, "sra", "severity_extra", "probability_extra")
+  #   load_options
 
-    @risk_type = 'Baseline'
-    render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
-  end
+  #   @risk_type = 'Baseline'
+  #   render :partial => 'risk_matrices/panel_matrix/form_matrix/risk_modal'
+  # end
 
 
 

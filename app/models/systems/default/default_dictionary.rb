@@ -243,6 +243,14 @@ class DefaultDictionary
       access: proc { |owner:,user:,**op| priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true)
       },
     },
+    add_records: {
+      btn: :add_records,
+      btn_loc: [:inline],
+      access: proc { |owner:,user:,**op| (priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true) ||
+                                         priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true)) &&
+                                         owner.status != 'Completed' && CONFIG.srm::GENERAL[:add_reports_to_sra].present?
+      },
+    },
   }
 
   PANEL = {
