@@ -216,4 +216,16 @@ class AJTConfig < DefaultConfig
     'ASAP MOU Holder FAA Designator' => 'ProSafeT'
   })
 
+  CSV_FILE_USER_IMPORT = {
+    sso_id: :email,
+    filename: 'ajt_users.csv',
+    prev_filename: 'ajt_users_prior.csv',
+    destination_file_path:'lib/tasks',
+    target_file_path: 'lib',
+
+    # Please add clients emails
+    client_emails: ['taeho.kim@prodigiq.com']
+  }
+
+
 end

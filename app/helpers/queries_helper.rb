@@ -23,6 +23,8 @@ module QueriesHelper
         value = 'Something Went Wrong'
       end
     else
+      field[:field] = "submit_name" if field[:field] == "get_submitter_name"
+
       field_type = field[:type]
       value = strip_html_tag(record.send(field[:field]))
 

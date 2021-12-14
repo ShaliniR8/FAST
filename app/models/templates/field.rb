@@ -33,6 +33,11 @@ class Field < ActiveRecord::Base
   end
 
 
+  def export_label_for_asrs
+    self.label.tr(' ','_').downcase
+  end
+
+
 
   def get_label
     if self.show_label
@@ -126,7 +131,7 @@ class Field < ActiveRecord::Base
       ActiveSupport::TimeZone.all.map(&:name)
     else
       if options.present?
-        options.split(";")
+        options.gsub("\r\n", '').split(";")
       elsif custom_option_id.present?
         CONFIG.custom_options_by_id[custom_option_id].options.split(';') rescue []
       else

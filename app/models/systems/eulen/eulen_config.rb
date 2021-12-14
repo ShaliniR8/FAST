@@ -319,5 +319,15 @@ class EULENConfig < DefaultConfig
     end
   end
 
+  CSV_FILE_USER_IMPORT = {
+    sso_id: :email,
+    filename: 'eulen_users.csv',
+    prev_filename: 'eulen_users_prior.csv',
+    destination_file_path:'lib/tasks',
+    target_file_path: '/lib',
+
+    # Please add clients emails
+    client_emails: ['taeho.kim@prodigiq.com']
+  }
 
 end

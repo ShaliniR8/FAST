@@ -405,8 +405,18 @@ class Record < Sr::SafetyReportingBase
   end
 
 
+  def self.get_asrs_data_dictionary_path(template_name)
+    template_prefix = CONFIG::NASA_ASRS[:templates][template_name.strip()]
+    dirname = File.join([Rails.root] + ['asrs'])
+    FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
+    filename = "#{template_prefix}_data_dictionary.txt"
+    path = File.join([dirname] + [filename])
+    path
+  end
+
+
   def get_asrs_path
-    template_prefix = CONFIG::NASA_ASRS[:templates][template.name]
+    template_prefix = CONFIG::NASA_ASRS[:templates][template.name.strip()]
     dirname = File.join([Rails.root] + ['asrs'])
     FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
     filename = "#{template_prefix}_#{id}.xml"
@@ -416,7 +426,7 @@ class Record < Sr::SafetyReportingBase
 
 
   def create_asrs_report(path)
-    template_prefix = CONFIG::NASA_ASRS[:templates][template.name]
+    template_prefix = CONFIG::NASA_ASRS[:templates][template.name.strip()]
     main_tag = "Airline#{CONFIG::NASA_ASRS[:airline_number]}_#{template_prefix.upcase}"
     reporter_fields = %i(employee_number full_name email job_title address city state zipcode mobile_number work_phone_number)
     reporter_info = {}.tap do |hash|
@@ -449,7 +459,7 @@ class Record < Sr::SafetyReportingBase
 
         sftp.upload!(from, to)
       end
-
+      update_attribute(:asrs_sent, true)
       @log.info "Report ##{id} is sent to NASA successfully."
     rescue => error
       # NotifyMailer.notify_rake_errors(subject, error_message, location)
@@ -470,7 +480,7 @@ class Record < Sr::SafetyReportingBase
   def export_nasa_asrs
     path = get_asrs_path
     create_asrs_report(path)
-    update_attribute(:asrs_sent, true)
+    # update_attribute(:asrs_sent, true)
     remove_asrs_report(path) if send_asrs_report(from: path)
   end
 

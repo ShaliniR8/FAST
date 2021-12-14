@@ -185,7 +185,7 @@ class SJOConfig < DefaultConfig
     risk_definitions: {
       crimson:          { rating: 'INTOLERABLE',      cells: 'A/1, A/2, and B/1',                description: 'Acceptable as is. No further safety risk mitigation required.' },
       yellow:           { rating: 'TOLERABLE',  cells: 'A/4, B/3, and D/1',                      description: 'Can be tolerated based on the safety risk mitigation. It may require management decision to accept the risk.' },
-      mediumseagreen:   { rating: 'Low',       cells: 'A/5, B/5, C/4, C/5, D/3, D/4, and D/5',   description: 'Take immediate action to mitigate the risk or stop the activity. Perform priority safety risk mitigation to ensure additional or enhanced preventative controls are in place to bring down the safety risk index to tolerable.' }
+      mediumseagreen:   { rating: 'ACCEPTABLE',       cells: 'A/5, B/5, C/4, C/5, D/3, D/4, and D/5',   description: 'Take immediate action to mitigate the risk or stop the activity. Perform priority safety risk mitigation to ensure additional or enhanced preventative controls are in place to bring down the safety risk index to tolerable.' }
     },
 
   }

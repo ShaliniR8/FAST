@@ -5,7 +5,7 @@ module RecordHelper
 
 
   def get_field_tag(field)
-    return 'no_name' if field.export_label.blank?
-    field.export_label.gsub('&amp;', 'and').gsub(/[^0-9A-Za-z_]/, '')
+    return 'no_name' if field.export_label_for_asrs.blank?
+    field.export_label_for_asrs.gsub('&amp;', 'and').gsub(/[^0-9A-Za-z_]/, '')
   end
 end
