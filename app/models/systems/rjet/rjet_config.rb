@@ -23,7 +23,7 @@ class RJETConfig < DefaultConfig
     advanced_checklist_data_type:               true,
     auto_populate_nested_fields_visualizations: true,
     checklist_query:                            true,
-    query_processing_in_rake_task:              true,
+    query_processing_in_rake_task:              false,
 
     # TO BE REMOVED
     base_risk_matrix:             false,

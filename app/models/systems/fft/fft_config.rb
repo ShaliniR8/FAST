@@ -24,7 +24,7 @@ class FFTConfig < DefaultConfig
     base_risk_matrix:                  false,
     allow_reopen_forms:                false,
     has_root_causes:                   false,
-    query_processing_in_rake_task:     true,
+    query_processing_in_rake_task:     false,
   })
 
 

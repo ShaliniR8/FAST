@@ -87,7 +87,7 @@ class QueriesController < ApplicationController
         @object_type = Object.const_get(@owner.target)
         apply_query
 
-        total_records = @records.size
+        total_records = @records_ids.size
 
         query_result[:query_detail] = get_query_detail_json(@owner, total_records)
         query_result[:visualizations] = get_visualizations_json(@owner)
@@ -446,15 +446,39 @@ class QueriesController < ApplicationController
 
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
     @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
-    @object_type = Object.const_get(@owner.target)
+    @object_name = @owner.target
+    @object_type = Object.const_get(@object_name)
     @table_name = @object_type.table_name
-    @headers = @object_type.get_meta_fields('index')
-    if ['Record', 'Submission'].include?(@owner.target)
-      @headers = filter_submitter_name_header(@headers)
+    @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+
+    @columns = get_data_table_columns(@object_name)
+    @columns.delete_if {|x| x[:data] == 'get_additional_info_html'}
+    if @object_name == 'Record'
+      if !CONFIG.sr::GENERAL[:show_submitter_name]
+        if !current_user.global_admin?
+          @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      else
+        if !current_user.admin?
+          @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      end
     end
-    if ['Record', 'Submission', 'Report'].include?(@owner.target)
-      @headers = filter_event_title_header(@headers)
+
+    if @object_name == 'Sra' && !CONFIG.srm::GENERAL[:risk_assess_sras].present?
+      @columns.delete_if {|x| ["get_risk_classification", "get_risk_classification_after"].include?(x[:data])}
     end
+
+    @column_titles = @columns.map { |col| col[:title] }
+    @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+      (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+    }.select(&:present?)
+
+    @source_column_indices = @column_titles.map.with_index { |val, inx|
+      (val.downcase.include?('source of input')) ? inx : nil
+    }.select(&:present?)
+
+
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
     @template_fields = []
 
@@ -479,36 +503,13 @@ class QueriesController < ApplicationController
 
     @fields = @target_fields + @template_fields
 
-    if @title == "Submissions"
-      records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
-    elsif @title == "Reports"
-      records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
-    elsif @title == "Checklists"
-      if @owner.templates.include? '-1'
-        records = Checklist.where(template_id: nil).select { |x| x.owner_type != 'ChecklistHeader' }
-        templates_id = @owner.templates.clone
-        templates_id.delete('-1')
-        records +=  Checklist.where(template_id: templates_id)
-      else
-        records =  Checklist.where(template_id: @owner.templates).select { |x| x.owner_type != 'ChecklistHeader' }
-      end
-    else
-      records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
-    end
-
-    if @owner.target == "Checklist"
-      records = records.map(&:checklist_rows).flatten
-    end
-
-    @owner.query_conditions.each do |condition|
-      records = records & expand_emit(condition, records)
-    end
-
-    if @owner.target == "Checklist"
-      @records = records.map(&:checklist).flatten.uniq
-    else
-      @records = records
-    end
+    logger = Logger.new("log/time_queries.log")
+    time_before = Time.now
+    @records_ids = get_query_results_ids(@owner)
+    @target = @owner.target
+    @is_query_ready = true
+    time_after = Time.now
+    logger.info "[SQL]: #{time_after - time_before}"
   end
 
 

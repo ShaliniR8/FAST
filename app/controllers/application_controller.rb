@@ -1020,6 +1020,8 @@ class ApplicationController < ActionController::Base
       render json: SafetyReportingDatatable.new(view_context, current_user)
     when 'CorrectiveAction'
       render json: CorrectiveActionDatatable.new(view_context, current_user)
+    when 'Query'
+      render json: QueryDatatable.new(view_context, current_user)
     else # SA, SRA modules
       render json: ApplicationDatatable.new(view_context, current_user)
     end
