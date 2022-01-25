@@ -385,6 +385,9 @@ class QueriesController < ApplicationController
     @data = @data.map{ |x| [x[0].to_s, x[1..-1]].flatten}
     @data_ids = @data_ids.map{ |x| [x[0].to_s, x[1..-1]].flatten(1)}
 
+    # REMOVE unnecessary quotes
+    @data_ids = @data_ids.map{ |x| [x[0].gsub('"', '').gsub("\'", ''), x[1..-1]].flatten(1)}
+    
     @redirect_page = false
 
     if params[:nested_xaxis] == true.to_s
