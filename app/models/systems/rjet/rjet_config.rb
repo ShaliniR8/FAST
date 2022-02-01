@@ -86,7 +86,7 @@ class RJETConfig < DefaultConfig
         'location'  => 'Location',
       },
       'Description' => {
-        'eventDescription' => '',
+        'eventDescription' => 'Description',
       },
     },
   }
