@@ -168,15 +168,7 @@ class FaaReportsController < ApplicationController
     object_name = controller_name.classify
     @table = Object.const_get('Record')
     @fields = Record.get_meta_fields('index')
-    if !CONFIG.sr::GENERAL[:show_submitter_name]
-      if !current_user.global_admin?
-        @fields.delete_if {|x| x[:field] == 'get_submitter_name'}
-      end
-    else
-      if !current_user.admin?
-        @fields.delete_if {|x| x[:field] == 'get_submitter_name'}
-      end
-    end
+    @fields.delete_if {|x| x[:field] == 'get_submitter_name'}
     @title = params[:title]
     @records = Record.where(:id => params[:reports].split)
     render :partial => "table"

@@ -8,15 +8,7 @@ class Document < ActiveRecord::Base
 
 
   def self.get_categories
-    [
-     "ProSafeT Information",
-     "General Information",
-     "Safety Reporting Guides Information",
-     "Safety Assurance Guides Information",
-     "SRA(SRM) Guides Information",
-     "SMS IM Guides Information",
-     "Other"
-    ]
+    CONFIG::DOCUMENT_CATEGORIES
   end
 
   def self.get_tracking_identifiers

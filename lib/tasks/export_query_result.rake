@@ -318,7 +318,8 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
       if search_value.downcase == "Anonymous".downcase
         return records.select{|record| xor ^ (record.send(field[:field]).to_s.downcase == search_value.downcase)}
       else
-        matching_users = User.where("full_name = ?", search_value).map(&:full_name)
+        map_attr = ['responsible_user_id', 'approver_id'].include?(field[:field]) ? :id : :full_name
+        matching_users = User.where("full_name = ?", search_value).map(&map_attr)
         return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
       end
     when 'date', 'datetime'
@@ -341,7 +342,8 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
     when 'boolean_box', 'boolean'
       return records.select{|record| xor ^ ((record.send(field[:field]) ? 'Yes' : 'No').downcase == search_value.downcase)}
     when 'user'
-      matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&:full_name)
+      map_attr = ['responsible_user_id', 'approver_id'].include?(field[:field]) ? :id : :full_name
+      matching_users = User.where("full_name LIKE ?", "%#{search_value}%").map(&map_attr)
       return records.select{|record| xor ^ (matching_users.include? record.send(field[:field]))}
     when 'date', 'datetime'
       start_date = search_value.split("to")[0]

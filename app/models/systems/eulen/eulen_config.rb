@@ -45,6 +45,9 @@ class EULENConfig < DefaultConfig
   end
 
 
+  DOCUMENT_CATEGORIES = ["Eulen Manuals", "Airlines Manuals", "Standard Operating Procedures", "Local Operating Procedures", "Safety Alerts", "Team Focus Briefs", "Other"]
+
+
   FAA_INFO = {
     "CHDO"=>"XXX",
     "Region"=>"Anchorage",

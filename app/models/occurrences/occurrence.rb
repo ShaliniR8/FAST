@@ -25,6 +25,10 @@ class Occurrence < ActiveRecord::Base
     end
   end
 
+  def format_for_query
+    value.split("\r\n").map(&:strip).map{|value| "#{parent_section} > #{title} > #{value}"}.flatten.join('<br>').html_safe
+  end
+
   def title
     self.template.title
   end

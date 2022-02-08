@@ -75,6 +75,8 @@ class DefaultConfig
 
   }
 
+  DOCUMENT_CATEGORIES = ["ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
+
   LABELS = {
 
   }

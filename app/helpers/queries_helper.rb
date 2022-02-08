@@ -1,39 +1,39 @@
 module QueriesHelper
 
   # returns the formatted values of record's field
-  def get_val(record, field_arr, title = nil)
-    field = field_arr[0]
-    if field.is_a?(Field)
-      field_type = field.display_type
-      if record.class == Submission
-        value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
-        if value.nil? && title.present?
-          sf_f_ids = record.submission_fields.map(&:fields_id)
-          field = Field.where("label = ? AND id IN (?)", title, sf_f_ids).first
-          value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
-        end
-      elsif record.class == Record
-        value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
-        if value.nil? && title.present?
-          rf_f_ids = record.record_fields.map(&:fields_id)
-          field = Field.where("label = ? AND id IN (?)", title, rf_f_ids).first
-          value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
-        end
-      else
-        value = 'Something Went Wrong'
-      end
-    else
-      field[:field] = "submit_name" if field[:field] == "get_submitter_name"
+  # def get_val(record, field_arr, title = nil)
+  #   field = field_arr[0]
+  #   if field.is_a?(Field)
+  #     field_type = field.display_type
+  #     if record.class == Submission
+  #       value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
+  #       if value.nil? && title.present?
+  #         sf_f_ids = record.submission_fields.map(&:fields_id)
+  #         field = Field.where("label = ? AND id IN (?)", title, sf_f_ids).first
+  #         value = SubmissionField.where(fields_id: field.id, submissions_id: record.id)[0].value rescue nil
+  #       end
+  #     elsif record.class == Record
+  #       value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
+  #       if value.nil? && title.present?
+  #         rf_f_ids = record.record_fields.map(&:fields_id)
+  #         field = Field.where("label = ? AND id IN (?)", title, rf_f_ids).first
+  #         value = RecordField.where(fields_id: field.id, records_id: record.id)[0].value rescue nil
+  #       end
+  #     else
+  #       value = 'Something Went Wrong'
+  #     end
+  #   else
+  #     field[:field] = "submit_name" if field[:field] == "get_submitter_name"
 
-      field_type = field[:type]
-      value = strip_html_tag(record.send(field[:field]))
+  #     field_type = field[:type]
+  #     value = strip_html_tag(record.send(field[:field]))
 
-      if value.present? && field[:field].downcase.include?('get_source')
-        value = value.split.first
-      end
-    end
-    format_val(value, field_type, field_arr[1])
-  end
+  #     if value.present? && field[:field].downcase.include?('get_source')
+  #       value = value.split.first
+  #     end
+  #   end
+  #   format_val(value, field_type, field_arr[1])
+  # end
 
 
   # helper for get_val: formats value based on field type
@@ -50,7 +50,7 @@ module QueriesHelper
     when 'boolean_box', 'boolean'
       (value ? 'Yes' : 'No') rescue 'No'
     when 'checkbox'
-      value.split(';').map(&:strip) rescue nil
+      value.split(';').map(&:strip).map{|val| val.gsub("\"", '')} rescue nil
     when 'list'
       value.split('<br>').map(&:strip) rescue nil
     when 'category'
@@ -59,7 +59,7 @@ module QueriesHelper
       if value.is_a? Integer
         value
       else
-        value.strip rescue ''
+        value.strip.gsub("\"", '') rescue ''
       end
     end
   end
@@ -85,70 +85,70 @@ module QueriesHelper
 
 
   # returns an array that stores x_axis and series value pairs
-  def create_hash_array(records, x_axis_field, series_field)
-    x_axis_field_title = x_axis_field[0][:title].nil? ? x_axis_field[0][:label] : x_axis_field[0][:title]
-    series_field_title = series_field[0][:title].nil? ? series_field[0][:label] : series_field[0][:title]
+  # def create_hash_array(records, x_axis_field, series_field)
+  #   x_axis_field_title = x_axis_field[0][:title].nil? ? x_axis_field[0][:label] : x_axis_field[0][:title]
+  #   series_field_title = series_field[0][:title].nil? ? series_field[0][:label] : series_field[0][:title]
 
-    if records[0].class == Report
-      arr = records.inject([]) do |res, report|
-        rep_id = report.id
-        if x_axis_field[0].is_a?(Field) && series_field[0].is_a?(Field)
-          x_val = nil
-          y_val = nil
-          if report.records.present?
-            report.records.each do |rec|
-              x_val = get_val(rec, x_axis_field, x_axis_field_title)
-              report.records.each do |inner_rec|
-                y_val = get_val(inner_rec, series_field, series_field_title)
-                if x_val.present? && y_val.present?
-                  res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
-                end
-              end
-            end
-          end
-        elsif x_axis_field[0].is_a?(Field) && !series_field[0].is_a?(Field)
-          x_val = nil
-          y_val = get_val(report, series_field)
-          if report.records.present?
-            report.records.each do |rec|
-              x_val = get_val(rec, x_axis_field, x_axis_field_title)
-              if x_val.present? && y_val.present?
-                res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
-              end
-            end
-          end
-        elsif !x_axis_field[0].is_a?(Field) && series_field[0].is_a?(Field)
-          x_val = get_val(report, x_axis_field)
-          y_val = nil
-          if report.records.present?
-            report.records.each do |rec|
-              y_val = get_val(rec, series_field, series_field_title)
-              if x_val.present? && y_val.present?
-                res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
-              end
-            end
-          end
-        else
-          x_val = get_val(report, x_axis_field)
-          y_val = get_val(report, series_field)
-          if x_val.present? && y_val.present?
-            res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
-          end
-        end
-        res
-      end
-    else
-      arr = records.inject([]) do |res, record|
-        x_val = get_val(record, x_axis_field, x_axis_field_title)
-        y_val = get_val(record, series_field, series_field_title)
-        if x_val.present? && y_val.present?
-          res = populate_hash_to_be_created(res, x_val, y_val, record.id)
-        end
-        res
-      end
-    end
-    arr
-  end
+  #   if records[0].class == Report
+  #     arr = records.inject([]) do |res, report|
+  #       rep_id = report.id
+  #       if x_axis_field[0].is_a?(Field) && series_field[0].is_a?(Field)
+  #         x_val = nil
+  #         y_val = nil
+  #         if report.records.present?
+  #           report.records.each do |rec|
+  #             x_val = get_val(rec, x_axis_field, x_axis_field_title)
+  #             report.records.each do |inner_rec|
+  #               y_val = get_val(inner_rec, series_field, series_field_title)
+  #               if x_val.present? && y_val.present?
+  #                 res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
+  #               end
+  #             end
+  #           end
+  #         end
+  #       elsif x_axis_field[0].is_a?(Field) && !series_field[0].is_a?(Field)
+  #         x_val = nil
+  #         y_val = get_val(report, series_field)
+  #         if report.records.present?
+  #           report.records.each do |rec|
+  #             x_val = get_val(rec, x_axis_field, x_axis_field_title)
+  #             if x_val.present? && y_val.present?
+  #               res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
+  #             end
+  #           end
+  #         end
+  #       elsif !x_axis_field[0].is_a?(Field) && series_field[0].is_a?(Field)
+  #         x_val = get_val(report, x_axis_field)
+  #         y_val = nil
+  #         if report.records.present?
+  #           report.records.each do |rec|
+  #             y_val = get_val(rec, series_field, series_field_title)
+  #             if x_val.present? && y_val.present?
+  #               res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
+  #             end
+  #           end
+  #         end
+  #       else
+  #         x_val = get_val(report, x_axis_field)
+  #         y_val = get_val(report, series_field)
+  #         if x_val.present? && y_val.present?
+  #           res = populate_hash_to_be_created(res, x_val, y_val, rep_id)
+  #         end
+  #       end
+  #       res
+  #     end
+  #   else
+  #     arr = records.inject([]) do |res, record|
+  #       x_val = get_val(record, x_axis_field, x_axis_field_title)
+  #       y_val = get_val(record, series_field, series_field_title)
+  #       if x_val.present? && y_val.present?
+  #         res = populate_hash_to_be_created(res, x_val, y_val, record.id)
+  #       end
+  #       res
+  #     end
+  #   end
+  #   arr
+  # end
 
 
   # return 2D hash of x_axis and series values
@@ -177,9 +177,11 @@ module QueriesHelper
   end
 
 
-  def get_data_table_for_google_visualization_with_series(x_axis_field_arr:, series_field_arr:, records:, get_ids:)
+  # def get_data_table_for_google_visualization_with_series(x_axis_field_arr:, series_field_arr:, records:, get_ids:)
+  def get_data_table_for_google_visualization_with_series(x_axis_field_arr:, series_field_arr:, records_ids:, get_ids:, query:)
     # build array of hash to stores values for x_axis and series
-    arr = create_hash_array(records, x_axis_field_arr, series_field_arr)
+    # arr = create_hash_array(records, x_axis_field_arr, series_field_arr)
+    arr = create_hash_array_sql(x_axis_field_arr, series_field_arr, records_ids, get_ids, query)
     # create a hash to store the occurences of each element
     data_hash = Hash.new
     added_pairs = Hash.new
@@ -231,413 +233,922 @@ module QueriesHelper
   end
 
 
-  def get_data_table_for_google_visualization(x_axis_field_arr:, records:)
-    # x_axis_field_arr has only one hash inside
-    x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
+  # def get_data_table_for_google_visualization(x_axis_field_arr:, records:)
+  #   # x_axis_field_arr has only one hash inside
+  #   x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
 
-    data = [[x_axis_field_title, 'Count']]
+  #   data = [[x_axis_field_title, 'Count']]
 
-    if x_axis_field_arr[0].is_a?(Field) && records[0].class == Report
-      val_hash = Hash.new
-      all_vals = []
-      records.each do |report|
-        rep_id = report.id
-        if report.records.present?
-          vals = []
-          report.records.each do |rec|
-            val = get_val(rec, x_axis_field_arr, x_axis_field_title)
-            vals << val if val.present?
-            all_vals << val if val.present?
-          end
-          val_hash[rep_id] = vals
-        end
-      end
-      all_vals = all_vals.uniq.sort
-      all_vals.each do |v|
-        count = 0
-        val_hash.each do |key, value|
-          if value.include?(v)
-            count = count + 1
-          end
-        end
-        data << [v, count]
+  #   if x_axis_field_arr[0].is_a?(Field) && records[0].class == Report
+  #     val_hash = Hash.new
+  #     all_vals = []
+  #     records.each do |report|
+  #       rep_id = report.id
+  #       if report.records.present?
+  #         vals = []
+  #         report.records.each do |rec|
+  #           val = get_val(rec, x_axis_field_arr, x_axis_field_title)
+  #           vals << val if val.present?
+  #           all_vals << val if val.present?
+  #         end
+  #         val_hash[rep_id] = vals
+  #       end
+  #     end
+  #     all_vals = all_vals.uniq.sort
+  #     all_vals.each do |v|
+  #       count = 0
+  #       val_hash.each do |key, value|
+  #         if value.include?(v)
+  #           count = count + 1
+  #         end
+  #       end
+  #       data << [v, count]
+  #     end
+  #   else
+  #     records.map{|record| get_val(record, x_axis_field_arr, x_axis_field_title)}
+  #       .compact.flatten
+  #       .reject(&:blank?)
+  #       .inject(Hash.new(0)){|h, e| h[e] += 1; h}
+  #       .sort_by{|k,v| k}
+  #       .each{|pair| data << pair}
+
+  #   end
+  #   return data
+  # end
+
+
+  def get_mapped_data_for_field(field_arr:, records_ids:, query:)
+    target = query.target
+    field_title = field_arr[0][:title].nil? ? field_arr[0][:label] : field_arr[0][:title]
+    field = field_arr[0]
+    field_param = field_arr[1]
+    values = Hash.new
+
+    if field.is_a?(Field)
+      field_type = field.display_type
+      fields_ids = Template.preload(:categories, :fields).where(id: query.templates).map(&:fields).flatten.select{|x| x.label == field_title}.map(&:id)
+
+      if target == 'Report'
+        sr_records = Record.find_by_sql("SELECT records.id FROM records WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:id) rescue []
+
+        values = Record.find_by_sql("SELECT records.reports_id, record_fields.value FROM records INNER JOIN record_fields ON records.id = record_fields.records_id
+                                    WHERE (record_fields.fields_id IN (#{fields_ids.join(',')})
+                                    AND record_fields.records_id IN (#{sr_records.present? ? sr_records.join(',') : "NULL"}))")
+                                    .map{|r| [r.reports_id, format_val(r.value, field_type, field_param)]}.to_h rescue {}
+
+      elsif target == 'Record'
+        values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                              record_fields.records_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                              .map{|r| [r.records_id, format_val(r.value, field_type, field_param)]}.to_h rescue {}
+
+      elsif target == 'Submission'
+        values = SubmissionField.find_by_sql("SELECT submission_fields.submissions_id, submission_fields.value FROM submission_fields WHERE submission_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                                  submission_fields.submissions_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                                  .map{|r| [r.submissions_id, format_val(r.value, field_type, field_param)]}.to_h rescue {}
       end
     else
-      records.map{|record| get_val(record, x_axis_field_arr, x_axis_field_title)}
-        .compact.flatten
-        .reject(&:blank?)
-        .inject(Hash.new(0)){|h, e| h[e] += 1; h}
-        .sort_by{|k,v| k}
-        .each{|pair| data << pair}
+      field_type = field[:type]
+      field_name = map_condition_field(target, field[:title])
+      object_type = Object.const_get(target)
+
+      case field_name
+      when 'additional_info'
+        if target == 'Report'
+          sr_records = Report.find_by_sql("SELECT records.id FROM records WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:id) rescue []
+
+          sr_record_fields = RecordField.find_by_sql("SELECT record_fields.id FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+                                                      WHERE (record_fields.records_id IN (#{sr_records.present? ? sr_records.join(',') : "NULL"}) AND fields.additional_info = 1)")
+                                                      .map(&:id) rescue []
+
+          values = Record.find_by_sql("SELECT records.reports_id, record_fields.value FROM records INNER JOIN record_fields ON record_fields.records_id = records.id
+                                      WHERE record_fields.id in (#{sr_record_fields.present? ? sr_record_fields.join(',') : "NULL"})").map{|r| [r.reports_id, r.value]}.to_h rescue {}
+
+        else
+          values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+                                            WHERE (record_fields.records_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}) AND
+                                            fields.additional_info = 1)").map{|r| [r.records_id, r.value]}.to_h rescue {}
+
+        end
+
+      when 'record_type'
+        values = Template.find_by_sql("SELECT templates.name, records.id FROM templates INNER JOIN records ON records.templates_id = templates.id
+                                       WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map{|r| [r.id, r.name]}.to_h rescue {}
+
+      when 'included_reports'
+        values = Record.find_by_sql("SELECT records.reports_id, CONCAT(\'#\', records.id, \' (\', templates.name, \')\') AS inc_report FROM records
+                                    INNER JOIN templates ON records.templates_id = templates.id WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                    .map{|r| [r.reports_id, r.inc_report]}.to_h rescue {}
+
+      when 'included_reports_types'
+        values = Record.find_by_sql("SELECT records.reports_id, templates.name FROM records INNER JOIN templates ON records.templates_id = templates.id
+                                    WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map{|r| [r.reports_id, r.inc_report]}.to_h rescue {}
+
+      when 'included_occurrences', 'included_findings', 'source_of_input', 'meeting_host'
+        temp_values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        temp_values.each do |temp_val|
+          t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
+          if t_val.present? && field[:field].downcase.include?('get_source')
+            t_val = t_val.split.first
+          end
+          t_val = format_val(t_val, field_type, field_param)
+
+          values[temp_val.id] = t_val
+        end
+
+      when 'included_verifications'
+        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) as ver_status FROM verifications WHERE
+                                          (verifications.owner_type = \'#{target}\' AND verifications.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))")
+                                          .map{|r| [r.owner_id, r.ver_status]}.to_h rescue {}
+
+      when 'cause_label'
+        values = Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) as cause_label FROM causes WHERE
+                                    (causes.owner_type = \'#{target}\' AND causes.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))")
+                                    .map{|r| [r.owner_id, r.cause_label]}.to_h rescue {}
+
+      when 'cause_value'
+        values = Cause.find_by_sql("SELECT causes.owner_id, causes.value FROM causes WHERE (causes.owner_type = \'#{target}\'
+                                    AND causes.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))")
+                                    .map{|r| [r.owner_id, (r.value.present? ? (r.value == 1 ? 'Yes' : (r.value == 0 ? 'No' : r.value)) : "")]}.to_h rescue {}
+
+      when 'initial_risk_score'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                          .map{|r| [r.id, r.get_risk_score]}.to_h rescue {}
+
+      when 'mitigated_risk_score'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                          .map{|r| [r.id, r.get_risk_score_after]}.to_h rescue {}
+
+      when 'users_id'
+        values = User.find_by_sql("SELECT users.full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
+                                  WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                  .map{|r| [r.id, r.full_name]}.to_h rescue {}
+
+      when 'user_id'
+        values = User.find_by_sql("SELECT users.full_name, submissions.id FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                   WHERE submissions.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                   .map{|r| [r.id, r.full_name]}.to_h rescue {}
+
+      when 'responsible_user_id', 'approver_id', 'created_by_id'
+        table_name = object_type.table_name
+        values = User.find_by_sql("SELECT users.full_name, #{table_name}.id FROM users INNER JOIN #{table_name} ON #{table_name}.#{field_name} = users.id
+                                            WHERE #{table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map{|r| [r.id, r.full_name]}.to_h rescue {}
+
+      else
+        values = object_type.find_by_sql("SELECT #{object_type.table_name}.id, #{object_type.table_name}.#{field_name} FROM #{object_type.table_name}
+                                          WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                          .map{|r| [r.id, format_val(r.send(field_name.to_sym), field_type, field_param)]}.to_h rescue {}
+      end
 
     end
-    return data
+
+    values
   end
 
 
-  def get_data_ids_table_for_google_visualization(x_axis_field_arr:, records:)
-    # x_axis_field_arr has only one hash inside
+  def create_hash_array_sql(x_axis_field_arr, series_field_arr, records_ids, get_ids, query)
+    x_vals_by_id = get_mapped_data_for_field(field_arr: x_axis_field_arr, records_ids: records_ids, query: query)
+    y_vals_by_id = get_mapped_data_for_field(field_arr: series_field_arr, records_ids: records_ids, query: query)
+    res = []
+
+    records_ids.each do |rid|
+      x_vals = x_vals_by_id[rid.to_i]
+      y_vals = y_vals_by_id[rid.to_i]
+      res = populate_hash_to_be_created(res, x_vals, y_vals, rid)
+    end
+
+    res
+  end
+
+
+  def get_data_table_for_google_visualization_sql(x_axis_field_arr:, records_ids:, query:)
+    target = query.target
     x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
+    data = [[x_axis_field_title, 'Count']]
+    field = x_axis_field_arr[0]
+    field_param = x_axis_field_arr[1]
+    values = []
 
-    data_ids = [[x_axis_field_title, 'IDs']]
+    if field.is_a?(Field)
+      field_type = field.display_type
+      fields_ids = Template.preload(:categories, :fields).where(id: query.templates).map(&:fields).flatten.select{|x| x.label == x_axis_field_title}.map(&:id)
 
-    if x_axis_field_arr[0].is_a?(Field) && records[0].class == Report
-      val_hash = Hash.new
-      records.each do |report|
-        rep_id = report.id
-        if report.records.present?
-          report.records.each do |rec|
-            val = get_val(rec, x_axis_field_arr, x_axis_field_title)
-            if val.present?
-              if val_hash[val].present?
-                if val_hash[val].exclude?(rep_id)
-                  val_hash[val] << rep_id
-                end
-              else
-                val_hash[val] = []
-                val_hash[val] << rep_id
-              end
-            end
-          end
-        end
-      end
-      val_hash = val_hash.sort
-      val_hash.each do |k, v|
-        data_ids << [k, v]
+      if target == 'Report'
+        sr_records = Record.find_by_sql("SELECT records.id FROM records WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:id) rescue []
+
+        values = RecordField.find_by_sql("SELECT record_fields.value FROM record_fields WHERE (record_fields.fields_id IN (#{fields_ids.join(',')})
+                                              AND record_fields.records_id IN (#{sr_records.present? ? sr_records.join(',') : "NULL"}))")
+                                              .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
+
+      elsif target == 'Record'
+        values = RecordField.find_by_sql("SELECT record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                              record_fields.records_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                              .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
+
+      elsif target == 'Submission'
+        values = SubmissionField.find_by_sql("SELECT submission_fields.value FROM submission_fields WHERE submission_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                                  submission_fields.submissions_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                                  .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
+
       end
     else
-      records.map{|record| [record.id, get_val(record, x_axis_field_arr, x_axis_field_title)] }
-        .reject{ |x| x[1].nil? || x[1].empty? rescue true } # remove empty records
-        .inject(Hash.new([])) { |hash, element|
-          record_id = element[0]
-          x_axis_field_value = element[1]
+      field_type = field[:type]
+      field_name = map_condition_field(target, field[:title])
+      object_type = Object.const_get(target)
 
-          if x_axis_field_value.class == 'Array' && x_axis_field_value.size > 1
-            x_axis_field_value.each do |x_value|
-              if hash[[x_value]].present?
-                hash[[x_value]] << record_id
-              else
-                hash[[x_value]] = []
-                hash[[x_value]] << record_id
+      case field_name
+      when 'additional_info'
+        if target == 'Report'
+          sr_records = Report.find_by_sql("SELECT records.id FROM records WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:id) rescue []
+          values = RecordField.find_by_sql("SELECT record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+                                            WHERE (record_fields.records_id IN (#{sr_records.present? ? sr_records.join(',') : "NULL"}) AND
+                                            fields.additional_info = 1)").map(&:value) rescue []
+
+        else
+          values = RecordField.find_by_sql("SELECT record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+                                            WHERE (record_fields.records_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}) AND
+                                            fields.additional_info = 1)").map(&:value) rescue []
+
+        end
+
+      when 'record_type'
+        values = Template.find_by_sql("SELECT templates.name FROM templates INNER JOIN records ON records.templates_id = templates.id
+                                       WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:name) rescue []
+
+      when 'included_reports'
+        values = Record.find_by_sql("SELECT CONCAT(\'#\', records.id, \' (\', templates.name, \')\') AS inc_report FROM records INNER JOIN templates ON records.templates_id = templates.id
+                                    WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:inc_report) rescue []
+
+      when 'included_reports_types'
+        values = Record.find_by_sql("SELECT templates.name FROM templates INNER JOIN records ON templates.id = records.templates_id
+                                    WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:name) rescue []
+
+      when 'included_occurrences', 'included_findings', 'source_of_input', 'meeting_host'
+        temp_values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        temp_values.each do |temp_val|
+          t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
+          if t_val.present? && field[:field].downcase.include?('get_source')
+            t_val = t_val.split.first
+          end
+          t_val = format_val(t_val, field_type, field_param)
+          values << t_val
+        end
+
+      when 'included_verifications'
+        values = Verification.find_by_sql("SELECT CONCAT(verifications.status, \', \', verifications.verify_date) as ver_status FROM verifications WHERE
+                                          (verifications.owner_type = \'#{target}\' AND verifications.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))")
+                                          .map(&:ver_status) rescue []
+
+      when 'cause_label'
+        values = Cause.find_by_sql("SELECT CONCAT(causes.category, \' > \', causes.attr) as cause_label FROM causes WHERE
+                                    (causes.owner_type = \'#{target}\' AND causes.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))").map(&:cause_label) rescue []
+
+      when 'cause_value'
+        values = Cause.find_by_sql("SELECT causes.value FROM causes WHERE (causes.owner_type = \'#{target}\'
+                                    AND causes.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))")
+                                    .map{|c| c.value.present? ? (c.value == 1 ? 'Yes' : (c.value == 0 ? 'No' : c.value)) : ""} rescue []
+
+      when 'initial_risk_score'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                          .map(&:get_risk_score) rescue []
+
+      when 'mitigated_risk_score'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                          .map(&:get_risk_score_after) rescue []
+
+      when 'user_id'
+        values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                  WHERE submissions.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:full_name) rescue []
+
+      when 'users_id'
+        values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN records ON records.users_id = users.id
+                                  WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:full_name) rescue []
+
+      when 'responsible_user_id', 'approver_id', 'created_by_id'
+        table_name = object_type.table_name
+        values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN #{table_name} ON #{table_name}.#{field_name} = users.id
+                                   WHERE #{table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:full_name) rescue []
+
+      else
+        values = object_type.find_by_sql("SELECT #{object_type.table_name}.#{field_name} FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                          .map(&field_name.to_sym).map{|val| format_val(val, field_type, field_param)} rescue []
+      end
+
+    end
+
+    values.compact
+          .flatten
+          .reject(&:blank?)
+          .inject(Hash.new(0)){|h, e| h[e] += 1; h}
+          .sort_by{|k,v| k}
+          .each{|pair| data << pair}
+
+    data
+  end
+
+
+  def get_data_ids_table_for_google_visualization_sql(x_axis_field_arr:, records_ids:, query:)
+    target = query.target
+    x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
+    data_ids = [[x_axis_field_title, 'IDs']]
+    field = x_axis_field_arr[0]
+    field_param = x_axis_field_arr[1]
+    values = []
+    val_hash = Hash.new { |hash, key| hash[key] = [] }
+
+    if field.is_a?(Field)
+      field_type = field.display_type
+      fields_ids = Template.preload(:categories, :fields).where(id: query.templates).map(&:fields).flatten.select{|x| x.label == x_axis_field_title}.map(&:id)
+
+      if target == 'Report'
+        sr_records_map = Record.find_by_sql("SELECT records.id, records.reports_id FROM records WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                             .map{|r| [r.id, r.reports_id]}.to_h rescue {}
+
+        values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields WHERE (record_fields.fields_id IN (#{fields_ids.join(',')})
+                                              AND record_fields.records_id IN (#{sr_records_map.keys.present? ? sr_records_map.keys.join(',') : "NULL"}))") rescue []
+
+        values.each do |val|
+          temp_val = format_val(val.value, field_type, field_param)
+          if temp_val.class.name == 'Array'
+            if temp_val.present?
+              temp_val.each do |t_val|
+                val_hash[t_val] << sr_records_map[val.records_id] if t_val.present? && sr_records_map[val.records_id].present?
               end
             end
           else
-            if hash[x_axis_field_value].present?
-              hash[x_axis_field_value] << record_id
-            else
-              hash[x_axis_field_value] = []
-              hash[x_axis_field_value] << record_id
+            val_hash[temp_val] << sr_records_map[val.records_id] if temp_val.present? && sr_records_map[val.records_id].present?
+          end
+        end
+
+      elsif target == 'Record'
+        values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                              record_fields.records_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          temp_val = format_val(val.value, field_type, field_param)
+          if temp_val.class.name == 'Array'
+            if temp_val.present?
+              temp_val.each do |t_val|
+                val_hash[t_val] << val.records_id if t_val.present?
+              end
             end
-          end
-          ; hash
-        }
-        .sort_by{|k,v| k}
-        .each{|pair| data_ids << pair}
-    end
-    return data_ids
-  end
-
-
-  def get_data_visualization_with_series(x_axis_field_arr:, series_field_arr:, records:, get_ids:)
-    # build array of hash to stores values for x_axis and series
-    arr = create_hash_array(records, x_axis_field_arr, series_field_arr)
-    # create a hash to store the occurences of each element
-    data_hash = Hash.new
-
-    arr.each do |record|
-      x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
-      series = record[:series].blank? ? 'N/A' : record[:series]
-
-      if x_axis.is_a?(Array) && series.is_a?(Array)
-        x_axis.each do |x|
-          series.each do |y|
-            populate_hash(data_hash, x, y, get_ids: get_ids, record_id: record[:id])
+          else
+            val_hash[temp_val] << val.records_id if temp_val.present?
           end
         end
-      elsif x_axis.is_a?(Array)
-        x_axis.each do |x|
-          populate_hash(data_hash, x, series, get_ids: get_ids, record_id: record[:id])
+
+      elsif target == 'Submission'
+        values = SubmissionField.find_by_sql("SELECT submission_fields.submissions_id, submission_fields.value FROM submission_fields WHERE submission_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                                  submission_fields.submissions_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          temp_val = format_val(val.value, field_type, field_param)
+          if temp_val.class.name == 'Array'
+            if temp_val.present?
+              temp_val.each do |t_val|
+                val_hash[t_val] << val.submissions_id if t_val.present?
+              end
+            end
+          else
+            val_hash[temp_val] << val.submissions_id if temp_val.present?
+          end
         end
-      elsif series.is_a?(Array)
-        series.each do |y|
-          populate_hash(data_hash, x_axis, y, get_ids: get_ids, record_id: record[:id])
-        end
-      else
-        populate_hash(data_hash, x_axis, series, get_ids: get_ids, record_id: record[:id])
+
       end
-    end
-
-    # get first row and first column values
-    series = data_hash.values.map(&:keys).flatten.uniq
-    x_axis = data_hash.keys
-    # creates final data array: 2-D array
-    # row1 = [params[:x_axis]] << series.sort
-    row1 = series.sort
-    data = [row1.flatten]
-    x_axis.sort.each do |x|
-      data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
-    end
-
-    return data
-  end
-
-
-  def get_data_visualization(x_axis_field_arr:, records:)
-    # x_axis_field_arr has only one hash inside
-    x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
-
-    data = []
-
-    records.map{|record| get_val(record, x_axis_field_arr, x_axis_field_title)}
-      .compact.flatten
-      .reject(&:blank?)
-      .inject(Hash.new(0)){|h, e| h[e] += 1; h}
-      .sort_by{|k,v| k}
-      .each{|pair| data << pair}
-
-    return data
-  end
-
-
-
-  def get_data(visualization)
-    @x_axis_field = get_field(@owner, @object_type, visualization.x_axis)
-
-    if visualization.series.present?
-      @series_field = get_field(@owner, @object_type, visualization.series)
-      get_data_visualization_with_series(x_axis_field_arr: @x_axis_field,
-                                         series_field_arr: @series_field,
-                                         records: @records,
-                                         get_ids: false)
     else
-      get_data_visualization(x_axis_field_arr: @x_axis_field, records: @records)
-    end
-  end
+      field_type = field[:type]
+      field_name = map_condition_field(target, field[:title])
+      object_type = Object.const_get(target)
 
+      case field_name
+      when 'additional_info'
+        if target == 'Report'
+          sr_records_map = Record.find_by_sql("SELECT records.id, records.reports_id FROM records WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})")
+                                             .map{|r| [r.id, r.reports_id]}.to_h rescue {}
 
-  def get_query_detail_json(owner, total_records)
-    attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
+          values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+                                            WHERE (record_fields.records_id IN (#{sr_records_map.keys.present? ? sr_records_map.keys.join(',') : "NULL"}) AND
+                                            fields.additional_info = 1)") rescue []
 
-    {
-      id: owner.id,
-      title: owner.title,
-      created_by: User.find(owner.created_by_id).full_name,
-      target: owner.send(attributes["get_target"]),
-      templates: owner.send(attributes["get_templates"]),
-      total: total_records
-    }
-  end
+          values.each do |val|
+            val_hash[val.value] << sr_records_map[val.records_id] if val.value.present? && sr_records_map[val.records_id].present?
+          end
 
+        else
+          values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+                                            WHERE (record_fields.records_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}) AND
+                                            fields.additional_info = 1)") rescue []
 
-  def get_visualization_w_series_json(data, visualization)
-    visualization_hash = {}
-    visualization_hash[:x_axis] = visualization.x_axis
-    visualization_hash[:series] = visualization.series
-    visualization_hash[:data] = {}
+          values.each do |val|
+            val_hash[val.value] << val.records_id if val.value.present?
+          end
 
-    series_names = data[0]
-    x_axis_names_with_count = data[1..-1]
+        end
 
-    x_axis_names_with_count.each do |x_axis|
+      when 'record_type'
+        values = Template.find_by_sql("SELECT records.id, templates.name FROM templates INNER JOIN records ON records.templates_id = templates.id
+                                       WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
 
-      x_axis_name = x_axis[0]
-      x_axis_counts = x_axis[1..-1]
+        values.each do |val|
+          val_hash[val.name] << val.id if val.name.present?
+        end
 
-      visualization_hash[:data][x_axis_name] = {}
+      when 'included_reports'
+        values = Record.find_by_sql("SELECT records.reports_id, CONCAT(\'#\', records.id, \' (\', templates.name, \')\') AS inc_report FROM records INNER JOIN templates ON records.templates_id = templates.id
+                                    WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
 
-      series_names.each_with_index do |series, index|
-        visualization_hash[:data][x_axis_name][series] = x_axis_counts[index]
-      end
-    end
+        values.each do |val|
+          val_hash[val.inc_report] << val.reports_id if val.inc_report.present?
+        end
 
-    visualization_hash
-  end
+      when 'included_reports_types'
+        values = Record.find_by_sql("SELECT records.reports_id, templates.name FROM templates INNER JOIN records ON templates.id = records.templates_id
+                                    WHERE records.reports_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
 
+        values.each do |val|
+          val_hash[val.name] << val.reports_id if val.name.present?
+        end
 
-  def get_visualization_wo_series_json(data, visualization)
-    visualization_hash = {}
-    visualization_hash[:x_axis] = visualization.x_axis
-    visualization_hash[:series] = "NA"
-    visualization_hash[:data] = {}
+      when 'included_occurrences', 'included_findings', 'source_of_input', 'meeting_host'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
 
-    data.each do |x_axis|
-      x_axis_name = x_axis[0]
-      x_axis_count = x_axis[1]
-
-      visualization_hash[:data][x_axis_name] = x_axis_count
-    end
-
-    visualization_hash
-  end
-
-
-  def get_visualizations_json(owner)
-    query_result_visualizations = []
-
-    owner.visualizations.each do |visualization|
-
-      data = get_data(visualization)
-
-      if visualization.series.present?
-        query_result_visualizations << get_visualization_w_series_json(data, visualization)
-      else
-        query_result_visualizations << get_visualization_wo_series_json(data, visualization)
-      end
-    end
-
-    query_result_visualizations
-  end
-
-
-  def get_data_visualization_with_series(x_axis_field_arr:, series_field_arr:, records:, get_ids:)
-    # build array of hash to stores values for x_axis and series
-    arr = create_hash_array(records, x_axis_field_arr, series_field_arr)
-    # create a hash to store the occurences of each element
-    data_hash = Hash.new
-
-    arr.each do |record|
-      x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
-      series = record[:series].blank? ? 'N/A' : record[:series]
-
-      if x_axis.is_a?(Array) && series.is_a?(Array)
-        x_axis.each do |x|
-          series.each do |y|
-            populate_hash(data_hash, x, y, get_ids: get_ids, record_id: record[:id])
+        values.each do |val|
+          temp_val = strip_html_tag(val.send(field[:field]))
+          if temp_val.present? && field[:field].downcase.include?('get_source')
+            temp_val = temp_val.split.first
+          end
+          temp_val = format_val(temp_val, field_type, field_param)
+          if temp_val.class.name == 'Array'
+            if temp_val.present?
+              temp_val.each do |t_val|
+                val_hash[t_val] << val.id if t_val.present?
+              end
+            end
+          else
+            val_hash[temp_val] << val.id if temp_val.present?
           end
         end
-      elsif x_axis.is_a?(Array)
-        x_axis.each do |x|
-          populate_hash(data_hash, x, series, get_ids: get_ids, record_id: record[:id])
+
+      when 'included_verifications'
+        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) as ver_status FROM verifications WHERE
+                                          (verifications.owner_type = \'#{target}\' AND verifications.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))") rescue []
+
+        values.each do |val|
+          val_hash[val.ver_status] << val.owner_id if val.ver_status.present?
         end
-      elsif series.is_a?(Array)
-        series.each do |y|
-          populate_hash(data_hash, x_axis, y, get_ids: get_ids, record_id: record[:id])
+
+      when 'cause_label'
+        values = Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) as cause_label FROM causes WHERE
+                                    (causes.owner_type = \'#{target}\' AND causes.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))") rescue []
+
+        values.each do |val|
+          val_hash[val.cause_label] << val.owner_id if val.cause_label.present?
         end
+
+      when 'cause_value'
+        values = Cause.find_by_sql("SELECT causes.owner_id, causes.value FROM causes WHERE (causes.owner_type = \'#{target}\'
+                                    AND causes.owner_id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"}))") rescue []
+
+        values.each do |val|
+          temp_val = val.value.present? ? (val.value == 1 ? 'Yes' : (val.value == 0 ? 'No' : val.value)) : ""
+          val_hash[temp_val] << val.owner_id if temp_val.present?
+        end
+
+      when 'initial_risk_score'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          temp_val = val.send(:get_risk_score)
+          val_hash[temp_val] << val.id if temp_val.present?
+        end
+
+      when 'mitigated_risk_score'
+        values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          temp_val = val.send(:get_risk_score_after)
+          val_hash[temp_val] << val.id if temp_val.present?
+        end
+
+      when 'user_id'
+        values = User.find_by_sql("SELECT submissions.id, users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                  WHERE submissions.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          val_hash[val.full_name] << val.id if val.full_name.present?
+        end
+
+      when 'users_id'
+        values = User.find_by_sql("SELECT records.id, users.full_name FROM users INNER JOIN records ON records.users_id = users.id
+                                   WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          val_hash[val.full_name] << val.id if val.full_name.present?
+        end
+
+      when 'responsible_user_id', 'approver_id', 'created_by_id'
+        table_name = object_type.table_name
+        values = User.find_by_sql("SELECT users.full_name, #{table_name}.id FROM users INNER JOIN #{table_name} ON #{table_name}.#{field_name} = users.id
+                                   WHERE #{table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          val_hash[val.full_name] << val.id if val.full_name.present?
+        end
+
       else
-        populate_hash(data_hash, x_axis, series, get_ids: get_ids, record_id: record[:id])
+        values = object_type.find_by_sql("SELECT #{object_type.table_name}.id, #{object_type.table_name}.#{field_name} FROM #{object_type.table_name}
+                                          WHERE #{object_type.table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+
+        values.each do |val|
+          temp_val = val.send(field_name.to_sym)
+          temp_val = format_val(temp_val, field_type, field_param)
+          if temp_val.class.name == 'Array'
+            if temp_val.present?
+              temp_val.each do |t_val|
+                val_hash[t_val] << val.id if t_val.present?
+              end
+            end
+          else
+            val_hash[temp_val] << val.id if temp_val.present?
+          end
+        end
+
       end
     end
 
-    # get first row and first column values
-    series = data_hash.values.map(&:keys).flatten.uniq
-    x_axis = data_hash.keys
-    # creates final data array: 2-D array
-    # row1 = [params[:x_axis]] << series.sort
-    row1 = series.sort
-    data = [row1.flatten]
-    x_axis.sort.each do |x|
-      data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
+    val_hash = val_hash.sort_by{|k,v| k}
+    val_hash.each do |k, v|
+      data_ids << [k, v]
     end
 
-    return data
+    data_ids
   end
 
 
-  def get_data_visualization(x_axis_field_arr:, records:)
-    # x_axis_field_arr has only one hash inside
-    x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
+  # def get_data_ids_table_for_google_visualization(x_axis_field_arr:, records:)
+  #   # x_axis_field_arr has only one hash inside
+  #   x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
 
-    data = []
+  #   data_ids = [[x_axis_field_title, 'IDs']]
 
-    records.map{|record| get_val(record, x_axis_field_arr)}
-      .compact.flatten
-      .reject(&:blank?)
-      .inject(Hash.new(0)){|h, e| h[e] += 1; h}
-      .sort_by{|k,v| k}
-      .each{|pair| data << pair}
+  #   if x_axis_field_arr[0].is_a?(Field) && records[0].class == Report
+  #     val_hash = Hash.new
+  #     records.each do |report|
+  #       rep_id = report.id
+  #       if report.records.present?
+  #         report.records.each do |rec|
+  #           val = get_val(rec, x_axis_field_arr, x_axis_field_title)
+  #           if val.present?
+  #             if val_hash[val].present?
+  #               if val_hash[val].exclude?(rep_id)
+  #                 val_hash[val] << rep_id
+  #               end
+  #             else
+  #               val_hash[val] = []
+  #               val_hash[val] << rep_id
+  #             end
+  #           end
+  #         end
+  #       end
+  #     end
+  #     val_hash = val_hash.sort
+  #     val_hash.each do |k, v|
+  #       data_ids << [k, v]
+  #     end
+  #   else
+  #     records.map{|record| [record.id, get_val(record, x_axis_field_arr, x_axis_field_title)] }
+  #       .reject{ |x| x[1].nil? || x[1].empty? rescue true } # remove empty records
+  #       .inject(Hash.new([])) { |hash, element|
+  #         record_id = element[0]
+  #         x_axis_field_value = element[1]
 
-    return data
-  end
-
-
-
-  def get_data(visualization)
-    @x_axis_field = get_field(@owner, @object_type, visualization.x_axis)
-
-    if visualization.series.present?
-      @series_field = get_field(@owner, @object_type, visualization.series)
-      get_data_visualization_with_series(x_axis_field_arr: @x_axis_field,
-                                         series_field_arr: @series_field,
-                                         records: @records,
-                                         get_ids: false)
-    else
-      get_data_visualization(x_axis_field_arr: @x_axis_field, records: @records)
-    end
-  end
-
-
-  def get_query_detail_json(owner, total_records)
-    attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
-
-    {
-      id: owner.id,
-      title: owner.title,
-      created_by: User.find(owner.created_by_id).full_name,
-      target: owner.send(attributes["get_target"]),
-      templates: owner.send(attributes["get_templates"]),
-      total: total_records
-    }
-  end
-
-
-  def get_visualization_w_series_json(data, visualization)
-    visualization_hash = {}
-    visualization_hash[:x_axis] = visualization.x_axis
-    visualization_hash[:series] = visualization.series
-    visualization_hash[:data] = {}
-
-    series_names = data[0]
-    x_axis_names_with_count = data[1..-1]
-
-    x_axis_names_with_count.each do |x_axis|
-
-      x_axis_name = x_axis[0]
-      x_axis_counts = x_axis[1..-1]
-
-      visualization_hash[:data][x_axis_name] = {}
-
-      series_names.each_with_index do |series, index|
-        visualization_hash[:data][x_axis_name][series] = x_axis_counts[index]
-      end
-    end
-
-    visualization_hash
-  end
+  #         if x_axis_field_value.class.name == 'Array' && x_axis_field_value.size > 1
+  #           x_axis_field_value.each do |x_value|
+  #             if hash[[x_value]].present?
+  #               hash[[x_value]] << record_id
+  #             else
+  #               hash[[x_value]] = []
+  #               hash[[x_value]] << record_id
+  #             end
+  #           end
+  #         else
+  #           if hash[x_axis_field_value].present?
+  #             hash[x_axis_field_value] << record_id
+  #           else
+  #             hash[x_axis_field_value] = []
+  #             hash[x_axis_field_value] << record_id
+  #           end
+  #         end
+  #         ; hash
+  #       }
+  #       .sort_by{|k,v| k}
+  #       .each{|pair| data_ids << pair}
+  #   end
+  #   return data_ids
+  # end
 
 
-  def get_visualization_wo_series_json(data, visualization)
-    visualization_hash = {}
-    visualization_hash[:x_axis] = visualization.x_axis
-    visualization_hash[:series] = "NA"
-    visualization_hash[:data] = {}
+  # def get_data_visualization_with_series(x_axis_field_arr:, series_field_arr:, records:, get_ids:)
+  #   # build array of hash to stores values for x_axis and series
+  #   arr = create_hash_array(records, x_axis_field_arr, series_field_arr)
+  #   # create a hash to store the occurences of each element
+  #   data_hash = Hash.new
 
-    data.each do |x_axis|
-      x_axis_name = x_axis[0]
-      x_axis_count = x_axis[1]
+  #   arr.each do |record|
+  #     x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
+  #     series = record[:series].blank? ? 'N/A' : record[:series]
 
-      visualization_hash[:data][x_axis_name] = x_axis_count
-    end
+  #     if x_axis.is_a?(Array) && series.is_a?(Array)
+  #       x_axis.each do |x|
+  #         series.each do |y|
+  #           populate_hash(data_hash, x, y, get_ids: get_ids, record_id: record[:id])
+  #         end
+  #       end
+  #     elsif x_axis.is_a?(Array)
+  #       x_axis.each do |x|
+  #         populate_hash(data_hash, x, series, get_ids: get_ids, record_id: record[:id])
+  #       end
+  #     elsif series.is_a?(Array)
+  #       series.each do |y|
+  #         populate_hash(data_hash, x_axis, y, get_ids: get_ids, record_id: record[:id])
+  #       end
+  #     else
+  #       populate_hash(data_hash, x_axis, series, get_ids: get_ids, record_id: record[:id])
+  #     end
+  #   end
 
-    visualization_hash
-  end
+  #   # get first row and first column values
+  #   series = data_hash.values.map(&:keys).flatten.uniq
+  #   x_axis = data_hash.keys
+  #   # creates final data array: 2-D array
+  #   # row1 = [params[:x_axis]] << series.sort
+  #   row1 = series.sort
+  #   data = [row1.flatten]
+  #   x_axis.sort.each do |x|
+  #     data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
+  #   end
+
+  #   return data
+  # end
 
 
-  def get_visualizations_json(owner)
-    query_result_visualizations = []
+  # def get_data_visualization(x_axis_field_arr:, records:)
+  #   # x_axis_field_arr has only one hash inside
+  #   x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
 
-    owner.visualizations.each do |visualization|
+  #   data = []
 
-      data = get_data(visualization)
+  #   records.map{|record| get_val(record, x_axis_field_arr, x_axis_field_title)}
+  #     .compact.flatten
+  #     .reject(&:blank?)
+  #     .inject(Hash.new(0)){|h, e| h[e] += 1; h}
+  #     .sort_by{|k,v| k}
+  #     .each{|pair| data << pair}
 
-      if visualization.series.present?
-        query_result_visualizations << get_visualization_w_series_json(data, visualization)
-      else
-        query_result_visualizations << get_visualization_wo_series_json(data, visualization)
-      end
-    end
+  #   return data
+  # end
 
-    query_result_visualizations
-  end
+
+
+  # def get_data(visualization)
+  #   @x_axis_field = get_field(@owner, @object_type, visualization.x_axis)
+
+  #   if visualization.series.present?
+  #     @series_field = get_field(@owner, @object_type, visualization.series)
+  #     get_data_visualization_with_series(x_axis_field_arr: @x_axis_field,
+  #                                        series_field_arr: @series_field,
+  #                                        records: @records,
+  #                                        get_ids: false)
+  #   else
+  #     get_data_visualization(x_axis_field_arr: @x_axis_field, records: @records)
+  #   end
+  # end
+
+
+  # def get_query_detail_json(owner, total_records)
+  #   attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
+
+  #   {
+  #     id: owner.id,
+  #     title: owner.title,
+  #     created_by: User.find(owner.created_by_id).full_name,
+  #     target: owner.send(attributes["get_target"]),
+  #     templates: owner.send(attributes["get_templates"]),
+  #     total: total_records
+  #   }
+  # end
+
+
+  # def get_visualization_w_series_json(data, visualization)
+  #   visualization_hash = {}
+  #   visualization_hash[:x_axis] = visualization.x_axis
+  #   visualization_hash[:series] = visualization.series
+  #   visualization_hash[:data] = {}
+
+  #   series_names = data[0]
+  #   x_axis_names_with_count = data[1..-1]
+
+  #   x_axis_names_with_count.each do |x_axis|
+
+  #     x_axis_name = x_axis[0]
+  #     x_axis_counts = x_axis[1..-1]
+
+  #     visualization_hash[:data][x_axis_name] = {}
+
+  #     series_names.each_with_index do |series, index|
+  #       visualization_hash[:data][x_axis_name][series] = x_axis_counts[index]
+  #     end
+  #   end
+
+  #   visualization_hash
+  # end
+
+
+  # def get_visualization_wo_series_json(data, visualization)
+  #   visualization_hash = {}
+  #   visualization_hash[:x_axis] = visualization.x_axis
+  #   visualization_hash[:series] = "NA"
+  #   visualization_hash[:data] = {}
+
+  #   data.each do |x_axis|
+  #     x_axis_name = x_axis[0]
+  #     x_axis_count = x_axis[1]
+
+  #     visualization_hash[:data][x_axis_name] = x_axis_count
+  #   end
+
+  #   visualization_hash
+  # end
+
+
+  # def get_visualizations_json(owner)
+  #   query_result_visualizations = []
+
+  #   owner.visualizations.each do |visualization|
+
+  #     data = get_data(visualization)
+
+  #     if visualization.series.present?
+  #       query_result_visualizations << get_visualization_w_series_json(data, visualization)
+  #     else
+  #       query_result_visualizations << get_visualization_wo_series_json(data, visualization)
+  #     end
+  #   end
+
+  #   query_result_visualizations
+  # end
+
+
+  # def get_data_visualization_with_series(x_axis_field_arr:, series_field_arr:, records:, get_ids:)
+  #   # build array of hash to stores values for x_axis and series
+  #   arr = create_hash_array(records, x_axis_field_arr, series_field_arr)
+  #   # create a hash to store the occurences of each element
+  #   data_hash = Hash.new
+
+  #   arr.each do |record|
+  #     x_axis = record[:x_axis].blank? ? 'N/A' : record[:x_axis]
+  #     series = record[:series].blank? ? 'N/A' : record[:series]
+
+  #     if x_axis.is_a?(Array) && series.is_a?(Array)
+  #       x_axis.each do |x|
+  #         series.each do |y|
+  #           populate_hash(data_hash, x, y, get_ids: get_ids, record_id: record[:id])
+  #         end
+  #       end
+  #     elsif x_axis.is_a?(Array)
+  #       x_axis.each do |x|
+  #         populate_hash(data_hash, x, series, get_ids: get_ids, record_id: record[:id])
+  #       end
+  #     elsif series.is_a?(Array)
+  #       series.each do |y|
+  #         populate_hash(data_hash, x_axis, y, get_ids: get_ids, record_id: record[:id])
+  #       end
+  #     else
+  #       populate_hash(data_hash, x_axis, series, get_ids: get_ids, record_id: record[:id])
+  #     end
+  #   end
+
+  #   # get first row and first column values
+  #   series = data_hash.values.map(&:keys).flatten.uniq
+  #   x_axis = data_hash.keys
+  #   # creates final data array: 2-D array
+  #   # row1 = [params[:x_axis]] << series.sort
+  #   row1 = series.sort
+  #   data = [row1.flatten]
+  #   x_axis.sort.each do |x|
+  #     data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
+  #   end
+
+  #   return data
+  # end
+
+
+  # def get_data_visualization(x_axis_field_arr:, records:)
+  #   # x_axis_field_arr has only one hash inside
+  #   x_axis_field_title = x_axis_field_arr[0][:title].nil? ? x_axis_field_arr[0][:label] : x_axis_field_arr[0][:title]
+
+  #   data = []
+
+  #   records.map{|record| get_val(record, x_axis_field_arr)}
+  #     .compact.flatten
+  #     .reject(&:blank?)
+  #     .inject(Hash.new(0)){|h, e| h[e] += 1; h}
+  #     .sort_by{|k,v| k}
+  #     .each{|pair| data << pair}
+
+  #   return data
+  # end
+
+
+
+  # def get_data(visualization)
+  #   @x_axis_field = get_field(@owner, @object_type, visualization.x_axis)
+
+  #   if visualization.series.present?
+  #     @series_field = get_field(@owner, @object_type, visualization.series)
+  #     get_data_visualization_with_series(x_axis_field_arr: @x_axis_field,
+  #                                        series_field_arr: @series_field,
+  #                                        records: @records,
+  #                                        get_ids: false)
+  #   else
+  #     get_data_visualization(x_axis_field_arr: @x_axis_field, records: @records)
+  #   end
+  # end
+
+
+  # def get_query_detail_json(owner, total_records)
+  #   attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
+
+  #   {
+  #     id: owner.id,
+  #     title: owner.title,
+  #     created_by: User.find(owner.created_by_id).full_name,
+  #     target: owner.send(attributes["get_target"]),
+  #     templates: owner.send(attributes["get_templates"]),
+  #     total: total_records
+  #   }
+  # end
+
+
+  # def get_visualization_w_series_json(data, visualization)
+  #   visualization_hash = {}
+  #   visualization_hash[:x_axis] = visualization.x_axis
+  #   visualization_hash[:series] = visualization.series
+  #   visualization_hash[:data] = {}
+
+  #   series_names = data[0]
+  #   x_axis_names_with_count = data[1..-1]
+
+  #   x_axis_names_with_count.each do |x_axis|
+
+  #     x_axis_name = x_axis[0]
+  #     x_axis_counts = x_axis[1..-1]
+
+  #     visualization_hash[:data][x_axis_name] = {}
+
+  #     series_names.each_with_index do |series, index|
+  #       visualization_hash[:data][x_axis_name][series] = x_axis_counts[index]
+  #     end
+  #   end
+
+  #   visualization_hash
+  # end
+
+
+  # def get_visualization_wo_series_json(data, visualization)
+  #   visualization_hash = {}
+  #   visualization_hash[:x_axis] = visualization.x_axis
+  #   visualization_hash[:series] = "NA"
+  #   visualization_hash[:data] = {}
+
+  #   data.each do |x_axis|
+  #     x_axis_name = x_axis[0]
+  #     x_axis_count = x_axis[1]
+
+  #     visualization_hash[:data][x_axis_name] = x_axis_count
+  #   end
+
+  #   visualization_hash
+  # end
+
+
+  # def get_visualizations_json(owner)
+  #   query_result_visualizations = []
+
+  #   owner.visualizations.each do |visualization|
+
+  #     data = get_data(visualization)
+
+  #     if visualization.series.present?
+  #       query_result_visualizations << get_visualization_w_series_json(data, visualization)
+  #     else
+  #       query_result_visualizations << get_visualization_wo_series_json(data, visualization)
+  #     end
+  #   end
+
+  #   query_result_visualizations
+  # end
 
 
   def get_query_results_ids(query)
@@ -654,13 +1165,14 @@ module QueriesHelper
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name} WHERE
             #{target_table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})").map(&:id)
     elsif query.target == 'Checklist'
+      template_ids = checklist_custom_query(query, nil, nil)
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name} WHERE
-            #{target_table_name}.templates_id IN (#{checklist_custom_query(query, nil, nil).join(',')})").map(&:id)
+            #{target_table_name}.template_id IN (#{template_ids.present? ? template_ids.join(',') : "NULL"})").map(&:id)
     else
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name}").map(&:id)
     end
 
-    ids
+    ids.compact.uniq
   end
 
 
@@ -877,12 +1389,12 @@ module QueriesHelper
       case query.target
       when 'Submission'
         str = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE (#{str}
-        AND #{table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')}) AND completed=1)").map(&:id).to_s
+        AND #{table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')}) AND completed=1)").map(&:id).to_s rescue []
       when 'Record'
         str = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE (#{str}
-        AND #{table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')}))").map(&:id).to_s
+        AND #{table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')}))").map(&:id).to_s rescue []
       else
-        str = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE #{str}").map(&:id).to_s
+        str = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE #{str}").map(&:id).to_s rescue []
       end
     end
 
@@ -920,8 +1432,8 @@ module QueriesHelper
     when 'additional_info'
       fields_ids = Field.find_by_sql("SELECT fields.id FROM fields INNER JOIN categories ON fields.categories_id = categories.id
                                         WHERE (categories.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})
-                                        AND fields.additional_info = 1)").map(&:id)
-      ids = RecordField.find_by_sql("SELECT record_fields.records_id FROM record_fields WHERE (record_fields.fields_id IN (#{fields_ids}) AND LOWER(record_fields.value) #{comparison_string})").map(&:records_id)
+                                        AND fields.additional_info = 1)").map(&:id) rescue []
+      ids = RecordField.find_by_sql("SELECT record_fields.records_id FROM record_fields WHERE (record_fields.fields_id IN (#{fields_ids}) AND LOWER(record_fields.value) #{comparison_string})").map(&:records_id) rescue ""
 
     when 'record_type'
       ids = Record.find_by_sql("SELECT records.id FROM records INNER JOIN templates ON records.templates_id = templates.id
@@ -937,11 +1449,24 @@ module QueriesHelper
                                 records.status = \'Linked\' AND LOWER(templates.name) #{comparison_string}").map(&:reports_id) rescue ""
 
     when 'included_occurrences'
-      ids = Occurrence.find_by_sql("SELECT occurrences.owner_id FROM occurrences WHERE (owner_type=\'#{query.target}\' AND
+      if condition.field_name == "Full #{object_type.find_top_level_section.label}"
+        case condition.logic
+        when 'Equals To', 'Contains'
+          ids = Occurrence.find_by_sql("SELECT occurrences.* FROM occurrences WHERE occurrences.owner_type=\'#{query.target}\'")
+                                          .keep_if{|occurrence| occurrence.format_for_query.downcase.include?(search_value)}.map(&:owner_id) rescue ""
+        when 'Not Equal To', 'Does Not Contain'
+          ids = Occurrence.find_by_sql("SELECT occurrences.* FROM occurrences WHERE occurrences.owner_type=\'#{query.target}\'")
+                                          .keep_if{|occurrence| occurrence.format_for_query.downcase.exclude?(search_value)}.map(&:owner_id) rescue ""
+        end
+
+      else
+        ids = Occurrence.find_by_sql("SELECT occurrences.owner_id FROM occurrences WHERE (occurrences.owner_type=\'#{query.target}\' AND
                                                                   LOWER(occurrences.value) #{comparison_string})").map(&:owner_id) rescue ""
+      end
 
     when 'included_verifications'
-      ids = Verification.find_by_sql("SELECT verifications.owner_id FROM verifications WHERE LOWER(CONCAT(verifications.status, \', \', verifications.verify_date)) #{comparison_string}").map(&:owner_id) rescue ""
+      ids = Verification.find_by_sql("SELECT verifications.owner_id FROM verifications WHERE (verifications.owner_type=\'#{query.target}\' AND
+                                     LOWER(CONCAT(verifications.status, \', \', verifications.verify_date)) #{comparison_string})").map(&:owner_id) rescue ""
 
     when 'included_findings'
       case condition.logic
@@ -960,7 +1485,7 @@ module QueriesHelper
       end
 
     when 'cause_label'
-      ids = Cause.find_by_sql("SELECT causes.owner_id From causes WHERE (causes.owner_type = \'#{query.target}\' AND LOWER(CONCAT(causes.category, \' > \', causes.attr)) #{comparison_string})").map(&:owner_id) rescue ""
+      ids = Cause.find_by_sql("SELECT causes.owner_id FROM causes WHERE (causes.owner_type = \'#{query.target}\' AND LOWER(CONCAT(causes.category, \' > \', causes.attr)) #{comparison_string})").map(&:owner_id) rescue ""
 
     when 'cause_value'
       search_value = search_value.include?('yes') ? 1 : (search_value.include?('no') ? 0 : search_value)
@@ -988,12 +1513,12 @@ module QueriesHelper
     else
       if query.target != 'Checklist'
         # All Safety Reporting Template cases
-        object_field_type = table_name == 'records' ? Object.const_get('RecordField') : Object.const_get('SubmissionField')
-        parent_id_attribute = table_name == 'records' ? 'records_id' : 'submissions_id'
+        object_field_type = ['records', 'reports'].include?(table_name) ? Object.const_get('RecordField') : Object.const_get('SubmissionField')
+        parent_id_attribute = ['records', 'reports'].include?(table_name) ? 'records_id' : 'submissions_id'
         object_field_table_name = object_field_type.table_name
         template_fields = Field.find_by_sql("SELECT fields.id, fields.data_type, fields.display_type, fields.nested_field_value
-                                            FROM fields INNER JOIN categories ON categories.id=fields.categories_id WHERE categories.templates_id IN (#{query.templates.join(',')})
-                                            AND fields.label=\'#{condition.field_name}\'") rescue nil
+                                            FROM fields INNER JOIN categories ON categories.id=fields.categories_id WHERE categories.templates_id
+                                            IN (#{query.templates.present? ? query.templates.join(',') : "NULL"}) AND fields.label=\'#{condition.field_name}\'") rescue nil
 
         if template_fields.present?
           template_fields.each do |template_field|
@@ -1022,7 +1547,7 @@ module QueriesHelper
                     str = ""
                   end
                 else
-                  str = "LOWER(#{object_field_table_name}.value) = \'#{search_value}\'"
+                  str = "LOWER(TRIM(#{object_field_table_name}.value)) = \'#{search_value}\'"
                 end
               end
 
@@ -1049,7 +1574,7 @@ module QueriesHelper
                     str = ""
                   end
                 else
-                  str = "LOWER(#{object_field_table_name}.value) <> \'#{search_value}\'"
+                  str = "LOWER(TRIM(#{object_field_table_name}.value)) <> \'#{search_value}\'"
                 end
               end
 
@@ -1076,7 +1601,7 @@ module QueriesHelper
                     str = ""
                   end
                 else
-                  str = "LOWER(#{object_field_table_name}.value) LIKE \'%#{search_value}%\'"
+                  str = "LOWER(TRIM(#{object_field_table_name}.value)) LIKE \'%#{search_value}%\'"
                 end
               end
 
@@ -1103,7 +1628,7 @@ module QueriesHelper
                     str = ""
                   end
                 else
-                  str = "LOWER(#{object_field_table_name}.value) NOT LIKE \'%#{search_value}%\'"
+                  str = "LOWER(TRIM(#{object_field_table_name}.value)) NOT LIKE \'%#{search_value}%\'"
                 end
               end
 
@@ -1142,10 +1667,10 @@ module QueriesHelper
 
             if str.present?
               if query.target == 'Report'
-                temp_ids = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym)
-                str = Record.find_by_sql("SELECT records.reports_id FROM records WHERE records.id in (#{temp_ids.join(",")})").map(&:reports_id)
+                temp_ids = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym) rescue []
+                str = Record.find_by_sql("SELECT records.reports_id FROM records WHERE records.id IN (#{temp_ids.present? ? temp_ids.join(",") : "NULL"})").map(&:reports_id) rescue []
               else
-                str = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym)
+                str = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym) rescue []
               end
               ids = ids | str
             end
@@ -1386,7 +1911,7 @@ module QueriesHelper
     mapping_hash['Report']["#{Report.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Report']["Full #{Report.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Report']['Event Date/Time'] = 'event_date'
-    mapping_hash['Report']['Event Title'] = 'description'
+    mapping_hash['Report']['Event Title'] = 'name'
     mapping_hash['Report']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Report']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
     mapping_hash['Report']['Meeting Minutes'] = 'minutes'
@@ -1643,7 +2168,7 @@ module QueriesHelper
     mapping_hash['Checklist']['Checklist Header'] = 'checklist_get_header'
     mapping_hash['Checklist']['Template'] = 'checklist_get_template'
 
-    return mapping_hash[target][condition_field].present? ? mapping_hash[target][condition_field] : condition_field.downcase.underscore
+    return mapping_hash[target][condition_field].present? ? mapping_hash[target][condition_field] : condition_field.downcase.gsub(' ','_')
   end
 
 

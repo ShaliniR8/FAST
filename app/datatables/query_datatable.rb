@@ -119,7 +119,7 @@ class QueryDatatable
 
   def query_records_sql(search_string, join_tables)
     res = []
-    search_string << "id IN (#{@ids.join(',')})"
+    search_string << "#{object.table_name}.id IN (#{@ids.join(',')})"
 
     res = object.joins(join_tables)
             .where(search_string.join(' and '))
