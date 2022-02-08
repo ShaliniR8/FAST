@@ -44,7 +44,8 @@ swal({
         update: function(event, ui){
           $('.field_group', this).each(function(index, elem) {
             $('.form-field-order', this).val(index);
-            // $('.form-field-order', this).addClass("changed");
+            $('.form-field-order', this).addClass("changed");
+            $('.form-control', this).addClass("changed");
           });
         }
       });
