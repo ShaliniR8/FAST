@@ -139,6 +139,7 @@
           $('.field_group', this).each(function(index, elem) {
             $('.form-field-order', this).val(index);
             $(this).closest('.to_delete').find(".form-control-id, .form-field-order").addClass('changed');
+            $('.form-control', this).addClass("changed");
           });
         }
       });
