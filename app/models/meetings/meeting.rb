@@ -53,6 +53,15 @@ class Meeting < ProsafetBase
   end
 
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    keys = Meeting.get_meta_fields(nil).select { |val| (val[:visible].split(',') & visible_fields).any? }
+                                          .map { |key| key[:field].to_s }
+
+    keys
+  end
+
+
   def participants
     parts = []
     invitations.each do |inv|

@@ -476,7 +476,8 @@ class QueriesController < ApplicationController
 
     @columns = get_data_table_columns(@object_name)
     @columns.delete_if {|x| x[:data] == 'get_additional_info_html'}
-    if @object_name == 'Record'
+
+    if ['Record', 'Submission'].include?(@owner.target)
       if !CONFIG.sr::GENERAL[:show_submitter_name]
         if !current_user.global_admin?
           @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
@@ -484,6 +485,18 @@ class QueriesController < ApplicationController
       else
         if !current_user.admin?
           @columns.delete_if {|x| x[:data] == 'get_submitter_name'}
+        end
+      end
+    end
+
+    if ['Record', 'Submission', 'Report'].include?(@owner.target)
+      if !CONFIG.sr::GENERAL[:show_event_title_in_query]
+        if !current_user.global_admin?
+          @columns.delete_if {|x| x[:data] == 'description'}
+        end
+      else
+        if !current_user.admin?
+          @columns.delete_if {|x| x[:data] == 'description'}
         end
       end
     end
@@ -525,14 +538,9 @@ class QueriesController < ApplicationController
     end
 
     @fields = @target_fields + @template_fields
-
-    logger = Logger.new("log/time_queries.log")
-    time_before = Time.now
     @records_ids = get_query_results_ids(@owner)
     @target = @owner.target
     @is_query_ready = true
-    time_after = Time.now
-    logger.info "[SQL]: #{time_after - time_before}"
   end
 
 
@@ -575,91 +583,91 @@ class QueriesController < ApplicationController
   # end
 
 
-  def apply_query_with_file
-    if !session[:mode].present?
-      redirect_to choose_module_home_index_path
-      return
-    end
-    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
-    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
-    @object_type = Object.const_get(@owner.target)
-    @table_name = @object_type.table_name
-    @headers = @object_type.get_meta_fields('index')
-    if ['Record', 'Submission'].include?(@owner.target)
-      @headers = filter_submitter_name_header(@headers)
-    end
-    if ['Record', 'Submission', 'Report'].include?(@owner.target)
-      @headers = filter_event_title_header(@headers)
-    end
+  # def apply_query_with_file
+  #   if !session[:mode].present?
+  #     redirect_to choose_module_home_index_path
+  #     return
+  #   end
+  #   adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
+  #   @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
+  #   @object_type = Object.const_get(@owner.target)
+  #   @table_name = @object_type.table_name
+  #   @headers = @object_type.get_meta_fields('index')
+  #   if ['Record', 'Submission'].include?(@owner.target)
+  #     @headers = filter_submitter_name_header(@headers)
+  #   end
+  #   if ['Record', 'Submission', 'Report'].include?(@owner.target)
+  #     @headers = filter_event_title_header(@headers)
+  #   end
 
-    @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
-    @template_fields = []
+  #   @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
+  #   @template_fields = []
     
 
-    if @owner.target == "Checklist"
-      # @owner.templates
-    else
-      Template.preload(:categories, :fields)
-        .where(id:  @owner.templates)
-        .map(&:fields)
-        .flatten
-        .uniq{|field| field.label}
-        .each{|field|
-        @template_fields << {
-          title: field.label,
-          field: field.label,
-          data_type: field.data_type,
-          field_type: field.display_type,
-          nested_field_title: field.nested_field_value
-        }
-      }
-    end
+  #   if @owner.target == "Checklist"
+  #     # @owner.templates
+  #   else
+  #     Template.preload(:categories, :fields)
+  #       .where(id:  @owner.templates)
+  #       .map(&:fields)
+  #       .flatten
+  #       .uniq{|field| field.label}
+  #       .each{|field|
+  #       @template_fields << {
+  #         title: field.label,
+  #         field: field.label,
+  #         data_type: field.data_type,
+  #         field_type: field.display_type,
+  #         nested_field_title: field.nested_field_value
+  #       }
+  #     }
+  #   end
     
-    @fields = @target_fields + @template_fields
+  #   @fields = @target_fields + @template_fields
 
-    query_file_path = "/public/queries/#{params[:id]}.yml"
-    query_file_full_path = File.join([Rails.root] + [query_file_path])
+  #   query_file_path = "/public/queries/#{params[:id]}.yml"
+  #   query_file_full_path = File.join([Rails.root] + [query_file_path])
 
-    # append 'processing_' to avoid race condition
-    # ex. "/public/queries/processing_1234.yml"
-    query_processing_file_full_path = query_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+  #   # append 'processing_' to avoid race condition
+  #   # ex. "/public/queries/processing_1234.yml"
+  #   query_processing_file_full_path = query_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
 
-    first_run_query = (not File.exist? query_processing_file_full_path) && (not File.exist? query_file_full_path)
+  #   first_run_query = (not File.exist? query_processing_file_full_path) && (not File.exist? query_file_full_path)
   
-    @is_query_ready = !first_run_query
+  #   @is_query_ready = !first_run_query
 
-    # 1) RUN QUERY
-    if first_run_query
-      @records = []
-      @status_msg = 'PROCESSING (Please revisit the page. Notification will be sent out once the query is ready)'
-      @query_status = "new"
+  #   # 1) RUN QUERY
+  #   if first_run_query
+  #     @records = []
+  #     @status_msg = 'PROCESSING (Please revisit the page. Notification will be sent out once the query is ready)'
+  #     @query_status = "new"
 
-      call_rake 'save_query_result',
-        title: @title,
-        owner_id: @owner.id,
-        object_type: @object_type,
-        file_path: query_file_full_path,
-        user_id: current_user.id,
-        processing_file_path: query_processing_file_full_path
+  #     call_rake 'save_query_result',
+  #       title: @title,
+  #       owner_id: @owner.id,
+  #       object_type: @object_type,
+  #       file_path: query_file_full_path,
+  #       user_id: current_user.id,
+  #       processing_file_path: query_processing_file_full_path
 
-    # 2) QUERY PROCESSING..
-    elsif File.exist? query_processing_file_full_path
-      @records = []
-      @status_msg = 'STILL PROCESSING (Please revisit the page later)'
-      @query_status = "new"
+  #   # 2) QUERY PROCESSING..
+  #   elsif File.exist? query_processing_file_full_path
+  #     @records = []
+  #     @status_msg = 'STILL PROCESSING (Please revisit the page later)'
+  #     @query_status = "new"
 
-    # 3) DISPLAY QUERY RESULT
-    elsif File.exist? query_file_full_path
-      @records = YAML.load(File.read(query_file_full_path))
+  #   # 3) DISPLAY QUERY RESULT
+  #   elsif File.exist? query_file_full_path
+  #     @records = YAML.load(File.read(query_file_full_path))
 
-      file_updated_at = File.mtime(query_file_full_path)
-                          .in_time_zone(CONFIG::GENERAL[:time_zone])
-                          .strftime('%a, %d %b %Y %l:%M %p')
+  #     file_updated_at = File.mtime(query_file_full_path)
+  #                         .in_time_zone(CONFIG::GENERAL[:time_zone])
+  #                         .strftime('%a, %d %b %Y %l:%M %p')
 
-      @status_msg = "Last Updated At #{file_updated_at}"
-      @query_status = "done"
-    end
-  end
+  #     @status_msg = "Last Updated At #{file_updated_at}"
+  #     @query_status = "done"
+  #   end
+  # end
 
 
   # def get_records

@@ -331,8 +331,9 @@ module QueriesHelper
         end
 
       when 'record_type'
-        values = Template.find_by_sql("SELECT templates.name, records.id FROM templates INNER JOIN records ON records.templates_id = templates.id
-                                       WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map{|r| [r.id, r.name]}.to_h rescue {}
+        table_name = object_type.table_name
+        values = Template.find_by_sql("SELECT templates.name, #{table_name}.id FROM templates INNER JOIN #{table_name} ON #{table_name}.templates_id = templates.id
+                                       WHERE #{table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map{|r| [r.id, r.name]}.to_h rescue {}
 
       when 'included_reports'
         values = Record.find_by_sql("SELECT records.reports_id, CONCAT(\'#\', records.id, \' (\', templates.name, \')\') AS inc_report FROM records
@@ -472,8 +473,9 @@ module QueriesHelper
         end
 
       when 'record_type'
-        values = Template.find_by_sql("SELECT templates.name FROM templates INNER JOIN records ON records.templates_id = templates.id
-                                       WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:name) rescue []
+        table_name = object_type.table_name
+        values = Template.find_by_sql("SELECT templates.name FROM templates INNER JOIN #{table_name} ON #{table_name}.templates_id = templates.id
+                                       WHERE #{table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})").map(&:name) rescue []
 
       when 'included_reports'
         values = Record.find_by_sql("SELECT CONCAT(\'#\', records.id, \' (\', templates.name, \')\') AS inc_report FROM records INNER JOIN templates ON records.templates_id = templates.id
@@ -647,8 +649,9 @@ module QueriesHelper
         end
 
       when 'record_type'
-        values = Template.find_by_sql("SELECT records.id, templates.name FROM templates INNER JOIN records ON records.templates_id = templates.id
-                                       WHERE records.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
+        table_name = object_type.table_name
+        values = Template.find_by_sql("SELECT #{table_name}.id, templates.name FROM templates INNER JOIN #{table_name} ON #{table_name}.templates_id = templates.id
+                                       WHERE #{table_name}.id IN (#{records_ids.present? ? records_ids.join(',') : "NULL"})") rescue []
 
         values.each do |val|
           val_hash[val.name] << val.id if val.name.present?
@@ -1163,11 +1166,12 @@ module QueriesHelper
       ids = eval(cond_str)
     elsif ['Submission', 'Record'].include?(query.target)
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name} WHERE
-            #{target_table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})").map(&:id)
+            #{target_table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})
+            #{query.target == 'Submission' ? " AND completed = 1" : ""}").map(&:id)
     elsif query.target == 'Checklist'
-      template_ids = checklist_custom_query(query, nil, nil)
+      checklist_ids = checklist_custom_query(query, nil, nil)
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name} WHERE
-            #{target_table_name}.template_id IN (#{template_ids.present? ? template_ids.join(',') : "NULL"})").map(&:id)
+            #{target_table_name}.id IN (#{checklist_ids.present? ? checklist_ids.join(',') : "NULL"})").map(&:id)
     else
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name}").map(&:id)
     end
@@ -1185,7 +1189,8 @@ module QueriesHelper
 
   def generate_query_string(query)
     target_table_name = Object.const_get(query.target).table_name
-    sql = "SELECT #{target_table_name}.* FROM #{target_table_name} WHERE #{target_table_name}.id is NOT NULL"
+    sql = "SELECT #{target_table_name}.* FROM #{target_table_name} WHERE #{target_table_name}.id IS NOT NULL"
+    sql = sql + " AND completed = 1" if target_table_name == 'submissions'
 
     if query.query_conditions.present?
       cond_str = generate_ids_string(query, generate_parseable_string(query))
@@ -1196,12 +1201,12 @@ module QueriesHelper
       if ids.present?
         sql = sql + " AND id IN (#{ids})"
       else
-        sql = "SELECT #{target_table_name}.* FROM #{target_table_name} WHERE #{target_table_name}.id = NULL"
+        sql = "SELECT #{target_table_name}.* FROM #{target_table_name} WHERE #{target_table_name}.id IS NULL"
       end
     elsif ['Submission', 'Record'].include?(query.target)
       sql = sql + " AND #{target_table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})"
     elsif query.target == 'Checklist'
-      sql = sql + " AND #{target_table_name}.template_id IN (#{checklist_custom_query(query, nil, nil).join(',')})"
+      sql = sql + " AND #{target_table_name}.id IN (#{checklist_custom_query(query, nil, nil).join(',')})"
     end
 
     sql
@@ -1268,7 +1273,7 @@ module QueriesHelper
         when 'date','datetime'
           start_date = search_value.split("to")[0]
           end_date = search_value.split("to")[1] || search_value.split("to")[0]
-          str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) < \'#{end_date}\'"
+          str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\'"
         when 'boolean', 'boolean_box'
           search_value = search_value == 'yes' ? 1 : 0
           str = "#{table_name}.#{field_name} = #{search_value}"
@@ -1290,9 +1295,9 @@ module QueriesHelper
         when 'date','datetime'
           start_date = search_value.split("to")[0]
           end_date = search_value.split("to")[1] || search_value.split("to")[0]
-          str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) < \'#{end_date}\')"
+          str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\')"
         when 'boolean', 'boolean_box'
-          search_value = search_value == 'Yes' ? 1 : 0
+          search_value = search_value == 'yes' ? 1 : 0
           str = "#{table_name}.#{field_name} <> #{search_value}"
         when 'checkbox'
           str = "LOWER(#{table_name}.#{field_name}) NOT LIKE \'%#{search_value}%\'"
@@ -1312,12 +1317,12 @@ module QueriesHelper
         when 'date','datetime'
           dates = search_value.split("to")
           if dates.length > 1
-            str = "DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) < \'#{dates[1]}\'"
+            str = "DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\'"
           else
             str = "DATE(#{table_name}.#{field_name}) LIKE \'%#{dates[0]}%\'"
           end
         when 'boolean', 'boolean_box'
-          search_value = search_value == 'Yes' ? 1 : 0
+          search_value = search_value == 'yes' ? 1 : 0
           str = "#{table_name}.#{field_name} LIKE \'%#{search_value}%\'"
         when 'checkbox'
           str = "LOWER(#{table_name}.#{field_name}) LIKE \'%#{search_value}%\'"
@@ -1337,12 +1342,12 @@ module QueriesHelper
         when 'date','datetime'
           dates = search_value.split("to")
           if dates.length > 1
-            str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) < \'#{dates[1]}\')"
+            str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\')"
           else
             str = "DATE(#{table_name}.#{field_name}) NOT LIKE \'%#{dates[0]}%\'"
           end
         when 'boolean', 'boolean_box'
-          search_value = search_value == 'Yes' ? 1 : 0
+          search_value = search_value == 'yes' ? 1 : 0
           str = "#{table_name}.#{field_name} NOT LIKE \'%#{search_value}%\'"
         when 'checkbox'
           str = "LOWER(#{table_name}.#{field_name}) NOT LIKE \'%#{search_value}%\'"
@@ -1375,9 +1380,9 @@ module QueriesHelper
         when 'date','datetime'
           dates = search_value.split("to")
           if dates.length > 1
-            str = "DATE(#{table_name}.#{field_name}) < \'#{dates[1]}\'"
+            str = "DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\'"
           else
-            str = "DATE(#{table_name}.#{field_name}) < \'#{dates[0]}\'"
+            str = "DATE(#{table_name}.#{field_name}) <= \'#{dates[0]}\'"
           end
         else
           str = "#{table_name}.#{field_name} < #{search_value}"
@@ -1408,7 +1413,7 @@ module QueriesHelper
     field_name = map_condition_field(query.target, condition.field_name)
     search_value = condition.value.downcase rescue ""
     ids = []
-    comparison_string = "= NULL"
+    comparison_string = "IS NULL"
 
     case condition.logic
     when 'Equals To'
@@ -1424,11 +1429,16 @@ module QueriesHelper
     case field_name
     when 'meeting_host' # All special cases like host and included findings etc
       case condition.logic
-      when 'Equals To', 'Contains'
+      when 'Equals To'
+        ids = object_type.all.keep_if{|obj| obj.get_host.downcase == search_value}.map(&:id) rescue ""
+      when 'Contains'
         ids = object_type.all.keep_if{|obj| obj.get_host.downcase.include?(search_value)}.map(&:id) rescue ""
-      when 'Not Equal To', 'Does Not Contain'
+      when 'Not Equal To'
+        ids = object_type.all.keep_if{|obj| obj.get_host.downcase != search_value}.map(&:id) rescue ""
+      when 'Does Not Contain'
         ids = object_type.all.keep_if{|obj| obj.get_host.downcase.exclude?(search_value)}.map(&:id) rescue ""
       end
+
     when 'additional_info'
       fields_ids = Field.find_by_sql("SELECT fields.id FROM fields INNER JOIN categories ON fields.categories_id = categories.id
                                         WHERE (categories.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})
@@ -1436,9 +1446,9 @@ module QueriesHelper
       ids = RecordField.find_by_sql("SELECT record_fields.records_id FROM record_fields WHERE (record_fields.fields_id IN (#{fields_ids}) AND LOWER(record_fields.value) #{comparison_string})").map(&:records_id) rescue ""
 
     when 'record_type'
-      ids = Record.find_by_sql("SELECT records.id FROM records INNER JOIN templates ON records.templates_id = templates.id
-                                  WHERE (records.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})
-                                  AND LOWER(templates.name) #{comparison_string})").map(&:id) rescue ""
+      ids = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} INNER JOIN templates ON #{table_name}.templates_id = templates.id
+                                    WHERE (#{table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')})
+                                    AND LOWER(templates.name) #{comparison_string})").map(&:id) rescue ""
 
     when 'included_reports'
       ids = Record.find_by_sql("SELECT records.reports_id FROM records INNER JOIN templates ON records.templates_id = templates.id
@@ -1488,7 +1498,7 @@ module QueriesHelper
       ids = Cause.find_by_sql("SELECT causes.owner_id FROM causes WHERE (causes.owner_type = \'#{query.target}\' AND LOWER(CONCAT(causes.category, \' > \', causes.attr)) #{comparison_string})").map(&:owner_id) rescue ""
 
     when 'cause_value'
-      search_value = search_value.include?('yes') ? 1 : (search_value.include?('no') ? 0 : search_value)
+      search_value = search_value == 'yes' ? 1 : (search_value == 'no' ? 0 : search_value)
       ids = Cause.find_by_sql("SELECT causes.owner_id FROM causes WHERE (causes.owner_type = \'#{query.target}\' AND LOWER(causes.value) #{comparison_string})").map(&:owner_id) rescue ""
 
     when 'initial_risk_score'
@@ -1529,7 +1539,7 @@ module QueriesHelper
               when 'datetime', 'date'
                 start_date = search_value.split("to")[0]
                 end_date = search_value.split("to")[1] || search_value.split("to")[0]
-                str = "DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) < \'#{end_date}\'"
+                str = "DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) <= \'#{end_date}\'"
               else
                 case template_field.display_type
                 when 'employee'
@@ -1556,7 +1566,7 @@ module QueriesHelper
               when 'datetime', 'date'
                 start_date = search_value.split("to")[0]
                 end_date = search_value.split("to")[1] || search_value.split("to")[0]
-                str = "NOT (DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) < \'#{end_date}\')"
+                str = "NOT (DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) <= \'#{end_date}\')"
               else
                 case template_field.display_type
                 when 'employee'
@@ -1583,7 +1593,7 @@ module QueriesHelper
               when 'datetime', 'date'
                 start_date = search_value.split("to")[0]
                 end_date = search_value.split("to")[1] || search_value.split("to")[0]
-                str = "DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) < \'#{end_date}\'"
+                str = "DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) <= \'#{end_date}\'"
               else
                 case template_field.display_type
                 when 'employee'
@@ -1610,7 +1620,7 @@ module QueriesHelper
               when 'datetime', 'date'
                 start_date = search_value.split("to")[0]
                 end_date = search_value.split("to")[1] || search_value.split("to")[0]
-                str = "NOT (DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) < \'#{end_date}\')"
+                str = "NOT (DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) <= \'#{end_date}\')"
               else
                 case template_field.display_type
                 when 'employee'
@@ -1655,10 +1665,10 @@ module QueriesHelper
                 if dates.length > 1
                   start_date = dates[0]
                   end_date = dates[1]
-                  str = "DATE(#{object_field_table_name}.value) < \'#{dates[1]}\'"
+                  str = "DATE(#{object_field_table_name}.value) <= \'#{dates[1]}\'"
                 else
                   date = dates[0]
-                  str = "DATE(#{object_field_table_name}.value) < \'#{dates[0]}\'"
+                  str = "DATE(#{object_field_table_name}.value) <= \'#{dates[0]}\'"
                 end
               else
                 str = "#{object_field_table_name}.value < #{search_value}"
@@ -1669,6 +1679,9 @@ module QueriesHelper
               if query.target == 'Report'
                 temp_ids = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym) rescue []
                 str = Record.find_by_sql("SELECT records.reports_id FROM records WHERE records.id IN (#{temp_ids.present? ? temp_ids.join(",") : "NULL"})").map(&:reports_id) rescue []
+              elsif query.target == 'Submission'
+                temp_str = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym) rescue []
+                str = Submission.find_by_sql("SELECT submissions.id FROM submissions WHERE submissions.id IN (#{temp_str.present? ? temp_str.join(',') : "NULL"}) AND completed = 1").map(&:id) rescue []
               else
                 str = object_field_type.find_by_sql("SELECT #{object_field_table_name}.#{parent_id_attribute} FROM #{object_field_table_name} WHERE #{str} AND #{object_field_table_name}.fields_id=#{template_field.id}").map(&parent_id_attribute.to_sym) rescue []
               end
@@ -1694,14 +1707,18 @@ module QueriesHelper
 
     if query.templates.present?
       if query.templates.include?('-1')
-        templates_ids = query.templates.clone
-        templates_id.delete('-1')
-        checklist_ids = Checklist.find_by_sql("SELECT checklists.id FROM checklists WHERE (checklist.owner_type <> \'ChecklistHeader\' AND checklists.template_id IN (#{templates_ids.join(',')} AND checklists.template_id = NULL))").map(&:id) rescue ""
+        templates_ids = query.templates.clone.reject(&:blank?)
+        templates_ids.delete('-1')
+        if templates_ids.present?
+          checklist_ids = Checklist.find_by_sql("SELECT checklists.id FROM checklists WHERE (checklists.owner_type <> \'ChecklistHeader\' AND (checklists.template_id IN (#{templates_ids.join(',')}) OR checklists.template_id IS NULL))").map(&:id) rescue ""
+        else
+          checklist_ids = Checklist.find_by_sql("SELECT checklists.id FROM checklists WHERE (checklists.owner_type <> \'ChecklistHeader\' AND checklists.template_id IS NULL)").map(&:id) rescue ""
+        end
       else
-        checklist_ids = Checklist.find_by_sql("SELECT checklists.id FROM checklists WHERE (checklist.owner_type <> \'ChecklistHeader\' AND checklists.template_id IN (#{query.templates.join(',')}))").map(&:id) rescue ""
+        checklist_ids = Checklist.find_by_sql("SELECT checklists.id FROM checklists WHERE (checklists.owner_type <> \'ChecklistHeader\' AND checklists.template_id IN (#{query.templates.join(',')}))").map(&:id) rescue ""
       end
     else
-      checklist_ids = Checklist.all.map(&:id)
+      checklist_ids = Checklist.find_by_sql("SELECT checklists.id FROM checklists WHERE checklists.owner_type <> \'ChecklistHeader\'").map(&:id) rescue ""
     end
 
     if checklist_ids.present? && field_name.present?
@@ -1726,16 +1743,16 @@ module QueriesHelper
 
     if query.templates.present?
       if query.templates.include?('-1')
-        templates_ids = query.templates.clone
+        templates_ids = query.templates.clone.reject(&:blank?)
         templates_id.delete('-1')
         checklists = Checklist.preload(:checklist_rows => :checklist_cells).find_by_sql("SELECT checklists.id FROM checklists
-          WHERE (checklists.owner_type <> \'ChecklistHeader\' AND checklists.template_id IN (#{templates_ids.join(',')} AND checklists.template_id = NULL))")
+          WHERE (checklists.owner_type <> \'ChecklistHeader\' AND checklists.template_id IN (#{templates_ids.join(',')} AND checklists.template_id IS NULL))")
       else
         checklists = Checklist.preload(:checklist_rows => :checklist_cells).find_by_sql("SELECT checklists.id FROM checklists
           WHERE (checklists.owner_type <> \'ChecklistHeader\' AND checklists.template_id IN (#{query.templates.join(',')}))")
       end
     else
-      checklists = Checklist.preload(:checklist_rows => :checklist_cells).all
+      checklists = Checklist.preload(:checklist_rows => :checklist_cells).where("owner_type != ?", "ChecklistHeader")
     end
 
 
@@ -1841,7 +1858,7 @@ module QueriesHelper
             case cells.map(&:data_type).first
             when 'date'
               values.each do |value|
-                found = value.to_date < search_value.to_date rescue false
+                found = value.to_date <= search_value.to_date rescue false
                 if found
                   valid_rows << checklist_row
                   break
@@ -1849,7 +1866,7 @@ module QueriesHelper
               end
             when 'datetime'
               values.each do |value|
-                found = value.to_datetime < search_value.to_datetime rescue false
+                found = value.to_datetime <= search_value.to_datetime rescue false
                 if found
                   valid_rows << checklist_row
                   break
@@ -1887,7 +1904,7 @@ module QueriesHelper
     mapping_hash['Submission']['Submitted By'] = 'user_id'
     mapping_hash['Submission']['Event Date/Time'] = 'event_date'
     mapping_hash['Submission']['Event Title'] = 'description'
-    mapping_hash['Submission']['Submission Type'] = 'type'
+    mapping_hash['Submission']['Submission Type'] = 'record_type'
 
 
     mapping_hash['Record'] = Hash.new
@@ -2081,6 +2098,7 @@ module QueriesHelper
 
 
     mapping_hash['Sra'] = Hash.new
+    mapping_hash['Sra']['SRM Triggers'] = 'type_of_change'
     mapping_hash['Sra']['SRA Title'] = 'title'
     mapping_hash['Sra']['System/Task'] = 'system_task'
     mapping_hash['Sra']['Creator'] = 'created_by_id'
