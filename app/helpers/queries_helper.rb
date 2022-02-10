@@ -247,14 +247,26 @@ module QueriesHelper
                                           .map{|r| [r.id, r.get_risk_score_after]}.to_h rescue {}
 
       when 'users_id'
-        values = User.find_by_sql("SELECT users.full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
-                                  WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
-                                  .map{|r| [r.id, r.full_name]}.to_h rescue {}
+        if CONFIG::GENERAL[:sabre_integration].present?
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
+                                    WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                    .map{|r| [r.id, r.full_name]}.to_h rescue {}
+        else
+          values = User.find_by_sql("SELECT users.full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
+                                    WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                    .map{|r| [r.id, r.full_name]}.to_h rescue {}
+        end
 
       when 'user_id'
-        values = User.find_by_sql("SELECT users.full_name, submissions.id FROM users INNER JOIN submissions ON submissions.user_id = users.id
-                                   WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
-                                   .map{|r| [r.id, r.full_name]}.to_h rescue {}
+        if CONFIG::GENERAL[:sabre_integration].present?
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name, submissions.id FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                     WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                     .map{|r| [r.id, r.full_name]}.to_h rescue {}
+        else
+          values = User.find_by_sql("SELECT users.full_name, submissions.id FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                     WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                     .map{|r| [r.id, r.full_name]}.to_h rescue {}
+        end
 
       when 'responsible_user_id', 'approver_id', 'created_by_id'
         table_name = object_type.table_name
@@ -371,12 +383,22 @@ module QueriesHelper
                                           .map(&:get_risk_score_after) rescue []
 
       when 'user_id'
-        values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
-                                  WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
+        if CONFIG::GENERAL[:sabre_integration].present?
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                    WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
+        else
+          values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                    WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
+        end
 
       when 'users_id'
-        values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN records ON records.users_id = users.id
-                                  WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
+        if CONFIG::GENERAL[:sabre_integration].present?
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN records ON records.users_id = users.id
+                                    WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
+        else
+          values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN records ON records.users_id = users.id
+                                    WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
+        end
 
       when 'responsible_user_id', 'approver_id', 'created_by_id'
         table_name = object_type.table_name
@@ -586,16 +608,26 @@ module QueriesHelper
         end
 
       when 'user_id'
-        values = User.find_by_sql("SELECT submissions.id, users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
-                                  WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+        if CONFIG::GENERAL[:sabre_integration].present?
+          values = User.find_by_sql("SELECT submissions.id, CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                    WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+        else
+          values = User.find_by_sql("SELECT submissions.id, users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+                                    WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+        end
 
         values.each do |val|
           val_hash[val.full_name] << val.id if val.full_name.present?
         end
 
       when 'users_id'
-        values = User.find_by_sql("SELECT records.id, users.full_name FROM users INNER JOIN records ON records.users_id = users.id
-                                   WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+        if CONFIG::GENERAL[:sabre_integration].present?
+          values = User.find_by_sql("SELECT records.id, CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN records ON records.users_id = users.id
+                                     WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+        else
+          values = User.find_by_sql("SELECT records.id, users.full_name FROM users INNER JOIN records ON records.users_id = users.id
+                                     WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+        end
 
         values.each do |val|
           val_hash[val.full_name] << val.id if val.full_name.present?
@@ -1515,6 +1547,7 @@ module QueriesHelper
     mapping_hash['Investigation']['Date/Time When Event Occurred'] = 'event_occured'
     mapping_hash['Investigation']['Local Time When Event Occurred'] = 'local_event_occured'
     mapping_hash['Investigation']['Investigation Type'] = 'inv_type'
+    mapping_hash['Investigation']['Regulatory Violation'] = 'ntsb' # SCX modification
     mapping_hash['Investigation']['NTSB Reportable'] = 'ntsb'
     mapping_hash['Investigation']['Description of Event'] = 'description'
     mapping_hash['Investigation']['Investigator\'s Comments'] = 'investigator_comment'
@@ -1587,13 +1620,15 @@ module QueriesHelper
 
 
     mapping_hash['Sra'] = Hash.new
-    mapping_hash['Sra']['SRM Triggers'] = 'type_of_change'
+    mapping_hash['Sra']['SRM Triggers'] = 'type_of_change' # AJT modification
     mapping_hash['Sra']['SRA Title'] = 'title'
     mapping_hash['Sra']['System/Task'] = 'system_task'
     mapping_hash['Sra']['Creator'] = 'created_by_id'
+    mapping_hash['Sra']['Risk Leader'] = 'responsible_user_id' # RUH modification
     mapping_hash['Sra']['Responsible User'] = 'responsible_user_id'
     mapping_hash['Sra']['Quality Reviewer'] = 'reviewer_id'
     mapping_hash['Sra']['Final Approver'] = 'approver_id'
+    mapping_hash['Sra']['SRA Approver'] = 'approver_id' # RUH modification
     mapping_hash['Sra']['Scheduled Completion Date'] = 'due_date'
     mapping_hash['Sra']['Actual Completion Date'] = 'close_date'
     mapping_hash['Sra']['Describe the Current System'] = 'description'
@@ -1624,8 +1659,13 @@ module QueriesHelper
     mapping_hash['Hazard']['Creator'] = 'created_by_id'
     mapping_hash['Hazard']['Hazard Title'] = 'title'
     mapping_hash['Hazard']['Department'] = 'departments'
+    mapping_hash['Hazard']['Lead Analyst'] = 'responsible_user_id' # FFT modification
+    mapping_hash['Hazard']['Risk Leader'] = 'responsible_user_id' # RUH modification
     mapping_hash['Hazard']['Responsible User'] = 'responsible_user_id'
+    mapping_hash['Hazard']['Risk Acceptor'] = 'approver_id' # FFT modification
+    mapping_hash['Hazard']['SRA Approver'] = 'approver_id' # RUH modification
     mapping_hash['Hazard']['Final Approver'] = 'approver_id'
+    mapping_hash['Hazard']['Date to Validate Effectiveness'] = 'due_date' # FFT modification
     mapping_hash['Hazard']['Scheduled Completion Date'] = 'due_date'
     mapping_hash['Hazard']['Responsible User\'s Comments'] = 'recommendations_comment'
     mapping_hash['Hazard']['Final Approver\'s Comments'] = 'final_comment'
@@ -1645,8 +1685,10 @@ module QueriesHelper
     mapping_hash['RiskControl']['Department'] = 'departments'
     mapping_hash['RiskControl']['Scheduled Completion Date'] = 'due_date'
     mapping_hash['RiskControl']['Date for Follow-Up/Monitor Plan'] = 'follow_up_date'
-    mapping_hash['RiskControl']['Responsible User'] = 'responsible_user_id'
+    mapping_hash['RiskControl']['Lead Analyst'] = 'responsible_user_id' # FFT modification
+    mapping_hash['RiskControl']['Responsible User'] = AIRLINE_CODE == 'FFT' ? 'approver_id' : 'responsible_user_id' # Required for FFT modification
     mapping_hash['RiskControl']['Final Approver'] = 'approver_id'
+    mapping_hash['RiskControl']['Risk Assessment Leader'] = 'approver_id' # RUH modification
     mapping_hash['RiskControl']['Type'] = 'control_type'
     mapping_hash['RiskControl']['Description of Risk Control/Mitigation Plan'] = 'description'
     mapping_hash['RiskControl']['Responsible User\'s Comments'] = 'closing_comment'
