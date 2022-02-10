@@ -26,7 +26,6 @@ class EULENConfig < DefaultConfig
     global_admin_default:              false,
     advanced_checklist_data_type:      true,
     checklist_query:                   true,
-    query_processing_in_rake_task:     false,
     sms_im_visibility:                 false,
     safety_promotion_visibility:       true,
   })
