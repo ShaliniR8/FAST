@@ -15,7 +15,7 @@ class QueryDatatable
       draw: params['draw'].to_i,
       data: data,
       recordsTotal: @ids.size,
-      recordsFiltered: records_filtered,
+      recordsFiltered: @count,
       searchTerms: handle_search[:search_columns_and_terms_map]
     }
   end
@@ -65,14 +65,6 @@ class QueryDatatable
     search_string = search_params[:search_string]
     join_tables = prepare_join_tables(search_params)
     query_records_sql(search_string, join_tables)
-  end
-
-
-  def records_filtered
-    search_params = handle_search
-    search_string = search_params[:search_string]
-    join_tables = prepare_join_tables(search_params)
-    query_records_size(search_string, join_tables)
   end
 
 
@@ -127,27 +119,22 @@ class QueryDatatable
 
   def query_records_sql(search_string, join_tables)
     res = []
+    @count = 0
     search_string << "#{object.table_name}.id #{@ids.present? ? "IN (#{@ids.join(',')})" : "IS NULL"}"
 
-    res = object.joins(join_tables)
+    if @ids.present?
+      res = object.joins(join_tables)
             .where(search_string.join(' and '))
-            .order("#{sort_column} #{sort_direction}")
-            .group("#{object.table_name}.id")
-            .limit(params['length'].to_i)
-            .offset(params['start'].to_i) if @ids.present?
+
+      @count = res.count
+
+      res = res.order("#{sort_column} #{sort_direction}")
+               .group("#{object.table_name}.id")
+               .limit(params['length'].to_i)
+               .offset(params['start'].to_i) if @ids.present?
+    end
 
     res
-  end
-
-
-  def query_records_size(search_string, join_tables)
-    res = []
-    search_string << "#{object.table_name}.id #{@ids.present? ? "IN (#{@ids.join(',')})" : "IS NULL"}"
-
-    res = object.joins(join_tables)
-            .where(search_string.join(' and ')) if @ids.present?
-
-    res.count
   end
 
 end
