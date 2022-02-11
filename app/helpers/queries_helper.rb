@@ -224,19 +224,21 @@ module QueriesHelper
         end
 
       when 'included_verifications'
-        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) as ver_status FROM verifications WHERE
+        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
                                           .map{|r| [r.owner_id, r.ver_status]}.to_h rescue {}
 
       when 'cause_label'
-        values = Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) as cause_label FROM causes WHERE
+        values = Hash.new { |h, k| h[k] = [] }
+        Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
                                     (causes.owner_type = \'#{target}\' AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                    .map{|r| [r.owner_id, r.cause_label]}.to_h rescue {}
+                                    .map{|r| values[r.owner_id] << r.cause_label} rescue {}
 
       when 'cause_value'
-        values = Cause.find_by_sql("SELECT causes.owner_id, causes.value FROM causes WHERE (causes.owner_type = \'#{target}\'
+        values = Hash.new { |h, k| h[k] = [] }
+        Cause.find_by_sql("SELECT causes.owner_id, causes.value FROM causes WHERE (causes.owner_type = \'#{target}\'
                                     AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                    .map{|r| [r.owner_id, (r.value.present? ? (r.value == 1 ? 'Yes' : (r.value == 0 ? 'No' : r.value)) : "")]}.to_h rescue {}
+                                    .map{|r| values[r.owner_id] << (r.value.present? ? (['Audit', 'Inspection'].exclude?(query.target) ? (r.value == 1 ? 'Yes' : (r.value == 0 ? 'No' : r.value)) : r.value) : "")} rescue {}
 
       when 'initial_risk_score'
         values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
@@ -248,7 +250,7 @@ module QueriesHelper
 
       when 'users_id'
         if CONFIG::GENERAL[:sabre_integration].present?
-          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
                                     WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
                                     .map{|r| [r.id, r.full_name]}.to_h rescue {}
         else
@@ -259,7 +261,7 @@ module QueriesHelper
 
       when 'user_id'
         if CONFIG::GENERAL[:sabre_integration].present?
-          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name, submissions.id FROM users INNER JOIN submissions ON submissions.user_id = users.id
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name, submissions.id FROM users INNER JOIN submissions ON submissions.user_id = users.id
                                      WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
                                      .map{|r| [r.id, r.full_name]}.to_h rescue {}
         else
@@ -361,18 +363,18 @@ module QueriesHelper
         end
 
       when 'included_verifications'
-        values = Verification.find_by_sql("SELECT CONCAT(verifications.status, \', \', verifications.verify_date) as ver_status FROM verifications WHERE
+        values = Verification.find_by_sql("SELECT CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
                                           .map(&:ver_status) rescue []
 
       when 'cause_label'
-        values = Cause.find_by_sql("SELECT CONCAT(causes.category, \' > \', causes.attr) as cause_label FROM causes WHERE
+        values = Cause.find_by_sql("SELECT CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
                                     (causes.owner_type = \'#{target}\' AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})").map(&:cause_label) rescue []
 
       when 'cause_value'
         values = Cause.find_by_sql("SELECT causes.value FROM causes WHERE (causes.owner_type = \'#{target}\'
                                     AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                    .map{|c| c.value.present? ? (c.value == 1 ? 'Yes' : (c.value == 0 ? 'No' : c.value)) : ""} rescue []
+                                    .map{|r| r.value.present? ? (['Audit', 'Inspection'].exclude?(query.target) ? (r.value == 1 ? 'Yes' : (r.value == 0 ? 'No' : r.value)) : r.value) : ""} rescue []
 
       when 'initial_risk_score'
         values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
@@ -384,7 +386,7 @@ module QueriesHelper
 
       when 'user_id'
         if CONFIG::GENERAL[:sabre_integration].present?
-          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
                                     WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
         else
           values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
@@ -393,7 +395,7 @@ module QueriesHelper
 
       when 'users_id'
         if CONFIG::GENERAL[:sabre_integration].present?
-          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN records ON records.users_id = users.id
+          values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name FROM users INNER JOIN records ON records.users_id = users.id
                                     WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:full_name) rescue []
         else
           values = User.find_by_sql("SELECT users.full_name FROM users INNER JOIN records ON records.users_id = users.id
@@ -567,7 +569,7 @@ module QueriesHelper
         end
 
       when 'included_verifications'
-        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) as ver_status FROM verifications WHERE
+        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})") rescue []
 
         values.each do |val|
@@ -575,7 +577,7 @@ module QueriesHelper
         end
 
       when 'cause_label'
-        values = Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) as cause_label FROM causes WHERE
+        values = Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
                                     (causes.owner_type = \'#{target}\' AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})") rescue []
 
         values.each do |val|
@@ -587,7 +589,7 @@ module QueriesHelper
                                     AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})") rescue []
 
         values.each do |val|
-          temp_val = val.value.present? ? (val.value == 1 ? 'Yes' : (val.value == 0 ? 'No' : val.value)) : ""
+          temp_val = val.value.present? ? (['Audit', 'Inspection'].exclude?(query.target) ? (val.value == 1 ? 'Yes' : (val.value == 0 ? 'No' : val.value)) : val.value) : ""
           val_hash[temp_val] << val.owner_id if temp_val.present?
         end
 
@@ -609,7 +611,7 @@ module QueriesHelper
 
       when 'user_id'
         if CONFIG::GENERAL[:sabre_integration].present?
-          values = User.find_by_sql("SELECT submissions.id, CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
+          values = User.find_by_sql("SELECT submissions.id, CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
                                     WHERE submissions.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
         else
           values = User.find_by_sql("SELECT submissions.id, users.full_name FROM users INNER JOIN submissions ON submissions.user_id = users.id
@@ -622,7 +624,7 @@ module QueriesHelper
 
       when 'users_id'
         if CONFIG::GENERAL[:sabre_integration].present?
-          values = User.find_by_sql("SELECT records.id, CONCAT(users.full_name, \' (\', users.employee_number, \')\') as full_name FROM users INNER JOIN records ON records.users_id = users.id
+          values = User.find_by_sql("SELECT records.id, CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name FROM users INNER JOIN records ON records.users_id = users.id
                                      WHERE records.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
         else
           values = User.find_by_sql("SELECT records.id, users.full_name FROM users INNER JOIN records ON records.users_id = users.id
@@ -781,7 +783,7 @@ module QueriesHelper
     table_name = Object.const_get(query.target).table_name
     field_name = map_condition_field(query.target, condition.field_name)
     object_type = Object.const_get(query.target)
-    search_value = condition.value.downcase rescue ""
+    search_value = condition.value.downcase.strip rescue ""
     str = ""
 
     target_field = object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field].present? && x[:title] == condition.field_name}.first rescue nil
@@ -932,7 +934,7 @@ module QueriesHelper
     object_type = Object.const_get(query.target)
     table_name = object_type.table_name
     field_name = map_condition_field(query.target, condition.field_name)
-    search_value = condition.value.downcase rescue ""
+    search_value = condition.value.downcase.strip rescue ""
     ids = []
     comparison_string = "IS NULL"
 
@@ -973,11 +975,11 @@ module QueriesHelper
 
     when 'included_reports'
       ids = Record.find_by_sql("SELECT records.reports_id FROM records INNER JOIN templates ON records.templates_id = templates.id
-                                WHERE (records.status = \'Linked\' AND (LOWER(templates.name) #{comparison_string} OR records.id #{comparison_string}))").map(&:reports_id) rescue ""
+                                WHERE (LOWER(templates.name) #{comparison_string} OR records.id #{comparison_string})").map(&:reports_id) rescue ""
 
     when 'included_reports_types'
       ids = Record.find_by_sql("SELECT records.reports_id FROM records INNER JOIN templates ON records.templates_id = templates.id WHERE
-                                records.status = \'Linked\' AND LOWER(templates.name) #{comparison_string}").map(&:reports_id) rescue ""
+                                LOWER(templates.name) #{comparison_string}").map(&:reports_id) rescue ""
 
     when 'included_occurrences'
       if condition.field_name == "Full #{object_type.find_top_level_section.label}"
@@ -1019,7 +1021,7 @@ module QueriesHelper
       ids = Cause.find_by_sql("SELECT causes.owner_id FROM causes WHERE (causes.owner_type = \'#{query.target}\' AND LOWER(CONCAT(causes.category, \' > \', causes.attr)) #{comparison_string})").map(&:owner_id) rescue ""
 
     when 'cause_value'
-      search_value = search_value == 'yes' ? 1 : (search_value == 'no' ? 0 : search_value)
+      search_value = ['Audit', 'Inspection'].exclude?(query.target) ? (search_value == 'yes' ? 1 : (search_value == 'no' ? 0 : search_value)) : search_value
       ids = Cause.find_by_sql("SELECT causes.owner_id FROM causes WHERE (causes.owner_type = \'#{query.target}\' AND LOWER(causes.value) #{comparison_string})").map(&:owner_id) rescue ""
 
     when 'initial_risk_score'
@@ -1448,7 +1450,7 @@ module QueriesHelper
     mapping_hash['Report']['Accepted Into ASAP'] = 'asap'
     mapping_hash['Report']["#{Report.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Report']["Full #{Report.find_top_level_section.label}"] = 'included_occurrences'
-    mapping_hash['Report']['Event Date/Time'] = 'event_date'
+    mapping_hash['Report']['Event Date'] = 'event_date'
     mapping_hash['Report']['Event Title'] = 'name'
     mapping_hash['Report']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Report']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
@@ -1631,7 +1633,7 @@ module QueriesHelper
     mapping_hash['Sra']['SRA Approver'] = 'approver_id' # RUH modification
     mapping_hash['Sra']['Scheduled Completion Date'] = 'due_date'
     mapping_hash['Sra']['Actual Completion Date'] = 'close_date'
-    mapping_hash['Sra']['Describe the Current System'] = 'description'
+    mapping_hash['Sra']['Describe the Current System'] = 'current_description'
     mapping_hash['Sra']['Describe Proposed Plan'] = 'plan_description'
     mapping_hash['Sra']['Responsible User\'s Comments'] = 'closing_comment'
     mapping_hash['Sra']['Quality Reviewer\'s Comments'] = 'reviewer_comment'
