@@ -251,7 +251,7 @@ class QueriesController < ApplicationController
     @owner = Query.find(params[:id])
     @chart_types = QueryVisualization.chart_types
     @object_type = Object.const_get(@owner.target)
-    @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
+    @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
     templates = Template.preload(:categories, :fields).where(:id => @owner.templates)
     templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @fields << {
