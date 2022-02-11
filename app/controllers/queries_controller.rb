@@ -526,7 +526,7 @@ class QueriesController < ApplicationController
     label = field_label
 
     # if top level field
-    field = object_type.get_meta_fields('show', 'index', 'invisible', 'query')
+    field = object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close')
       .keep_if{|f| f[:title] == label}.first
     # else check template fields
     field = Template.preload(:categories, :fields)
