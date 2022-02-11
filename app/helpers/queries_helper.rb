@@ -208,7 +208,7 @@ module QueriesHelper
 
       when 'included_reports_types'
         values = Record.find_by_sql("SELECT records.reports_id, templates.name FROM records INNER JOIN templates ON records.templates_id = templates.id
-                                    WHERE records.reports_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map{|r| [r.reports_id, r.inc_report]}.to_h rescue {}
+                                    WHERE records.reports_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map{|r| [r.reports_id, r.name]}.to_h rescue {}
 
       when 'included_occurrences', 'included_findings', 'source_of_input', 'meeting_host'
         temp_values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
@@ -1452,6 +1452,7 @@ module QueriesHelper
     mapping_hash['Report']["Full #{Report.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Report']['Event Date'] = 'event_date'
     mapping_hash['Report']['Event Title'] = 'name'
+    mapping_hash['Report']['Event Description'] = 'narrative'
     mapping_hash['Report']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Report']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
     mapping_hash['Report']['Meeting Minutes'] = 'minutes'
