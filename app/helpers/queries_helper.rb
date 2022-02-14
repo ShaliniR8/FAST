@@ -153,24 +153,25 @@ module QueriesHelper
     if field.is_a?(Field)
       field_type = field.display_type
       fields_ids = Template.preload(:categories, :fields).where(id: query.templates).map(&:fields).flatten.select{|x| x.label == field_title}.map(&:id)
+      values = Hash.new { |h, k| h[k] = [] }
 
       if target == 'Report'
         sr_records = Record.find_by_sql("SELECT records.id FROM records WHERE records.reports_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:id) rescue []
 
-        values = Record.find_by_sql("SELECT records.reports_id, record_fields.value FROM records INNER JOIN record_fields ON records.id = record_fields.records_id
-                                    WHERE (record_fields.fields_id IN (#{fields_ids.join(',')})
-                                    AND record_fields.records_id #{sr_records.present? ? "IN (#{sr_records.join(',')})" : "IS NULL"})")
-                                    .map{|r| [r.reports_id, format_val(r.value, field_type, field_param)]}.to_h rescue {}
+        Record.find_by_sql("SELECT records.reports_id, record_fields.value FROM records INNER JOIN record_fields ON records.id = record_fields.records_id
+                            WHERE (record_fields.fields_id IN (#{fields_ids.join(',')})
+                            AND record_fields.records_id #{sr_records.present? ? "IN (#{sr_records.join(',')})" : "IS NULL"})")
+                            .map{|r| values[r.reports_id] << format_val(r.value, field_type, field_param)} rescue {}
 
       elsif target == 'Record'
-        values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
-                                              record_fields.records_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
-                                              .map{|r| [r.records_id, format_val(r.value, field_type, field_param)]}.to_h rescue {}
+        RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                record_fields.records_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                .map{|r| values[r.records_id] << format_val(r.value, field_type, field_param)} rescue {}
 
       elsif target == 'Submission'
-        values = SubmissionField.find_by_sql("SELECT submission_fields.submissions_id, submission_fields.value FROM submission_fields WHERE submission_fields.fields_id IN (#{fields_ids.join(',')}) AND
-                                                  submission_fields.submissions_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
-                                                  .map{|r| [r.submissions_id, format_val(r.value, field_type, field_param)]}.to_h rescue {}
+        SubmissionField.find_by_sql("SELECT submission_fields.submissions_id, submission_fields.value FROM submission_fields WHERE submission_fields.fields_id IN (#{fields_ids.join(',')}) AND
+                                    submission_fields.submissions_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                    .map{|r| values[r.submissions_id] << format_val(r.value, field_type, field_param)} rescue {}
       end
     else
       field_type = field[:type]
@@ -179,6 +180,7 @@ module QueriesHelper
 
       case field_name
       when 'additional_info'
+        values = Hash.new { |h, k| h[k] = [] }
         if target == 'Report'
           sr_records = Report.find_by_sql("SELECT records.id FROM records WHERE records.reports_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}").map(&:id) rescue []
 
@@ -186,13 +188,13 @@ module QueriesHelper
                                                       WHERE (record_fields.records_id #{sr_records.present? ? "IN (#{sr_records.join(',')})" : "IS NULL"} AND fields.additional_info = 1)")
                                                       .map(&:id) rescue []
 
-          values = Record.find_by_sql("SELECT records.reports_id, record_fields.value FROM records INNER JOIN record_fields ON record_fields.records_id = records.id
-                                      WHERE record_fields.id #{sr_record_fields.present? ? "IN (#{sr_record_fields.join(',')})" : "IS NULL"}").map{|r| [r.reports_id, r.value]}.to_h rescue {}
+          Record.find_by_sql("SELECT records.reports_id, record_fields.value FROM records INNER JOIN record_fields ON record_fields.records_id = records.id
+                                      WHERE record_fields.id #{sr_record_fields.present? ? "IN (#{sr_record_fields.join(',')})" : "IS NULL"}").map{|r| values[r.reports_id] << r.value} rescue {}
 
         else
-          values = RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
+          RecordField.find_by_sql("SELECT record_fields.records_id, record_fields.value FROM record_fields INNER JOIN fields ON record_fields.fields_id = fields.id
                                             WHERE (record_fields.records_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"} AND
-                                            fields.additional_info = 1)").map{|r| [r.records_id, r.value]}.to_h rescue {}
+                                            fields.additional_info = 1)").map{|r| values[r.records_id] << r.value} rescue {}
 
         end
 
