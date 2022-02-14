@@ -289,13 +289,11 @@ class QueriesController < ApplicationController
 
     # find x_axis field name
     @x_axis_field = get_field(@owner, @object_type, params[:x_axis])
+    # find series field name
+    @series_field = get_field(@owner, @object_type, params[:series])
 
-    if params[:series].present? # if series present, build data from both values
+    if params[:series].present? && params[:x_axis].present? # if series present, build data from both values
       title = "#{params[:x_axis]} By #{params[:series]}"
-      # find series field name
-      @series_field = get_field(@owner, @object_type, params[:series])
-
-
       @data = get_data_table_for_google_visualization_with_series(x_axis_field_arr: @x_axis_field,
                                                                   series_field_arr: @series_field,
                                                                   records_ids: params[:records].split(','),
@@ -308,7 +306,7 @@ class QueriesController < ApplicationController
                                                                       get_ids: true,
                                                                       query: @owner)
 
-    else # when series not present, use default charts
+    elsif params[:x_axis].present?
       @data     = get_data_table_for_google_visualization_sql(x_axis_field_arr: @x_axis_field, records_ids: params[:records].split(','), query: @owner)
       @data_ids = get_data_ids_table_for_google_visualization_sql(x_axis_field_arr: @x_axis_field, records_ids: params[:records].split(','), query: @owner)
 
@@ -317,6 +315,18 @@ class QueriesController < ApplicationController
         @data << ['N/A', 0]
         @data_ids << ['N/A', 0]
       end
+
+    elsif params[:series].present?
+      title     = "#{params[:series]}"
+      @data     = get_data_table_for_google_visualization_sql(x_axis_field_arr: @series_field, records_ids: params[:records].split(','), query: @owner)
+      @data_ids = get_data_ids_table_for_google_visualization_sql(x_axis_field_arr: @series_field, records_ids: params[:records].split(','), query: @owner)
+
+      # to draw empty charts for empty data
+      if @data.length == 1 && @data_ids.length == 1
+        @data << ['N/A', 0]
+        @data_ids << ['N/A', 0]
+      end
+
     end
 
     @data = @data.map{ |x| [x[0].to_s, x[1..-1]].flatten}
@@ -327,22 +337,22 @@ class QueriesController < ApplicationController
     
     @redirect_page = false
 
-    if params[:nested_xaxis] == true.to_s
+    if params[:nested_xaxis] == true.to_s && @x_axis_field.first.is_a?(Field)
       @x_axis_field.first.nested_fields.where(deleted: false).map(&:id).each do |nested_field_id|
         visualization = @owner.visualizations.create(
           x_axis: Field.find(nested_field_id).label
         )
+        @redirect_page = true
       end
-      @redirect_page = true
     end
 
-    if params[:nested_series] == true.to_s
+    if params[:nested_series] == true.to_s && @series_field.first.is_a?(Field)
       @series_field.first.nested_fields.where(deleted: false).map(&:id).each do |nested_field_id|
         visualization = @owner.visualizations.create(
           x_axis: Field.find(nested_field_id).label
         )
+        @redirect_page = true
       end
-      @redirect_page = true
     end
 
     @options = { title: title || params[:x_axis] }
