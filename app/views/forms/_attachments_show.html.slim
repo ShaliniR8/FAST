@@ -42,7 +42,7 @@ ruby:
                             span.glyphicon.glyphicon-remove
                       .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
                         .col-xs-12 align='center'
-                          = render 'forms/attachments_preview', attachment: attachment
+                          = render 'forms/attachments_preview', attachment: attachment, from_mini: false
                   = link_to 'Preview', '#',
                     class: 'btn btn-info show_preview_btn',
                     'data-toggle' => 'modal',
