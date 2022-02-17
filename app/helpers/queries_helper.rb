@@ -1297,7 +1297,7 @@ module QueriesHelper
             when 'employee'
               # values = cells.map(&:value).compact.map(&:downcase).map{ |val| User.find(val).full_name rescue '' }.first.downcase
               values = User.find_by_sql("SELECT LOWER(users.full_name) FROM users WHERE LOWER(users.full_name)
-                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).map(&:strip).join('|')}\'").map(&:full_name).first
+                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).map(&:strip).join('|')}\'").map(&:full_name).first rescue nil
               valid_rows << checklist_row if values == search_value
             else
               values = cells.map(&:value).compact.map(&:downcase).map(&:strip)
@@ -1308,7 +1308,7 @@ module QueriesHelper
             case cells.map(&:data_type).first
             when 'employee'
               values = User.find_by_sql("SELECT LOWER(users.full_name) FROM users WHERE LOWER(users.full_name)
-                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).map(&:strip).join('|')}\'").map(&:full_name).first
+                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).map(&:strip).join('|')}\'").map(&:full_name).first rescue nil
               valid_rows << checklist_row if values != search_value
             else
               values = cells.map(&:value).compact.map(&:downcase).map(&:strip)
@@ -1319,8 +1319,8 @@ module QueriesHelper
             case cells.map(&:data_type).first
             when 'employee'
               values = User.find_by_sql("SELECT LOWER(users.full_name) FROM users WHERE LOWER(users.full_name)
-                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).join('|')}\'").map(&:full_name).first
-              valid_rows << checklist_row if values.include?(search_value)
+                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).join('|')}\'").map(&:full_name).first rescue nil
+              valid_rows << checklist_row if values.present? && values.include?(search_value)
             else
               values = cells.map(&:value).compact.map(&:downcase)
 
@@ -1336,8 +1336,8 @@ module QueriesHelper
             case cells.map(&:data_type).first
             when 'employee'
               values = User.find_by_sql("SELECT LOWER(users.full_name) FROM users WHERE LOWER(users.full_name)
-                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).join('|')}\'").map(&:full_name).first
-              valid_rows << checklist_row if values.exclude?(search_value)
+                                        REGEXP \'#{cells.map(&:value).compact.map(&:downcase).join('|')}\'").map(&:full_name).first rescue nil
+              valid_rows << checklist_row if values.present? && values.exclude?(search_value)
             else
               values = cells.map(&:value).compact.map(&:downcase)
 
