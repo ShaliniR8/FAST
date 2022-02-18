@@ -94,7 +94,6 @@
           </script>
         <%when 2%>
           <script type="text/javascript">
-            google.charts.load("current", {packages:["corechart"]});
             google.charts.setOnLoadCallback(drawPieChart);
 
             $(window).bind('resizeEnd', function(){
@@ -206,7 +205,6 @@
           </script>
         <%when 3%>
           <script>
-            google.charts.load("current", {'packages': ["bar"]});
             google.charts.setOnLoadCallback(drawBarChart);
 
             $(window).bind('resizeEnd', function(){
@@ -251,7 +249,6 @@
           </script>
         <%when 4%>
           <script>
-            google.charts.load("current", {'packages': ["line"]});
             google.charts.setOnLoadCallback(drawLineChart);
 
             $(window).bind('resizeEnd', function(){
@@ -296,7 +293,6 @@
           </script>
         <%when 5%>
           <script>
-            google.charts.load("current", {'packages': ['corechart']});
             google.charts.setOnLoadCallback(drawStackedChart);
 
             $(window).bind('resizeEnd', function(){

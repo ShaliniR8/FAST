@@ -152,6 +152,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       get 'load_conditions_block'
       get "get_all_query_result_json"
+      post "get_dataset"
     end
   end
 

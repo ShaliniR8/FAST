@@ -7,15 +7,15 @@ ruby:
     a href=url target='_blank'
       = image_tag url,
         class: 'img-responsive',
-        style: 'width: 100%; height: auto;'
+        style: "width: 100%; height: #{from_mini.present? ? "50px" : "auto"};"
   - when *Attachment.audio_extensions
     audio controls=true
       source src=url type='audio/mpeg'
   - when *Attachment.video_extensions
-    video style='width: 100%; height: auto;' controls=true autostart=false
+    video style="width: 100%; height: #{from_mini.present? ? "50px" : "auto"};" controls=true autostart=false
       source src=url type='video/mp4'
   - when *Attachment.pdf_extensions
-    object style='width: 100%; height: auto;' data=url type='application/pdf'
+    object style="width: 100%; height: #{from_mini.present? ? "50px" : "auto"};" data=url type='application/pdf'
       a href=url = "#{attachment.document_filename}.pdf"
   - else
     font style='color: red; font-weight: bold;' No Preview Available

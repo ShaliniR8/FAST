@@ -343,7 +343,7 @@ class DefaultSafetyRiskManagementConfig
           responsible_user: { default: true },
           approver: { default: true,
             field: 'approver_id',
-            visible: 'index,form,show'
+            visible: 'index,form,show,auto'
           },
           faa_approval: {
             field: 'faa_approval', title: 'Requires FAA Approval',

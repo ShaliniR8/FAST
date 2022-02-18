@@ -56,7 +56,6 @@ class DefaultConfig
     has_root_causes:                            true,    # Enables the use of root causes - default on
     shared_links:                               false,   # Enables shareable links to be created for forms - default off
     drop_down_risk_selection:                   false,
-    query_processing_in_rake_task:              false,
     advanced_checklist_data_type:               false,
     auto_populate_nested_fields_visualizations: false,
     add_attachment_in_any_status:               false,
@@ -74,6 +73,8 @@ class DefaultConfig
     safety_promotion_visibility:        false,  # Default visibility of Safety Promotion --> OFF
 
   }
+
+  DOCUMENT_CATEGORIES = ["ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
 
   LABELS = {
 

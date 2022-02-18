@@ -3,15 +3,6 @@
     <div class="panel-title">
       <div>
         <span class="top_text">Query Detail</span>
-        <% if CONFIG::GENERAL[:query_processing_in_rake_task] %>
-          <%= link_to(refresh_query_query_path(@owner),
-                       method: :post,
-                      :class => 'btn btn-primary pull-right ml10',
-                      :id => 'query-refresh-btn') do %>
-            <span class="glyphicon glyphicon-refresh"></span>
-          <% end %>
-          <span class="pull-right" id="query-processing-status"><%=@status_msg%></span>
-        <% end %>
       </div>
       <div class="top_buttons pull-right"></div>
     </div>

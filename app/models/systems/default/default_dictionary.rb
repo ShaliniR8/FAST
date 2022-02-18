@@ -670,7 +670,7 @@ class DefaultDictionary
       required: false,  html_class: 'get_before_risk_color'
     },
     risk_score: {
-      field: 'get_risk_score', title: 'Baseline Risk Score',
+      field: 'get_risk_score', title: 'Initial Risk Score',
       num_cols: 12, type: 'text', visible: 'query',
       required: false,  html_class: 'get_before_risk_color'
     },
@@ -690,7 +690,7 @@ class DefaultDictionary
       required: false,  html_class: 'get_after_risk_color'
     },
     risk_score_after: {
-      field: 'get_risk_score_after', title: 'Baseline Risk Score',
+      field: 'get_risk_score_after', title: 'Mitigated Risk Score',
       num_cols: 12, type: 'text', visible: 'query',
       required: false,  html_class: 'get_before_risk_color'
     },

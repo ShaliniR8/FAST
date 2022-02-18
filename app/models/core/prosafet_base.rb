@@ -88,7 +88,7 @@ class ProsafetBase < ActiveRecord::Base
     result = ""
     counter = 1
     self.verifications.each do |verification|
-      result  += "##{counter}: #{verification.status}, <b>#{verification.verify_date.strftime(CONFIG.getTimeFormat[:dateformat])}</b><br><br>"
+      result  += "##{counter}: #{verification.status}, <b>#{verification.verify_date.strftime(CONFIG.getTimeFormat[:dateformat].gsub('/', '-'))}</b><br><br>"
       counter += 1
     end
     result.html_safe

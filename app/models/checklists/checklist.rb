@@ -21,6 +21,14 @@ class Checklist < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
+    keys = Checklist.get_meta_fields(nil).select { |val| (val[:visible].split(',') & visible_fields).any? }
+                                          .map { |key| key[:field].to_s }
+
+    keys
+  end
+
   def temp_method
     # byebug
   end

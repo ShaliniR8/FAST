@@ -23,7 +23,7 @@ css:
   - attachments.each.with_index do |attachment, index|
     .row.attachment-item align='center' class=((edit || index < attachments.length - 1) && 'mb10')
       .attachment-thumbnail
-        = render 'forms/attachments_preview', attachment: attachment
+        = render 'forms/attachments_preview', attachment: attachment, from_mini: true
       p
         strong = attachment.caption
       - if edit
@@ -53,7 +53,7 @@ css:
               span.glyphicon.glyphicon-remove
         .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
           .col-xs-12 align='center'
-            = render 'forms/attachments_preview', attachment: attachment
+            = render 'forms/attachments_preview', attachment: attachment, from_mini: false
   - if edit
     .row
       div id="#{owner.id}_add_attachments"

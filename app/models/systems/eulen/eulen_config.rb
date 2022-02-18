@@ -26,7 +26,6 @@ class EULENConfig < DefaultConfig
     global_admin_default:              false,
     advanced_checklist_data_type:      true,
     checklist_query:                   true,
-    query_processing_in_rake_task:     true,
     sms_im_visibility:                 false,
     safety_promotion_visibility:       true,
   })
@@ -43,6 +42,9 @@ class EULENConfig < DefaultConfig
       :faa_report       => true
     }
   end
+
+
+  DOCUMENT_CATEGORIES = ["Eulen Manuals", "Airlines Manuals", "Standard Operating Procedures", "Local Operating Procedures", "Safety Alerts", "Team Focus Briefs", "Other"]
 
 
   FAA_INFO = {

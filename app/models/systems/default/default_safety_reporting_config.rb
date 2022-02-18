@@ -138,7 +138,7 @@ class DefaultSafetyReportingConfig
           },
           disposition: {
             field: 'disposition', title: 'Disposition',
-            num_cols: 6, type: 'datalist', visible: 'close, query',
+            num_cols: 6, type: 'datalist', visible: 'close,query',
             required: false,  options: "CONFIG.custom_options['Dispositions']"
           },
           company_disposition: {

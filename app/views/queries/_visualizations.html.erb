@@ -20,7 +20,7 @@
     <%if @owner.visualizations.present?%>
       <%@owner.visualizations.each do |visualization|%>
         <%=render "visualization",
-          records: @records.map(&:id).join(","),
+          records: @records_ids.join(","),
           visualization: visualization%>
       <%end%>
     <%end%>
@@ -50,7 +50,7 @@
       $.ajax({
         type: "POST",
         url: "<%=add_visualization_query_path(@owner)%>",
-        data: {"records": "<%=@records.map(&:id).join(',')%>"},
+        data: {"records": "<%=@records_ids.map(&:to_i).join(',')%>"},
         success: function(response){$("#visualizations").prepend(response);},
         error: function(response){console.log(response);}
       });

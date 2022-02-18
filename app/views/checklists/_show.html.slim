@@ -39,7 +39,11 @@ ruby:
 
               b Checklist Template:
               - if checklist.template_id.present?
-                = " #{Checklist.find(checklist.template_id).title}"
+                - cklst = Checklist.find(checklist.template_id) rescue nil
+                - if cklst.present?
+                  = " #{Checklist.find(checklist.template_id).title}"
+                - else
+                  = ' Template was Removed from System'
               - else
                 = ' No Template'
 

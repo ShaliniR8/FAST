@@ -371,8 +371,8 @@ class ChecklistsController < ApplicationController
     checklist = @table.preload(:checklist_rows => :checklist_cells).find(params[:id])
     owner = checklist.owner
     checklist_name = checklist.title
+    AccessControl.where(entry: checklist_name).map(&:destroy) if checklist.owner_type == 'ChecklistHeader'
     checklist.destroy
-    AccessControl.where(entry: checklist_name).map(&:destroy)
     redirect_to owner.class.name == 'ChecklistHeader' ? checklists_path : owner
   end
 

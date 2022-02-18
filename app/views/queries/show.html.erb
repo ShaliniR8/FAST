@@ -85,6 +85,7 @@
 
 <script>
   $(function() {
+    google.charts.load("current", {packages:["corechart", "bar", "line"]});
     isReady = <%= @owner.is_ready_to_export %>
 
     if (isReady) {
