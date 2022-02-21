@@ -136,6 +136,11 @@ class DefaultSafetyReportingConfig
             num_cols: 6, type: 'boolean', visible: 'close',
             required: true
           },
+          regulatory_violation: {
+            field: 'regulatory_violation', title: 'Regulatory Violation',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: false
+          },
           disposition: {
             field: 'disposition', title: 'Disposition',
             num_cols: 6, type: 'datalist', visible: 'close,query',
@@ -260,6 +265,11 @@ class DefaultSafetyReportingConfig
             field: 'sole', title: 'Sole Source',
             num_cols: 6, type: 'boolean', visible: 'asap',
             required: true
+          },
+          regulatory_violation: {
+            field: 'regulatory_violation', title: 'Regulatory Violation',
+            num_cols: 6, type: 'boolean', visible: 'asap',
+            required: false
           },
           disposition: {
             field: 'disposition', title: 'Disposition',

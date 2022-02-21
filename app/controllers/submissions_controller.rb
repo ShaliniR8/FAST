@@ -223,11 +223,11 @@ class SubmissionsController < ApplicationController
 
       field_label_hash = CONFIG.sr::ASAP_LIBRARY_FIELD_NAMES
       record.record_fields.each do |rf|
-        if rf.field.label.present? && field_label_hash[:departure_names].include?(rf.field.label.strip)
+        if rf.field.present? && rf.field.label.present? && field_label_hash[:departure_names].include?(rf.field.label.strip)
           @entries[record.id]["Departure"] = rf.value.to_s
-        elsif rf.field.label.present? && field_label_hash[:arrival_names].include?(rf.field.label.strip)
+        elsif rf.field.present? && rf.field.label.present? && field_label_hash[:arrival_names].include?(rf.field.label.strip)
           @entries[record.id]["Scheduled Landing"] = rf.value.to_s
-        elsif rf.field.label.present? && field_label_hash[:actual_names].include?(rf.field.label.strip)
+        elsif rf.field.present? && rf.field.label.present? && field_label_hash[:actual_names].include?(rf.field.label.strip)
           @entries[record.id]["Actual Landing"] = rf.value.to_s
         end
       end

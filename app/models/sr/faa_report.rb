@@ -54,6 +54,8 @@ class FaaReport < ActiveRecord::Base
         link: true, mode: 5, value: 'statistics', value_key: 'asap_accepted_employee_car'},
       {title: 'Number of accepted reports present quarter, which resulted in recommendations to the company for corrective action',
         link: true, mode: 6, value: 'statistics', value_key: 'asap_aceepted_company_car'},
+      {title: 'Number of ASAP reports that are actual regulatory violations present quarter',
+        link: true, mode: 7, value: 'statistics', value_key: 'actual_reg_violation'},
     ]
   end
 
@@ -66,7 +68,8 @@ class FaaReport < ActiveRecord::Base
       asap_accepted_sole_source: accepted_reports.select{|report| report.sole}.map(&:id),
       asap_accepted_closed: accepted_reports.select{|report| report.status == 'Closed'}.map(&:id),
       asap_accepted_employee_car: accepted_reports.select{|report| report.has_emp}.map(&:id),
-      asap_aceepted_company_car: accepted_reports.select{|report| report.has_com}.map(&:id)
+      asap_aceepted_company_car: accepted_reports.select{|report| report.has_com}.map(&:id),
+      actual_reg_violation: asap_reports.select{|report| report.regulatory_violation.present?}.map(&:id)
     }
     result
   end
@@ -79,12 +82,13 @@ class FaaReport < ActiveRecord::Base
         (x.template.name.include? "ASAP") &&
         (x.template.name.include? "#{self.employee_group}")}
     stats = self.statistics(asap_reports)
-    self.asap_submit = stats[:asap_submitted].size
-    self.asap_accept = stats[:asap_accepted].size
-    self.sole        = stats[:asap_accepted_sole_source].size
-    self.asap_close  = stats[:asap_accepted_closed].size
-    self.asap_emp    = stats[:asap_accepted_employee_car].size
-    self.asap_com    = stats[:asap_aceepted_company_car].size
+    self.asap_submit           = stats[:asap_submitted].size
+    self.asap_accept           = stats[:asap_accepted].size
+    self.sole                  = stats[:asap_accepted_sole_source].size
+    self.asap_close            = stats[:asap_accepted_closed].size
+    self.asap_emp              = stats[:asap_accepted_employee_car].size
+    self.asap_com              = stats[:asap_aceepted_company_car].size
+    self.asap_reg_violation    = stats[:actual_reg_violation].size
     self.save
   end
 

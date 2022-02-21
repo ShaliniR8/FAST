@@ -210,10 +210,10 @@ class AJTConfig < DefaultConfig
   }
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({
-    'CHDO'                           => 'ProSafeT',
-    'Region'                         => 'Pacific',
-    'ASAP MOU Holder Name'           => 'ProSafeT',
-    'ASAP MOU Holder FAA Designator' => 'ProSafeT'
+    'CHDO'                           => 'FAA',
+    'Region'                         => 'Eastern',
+    'ASAP MOU Holder Name'           => 'Amerijet International',
+    'ASAP MOU Holder FAA Designator' => 'Stewart Salisbury'
   })
 
   CSV_FILE_USER_IMPORT = {
