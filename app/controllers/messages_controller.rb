@@ -222,4 +222,18 @@ class MessagesController < ApplicationController
   end
 
 
+  def delete_multiple
+    message_ids_to_delete = params[:message_ids].split(',')
+
+    if params[:source] == "Sent"
+      SendFrom.where(messages_id: message_ids_to_delete).map{|s| s.update_attributes({visible: false})}
+    else
+      SendTo.where(messages_id: message_ids_to_delete).map{|s| s.update_attributes({visible: false, status: 'Read'})}
+      CC.where(messages_id: message_ids_to_delete).map{|s| s.update_attributes({visible: false, status: 'Read'})}
+    end
+
+    render json: { message: "#{message_ids_to_delete.count} #{message_ids_to_delete.count > 1 ? 'Messages' : 'Message'} deleted" }
+  end
+
+
 end

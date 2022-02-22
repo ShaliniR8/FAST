@@ -4,13 +4,20 @@
 <script type="text/javascript" src="/javascripts/utility/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"/>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <div class="item active mt20" style="height:auto;">
   <div class="grid per90 center-block">
     <div class="panel panel-steelblue">
       <div class="panel-heading">
         <div class="panel-title">
-          <%=@title%>
+          <div class="top_text">
+            <%=@title%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%=link_to "Mark All", '#', class: "btn btn-warning mark-all"%>
+            <%=link_to "Delete Marked", '#', class: "btn btn-danger delete-multiple"%>
+          </div>
         </div>
       </div>
       <div class="panel-body">
@@ -30,9 +37,14 @@
                       <%end%>
                     <%end%>
                     <td style="font-weight:<%=@status ? 'bold' : 'normal'%>">
-                      <div class="pull-right"><%=m.get_time%></div>
-                      <%=action_name == 'sent' ? ((send_to_list = m.getAll('send_to')).empty? ? 'No Recipients' : send_to_list) : m.getAll('send_from')%><br>
-                      <%=m.subject%></br>
+                      <div class='col-xs-1'>
+                        <input type="checkbox" id="<%=m.id%>" value="<%=m.id%>" class="deletable-messages">
+                      </div>
+                      <div class='col-xs-11'>
+                        <div class="pull-right"><%=m.get_time%></div>
+                        <%=action_name == 'sent' ? ((send_to_list = m.getAll('send_to')).empty? ? 'No Recipients' : send_to_list) : m.getAll('send_from')%><br>
+                        <%=m.subject%></br>
+                      </div>
                     </td>
                   </tr>
                 <%end%>
@@ -58,6 +70,7 @@
 
 <script>
   $(document).ready(function(){
+
     $("tr").on("click",function(){
       $(this).find('td').css('font-weight', 'normal');
       $("tr").css('background-color', 'white');
@@ -66,11 +79,55 @@
         $("#view_message").html(data);
       });
     });
+
     var dt=$('#users').DataTable({
       'bPaginate':false,
       "bInfo":false,
       "dom": 'flpt',
       "aaSorting": [[0, "desc"]]
     });
+
+    $('.delete-multiple').on('click', function(){
+      let deletable_items = ''
+      let delete_elems = $("input.deletable-messages:checked");
+
+      delete_elems.each(function(index, elem){
+          deletable_items += $(elem).val() + ",";
+      });
+
+      if (deletable_items == ''){
+        alert("Please select at least 1 message to delete!");
+        return false;
+      } else {
+        $.ajax({
+          url: "<%=delete_multiple_messages_path%>",
+          type: "POST",
+          dataType: 'json',
+          data: {message_ids: deletable_items.slice(0, -1), source: "<%=@title%>"},
+          success: function(data) {
+            Swal.fire({
+              icon: 'success',
+              title: data['message'],
+              showConfirmButton: false,
+              timer: 1500
+            }).then((result) => {
+              location.reload(true);
+            });
+          }
+        });
+      }
+    })
+
+    $('.mark-all').on('click', function(){
+      let btn_text = $(this).text();
+      if (btn_text == 'Mark All') {
+        $(this).text('Unmark All');
+        $('.deletable-messages').prop("checked", true);
+      } else {
+        $(this).text('Mark All');
+        $('.deletable-messages').prop("checked", false);
+      }
+    })
+
   });
 </script>

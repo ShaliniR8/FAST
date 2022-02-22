@@ -110,6 +110,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       get 'sent'
       get 'message_submitter'
+      post 'delete_multiple'
     end
   end
   resources :time do
