@@ -44,6 +44,7 @@ class SubmissionWidgetsController < ApplicationController
 
     if @record.save
       @record.make_report
+      notify_notifiers(@record)
       redirect_to new_submission_widget_path + "/#{params[:submission][:templates_id]}",
       notice: "Your General Safety Report has been submitted."
     else
@@ -51,5 +52,23 @@ class SubmissionWidgetsController < ApplicationController
       alert: "Failed"
     end
 
+  end
+
+
+  def notify_notifiers(owner)
+    mailer_privileges = AccessControl.where(
+      :action => 'notifier',
+      :entry => owner.template.name)
+      .map{|x| x.privileges.map(&:id)}.flatten
+
+    notifiers = User.preload(:privileges)
+      .where("disable is null or disable = 0")
+      .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
+
+    call_rake 'submission_notify',
+            owner_type: owner.class.name,
+            owner_id: owner.id,
+            users: notifiers.map(&:id),
+            attach_pdf: CONFIG.sr::GENERAL[:attach_pdf_submission]
   end
 end
