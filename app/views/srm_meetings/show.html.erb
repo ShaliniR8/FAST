@@ -44,7 +44,7 @@
       <div class="panel-body">
         <div class="col-xs-12 mb15">
 
-          <%if current_user.has_access("srm_meetings","edit") &&
+          <%if current_user.has_access("srm_meetings","edit", admin: CONFIG::GENERAL[:global_admin_default]) &&
                 @meeting.status == "Open" &&
                 @meeting.has_user(current_user)%>
             <%=link_to 'Close Meeting', '#',
