@@ -149,6 +149,8 @@ PrdgSession::Application.routes.draw do |map|
       post "generate_visualization"
       post "display_chart_result"
       post "enable"
+      get "add_subscribers_view"
+      get "print"
     end
     collection do
       get 'load_conditions_block'

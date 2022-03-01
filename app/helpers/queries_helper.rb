@@ -73,7 +73,7 @@ module QueriesHelper
   end
 
 
-  def get_data_table_for_google_visualization_with_series(x_axis_field_arr:, series_field_arr:, records_ids:, get_ids:, query:)
+  def get_data_table_for_google_visualization_with_series(x_axis_field_name:, x_axis_field_arr:, series_field_arr:, records_ids:, get_ids:, query:)
     # build array of hash to stores values for x_axis and series
     arr = create_hash_array_sql(x_axis_field_arr, series_field_arr, records_ids, get_ids, query)
     # create a hash to store the occurences of each element
@@ -118,7 +118,7 @@ module QueriesHelper
     x_axis = data_hash.keys
 
     # creates final data array: 2-D array
-    row1 = [params[:x_axis]] << series.sort
+    row1 = [x_axis_field_name] << series.sort
     data = [row1.flatten]
     x_axis.sort.each do |x|
       data << series.sort.inject([x]){|arr, y| arr << (data_hash[x][y] || 0)}
@@ -911,6 +911,13 @@ module QueriesHelper
         else
           str = "#{table_name}.#{field_name} < #{search_value}"
         end
+
+      when 'Last ( ) Days'
+        case target_field[:type]
+        when 'date', 'datetime'
+          start_date, end_date = (Date.current - search_value.to_f.days).strftime('%Y-%m-%d'), Date.today.strftime('%Y-%m-%d')
+          str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\'"
+        end
       end
     end
 
@@ -1197,6 +1204,13 @@ module QueriesHelper
                 end
               else
                 str = "#{object_field_table_name}.value < #{search_value}"
+              end
+
+            when 'Last ( ) Days'
+              case template_field.data_type
+              when 'date', 'datetime'
+                start_date, end_date = (Date.current - search_value.to_f.days).strftime('%Y-%m-%d'), Date.today.strftime('%Y-%m-%d')
+                str = "DATE(#{object_field_table_name}.value) >= \'#{start_date}\' AND DATE(#{object_field_table_name}.value) <= \'#{end_date}\'"
               end
             end
 

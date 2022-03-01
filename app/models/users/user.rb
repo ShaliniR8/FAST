@@ -266,6 +266,11 @@ class User < ActiveRecord::Base
   end
 
 
+  def get_search_detail
+    employee_number.present? ? "#{full_name} (##{employee_number})" : "#{full_name}"
+  end
+
+
   def self.get_headers
     h = Hash.new
 

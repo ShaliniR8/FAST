@@ -1,0 +1,28 @@
+- record = locals[:record]
+- style = defined?(locals[:from_form]) ? (locals[:from_form].present? ? "display:none;" : "") : ""
+tr.field-group.deletable
+  td
+    = text_field_tag :user_name,
+      record.present? ? "#{record.user.get_search_detail}" : nil,
+      list: 'users_list',
+      class: 'form-control user_field required_field'
+    = f.hidden_field :user_id, class: 'form_id'
+
+  td style=style
+    - field_options = Subscription.frequency_types.invert
+    - selected = record.present? ? record.frequency : nil
+    = f.select :frequency, options_for_select(field_options, selected),
+      {include_blank:''}, {class: "field_select form-control required_field"}
+
+  td style=style
+    = f.text_field :day, class: 'form-control'
+
+  td
+    = f.hidden_field :_destroy, class: 'archived-field'
+    - if locals[:existing]
+      = link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+        class: 'btn btn-sm btn-outline-warning pull-left mr5 delete-btn'
+    - else
+      = link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
+        class: 'btn btn-sm btn-outline-warning mr5 mt5 delete-btn',
+        "title" => "Delete"

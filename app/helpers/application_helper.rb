@@ -1,5 +1,6 @@
 module ApplicationHelper
   include ShowDataHelper
+  include QueriesHelper
 
   def get_filtered_data(params)
     use_advanced_search = params[:advance_search].present? && params[:advance_search]["advance_search"]
@@ -922,4 +923,71 @@ module ApplicationHelper
   def strip_html_tag(text)
     text.gsub(/<\/?[^>]+>/, '') rescue text
   end
+
+
+  def get_query_results_ids_helper(query_id)
+    query = Query.find(query_id)
+    return get_query_results_ids(query)
+  end
+
+
+  def generate_visualization_helper(query_id, x_axis, series, records_ids)
+    query = Query.find(query_id)
+    object_type = Object.const_get(query.target)
+    x_axis_field = get_field_helper(query, object_type, x_axis)
+    series_field = get_field_helper(query, object_type, series)
+
+    if series.present? && x_axis.present?
+      data = get_data_table_for_google_visualization_with_series(x_axis_field_name: x_axis,
+                                                                 x_axis_field_arr: x_axis_field,
+                                                                 series_field_arr: series_field,
+                                                                 records_ids: records_ids,
+                                                                 get_ids: false,
+                                                                 query: query)
+
+    elsif x_axis.present?
+      data = get_data_table_for_google_visualization_sql(x_axis_field_arr: x_axis_field, records_ids: records_ids, query: query)
+      data << ['N/A', 0] if data.length == 1
+    elsif series.present?
+      data = get_data_table_for_google_visualization_sql(x_axis_field_arr: series_field, records_ids: records_ids, query: query)
+      data << ['N/A', 0] if data.length == 1
+    end
+
+    return data.map{ |x| [x[0].to_s, x[1..-1]].flatten}
+  end
+
+
+  def visualization_title_helper(x_axis, series)
+    title = ""
+
+    if series.present? && x_axis.present?
+      title = "#{x_axis} By #{series}"
+    elsif x_axis.present?
+      title = "#{x_axis}"
+    elsif series.present?
+      title = "#{series}"
+    end
+
+    title
+  end
+
+
+  def get_field_helper(query, object_type, field_label)
+    # label = field_label.split(',').map(&:strip)[0]
+    label = field_label
+
+    # if top level field
+    field = object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close')
+      .keep_if{|f| f[:title] == label}.first
+    # else check template fields
+    field = Template.preload(:categories, :fields)
+      .where(id: query.templates)
+      .map(&:fields)
+      .flatten
+      .select{|x| x.label.strip == label.strip}
+      .first if field.nil?
+    # [field, field_label.split(',').map(&:strip)[1]]
+    [field, field_label]
+  end
+
 end

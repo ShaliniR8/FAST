@@ -102,7 +102,11 @@
           mode: "single",
           dateFormat: 'Y-m-d',
         });
-      } else if (($(this).val() != '<' && $(this).val() != '>=') && (field_type == "date" || field_type == "datetime")) {
+      } else if ($(this).val() == 'Last ( ) Days' && (field_type == "date" || field_type == "datetime")){
+        let field_value = $(this).parent().parent().find(".field_value");
+        let html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number">';
+        $(field_value).html(html);
+      } else if (($(this).val() != '<' && $(this).val() != '>=' && $(this).val() != 'Last ( ) Days') && (field_type == "date" || field_type == "datetime")) {
         let field_value = $(this).parent().parent().find(".field_value");
         $(field_value).find(".value_field").flatpickr({
           mode: "range",
@@ -119,6 +123,7 @@
     var field_name = $(field).val();
     var field_type = $("option[value='" + field_name + "']").data("fieldtype");
     var field_value = $(field).parent().parent().find(".field_value");
+    var condition_type = $(field).parent().parent().find('.field-operator-all').val();
 
     var name = $(field).attr("name").replace("field", "value");
 
@@ -126,10 +131,20 @@
 
     if (field_type == "date" || field_type == "datetime") {
       $(field_value).html(html);
-      $(field_value).find(".value_field").flatpickr({
-        mode: "range",
-        dateFormat: 'Y-m-d',
-      });
+      if (condition_type == 'Last ( ) Days') {
+        html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number" value="' + value + '">';
+        $(field_value).html(html);
+      } else if (condition_type == '>=' || condition_type == '<') {
+        $(field_value).find(".value_field").flatpickr({
+          mode: "single",
+          dateFormat: 'Y-m-d',
+        });
+      } else {
+        $(field_value).find(".value_field").flatpickr({
+          mode: "range",
+          dateFormat: 'Y-m-d',
+        });
+      }
 
     } else if (field_type == "boolean_box" || field_type == "boolean") {
       html = '<select class="form-control value_field" id="' + name + '" name="' + name + '">' +

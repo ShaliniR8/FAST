@@ -112,4 +112,19 @@ class NotifyMailer < ApplicationMailer
     mail(to: email, subject: 'Report Export Complete').deliver
   end
 
+
+  def send_query_digest(users:users, query:query, file:file)
+    emails = users.map(&:email).uniq
+    attachments["Query_#{query.id}.pdf"] = file
+    @query = query
+    default = 'noc@prosafet.com'
+    subject = "#{CONFIG::GENERAL[:name]} Query Digest for #{query.title}"
+
+    if Rails.env.production?
+      mail(to: emails, subject: subject).deliver
+    else
+      mail(to: default, subject: subject).deliver
+    end
+  end
+
 end

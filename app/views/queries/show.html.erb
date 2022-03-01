@@ -26,6 +26,12 @@
             <%if CONFIG::GENERAL[:power_bi_integration]%>
               <input type="checkbox" id="export_query_result">
             <%end%>
+            <%=link_to 'Add/Edit Subscribers', '#',
+              :class => 'btn btn-success add_subs_btn',
+              'data-toggle' => 'modal',
+              'data-target' => '.bs-example-modal-lg',
+              :route => add_subscribers_view_query_path(@owner)%>
+            <%=link_to 'PDF', print_query_path(@owner, format: :pdf), class: 'btn btn-info'%>
             <%=link_to "Make a Copy", clone_query_path(@owner), class: "btn btn-info", confirm: "Are you sure?"%>
             <%=link_to "Edit", edit_query_path(@owner), class: "btn btn-warning", disable_with: "Editing..."%>
             <%=link_to "Delete", query_path(@owner), method: :delete, class: "btn btn-danger", confirm: "Are you sure?"%>
@@ -106,6 +112,13 @@
       width: '150px',
       onstyle: onStyle,
       offstyle: offStyle
+    });
+
+    $(".add_subs_btn").on('click',function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
     });
 
     $('.toggle.btn').change(function() {
