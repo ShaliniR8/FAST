@@ -3,7 +3,7 @@
 tr.field-group.deletable
   td
     = text_field_tag :user_name,
-      record.present? ? "#{record.user.get_search_detail}" : nil,
+      record.present? ? "#{record.user.get_search_detail rescue ""}" : nil,
       list: 'users_list',
       class: 'form-control user_field required_field'
     = f.hidden_field :user_id, class: 'form_id'
