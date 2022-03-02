@@ -136,7 +136,7 @@ class RecurrencesController < ApplicationController
     @recurrence = Recurrence.find(params[:id])
     @fields = Recurrence.get_meta_fields('show')
     @type = Object.const_get(@recurrence.form_type)
-    @template = @type.find(@recurrence.template_id)
+    @template = @type.find(@recurrence.template_id) rescue nil
 
     if CONFIG.sa::GENERAL[:recurring_item_checklist]
       @fields = Recurrence.get_meta_fields_spawns('show')
@@ -162,8 +162,8 @@ class RecurrencesController < ApplicationController
     recurrence = Recurrence.find(params[:id])
     @type = Object.const_get(recurrence.form_type)
     child_access_validation(@type.name,'destroy')
-    template = @type.find(recurrence.template_id)
-    template.destroy
+    template = @type.find(recurrence.template_id) rescue nil
+    template.destroy if template.present?
     recurrence.destroy
     redirect_to "/recurrences?form_type=#{@type}", flash: {danger: "Recurrence ##{params[:id]} deleted."}
   end

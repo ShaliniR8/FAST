@@ -75,7 +75,9 @@
                 </div>
               </div>
               <div class="panel-body">
-                <%=render 'forms/show_fields', fields: @template_fields, record: @template %>
+                <%if @template.present?%>
+                  <%=render 'forms/show_fields', fields: @template_fields, record: @template %>
+                <%end%>
               </div>
             </div>
           </div>
