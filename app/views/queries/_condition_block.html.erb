@@ -118,6 +118,7 @@
     $(document).on("change", ".field-operator-all", function(){
       let field_name = $(this).parent().parent().find("#field_select_all").val();
       let field_type = $("option[value='" + field_name + "']").data("fieldtype");
+      let name = $(this).attr("name").replace("logic", "value");
 
       if (($(this).val() == '<' || $(this).val() == '>=') && (field_type == "date" || field_type == "datetime")) {
         let field_value = $(this).parent().parent().find(".field_value");

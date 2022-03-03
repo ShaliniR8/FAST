@@ -250,6 +250,19 @@ module QueriesHelper
         values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
                                           .map{|r| [r.id, r.get_risk_score_after]}.to_h rescue {}
 
+      when 'risk_severity', 'risk_severity_after', 'risk_likelihood', 'risk_likelihood_after'
+        field_name = field_name.gsub('risk_', '')
+
+        if field_name.include?('severity')
+          arr = CONFIG::MATRIX_INFO[:severity_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+        else
+          arr = CONFIG::MATRIX_INFO[:probability_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+        end
+
+        values = object_type.find_by_sql("SELECT #{object_type.table_name}.id, #{object_type.table_name}.#{field_name} FROM #{object_type.table_name}
+                                          WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
+                                          .map{|r| [r.id, (r.send(field_name).present? ? arr[r.send(field_name).to_i].gsub('&nbsp;', ' ') : nil)]}.to_h rescue {}
+
       when 'users_id'
         if CONFIG::GENERAL[:sabre_integration].present?
           values = User.find_by_sql("SELECT CONCAT(users.full_name, \' (\', users.employee_number, \')\') AS full_name, records.id FROM users INNER JOIN records ON records.users_id = users.id
@@ -385,6 +398,22 @@ module QueriesHelper
       when 'mitigated_risk_score'
         values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
                                           .map(&:get_risk_score_after) rescue []
+
+      when 'risk_severity', 'risk_severity_after', 'risk_likelihood', 'risk_likelihood_after'
+        field_name = field_name.gsub('risk_', '')
+
+        if field_name.include?('severity')
+          arr = CONFIG::MATRIX_INFO[:severity_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+        else
+          arr = CONFIG::MATRIX_INFO[:probability_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+        end
+
+        temp_values = object_type.find_by_sql("SELECT #{object_type.table_name}.#{field_name} FROM #{object_type.table_name}
+                                          WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+
+        temp_values.each do |tv|
+          values << arr[tv.send(field_name).to_i].gsub('&nbsp;', ' ') if tv.send(field_name).present?
+        end
 
       when 'user_id'
         if CONFIG::GENERAL[:sabre_integration].present?
@@ -608,6 +637,23 @@ module QueriesHelper
 
         values.each do |val|
           temp_val = val.send(:get_risk_score_after)
+          val_hash[temp_val] << val.id if temp_val.present?
+        end
+
+      when 'risk_severity', 'risk_severity_after', 'risk_likelihood', 'risk_likelihood_after'
+        field_name = field_name.gsub('risk_', '')
+
+        if field_name.include?('severity')
+          arr = CONFIG::MATRIX_INFO[:severity_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+        else
+          arr = CONFIG::MATRIX_INFO[:probability_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+        end
+
+        values = object_type.find_by_sql("SELECT #{object_type.table_name}.id, #{object_type.table_name}.#{field_name} FROM #{object_type.table_name}
+                                          WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
+
+        values.each do |val|
+          temp_val = val.send(field_name).present? ? arr[val.send(field_name).to_i].gsub('&nbsp;', ' ') : nil
           val_hash[temp_val] << val.id if temp_val.present?
         end
 
@@ -1049,6 +1095,26 @@ module QueriesHelper
         ids = object_type.all.keep_if{|obj| obj.get_risk_score_after.exclude?(search_value)}.map(&:id) rescue ""
       end
 
+    when 'risk_severity', 'risk_severity_after', 'risk_likelihood', 'risk_likelihood_after'
+      field_name = field_name.gsub('risk_', '')
+
+      if field_name.include?('severity')
+        arr = CONFIG::MATRIX_INFO[:severity_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+      else
+        arr = CONFIG::MATRIX_INFO[:probability_table][:orientation] == :vertical ? CONFIG::MATRIX_INFO[:risk_table][:row_header] : CONFIG::MATRIX_INFO[:risk_table][:column_header]
+      end
+
+      arr = arr.map{|e| e.gsub('&nbsp;', ' ')}.map(&:downcase)
+      ind = ['Equals To', 'Not Equal To'].include?(condition.logic) ? arr.index(search_value).to_s : arr.index{|a| a.include?(search_value)}
+      ids = ""
+
+      case condition.logic
+      when 'Equals To', 'Contains'
+        ids = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE #{table_name}.#{field_name} = \'#{ind}\'").map(&:id) rescue "" if ind.present?
+      when 'Not Equal To', 'Does Not Contain'
+        ids = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE #{table_name}.#{field_name} <> \'#{ind}\'").map(&:id) rescue "" if ind.present?
+      end
+
     when 'checklist_get_owner', 'checklist_get_header', 'checklist_get_template'
       ids = checklist_custom_query(query, object_type, search_value, field_name)
 
@@ -1457,6 +1523,10 @@ module QueriesHelper
     mapping_hash['Record']['Exclude From ASAP Library'] = 'scoreboard'
     mapping_hash['Record']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Record']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['Record']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['Record']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['Record']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['Record']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['Record']['Sole Source'] = 'sole'
     mapping_hash['Record']["Additional Info"] = 'additional_info'
     mapping_hash['Record']["Type"] = 'record_type'
@@ -1471,6 +1541,10 @@ module QueriesHelper
     mapping_hash['Report']['Event Description'] = 'narrative'
     mapping_hash['Report']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Report']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['Report']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['Report']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['Report']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['Report']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['Report']['Meeting Minutes'] = 'minutes'
     mapping_hash['Report']["Included Reports"] = 'included_reports'
     mapping_hash['Report']["Included Reports Types"] = 'included_reports_types'
@@ -1575,6 +1649,10 @@ module QueriesHelper
     mapping_hash['Investigation']["Full #{Investigation.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Investigation']["#{I18n.t('sa.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Investigation']["#{I18n.t('sa.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['Investigation']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['Investigation']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['Investigation']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['Investigation']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['Investigation']['Source of Input'] = 'source_of_input'
     mapping_hash['Investigation']['Included Findings'] = 'included_findings'
     mapping_hash['Investigation']["Verifications"] = 'included_verifications'
@@ -1601,6 +1679,10 @@ module QueriesHelper
     mapping_hash['Finding']["Full #{Finding.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Finding']["#{I18n.t('sa.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Finding']["#{I18n.t('sa.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['Finding']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['Finding']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['Finding']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['Finding']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['Finding']['Source of Input'] = 'source_of_input'
     mapping_hash['Finding']["Verifications"] = 'included_verifications'
 
@@ -1618,6 +1700,10 @@ module QueriesHelper
     mapping_hash['SmsAction']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['SmsAction']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['SmsAction']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['SmsAction']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['SmsAction']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['SmsAction']['Source of Input'] = 'source_of_input'
     mapping_hash['SmsAction']["Verifications"] = 'included_verifications'
 
@@ -1667,8 +1753,12 @@ module QueriesHelper
     mapping_hash['Sra']['Affected Regulatory Compliances'] = 'compliances'
     mapping_hash['Sra']['Other Affected Regulatory Compliances'] = 'other_compliance'
     mapping_hash['Sra']['Affected Regulatory Compliances Comments'] = 'compliances_comment'
-    mapping_hash['Sra']["#{I18n.t('srm.risk.baseline.title')} Risk"] = 'departments_comment'
-    mapping_hash['Sra']["#{I18n.t('srm.risk.mitigated.title')} Risk"] = 'departments_comment'
+    mapping_hash['Sra']["#{I18n.t('srm.risk.baseline.title')} Risk"] = 'risk_factor'
+    mapping_hash['Sra']["#{I18n.t('srm.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['Sra']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['Sra']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['Sra']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['Sra']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['Sra']['Source of Input'] = 'source_of_input'
     mapping_hash['Sra']["Verifications"] = 'included_verifications'
 
@@ -1692,6 +1782,10 @@ module QueriesHelper
     mapping_hash['Hazard']["Full #{Hazard.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Hazard']["#{I18n.t('srm.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Hazard']["#{I18n.t('srm.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['Hazard']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['Hazard']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['Hazard']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['Hazard']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['Hazard']['Source of Input'] = 'source_of_input'
     mapping_hash['Hazard']["#{I18n.t('srm.risk.baseline.title')} Risk Score"] = 'initial_risk_score'
     mapping_hash['Hazard']["#{I18n.t('srm.risk.mitigated.title')} Risk Score"] = 'mitigated_risk_score'
