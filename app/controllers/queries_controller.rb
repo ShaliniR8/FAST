@@ -108,11 +108,15 @@ class QueriesController < ApplicationController
 
   def update
     @owner = Query.find(params[:id])
-    params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
-    params[:query][:templates] = params[:query][:templates].split(",")
-    @owner.update_attributes(params[:query])
-    @owner.query_conditions.destroy_all
-    params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
+    if params[:commit] != 'Save Subscription List'
+      params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
+      params[:query][:templates] = params[:query][:templates].split(",")
+      @owner.update_attributes(params[:query])
+      @owner.query_conditions.destroy_all
+      params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
+    else
+      @owner.update_attributes(params[:query])
+    end
     redirect_to query_path(@owner)
   end
 
@@ -133,7 +137,7 @@ class QueriesController < ApplicationController
 
   # on target select, load conditions block - primarily used to show only relevant fields
   def load_conditions_block
-    @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<']
+    @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<', 'Last ( ) Days']
     @operators = ["AND", "OR"]
     @owner = params[:query_id].present? ? Query.find(params[:query_id]) : Query.new
 
@@ -209,6 +213,18 @@ class QueriesController < ApplicationController
     @fields = @fields.sort_by{|field| (field[:title].present? ? field[:title] : "")}
     render :partial => "building_query"
   end
+
+
+  def print
+    @owner = @table.find(params[:id])
+    html = render_to_string(template: 'queries/print.html.slim')
+    pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    filename = "Query ##{@owner.id}"
+    send_data pdf.to_pdf, :filename => "#{filename}.pdf"
+  end
+
 
   def display_chart_result
     header = 0
@@ -294,13 +310,15 @@ class QueriesController < ApplicationController
 
     if params[:series].present? && params[:x_axis].present? # if series present, build data from both values
       title = "#{params[:x_axis]} By #{params[:series]}"
-      @data = get_data_table_for_google_visualization_with_series(x_axis_field_arr: @x_axis_field,
+      @data = get_data_table_for_google_visualization_with_series(x_axis_field_name: params[:x_axis],
+                                                                  x_axis_field_arr: @x_axis_field,
                                                                   series_field_arr: @series_field,
                                                                   records_ids: params[:records].split(','),
                                                                   get_ids: false,
                                                                   query: @owner)
 
-      @data_ids = get_data_table_for_google_visualization_with_series(x_axis_field_arr: @x_axis_field,
+      @data_ids = get_data_table_for_google_visualization_with_series(x_axis_field_name: params[:x_axis],
+                                                                      x_axis_field_arr: @x_axis_field,
                                                                       series_field_arr: @series_field,
                                                                       records_ids: params[:records].split(','),
                                                                       get_ids: true,
@@ -468,6 +486,12 @@ class QueriesController < ApplicationController
     @records_ids = get_query_results_ids(@owner)
     @target = @owner.target
     @is_query_ready = true
+  end
+
+
+  def add_subscribers_view
+    @owner = Query.find(params[:id])
+    render :partial => 'shared/subscriptions'
   end
 
 

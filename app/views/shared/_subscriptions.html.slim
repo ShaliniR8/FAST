@@ -1,0 +1,85 @@
+= javascript_include_tag "/javascripts/utility/validate-form.js"
+= javascript_include_tag "/javascripts/utility/extra_fields.js"
+= form_for @owner do |f|
+
+  .panel-warning
+    .panel-heading
+      .panel-title
+        | Subscriber List for Query ##{@owner.id}
+        button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"
+          span class="glyphicon glyphicon-remove"
+
+    .panel-body
+      = f.submit 'Save Subscription List',
+        class: 'btn btn-success pull-right mb20',
+        disable_with: 'Saving...'
+
+      .col-xs-12.subscriptions.insertposition
+        table.table.table-bordered
+          thead
+            - Subscription.get_meta_fields('form').each do |field|
+              th = label_tag field[:field], field[:title], class: "#{field[:required] ? 'required_label' : ''}"
+            th Actions
+
+          tbody.subscriptions-insertposition
+            - @owner.subscriptions.each do |subscription|
+              = f.fields_for :subscriptions, subscription do |ff|
+                = render 'shared/subscription_field',
+                  f:ff,
+                  locals: {existing:true, record:subscription}
+
+        = link_to_add_fields '+ Subscriber', f,
+          :subscriptions,
+          {existing:false},
+          {class: 'btn btn-sm btn-outline-success pull-right mr20'},
+          partial: 'shared/subscription_field'
+
+
+
+datalist id="users_list"
+  - User.active.each do |user|
+    option[
+      value=%Q[#{user.get_search_detail}]
+      data-id="#{user.id}"]
+
+
+javascript:
+
+  $(function(e) {
+
+    $(document).on('change', '.user_field', function(){
+      var selected = escapeStr($(this).val());
+      var form_id = $('#users_list option[value="' + selected +'"]').attr('data-id');
+      $(this).next('.form_id').val(form_id)
+    });
+
+
+    $(document).on('click', '.delete-btn', function(e) {
+      e.preventDefault();
+      if ($(this).closest('tr').find('.archived-field').hasClass('db-record')) {
+        $(this).closest('tr').find('.archived-field').val(true);
+        $(this).closest('tr').hide();
+      } else {
+        $(this).closest('tr').remove();
+      }
+    });
+
+
+  });
+
+
+  //function to add nested attributes
+  function add_fields(link, association, content, target) {
+    console.log('link: ' + link + ', association: ' + association + ', target: ' + target);
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    var insertposition = "." + target + '-insertposition';
+    var new_content = content.replace(regexp, new_id);
+    $(content.replace(regexp, new_id)).appendTo($(link).closest(".insertposition").find(insertposition));
+  }
+
+
+  function removeField(deletable){
+    event.preventDefault();
+    $(deletable).closest('.deletable').remove();
+  }

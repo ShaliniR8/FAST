@@ -656,12 +656,12 @@ class DefaultDictionary
     },
     likelihood: {
       field: 'likelihood', title: 'Baseline Likelihood',
-      num_cols: 12, type: 'text', visible: 'adv',
+      num_cols: 12, type: 'text', visible: 'adv,query',
       required: false
     },
     severity: {
       field: 'severity', title: 'Baseline Severity',
-      num_cols: 12, type: 'text', visible: 'adv',
+      num_cols: 12, type: 'text', visible: 'adv,query',
       required: false
     },
     risk_factor: {
@@ -676,12 +676,12 @@ class DefaultDictionary
     },
     likelihood_after: {
       field: 'likelihood_after', title: 'Mitigated Likelihood',
-      num_cols: 12, type: 'text', visible: 'adv',
+      num_cols: 12, type: 'text', visible: 'adv,query',
       required: false
     },
     severity_after: {
       field: 'severity_after', title: 'Mitigated Severity',
-      num_cols: 12, type: 'text', visible: 'adv',
+      num_cols: 12, type: 'text', visible: 'adv,query',
       required: false
     },
     risk_factor_after: {

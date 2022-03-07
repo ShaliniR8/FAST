@@ -1,5 +1,7 @@
 class Query < ActiveRecord::Base
 
+  include Subscriptionable
+
   has_many :query_conditions, foreign_key: :query_id, class_name: 'QueryCondition', dependent: :destroy
   has_many :visualizations, foreign_key: :owner_id, class_name: 'QueryVisualization', dependent: :destroy
   belongs_to :created_by, foreign_key: :created_by_id, class_name: "User"
