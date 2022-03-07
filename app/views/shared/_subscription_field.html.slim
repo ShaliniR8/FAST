@@ -18,7 +18,7 @@ tr.field-group.deletable
     = f.text_field :day, class: 'form-control'
 
   td
-    = f.hidden_field :_destroy, class: 'archived-field'
+    = f.hidden_field :_destroy, class: "archived-field #{locals[:existing].present? ? "db-record" : ""}"
     - if locals[:existing]
       = link_to '<i class="glyphicon glyphicon-trash"></i>'.html_safe, '#',
         class: 'btn btn-sm btn-outline-warning pull-left mr5 delete-btn'

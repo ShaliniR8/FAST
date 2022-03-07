@@ -56,7 +56,7 @@ javascript:
 
     $(document).on('click', '.delete-btn', function(e) {
       e.preventDefault();
-      if ($(this).closest('tr').find('.archived-field').val() != null) {
+      if ($(this).closest('tr').find('.archived-field').hasClass('db-record')) {
         $(this).closest('tr').find('.archived-field').val(true);
         $(this).closest('tr').hide();
       } else {
