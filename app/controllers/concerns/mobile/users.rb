@@ -54,6 +54,17 @@ module Concerns
         # change when configs are updated to v1.2
         mobile_user_info[:enable_dual_report] = CONFIG.sr::GENERAL[:enable_dual_report]
 
+        if CONFIG::MOBILE_MODULES.include?('SMS')
+          finding_json = Finding.get_meta_fields('form').as_json
+          finding_json.each do |ffield|
+            ffield.delete('num_cols') if ffield['num_cols'].present?
+            ffield.delete('visible') if ffield['visible'].present?
+            ffield['type'] = 'boolean' if ffield['type'] == 'boolean_box'
+            ffield['options'] = eval(ffield['options']) if ffield['options'].present?
+          end
+          mobile_user_info[:finding_data] = finding_json
+        end
+
         render :json => mobile_user_info
       end
 
