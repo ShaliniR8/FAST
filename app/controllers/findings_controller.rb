@@ -71,7 +71,7 @@ class FindingsController < SafetyAssuranceController
     notify_on_object_creation(@finding)
     respond_to do |format|
       format.html { redirect_to @finding, flash: {success: 'Finding created.'} }
-      render :json => { :success => 'Finding Created.' }, :status => 200
+      format.json {render :json => { :success => 'Finding Created.' }, :status => 200}
     end
   end
 
