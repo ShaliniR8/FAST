@@ -38,6 +38,9 @@ module Concerns
                 attachments: {
                   only: [:id, :caption, :owner_id],
                   methods: :url
+                },
+                findings: {
+                  only: [:id, :title, :status]
                 }
               }
             }
