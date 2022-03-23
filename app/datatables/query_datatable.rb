@@ -130,7 +130,7 @@ class QueryDatatable
 
       res = res.order("#{sort_column} #{sort_direction}")
                .group("#{object.table_name}.id")
-               .limit(params['length'].to_i)
+               .limit(params['length'].to_i == -1 ? @ids.size : params['length'].to_i)
                .offset(params['start'].to_i) if @ids.present?
     end
 
