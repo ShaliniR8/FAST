@@ -16,6 +16,8 @@ table.table.table-bordered.table-striped.mt10 id="page-view-#{checklist.id}"
             - case data_type 
             - when 'employee'
               - input = User.find(content[header.id]).full_name
+            - when 'checkboxes', 'checkboxes-custom'
+              - input = content[header.id].gsub(";", '<br/>');
             - else
               - input = content[header.id]
               

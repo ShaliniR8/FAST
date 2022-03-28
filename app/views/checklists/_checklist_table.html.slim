@@ -56,13 +56,13 @@ javascript:
       .replaceAll("&#39;",'"')
   }
 
-  columnWidths = JSON.parse(escapeHtml("#{column_widths}"))
+  // columnWidths = JSON.parse(escapeHtml("#{column_widths}"))
 
   $("#checklist_records_#{checklist.id}").DataTable({
     /* Disable initial sort */
     "order": [],
     autoWidth: false,
-    "columnDefs": columnWidths
+    // "columnDefs": columnWidths
   })
   /* Disable sort buttons (table headers) */
   $("#checklist_records_#{checklist.id}").find("th").off("click")

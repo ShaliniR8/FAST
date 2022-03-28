@@ -240,61 +240,95 @@ class ChecklistsController < ApplicationController
 
 
   def update
-
-    # reset checklist cell value when data type is changed
-    if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
-      params[:checklist][:checklist_rows_attributes].each do |key, checklist_row|
-        if checklist_row[:checklist_cells_attributes].present?
-          checklist_row[:checklist_cells_attributes].each do |key, checklist_cell|
-            ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present? && checklist_cell[:id].present?
+    if params[:checklist][:page_view_checklist].present? || params[:checklist][:page_view_checklist] == ''
+      
+      # # Handle attachments
+      # if params[:checklist][:checklist_rows_attributes].present?
+      #   params[:checklist][:checklist_rows_attributes].keys.each do |row_id|
+      #     if params[:checklist][:checklist_rows_attributes][row_id.to_s].present?
+      #       ChecklistRow.find(row_id).update_attributes(params[:checklist][:checklist_rows_attributes][row_id])
+      #     end
+      #   end
+      # end
+      
+      #
+      @record = @table.find(params[:id])
+      if params[:autosave] == 'true'
+        cell_ids = @record.checklist_rows.map(&:checklist_cells).flatten.map(&:id)
+        params.each do |key, val|
+          if cell_ids.include? key.to_i
+            value = val.gsub('ccc', ";").gsub(";;", '')
+            ChecklistCell.find(key).update_attribute(:value, value)
           end
         end
-      end
-    end
 
-    if params[:template_names].present?
-      template_id = Checklist.where(owner_type: 'ChecklistHeader').where(title: (params[:template_names])).first.id
-      params[:checklist][:template_id] = template_id
-    end
-
-    if params[:commit].present? && params[:commit] == 'Create Audit'
-      create_audit_from_checklist(params, false)
-    else
-      @record = @table.find(params[:id])
-      updated_name = params[:checklist][:title]
-      # Assignee update
-      if params.key?(:assignee_names)
-        user = User.find_by_full_name(params[:assignee_names])
-        if user.present?
-          params[:checklist][:assignee_ids] = user.id if user.present?
-        else
-          params[:checklist][:assignee_ids] = nil
-        end
+        render js: "alert('Updated!');"
       else
-        params[:checklist].delete(:assignee_ids) if params[:checklist].present? && params[:checklist].key?(:assignee_ids)
+        page_view_checklist = JSON.parse  params[:checklist][:page_view_checklist] rescue page_view_checklist = []
+        page_view_checklist.each do |_, page|
+          page.each do |data|
+            value = data['value'].gsub(";;", '')
+            ChecklistCell.find(data['id']).update_attribute(:value, value)
+          end
+        end
+        redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
       end
-
-      # TODO: refactor needed
+    else
+      # reset checklist cell value when data type is changed
       if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
-        params[:checklist][:checklist_rows_attributes].each do |x, y|
-          next if y[:checklist_cells_attributes].nil? # when update only attachments
-          y[:checklist_cells_attributes].each do |m, n|
-            n.each do |key, value|
-              if value.is_a?(Array)
-                n[:value].delete("")
-                n[:value] = n[:value].join(";")
-              end
+        params[:checklist][:checklist_rows_attributes].each do |key, checklist_row|
+          if checklist_row[:checklist_cells_attributes].present?
+            checklist_row[:checklist_cells_attributes].each do |key, checklist_cell|
+              ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present? && checklist_cell[:id].present?
             end
           end
         end
       end
-      if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
-        AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
+
+      if params[:template_names].present?
+        template_id = Checklist.where(owner_type: 'ChecklistHeader').where(title: (params[:template_names])).first.id
+        params[:checklist][:template_id] = template_id
       end
-      
-      @record.update_attributes(params[:checklist])
-      @record.update_row_orders
-      redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
+
+      if params[:commit].present? && params[:commit] == 'Create Audit'
+        create_audit_from_checklist(params, false)
+      else
+        @record = @table.find(params[:id])
+        updated_name = params[:checklist][:title]
+        # Assignee update
+        if params.key?(:assignee_names)
+          user = User.find_by_full_name(params[:assignee_names])
+          if user.present?
+            params[:checklist][:assignee_ids] = user.id if user.present?
+          else
+            params[:checklist][:assignee_ids] = nil
+          end
+        else
+          params[:checklist].delete(:assignee_ids) if params[:checklist].present? && params[:checklist].key?(:assignee_ids)
+        end
+
+        # TODO: refactor needed
+        if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+          params[:checklist][:checklist_rows_attributes].each do |x, y|
+            next if y[:checklist_cells_attributes].nil? # when update only attachments
+            y[:checklist_cells_attributes].each do |m, n|
+              n.each do |key, value|
+                if value.is_a?(Array)
+                  n[:value].delete("")
+                  n[:value] = n[:value].join(";")
+                end
+              end
+            end
+          end
+        end
+        if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
+          AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
+        end
+        
+        @record.update_attributes(params[:checklist])
+        @record.update_row_orders
+        redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
+      end
     end
   end
 
@@ -331,10 +365,10 @@ class ChecklistsController < ApplicationController
   def select_checklists_raw
     has_admin_access = current_user.has_access(Object.const_get('Checklist').rule_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default])
     if has_admin_access
-      @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader')
+      @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader').keep_if { |t| t.table_view }
     else
       addressable_templates = current_user.get_all_checklist_addressable_templates
-      @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}
+      @checklist_template_list = @table.where(:owner_type => 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}.keep_if { |t| t.table_view }
     end
   end
 
@@ -403,6 +437,9 @@ class ChecklistsController < ApplicationController
         new_checklist.checklist_rows << new_row
         row.checklist_cells.each{ |cell| new_row.checklist_cells << cell.clone }
       end
+
+      large_page_checklist = new_checklist.checklist_rows[0].checklist_cells.size > 11
+      new_checklist.update_attribute(:table_view, false) if large_page_checklist
     end
 
     respond_to do |format|

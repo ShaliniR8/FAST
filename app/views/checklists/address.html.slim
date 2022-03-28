@@ -4,7 +4,8 @@
   'utility/dataTables.buttons.min',
   'utility/nested_fields',
   'utility/checklist-control',
-  'utility/dirty-form'
+  'utility/dirty-form',
+  'utility/format-builder'
 
 .modal.fade.emp_modal
   tabindex="-1"
@@ -49,38 +50,11 @@
                       = f.fields_for :checklist_rows, checklist_row do |row_form|
                         = render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing'
               - else # Page View
+                = f.hidden_field :page_view_checklist, class: 'changed', value: ''
                 table class='table table-bordered table-striped mt10' id="page-view-update-#{@record.id}"
                   thead
                     th = "Page View"
                   tbody
-                    - @record.checklist_rows.each do |checklist_row|
-                      - is_header = (defined? checklist_row) && checklist_row.is_header || false
-                      = f.fields_for :checklist_rows, checklist_row do |row_form|
-                        tr
-                          td
-                            table class='table table-bordered table-striped mt10'
-                              thead
-                                = row_form.hidden_field :id, class: 'row-id changed'
-                                th = "Header"
-                                th = "Content"
-                              tbody.checklist_rows
-                                - checklist_row.checklist_cells.each do |checklist_cell|
-                                  tr
-                                    = row_form.fields_for :checklist_cells, checklist_cell do |cell_form|
-                                      - header_item = checklist_cell.checklist_header_item
-                                      td
-                                        b = header_item.title
-                                      = render 'checklist_row_fields_td',
-                                        :source => 'Existing',
-                                        :header_item => header_item,
-                                        :checklist_cell => checklist_cell,
-                                        :f => cell_form
-                                - if action_name != 'edit'
-                                  td
-                                    b Attachments
-                                  td
-                                    - unless is_header
-                                      = render 'forms/attachments_show_mini', owner: checklist_row, edit: true, f: row_form
 
           = f.submit 'Save', class: 'btn btn-success pull-right mt20 mb20', disable_with: 'Saving...'
 
@@ -92,13 +66,27 @@ css:
     box-shadow: 0px 0px 7px orange;
   }
 
+  .attachment-item {
+    border: 1px solid silver;
+    border-radius: 3px;
+    padding: 10px;
+    background-color: #e8e8e8;
+  }
+  .tooltip-inner {
+    max-width: 100% !important;
+  }
+  .attachment-thumbnail {
+    background-color: white;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid silver;
+  }
+
 script src="/plugins/forms/bootstrap-tagsinput/bootstrap-tagsinput.js"
 script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
-
-
     // employ selector
     var employee_table;
 
@@ -181,10 +169,27 @@ javascript:
       });
       // User clicked on a row
       $("body").on("click", "#airports" + field_id + " tbody tr", function(){
-        console.log('clicked!')
         // Get the row information
         var icao = $(this).find("td").eq(0).text();
         var iata = $(this).find("td").eq(1).text();
+
+        var target = $("#airport" + field_id)[0];
+        target_page = target.dataset.page;
+        target_row = target.dataset.row;
+
+        if (checklistData[target_page] != null) {
+          selected_data = checklistData[target_page].find(element => element['id'] == target_row);
+          selected_data['value'] = icao + ";" + iata;
+
+          checklistNewData[target_page] = checklistNewData[target_page] || [];
+          target_id = checklistNewData[target_page].findIndex(element => element['id'] == target_row);
+          if (target_id != -1) {
+            checklistNewData[target_page][target_id] = selected_data;
+          } else {
+            checklistNewData[target_page].push(selected_data);
+          }
+        }
+
         // Set the value on the form
         $("#airport" + field_id).val(icao + ";" + iata);
         $("#airport-select" + field_id).val(icao + ";" + iata);
@@ -192,22 +197,18 @@ javascript:
       });
     }
 
-      // Get listing of all the airport buttons
+    // Get listing of all the airport buttons
     var field_id;
     $(this).find(".airport_button").each(function(index, item){
       // Get the button that's being clicked
       $(item).on("click", function(){
         // Get the selected airport's field id
         field_id = $(this).prop("id");
-        console.log(field_id)
         resetModal(field_id);
         $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
         $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
       });
     });
-
-
-    //
 
     autoSaveText = document.getElementById('auto-save');
 
@@ -221,18 +222,372 @@ javascript:
     /* Disable sort buttons (table headers) */
     $("#table-view-#{@record.id}").find("th").off("click")
 
+
+    // ---- Page View DataTable
+    var currentPage = 0;
+    var checklistData = {};
+    var checklistNewData = checklistNewData || {};
+
+    $('#page-view-update-#{@record.id}').change(function(event) {
+      var target = event.target;
+
+      if (target.className.includes('checklist-input')) {
+        target_page = target.dataset.page;
+        target_row = target.dataset.row;
+
+        selected_data = checklistData[target_page].find(element => element['id'] == target_row);
+
+        if (selected_data['data_type'] == 'checkboxes') {
+          if (target.checked) {
+            selected_data['value'] += `;${target.value}`;
+
+          }else {
+            selected_data['value'] = selected_data['value'].replace(target.value, '');
+          }
+        } else {
+          if (target.value != selected_data['value']) {
+            selected_data['value'] = target.value;
+          }
+        }
+        checklistNewData[target_page] = checklistNewData[target_page] || [];
+        
+        target_id = checklistNewData[target_page].findIndex(element => element['id'] == target_row);
+        if (target_id != -1) {
+          checklistNewData[target_page][target_id] = selected_data;
+        } else {
+          checklistNewData[target_page].push(selected_data);
+        }
+      }
+    });
+
     var table = $("#page-view-update-#{@record.id}").DataTable({
-      "aaSorting": [],
-      "aLengthMenu": [[1, -1], [1, "All"]],
-      "iDisplayLength": -1,
+      "bFilter": false,
+      "aLengthMenu": [[1], [1]],
+      "iDisplayLength": 1,
+      preDrawCallback: function() {
+        var api = this.api();
+        var pageInfo = api.page.info();
+        currentPage = pageInfo['page'];
+      },
+      ajax: {
+        url: "get_dataset",
+        method: "POST",
+        data: {
+          checklist_id: '#{@record.id}'
+        },
+        dataSrc: function ( json ) {
+          checklistData = json.data;
+
+          if (checklistNewData[currentPage] != undefined && checklistNewData[currentPage] != {}) {
+            checklistNewData[currentPage].forEach( new_data => {
+              index = checklistData[currentPage].findIndex(data => data['id'] == new_data['id']);
+              if (index != -1) { checklistData[currentPage][index] = new_data; }
+            });
+          }
+          return checklistData;
+        }
+      },
+      drawCallback: drawChecklistRowInOnePage,
+      serverSide: true,
     })
 
+    function textInputField(data) {
+      if (data['value'] == null) { data['value'] = ''; }
+      return `
+        <textarea class='form-control checklist-input' data-page='${currentPage}' data-row='${data['id']}' rows='4' placeholder='Enter Text'>`
+          + data['value'] +
+        `</textarea>
+      `;
+    }
+
+    function dropdownInputField(data) {
+      if (data['options'] === null) { data['options'] = ''; }
+      var options = data['options'].split(";").map(function (option) {
+        return (`
+          <option value='${option}' ${ data['value'] == option ? 'selected' : '' }>
+            ${option}
+          </option>
+        `);
+      }).join(' ');
+
+      return `
+        <select class='form-control checklist-input' data-page='${currentPage}' data-row='${data['id']}'>
+          <option></option>
+          ${options}
+        </select>
+      `;
+    }
+
+    function radioInputField(data) {
+      if (data['options'] === null) { data['options'] = ''; }
+      var options = data['options'].split(";").map(function (option) {
+        return (`
+          <label class='radio radio-inline'>
+            <input class='checklist-input' type='radio' value='${option}' ${ data['value'] == option ? 'checked="checked"' : '' } name='${data['id']}' data-page='${currentPage}' data-row='${data['id']}'>
+            ${option}
+          </label>
+        `);
+      }).join('<br>');
+      
+      return `
+        <div class='col-xs-12 ml5'>
+          ${options}
+        </div>
+      `;
+    }
+
+    function checkboxesInputField(data) {
+      if (data['options'] === null) { data['options'] = ''; }
+      if (data['value'] === null) { data['value'] = ''; }
+      var options = data['options'].split(";").map(function (option) {
+        return (`
+          <label class='checkbox checkbox-inline'>
+            <input class='checkbox checklist-input' type='checkbox' value='${option}' ${ data['value'].includes(option) ? 'checked="checked"' : '' } data-page='${currentPage}' data-row='${data['id']}'>
+            ${option}
+          </label>
+        `);
+      }).join('<br>');
+      
+      return `
+        <div class='col-xs-12 ml5'>
+          ${options}
+        </div>
+      `;
+    }
+
+    function employeeInputField(data) {
+      if (data['name'] == null) {
+        data['name'] = '';
+        data['value'] = '';
+      }
+      return `
+        <div class='input-group'>
+          <input class='form-control ml5 emp' id='emp${data['id']}' readonly='readonly' type='text' value='${data['name']}' data-page='${currentPage}' data-row='${data['id']}' data-userid='${data['value']}'>
+
+          <span class='input-group-btn'>
+            <a id='${data['id']}' href='#' class='btn btn-info emp_button' data-target='.emp_modal' data-toggle='modal'>...</a>
+          </span>
+        </div>
+      `;
+    }
+
+    function airportInputField(data) {
+      return `
+        <div class='input-group'>
+          <input class='form-control ml5 airport' id='airport${data['id']}' readonly='readonly' type='text' value='${data['value']}' data-page='${currentPage}' data-row='${data['id']}'>
+
+          <span class='input-group-btn'>
+            <a id='${data['id']}' href='#' class='btn btn-info airport_button' data-target='.airport_modal' data-toggle='modal'>...</a>
+          </span>
+        </div>
+      `;
+    }
+
+    function dateInputField(data) {
+      return `
+        <input class='field-date form-control input checklist-input' readonly='readonly' placeholder='' value='${data['value']}' data-page='${currentPage}' data-row='${data['id']}'>
+      `;
+    }
+
+    function datetimeInputField(data) {
+      return `
+        <input class='field-datetime form-control input checklist-input' readonly='readonly' placeholder='' value='${data['value']}' data-page='${currentPage}' data-row='${data['id']}'>
+      `;
+    }
+
+    function dropdownCustomInputField(data) {
+      return ``;
+    }
+
+    function attachmentThumbnail(data) {
+      attachments = ``;
+
+      names    = data['name'];
+      captions = data['options'];
+
+      data['value'].forEach(function (value, index) {
+        if (captions[index] === null) { captions[index] = ''; }
+        attachments += `
+          <div align='center' class='row attachment-item mb10'>
+            <div class='attachment-thumbnail'>
+              <a href='${names[index]["url"]}' target='_blank'>
+                <img alt='${captions[index]}' class='img-responsive' src='${names[index]["url"]}' style='width:100%; height;50px;'>
+              </a>
+            </div>
+            <p>
+              <strong>${captions[index]}</strong>
+            </p>
+            <a href="#" class="btn btn-danger attachment-destroy">Delete</a>
+          </div>
+        `
+      })
+
+      return attachments;
+    }
+
+    function attachmentInputField(data) {
+      return `
+        <div class='col-xs-12' id='${data['id']}_attachments' style='max-width:200px;'>
+          <div class='row'>
+
+            <div id='${data['id']}_add_attachments'>
+              ${attachmentThumbnail(data)}
+            </div>
+
+            <a class="btn btn-success center-block add_attachment_mini" href="#" onclick="add_fields(this, 'attachments', '<style type=\&quot;text/css\&quot;>.hidden-file-input {  width: 0.1px;  height: 0.1px;  opacity: 0;  overflow: hidden;  position: absolute;  z-index: -1;}<\/style><div align=\&quot;center\&quot; class=\&quot;to-delete attachment-item mb10\&quot;><input class=\&quot;hidden-file-input\&quot; id=\&quot;new_attachments\&quot; name=\&quot;checklist[checklist_rows_attributes][${data['id']}][attachments_attributes][new_attachments][name]\&quot; type=\&quot;file\&quot; /><label class=\&quot;mt10 btn btn-info\&quot; for=\&quot;new_attachments\&quot;>Upload File<\/label><input class=\&quot;form-control mt10\&quot; id=\&quot;checklist_checklist_rows_attributes_${data['id']}_attachments_attributes_new_attachments_caption\&quot; name=\&quot;checklist[checklist_rows_attributes][${data['id']}][attachments_attributes][new_attachments][caption]\&quot; placeholder=\&quot;Caption\&quot; size=\&quot;30\&quot; type=\&quot;text\&quot; /><a href=\&quot;#\&quot; class=\&quot;btn btn-danger attachment-delete mt10\&quot;>Delete<\/a><\/div>', '${data['id']}_add_attachments'); return false;">Add</a>
+
+          </div>
+        </div>
+      `
+    }
+
+    function inputFieldElement(data) {
+      if (!data['allow_input']) { return data['value']; }
+
+      switch (data['data_type']) {
+        case 'text':
+          return textInputField(data);
+        case 'dropdown':
+          return dropdownInputField(data);
+        case 'radio':
+          return radioInputField(data);
+        case 'checkboxes':
+          return checkboxesInputField(data);
+        case 'employee':
+          return employeeInputField(data);
+        case 'airport':
+          return airportInputField(data);
+        case 'date':
+          return dateInputField(data);
+        case 'datetime':
+          return datetimeInputField(data);
+        case 'dropdown-custom':
+          return dropdownCustomInputField(data);
+        case 'attachment':
+          return attachmentInputField(data);
+        default:
+          console.log('Check if all data type is handled')
+      }
+    }
+
+
+    function drawChecklistRowInOnePage() {
+      var checklistRowPage = $("#page-view-update-#{@record.id}").find("tr td")
+
+      rows = ''
+      checklistData[currentPage].forEach( (data) => {
+        header_cell  = data['header']
+        content_cell = inputFieldElement(data);
+        rows += `
+          <tr>
+            <td><b>${header_cell}</b></td>
+            <td>${content_cell}</td>
+          </tr
+        `
+      })
+
+      nested_table = `
+        <table class='table table-bordered table-striped mt10' id='temp'>
+          <thead>
+            <th>Header</th>
+            <th>Content</th>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `
+      checklistRowPage.html(nested_table);
+
+      // TODO: Put the below code in helpers for resuability
+      $('.field-date').flatpickr({
+        altInput: true,
+        altFormat: 'Y-m-d',
+        dateFormat: 'Y-m-d',
+      });
+
+      $('.field-datetime').flatpickr({
+        altInput: true,
+        altFormat: 'Y-m-d H:i',
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        time_24hr: true,
+        allowInput: true,
+      });
+
+
+      // -- emp
+      $(this).find(".emp_button").each(function(index, item){
+        $(item).on("click", function(){
+          var field_id = $(this).prop('id');
+          $(".emp_modal").show();
+          clear_user_table();
+          $("#users tbody tr").unbind();
+          $("#users tbody tr").on("click", function(){
+            
+            var target = $(item).parent().parent().find("#emp" + field_id)[0];
+            target_page = target.dataset.page;
+            target_row = target.dataset.row;
+
+            selected_data = checklistData[target_page].find(element => element['id'] == target_row);
+
+            new_value = $(this).find("td").eq(0).text();
+            new_name = $(this).find("td").eq(1).text();
+
+            selected_data['value'] = new_value;
+            selected_data['name'] = new_name;
+
+            checklistNewData[target_page] = checklistNewData[target_page] || [];
+            target_id = checklistNewData[target_page].findIndex(element => element['id'] == target_row);
+            if (target_id != -1) {
+              checklistNewData[target_page][target_id] = selected_data;
+            } else {
+              checklistNewData[target_page].push(selected_data);
+            }
+
+            $(item).parent().parent().find("#emp" + field_id).val(new_name);
+            $('#emp_div').hide();
+            $('.emp_modal').modal('toggle');
+          });
+          $('.close').on('click',function(){
+            $(item).parent().parent().find("#emp"+field_id).val("");
+            $('#emp_div').hide();
+          });
+          build_user_table();
+        });
+      });
+
+      // -- airport
+      $(this).find(".airport_button").each(function(index, item){
+        // Get the button that's being clicked
+        $(item).on("click", function(){
+          // Get the selected airport's field id
+          var field_id = $(this).prop("id");
+          resetModal(field_id);
+          $("#search_btn").html('<button class="btn btn-info" id="search_btn_' + field_id + '">Search</button>');
+          $("#search_btn_"+field_id).on("click", {field_id: field_id}, handleSearch);
+        });
+      });
+    }
+
     function autosave() {
+      var newData = '';
+      for (var page in checklistNewData) {
+        newData += checklistNewData[page].map( function(hash) {
+          var tempStr = '';
+          var value = hash['value'].replaceAll(";", 'ccc');
+          tempStr += `&${hash['id']}=${value}`;
+
+          delete checklistNewData[page];
+          return tempStr;
+        }).join("&");
+      }
+
       $.ajax({
         type: "POST",
         url: $('form').attr('action'),
-        data: $('form').serialize(),
-        dataType: "script"
+        data: $('form').serialize() + "&autosave=true&"+ newData,
+        dataType: "json"
       });
     }
 
@@ -244,6 +599,12 @@ javascript:
     $(window).on('beforeunload', function(){
       clearInterval(runAutosave)
       return true;
+    });
+
+    $('#checklist_submit').on("click", function(event){
+      if (Object.keys(checklistNewData).length != 0) {
+        $('#checklist_page_view_checklist')[0].value = JSON.stringify(checklistNewData);
+      }
     });
 
     $(document).on("submit", "form", function(event){

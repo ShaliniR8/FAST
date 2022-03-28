@@ -221,6 +221,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get 'address'
       get 'export'
+      post "get_dataset"
     end
     collection do
       get 'address_raw'
@@ -228,6 +229,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'retract_form_upload'
       get 'retract_form_template'
       post 'add_template'
+
     end
   end
   resources :checklist_rows do

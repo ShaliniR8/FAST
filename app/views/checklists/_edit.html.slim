@@ -1,12 +1,14 @@
 = javascript_include_tag \
   'utility/nested_fields',
   'utility/checklist-control',
-  'utility/dirty-form'
+  'utility/dirty-form',
+  'utility/format-builder.js'
 
+link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"
 
 = form_for @record, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|
 
-  .col-xs-12
+  .col-xs-12 style="overflow-x:auto;"
     .panel.panel-warning
       .panel-heading
         .panel-title
@@ -53,13 +55,19 @@
             .col-xs-12.form-group.mb10
               .col-xs-2.mt5
                 = f.label :table_view, 'Table View', class: 'pull-right'
-              .col-xs-8.mt5
-                = f.check_box :table_view
-
+              .col-xs-8.mt5.tooltip-wrapper
+                - large_page_checklist = @record.checklist_rows[0].checklist_cells.size > 11 rescue false
+                - if large_page_checklist
+                  = f.check_box :table_view, disabled: 'disabled',
+                    "data-toggle" => "tooltip",
+                    "data-placement" => "right",
+                    "title" => "Checklists that have more than 12 columns can only use Page View."
+                - else
+                  =  f.check_box :table_view
             = render '/checklists/edit_instructions'
 
           - if action_name == 'edit' || @record.table_view
-            table class='table table-bordered table-striped mt10' id="table-view-#{@record.id}"
+            table class='table table-bordered table-striped mt10' id="table-view-#{@record.id}" style="overflow: hidden; width: 100%"
               thead
                 tr
                   - @record.checklist_header.checklist_header_items.each do |item|
@@ -122,6 +130,8 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
+     $('.tooltip-wrapper').tooltip();
+
     $("#page-view-update-#{@record.id}").DataTable({
       "aaSorting": [],
       "aLengthMenu": [[1, -1], [1, "All"]],
