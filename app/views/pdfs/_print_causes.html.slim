@@ -1,7 +1,7 @@
 / # - causes = Cause.where(obj_id: owner.obj_id)
 - causes = Cause.where({owner_type: owner.class.name, owner_id: owner.id})
 - if !causes.present?
-  - causes = Cause.where({owner_type: 'Record', obj_id: owner.obj_id})
+  - causes = Cause.where({owner_type: 'Record', obj_id: owner.obj_id}) rescue []
 - cause_label = CONFIG::CAUSE_LABEL
 
 - if causes.present?

@@ -20,18 +20,19 @@ h3: b Visualizations
     - records_ids = get_query_results_ids_helper(owner.id)
     - owner.visualizations.each do |visualization|
       - data = generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids)
-      .col-xs-12
-        .sub_sub_title = visualization_title_helper(visualization.x_axis, visualization.series)
+      - if data.present?
         .col-xs-12
-          table.table.table-striped.bordered
-            thead
-              - data[0].each do |header|
-                th = header
-            tbody
-              - data[1..-1].each do |row|
-                tr
-                  - row.each do |value|
-                    td = value
+          .sub_sub_title = visualization_title_helper(visualization.x_axis, visualization.series)
+          .col-xs-12
+            table.table.table-striped.bordered
+              thead
+                - data[0].each do |header|
+                  th = header
+              tbody
+                - data[1..-1].each do |row|
+                  tr
+                    - row.each do |value|
+                      td = value
 
 
 

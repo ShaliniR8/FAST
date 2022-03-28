@@ -62,7 +62,7 @@ class SubmissionsController < ApplicationController
 
         @column_titles = @columns.map { |col| col[:title] }
 
-        @column_date_type = @column_titles.map.with_index { |val, inx|
+        @date_type_column_indices = @column_titles.map.with_index { |val, inx|
           (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
         }.select(&:present?)
 

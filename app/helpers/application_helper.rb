@@ -951,6 +951,8 @@ module ApplicationHelper
     elsif series.present?
       data = get_data_table_for_google_visualization_sql(x_axis_field_arr: series_field, records_ids: records_ids, query: query)
       data << ['N/A', 0] if data.length == 1
+    else
+      data = []
     end
 
     return data.map{ |x| [x[0].to_s, x[1..-1]].flatten}
