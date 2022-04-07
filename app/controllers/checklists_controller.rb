@@ -346,7 +346,8 @@ class ChecklistsController < ApplicationController
 
         # Check Access Control
         template_name = Checklist.find(@record.template_id).title rescue @record.title
-        has_access = current_user.has_access(template_name, 'viewable') || (current_user.admin? && @is_template)
+        has_access = current_user.has_access(template_name, 'viewable', admin: CONFIG::GENERAL[:global_admin_default]) ||
+                     current_user.has_access('checklist', 'admin', admin: CONFIG::GENERAL[:global_admin_default]) || (current_user.admin? && @is_template)
         redirect_to errors_path unless has_access
       end
       format.json { show_as_json }
