@@ -63,7 +63,19 @@
         <%=field_value%>
       <%end%>
     <%else%>
-      <%=field_value%>
+      <%if field_description == 'Attachments'%>
+        <% attachment_ids = field_value.scan(/\/uploads\/attachment\/name\/(\d+)/).map { |x| x.first.to_i } %>
+
+        <% access_attachment = current_user.has_access('reports', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
+        <% if access_attachment %>
+          <%=field_value%>
+        <% else %>
+          <% attachments = field_value.split(/br/).map { |str| str.match(/\<\/i\>(?<name>.*)\<\/a/)[:name] rescue nil}.compact.join('<br>') %>
+          <%= "<b>Attachments:</b> <br>#{attachments}".html_safe %>
+        <% end %>
+      <% else %>
+        <%=field_value%>
+      <% end %>
     <%end%>
   <%end%>
 <%end%>
