@@ -32,6 +32,8 @@ module Concerns
 
       def format_finding_json(finding)
         fields_attributes = @fields.map{|f| f[:field]}
+        finding['get_status'] = finding['status']
+        finding['get_source'] = ActionView::Base.full_sanitizer.sanitize(Finding.find(finding['id']).get_source).strip rescue ""
         json = finding.delete_if{ |key, value| fields_attributes.exclude?(key) }
 
         # Takes the id of each user field and replaces it with the
