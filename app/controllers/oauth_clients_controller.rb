@@ -47,7 +47,7 @@ class OauthClientsController < ApplicationController
 
   def authenticate_user(username,password)
     user = User.authenticate(params[:login], params[:password])
-    if user
+    if user && !user.disable
       #Rails.logger.info user.inspect
       session[:user_id] = user.id
       session[:mode] = "ASAP"

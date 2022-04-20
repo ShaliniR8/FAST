@@ -22,12 +22,15 @@ class SessionsController < ApplicationController
 
   def create
     user = User.authenticate(params[:login], params[:password])
-    if user
+    if user && !user.disable
       session[:user_id] = user.id
       session[:mode] = ""
       session[:last_active] = Time.now
       define_session_permissions
       redirect_to_target_or_default(root_url)
+    elsif user && user.disable
+      flash.now[:danger] = "The user is disabled."
+      render :new
     else
       flash.now[:danger] = "Invalid username or password."
       render :new
@@ -82,7 +85,7 @@ class SessionsController < ApplicationController
 # -------------- BELOW ARE EVERYTHING FOR PROSAFET APP
   def get_user_json
     @user = User.authenticate(params[:login], params[:password])
-    if user
+    if user && !user.disable
       session[:user_id] = user.id
       session[:mode] = "ASAP"
       @templates = user.templates

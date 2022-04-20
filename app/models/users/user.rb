@@ -179,7 +179,7 @@ class User < ActiveRecord::Base
 
   def self.authenticate(login, pass)
     user = find_by_username(login) || find_by_email(login)
-    return user if user && user.matching_password?(pass) && !user.disable
+    return user if user && user.matching_password?(pass)
   end
 
 

@@ -16,7 +16,7 @@ class OauthController < ApplicationController
   def authenticate_user(username,password)
     Rails.logger.info "authenticate_user"
     user = User.authenticate(username, password)
-    if user
+    if user && !user.disable
       Rails.logger.info user.inspect
       session[:user_id] = user.id
       session[:platform] = Transaction::PLATFORMS[:mobile]
