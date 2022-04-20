@@ -14,6 +14,9 @@ $('#calendar').fullCalendar('removeEvents');
 $('#calendar').fullCalendar('addEventSource', <%=raw(@calendar_entries.to_json)%>);
 $('#calendar').fullCalendar('rerenderEvents' );
 
+$('.baseline_matrix').html("<%= escape_javascript(render partial: 'risk_matrices/dashboard_matrix/baseline/matrix') %>");
+$('.mitigate_matrix').html("<%= escape_javascript(render partial: 'risk_matrices/dashboard_matrix/mitigate/matrix') %>");
+
 // console.log("params=", params);
 <% if session[:mode] == "ASAP" %>
     drawChartsubs(submissionData,   params);

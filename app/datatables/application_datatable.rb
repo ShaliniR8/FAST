@@ -268,7 +268,6 @@ class ApplicationDatatable
 
 
   def query_with_search_term(search_string, join_tables, start_date, end_date)
-
     if !@current_user.has_access(object.table_name, 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && object.table_name != "safety_plans"
       status_queries = []
       status_queries << "created_by_id = #{@current_user.id}"
@@ -286,10 +285,11 @@ class ApplicationDatatable
               .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(nil, nil)
+              .within_timerange(start_date, end_date)
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
+
       else
         object.joins(join_tables)
               .where(id: @recs.map(&:id))
@@ -303,7 +303,7 @@ class ApplicationDatatable
             .where(id: @recs.map(&:id))
             .where(search_string.join(' and '))
             .order("#{sort_column} #{sort_direction}")
-            .within_timerange(nil, nil)
+            .within_timerange(start_date, end_date)
             .where(["#{params[:controller]}.due_date < :today and #{params[:controller]}.status != :status", {today: Time.now.to_date, status: 'Completed'}])
             .limit(params['length'].to_i)
             .offset(params['start'].to_i)
@@ -315,7 +315,7 @@ class ApplicationDatatable
               .where(id: @recs.map(&:id))
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
-              .within_timerange(nil, nil)
+              .within_timerange(start_date, end_date)
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
@@ -372,6 +372,8 @@ class ApplicationDatatable
 
   def query_records_for_risk(search_params, adv_params, join_tables)
     search_string = search_params[:search_string]
+    start_date = adv_params[:start_date]
+    end_date = adv_params[:end_date]
 
     if adv_params[:searchterm_1] == 'severity' || adv_params[:searchterm_1] == 'severity_after'
       if adv_params[:searchterm_1] == 'severity_after'
@@ -404,6 +406,7 @@ class ApplicationDatatable
       if object.name == 'Record'
         @status_count = object.joins(join_tables)
                           .order("#{sort_column} #{sort_direction}")
+                          .within_timerange(start_date, end_date) 
                           .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)", full_access_templates, viewer_access_templates, confidential_access_templates)
                           .where(search_string.join(' and '))
                           .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
@@ -415,6 +418,7 @@ class ApplicationDatatable
           .map(&:report).flatten.uniq.compact
         @status_count = object.joins(join_tables)
                           .order("#{sort_column} #{sort_direction}")
+                          .within_timerange(start_date, end_date)
                           .where(id: reports.map(&:id))
                           .where(search_string.join(' and '))
                           .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
@@ -423,6 +427,7 @@ class ApplicationDatatable
     else
       @status_count = object.joins(join_tables)
                         .order("#{sort_column} #{sort_direction}")
+                        .within_timerange(start_date, end_date)
                         .where(search_string.join(' and '))
                         .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
                         .group("#{object.table_name}.status").count
@@ -440,6 +445,7 @@ class ApplicationDatatable
       if object.name == 'Record'
         object.joins(join_tables)
           .order("#{sort_column} #{sort_direction}")
+          .within_timerange(start_date, end_date)
           .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)", full_access_templates, viewer_access_templates, confidential_access_templates)
           .where(search_string.join(' and '))
           .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
@@ -453,6 +459,7 @@ class ApplicationDatatable
 
         object.joins(join_tables)
           .order("#{sort_column} #{sort_direction}")
+          .within_timerange(start_date, end_date)
           .where(id: reports.map(&:id))
           .where(search_string.join(' and '))
           .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
@@ -462,6 +469,7 @@ class ApplicationDatatable
     else
       object.joins(join_tables)
         .order("#{sort_column} #{sort_direction}")
+        .within_timerange(start_date, end_date)
         .where(search_string.join(' and '))
         .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)
         .limit(params['length'].to_i)
@@ -497,12 +505,12 @@ class ApplicationDatatable
       @status_count = object.joins(join_tables)
                             .where(id: @recs.map(&:id))
                             .where(search_string.join(' and '))
-                            .within_timerange(nil, nil)
+                            .within_timerange(start_date, end_date)
                             .group("#{object.table_name}.status").count
     end
 
     @status_count['Overdue'] = object.joins(join_tables)
-                                     .within_timerange(nil, nil)
+                                     .within_timerange(start_date, end_date)
                                      .where(id: @recs.map(&:id))
                                      .where(search_string.join(' and '))
                                      .group("#{object.table_name}.id")
