@@ -1024,6 +1024,8 @@ class ApplicationController < ActionController::Base
       render json: QueryDatatable.new(view_context, current_user)
     when 'Checklist'
       render json: ChecklistDatatable.new(view_context, current_user)
+    when 'Finding'
+      render json: FindingDatatable.new(view_context, current_user)
     else # SA, SRA modules
       render json: ApplicationDatatable.new(view_context, current_user)
     end

@@ -36,7 +36,8 @@
                   tr
                     - @column_titles.each do |column_title|
                       th = column_title
-
+ruby:
+  @finding_sub_index_page = params[:controller] == 'findings' && params[:type].present?
 
 css:
   .nav-pills {
@@ -90,15 +91,22 @@ javascript:
   }
 
   function addIndividualColumnSearchField() {
-    $('#records_table tfoot th').each(function(index) {
-
-      isDateField = "#{@date_type_column_indices}".includes(index)
-      if (isDateField) {
-        $(this).html('<input type="date" class="form-control" />');
-      } else {
-        $(this).html('<input type="text" class="form-control" />');
-      }
-    });
+    if ("#{@finding_sub_index_page}" == 'true') {
+      $('#adv').hide();
+      $('#records_table tfoot th').each(function(index) {
+        $(this).hide();
+      });
+    }
+    else {
+      $('#records_table tfoot th').each(function(index) {
+        isDateField = "#{@date_type_column_indices}".includes(index)
+        if (isDateField) {
+          $(this).html('<input type="date" class="form-control" />');
+        } else {
+          $(this).html('<input type="text" class="form-control" />');
+        }
+      });
+    }
   }
 
   function hideSourceColumnSearchField() {
@@ -174,7 +182,6 @@ javascript:
   }
 
   $(function() {
-
     initContent("#{@default_tab}");
     var recordsTable = $('#records_table').DataTable({
       sDom: 'Blrtip', // hide search input field
