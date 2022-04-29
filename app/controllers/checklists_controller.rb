@@ -326,7 +326,6 @@ class ChecklistsController < ApplicationController
         end
         
         @record.update_attributes(params[:checklist])
-        @record.update_row_orders
         redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
       end
     end
