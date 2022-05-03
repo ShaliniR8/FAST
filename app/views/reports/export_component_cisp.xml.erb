@@ -88,7 +88,7 @@
 
         <%narrative_label_name = CONFIG::CISP_FIELD_PARSE[record.template.name][narrative_category_name]["eventDescription"]%>
 
-        <%narrative_field = record.categories.select { |category| category.title == narrative_category_name}.first.fields.select { |f| f.label.include? narrative_label_name }.first rescue byebug %>
+        <%narrative_field = record.categories.select { |category| category.title == narrative_category_name}.first.fields.select { |f| f.label.include? narrative_label_name }.first rescue "" %>
 
         <%narrative = all_record_fields[narrative_field.id].value rescue ''%>
 

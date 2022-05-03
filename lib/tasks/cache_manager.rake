@@ -1,7 +1,7 @@
 namespace :cache_manager do
   require 'find'
 
-  CACHE_THRESHOLD = 256.to_f # in MB
+  CACHE_THRESHOLD = 512.to_f # in MB
 
 
   def directory_size(path)

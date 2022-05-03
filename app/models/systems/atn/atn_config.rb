@@ -17,6 +17,9 @@ class ATNConfig < DefaultConfig
     cisp_integration:                   true,
     add_attachment_in_any_status:       true,
     global_admin_default:               false,
+    add_attachment_in_any_status:       true,
+    advanced_checklist_data_type:       true,
+    checklist_query:                    true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,

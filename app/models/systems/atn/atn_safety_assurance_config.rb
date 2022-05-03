@@ -3,6 +3,10 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
   GENERAL = DefaultSafetyAssuranceConfig::GENERAL.merge({
     # General Module Features:
     checklist_version:            '3',
+    recurring_item_checklist:           true,
+    non_recurring_item_checklist:       true,
+    days_to_complete_instead_of_date:   true,
+    daily_weekly_recurrence_frequecies: true,
   })
 
 
@@ -671,96 +675,116 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
     menu_items: {
       'Audits' => {
         title: 'Audits', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('Checklist'), user, 'add', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'audits_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_audit_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'Recurring Audits', path: "recurrences_path(form_type: 'Audit')",
-            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Audit'), user, 'admin', true, true)}},
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] &&
+                                       priv_check.call(Object.const_get('Audit'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New Recurring Audits', path: "new_recurrence_path(form_type: 'Audit')",
-            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Audit'), user, 'admin', true, true)}},
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] &&
+                                       priv_check.call(Object.const_get('Audit'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'Start Checklist', path: 'select_checklists_raw_checklists_path',
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Checklist'), user, 'add', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Inspections' => {
         title: 'Inspections', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('Inspection'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'inspections_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_inspection_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'Recurring Inspections', path: "recurrences_path(form_type: 'Inspection')",
-            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Inspection'), user, 'admin', true, true)}},
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] &&
+                                       priv_check.call(Object.const_get('Inspection'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Inspection'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New Recurring Inspections', path: "new_recurrence_path(form_type: 'Inspection')",
-            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Inspection'), user, 'admin', true, true)}},
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] &&
+                                       priv_check.call(Object.const_get('Inspection'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Inspection'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Evaluations' => {
         title: 'Evaluations', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('Evaluation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) },
         subMenu: [
           {title: 'All', path: 'evaluations_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_evaluation_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'new', true, true)}},
-          {title: 'Recurring Inspections', path: "recurrences_path(form_type: 'Evaluation')",
-            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Evaluation'), user, 'admin', true, true)}},
-          {title: 'New Recurring Inspections', path: "new_recurrence_path(form_type: 'Evaluation')",
-            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] && priv_check.call(Object.const_get('Evaluation'), user, 'admin', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'Recurring Evaluations', path: "recurrences_path(form_type: 'Evaluation')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] &&
+                                       priv_check.call(Object.const_get('Evaluation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Evaluation'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true)}},
+          {title: 'New Recurring Evaluations', path: "new_recurrence_path(form_type: 'Evaluation')",
+            display: proc{|user:,**op| CONFIG.sa::GENERAL[:enable_recurrence] &&
+                                       priv_check.call(Object.const_get('Evaluation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) &&
+                                       priv_check.call(Object.const_get('Evaluation'), user, 'admin', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Investigations' => {
         title: 'Investigations', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('Investigation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'investigations_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_investigation_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Findings' => {
         title: 'Findings', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'findings_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Audits', path: 'findings_path(status: "New", :type=>"Audit")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Inspections', path: 'findings_path(status: "New", :type=>"Inspection")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Inspection'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Evaluations', path: 'findings_path(status: "New", :type=>"Evaluation")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Evaluation'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Investigations', path: 'findings_path(status: "New", :type=>"Investigation")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Corrective Actions' => {
         title: 'Corrective Actions', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
+                                   priv_check.call(Object.const_get('SmsAction'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'sms_actions_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Findings', path: 'sms_actions_path(status: "New", :type=>"Finding")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Investigations', path: 'sms_actions_path(status: "New", :type=>"Investigation")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_sms_action_path',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'new', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Recommendations' => {
         title: 'Recommendations', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Recommendation'), user, 'index', true, true)},
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Recommendation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [
           {title: 'All', path: 'recommendations_path(status: "New")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('SmsAction'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Recommendation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Findings', path: 'recommendations_path(status: "New", :type=>"Finding")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Finding'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Recommendation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'For Investigations', path: 'recommendations_path(status: "New", :type=>"Investigation")',
-            display: proc{|user:,**op| priv_check.call(Object.const_get('Investigation'), user, 'index', true, true)}},
+            display: proc{|user:,**op| priv_check.call(Object.const_get('Recommendation'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
         ]
       },
       'Query Center' => {
