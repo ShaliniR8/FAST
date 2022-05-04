@@ -21,6 +21,9 @@ class SCXConfig < DefaultConfig
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,
+    global_admin_default:               false,
+    advanced_checklist_data_type:       true,
+    checklist_query:                    true,
   })
 
 
