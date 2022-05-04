@@ -9,6 +9,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
 
     matrix_carry_over:        true,
     share_meeting_agendas:    false,
+    show_pdf_column_scoreboard: true,
     # Airline-Specific Features:
   })
 
