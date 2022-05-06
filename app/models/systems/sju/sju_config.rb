@@ -17,8 +17,8 @@ class SJUConfig < DefaultConfig
 
     has_gmap:                      true,
     gis_layers:                    true,
-    lat:                           18.438055,
-    lng:                           -66.004444,
+    lat:                           18.439875,
+    lng:                           -66.002044,
     gMapZoom:                      15,
 
     global_admin_default:          false,
