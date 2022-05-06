@@ -23,7 +23,6 @@ class HomeController < ApplicationController
     prepare_data
     prepare_calendar
     prepare_risk_matrix
-    prepare_special_risk_matrix
 
     @params = {
       advance_search: true,
@@ -154,7 +153,6 @@ class HomeController < ApplicationController
       @corrective_actions = CorrectiveAction.where(corrective_action_queries.join(' AND '))
       @grouped_corrective_actions = @corrective_actions.group_by(&:status)
       @corrective_actions_scheduled_completion_date = get_avg_completion_date(@corrective_actions)
-
 
     when 'SMS IM'
       @title = "SMS IM Dashboard"
@@ -563,141 +561,6 @@ class HomeController < ApplicationController
           })
         end
       end
-    end
-  end
-
-
-  def prepare_special_risk_matrix
-    special_matrix
-    row_sz = @risk_table[:row_header].size
-    col_sz = @risk_table[:column_header].size
-
-    if row_sz > col_sz
-      col_sz = row_sz
-    else
-      row_sz = col_sz
-    end
-
-    @frequency = [
-      'FREQUENT >4.00',
-      'PROBABLE 4.00~3.01',
-      'OCCASIONAL 3.00~2.01',
-      'REMOTE 2.01~1.00',
-      'IMPROBABLE <1.00'
-    ]
-    @severity = [
-      'CATASTROPHIC, >4.00',
-      'CRITICAL 4.00~2.51',
-      'MARGINAL 2.50~1.01',
-      'MINOR <=1.0'
-    ]
-
-    # Safety Assurance
-    if session[:mode] == "SMS"
-      # Findings
-      @finding_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @finding_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      Finding.within_timerange(@start_date, @end_date).each do |finding|
-        if finding.severity.present? && finding.likelihood_index.present?
-          @finding_matrix[finding.severity.to_i][finding.likelihood_index] =
-            @finding_matrix[finding.severity.to_i][finding.likelihood_index] + 1
-        end
-        if finding.severity_after.present? && finding.likelihood_after_index.present?
-          @finding_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] =
-            @finding_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] + 1
-        end
-      end
-      # Investigations
-      @inv_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @inv_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      Investigation.within_timerange(@start_date, @end_date).each do |finding|
-        if finding.severity.present? && finding.likelihood_index.present?
-          @inv_matrix[finding.severity.to_i][finding.likelihood_index] =
-            @inv_matrix[finding.severity.to_i][finding.likelihood_index] + 1
-        end
-        if finding.severity_after.present? && finding.likelihood_after_index.present?
-          @inv_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] =
-            @inv_after_matrix[finding.severity_after.to_i][finding.likelihood_after_index] + 1
-        end
-      end
-      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Findings"
-      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Findings"
-
-      # SmsActions
-      @car_after_matrix = Array.new(row_sz){Array.new(col_sz, 0)}
-      @car_matrix = Array.new(row_sz){Array.new(col_sz, 0)}
-      SmsAction.within_timerange(@start_date, @end_date).each do |x|
-        if x.severity.present? && x.likelihood_index.present?
-          @car_matrix[x.severity.to_i][x.likelihood_index] =
-            @car_matrix[x.severity.to_i][x.likelihood_index] + 1
-        end
-        if x.severity_after.present? && x.likelihood_after_index.present?
-          @car_after_matrix[x.severity_after.to_i][x.likelihood_after_index] =
-            @car_after_matrix[x.severity_after.to_i][x.likelihood_after_index] + 1
-        end
-      end
-
-
-    # Safety Reporting Module
-    elsif session[:mode] == "ASAP"
-      @record_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @record_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-
-      @records.each do |record|
-        if record.severity_after.present? && record.likelihood_after_index.present?
-          @record_after_matrix[record.severity_after.to_i][record.likelihood_after_index] =
-            @record_after_matrix[record.severity_after.to_i][record.likelihood_after_index] + 1
-        end
-        if record.severity.present? && record.likelihood_index.present?
-          @record_matrix[record.severity.to_i][record.likelihood_index] =
-            @record_matrix[record.severity.to_i][record.likelihood_index] + 1
-        end
-      end
-
-      @report_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @report_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @reports.each do |report|
-        if report.severity_after.present? && report.likelihood_after_index.present?
-          @report_after_matrix[report.severity_after.to_i][report.likelihood_after_index] =
-            @report_after_matrix[report.severity_after.to_i][report.likelihood_after_index] + 1
-        end
-        if report.severity.present? && report.likelihood_index.present?
-          @report_matrix[report.severity.to_i][report.likelihood_index] =
-            @report_matrix[report.severity.to_i][report.likelihood_index] + 1
-        end
-      end
-      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Reports"
-      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Reports"
-
-    # Safety Risk Management
-    else
-
-      @hazard_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @hazard_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |hazard|
-        if hazard.severity_after.present? && hazard.likelihood_after_index.present?
-          @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] =
-            @hazard_after_matrix[hazard.severity_after.to_i][hazard.likelihood_after_index] + 1
-        end
-        if hazard.severity.present? && hazard.likelihood_index.present?
-          @hazard_matrix[hazard.severity.to_i][hazard.likelihood_index] =
-            @hazard_matrix[hazard.severity.to_i][hazard.likelihood_index] + 1
-        end
-      end
-      @sra_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      @sra_after_matrix = Array.new(row_sz){Array.new(col_sz,0)}
-      Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).each do |sra|
-        if sra.severity_after.present? && sra.likelihood_after_index.present?
-          @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] =
-            @sra_after_matrix[sra.severity_after.to_i][sra.likelihood_after_index] + 1
-        end
-        if sra.severity.present? && sra.likelihood_index.present?
-          @sra_matrix[sra.severity.to_i][sra.likelihood_index] =
-            @sra_matrix[sra.severity.to_i][sra.likelihood_index] + 1
-        end
-      end
-      @matrix_title = "#{I18n.t("core.risk.baseline.title")} Risk Analysis: Hazards"
-      @after_title = "#{I18n.t("core.risk.mitigated.title")} Risk Analysis: Hazards"
     end
   end
 

@@ -110,7 +110,7 @@
                   :disable_with => "Reopening...",
                   "data-toggle" => "tooltip",
                   "data-placement" => "top",
-                  :title => "This will the Event and all the included Reports"%>
+                  :title => "This will reopen the Event and all the included Reports"%>
               <%end%>
               <%if @report.status != "Closed" &&
                 current_user.has_access('corrective_actions','new', admin: CONFIG::GENERAL[:global_admin_default])%>
