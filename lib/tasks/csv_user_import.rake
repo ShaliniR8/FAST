@@ -171,7 +171,7 @@ namespace :csv_user_import do
     return false if sso_id.nil?
     result = false
 
-    if @users_in_csv.map(&:sso_id).map(&:downcase).include? sso_id
+    if @users_in_csv.map(&:sso_id).compact.map(&:downcase).include? sso_id
       @duplicate_sso_id_in_csv_error << @row_num
       result =  true
     end
@@ -376,7 +376,7 @@ namespace :csv_user_import do
     @num_deleted_users = users_to_be_disabled.size
     users_to_be_disabled.each do |u|
       u.disable = true
-      u.sso_id  = nil
+      # u.sso_id  = nil
       u.save
     end
 
@@ -413,6 +413,7 @@ namespace :csv_user_import do
       users = User.where(sso_id: @table[row-1][sso_id_column])
       user_id = users.reduce('') { |txt, user| txt + "##{user.id}, "}[0...-2]
       result += " (#{user_id})" if user_id.present?
+
       result
     end
   end

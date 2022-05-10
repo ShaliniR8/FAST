@@ -218,14 +218,13 @@ class AJTConfig < DefaultConfig
 
   CSV_FILE_USER_IMPORT = {
     sso_id: :email,
-    filename: 'ajt_users.csv',
-    prev_filename: 'ajt_users_prior.csv',
+    filename: 'AMJ_AD_Export.csv',
+    prev_filename: 'AMJ_AD_Export_prior.csv',
     destination_file_path:'lib/tasks',
-    target_file_path: 'lib',
+    target_file_path: '/var/sftp/ajtsftpuser',
 
     # Please add clients emails
-    client_emails: ['taeho.kim@prodigiq.com']
+    client_emails: ['jlovelace@amerijet.com']
   }
-
 
 end
