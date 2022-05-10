@@ -807,7 +807,7 @@ module QueriesHelper
 
     all_conditions.each do |c|
       to_replace = "C#{c.id}C"
-      replace_with = generate_single_condition_ids(query, c)
+      replace_with = c.field_name.present? ? generate_single_condition_ids(query, c) : nil
       replace_with = "[]" if !replace_with.present?
       query_string.gsub!(to_replace, replace_with)
     end
