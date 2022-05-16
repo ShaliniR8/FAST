@@ -22,7 +22,7 @@ class DemoConfig < DefaultConfig
 
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_report:          false,
-    configurable_risk_matrices:   true,
+    configurable_risk_matrices:   false,
     shared_links:                 true,
     drop_down_risk_selection:     false,
 
@@ -30,7 +30,16 @@ class DemoConfig < DefaultConfig
     allow_set_alert:              true,
     has_extension:                true,
     has_verification:             true,
+    sms_im_visibility:            false,
+    safety_promotion_visibility:  true,
+    global_admin_default:         false,
   })
+
+  RISK_MATRIX = {
+    :likelihood       => ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"],
+    :severity         => (0..4).to_a.reverse,
+    :risk_factor      => {"LOW" => "lime", "MODERATE" => "yellow", "HIGH" => "orange"},
+  }
 
   MATRIX_INFO = DefaultConfig::MATRIX_INFO.deep_merge({
     severity_table: {
@@ -70,6 +79,14 @@ class DemoConfig < DefaultConfig
       yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Acceptable with Mitigation"   },
       limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable"                   },
     },
+
+    risk_table_dict: {
+      limegreen:  'LOW',
+      red:        'HIGH',
+      yellow:        'MODERATE',
+      orange:        'HIGH',
+
+    }
   })
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({

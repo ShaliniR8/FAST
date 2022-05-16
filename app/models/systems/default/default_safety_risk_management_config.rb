@@ -9,7 +9,8 @@ class DefaultSafetyRiskManagementConfig
 
     # Airline-Specific Features:
     risk_assess_sras:      false,
-    add_reports_to_sra:    false
+    add_reports_to_sra:    false,
+    enable_risk_register:  false
   }
 
 
@@ -530,6 +531,11 @@ class DefaultSafetyRiskManagementConfig
       'Risk Controls' => {
         title: 'Risk Controls', path: 'risk_controls_path(status: "New")',
         display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)},
+      },
+      'Risk Register' => {
+        title: 'Risk Register', path: 'view_register_risk_controls_path',
+        display: proc{|user:,**op| priv_check.call(Object.const_get('RiskControl'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) &&
+                                   CONFIG.srm::GENERAL[:enable_risk_register]},
       },
       'Safety Plans' => {
         title: 'Safety Plans', path: '#',

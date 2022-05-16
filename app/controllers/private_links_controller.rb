@@ -49,7 +49,7 @@ class PrivateLinksController < ApplicationController
     @owner.digest = Digest::SHA512.hexdigest("#{@owner.created_at}#{@owner.email}")
     @owner.save
     NotifyMailer.share_private_link(current_user, @owner)
-    redirect_to "#{@owner.link}"
+    redirect_to "#{@owner.link}", flash: {success: "Link shared with #{params[:private_link][:name]}."}
   end
 
 

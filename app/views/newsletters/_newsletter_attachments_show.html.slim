@@ -22,16 +22,23 @@ ruby:
         table#attachment_table.table.table-striped.table-bordered
           thead
             tr
-              th Filename
-              th Caption
-              th Action
+              th style="width=20%;"
+                | Filename
+              th style="width=20%;"
+                | Caption
+              th style="width=30%;"
+                | Action
+              - if owner.my_action(current_user.id) == 'Unread'
+                th style="width=30%;"
+                  | Read Receipt(Acknowledge all Documents)
           tbody
             - attachments.each do |attachment|
               tr attachment_id=attachment.id
-                td
+                td style="text-align:center;width=20%;"
                   strong = attachment.document_filename
-                td = attachment.caption
-                td
+                td style="text-align:center;width=20%;"
+                  = attachment.caption
+                td style="text-align:center;width=30%;"
                   div id="preview_attachment_#{attachment.id}" style='display: none;'
                     .panel-lightskyblue
                       .panel-heading
@@ -48,6 +55,10 @@ ruby:
                     'data-target' => '.bs-example-modal-lg'
                   = link_to 'Download', attachment.name.url,
                     class: 'btn btn-success ml5'
+                - if owner.my_action(current_user.id) == 'Unread'
+                  td style="text-align:center;width=30%;"
+                    = check_box_tag "read_receipt_#{attachment.id}", nil, false, class: 'accept_read_receipt mr10'
+                    b I hereby confirm and acknowledge that I have read the Document captioned #{(attachment.caption.upcase) rescue "N/A"} in its entirety
 
 javascript:
   $(function() {

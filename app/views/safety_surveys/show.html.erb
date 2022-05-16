@@ -73,6 +73,9 @@
             <b>Description: </b><%=@survey.description%>
           </div>
           <div class='col-xs-12 mt5'>
+            <b>Anonymous: </b><%=@survey.anonymous.present? ? 'Yes' : 'No'%>
+          </div>
+          <div class='col-xs-12 mt5'>
             <b>Status: </b><%=@survey.status%>
           </div>
           <div class='col-xs-12 mt5'>

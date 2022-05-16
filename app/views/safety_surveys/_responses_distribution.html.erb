@@ -29,10 +29,15 @@
               <%@grouped_responses.each do |k,v|%>
                 <tr>
                   <td><%=k%></td>
-                  <td><%=link_to v.split(',').count,
+                  <td>
+                    <%if @owner.anonymous.present?%>
+                      <%=v.split(',').count%>
+                    <%else%>
+                      <%=link_to v.split(',').count,
                          "#",
                          class: "users_link",
                          "data-list" => v%>
+                    <%end%>
                   </td>
                 </tr>
               <%end%>
@@ -41,7 +46,7 @@
         </div>
       <%end%>
 
-      <%if @user_responses.present?%>
+      <%if @user_responses.present? && !@owner.anonymous.present?%>
         <div class="mt20 mb10 mr10">
           <b style="font-size:18px;text-decoration: underline;">ALL USER RESPONSES</b>
         </div>

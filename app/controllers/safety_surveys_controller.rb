@@ -128,6 +128,7 @@ class SafetySurveysController < ApplicationController
 
 
   def get_responses_distribution
+    @owner = @table.find(params[:id])
     checklist_ids = Completion.preload(:checklist).where({owner_id: params[:id], owner_type: 'SafetySurvey'}).keep_if{|c| c.checklist.present?}.map{|c| c.checklist.id}.flatten rescue []
     user_ids = Completion.where({owner_id: params[:id], owner_type: 'SafetySurvey'}).keep_if{|c| c.checklist.present?}.map{|c| c.user_id} rescue []
     checklists = Checklist.preload(:checklist_rows => :checklist_cells).where(id: checklist_ids)
@@ -195,11 +196,9 @@ class SafetySurveysController < ApplicationController
           mailer: true, subject: "New Safety Survey Published in ProSafeT")
       end
 
-      if survey.checklist.present?
-        call_rake 'create_survey_checklists',
-          survey_id: survey.id,
-          users: user_ids
-      end
+      call_rake 'create_survey_checklists',
+        survey_id: survey.id,
+        users: user_ids
     end
   end
 
