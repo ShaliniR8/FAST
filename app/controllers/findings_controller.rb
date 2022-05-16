@@ -33,6 +33,8 @@ class FindingsController < SafetyAssuranceController
   before_filter(only: [:create]) {set_parent(:finding)}
   after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @finding)}
 
+  include Concerns::Mobile # used for [method]_as_json
+
   def define_owner
     @class = Object.const_get('Finding')
     @owner = @class.find(params[:id])
@@ -69,7 +71,10 @@ class FindingsController < SafetyAssuranceController
       @finding = @parent.findings.create(params[:finding])
     end
     notify_on_object_creation(@finding)
-    redirect_to @finding, flash: {success: 'Finding created.'}
+    respond_to do |format|
+      format.html { redirect_to @finding, flash: {success: 'Finding created.'} }
+      format.json {render :json => { :success => 'Finding Created.' }, :status => 200}
+    end
   end
 
 
@@ -107,10 +112,15 @@ class FindingsController < SafetyAssuranceController
 
 
   def show
-    load_special_matrix(@owner)
-    @type = @owner.get_owner
-    @fields = Finding.get_meta_fields('show')
-    @true_owner = @owner.find_true_owner
+    respond_to do |format|
+      format.html do
+        load_special_matrix(@owner)
+        @type = @owner.get_owner
+        @fields = Finding.get_meta_fields('show')
+        @true_owner = @owner.find_true_owner
+      end
+      format.json { show_as_json }
+    end
   end
 
 
