@@ -22,7 +22,7 @@ class DefaultMobileConfig
     #SCX Portals
     scx_general_sso:  { label: 'Personal Device',               subdomain: 'scx',           sso: true },
     scx_general_dir:  { label: 'External User',                 subdomain: 'scx', },
-    scx_shared_sso:   { label: 'Shared Device',                 subdomain: 'scx',           sso: true,  shared: true },
+    scx_shared_sso:   { label: 'Shared Company Device',         subdomain: 'scx',           sso: true,  shared: true },
     scx_shared_dir:   { label: 'General (Shared) (ProSafeT)',   subdomain: 'scx',                       shared: true },
     scx_training_sso: { label: 'Training',                      subdomain: 'scx-training',  sso: true },
     scx_training_dir: { label: 'Training (ProSafeT)',           subdomain: 'scx-training', },
@@ -52,8 +52,12 @@ class DefaultMobileConfig
     rjet_dir:          { label: 'Login with ProSafeT',           subdomain: 'rjet'},
     rjet_sso:          { label: 'SSO',                           subdomain: 'rjet',           sso: true},
 
+    #RPA portals
+    rpa_dir:          { label: 'Login with ProSafeT',           subdomain: 'rpa'},
+    rpa_sso:          { label: 'SSO',                           subdomain: 'rpa',           sso: true},
+
     #Eulen Portals
-    eulen_general_dir:    { label: 'Login with ProSafeT', subdomain: 'eulen' },
+    eulen_general_dir: { label: 'Login with ProSafeT', subdomain: 'eulen' },
 
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
@@ -164,6 +168,14 @@ class DefaultMobileConfig
     },
 
 
+    'RPA Key' =>{ # 2A52-7296-251B-74E2
+      key_name: 'Republic Airways',
+      portals: %i[
+        rpa_dir
+        rpa_sso
+      ]
+    },
+
     'EULEN Key' =>{ # 8DD7-B9B3-F409-3A49
       key_name: 'Grupo Eulen',
       portals: %i[
@@ -172,7 +184,7 @@ class DefaultMobileConfig
     },
 
 
-    'Trial Key' => { # 6158-BC31-0338-233B
+    'Trial Key' => { # B0A6-42C4-FFD3-A978
       key_name: 'Trial',
       portals: %i[trial_general]
     },

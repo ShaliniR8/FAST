@@ -717,6 +717,7 @@ PrdgSession::Application.routes.draw do |map|
     collection do
       post 'load_records'
       get 'advanced_search'
+      get "view_register"
       post "get_dataset"
     end
     member do

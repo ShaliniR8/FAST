@@ -51,7 +51,7 @@
             <%end%>
 
             <%if @newsletter.my_action(current_user.id) == 'Unread'%>
-              <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
+              <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5", id: "complete_newsletter_btn", :style=>"display:none"%>
             <%end%>
 
             <%=link_to "Add Comment",
@@ -117,7 +117,7 @@
           <%=render "/newsletters/newsletter_attachments_show", :owner => @newsletter, show_btn: current_user.has_access(Object.const_get('Newsletter').rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])%>
           <!-- Admin Panel for completion Statistics -->
           <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "admin", admin: CONFIG::GENERAL[:global_admin_default])%>
-            <%=render "/newsletters/admin_stats", :owner => @newsletter%>
+            <%=render "/safety_surveys/admin_stats", :owner => @newsletter%>
           <%end%>
 
           <!-- Attachments -->
@@ -163,6 +163,20 @@
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
+    });
+
+    $('.accept_read_receipt').on('change', function(){
+      let accept_all = true;
+      $('.accept_read_receipt').each(function(){
+        if($(this).prop('checked') == false) {
+          accept_all = false;
+        }
+      });
+      if (accept_all == true) {
+        $('#complete_newsletter_btn').show();
+      } else {
+        $('#complete_newsletter_btn').hide();
+      }
     });
 
   });

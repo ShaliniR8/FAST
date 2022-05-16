@@ -80,7 +80,7 @@ class HazardsController < ApplicationController
     if params[:owner_type].present?
       @owner = Object.const_get(params[:owner_type]).find(params[:owner_id])
     else # from Launch Object
-      @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id])
+      @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id]) rescue nil
     end
     load_options
     @fields = Hazard.get_meta_fields('form')
