@@ -54,7 +54,7 @@ ruby:
                     'data-toggle' => 'modal',
                     'data-target' => '.bs-example-modal-lg'
                   = link_to 'Download', attachment.name.url,
-                    class: 'btn btn-success ml5'
+                    class: 'btn btn-success m5'
                 - if owner.my_action(current_user.id) == 'Unread'
                   td style="text-align:center;width=30%;"
                     = check_box_tag "read_receipt_#{attachment.id}", nil, false, class: 'accept_read_receipt mr10'
