@@ -4,7 +4,7 @@ class ApplicationMailer < ActionMailer::Base
   protected
   def to_email(email)
     CONFIG::GENERAL[:enable_mailer] && Rails.env.production? ?
-      {to: email, bcc: 'noc@prosafet.com'} : {to: 'noc@prodigiq.com'}
+      {to: email, bcc: 'noc@prosafet.com'} : {to: 'noc@prosafet.com'}
   end
 
   def define_attachments
