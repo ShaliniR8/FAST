@@ -1463,7 +1463,7 @@ module QueriesHelper
             case cells.map(&:data_type).first
             when 'date'
               values.each do |value|
-                found = value.to_date <= search_value.to_date rescue false
+                found = value.to_date < search_value.to_date rescue false
                 if found
                   valid_rows << checklist_row
                   break
@@ -1471,7 +1471,7 @@ module QueriesHelper
               end
             when 'datetime'
               values.each do |value|
-                found = value.to_datetime <= search_value.to_datetime rescue false
+                found = value.to_datetime < search_value.to_datetime rescue false
                 if found
                   valid_rows << checklist_row
                   break

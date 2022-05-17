@@ -58,7 +58,7 @@ ruby:
                 - if owner.my_action(current_user.id) == 'Unread'
                   td style="text-align:center;width=30%;"
                     = check_box_tag "read_receipt_#{attachment.id}", nil, false, class: 'accept_read_receipt mr10'
-                    b I hereby confirm and acknowledge that I have read the Document captioned #{(attachment.caption.upcase) rescue "N/A"} in its entirety
+                    b I hereby acknowledge that I have read the document captioned #{(attachment.caption.upcase) rescue "N/A"} in its entirety
 
 javascript:
   $(function() {

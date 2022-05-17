@@ -45,7 +45,7 @@
                 :class => "btn btn-success pull-right mt5",
                 :disable_with => "Saving..."%>
               <%=link_to "Cancel",
-                action_name == 'new' ? @parent_old : @owner.becomes(Finding),
+                action_name == 'new' ? (@parent_old.class.name == 'ChecklistRow' ? @parent_old.checklist.owner : @parent_old) : @owner.becomes(Finding),
                 :class => "btn btn-default pull-right mt5 mr5",
                 :confirm => 'Are you sure?'%>
               <%#=link_to "Group Access",

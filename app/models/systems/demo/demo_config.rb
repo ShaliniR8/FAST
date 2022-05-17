@@ -25,6 +25,18 @@ class DemoConfig < DefaultConfig
     configurable_risk_matrices:   false,
     shared_links:                 true,
     drop_down_risk_selection:     false,
+    has_gmap:                     true,
+    gis_layers:                   true,
+    # lat:                        24.958202,
+    # lng:                        46.700779, #Dammam
+    # lat:                        29.9872543,
+    # lng:                        -95.3502256, #IAH #1
+    # lat:                        29.9866102,
+    # lng:                        -95.3476103, #IAH #2
+    lat:                          29.6459141,
+    lng:                          -95.2768951, #HOU
+    gMapZoom:                     15,
+    checklist_query:              true,
 
     # TO BE REMOVED:
     allow_set_alert:              true,
