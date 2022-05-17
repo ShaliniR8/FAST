@@ -565,6 +565,10 @@ module ApplicationHelper
       entry_url = im_url(entry)
     when 'SmsTask'
       entry_url = eval("#{entry.owner_type.underscore}_url(entry.owner)")
+    when 'Newsletter'
+      entry_url = newsletter_url(entry)
+    when 'SafetySurvey'
+      entry_url = safety_survey_url(entry)
     else
       entry_url = "N/A"
     end

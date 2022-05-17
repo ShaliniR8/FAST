@@ -4,6 +4,9 @@ class DemoSafetyReportingConfig < DefaultSafetyReportingConfig
     enable_orm:                  true,
     template_nested_fields:      true,
     dropdown_event_title_list:   true,
+    submission_corrective_action_root_cause:    true,
+    enable_external_email:     true,
+    show_pdf_column_scoreboard: true,
   })
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
