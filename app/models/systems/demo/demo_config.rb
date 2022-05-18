@@ -21,10 +21,10 @@ class DemoConfig < DefaultConfig
     integrations: ['mitre', 'eccairs'],
 
     # SYSTEM-WIDE FORM CONFIGS
-    allow_reopen_report:          false,
     configurable_risk_matrices:   false,
     shared_links:                 true,
     drop_down_risk_selection:     false,
+    advanced_checklist_data_type: true,
     has_gmap:                     true,
     gis_layers:                   true,
     # lat:                        24.958202,
