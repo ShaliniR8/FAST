@@ -72,6 +72,7 @@ class SafetySurveysController < ApplicationController
 
   def update
     @survey = @table.find(params[:id])
+    survey_status = @survey.status
 
     if @survey.update_attributes(params[:safety_survey])
       transaction_action = "Update"
@@ -84,6 +85,20 @@ class SafetySurveysController < ApplicationController
           transaction_content = val[:content] rescue nil
           flash = {success: "Comment Added to Safety Survey #{@survey.title}"}
         end
+      end
+
+      if params[:commit] == 'Override Status'
+        if survey_status != params[:safety_survey][:status]
+          if params[:safety_survey][:status] == 'New'
+            @survey.archive_date = nil
+            @survey.publish_date = nil
+            @survey.completions.each.map(&:destroy)
+            @survey.save
+          end
+        end
+        transaction_action = "Update Status"
+        transaction_content = "Safety Survey status updated from #{survey_status} to #{params[:safety_survey][:status]}"
+        flash = {success: "Safety Survey #{@survey.title} status updated"}
       end
 
       @survey.append_transaction(transaction_action, current_user.id, transaction_content)

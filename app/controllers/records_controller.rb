@@ -450,7 +450,7 @@ class RecordsController < ApplicationController
     @deidentified = params[:deidentified]
     @record = Record.find(params[:id])
     @meta_field_args = ['show']
-    @meta_field_args << 'admin' if current_user.global_admin?
+    @meta_field_args << 'admin' if current_user.global_admin? || current_user.has_template_access(@record.template.name).include?('viewer_template_id')
     html = render_to_string(:template => "/pdfs/print_record.html.erb")
     pdf_options = {
       header_html:  'app/views/pdfs/print_header.html',

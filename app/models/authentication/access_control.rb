@@ -101,7 +101,7 @@ class AccessControl < ActiveRecord::Base
       "smsim" => ["SMS IM", "ims", "packages", 'sms_meetings'],
       "safety_assurance" => ["audits", "Safety Assurance", "inspections", "investigations", "evaluations", "findings", "sms_actions", 'recommendations', 'checklist'],
       "srm" => ["sras", "safety_plans", 'hazards', 'risk_controls', 'srm_meetings', 'Safety Risk Management'],
-      "safety_promotion" => ["Safety Promotion", "newsletters", "safety_surveys", 'safety_badges'],
+      "safety_promotion" => ["Safety Promotion", "newsletters", "safety_surveys"],
       "other" => ["documents", "Role", "home"],
       "templates" => Template.find(:all).map(&:name),
       "checklist_templates" => Checklist.where(owner_type: 'ChecklistHeader').map(&:title),
@@ -421,7 +421,6 @@ class AccessControl < ActiveRecord::Base
   def self.get_meta
     {
       "submissions"=>{
-        # "New"=>"new",
         "View"=>"show",
         "Delete"=>"destroy",
         "Listing"=>"index",
@@ -437,7 +436,6 @@ class AccessControl < ActiveRecord::Base
         "Delete"=>"destroy",
         "Listing"=>"index",
         "Query"=>"query",
-        # "De-Identified" => "deid",
         "Full Access"=>"admin",
         "Override" => 'override'
       },
@@ -676,16 +674,6 @@ class AccessControl < ActiveRecord::Base
         "Override" => 'override',
         "Notify" => 'notify'
        },
-       'safety_badges'=>{
-        "New"=>"new",
-        "View"=>"show",
-        "Edit"=>"edit",
-        "Delete"=>"destroy",
-        "Listing"=>"index",
-        "Admin"=>"admin",
-        "Override" => 'override',
-        "Notify" => 'notify'
-       },
        'ASAP'=>{
         'Module Access'=>'module'
        },
@@ -770,7 +758,6 @@ class AccessControl < ActiveRecord::Base
       "SRA(SRM) Meetings"                     => "srm_meetings",
       "Newsletters"                           => "newsletters",
       "Safety Surveys"                        => "safety_surveys",
-      "Safety Badges"                         => "safety_badges",
       "Safety Reporting"                      => "ASAP",
       "SMS IM"                                => "SMS IM",
       "Safety Assurance"                      => "Safety Assurance",
@@ -796,7 +783,6 @@ class AccessControl < ActiveRecord::Base
       "SRA(SRM)"                              => "sras",
       "Hazards"                               => "hazards",
       "Risk Controls"                         => "risk_controls",
-      # "Safety Plans"                          => "safety_plans",
       "Verifications"                         => "verifications",
     }.sort.to_h
   end

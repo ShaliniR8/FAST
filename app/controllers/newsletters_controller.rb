@@ -72,6 +72,7 @@ class NewslettersController < ApplicationController
 
   def update
     @newsletter = @table.find(params[:id])
+    newsletter_status = @newsletter.status
 
     if @newsletter.update_attributes(params[:newsletter])
       transaction_action = "Update"
@@ -84,6 +85,20 @@ class NewslettersController < ApplicationController
           transaction_content = val[:content] rescue nil
           flash = {success: "Comment Added to Newsletter #{@newsletter.title}"}
         end
+      end
+
+      if params[:commit] == 'Override Status'
+        if newsletter_status != params[:newsletter][:status]
+          if params[:newsletter][:status] == 'New'
+            @newsletter.archive_date = nil
+            @newsletter.publish_date = nil
+            @newsletter.completions.each.map(&:destroy)
+            @newsletter.save
+          end
+        end
+        transaction_action = "Update Status"
+        transaction_content = "Newsletter status updated from #{newsletter_status} to #{params[:newsletter][:status]}"
+        flash = {success: "Newsletter #{@newsletter.title} status updated"}
       end
 
       @newsletter.append_transaction(transaction_action, current_user.id, transaction_content)

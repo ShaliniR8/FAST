@@ -20,16 +20,16 @@ task :create_all_rules => [:environment] do |t|
           old_access = AccessControl.where("action = ? AND entry = ?", action, entry)
           if old_access.blank?
             if new_access.save
-              puts "  Successfully saved new #{action_names[index]} rule for entry #{entry_names[index]}\n"
+              puts "  Successfully saved new #{action_names[index]} rule for entry #{entry}\n"
             else
-              puts "  Failed to save new #{action_names[index]} rule for entry #{entry_names[index]}\n"
+              puts "  Failed to save new #{action_names[index]} rule for entry #{entry}\n"
             end
           else
-            puts "  #{action_names[index]} rule already present for entry #{entry_names[index]}\n"
+            puts "  #{action_names[index]} rule already present for entry #{entry}\n"
           end
         end
       else
-        puts "Entry #{entry_names[index]} does not have any options. Check for possible errors."
+        puts "Entry #{entry} does not have any options. Check for possible errors."
       end
     end
 
