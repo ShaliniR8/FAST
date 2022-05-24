@@ -148,7 +148,7 @@ namespace :csv_user_import do
       address:            row[ADDRESS_COL],
       city:               row[CITY_COL],
       state:              row[STATE_COL],
-      zip_code:           row[ZIPCODE_COL],
+      zipcode:            row[ZIPCODE_COL],
       mobile_number:      row[MOBILENUMBER_COL],
       work_phone_number:  row[WORKNUMBER_COL],
       disable:            false
@@ -330,7 +330,7 @@ namespace :csv_user_import do
         address:            user_params[:address],
         city:               user_params[:city],
         state:              user_params[:state],
-        zip_code:           user_params[:zip_code],
+        zipcode:            user_params[:zipcode],
         mobile_number:      user_params[:mobile_number],
         work_phone_number:  user_params[:work_phone_number],
         password:           '1rDte@p9q657UtfH&4wQ!',
@@ -376,7 +376,6 @@ namespace :csv_user_import do
     @num_deleted_users = users_to_be_disabled.size
     users_to_be_disabled.each do |u|
       u.disable = true
-      # u.sso_id  = nil
       u.save
     end
 
