@@ -8,7 +8,7 @@
     <div class="panel-body" style="height:300px">
       <div class="row">
         <div class="col-xs-12">
-          <h4>Average Days to Complete: <%=Hazard.get_avg_complete%></h4>
+          <h4 id='hazard_avg_days_to_complete'>Average Days to Complete: <%=Hazard.get_avg_complete(nil, @start_date, @end_date)%></h4>
         </div>
       </div>
       <div id="hazards" style="width: 100%"></div>

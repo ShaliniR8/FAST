@@ -82,7 +82,7 @@ class HomeController < ApplicationController
       submission_queries << "(completed = true)"
       # template query
       if params[:emp_groups].present?
-        templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact, emp_group: params[:emp_group])
+        templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact, emp_group: params[:emp_groups])
       else
         templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact)
       end
@@ -108,12 +108,13 @@ class HomeController < ApplicationController
 
       # template query
       if params[:emp_groups].present?
-        full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact, emp_group: params[:emp_group])
-        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact, emp_group: params[:emp_group])
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact, emp_group: params[:emp_groups])
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact, emp_group: params[:emp_groups])
       else
         full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact)
         viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact)
       end
+
       template_query = ["(users_id = #{current_user.id})"]
       if full_template.length > 0
         template_query << "(templates_id in (#{full_template.map(&:id).join(',')}))"
@@ -245,7 +246,6 @@ class HomeController < ApplicationController
 
     when 'SRM'
       @title = "SRA (SRM) Dashboard"
-
       @sras = Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).sort{|x,y| status_index(x) <=> status_index(y)}
       @grouped_sras = @sras.group_by{|x| x.status}
       if (temp = @sras.select{|x| x.overdue}).present?

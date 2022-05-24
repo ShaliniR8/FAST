@@ -11,8 +11,12 @@ module ModelHelpers
   #######################
   included do
 
-    def self.get_avg_complete(current_user=nil)
-      completed_objects = self.where('status = ? and close_date is not ?', 'Completed', nil)
+    def self.get_avg_complete(current_user=nil, start_date=nil, end_date=nil, departments=nil)
+      if start_date && end_date
+        completed_objects = self.within_timerange(start_date, end_date).where('status = ? and close_date is not ?', 'Completed', nil)
+      else
+        completed_objects = self.where('status = ? and close_date is not ?', 'Completed', nil)
+      end
 
       case self.name
       when 'Record'
@@ -25,6 +29,12 @@ module ModelHelpers
 
       when 'Report'
         completed_objects = self.where('status = ? and close_date is not ?', 'Closed', nil)
+      when 'Sra', 'Hazard', 'RiskControl'
+        if start_date && end_date
+          completed_objects = self.within_timerange(start_date, end_date).where('status = ? and close_date is not ?', 'Completed', nil).by_departments(departments)
+        else
+          completed_objects = self.where('status = ? and close_date is not ?', 'Completed', nil).by_departments(departments)
+        end
       end
 
       if completed_objects.present?
