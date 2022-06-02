@@ -37,12 +37,14 @@ class Attachment < ActiveRecord::Base
 
 
   def delete_transaction
-    Transaction.build_for(
-      self.owner,
-      'Delete Attachment',
-      (session[:simulated_id] || session[:user_id]),
-      self.document_filename
-    )
+    if self.owner.class.name != 'ChecklistRow'
+      Transaction.build_for(
+        self.owner,
+        'Delete Attachment',
+        (session[:simulated_id] || session[:user_id]),
+        self.document_filename
+      )
+    end
   end
 
   def url

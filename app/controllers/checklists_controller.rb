@@ -320,6 +320,19 @@ class ChecklistsController < ApplicationController
               end
             end
           end
+
+          params[:checklist][:checklist_rows_attributes].each do |a, b|
+            if b[:attachments_attributes].present?
+              b[:attachments_attributes].each do |c, d|
+                if d['_destroy'].present? && d['_destroy'].to_i == 1
+                  obj = Attachment.find(d['id']) rescue nil
+                  if obj.nil?
+                    b[:attachments_attributes].delete(c)
+                  end
+                end
+              end
+            end
+          end
         end
         if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
           AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
