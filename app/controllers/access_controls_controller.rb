@@ -5,7 +5,7 @@ class AccessControlsController < ApplicationController
 
 
   def index
-    @access = AccessControl.find(:all)
+    @access = CONFIG::GENERAL[:safety_promotion_visibility].present? ? AccessControl.find(:all) : AccessControl.find(:all).keep_if{|a| ["Safety Promotion", "newsletters", "safety_surveys"].exclude?(a.entry)}
     @headers = AccessControl.get_headers
   end
 
@@ -14,7 +14,7 @@ class AccessControlsController < ApplicationController
   def module_index
     module_name = params[:module_name]
     @headers = AccessControl.get_headers
-    @access = AccessControl.find(:all)
+    @access = CONFIG::GENERAL[:safety_promotion_visibility].present? ? AccessControl.find(:all) : AccessControl.find(:all).keep_if{|a| ["Safety Promotion", "newsletters", "safety_surveys"].exclude?(a.entry)}
     if module_name != "all"
       rules = AccessControl.module_map[module_name]
       @access = @access.keep_if{|x| rules.include?(x.entry)}

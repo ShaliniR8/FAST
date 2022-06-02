@@ -367,7 +367,7 @@ class DefaultSafetyAssuranceConfig
           },
           created_by: { default: true, on_newline: true },
           responsible_user: { default: true },
-          approver: { default: true, visible: 'index,form,show'  },
+          approver: { default: true, visible: 'index,form,show,auto'  },
           due_date: { field: 'due_date', default: true },
           reference: { default: true, title: 'Reference or Requirement' },
           classification: {
@@ -524,7 +524,7 @@ class DefaultSafetyAssuranceConfig
           due_date: { default: true, field: 'due_date', on_newline: true },
           close_date: { default: true },
           responsible_user: { default: true },
-          approver: { default: true, visible: 'index,form,show', required: false },
+          approver: { default: true, visible: 'index,form,show,auto', required: false },
           responsible_department: {
             field: 'responsible_department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'form,show',

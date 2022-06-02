@@ -40,7 +40,7 @@ class PrivilegesController < ApplicationController
   def edit
     @privilege=Privilege.find(params[:id])
     @headers=AccessControl.get_headers
-    @rules=AccessControl.find(:all)
+    @rules = CONFIG::GENERAL[:safety_promotion_visibility].present? ? AccessControl.find(:all) : AccessControl.find(:all).keep_if{|a| ["Safety Promotion", "newsletters", "safety_surveys"].exclude?(a.entry)}
   end
 
   def update
