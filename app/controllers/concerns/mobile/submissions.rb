@@ -261,7 +261,7 @@ module Concerns
               end
             end
 
-            category[:fields].sort!{ |a, b| a['field_order'] <=> b['field_order'] }
+            category[:fields].sort!{ |a, b| (a['field_order'].compact.present? && b['field_order'].compact.present?) ? a['field_order'].compact <=> b['field_order'].compact : -1 }
           end
         end
 
