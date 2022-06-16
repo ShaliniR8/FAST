@@ -7,7 +7,12 @@ ruby:
     end
   }
 
+
 table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.id}"
+  thead
+    tr
+      td colspan="100"
+        h5.checklist_title = "Checklist ##{checklist.id}: #{checklist.title}"
   thead
     tr
       - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
