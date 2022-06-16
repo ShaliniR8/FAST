@@ -17,6 +17,7 @@ class SJOConfig < DefaultConfig
     # login_option:                       'sso',
     has_mobile_app:                     false,
     cisp_integration:                   false,
+    display_logo:                       true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                  false,
