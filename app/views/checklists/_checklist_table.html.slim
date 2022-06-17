@@ -16,8 +16,9 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
       - if owner.class.name != 'SafetySurvey'
         th Findings
   tbody
-    
-    - checklist.checklist_rows.order(:row_order).each do |checklist_row|
+    - has_row = ![[1000], []].include?(checklist.checklist_rows.map(&:row_order).uniq.compact)
+    - checklists = has_row ? checklist.checklist_rows.order(:row_order) : checklist.checklist_rows
+    - checklists.each do |checklist_row|
       tr class="#{checklist_row.is_header ? 'header-row' : ''}"
         - checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
           td
