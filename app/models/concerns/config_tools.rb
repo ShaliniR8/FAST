@@ -5,7 +5,14 @@ module ConfigTools
     # priv_check is a shorthand for user.has_access for actions[:access] procs in HIERARCHY- do not alter
     def self.priv_check
       proc { |owner, user, action, admin=true, strict=false|
-        user.has_access(owner.rule_name, action, admin: admin, strict: strict)
+        
+        if owner.class.name == 'Meeting' && owner.type == 'SrmMeeting'
+          rule_name = 'srm_meetings'
+        else
+          rule_name = owner.rule_name
+        end
+
+        user.has_access(rule_name, action, admin: admin, strict: strict)
       }
     end
 
