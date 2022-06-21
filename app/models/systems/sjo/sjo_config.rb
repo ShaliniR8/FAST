@@ -5,7 +5,7 @@ class SJOConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_MODULES = %w[ASAP]
+  MOBILE_MODULES = %w[SMS]
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS

@@ -59,6 +59,9 @@ class DefaultMobileConfig
     #Eulen Portals
     eulen_general_dir: { label: 'Login with ProSafeT', subdomain: 'eulen' },
 
+    #SJO Portals
+    sjo_general_dir: { label: 'Login with ProSafeT', subdomain: 'sjo' },
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -180,6 +183,13 @@ class DefaultMobileConfig
       key_name: 'Grupo Eulen',
       portals: %i[
         eulen_general_dir
+      ]
+    },
+
+    'SJO Key' =>{ # D238-B9D1-1135-3381
+      key_name: 'Juan Santamaría International',
+      portals: %i[
+        sjo_general_dir
       ]
     },
 
