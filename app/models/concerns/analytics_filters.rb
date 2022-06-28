@@ -41,7 +41,7 @@ module AnalyticsFilters
     when 'Submission', 'Record'
       return where("#{table_name}.event_date >= ? && #{table_name}.event_date <= ?", start_date.utc, end_date.utc)
     when 'CorrectiveAction', 'Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation', 'Sra', 'RiskControl' #Removed Hazard from here because that was causing inconsistencies in the mitigated risk matrix
-      return where("#{table_name}.due_date >= ? && #{table_name}.due_date <= ?", start_date.utc, end_date.utc)
+      return where("#{table_name}.due_date >= ? && #{table_name}.due_date <= ?", start_date.utc.to_date, end_date.utc.to_date)
     else
       return where("#{table_name}.created_at >= ? && #{table_name}.created_at <= ?", start_date.utc, end_date.utc)
     end
