@@ -217,7 +217,7 @@ class SubmissionsController < ApplicationController
       @entries[record.id] = Hash.new
 
       @entries[record.id]["Employee Group"] = record.template.emp_group
-      @entries[record.id]["Year/Month"] = record.event_date.strftime("%Y/%m")
+      @entries[record.id]["Year/Month"] = record.event_date.strftime("%Y/%m") rescue ""
       @entries[record.id]["Final Comment"] = record.final_comment
       @entries[record.id]["Narratives"] = record.narrative
 

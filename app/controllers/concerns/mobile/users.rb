@@ -62,7 +62,20 @@ module Concerns
             ffield['type'] = 'boolean' if ffield['type'] == 'boolean_box'
             ffield['options'] = eval(ffield['options']) if ffield['options'].present?
           end
+
+          finding_title_json = Finding.get_meta_fields('show').as_json
+          finding_title_json.each do |ffield|
+            ffield.delete('num_cols') if ffield['num_cols'].present?
+            ffield.delete('visible') if ffield['visible'].present?
+            ffield.delete('type') if ffield['type'].present?
+            ffield.delete('required') if ffield['required'].present?
+            ffield.delete('options') if ffield['options'].present?
+            ffield.delete('default') if ffield['default'].present?
+            ffield.delete('on_newline') if ffield['on_newline'].present?
+          end
+
           mobile_user_info[:finding_data] = finding_json
+          mobile_user_info[:finding_metadata] = finding_title_json
         end
 
         render :json => mobile_user_info

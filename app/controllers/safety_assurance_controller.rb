@@ -59,6 +59,32 @@ class SafetyAssuranceController < ApplicationController
       end
     end
 
+    if object_name == 'finding'
+      if params[:finding][:attachments_attributes].present?
+        params[:finding][:attachments_attributes].each do |key, attachment|
+        # File is a base64 string
+          if attachment[:name].present? && attachment[:name].is_a?(Hash)
+            file_params = attachment[:name]
+
+            temp_file = Tempfile.new('file_upload')
+            temp_file.binmode
+            temp_file.write(Base64.decode64(file_params[:base64]))
+            temp_file.rewind()
+
+            file_name = file_params[:fileName]
+            mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+            uploaded_file = ActionDispatch::Http::UploadedFile.new(
+              :tempfile => temp_file,
+              :filename => file_name,
+              :type     => mime_type)
+
+            # Replace attachment parameter with the created file
+            params[:finding][:attachments_attributes][key][:name] = uploaded_file
+          end
+        end
+      end
+    end
 
     current_status = @owner.status
     @owner.update_attributes(params[object_name.to_sym])

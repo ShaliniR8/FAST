@@ -64,6 +64,31 @@ class FindingsController < SafetyAssuranceController
   def create
     convert_from_risk_value_to_risk_index
 
+    if params[:finding][:attachments_attributes].present?
+      params[:finding][:attachments_attributes].each do |key, attachment|
+      # File is a base64 string
+        if attachment[:name].present? && attachment[:name].is_a?(Hash)
+          file_params = attachment[:name]
+
+          temp_file = Tempfile.new('file_upload')
+          temp_file.binmode
+          temp_file.write(Base64.decode64(file_params[:base64]))
+          temp_file.rewind()
+
+          file_name = file_params[:fileName]
+          mime_type = Mime::Type.lookup_by_extension(File.extname(file_name)[1..-1]).to_s
+
+          uploaded_file = ActionDispatch::Http::UploadedFile.new(
+            :tempfile => temp_file,
+            :filename => file_name,
+            :type     => mime_type)
+
+          # Replace attachment parameter with the created file
+          params[:finding][:attachments_attributes][key][:name] = uploaded_file
+        end
+      end
+    end
+
     if params[:owner_type].present?
       @parent_old = Object.const_get(params[:owner_type]).find(params[:owner_id])
       @finding = @parent_old.findings.create(params[:finding])

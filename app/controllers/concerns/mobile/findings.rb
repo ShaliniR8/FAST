@@ -25,7 +25,15 @@ module Concerns
 
         # Include other fields that should always be whitelisted
         whitelisted_fields = [:id, *json_fields]
-        json = findings.as_json(only: whitelisted_fields).map { |finding| format_finding_json(finding) }
+        json = findings.as_json(
+                 only: whitelisted_fields,
+                 include: {
+                   attachments: {
+                     only: [:id, :caption, :owner_id],
+                     methods: :url
+                   }
+                 }
+               ).map { |finding| format_finding_json(finding) }
 
         ids.is_a?(Array) ? array_to_id_map(json) : json[0]
       end
@@ -34,15 +42,15 @@ module Concerns
         fields_attributes = @fields.map{|f| f[:field]}
         finding['get_status'] = finding['status']
         finding['get_source'] = ActionView::Base.full_sanitizer.sanitize(Finding.find(finding['id']).get_source).strip rescue ""
-        json = finding.delete_if{ |key, value| fields_attributes.exclude?(key) }
 
-        # Takes the id of each user field and replaces it with the
-        # full name of the user corresponding to that id
-        user_fields = @fields.select{ |field| field[:type] == 'user' }
-        user_fields.map do |field|
-          key = field[:field]
-          user_id = json[key]
-          json[key] = User.find(user_id).full_name rescue nil if user_id
+        finding_attachments = finding[:attachments]
+        json = finding.delete_if{ |key, value| fields_attributes.exclude?(key) }
+        json[:attachments_attributes] = {}
+
+        finding_attachments.each do |attachment|
+          attachment[:uri] = "#{request.protocol}#{request.host_with_port}#{attachment[:url]}"
+          attachment.delete(:url)
+          json[:attachments_attributes][attachment['id']] = attachment
         end
 
         # Creates a key map for all the meta field titles that will be shown
