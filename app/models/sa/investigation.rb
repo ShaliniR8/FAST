@@ -56,6 +56,7 @@ class Investigation < Sa::SafetyAssuranceBase
 
     keys[keys.index('get_source')] = 'owner_id' if keys.include? 'get_source'
     keys[keys.index('responsible_user')] = 'responsible_user#responsible_user.full_name' if keys.include? 'responsible_user'
+    keys[keys.index('findings')] = 'findings.id' if keys.include? 'findings'
     keys[keys.index('verifications')] = 'verifications.status' if keys.include? 'verifications'
 
     keys

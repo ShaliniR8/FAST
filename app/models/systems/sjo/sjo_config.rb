@@ -15,8 +15,14 @@ class SJOConfig < DefaultConfig
     # SYSTEM CONFIGS
     # enable_sso:                         true,
     # login_option:                       'sso',
-    has_mobile_app:                     false,
+    has_mobile_app:                     true,
     cisp_integration:                   false,
+    has_gmap:                           true,
+    gis_layers:                         true,
+
+    lat:                                9.994908,
+    lng:                                -84.207566,
+    gMapZoom:                           15,
     display_logo:                       true,
 
     # SYSTEM-WIDE FORM CONFIGS
