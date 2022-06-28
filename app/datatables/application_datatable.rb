@@ -6,7 +6,6 @@ class ApplicationDatatable
     @view = view
     @current_user = current_user
     @status_count = {}
-
     @records_total = records_total
     @status_counts = {}
   end
@@ -276,7 +275,7 @@ class ApplicationDatatable
       status_queries << "reviewer_id = #{@current_user.id}"  if object.table_name == 'sras'
       search_string << "(#{status_queries.join(' OR ')})"
     end
-
+    @recs = object.can_be_accessed(@current_user)
     has_date_range = start_date.present? && end_date.present?
     case status
     when 'All'
@@ -289,7 +288,6 @@ class ApplicationDatatable
               .group("#{object.table_name}.id")
               .limit(params['length'].to_i)
               .offset(params['start'].to_i)
-
       else
         object.joins(join_tables)
               .where(id: @recs.map(&:id))
