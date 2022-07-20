@@ -27,12 +27,14 @@ class Attachment < ActiveRecord::Base
   end
 
   def create_transaction
-    Transaction.build_for(
-      self.owner,
-      'Add Attachment',
-      session[:simulated_id] || session[:user_id],
-      self.document_filename
-    )
+    if self.owner.class.name != 'ChecklistRow'
+      Transaction.build_for(
+        self.owner,
+        'Add Attachment',
+        session[:simulated_id] || session[:user_id],
+        self.document_filename
+      )
+    end
   end
 
 
