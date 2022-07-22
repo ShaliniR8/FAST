@@ -65,8 +65,12 @@
         <%field.getOptions.each do |option|%>
           <div class="col-xs-6">
             <label class="radio">
-              <%=radio_button_tag :value, option, false, :class => "radio field_rb_select", "data-id" => field.id%>
-              <%=option%>
+              <% if option.include? 'http' %>
+                <a href="<%=option%>" class="btn btn-info" data-confirm="Are you sure?">Link</a>
+              <% else %>
+                <%=radio_button_tag :value, option, false, :class => "radio field_rb_select", "data-id" => field.id%>
+                <%=option%>
+              <% end %>
             </label>
           </div>
         <%end%>
