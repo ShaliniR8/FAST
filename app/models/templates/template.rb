@@ -35,6 +35,15 @@ class Template < ActiveRecord::Base
     target_template = Template.create(name: self.name + ' -- copy')
     target_template.update_attributes(users_id: self.users_id)
 
+    AccessControl.get_template_opts.map { |disp, db_val|
+      AccessControl.new({
+        list_type: 1,
+        action: db_val,
+        entry: target_template.name,
+        viewer_access: 1
+      }).save
+    }
+
     if source_template.map_template_id.present?
       source_template.map_template_id = target_template.id
       target_template.map_template_id = source_template.id
