@@ -57,111 +57,39 @@ class SCXConfig < DefaultConfig
       column_header: ['1','2','3','4','5'],
       row_header_name: 'CLASS',
       row_header: [
-        'Accident or Incident',
-        'Employee/Customer Injury',
-        'Assets',
-        'Operational Events',
-        'Airworthiness',
-        'Brand',
-        'Customer',
-        'Environment',
+        'System/  Program/ Policy',
+        'Operations',
         'Security',
-        'Regulatory',
-        'System or Process',
-        'Audit Finding',
-        'OSHA'
+        'Injury'
       ],
       rows: [
-        [ #Accident or Incident
-          'Accident with serious injuries or fatalities; or significant damage to aircraft or property',
-          'Serious incident with injuries and/or substantial damage to aircraft or property',
-          'Incident with minor injury and/or minor aircraft or property damage',
-          'incident with less than minor injury and/or less than minor damage',
-          'No relevant safety risk'
+        [ #System/  Program/ Policy
+          'Loss or breakdown of entire system, subsystem, program or policy conformity. ',
+          'Major breakdown of a system, subsystem, program or policy conformity.',
+          'Partial breakdown of a system, subsystem, program, or policy conformity. ',
+          'Little to no effect on system, subsystem, program or policy compliance. But falls below industry best practices.',
+          'No impact on system, subsystem, program, or breach of policy.'
         ],
-        [ #Employee/Customer Injury
-          'Fatality or serious injury with total disability/loss of capacity',
-          'Immediate admission to hospital as an inpatient and/or partial disability/loss of capacity',
-          'Injury requiring ongoing treatment, with no permanent disability/loss of capacity',
-          'Minor injury not resulting in an absence',
-          'No injury risk'
-        ],
-        [ #Assets
-          'Multiple Aircraft OTS > 24 hours',
-          'One aircraft OTS > 24 hours',
-          'Aircraft OTS 2 to 24 hours',
-          'Aircraft OTS < 2 hours',
-          'No Aircraft OTS'
-        ],
-        [ #Operational Events
-          'Loss of aircraft; beyond crew capability, operating with no meaningful safety margins',
-          'Physical distress/high workload impairing the accuracy and completion of tasks',
-          'Large reduction in safety margins; reduction in ability of crew to cope with adverse operating conditions',
-          'Operation beyond operating limitations; Use of abnormal procedures',
-          'No effect on operational safety'
-        ],
-        [ #Airworthiness
-          'Returning an aircraft to service and operating it in a non-standard, unairworthy, or unsafe condition',
-          'Returning an aircraft to service and operating it in a non-standard but not unsafe condition',
-          'Returning an aircraft to service in a non-standard condition, but not operating it',
-          'Affecting aircraft or systems reliability above established control limits but no affect on airworthiness or the safe operation of the aircraft',
-          'No effect on airworthiness'
-        ],
-        [ #Brand
-          'Extended negative national media coverage resulting in a substantial change in public opinion of Sun Country',
-          'Short term negative media/internet activity resulting in minor change in public opinion of Sun Country',
-          'Short term negative media/internet activity resulting in no change in public opinion of Sun Country',
-          'Isolated negative media/internet activity resulting in no change in public opinion of Sun Country',
-          'No negative media/internet activity',
-        ],
-        [ #Customer
-          "<b><center>Extreme Customer Dissatisfaction</b></center>More than 500 customers affected for 48 hours or more",
-          "<b><center>Customer Dissatisfaction</b></center>More than 500 customers affected for 3 to 48 hours",
-          "<b><center>Customer Annoyance</b></center>Less than 500 customers affected for 3 to 48 hours",
-          "<b><center>Isolated Customer Annoyance</b></center>Less than 500 customers affected for up to 3 hours",
-          'No customer disruptions'
-        ],
-        [ #Environment
-          "Severe Danger to Environment:<br />Large, significant waste of resources and emissions into water, air, or soil",
-          'Medium significance in waste of resources and emissions into water, air, or soil',
-          'Small significance in waste of resources and emissions into water, air, or soil',
-          'Small waste or emission, no relevant risk of pollution',
-          'No relevant risk of pollution, no spill but an undesirable situation'
+        [ #Operations
+          'Control loss aircraft or equipment; beyond employee capability, operating with no meaningful safety margins.',
+          'Physical distress/high workload impairing the accuracy and completion of tasks. Equipment/aircraft difficult to control.',
+          'Large reduction in safety margins; reduction in ability to cope with adverse operating conditions or equipment.',
+          'Operation beyond operating limitations; Use of abnormal procedures or equipment, or unfamiliar employees.',
+          'No effect on operational safety.'
         ],
         [ #Security
-          'Loss of aircraft or death of Sun Country employee due to successful attack, terrorist activity, or civil unrest',
-          'Security threat is genuine. Situation can only be resolved by handing control to outside agencies',
-          'Security threat is genuine. Situation is only mitigated/resolved with assistance of outside agencies',
-          'Security threat is genuine but can be mitigated or resolved by Sun Country',
-          'Security threat is a hoax'
+          'Loss of aircraft or death of employee due to successful attack, terrorist activity, or civil unrest.',
+          'Threat is genuine.  Situation can only be resolved by handing control to outside agencies.',
+          'Threat is genuine. Situation is only mitigated/resolved with assistance of outside agencies.',
+          'Security threat is genuine but can be mitigated or resolved by employees/company.',
+          'Security threat is a hoax or misidentified.'
         ],
-        [ #Regulatory
-          "<center><b>Major Regulatory Deviation</b></center>Loss of company approvals, permits or certificates, resulting in the suspension of all operations",
-          "<center><b>Moderate Regulatory Deviation</b></center>Loss of company approvals, permits or certificates, resulting in suspension in part of Sun Country operations",
-          "<center><b>Minor Regulatory Deviation</b></center>Major breach of company policy or SOPs with no direct impact on approvals, permits or certificates, with a significant negative effect of ability to manage operations. Attitude of regulatory authority towards Sun Country has been negatively impacted",
-          "<center><b>Policy/Procedure Deviation</b></center>Breach of company policy or SOPs, with no direct impact on approvals, certificates, permits, with a minor effect of ability to manage operations. Falls below industry \"best practices\"",
-          "No breach of company requirements; No impact on approvals or permits"
-        ],
-        [ #System or Process
-          'Loss or breakdown of entire system, subsystem or process',
-          'Partial breakdown of a system, subsystem, or process',
-          'System deficiencies leading to poor reliability or disruption',
-          'Little to no effect on system, subsystem, or process',
-          'No impact on system, subsystem, or process'
-        ],
-        [ #Audit Finding
-          'Safety of Operations in Doubt',
-          'Non-Compliance with company policy or CFR',
-          'Non-conformance with company policy or CFR',
-          'Audit Observation',
-          'No findings or observations'
-        ],
-        [ #OSHA
-          'Willful',
-          'Repeat',
-          'Serious',
-          'General/Other',
-          'No breach of OSHA requirements'
+        [ #Injury
+          'Fatality or serious injury with total disability/loss of capacity.',
+          'Immediate admission to hospital as an inpatient and/or partial disability/loss of capacity.',
+          'Injury requiring ongoing treatment, with no permanent disability/loss of capacity.',
+          'Minor injury not resulting in an absence.',
+          'No injury risk.'
         ]
       ] #End of rows
     },
@@ -188,23 +116,19 @@ class SCXConfig < DefaultConfig
       row_header_name: 'PROBABILITY',
       row_header: ['A', 'B', 'C', 'D'],
       column_header_name: 'CRITERIA',
-      column_header: ['Reactive Assessment (Control Effectiveness)', 'Proactive Assessment (Likelihood)'],
+      column_header: [''],
       rows: [
         [ #A
-          "<center><b>Not Effective</b></center>Remaining controls were ineffective or no controls remained. The only thing preventing an accident were luck or exceptional skill, which is not trained or required",
-          "<center><b>Likely to Occur</b></center>(Will occur in most circumstances, not surprised if it happens) or occurs > 1 in 100"
+          "<center><b>Likely to Occur</b></center>Will occur in most circumstances, not surprised if it happens (1 in 100 events)"
         ],
         [ #B
-          "<center><b>Minimal</b></center>Some controls were left but their total effectiveness was minimal",
-          "<center><b>Possible to Occur</b></center>(Might occur in some circumstances) or occurs > 1 in 1,000"
+          "<center><b>Possible to Occur</b></center>Might occur in some circumstances (1 in 1000 events)"
         ],
         [ #C
-          "<center><b>Limited</b></center>An abnormal situation, more demanding to manage, but with still a considerable remaining safety margin",
-          "<center><b>Unlikely to Occur</b></center>(Could occur in some circumstances, surprised if it happens) or occurs in > 1 in 10,000"
+          "<center><b>Unlikely to Occur</b></center>Could occur in some circumstances, surprised if it happens (1 in 5000 events)"
         ],
         [ #D
-          "<center><b>Effective</b></center>Consisting of several good controls",
-          "<center><b>Rare to Occur</b></center>(May occur but only in exceptional circumstances, may happen but it would only be highly unexpected) or occurs > 1 in 1,000,000"
+          "<center><b>Rare to Occur</b></center>(May occur but only in exceptional circumstances, may happen but would only be highly unexpected (1 in 10,000 events)"
         ]
       ] #End of rows
     },
