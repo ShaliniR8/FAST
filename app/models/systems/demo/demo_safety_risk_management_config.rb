@@ -7,6 +7,15 @@ class DemoSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
   })
 
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
+    objects: {
+      'RiskControl' => {
+        risk_category: {
+          field: 'risk_category', title: 'Risk Category',
+          num_cols: 6, type: 'select', visible: 'form,show',
+          required: false, options: "CONFIG.custom_options['Risk Categories']"
+        }
+      }
+    },
     menu_items: {
       'Hazards' => {
         title: 'Hazards', path: '#',
