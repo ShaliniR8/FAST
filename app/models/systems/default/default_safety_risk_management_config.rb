@@ -355,6 +355,11 @@ class DefaultSafetyRiskManagementConfig
             num_cols: 6, type: 'datalist', visible: 'form,show',
             required: false, options: "CONFIG.custom_options['Risk Control Types']"
           },
+          risk_category: {
+            field: 'risk_category', title: 'Risk Category',
+            num_cols: 6, type: 'select', visible: 'form,show',
+            required: false, options: "CONFIG.custom_options['Risk Categories']"
+          },
           description: {
             field: 'description', title: 'Description of Risk Control/Mitigation Plan',
             num_cols: 12, type: 'textarea', visible: 'form,show',

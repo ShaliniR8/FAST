@@ -173,10 +173,10 @@ javascript:
         "drawCallback": drawTableCallBack,
     });
 
-    $("#risks_table tbody tr").on('click', function() {
-          let row_id = $(this).attr('id');
-          console.log("Redirect to show page for ID: " + row_id);
-          window.open("/risk_controls/"+row_id,"_self");
+    $('#risks_table').on('click','.pointer', function (event) {
+        let row_id = $(this).attr('id');
+        console.log("Redirect to show page for ID: " + row_id);
+        window.open("/risk_controls/"+row_id,"_self");
     });
 
     let adv_path = "#{@adv_path}"
