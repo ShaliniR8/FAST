@@ -394,12 +394,6 @@ def get_records
   @object_type = Object.const_get(@owner.target)
   @table_name = @object_type.table_name
   @headers = @object_type.get_meta_fields('index')
-  if ['Record', 'Submission'].include?(@owner.target)
-    @headers = filter_submitter_name_header(@headers)
-  end
-  if ['Record', 'Submission', 'Report'].include?(@owner.target)
-    @headers = filter_event_title_header(@headers)
-  end
   @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
   @template_fields = []
   Template.preload(:categories, :fields)
@@ -424,6 +418,12 @@ def get_records
   else
     records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
   end
+
+  @owner.query_conditions.each do |condition|
+    records = records & expand_emit(condition, records)
+  end
+
+  @records = records
 end
 
 def get_field(query, object_type, field_label)
@@ -692,7 +692,6 @@ def get_visualizations_json(owner)
 
   query_result_visualizations
 end
-
 
 require 'net/sftp'
 require 'stringio'
