@@ -36,6 +36,13 @@ class SubmissionDatatable < ApplicationDatatable
     term = 'true'
     search_string << "completed = true"
 
+    if search_string.select {|str| str.include?('users.full_name') && str.downcase.include?('anonymous')}.present? 
+      search_string = search_string - search_string.select {|str| str.include?('users.full_name')}
+      search_string << "anonymous = true"
+    elsif search_string.select {|str| str.include? 'users.full_name'}.present? 
+      search_string << "anonymous = false"
+    end
+
     {search_columns_and_terms_map: search_columns_and_terms_map, search_string: search_string}
   end
 

@@ -13,6 +13,37 @@ class SafetyReportingDatatable < ApplicationDatatable
 
   private
 
+  def handle_search
+    search_columns_and_terms_map = params[:columns].reduce({}) { |acc, (key,value)|
+      acc.merge({key => value[:search][:value]})
+    }.keep_if { |key,value| value.present? }
+
+    search_string = []
+    search_columns_and_terms_map.each do |index, term|
+      column = columns[index.to_i]
+      column = column.include?('#') ? column.split('#').second : column
+      column = column.include?('.') ? column : "#{object.table_name}.#{column}"
+
+      search_string << "#{column} like '%#{term}%'"
+    end
+
+    if search_string.select {|substr| substr.include? '.viewer_access'}.present? 
+      search_string.map! { |str| str.downcase.include?('yes') ? str.downcase.gsub!('yes', '1') : str }
+      search_string.map! { |str| str.downcase.include?('no') ? str.downcase.gsub!('no', '0') : str }
+    end
+
+    term = 'true'
+    if search_string.select {|str| str.include?('users.full_name') && str.downcase.include?('anonymous')}.present? 
+      search_string = search_string - search_string.select {|str| str.include?('users.full_name')}
+      search_string << "anonymous = true"
+    elsif search_string.select {|str| str.include? 'users.full_name'}.present? 
+      search_string << "anonymous = false"
+    end
+    
+
+    {search_columns_and_terms_map: search_columns_and_terms_map, search_string: search_string}
+  end
+
 
   def records_total
     counts = @object_access_filtered.group(:status).count
