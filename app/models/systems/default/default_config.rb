@@ -32,6 +32,7 @@ class DefaultConfig
     cisp_integration:                   false,
     asrs_integration:                   false,
     sabre_integration:                  false,
+    sabre_reports_recommendation:       false,
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
     power_bi_integration:               false,

@@ -9,14 +9,34 @@ $(document).ready(
 				$(this).removeClass("btn-danger").addClass("btn-warning");
 				row=$(this).closest("tr").detach();
 				$(this).find("span").removeClass("glyphicon-remove").addClass("glyphicon-plus");
-				row.appendTo("#candidates tbody");
-				sorttr();
+				
+				if (
+					row.is('.flight_date') ||
+					row.is('.flight_number') ||
+					row.is('.tail_number') ||
+					row.is('.departure_airport') ||
+					row.is('.arrival_airport') ||
+					row.is('.landing_airport') ||
+					row.is('.ca') ||
+					row.is('.fo') ||
+					row.is('.fa_1') ||
+					row.is('.fa_2')
+				) {
+					row.appendTo("#relevant_reports tbody");
+					sorttr('relevant_reports');
+				} else {
+					row.appendTo("#available_reports tbody");
+					sorttr('available_reports');
+				}
+
 			}else{
 				$(this).removeClass("btn-warning").addClass("btn-danger");
 				row=$(this).closest("tr").detach();
 				$(this).find("span").removeClass("glyphicon-plus").addClass("glyphicon-remove");
+
 				row.appendTo("#included tbody");
-				sorttr();
+				sorttr('relevant_reports');
+				sorttr('available_reports');
 			}
 		});
 		$('form').on('submit',function(){
@@ -28,7 +48,13 @@ $(document).ready(
           count++;
         }
 			});
-			$("#candidates tbody tr").each(function(){
+			$("#relevant_reports tbody tr").each(function(){
+        if(typeof($(this).attr("record")) !== "undefined"){
+				  form.append('<input type="hidden" name=dettach['+count+ '] value='+$(this).attr("record")+'>');
+				  count++;
+        }
+			});
+			$("#available_reports tbody tr").each(function(){
         if(typeof($(this).attr("record")) !== "undefined"){
 				  form.append('<input type="hidden" name=dettach['+count+ '] value='+$(this).attr("record")+'>');
 				  count++;
@@ -38,10 +64,10 @@ $(document).ready(
 		});
 	}
 );
-function sorttr()
+function sorttr(table)
 {
 
-	var rows=$("#candidates tbody tr").get();
+	var rows=$(`#${table} tbody tr`).get();
     if ($("#included tbody tr").length)
     {
     	var base_date=Date.parse($("#included tbody tr").eq(0).find('td').eq(1).text());
@@ -64,6 +90,6 @@ function sorttr()
 		});
 	}
 	$(rows).each(function(){
-		$(this).appendTo("#candidates tbody");
+		$(this).appendTo(`#${table} tbody`);
 	});
 }

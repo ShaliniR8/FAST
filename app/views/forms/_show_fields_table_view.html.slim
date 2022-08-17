@@ -1,4 +1,17 @@
+css:
+  .flight_date { background-color: lightcoral !important;}
+  .flight_number { background-color: lightpink !important;}
+  .tail_number { background-color: lightsalmon !important;}
+  .departure_airport { background-color: lemonchiffon !important;}
+  .arrival_airport { background-color: khaki !important;}
+  .landing_airport { background-color: honeydew !important;}
+  .ca { background-color: lightblue !important;}
+  .fo { background-color: lightskyblue !important;}
+  .fa_1 { background-color: plum !important;}
+  .fa_2 { background-color: plum !important;}
+
 - users_hash = User.all.map{|x| [x.id, x.full_name]}.to_h
+- colors ||= {}
 
 table.table.table-striped.table-bordered id="#{table_id}"
 
@@ -9,8 +22,7 @@ table.table.table-striped.table-bordered id="#{table_id}"
 
   tbody
     - records.each do |record|
-
-      tr record="#{record.id}"
+      tr record="#{record.id}" class="#{colors[record.id]}"
         - fields.each do |field|
           td class="#{field[:html_class].present? ? record.send(field[:html_class]) : ''}"
             - case field[:type]

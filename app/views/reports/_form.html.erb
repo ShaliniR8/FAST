@@ -47,55 +47,62 @@
                   records: @report.records,
                   table_id: 'included',
                   btns: btns%>
-
-
-                <%if false%>
-                <div class="table-responsive">
-                  <table id="included" class="table table-bordered">
-                    <thead>
-                      <tr>
-                        <%@report_fields.each do |header|%>
-                          <th><%=header[:title]%></th>
-                        <%end%>
-                        <th>Additional Info</th>
-                        <th width="10%">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <%@report.records.each do |record|%>
-                        <tr record="<%=record.id%>">
-                          <%@report_fields.each do |header|%>
-                            <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
-                              <%=render 'forms/show_field', :record => record, :field_hash => header%>
-                            </td>
-                          <%end%>
-                          <td>
-                            <%additional_info = record.get_additional_info%>
-                            <%additional_info.each do |field|%>
-                              <% if field[:value].present? %>
-                                <p><b><%=field[:label]%></b>: <%=field[:value]%></p>
-                              <%end%>
-                            <%end%>
-                          </td>
-                          <td>
-                            <div class="btn-group">
-                              <a class="btn btn-info view_btn mr5">
-                                <span class="glyphicon glyphicon-search"></span>
-                              </a>
-                              <a class="btn btn-danger action-btn">
-                                <span class="glyphicon glyphicon-remove"></span>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      <%end%>
-                    </tbody>
-                  </table>
-                </div>
-                <%end%>
               </div>
             </div>
           </div>
+
+          <%btns = [
+            {btn_name: '<span class="glyphicon glyphicon-search"></span>', btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
+            {btn_name: '<span class="glyphicon glyphicon-plus"></span>', btn_path: '#', btn_class: 'btn btn-warning action-btn mr5'},
+          ]%>
+
+          <% if CONFIG::GENERAL[:sabre_reports_recommendation] %>
+            <div class="col-xs-12">
+              <div class="panel panel-primary">
+                <div class="panel-heading">
+                  <div class="panel-title"><b>Relevant Reports</b></div>
+                </div>
+                <div class="panel-body">
+
+                  <div class="row">
+                    <div class="col-xs-4">
+                      <div class="well">
+                        <b>
+                          <font style='font-size:15px;background-color:lightcoral'>Flight Date</font><br>
+                          <font style='font-size:15px;background-color:lightpink'>Flight Number</font><br>
+                          <font style='font-size:15px;background-color:lightsalmon'>Tail Number</font><br>
+                          <font style='font-size:15px;background-color:lemonchiffon'>Departure Airport</font><br>
+                          <font style='font-size:15px;background-color:khaki'>Arrival Airport</font><br>
+                          <font style='font-size:15px;background-color:honeydew'>Landing Airport</font><br>
+                          <font style='font-size:15px;background-color:lightblue'>Captain</font><br>
+                          <font style='font-size:15px;background-color:lightskyblue'>First Officer</font><br>
+                          <font style='font-size:15px;background-color:plum'>Flight Attendance</font><br>
+                        </b>
+                      </div>
+                    </div>
+
+                    <div class="col-xs-8">
+                      <div class="well">
+                        <b>
+                          * The relevant reports are for the events happening between <%=@timewindow_from.strftime("%Y/%m/%d")%> and <%=@timewindow_to.strftime("%Y/%m/%d")%>.
+                          <br>
+                          * If multiple attributes are matching to a report, the report is highlighted with the color of the first matchging attribute. 
+                        </b>
+                      </div>
+                    </div>
+                  </div>
+
+                  <%=render 'forms/show_fields_table_view',
+                    fields: @report_fields,
+                    records: @relevant_reports,
+                    colors: @relevant_reports_colors,
+                    table_id: 'relevant_reports',
+                    btns: btns%>
+
+                </div>
+              </div>
+            </div>
+          <% end %>
 
           <div class="col-xs-12">
             <div class="panel panel-info">
@@ -103,69 +110,11 @@
                 <div class="panel-title"><b>Available Reports</b></div>
               </div>
               <div class="panel-body">
-
-
-                <%btns = [
-                  {btn_name: '<span class="glyphicon glyphicon-search"></span>', btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
-                  {btn_name: '<span class="glyphicon glyphicon-plus"></span>', btn_path: '#', btn_class: 'btn btn-warning action-btn mr5'},
-                ]%>
-
                 <%=render 'forms/show_fields_table_view',
                   fields: @report_fields,
-                  records: @candidates,
-                  table_id: 'candidates',
+                  records: @available_reports,
+                  table_id: 'available_reports',
                   btns: btns%>
-
-
-
-
-                <%if false%>
-                <div class="table-responsive">
-                  <table id="candidates" class="table table-bordered">
-                    <thead>
-                      <tr>
-                        <%@report_fields.each do |header|%>
-                          <th><%=header[:title]%></th>
-                        <%end%>
-                        <th>Additional Info</th>
-                        <th width="10%">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <%@candidates.each do |record|%>
-                        <tr record="<%=record.id%>">
-                          <%@report_fields.each do |header|%>
-                            <td class="<%=header[:html_class].present? ? record.send(header[:html_class]) : ''%>">
-                              <%=render 'forms/show_field', :record => record, :field_hash => header%>
-                            </td>
-                          <%end%>
-                          <td>
-                            <%additional_info = record.get_additional_info%>
-                            <%additional_info.each do |field|%>
-                              <% if field[:value].present? %>
-                                <p><b><%=field[:label]%></b>: <%=field[:value]%></p>
-                              <%end%>
-                            <%end%>
-                          </td>
-                          <td>
-                            <div class="btn-group">
-                              <a class="btn btn-info view_btn mr5">
-                                <span class="glyphicon glyphicon-search"></span>
-                              </a>
-                              <a class="btn btn-warning action-btn">
-                                <span class="glyphicon glyphicon-plus"></span>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      <%end%>
-                    </tbody>
-                  </table>
-                </div>
-                <%end%>
-
-
-
               </div>
             </div>
           </div>
@@ -220,7 +169,12 @@
       "columnDefs": [{ type: 'natural', targets: 0 }],
     });
 
-    $("#candidates").dataTable({
+    $("#relevant_reports").dataTable({
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+    });
+
+    $("#available_reports").dataTable({
       "aaSorting": [[0, "desc"]],
       "columnDefs": [{ type: 'natural', targets: 0 }],
     });

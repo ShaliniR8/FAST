@@ -535,7 +535,7 @@ class Record < Sr::SafetyReportingBase
 
 
   def get_additional_info_html
-    get_additional_info.map{|v| "<b>#{v[:label]}</b>: #{v[:value]}"}.join('<br>').html_safe
+    get_additional_info.select{|v| v[:value].present?}.map{|v| "<b>#{v[:label]}</b>: #{v[:value]}"}.join('<br>').html_safe
   end
 
 

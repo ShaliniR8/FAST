@@ -284,6 +284,37 @@ class ReportsController < ApplicationController
     @report_fields = Record.get_meta_fields('index', 'meeting_form')
     @candidates = Record.preload(:template, :occurrences, :created_by).where(status: 'Open').select{|x| x.report.blank?} - @report.records
     @candidates.sort_by!{|x| x.event_date.present? ? x.event_date : Time.now - 10.years}.reverse!
+
+    @relevant_reports = []
+    if CONFIG::GENERAL[:sabre_reports_recommendation]
+      @relevant_reports_colors = {}
+
+      @timewindow_from = @report.records.map(&:event_date).min - 1.week
+      @timewindow_to = @report.records.map(&:event_date).max + 1.week
+
+      @report.records.each do |record|
+
+        fields = record.record_fields.select { |field| Field.find(field.fields_id).sabre_map.present? }
+        sabre_fields = fields.map { |field| [field.field.sabre_map, field.value] }
+
+        @candidates.select {|record| record.event_date >= @timewindow_from && record.event_date <= @timewindow_to rescue false}.each do |candidate|
+          candidate.record_fields.each do |field|
+            sabre_fields.each do |sabre_field|
+              next if field.field.nil?
+              next if field.field.sabre_map.nil?
+              if field.field.sabre_map == sabre_field.first && field.value == sabre_field.last
+                unless @relevant_reports.include? candidate
+                  @relevant_reports << candidate
+                  @relevant_reports_colors[candidate.id] = field.field.sabre_map
+                end
+              end
+            end 
+          end
+        end
+      end
+    end
+    @available_reports = @candidates - @relevant_reports
+
     load_special_matrix_form('report', 'baseline', @report)
   end
 
@@ -338,13 +369,43 @@ class ReportsController < ApplicationController
     end
     @report_fields = Record.get_meta_fields('index')
     @candidates = Record.where(:status => 'Open').select{|x| x.template.present?} - @report.records
+
+    @relevant_reports = []
+    if CONFIG::GENERAL[:sabre_reports_recommendation]
+      @relevant_reports_colors = {}
+
+      @timewindow_from = @report.records.map(&:event_date).min - 1.week
+      @timewindow_to = @report.records.map(&:event_date).max + 1.week
+
+      @report.records.each do |record|
+
+        fields = record.record_fields.select { |field| Field.find(field.fields_id).sabre_map.present? }
+        sabre_fields = fields.map { |field| [field.field.sabre_map, field.value] }
+
+        @candidates.select {|record| record.event_date >= @timewindow_from && record.event_date <= @timewindow_to rescue false}.each do |candidate|
+          candidate.record_fields.each do |field|
+            sabre_fields.each do |sabre_field|
+              next if field.field.nil?
+              next if field.field.sabre_map.nil?
+              if field.field.sabre_map == sabre_field.first && field.value == sabre_field.last
+                unless @relevant_reports.include? candidate
+                  @relevant_reports << candidate
+                  @relevant_reports_colors[candidate.id] = field.field.sabre_map
+                end
+              end
+            end 
+          end
+        end
+      end
+    end
+    @available_reports = @candidates - @relevant_reports
+
   end
 
   def override_status
     @owner = Report.find(params[:id]).becomes(Report)
     render :partial => '/forms/workflow_forms/override_status'
   end
-
 
   def update
     convert_from_risk_value_to_risk_index
