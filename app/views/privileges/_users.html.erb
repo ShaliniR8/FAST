@@ -34,6 +34,10 @@
       window.location=$(this).attr('uid');
     });
       $('#ut').DataTable({
+        dom: "<'row'<'col-sm-6'B><'col-sm-6'f>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-4'i><'col-sm-4 text-center'l><'col-sm-4'p>>",
+        buttons: ['copy', 'csv', 'excel', 'print'],
         "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
         "iDisplayLength": 10
       });

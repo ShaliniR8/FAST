@@ -14,7 +14,7 @@ module AnalyticsFilters
     elsif self.to_s == 'Record'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer_template_deid])
       preload(:template)
-        .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
+        .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR records.users_id = #{current_user.id} OR (records.templates_id IN (?) AND confidential = true)",
           full_access_templates, viewer_access_templates, confidential_access_templates)
     elsif self.to_s == 'Report'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer_template_deid])

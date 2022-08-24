@@ -28,13 +28,15 @@ class SrmMeeting < Meeting
   def self.get_headers
     [
       { :field => "get_id",                                         :title => "ID"},
+      { :field => "status",                                         :title => "Status"},
+      { :field => "get_host" ,                                      :title => "Host"},
+      { :field => 'meeting_type',                                   :title => 'Meeting Type',     },
+      { :field => 'title',                                          :title => 'Title', options: CONFIG.custom_options['Meeting Titles']},
       { :field => "get_time",         :param => "review_start",     :title => "Review Start"},
       { :field => "get_time",         :param => "review_end",       :title => "Review End"},
       { :field => "get_time",         :param => "meeting_start",    :title => "Meeting Start"},
       { :field => "get_time",         :param => "meeting_end",      :title => "Meeting End"},
-      { :field => "get_sras_count",                                 :title => "Included SRAs"},
-      { :field => "get_host" ,                                      :title => "Host"},
-      { :field => "status",                                         :title => "Status"}
+      { :field => "get_sras_count",                                 :title => "Included SRAs"}
     ]
   end
 
