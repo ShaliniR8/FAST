@@ -429,11 +429,14 @@ class RecordsController < ApplicationController
     @template = Template.preload(categories: [:fields]).find(@record.templates_id)
 
     access_level = current_user.has_template_access(@template.name)
-    redirect_to errors_path unless current_user.has_access('records', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: false) &&
-                              (access_level.split(';').include?('viewer_template_id') ||
-                              (access_level.split(';').include?('viewer_template_deid') && @record.viewer_access) ||
-                              (access_level.split(';').include?('confidential') && @record.confidential))
 
+    unless current_user.id == @record.users_id
+      redirect_to errors_path unless current_user.has_access('records', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: false) &&
+                                (access_level.split(';').include?('viewer_template_id') ||
+                                (access_level.split(';').include?('viewer_template_deid') && @record.viewer_access) ||
+                                (access_level.split(';').include?('confidential') && @record.confidential)) 
+    end
+    
     @corrective_actions = @record.corrective_actions
     @corrective_actions << @record.report.corrective_actions if @record.report.present?
 
