@@ -62,6 +62,9 @@ class DefaultMobileConfig
     #SJO Portals
     sjo_general_dir: { label: 'Login with ProSafeT', subdomain: 'sjo' },
 
+    #MAF US Portals
+    maf_us_general_dir: { label: 'Login with ProSafeT', subdomain: 'crossconnect' },
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -197,6 +200,12 @@ class DefaultMobileConfig
     'Trial Key' => { # B0A6-42C4-FFD3-A978
       key_name: 'Trial',
       portals: %i[trial_general]
+    },
+
+
+    'MAF US Key' => { # B4F4-A34C-0045-26C5
+      key_name: 'Mission Aviation Fellowship US',
+      portals: %i[maf_us_general_dir]
     },
 
   }.map{ |key, value|

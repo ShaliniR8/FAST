@@ -16,6 +16,7 @@ class MAFConfig < DefaultConfig
     login_option:                       'dual',
     advanced_checklist_data_type:  true,
     checklist_query:               true,
+    has_mobile_app:                true,
 
     global_admin_default:          false,
   })
