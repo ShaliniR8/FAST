@@ -34,18 +34,18 @@ class HAECOConfig < DefaultConfig
       header_style: 'sevHeader',
       cell_name: 'severity_td',
 
-      row_header_name: ' ',
+      row_header_name: '',
       row_header: [
-        'CLASS'
+        '',
+        '',
+        ''
       ],
       column_header_name: 'SEVERITY',
       column_header: ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'],
       rows: [
-        [ "Little consequences.<br><br>First aid injury. Discrepancies found on a safety audit which have low potential of leading to an injury.<br><br>No significance to aircraft-related operational safety.", 
-          "Minor damage.<br><br>Recordable injury. Identified hazard which seems isolated in nature. Minor reported hazards which could result in an injury if left uncorrected.<br><br>Degrades or affects normal aircraft operational procedures or performance.", 
-          "Extensive damage (non-structural).<br><br>Partial loss of significant/ major aircraft systems or results in abnormal flight operations procedure application.<br><br>Lost Time Injury. Safety trending that indicates a failure within the safety process.", 
-          "Significant  Structural damage.<br><br>Complete failure of significant/ major aircraft  systems or results in application of emergency flight  procedures.<br><br>1> hospitalized from complete failure of a safety critical component<br><br>Hospitalization requiring urgent operation or permanent total incapacity. Large scale event which could lead to 3> employees obtaining adverse health effects.", 
-          "Fatality.<br><br>Loss  of aircraft.<br><br>Complete failure of a safety critical component resulting in the death of an Individual(s)."],
+        ["Little consequences.", "Minor damage.", "Extensive damage (non-structural).", "Significant  Structural damage.", "Fatality."],
+        ["First aid injury. Discrepancies found on a safety audit which have low potential of leading to an injury.", "Recordable injury. Identified hazard which seems isolated in nature. Minor reported hazards which could result in an injury if left uncorrected.", "Partial loss of significant/ major aircraft systems or results in abnormal flight operations procedure application.", "Complete failure of significant/ major aircraft  systems or results in application of emergency flight  procedures.<br><br>1> hospitalized from complete failure of a safety critical component", " Loss  of aircraft."],
+        ["No significance to aircraft-related operational safety.", "Degrades or affects normal aircraft operational procedures or performance.", "Lost Time Injury. Safety trending that indicates a failure within the safety process.", "Hospitalization requiring urgent operation or permanent total incapacity. Large scale event which could lead to 3> employees obtaining adverse health effects.", "Complete failure of a safety critical component resulting in the death of an Individual(s)."]
       ]
     },
 
