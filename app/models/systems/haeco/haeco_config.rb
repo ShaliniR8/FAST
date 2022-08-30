@@ -8,7 +8,7 @@ class HAECOConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    name:                         'Hong Kong Aircraft Engineering Company',
+    name:                         'HAECO Americas',
     time_zone:                    'Hong Kong',
 
     # SYSTEM CONFIGS
