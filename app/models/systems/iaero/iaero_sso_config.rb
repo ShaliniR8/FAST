@@ -11,21 +11,21 @@ class IAEROSsoConfig
 
     # Location to send SAML request from ProSafeT, should be in the following format:
     # "|__IdP_domain__|/adfs/ls/idpinitiatedsignon"
-    access_point: 'https://login.microsoftonline.com/2ebb9fda-6f05-43ed-8507-e83c949691ac/saml2',
+    access_point: 'https://login.microsoftonline.com/d2d40491-3b74-45fa-bfa1-21db1ded63c7/saml2',
 
     # Route to IdP's sign-out; should be in the following format:
     # '|__IdP_domain__|/adfs/ls/?wa=wsignout1.0'
-    idp_slo_target_url: 'https://login.microsoftonline.com/2ebb9fda-6f05-43ed-8507-e83c949691ac/saml2',
+    idp_slo_target_url: 'https://login.microsoftonline.com/d2d40491-3b74-45fa-bfa1-21db1ded63c7/saml2',
 
 
     # Route to IdP; should be in metadata.xml under:
      # <EntityDescriptor ... entityID="|__this__|" />
-    idp_entity_id: 'https://sts.windows.net/2ebb9fda-6f05-43ed-8507-e83c949691ac/',
+    idp_entity_id: 'https://sts.windows.net/d2d40491-3b74-45fa-bfa1-21db1ded63c7/',
 
     # Route to IdP's sign-in; should be in metadata.xml under:
      # <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="|__this__|" />
     #idp_sso_target_url: 'https://flyfrontier.id.overwatchid.com/idp/profile/SAML2/POST/SSO',
-    idp_sso_target_url: 'https://login.microsoftonline.com/2ebb9fda-6f05-43ed-8507-e83c949691ac/saml2',
+    idp_sso_target_url: 'https://login.microsoftonline.com/d2d40491-3b74-45fa-bfa1-21db1ded63c7/saml2',
 
     # Specifies the route to the hash algorithm; standard format is sha1, s"http://www.w3.org/2000/09/xmldsig#sha1"
 
@@ -46,10 +46,10 @@ class IAEROSsoConfig
       # Do NOT include BEGIN-END tags on the certificates
 
       # Certificate used for signing the response
-      signing_cert:     'MIIC8DCCAdigAwIBAgIQF5+Qmixn5a9O1K7ccV/UijANBgkqhkiG9w0BAQsFADA0MTIwMAYDVQQDEylNaWNyb3NvZnQgQXp1cmUgRmVkZXJhdGVkIFNTTyBDZXJ0aWZpY2F0ZTAeFw0yMTAyMTUxOTM4MDhaFw0yNDAyMTUxOTM4MDhaMDQxMjAwBgNVBAMTKU1pY3Jvc29mdCBBenVyZSBGZWRlcmF0ZWQgU1NPIENlcnRpZmljYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtpA8YRoA3DPUdxsq6PCvi1Qc8AogzteOUBIgdnandnGiHX2+6S56qaZzh/P/3D2QziCesiGF+8rYraitgCQxCyFZJyZgsnLPeSfAUa+8vKPB/JU9k8xKPL2sk3X0ScESGXiJ57WzbCA7R617fVJ+/g9jbJJY9eTzrhNBLLxTeX3UATSf4SgQbHZ29yx+TyrBspzD01bJHT0gf3OwzY6atYlsVzrsduBwMDmYVfZv+EX52UxGfqv9YbQpBTsQPwPQIlmVOEzYxkDs3sae4tc+dPiI50qvdXepSqrzKh333TmaHZOHZUJu26zZLn8TwuADTg6Hyn+byR3DQsEweuRlPQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAj5fsX/kmZMuyFCU1C11dtNK3Q8smy0gpNXUBGthhNL7rELtePdz6qEEkfRzAchzNdTJ+9D8rbw0SjjH3mo5BUI5IrdJ4332qW7/KMxlpbW9cejiJUumIRAYWRhnm45LUStdXzGnHM5s63PKjGuaI2H4h7oUduM2/iot0MAeG06/1GnRU9Sj0xg2EJiXZmEDxocOd392nCWNaQrF47cEWrL69yt9ZxC+GssK4tX/TNnm/pRNnznM68GlrBo2z9ECMLXLONM4ZUqIENUeSWR/Mj6+r44H5PNf1jEyMDsuzPHEvMP0S0GwDWtj0gnEJ8rPNmm+9se8tUSpuIEDOkGYnd',
+      signing_cert:     'MIIDBTCCAe2gAwIBAgIQH4FlYNA+UJlF0G3vy9ZrhTANBgkqhkiG9w0BAQsFADAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MB4XDTIyMDUyMjIwMDI0OVoXDTI3MDUyMjIwMDI0OVowLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMBDDCbY/cjEHfEEulZ5ud/CuRjdT6/yN9fy1JffjgmLvvfw6w7zxo1YkCvZDogowX8qqAC/qQXnJ/fl12kvguMWU59WUcPvhhC2m7qNLvlOq90yo+NsRQxD/v0eUaThrIaAveZayolObXroZ+HwTN130dhgdHVTHKczd4ePtDjLwSv/2a/bZEAlPys102zQo8gO8m7W6/NzRfZNyo6U8jsmNkvqrxW2PgKKjIS/UafK9hwY/767K+kV+hnokscY2xMwxQNlSHEim0h72zQRHltioy15M+kBti4ys+V7GC6epL//pPZT0Acv1ewouGZIQDfuo9UtSnKufGi26dMAzSkCAwEAAaMhMB8wHQYDVR0OBBYEFLFr+sjUQ+IdzGh3eaDkzue2qkTZMA0GCSqGSIb3DQEBCwUAA4IBAQCiVN2A6ErzBinGYafC7vFv5u1QD6nbvY32A8KycJwKWy1sa83CbLFbFi92SGkKyPZqMzVyQcF5aaRZpkPGqjhzM+iEfsR2RIf+/noZBlR/esINfBhk4oBruj7SY+kPjYzV03NeY0cfO4JEf6kXpCqRCgp9VDRM44GD8mUV/ooN+XZVFIWs5Gai8FGZX9H8ZSgkIKbxMbVOhisMqNhhp5U3fT7VPsl94rilJ8gKXP/KBbpldrfmOAdVDgUC+MHw3sSXSt+VnorB4DU4mUQLcMriQmbXdQc8d1HUZYZEkcKaSgbygHLtByOJF44XUsBotsTfZ4i/zVjnYcjgUQmwmAWD',
 
       # Certificate used for encrypting the response
-      encryption_cert:  'MIIC8DCCAdigAwIBAgIQF5+Qmixn5a9O1K7ccV/UijANBgkqhkiG9w0BAQsFADA0MTIwMAYDVQQDEylNaWNyb3NvZnQgQXp1cmUgRmVkZXJhdGVkIFNTTyBDZXJ0aWZpY2F0ZTAeFw0yMTAyMTUxOTM4MDhaFw0yNDAyMTUxOTM4MDhaMDQxMjAwBgNVBAMTKU1pY3Jvc29mdCBBenVyZSBGZWRlcmF0ZWQgU1NPIENlcnRpZmljYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtpA8YRoA3DPUdxsq6PCvi1Qc8AogzteOUBIgdnandnGiHX2+6S56qaZzh/P/3D2QziCesiGF+8rYraitgCQxCyFZJyZgsnLPeSfAUa+8vKPB/JU9k8xKPL2sk3X0ScESGXiJ57WzbCA7R617fVJ+/g9jbJJY9eTzrhNBLLxTeX3UATSf4SgQbHZ29yx+TyrBspzD01bJHT0gf3OwzY6atYlsVzrsduBwMDmYVfZv+EX52UxGfqv9YbQpBTsQPwPQIlmVOEzYxkDs3sae4tc+dPiI50qvdXepSqrzKh333TmaHZOHZUJu26zZLn8TwuADTg6Hyn+byR3DQsEweuRlPQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAj5fsX/kmZMuyFCU1C11dtNK3Q8smy0gpNXUBGthhNL7rELtePdz6qEEkfRzAchzNdTJ+9D8rbw0SjjH3mo5BUI5IrdJ4332qW7/KMxlpbW9cejiJUumIRAYWRhnm45LUStdXzGnHM5s63PKjGuaI2H4h7oUduM2/iot0MAeG06/1GnRU9Sj0xg2EJiXZmEDxocOd392nCWNaQrF47cEWrL69yt9ZxC+GssK4tX/TNnm/pRNnznM68GlrBo2z9ECMLXLONM4ZUqIENUeSWR/Mj6+r44H5PNf1jEyMDsuzPHEvMP0S0GwDWtj0gnEJ8rPNmm+9se8tUSpuIEDOkGYnd',
+      encryption_cert:  'MIIDBTCCAe2gAwIBAgIQH4FlYNA+UJlF0G3vy9ZrhTANBgkqhkiG9w0BAQsFADAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MB4XDTIyMDUyMjIwMDI0OVoXDTI3MDUyMjIwMDI0OVowLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMBDDCbY/cjEHfEEulZ5ud/CuRjdT6/yN9fy1JffjgmLvvfw6w7zxo1YkCvZDogowX8qqAC/qQXnJ/fl12kvguMWU59WUcPvhhC2m7qNLvlOq90yo+NsRQxD/v0eUaThrIaAveZayolObXroZ+HwTN130dhgdHVTHKczd4ePtDjLwSv/2a/bZEAlPys102zQo8gO8m7W6/NzRfZNyo6U8jsmNkvqrxW2PgKKjIS/UafK9hwY/767K+kV+hnokscY2xMwxQNlSHEim0h72zQRHltioy15M+kBti4ys+V7GC6epL//pPZT0Acv1ewouGZIQDfuo9UtSnKufGi26dMAzSkCAwEAAaMhMB8wHQYDVR0OBBYEFLFr+sjUQ+IdzGh3eaDkzue2qkTZMA0GCSqGSIb3DQEBCwUAA4IBAQCiVN2A6ErzBinGYafC7vFv5u1QD6nbvY32A8KycJwKWy1sa83CbLFbFi92SGkKyPZqMzVyQcF5aaRZpkPGqjhzM+iEfsR2RIf+/noZBlR/esINfBhk4oBruj7SY+kPjYzV03NeY0cfO4JEf6kXpCqRCgp9VDRM44GD8mUV/ooN+XZVFIWs5Gai8FGZX9H8ZSgkIKbxMbVOhisMqNhhp5U3fT7VPsl94rilJ8gKXP/KBbpldrfmOAdVDgUC+MHw3sSXSt+VnorB4DU4mUQLcMriQmbXdQc8d1HUZYZEkcKaSgbygHLtByOJF44XUsBotsTfZ4i/zVjnYcjgUQmwmAWD',
   }
 
   def self.digest_response(response)
