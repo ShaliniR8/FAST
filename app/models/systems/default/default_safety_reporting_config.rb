@@ -12,7 +12,7 @@ class DefaultSafetyReportingConfig
     submission_description:           true,      # Changes Character Limit or adds General Description - default on
     submission_description_required:  true,
     submission_time_zone:             false,
-    template_nested_fields:           true,      # WIP nested smart forms functionality - default off
+    template_nested_fields:           true,      # nested smart forms functionality - default ON
     enable_dual_report:               true,
     matrix_carry_over:                false,
     configurable_agenda_dispositions: false,
