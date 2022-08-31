@@ -76,6 +76,7 @@ class HomeController < ApplicationController
       @title = "Safety Reporting Dashboard"
 
       @templates = Template.where(name: (@permissions['submitter'] || []).compact)
+      @orm_templates = CONFIG.sr::GENERAL[:enable_orm] ? OrmTemplate.order(:name).all : nil
 
       # ############################ SUBMISSIONS ########################
       submission_queries = []
