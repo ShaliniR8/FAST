@@ -8,11 +8,15 @@ class IAEROConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
-    name:                         'Swift Air',
+    name:                         'iAero Airways',
     time_zone:                    'Mountain Time (US & Canada)',
+
+    enable_sso:                         false,
+    login_option:                       'prosafet',
 
     # SYSTEM CONFIGS
     global_admin_default:          false,
+    sms_im_visibility:             false,
   })
 
   MATRIX_INFO = {
