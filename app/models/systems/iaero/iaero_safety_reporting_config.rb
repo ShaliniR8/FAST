@@ -1,4 +1,4 @@
-class DemoSafetyReportingConfig < DefaultSafetyReportingConfig
+class IAEROSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     enable_orm:                  true,
