@@ -11,8 +11,8 @@ class IAEROConfig < DefaultConfig
     name:                         'iAero Airways',
     time_zone:                    'Mountain Time (US & Canada)',
 
-    enable_sso:                         false,
-    login_option:                       'prosafet',
+    enable_sso:                         true,
+    login_option:                       'dual',
 
     # SYSTEM CONFIGS
     global_admin_default:          false,

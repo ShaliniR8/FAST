@@ -2,7 +2,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
 
   GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
     # General Module Features:
-    show_submitter_name:      false,
+    show_submitter_name:      true,
     enable_dual_report:       false,
     submission_time_zone:     true,
     default_submission_time_zone:               'Central Time (US & Canada)',
