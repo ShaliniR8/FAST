@@ -9,7 +9,7 @@ class HAECOConfig < DefaultConfig
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'HAECO Americas',
-    time_zone:                    'Hong Kong',
+    time_zone:                    'Eastern Time (US & Canada)',
 
     # SYSTEM CONFIGS
     global_admin_default:          false,
@@ -44,8 +44,9 @@ class HAECOConfig < DefaultConfig
       column_header: ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'],
       rows: [
         ["Little consequences.", "Minor damage.", "Extensive damage (non-structural).", "Significant  Structural damage.", "Fatality."],
-        ["First aid injury. Discrepancies found on a safety audit which have low potential of leading to an injury.", "Recordable injury. Identified hazard which seems isolated in nature. Minor reported hazards which could result in an injury if left uncorrected.", "Partial loss of significant/ major aircraft systems or results in abnormal flight operations procedure application.", "Complete failure of significant/ major aircraft  systems or results in application of emergency flight  procedures.<br><br>1> hospitalized from complete failure of a safety critical component", " Loss  of aircraft."],
-        ["No significance to aircraft-related operational safety.", "Degrades or affects normal aircraft operational procedures or performance.", "Lost Time Injury. Safety trending that indicates a failure within the safety process.", "Hospitalization requiring urgent operation or permanent total incapacity. Large scale event which could lead to 3> employees obtaining adverse health effects.", "Complete failure of a safety critical component resulting in the death of an Individual(s)."]
+        ["No significance  to aircraft-related operational  safety.", "Degrades or affects normal aircraft operational procedures or performance.", "Partial loss of significant/ major aircraft systems or results in abnormal flight operations procedure application.", "Complete failure of significant/ major aircraft systems or results in application of emergency flight procedures.", "Loss of aircraft."],
+        ["First aid injury. Discrepancies found on a safety audit which have low potential of leading to an injury.", "Recordable injury. Identified hazard which seems isolated in nature. Minor reported hazards which could result in an injury if left uncorrected.", "Lost Time Injury. Safety trending that indicates a failure within the safety process.", "1> hospitalized from complete failure of a safety critical component.<br><br>Hospitalization requiring urgent operation or permanent total incapacity.<br><br>Large scale event which could lead to 3> employees  obtaining  adverse health effects.", "Complete failure of a safety critical component resulting in the death of an Individual(s).
+"]
       ]
     },
 
