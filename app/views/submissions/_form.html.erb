@@ -251,7 +251,7 @@
                     timezone_options = ustimezone.include?(deafult_time_zone) ? us_options : all_options
                   %>
 
-                  <%event_time_zone = deafult_time_zone if event_time_zone.blank?%>
+                  <%event_time_zone = deafult_time_zone if (event_time_zone.blank? || @action == 'new')%>
                   <div class="input-group">
                     <%=f.select :event_time_zone,
                        ActiveSupport::TimeZone.all.map(&:name),
