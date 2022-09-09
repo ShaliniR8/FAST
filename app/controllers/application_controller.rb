@@ -1109,14 +1109,7 @@ class ApplicationController < ActionController::Base
     class_name = self.class.name.gsub('Controller', '').singularize
     @owner = Object.const_get(class_name).find(params[:id])
 
-
     case params[:commit]
-    when 'Update Risk Matrix'
-      convert_from_risk_value_to_risk_index
-      @owner.update_attributes(params[object_name.to_sym])
-      load_special_matrix(@owner)
-      render partial: 'risk_matrices/panel_matrix/show_matrix/matrix_content'
-
     when 'Save Fields'
       if params[:record][:record_fields_attributes].present?
         params[:record][:record_fields_attributes].each_value do |field|
@@ -1143,6 +1136,12 @@ class ApplicationController < ActionController::Base
              record_edit_access: current_user.has_access('records', 'edit', admin: CONFIG::GENERAL[:global_admin_default]),
              hide_panel_head: true}
     else
+      if params[:ajax_call]
+        convert_from_risk_value_to_risk_index
+        @owner.update_attributes(params[object_name.to_sym])
+        load_special_matrix(@owner)
+        render partial: 'risk_matrices/panel_matrix/show_matrix/matrix_content'
+      end
     end
 
   end

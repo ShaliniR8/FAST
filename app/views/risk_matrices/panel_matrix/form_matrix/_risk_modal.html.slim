@@ -2,7 +2,7 @@
 
   = render 'risk_matrices/panel_matrix/form_matrix/form_matrix', f: f, risk_type: @risk_type
 
-  = hidden_field_tag :commit, 'Update Risk Matrix'
+  = hidden_field_tag :ajax_call, 'Update Risk Matrix'
 
   = f.submit "Save #{CONFIG::MATRIX_INFO[:terminology][@risk_type]} Risk",
     class: 'btn btn-success pull-right',
