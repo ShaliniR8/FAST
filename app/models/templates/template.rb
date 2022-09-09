@@ -58,6 +58,7 @@ class Template < ActiveRecord::Base
       target_category =
         Category.create(title: category.title,
                         templates_id: target_template_id,
+                        description: category.description,
                         panel: category.panel,
                         print: category.print,
                         category_order: category.category_order)
@@ -65,7 +66,9 @@ class Template < ActiveRecord::Base
       target_category_id = target_category.id
 
       source_fields = Field.where(categories_id: source_category_id, deleted: 0)
+      source_fields = source_fields.select { |x| x.nested_field_id.nil? || !Field.find(x.nested_field_id).deleted }
       nested_field_ids_map = {}
+
       source_fields.each do |field|
 
         target_field =
