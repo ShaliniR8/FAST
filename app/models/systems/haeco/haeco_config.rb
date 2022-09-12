@@ -13,6 +13,8 @@ class HAECOConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     global_admin_default:          false,
+    enable_sso:                    true,
+    login_option:                  'dual',
   })
 
   MATRIX_INFO = {
