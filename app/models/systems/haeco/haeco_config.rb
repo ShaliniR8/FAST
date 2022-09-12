@@ -47,8 +47,7 @@ class HAECOConfig < DefaultConfig
       rows: [
         ["Little consequences.", "Minor damage.", "Extensive damage (non-structural).", "Significant  Structural damage.", "Fatality."],
         ["No significance  to aircraft-related operational  safety.", "Degrades or affects normal aircraft operational procedures or performance.", "Partial loss of significant/ major aircraft systems or results in abnormal flight operations procedure application.", "Complete failure of significant/ major aircraft systems or results in application of emergency flight procedures.", "Loss of aircraft."],
-        ["First aid injury. Discrepancies found on a safety audit which have low potential of leading to an injury.", "Recordable injury. Identified hazard which seems isolated in nature. Minor reported hazards which could result in an injury if left uncorrected.", "Lost Time Injury. Safety trending that indicates a failure within the safety process.", "1> hospitalized from complete failure of a safety critical component.<br><br>Hospitalization requiring urgent operation or permanent total incapacity.<br><br>Large scale event which could lead to 3> employees  obtaining  adverse health effects.", "Complete failure of a safety critical component resulting in the death of an Individual(s).
-"]
+        ["First aid injury. Discrepancies found on a safety audit which have low potential of leading to an injury.", "Recordable injury. Identified hazard which seems isolated in nature. Minor reported hazards which could result in an injury if left uncorrected.", "Lost Time Injury. Safety trending that indicates a failure within the safety process.", "1> hospitalized from complete failure of a safety critical component.<br><br>Hospitalization requiring urgent operation or permanent total incapacity.<br><br>Large scale event which could lead to 3> employees  obtaining  adverse health effects.", "Complete failure of a safety critical component resulting in the death of an Individual(s)."]
       ]
     },
 
@@ -82,7 +81,7 @@ class HAECOConfig < DefaultConfig
          (has occurred infrequently,  once per year or less)"],
         ["<b>Unlikely but possible to occur</b><br>
          (has occurred rarely, once every 3-5 years or less)"],
-        ["<b>Very unlikely to occur</b><br> 
+        ["<b>Very unlikely to occur</b><br>
          (not known to have occurred)"],
         ["<b>Almost inconceivable that the event will occur</b>"],
       ]
@@ -131,16 +130,16 @@ class HAECOConfig < DefaultConfig
     },
 
     risk_definitions: {
-      red:       {rating: "HIGH",       description: "Specific Risk Mitigation Action Plan required before operation re-starts." },
-      orange:    {rating: "MODERATE",   description: "Requires Risk mitigation Action with specific owner identified, and implementation time determined<br>Normally managed by routine procedures, procedure reviews, or minor mitigation." },
-      yellow:    {rating: "LOW",        description: "For statistics only or minimal intervention (ALARP)" },
       limegreen: {rating: "ACCEPTABLE", description: "Acceptable as is. No further risk mitigation required." },
+      yellow:    {rating: "LOW",        description: "For statistics only or minimal intervention (ALARP)" },
+      orange:    {rating: "MODERATE",   description: "Requires Risk mitigation Action with specific owner identified, and implementation time determined.<br>Normally managed by routine procedures, procedure reviews, or minor mitigation." },
+      red:       {rating: "HIGH",       description: "Specific Risk Mitigation Action Plan required before operation re-starts." },
     },
 
     risk_table_index: {
       'ACCEPTABLE' => 'limegreen',
       'LOW'        => 'yellow',
-      'MODERATE'   => 'orange',      
+      'MODERATE'   => 'orange',
       'HIGH'       => 'red',
     },
 
