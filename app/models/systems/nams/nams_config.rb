@@ -20,6 +20,10 @@ class NAMSConfig < DefaultConfig
     # SYSTEM-WIDE FORM CONFIGS
     allow_reopen_report:                false,
     base_risk_matrix:                   false,
+    only_approver_approve:              true,
+    has_source_of_input_msg:            false,
+    enable_attended_status:             true,
+
 
   })
 

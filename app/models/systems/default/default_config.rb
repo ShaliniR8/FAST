@@ -40,6 +40,9 @@ class DefaultConfig
     csv_user_import:                    false,
     checklist_query:                    false,
     display_logo:                       false,
+    only_approver_approve:              false,
+    has_source_of_input_msg:            true,
+    enable_attended_status:             false,
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,

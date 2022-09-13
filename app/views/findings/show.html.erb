@@ -29,7 +29,7 @@
 
             <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
 
-            <%if @owner.owner.class.name != 'ChecklistRow' && @owner.status == 'New' && !@owner.can_assign?(current_user)%>
+            <%if @owner.owner.class.name != 'ChecklistRow' && @owner.status == 'New' && !@owner.can_assign?(current_user) && CONFIG::GENERAL[:has_source_of_input_msg]%>
               <b style='color:red;'>*Please complete the Source of Input before assigning the Finding.</b>
             <%end%>
 

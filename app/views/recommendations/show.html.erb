@@ -26,7 +26,7 @@
           <div class="col-xs-12 mb15">
             <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
 
-            <%if @owner.status == 'New' && !@owner.can_assign?(current_user) %>
+            <%if @owner.status == 'New' && !@owner.can_assign?(current_user) && CONFIG::GENERAL[:has_source_of_input_msg]%>
               <b style='color:red;'>*Please complete the Source of Input before assigning the Recommendation.</b>
             <%end%>
           </div>

@@ -17,6 +17,7 @@ class DefaultDictionary
         user_confirmed = [owner.approver_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
+        user_confirmed = [owner.approver_id].include?(user.id) if CONFIG::GENERAL[:only_approver_approve]
         form_confirmed && user_confirmed
       },
     },

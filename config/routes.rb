@@ -410,6 +410,7 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :meetings do
     member do
+      get "update_invitation"
       get "message"
       post "send_message"
       get "close"

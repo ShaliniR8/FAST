@@ -17,12 +17,21 @@
             <td><%=user.send(header[:field])%></td>
           <%end%>
           <%if !(defined?(hide_btns) && hide_btns)%>
-            <% invite_status = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.status rescue
-              'Not Invited'%>
+            <% 
+              invite_status = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.status rescue 'Not Invited'
+              invitation_id = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.id
+            %>
             <%if action_name == "new"%>
               <td><a class="btn btn-info invite_btn">Invite</a></td>
             <%elsif action_name == "show"%>
-              <td><%=invite_status%></td>
+              <td class="row">
+                <div class="col-xs-6 invite_status"><%=invite_status%></div>
+                <%if invite_status == 'Accepted' && current_user.id == @meeting.host.users_id && CONFIG::GENERAL[:enable_attended_status]%>
+                  <div class="col-xs-6 pull-right">
+                    <%= link_to 'Attended', '#', class: 'btn btn-info', id: 'attedned-btn', :'data-id' => invitation_id %>
+                  </div>
+                <%end%>
+              </td>
             <%else%>
               <%if invite_status == "Not Invited"%>
                 <td><a class="btn btn-info invite_btn">Invite</a></td>
@@ -36,3 +45,15 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  $(document).ready(function(){
+    $("#attedned-btn").on('click', function(){
+      console.log($(this).parent().prev())
+      $(this).parent().prev().text('Attended');
+      $(this).hide();
+      $.get("<%=update_invitation_meeting_path()%>", { invitation: $(this).data('id') },function(data){
+      });
+    });
+  });
+</script>

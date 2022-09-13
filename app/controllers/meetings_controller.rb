@@ -41,6 +41,16 @@ class MeetingsController < ApplicationController
     end
   end
 
+  def update_invitation
+    invitation = Invitation.find(params[:invitation])
+    invitation.status = 'Attended'
+    if invitation.save
+      render json: { message: 'success'}
+    else
+      render json: { message: 'failed'}
+    end
+  end
+
 
   def reopen
     @meeting = Meeting.find(params[:id]).becomes(Meeting)
