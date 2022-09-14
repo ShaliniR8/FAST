@@ -1,4 +1,4 @@
-class IAEROConfig < DefaultConfig
+class SWQConfig < DefaultConfig
   #used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
   #used for creating different environments in database.yml; example would be %w[training]
@@ -13,6 +13,7 @@ class IAEROConfig < DefaultConfig
 
     enable_sso:                         true,
     login_option:                       'dual',
+    advanced_checklist_data_type:  true,
 
     # SYSTEM CONFIGS
     global_admin_default:          false,

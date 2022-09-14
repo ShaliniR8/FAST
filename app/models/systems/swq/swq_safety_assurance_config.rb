@@ -1,4 +1,4 @@
-class IAEROSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
+class SWQSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
   GENERAL = DefaultSafetyAssuranceConfig::GENERAL.merge({
     recurring_item_checklist:           true,

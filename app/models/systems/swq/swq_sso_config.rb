@@ -1,4 +1,4 @@
-class IAEROSsoConfig
+class SWQSsoConfig
   SAML_DATA = {
     metadata_link: '',
 
