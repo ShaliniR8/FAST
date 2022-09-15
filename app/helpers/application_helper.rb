@@ -996,4 +996,8 @@ module ApplicationHelper
     [field, field_label]
   end
 
+  def article_adjustment(str)
+    %w(a e i o u).include?(str[0].downcase) ? "an #{str}" : "a #{str}"
+  end
+
 end
