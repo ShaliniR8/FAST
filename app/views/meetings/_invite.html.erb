@@ -19,7 +19,7 @@
           <%if !(defined?(hide_btns) && hide_btns)%>
             <% 
               invite_status = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.status rescue 'Not Invited'
-              invitation_id = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.id
+              invitation_id = user.invitations.detect{|inv| inv.meetings_id == @meeting.id}.id rescue nil
             %>
             <%if action_name == "new"%>
               <td><a class="btn btn-info invite_btn">Invite</a></td>
@@ -52,7 +52,7 @@
       console.log($(this).parent().prev())
       $(this).parent().prev().text('Attended');
       $(this).hide();
-      $.get("<%=update_invitation_meeting_path()%>", { invitation: $(this).data('id') },function(data){
+      $.get("<%=update_invitation_meetings_path%>", { invitation: $(this).data('id') },function(data){
       });
     });
   });

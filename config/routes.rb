@@ -410,7 +410,6 @@ PrdgSession::Application.routes.draw do |map|
   end
   resources :meetings do
     member do
-      get "update_invitation"
       get "message"
       post "send_message"
       get "close"
@@ -425,6 +424,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
     end
     collection do
+      get "update_invitation"
       post 'load_records'
       get 'advanced_search'
       get "send_success"
