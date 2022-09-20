@@ -7,6 +7,7 @@
     </div>
     <div class="panel-body" style="overflow-y:auto;overflow-x:hidden">
       <%@templates.each do |x|%>
+      <%description = x.description? ? x.description.gsub('<br>', ' ') : ''%>
         <div class="col-xs-12 col-lg-4">
           <%=link_to x.name,
             new_submission_path(:template => x, :home => true),
@@ -14,7 +15,7 @@
             :disable_with => "#{x.name} ...",
             "data-toggle" => "tooltip",
             "data-placement" => "right",
-            "title" => x.description%>
+            "title" => description%>
         </div>
       <%end%>
     </div>

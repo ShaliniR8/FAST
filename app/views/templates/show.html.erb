@@ -57,7 +57,7 @@
         <div class="panel-body " id="form_body">
           <div class="col-xs-12 mb20">
             <b>Template Name: </b><%=@template.name%><br>
-            <b>Descriptions: </b><%=@template.description%><br>
+            <b>Descriptions: </b><%=@template.description.html_safe%><br>
             <b>Allow Anonymous Submission: </b><%=@template.allow_anonymous? ? 'Yes' : 'No'%><br>
             <b>Last Updated: </b><%=@template.updated%><br>
           </div>

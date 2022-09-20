@@ -17,6 +17,9 @@ class HAECOConfig < DefaultConfig
     login_option:                  'dual',
   })
 
+  DOCUMENT_CATEGORIES = ["HAECO References Information", "ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
+
+
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Baseline Risk',
