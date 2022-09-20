@@ -1,6 +1,6 @@
 <script type="text/javascript" src="/javascripts/utility/nested_fields.js"></script>
 
-<%=form_tag edit_nested_fields_templates_path, method: :post, remote: true do%>
+<%=form_tag edit_nested_fields_templates_path, method: :post, remote: true, style: 'max-height: 80vh; overflow-y: auto' do%>
   <%=hidden_field_tag :field_id, @field.id, {:class => "changed"}%>
   <%=hidden_field_tag :category_id, @category.id, {:class => "changed"}%>
   <%=fields_for :category, @category do |f1|%>
