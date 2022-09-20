@@ -31,7 +31,8 @@
       <div class="panel-heading">
         <div class="panel-title">
           <div class="top_text">
-            <%=@action.titleize + " " + @record.template.name + " " + @action != "new" ? (@record.confidential? ? "(Confidential)" : '') : ''%>
+            <% panel_title = @action.titleize + " " + @record.template.name %>
+            <%= @action != "new" ? (@record.confidential? ? "#{panel_title} (Confidential)" : panel_title) : panel_title %>
           </div>
           <div class="top_buttons pull-right">
             <a class="btn btn-default expandall mb5"
