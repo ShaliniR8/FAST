@@ -12,7 +12,7 @@
 
       <div class="row" id="fields">
         <div class="col-xs-12">
-          <font style="color:blue;font-weight:bold"><%=@cat.description%></font>
+          <font style="color:blue;font-weight:bold"><%=@cat.description.html_safe%></font>
         </div>
         <div class="col-xs-12">
           <%fields = @cat.fields.where(deleted: false, nested_field_id: nil).order(:field_order)%>

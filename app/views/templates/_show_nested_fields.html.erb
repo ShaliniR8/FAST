@@ -103,15 +103,15 @@
                 <%end%>
               <%end%>
             </tbody>
-
-            <%=link_to_add_fields 'Add a Field',
-              f1,
-              :fields,
-              {nested_field_value: x, nested_field_id: @field.id},
-              partial: 'field_fields'%>
-            </br>
-
           </table>
+
+          <%=link_to_add_fields 'Add a Field',
+            f1,
+            :fields,
+            {nested_field_value: x, nested_field_id: @field.id},
+            partial: 'field_fields'%>
+          </br>
+
         </div>
       </div>
     <%end%>

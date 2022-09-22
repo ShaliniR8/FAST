@@ -8,7 +8,7 @@
     </div>
 
     <div class="panel-body" style="display:none" >
-      <h5 class="mb5" style="color:blue; font-weight:bold"><%=@cat.description%></h5><br>
+      <h5 class="mb5" style="color:blue; font-weight:bold"><%=@cat.description.html_safe%></h5><br>
       <div class="row" id="fields">
 
         <%@cat.fields.where(deleted: false).order(:field_order).each do |field|%>
