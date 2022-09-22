@@ -255,5 +255,17 @@
       $(this).next('.eccairs_attribute_id_field').val(attribute_id);
     });
 
+    // One Map Points restrictions
+    $(document).on('change', '.date-type-select', function() {
+      map_field_counts = 0
+      fields_array = $('.date-type-select').map(function() {return $(this).val()}).get();
+      fields_array.forEach(function (x) { if (x == 'map') map_field_counts += 1})
+
+      if ($(this).val() == 'map' && map_field_counts > 1) {
+        alert('A template can have only one Map Points field.');
+        $(this).val('text');
+      }
+    });
+
   });
 </script>

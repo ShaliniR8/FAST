@@ -101,7 +101,7 @@ class HomeController < ApplicationController
       end
 
       @submissions = Submission.preload(:created_by, :template).where(submission_queries.join(' AND '))
-      @grouped_submissions = @submissions.group_by{|x| x.template.name}.sort_by{|k, v| k}.to_h
+      @grouped_submissions = @submissions.select{|x| x.template.present?}.group_by{|x| x.template.name}.sort_by{|k, v| k}.to_h
 
 
       # ############################ RECORDS ########################
@@ -123,7 +123,7 @@ class HomeController < ApplicationController
       if viewer_template.length > 0
         template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = true)"
       end
-      record_queries << "(#{template_query.join(' OR ')})"
+      record_queries << "(#{template_query.join(' AND ')})"
 
       # time range
       if @start_date.present? && @end_date.present?
@@ -131,10 +131,23 @@ class HomeController < ApplicationController
         record_queries << "event_date <= '#{@end_date.utc.strftime('%Y-%m-%d %H:%M:%S')}'"
       end
 
-      @records = Record.preload(:created_by, :template, :report).where(record_queries.join(' AND '))
+      @records = Record.preload(:created_by, :template, :report, :record_fields).where(record_queries.join(' AND '))
       @grouped_records = @records.group_by(&:status).sort_by{|k, v| k}.to_h
       @records_scheduled_completion_date = get_avg_completion_date(@records)
 
+      @lat = CONFIG::GENERAL[:lat]
+      @lng = CONFIG::GENERAL[:lng]
+      @zoom = CONFIG::GENERAL[:gMapZoom]
+      @coords = @records.map { |record| record.record_fields }.flatten.select { |x| x.field && x.field.display_type == 'map' }.map { |x| x.points.map { |point| 
+        {
+          lat: point.lat.to_f,
+          lng: point.lng.to_f,
+          id: point.owner.records_id,
+          template: point.owner.record.template.name,
+          title: point.owner.record.title,
+          event_date: point.owner.record.event_date.to_date,
+        }
+      }}.flatten
 
       # ############################ REPORTS ########################
       @reports = @records.map(&:report).flatten.compact.uniq
@@ -363,7 +376,7 @@ class HomeController < ApplicationController
       end
 
       if current_user.has_access("submissions", "index")
-        @submissions.each do |a|
+        @submissions.select {|x| x.template}.each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
             :start => a.get_date,
@@ -376,7 +389,7 @@ class HomeController < ApplicationController
       end
 
       if current_user.has_access("records", "index")
-        @records.each do |a|
+        @records.select {|x| x.template}.each do |a|
           title_status = a.status == 'Closed' ? "#{a.template.name} ##{a.get_id} (Closed)" : "#{a.template.name} ##{a.get_id}"
           @calendar_entries.push({
             :url => record_path(a),

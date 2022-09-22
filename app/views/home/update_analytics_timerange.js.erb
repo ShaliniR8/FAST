@@ -9,6 +9,8 @@ var params = {
     <% if @feeder_operators.present? %>feederOperators: ['<%= @feeder_operators.join("','") %>'] <% end %>
 }
 
+$('#heat-map').html("<%= escape_javascript(render partial: 'heatmap') %>");
+
 // $("#calendar-parent").html("<%= escape_javascript(render('calendar')) %>");
 $('#calendar').fullCalendar('removeEvents');
 $('#calendar').fullCalendar('addEventSource', <%=raw(@calendar_entries.to_json)%>);
@@ -19,6 +21,9 @@ $('.mitigate_matrix').html("<%= escape_javascript(render partial: 'risk_matrices
 
 // console.log("params=", params);
 <% if session[:mode] == "ASAP" %>
+    $('#heat-map').html("<%= escape_javascript(render partial: 'home/heatmap') %>");
+
+
     $('#record_avg_days_to_complete').html("Average Days to Complete: <%=@records_scheduled_completion_date%>")
     $('#report_avg_days_to_complete').html("Average Days to Complete: <%=@reports_scheduled_completion_date%>")
     $('#ca_avg_days_to_complete').html("Average Days to Complete: <%=@corrective_actions_scheduled_completion_date%>")
@@ -67,3 +72,4 @@ $('.mitigate_matrix').html("<%= escape_javascript(render partial: 'risk_matrices
 // console.log("start-date=", "<%=@start_date%>");
 <% Rails.logger.debug "before render, start_date=#{@start_date}" %>
 //$("#risk-matrix-parent").html('<%#= escape_javascript(render("risk_matrices/dashboard_matrix/risk_matrices"))%>')
+
