@@ -28,7 +28,10 @@ ruby:
               th Action
           tbody
             - attachments.each do |attachment|
-              tr attachment_id=attachment.id
+              - record_view_access = current_user.has_access('records','view', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+              - template_view_access = current_user.has_access(attachment.owner.template.name,'viewer_template_id', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+              - disabled = record_view_access && template_view_access ? '' : 'disabled'
+              tr attachment_id=attachment.id 
                 td
                   strong = attachment.document_filename
                 td = attachment.caption
@@ -43,12 +46,14 @@ ruby:
                       .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
                         .col-xs-12 align='center'
                           = render 'forms/attachments_preview', attachment: attachment, from_mini: false
-                  = link_to 'Preview', '#',
-                    class: 'btn btn-info show_preview_btn',
-                    'data-toggle' => 'modal',
-                    'data-target' => '.bs-example-modal-lg'
-                  = link_to 'Download', attachment.name.url,
-                    class: 'btn btn-success ml5'
+                  .tooltip-wrapper
+                    = link_to 'Preview', '#',
+                      class: "btn btn-info show_preview_btn #{disabled}",
+                      'data-toggle' => 'modal',
+                      'data-target' => '.bs-example-modal-lg'
+                    = link_to 'Download', attachment.name.url,
+                      class: "btn btn-success ml5 #{disabled}"
+                    b.ml15.text-danger = "You do not have an access to view the identified information for #{attachment.owner.template.name}" if disabled == 'disabled'
 
 javascript:
   $(function() {
