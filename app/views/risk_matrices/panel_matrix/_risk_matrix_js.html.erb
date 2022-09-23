@@ -553,7 +553,7 @@
 
   function update_hidden_fields(row_index, column_index) {
     <%risk_table = CONFIG::MATRIX_INFO[:risk_table]%>
-    risk_table_rows = <%=(risk_table[:rows] || risk_table[:rows_color]).to_json.html_safe%>
+    risk_table_rows = <%=risk_table[:rows_color].to_json.html_safe%>
     risk_table_dict = <%=CONFIG::MATRIX_INFO[:risk_table_dict].to_json.html_safe%>
 
     risk_cell_val = risk_table_rows[row_index][column_index]
@@ -561,10 +561,6 @@
 
     probability = <%=is_row_probability?%> ? row_index    : column_index
     severity    = <%=is_row_probability?%> ? column_index : row_index
-
-    console.log(severity)
-    console.log(probability)
-    console.log(risk_factor)
 
     $('input#sev').val(severity)
     $('input#like').val(probability)
