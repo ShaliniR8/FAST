@@ -28,9 +28,12 @@ ruby:
               th Action
           tbody
             - attachments.each do |attachment|
-              - record_view_access = current_user.has_access('records','view', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
-              - template_view_access = current_user.has_access(attachment.owner.template.name,'viewer_template_id', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
-              - disabled = record_view_access && template_view_access ? '' : 'disabled'
+              - disabled = ''
+              - has_template = attachment.owner.template rescue false
+              - if has_template
+                - record_view_access = current_user.has_access('records','view', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+                - template_view_access = current_user.has_access(attachment.owner.template.name,'viewer_template_id', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+                - disabled = record_view_access && template_view_access ? '' : 'disabled'
               tr attachment_id=attachment.id 
                 td
                   strong = attachment.document_filename
