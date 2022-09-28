@@ -15,6 +15,8 @@ class HAECOConfig < DefaultConfig
     global_admin_default:          false,
     enable_sso:                    true,
     login_option:                  'dual',
+
+    hide_employee_group:           true,
   })
 
   DOCUMENT_CATEGORIES = ["HAECO References Information", "ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]

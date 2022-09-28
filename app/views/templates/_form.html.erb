@@ -55,13 +55,16 @@
                 <%=f.text_field :js_link, {:class => "form-control"}%>
               </div>
 
-              <div class="form-inline col-xs-3">
-                <%=f.label :emp_group, "Employee Group"%>
-                <%=f.select :emp_group,
-                  options_for_select(CONFIG::EMPLOYEE_GROUPS, @template.send(:emp_group)),
-                  {include_blank: true},
-                  {:class => "form-control"}%>
-              </div>
+              <% unless CONFIG::GENERAL[:hide_employee_group] %>
+                <div class="form-inline col-xs-3">
+                  <%=f.label :emp_group, "Employee Group"%>
+                  <%=f.select :emp_group,
+                    options_for_select(CONFIG::EMPLOYEE_GROUPS, @template.send(:emp_group)),
+                    {include_blank: true},
+                    {:class => "form-control"}%>
+                </div>
+              <%end%>
+
               <div class="form-inline col-xs-2">
                 <%=f.label :report_type, "Report Type"%>
                 <%=f.select :report_type,
