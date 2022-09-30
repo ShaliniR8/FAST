@@ -27,15 +27,17 @@
                   {:include_blank=>""},
                   {:class=>"form-control ml5 required_field"}%>
               </div>
-              <div class="form-group form-inline col-sm-4">
-                <%=f.label :employee_group,
-                  "ASAP MOU Employee Group",
-                  :class => "required"%>
-                <%=f.select :employee_group,
-                  options_for_select(FaaReport.getEmployeeGroup),
-                  {:include_blank => true},
-                  {:class => "form-control required_field"}%>
-              </div>
+              <% unless CONFIG::GENERAL[:hide_employee_group] %>
+                <div class="form-group form-inline col-sm-4">
+                  <%=f.label :employee_group,
+                    "ASAP MOU Employee Group",
+                    :class => "required"%>
+                  <%=f.select :employee_group,
+                    options_for_select(FaaReport.getEmployeeGroup),
+                    {:include_blank => true},
+                    {:class => "form-control required_field"}%>
+                </div>
+              <% end %>
               <div class="form-group form-inline col-sm-12">
                 <%=f.label :faa,
                   "FAA Member",

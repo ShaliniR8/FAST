@@ -177,12 +177,14 @@ class FaaReport < ActiveRecord::Base
 
 
   def self.get_headers
-    [
+    headers = [
       {:field =>  "year",           :title=>"Fiscal Year"},
       {:field =>  "quarter",        :title=>"Fiscal Quarter"},
       {:field =>  "enhancements",   :title=>"Safety Enhancements"},
-      {:field =>  "employee_group", :title => "Employee Group"}
     ]
+
+    headers << {:field =>  "employee_group", :title => "Employee Group"} unless CONFIG::GENERAL[:hide_employee_group]
+    headers
   end
 
   def enhancements

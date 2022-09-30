@@ -21,9 +21,11 @@
             <b><%=k%>:</b> <%=v%>
           </div>
         <%end%>
-        <div class="col-xs-12">
-          <b>ASAP MOU Employee Group: </b><%=@report.employee_group.titleize%>
-        </div>
+        <% unless CONFIG::GENERAL[:hide_employee_group] %>
+          <div class="col-xs-12">
+            <b>ASAP MOU Employee Group: </b><%=@report.employee_group.titleize%>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
