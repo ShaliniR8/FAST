@@ -13,16 +13,17 @@ css:
     display: inline-block;
   }
 
-.col-xs-12
-  .panel.panel-thin.panel-danger
-    .panel-heading
-      .panel-title
-        .top_text
-          | Heatmap
-    .panel-body.text-center
-      #map-canvas
-      .center
-        input id="toggle-pins" type="checkbox"
+- if session[:mode] == "ASAP" && CONFIG::GENERAL[:has_gmap]
+  .col-xs-12
+    .panel.panel-thin.panel-danger
+      .panel-heading
+        .panel-title
+          .top_text
+            | Heatmap
+      .panel-body.text-center
+        #map-canvas
+        .center
+          input id="toggle-pins" type="checkbox"
 
 javascript:
   $( document ).ready(function() {
