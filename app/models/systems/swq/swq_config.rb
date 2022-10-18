@@ -31,8 +31,8 @@ class SWQConfig < DefaultConfig
     severity_table: {
       title: 'SEVERITY',
 
-      orientation: :horizontal,
-      direction: :right,
+      orientation: :vertical,
+      direction: :down,
       size: 'col-xs-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
@@ -70,34 +70,36 @@ class SWQConfig < DefaultConfig
     probability_table: {
       title: 'LIKELIHOOD',
 
-      orientation: :vertical,
-      direction: :down,
+      orientation: :horizontal,
+      direction: :right,
       size: 'col-xs-6',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',
       header_style: 'probHeader',
       cell_name: 'probability_td',
 
-      row_header_name: 'Likelihood Definitions',
-      row_header: ['Improbable', 'Seldom', 'Occasional', 'Probable', 'Frequent'],
-      column_header_name: '',
-      column_header: [''],
+      row_header_name: '',
+      row_header: [
+        ''
+      ],
+      column_header_name: 'Likelihood Definitions',
+      column_header: ['Improbable', 'Seldom', 'Occasional', 'Probable', 'Frequent'],
       rows: [
         ["A remote likelihood, almost inconceivable that event will occur (has not happened before)<br>
-         Auditors/Regulators have very low likelihood of non-conformance discovery during a specialized or focused review<br>
-         Quantitative - Greater than or equal to 1 in 1,000,000, or once every ten years"],
-        ["Very unlikely to occur (if existing issue, occurred only once or twice). An activity or event that occurs intermittently, not likely to happen (but could)<br>
-         Auditors/Regulators have low likelihood of non-conformance discovery during any general or focused review<br>
-         Quantitative - Greater than or equal to 1 to 100,000, or once a year"],
-        ["Unlikely, but possible to occur (if existing issue, occurs rarely). An activity or event that occurs infrequently or irregularly<br>
-         Auditors/Regulators have potential of non-conformance discovery during focused or specialized review<br>
-         Quantitative - Greater than or equal to 1 in 10,000, or once a month"],
-        ["Likely to occur sometimes (if existing issue, occurs infrequently). Will occur often if events follow normal patterns. Event is repeatable and less sporadic<br>
-         Auditors/Regulators have potential of non-conformance discovery with light audit activity<br>
-         Quantitative - Greater than or equal to 1 in 1,000, or once a week"],
-        ["Likely to occur many times (if existing issue, occurs frequently). Will be continuously experienced unless action is taken to change events<br>
-         Auditors/Regulators have potential of non-conformance discovery with minimal audit activity<br>
-         Quantitative - Greater than or equal to 1 in 100, or once a day"],
+        Auditors/Regulators have very low likelihood of non-conformance discovery during a specialized or focused review<br>
+        Quantitative - Greater than or equal to 1 in 1,000,000, or once every ten years",
+        "Very unlikely to occur (if existing issue, occurred only once or twice). An activity or event that occurs intermittently, not likely to happen (but could)<br>
+        Auditors/Regulators have low likelihood of non-conformance discovery during any general or focused review<br>
+        Quantitative - Greater than or equal to 1 to 100,000, or once a year",
+        "Unlikely, but possible to occur (if existing issue, occurs rarely). An activity or event that occurs infrequently or irregularly<br>
+        Auditors/Regulators have potential of non-conformance discovery during focused or specialized review<br>
+        Quantitative - Greater than or equal to 1 in 10,000, or once a month",
+        "Likely to occur sometimes (if existing issue, occurs infrequently). Will occur often if events follow normal patterns. Event is repeatable and less sporadic<br>
+        Auditors/Regulators have potential of non-conformance discovery with light audit activity<br>
+        Quantitative - Greater than or equal to 1 in 1,000, or once a week",
+        "Likely to occur many times (if existing issue, occurs frequently). Will be continuously experienced unless action is taken to change events<br>
+        Auditors/Regulators have potential of non-conformance discovery with minimal audit activity<br>
+        Quantitative - Greater than or equal to 1 in 100, or once a day"]
       ]
     },
 
@@ -120,13 +122,13 @@ class SWQConfig < DefaultConfig
       cell_style: 'bold',
 
       # maps severity / likelihood attribute to position on table
-      severity_pos: 'column',
-      likelihood_pos: 'row',
+      severity_pos: 'row',
+      likelihood_pos: 'column',
 
       row_header_name: 'Severity Levels',
-      row_header: ['A<br>Improbable', 'B<br>Seldom', 'C<br>Occasional', 'D<br>Probable', 'E<br>Frequent'],
+      row_header: ['0', '1', '2', '3', '4'],
       column_header_name: 'Likelihood Levels',
-      column_header: ['0', '1', '2', '3','4'],
+      column_header: ['A<br>Improbable', 'B<br>Seldom', 'C<br>Occasional', 'D<br>Probable', 'E<br>Frequent'],
       rows: [
         ['A0',   'B0',    'C0',    'D0',    'E0' ],
         ['A1',   'B1',    'C1',    'D1',    'E1' ],
