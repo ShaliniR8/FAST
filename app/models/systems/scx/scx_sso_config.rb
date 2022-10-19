@@ -18,7 +18,8 @@ class SCXSsoConfig
 
     # Route to IdP's sign-out; should be in the following format:
     # '|__IdP_domain__|/adfs/ls/?wa=wsignout1.0'
-    idp_slo_target_url: 'https://suncountry.okta.com/app/suncountry_prosafet_1/exktiwa7r8Jnln8jT696/sso/saml',
+    idp_slo_target_url: 'https://suncountry.okta.com/app/suncountry_prosafet_1/exktiwa7r8Jnln8jT696/slo/saml',
+    # idp_slo_target_url: 'https://suncountry.okta.com/app/suncountry_prosafet_1/exktiwa7r8Jnln8jT696/sso/saml',
 
 
     # Route to IdP; should be in metadata.xml under:
