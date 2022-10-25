@@ -21,6 +21,9 @@ class MAFConfig < DefaultConfig
     global_admin_default:          false,
   })
 
+  EVENT_TITLE = 'Submission Title'
+  EVENT_DATE = 'Date and Time of Occurrence/Observation'
+
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Baseline Risk',

@@ -183,7 +183,7 @@
               <%if CONFIG.sr::GENERAL[:submission_description_required]%>
                 <div class="col-xs-12 col-sm-4 mb5">
                   <%=label_tag :description,
-                    "Event Title",
+                    CONFIG::EVENT_TITLE,
                     :style => "color:red" %>
                   <%if CONFIG.sr::GENERAL[:limit_reporting_title_length]%>
                     <%=f.text_field :description,
@@ -221,7 +221,7 @@
               <%if !CONFIG.sr::GENERAL[:submission_time_zone]%>
                 <%date_value = @record.event_date%>
               <%end%>
-              <%=label_tag :event_date, "Date and Time of Event", :style => "color:red"%>
+              <%=label_tag :event_date, CONFIG::EVENT_DATE, :style => "color:red"%>
               <%=f.text_field :event_date,
                 {:class => 'field-datetime form-control required_field', :id => "event_date", 'data-format' => CONFIG.getTimeFormat[:datetimepicker],
                   value: date_value}%>
@@ -275,6 +275,7 @@
                 <%end%>
               <%else%>
                 <%event_time_zone = 'Local' if event_time_zone.blank?%>
+                <%event_time_zone = 'UTC' if CONFIG.sr::GENERAL[:submission_utc_time_zone]%>
                 <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
                 <button
                   id="time-zone-toggle-btn"
@@ -457,15 +458,17 @@
 
     timeZoneToggleBtn = document.querySelector('#time-zone-toggle-btn')
     if (timeZoneToggleBtn != null) {
-      $('#time-zone-toggle-btn').on('click', function() {
-        if (timeZoneToggleBtn.innerHTML == 'Local') {
-          timeZoneToggleBtn.innerHTML = 'UTC'
-          $('#submission_event_time_zone').val('UTC')
-        } else {
-          timeZoneToggleBtn.innerHTML = 'Local'
-          $('#submission_event_time_zone').val('Local')
-        }
-      })
+      <% unless CONFIG.sr::GENERAL[:submission_utc_time_zone] %>
+        $('#time-zone-toggle-btn').on('click', function() {
+          if (timeZoneToggleBtn.innerHTML == 'Local') {
+            timeZoneToggleBtn.innerHTML = 'UTC'
+            $('#submission_event_time_zone').val('UTC')
+          } else {
+            timeZoneToggleBtn.innerHTML = 'Local'
+            $('#submission_event_time_zone').val('Local')
+          }
+        })
+      <%end%>
     }
 
     // Count the characters limit

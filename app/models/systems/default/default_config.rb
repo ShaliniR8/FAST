@@ -104,6 +104,9 @@ class DefaultConfig
 
   CAUSE_LABEL = 'Causes'
 
+  EVENT_TITLE = 'Event Title'
+  EVENT_DATE = 'Date and Time of Event'
+
   def self.getTimeFormat
     {
       :timepicker       => 'H:i',
