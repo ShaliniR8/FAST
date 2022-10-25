@@ -9,7 +9,7 @@ class SWQConfig < DefaultConfig
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'iAero Airways',
-    time_zone:                    'Mountain Time (US & Canada)',
+    time_zone:                    'Eastern Time (US & Canada)',
 
     has_mobile_app:                     true,
     enable_sso:                         true,
