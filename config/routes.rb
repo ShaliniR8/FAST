@@ -269,6 +269,7 @@ PrdgSession::Application.routes.draw do |map|
     member do
       get "users"
       get "rules"
+      get "copy"
     end
   end
   resources :access_controls do

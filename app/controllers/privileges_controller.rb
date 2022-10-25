@@ -43,6 +43,19 @@ class PrivilegesController < ApplicationController
     @rules = CONFIG::GENERAL[:safety_promotion_visibility].present? ? AccessControl.find(:all) : AccessControl.find(:all).keep_if{|a| ["Safety Promotion", "newsletters", "safety_surveys"].exclude?(a.entry)}
   end
 
+
+  def copy
+    priv=Privilege.find(params[:id])
+    new_priv = Privilege.create(name: "#{priv.name} -- copy", description: priv.description, example: priv.example)
+
+    priv.assignments.each do |assignment|
+      Assignment.create(access_controls_id: assignment.access_controls_id, privileges_id: new_priv.id)
+    end
+
+    redirect_to privileges_path
+  end
+
+
   def update
     privilege=Privilege.find(params[:id])
     privilege.update_attributes(params[:privilege])

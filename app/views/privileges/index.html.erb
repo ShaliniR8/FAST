@@ -61,6 +61,10 @@
                           edit_privilege_path(a),
                           :class=>"btn mb5 btn-warning",
                           :disable_with => "Editing..."%>
+                        <%=link_to "Copy Privilege",
+                          copy_privilege_path(a),
+                          :class=>"btn mb5 btn-warning",
+                          :disable_with => "Making a copy..."%>
                         <%=link_to "Delete",
                           privilege_path(a),
                           :confirm => "Are you sure?",
@@ -105,7 +109,7 @@ $(document).ready(function(){
   $('#candidates').DataTable({
     "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
     "iDisplayLength": 150,
-    "aaSorting": [[1, "asc"]],
+    "aaSorting": [[0, "desc"]],
   });
 });
 </script>
