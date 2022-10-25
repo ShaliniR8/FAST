@@ -4,13 +4,14 @@ class SWQConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_MODULES = %w[]
+  MOBILE_MODULES = %w[ASAP SMS]
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'iAero Airways',
     time_zone:                    'Mountain Time (US & Canada)',
 
+    has_mobile_app:                     true,
     enable_sso:                         true,
     login_option:                       'dual',
     advanced_checklist_data_type:  true,

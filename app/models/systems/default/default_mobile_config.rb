@@ -65,6 +65,10 @@ class DefaultMobileConfig
     #MAF US Portals
     maf_us_general_dir: { label: 'Login with ProSafeT', subdomain: 'crossconnect' },
 
+    #SWQ(iAero) Portals
+    swq_dir: { label: 'Login with ProSafeT', subdomain: 'swq' },
+    swq_sso: { label: 'Login with iAero Airways', subdomain: 'swq', sso: true},
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -206,6 +210,15 @@ class DefaultMobileConfig
     'MAF US Key' => { # B4F4-A34C-0045-26C5
       key_name: 'Mission Aviation Fellowship US',
       portals: %i[maf_us_general_dir]
+    },
+
+
+    'SWQ Key' => { # B1E1-CA92-F1DD-3878
+      key_name: 'iAero Airways',
+      portals: %i[
+        swq_dir
+        swq_sso
+      ]
     },
 
   }.map{ |key, value|
