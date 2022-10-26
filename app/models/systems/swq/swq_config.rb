@@ -14,7 +14,8 @@ class SWQConfig < DefaultConfig
     has_mobile_app:                     true,
     enable_sso:                         true,
     login_option:                       'dual',
-    advanced_checklist_data_type:  true,
+    checklist_query:                    true,
+    advanced_checklist_data_type:       true,
 
     # SYSTEM CONFIGS
     global_admin_default:          false,
