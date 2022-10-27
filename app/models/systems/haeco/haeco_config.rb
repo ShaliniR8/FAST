@@ -17,6 +17,7 @@ class HAECOConfig < DefaultConfig
     login_option:                  'dual',
 
     hide_employee_group:           true,
+    custom_uniq_id:                true,
   })
 
   DOCUMENT_CATEGORIES = ["HAECO References Information", "ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]

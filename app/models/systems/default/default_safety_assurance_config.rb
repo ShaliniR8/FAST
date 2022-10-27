@@ -29,6 +29,7 @@ class DefaultSafetyAssuranceConfig
           :extension_requests],
         fields: {
           id: { default: true },
+          uniq_custom_id: { visible: '' },
           title: { default: true },
           status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },

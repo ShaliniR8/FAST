@@ -570,6 +570,11 @@ class DefaultDictionary
       num_cols: 6, type: 'text', visible: 'index,show',
       required: false
     },
+    uniq_custom_id: {
+      field: 'uniq_custom_id', title: 'Custom ID',
+      num_cols: 6, type: 'text', visible: 'index,show',
+      required: false
+    },
     title: {
       field: 'title', title: 'Title',
       num_cols: 6, type: 'text', visible: 'index,form,show',

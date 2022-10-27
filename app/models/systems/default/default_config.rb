@@ -44,6 +44,7 @@ class DefaultConfig
     has_source_of_input_msg:            true,
     enable_attended_status:             false,
     hide_employee_group:                false,
+    custom_uniq_id:                     false,
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,
