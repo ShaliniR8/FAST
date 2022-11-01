@@ -43,12 +43,12 @@ class ATNConfig < DefaultConfig
     }
   })
 
-  FAA_INFO = DefaultConfig::FAA_INFO.merge({ #CORRECT/REVISE
-    'CHDO'=>'Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450',
-    'Region'=>'Great Lakes',
-    'ASAP MOU Holder Name'=>'N/A',
-    'ASAP MOU Holder FAA Designator'=>'SCNA'
-  })
+  FAA_INFO = {
+    'CMO'=>'DFW Certificate Management Office, 8700 Freeport Parkway, Suite 200A, Irving, TX 75063',
+    'Region'=>'SW',
+    'ASAP MOU Holder Name'=>'Air Transport International',
+    'ASAP MOU Holder FAA Designator'=>'IXXA'
+  }
 
   RISK_MATRIX = {
     # :likelihood       => ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"],
