@@ -45,6 +45,7 @@ class DefaultConfig
     enable_attended_status:             false,
     hide_employee_group:                false,
     custom_uniq_id:                     false,
+    attachment_identified_view_access:  true,
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,

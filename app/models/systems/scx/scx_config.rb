@@ -18,6 +18,7 @@ class SCXConfig < DefaultConfig
     login_option:                       'dual',
     has_mobile_app:                     true,
     add_attachment_in_any_status:       true,
+    attachment_identified_view_access:  false,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,
