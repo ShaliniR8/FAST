@@ -24,7 +24,6 @@ class RiskControl < Srm::SafetyRiskManagementBase
 
   after_create :create_transaction
   after_create :create_owner_transaction
-  after_create :delete_owner_cached_fragments
   after_save :delete_cached_fragments
 
 
@@ -87,11 +86,13 @@ class RiskControl < Srm::SafetyRiskManagementBase
     ActionController::Base.new.expire_fragment(source_fragment_name)
     ActionController::Base.new.expire_fragment(show_fragment_name)
     ActionController::Base.new.expire_fragment(show_limited_fragment_name)
+
+    self.delete_owner_cached_fragments if hazard.present?
   end
 
 
   def delete_owner_cached_fragments
-    Hazard.find(hazard_id).delete_cached_fragments
+    hazard.delete_cached_fragments
   end
 
 end

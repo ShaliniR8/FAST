@@ -115,5 +115,11 @@ class Hazard < Srm::SafetyRiskManagementBase
   def delete_cached_fragments
     fragment_name = "show_hazards_#{id}"
     ActionController::Base.new.expire_fragment(fragment_name)
+
+    self.delete_owner_cached_fragments if sra.present?
+  end
+
+  def delete_owner_cached_fragments
+    sra.delete_cached_fragments
   end
 end

@@ -10,6 +10,8 @@ class Verification < ProsafetBase
     transaction_log('Update') if transaction_include_action?(:update)
   }
 
+  after_save :delete_owner_cached_fragments
+
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
@@ -69,6 +71,10 @@ class Verification < ProsafetBase
       "#{action.titleize} Verification",
       session[:user_id],
       self.detail)
+  end
+
+  def delete_owner_cached_fragments
+    owner.delete_cached_fragments if owner.present? && owner_type != 'CorrectiveAction'
   end
 
 end
