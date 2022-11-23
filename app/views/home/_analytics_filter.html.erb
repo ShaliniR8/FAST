@@ -149,6 +149,22 @@
                 </div>
               </div>
             </div>
+            <% if false %>
+              <div class="row mt10">
+                <div class="col-sm-12">
+                  <div class="input-group">
+                    <div class="input-group-btn btn-group-vertical-xs" data-toggle="buttons">
+                      <%= label_tag :data_access, class: "btn btn-danger analytics-filter no-border" do %>
+                        <%= radio_button_tag :data_access, :all_data, false, options %> All Data
+                      <% end %>
+                      <%= label_tag :data_access, class: "btn btn-danger analytics-filter no-border" do %>
+                        <%= radio_button_tag :data_access, :related_data, false, options %> My Data Only
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
           <% end %>
           <% if session[:mode] == "SRM" %>
             <div class="row mt10">

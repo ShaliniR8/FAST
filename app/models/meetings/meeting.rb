@@ -132,6 +132,15 @@ class Meeting < ProsafetBase
   end
 
 
+  def include_user(user)
+    if self.host.present? && (self.host.users_id == user.id)
+      true
+    else
+      self.invited?(user)
+    end
+  end
+
+
   def invited?(user)
     result = false
     self.invitations.each do |f|

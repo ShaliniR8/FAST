@@ -20,6 +20,7 @@ class ATNConfig < DefaultConfig
     add_attachment_in_any_status:       true,
     advanced_checklist_data_type:       true,
     checklist_query:                    true,
+    hide_submission_in_dashboard:       true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,

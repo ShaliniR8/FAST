@@ -72,7 +72,6 @@ class HomeController < ApplicationController
 
     case session[:mode]
     when 'ASAP'
-
       @title = "Safety Reporting Dashboard"
 
       @templates = Template.where(name: (@permissions['submitter'] || []).compact)
@@ -100,7 +99,14 @@ class HomeController < ApplicationController
         submission_queries << "event_date <= '#{@end_date.strftime('%Y-%m-%d %H:%M:%S')}'"
       end
 
-      @submissions = Submission.preload(:created_by, :template).where(submission_queries.join(' AND '))
+      if params[:data_access] == 'related_data'
+        @submissions = Submission.preload(:created_by, :template).where(user_id: current_user.id, completed: true)
+      else
+        @submissions = Submission.preload(:created_by, :template).where(submission_queries.join(' AND '))
+      end
+
+      @submissions = [] if CONFIG::GENERAL[:hide_submission_in_dashboard]
+
       @grouped_submissions = @submissions.select{|x| x.template.present?}.group_by{|x| x.template.name}.sort_by{|k, v| k}.to_h
 
 
@@ -116,9 +122,11 @@ class HomeController < ApplicationController
         viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact)
       end
 
-      template_query = ["(users_id = #{current_user.id})"]
+      # template_query = ["(users_id = #{current_user.id})"]
+      template_query = []
+
       if full_template.length > 0
-        template_query << "(templates_id in (#{full_template.map(&:id).join(',')}))"
+        template_query << "(templates_id in (#{full_template.map(&:id).join(',')}) OR users_id = #{current_user.id})"
       end
       if viewer_template.length > 0
         template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = true)"
@@ -131,7 +139,12 @@ class HomeController < ApplicationController
         record_queries << "event_date <= '#{@end_date.utc.strftime('%Y-%m-%d %H:%M:%S')}'"
       end
 
-      @records = Record.preload(:created_by, :template, :report, :record_fields).where(record_queries.join(' AND '))
+      if params[:data_access] == 'related_data'
+        @records = Record.preload(:created_by, :template, :report, :record_fields).where(users_id: current_user.id)
+      else
+        @records = Record.preload(:created_by, :template, :report, :record_fields).where(record_queries.join(' AND '))
+      end
+
       @grouped_records = @records.group_by(&:status).sort_by{|k, v| k}.to_h
       @records_scheduled_completion_date = get_avg_completion_date(@records)
 
@@ -362,6 +375,7 @@ class HomeController < ApplicationController
       if current_user.has_access("meeting", "index")
         meetings = Meeting.preload(:host, :invitations).where("status != ? and type is null", "Closed")
         meetings = meetings.select{|x| x.has_user(current_user)}
+        meetings = meetings.select{|x| x.include_user(current_user)} if params[:data_access] == 'related_data'
         meetings.each do |meeting|
           @calendar_entries.push({
             :url => meeting_path(meeting),
@@ -418,7 +432,6 @@ class HomeController < ApplicationController
           end
         end
       end
-
 
     elsif session[:mode] == "SRM"
 
