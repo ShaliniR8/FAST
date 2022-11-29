@@ -132,6 +132,8 @@ class HomeController < ApplicationController
         template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = true)"
       end
       record_queries << "(#{template_query.join(' AND ')})"
+      record_queries.delete("()")
+
 
       # time range
       if @start_date.present? && @end_date.present?
