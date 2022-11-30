@@ -29,6 +29,7 @@
 
               <%record_field = (@record_fields_hash[field.id] || []).first%>
               <%record_field = RecordField.new(value: '') if !record_field.present?%>
+
               <%=render "records/field", field: field, f: f, record_field: record_field, is_nested_field:false%>
 
               <%nested_fields = @nested_fields_hash[field.id]%>
@@ -50,7 +51,6 @@
                           <%nested_record_field = RecordField.new(value: '') if !nested_record_field.present?%>
                           <%record_val = nested_record_field.value || ''%>
                           <%size = calculate_column_size(field: nested_field)%>
-
                           <div class="<%=size%> nested_field nested_field_<%=field.id%> nested_field_<%=field.id%>_<%=nv.parameterize%>">
                             <%= render 'records/field', field: nested_field, f: f, record_field: nested_record_field, is_nested_field: true%>
                           </div>

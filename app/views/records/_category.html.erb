@@ -3,6 +3,19 @@
 <%record_edit_access = defined?(record_edit_access) ? record_edit_access : false%>
 <%hide_panel_head = defined?(hide_panel_head) ? hide_panel_head : false%>
 
+<%
+  # all_record_fields = @record.record_fields.map{|sf| [sf.fields_id, sf] }.to_h
+
+  all_record_fields = {}
+  @record.record_fields.each { |field|
+    if all_record_fields[field.fields_id].present?
+      all_record_fields[field.id] = field if field.updated_at > all_record_fields[field.fields_id].updated_at
+    else
+      all_record_fields[field.fields_id] = field
+    end
+  }
+%>
+
 <%if !hide_panel_head%>
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <div class="panel <%=@cat.panel%>">
@@ -16,7 +29,6 @@
       </div>
       <div class="panel-body">
         <div class="row" id="fields" style="word-wrap: break-word">
-          <%all_record_fields = @record.record_fields.map{|sf| [sf.fields_id, sf] }.to_h%>
           <%@cat.fields.each do |field|%>
             <%if field.print || !deid%>
               <%if field.nested_field_id.nil?%>
@@ -59,7 +71,6 @@
 
 <%else%>
   <div class="row" id="fields" style="word-wrap: break-word">
-    <%all_record_fields = @record.record_fields.map{|sf| [sf.fields_id, sf] }.to_h%>
     <%@cat.fields.each do |field|%>
       <%if field.print || !deid%>
         <%if field.nested_field_id.nil?%>

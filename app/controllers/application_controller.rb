@@ -1108,7 +1108,6 @@ class ApplicationController < ActionController::Base
     object_name = self.class.name.gsub('Controller', '').underscore.singularize
     class_name = self.class.name.gsub('Controller', '').singularize
     @owner = Object.const_get(class_name).find(params[:id])
-
     case params[:commit]
     when 'Save Fields'
       if params[:record][:record_fields_attributes].present?
@@ -1119,7 +1118,7 @@ class ApplicationController < ActionController::Base
           end
         end
       end
-
+      
       # @owner.update_attributes(params[object_name.to_sym])
       # @record = @owner
       # category = Category.find(params[:category_id])
