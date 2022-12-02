@@ -221,6 +221,15 @@ class DefaultMobileConfig
       ]
     },
 
+
+    'HAECO Key' => { # 75D9-6E5F-83F4-885D
+      key_name: 'HAECO Americas',
+      portals: %i[
+        swq_dir
+        swq_sso
+      ]
+    },
+
   }.map{ |key, value|
     value[:portals] = value[:portals].map{ |elem| PORTALS[elem] }
     [Digest::SHA2.hexdigest(key)[0..15], value]

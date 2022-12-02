@@ -4,7 +4,7 @@ class HAECOConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_MODULES = %w[]
+  MOBILE_MODULES = %w[ASAP SMS]
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
@@ -12,6 +12,7 @@ class HAECOConfig < DefaultConfig
     time_zone:                    'Eastern Time (US & Canada)',
 
     # SYSTEM CONFIGS
+    has_mobile_app:                true,
     global_admin_default:          false,
     enable_sso:                    true,
     login_option:                  'dual',
