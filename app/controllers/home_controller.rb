@@ -388,7 +388,7 @@ class HomeController < ApplicationController
         end
       end
 
-      if current_user.has_access("submissions", "index")
+      if current_user.has_access("submissions", "index") && !@submissions.empty?
         @submissions.joins(:template).each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
@@ -719,9 +719,11 @@ class HomeController < ApplicationController
 
 
   def get_avg_completion_date(records, start_date = 'created_at', end_date = 'updated_at')
-    records
+    all_records = records
       .where("`#{records.table.name}`.status NOT IN (?)", ['Closed', 'Completed'])
       .average("DATE(IFNULL(`#{records.table.name}`.#{end_date}, `#{records.table.name}`.updated_at)) - DATE(`#{records.table.name}`.#{start_date})")
-      .round(1)
+    
+    return 0 if all_records.nil?
+    all_records.round(1)
   end
 end
