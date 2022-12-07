@@ -89,6 +89,9 @@ module RiskMatricesHelper
       Object.const_get(object).within_timerange(@start_date, @end_date)
     end
 
+    # TODO
+    # Report.group('severity, likelihood').select('severity, likelihood, count(*) as num_reports').map {|x| [x.severity, x.likelihood_index, x.num_reports] }
+
     items.each do |item|
       if is_row_probability?
         # row is probability

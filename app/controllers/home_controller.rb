@@ -68,8 +68,6 @@ class HomeController < ApplicationController
     @employee_groups = Template.select("distinct emp_group").map(&:emp_group).keep_if{|emp_grp| emp_grp.present?}
     @departments_list = CONFIG.custom_options['Departments']
 
-
-
     case session[:mode]
     when 'ASAP'
       @title = "Safety Reporting Dashboard"
@@ -105,9 +103,11 @@ class HomeController < ApplicationController
         @submissions = Submission.preload(:created_by, :template).where(submission_queries.join(' AND '))
       end
 
+      @submissions = @submissions.joins(:template).order('templates.name')
+
       @submissions = [] if CONFIG::GENERAL[:hide_submission_in_dashboard]
 
-      @grouped_submissions = @submissions.select{|x| x.template.present?}.group_by{|x| x.template.name}.sort_by{|k, v| k}.to_h
+      @grouped_submissions = @submissions.group_by{|x| x.template.name}
 
 
       # ############################ RECORDS ########################
@@ -126,7 +126,7 @@ class HomeController < ApplicationController
       template_query = []
 
       if full_template.length > 0
-        template_query << "(templates_id in (#{full_template.map(&:id).join(',')}) OR users_id = #{current_user.id})"
+        template_query << "(templates_id in (#{full_template.map(&:id).join(',')}) OR `records`.users_id = #{current_user.id})"
       end
       if viewer_template.length > 0
         template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = true)"
@@ -142,30 +142,34 @@ class HomeController < ApplicationController
       end
 
       if params[:data_access] == 'related_data'
-        @records = Record.preload(:created_by, :template, :report, :record_fields).where(users_id: current_user.id)
+        @records = Record.preload(:created_by, :template).where(users_id: current_user.id)
       else
-        @records = Record.preload(:created_by, :template, :report, :record_fields).where(record_queries.join(' AND '))
+        @records = Record.preload(:created_by, :template).where(record_queries.join(' AND '))
       end
 
-      @grouped_records = @records.group_by(&:status).sort_by{|k, v| k}.to_h
-      @records_scheduled_completion_date = get_avg_completion_date(@records)
+      @grouped_records = @records.order(:status).group_by(&:status)
+      @records_scheduled_completion_date = get_avg_completion_date(@records, 'created_at', 'close_date')
 
-      @lat = CONFIG::GENERAL[:lat]
-      @lng = CONFIG::GENERAL[:lng]
-      @zoom = CONFIG::GENERAL[:gMapZoom]
-      @coords = @records.map { |record| record.record_fields }.flatten.select { |x| x.field && x.field.display_type == 'map' }.map { |x| x.points.map { |point| 
-        {
-          lat: point.lat.to_f,
-          lng: point.lng.to_f,
-          id: point.owner.records_id,
-          template: point.owner.record.template.name,
-          title: point.owner.record.title,
-          event_date: point.owner.record.event_date.to_date,
-        }
-      }}.flatten
+      if CONFIG::GENERAL[:has_gmap]
+
+        @lat = CONFIG::GENERAL[:lat]
+        @lng = CONFIG::GENERAL[:lng]
+        @zoom = CONFIG::GENERAL[:gMapZoom]
+
+        @coords = Point.joins(record_field: { record: :template }).where(records: { id: @records }).map do |point|
+          {
+            lat: point.lat.to_f,
+            lng: point.lng.to_f,
+            id: point.owner.records_id,
+            template: point.owner.record.template.name,
+            title: point.owner.record.title,
+            event_date: point.owner.record.event_date.to_date,
+          }
+        end
+      end
 
       # ############################ REPORTS ########################
-      @reports = @records.map(&:report).flatten.compact.uniq
+      @reports = Report.joins(:records).where(records: { id: @records }).select("DISTINCT(reports.id), reports.*")
       @grouped_reports = @reports.group_by{|x| x.status}
       @reports_scheduled_completion_date = get_avg_completion_date(@reports)
 
@@ -219,81 +223,76 @@ class HomeController < ApplicationController
       @title = "Safety Assurance Dashboard"
 
       if current_user.has_access("audit","index")
-        @audits = Audit.regulars.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
+        @audits = sort_by_status(Audit.regulars.within_timerange(@start_date, @end_date))
         @grouped_audits = @audits.group_by{|x| x.status}
         if (temp = @audits.select{|x| x.overdue}).present?
           @grouped_audits["Overdue"] = temp
         end
       end
       if current_user.has_access("findings","index")
-        @findings = Finding.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
+        @findings = sort_by_status(Finding.within_timerange(@start_date, @end_date))
         @grouped_findings = @findings.group_by{|x| x.status}
         if (temp = @findings.select{|x| x.overdue}).present?
           @grouped_findings["Overdue"] = temp
         end
       end
       if current_user.has_access("sms_actions","index")
-        @corrective_actions = SmsAction.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x) <=> status_index(y)}
+        @corrective_actions = sort_by_status(SmsAction.within_timerange(@start_date, @end_date))
         @grouped_corrective_actions = @corrective_actions.group_by{|x| x.status}
         if (temp = @corrective_actions.select{|x| x.overdue}).present?
           @grouped_corrective_actions["Overdue"] = temp
         end
       end
       if current_user.has_access("inspections","index")
-        @inspections = Inspection.regulars.within_timerange(@start_date, @end_date)
-          .sort{|x,y| status_index(x) <=> status_index(y)}
+        @inspections = sort_by_status(Inspection.regulars.within_timerange(@start_date, @end_date))
         @grouped_inspections = @inspections.group_by{|x| x.status}
         if (temp = @inspections.select{|x| x.overdue}).present?
            @grouped_inspections["Overdue"] = temp
         end
       end
       if current_user.has_access("evaluations","index")
-        @evaluations = Evaluation.regulars.within_timerange(@start_date, @end_date)
-          .sort{|x,y| status_index(x) <=> status_index(y)}
+        @evaluations = sort_by_status(Evaluation.regulars.within_timerange(@start_date, @end_date))
         @grouped_evaluations = @evaluations.group_by{|x| x.status}
         if (temp = @evaluations.select{|x| x.overdue}).present?
           @grouped_evaluations["Overdue"] = temp
         end
       end
       if current_user.has_access("recommendations","index")
-        @recommendations = Recommendation.within_timerange(@start_date, @end_date)
-          .sort{|x,y| status_index(x) <=> status_index(y)}
+        @recommendations = sort_by_status(Recommendation.within_timerange(@start_date, @end_date))
         @grouped_recommendations = @recommendations.group_by{|x| x.status}
         if (temp = @recommendations.select{|x| x.overdue}).present?
           @grouped_recommendations["Overdue"] = temp
         end
       end
       if current_user.has_access("investigations","index")
-        @investigations = Investigation.regulars.within_timerange(@start_date, @end_date)
-          .sort{|x,y| status_index(x) <=> status_index(y)}
+        @investigations = sort_by_status(Investigation.regulars.within_timerange(@start_date, @end_date))
         @grouped_investigations = @investigations.group_by{|x| x.status}
         if (temp = @investigations.select{|x| x.overdue}).present?
           @grouped_investigations["Overdue"] = temp
         end
       end
 
-
     when 'SRM'
       @title = "SRA (SRM) Dashboard"
-      @sras = Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]).sort{|x,y| status_index(x) <=> status_index(y)}
+      @sras = sort_by_status(Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]))
       @grouped_sras = @sras.group_by{|x| x.status}
       if (temp = @sras.select{|x| x.overdue}).present?
         @grouped_sras["Overdue"] = temp
       end
 
-      @hazards = Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]).sort{|x,y| status_index(x) <=> status_index(y)}
+      @hazards = sort_by_status(Hazard.within_timerange(@start_date, @end_date).by_departments(params[:departments]))
       @grouped_hazards = @hazards.group_by{|x| x.status}
       if (temp = @hazards.select{|x| x.overdue}).present?
         @grouped_hazards['Overdue'] = temp
       end
 
-      @risk_controls = RiskControl.within_timerange(@start_date, @end_date).by_departments(params[:departments]).sort{|x,y| status_index(x) <=> status_index(y)}
+      @risk_controls = sort_by_status(RiskControl.within_timerange(@start_date, @end_date).by_departments(params[:departments]))
       @grouped_risk_controls = @risk_controls.group_by{|x| x.status}
       if (temp = @risk_controls.select{|x| x.overdue}).present?
         @grouped_risk_controls['Overdue'] = temp
       end
 
-      @safety_plans = SafetyPlan.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
+      @safety_plans = sort_by_status(SafetyPlan.within_timerange(@start_date, @end_date))
       @grouped_safety_plans = @safety_plans.group_by{|x| x.status}
 
     when 'SP'
@@ -323,19 +322,17 @@ class HomeController < ApplicationController
 
       objects = ['Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation']
       objects.each do |x|
-        records = Object.const_get(x).where(status: 'Assigned', responsible_user_id: current_user_id)
-        records << Object.const_get(x).where(status: 'Pending Approval', approver_id: current_user_id)
+        records = Object.const_get(x).where(status: 'Assigned', responsible_user_id: current_user_id).where('due_date IS NOT NULL')
+        records << Object.const_get(x).where(status: 'Pending Approval', approver_id: current_user_id).where('due_date IS NOT NULL')
         records.flatten.each do |record|
           x = x == 'SmsAction' ? 'CorrectiveAction' : x
-          if (record.get_completion_date.present? rescue false)
-            @calendar_entries.push({
-              :url => "#{records.table_name}/#{record.id}",
-              :start => record.get_completion_date,
-              :color => (record.overdue ? "lightcoral" : "skyblue"),
-              :textColor => "darkslategrey",
-              :title => "#{x.titleize} ##{record.id}: #{record.title} (#{record.status})"
-            })
-          end
+          @calendar_entries.push({
+            :url => "#{records.table_name}/#{record.id}",
+            :start => record.get_completion_date,
+            :color => (record.overdue ? "lightcoral" : "skyblue"),
+            :textColor => "darkslategrey",
+            :title => "#{x.titleize} ##{record.id}: #{record.title} (#{record.status})"
+          })
         end
       end
 
@@ -392,7 +389,7 @@ class HomeController < ApplicationController
       end
 
       if current_user.has_access("submissions", "index")
-        @submissions.select {|x| x.template}.each do |a|
+        @submissions.joins(:template).each do |a|
           @calendar_entries.push({
             :url => submission_path(a),
             :start => a.get_date,
@@ -437,47 +434,41 @@ class HomeController < ApplicationController
 
     elsif session[:mode] == "SRM"
 
-      sras = Sra.where(status: 'Assigned', responsible_user_id: current_user_id)
-      sras << Sra.where(status: 'Pending Review', reviewer_id: current_user_id)
-      sras << Sra.where(status: 'Pending Approval', approver_id: current_user_id)
+      sras = Sra.where(status: 'Assigned', responsible_user_id: current_user_id).where('due_date IS NOT NULL')
+      sras << Sra.where(status: 'Pending Review', reviewer_id: current_user_id).where('due_date IS NOT NULL')
+      sras << Sra.where(status: 'Pending Approval', approver_id: current_user_id).where('due_date IS NOT NULL')
       sras.flatten.each do |a|
-        if a.due_date.present?
-          @calendar_entries.push({
-            :url => sra_path(a),
-            :start => a.get_due_date,
-            :color => (a.overdue ? "lightcoral" : "skyblue"),
-            :textColor => "darkslategrey",
-            :title=>"SRA ##{a.id}: "+ a.title + " (#{a.status})"
-          })
-        end
+        @calendar_entries.push({
+          :url => sra_path(a),
+          :start => a.get_due_date,
+          :color => (a.overdue ? "lightcoral" : "skyblue"),
+          :textColor => "darkslategrey",
+          :title=>"SRA ##{a.id}: "+ a.title + " (#{a.status})"
+        })
       end
 
-      risk_controls = RiskControl.where(status: 'Assigned', responsible_user_id: current_user_id)
-      risk_controls << RiskControl.where(status: 'Pending Approval', approver_id: current_user_id)
+      risk_controls = RiskControl.where(status: 'Assigned', responsible_user_id: current_user_id).where('due_date IS NOT NULL')
+      risk_controls << RiskControl.where(status: 'Pending Approval', approver_id: current_user_id).where('due_date IS NOT NULL')
       risk_controls.flatten.each do |a|
-        if a.due_date.present?
-          @calendar_entries.push({
-            :url => risk_control_path(a),
-            :start => a.get_due_date,
-            :color => (a.overdue ? "lightcoral" : "skyblue"),
-            :textColor => "darkslategrey",
-            :title => "Risk Control ##{a.id}: " + a.title + " (#{a.status})"
-          })
-        end
+        @calendar_entries.push({
+          :url => risk_control_path(a),
+          :start => a.get_due_date,
+          :color => (a.overdue ? "lightcoral" : "skyblue"),
+          :textColor => "darkslategrey",
+          :title => "Risk Control ##{a.id}: " + a.title + " (#{a.status})"
+        })
       end
 
-      hazards = Hazard.where(status: 'Assigned', responsible_user_id: current_user_id)
-      hazards << Hazard.where(status: 'Pending Approval', approver_id: current_user_id)
+      hazards = Hazard.where(status: 'Assigned', responsible_user_id: current_user_id).where('due_date IS NOT NULL')
+      hazards << Hazard.where(status: 'Pending Approval', approver_id: current_user_id).where('due_date IS NOT NULL')
       hazards.flatten.each do |a|
-        if a.due_date.present?
-          @calendar_entries.push({
-            :url => hazard_path(a),
-            :start => a.get_due_date,
-            :color => (a.overdue ? "lightcoral" : "skyblue"),
-            :textColor => "darkslategrey",
-            :title => "Hazard ##{a.id}: " + a.title + " (#{a.status})"
-          })
-        end
+        @calendar_entries.push({
+          :url => hazard_path(a),
+          :start => a.get_due_date,
+          :color => (a.overdue ? "lightcoral" : "skyblue"),
+          :textColor => "darkslategrey",
+          :title => "Hazard ##{a.id}: " + a.title + " (#{a.status})"
+        })
       end
 
 
@@ -695,7 +686,6 @@ class HomeController < ApplicationController
   end
 
 
-
   def advanced_search
     @table = Object.const_get(params[:table])
     @path = params[:path].present? ? params[:path] : eval("#{@table.table_name}_path")
@@ -709,21 +699,29 @@ class HomeController < ApplicationController
 
   private
 
+  def sort_by_status(records)
+    return [] if records.empty?
+    
+    modules = {
+      'ASAP'   => 'sr',
+      'SMS IM' => 'im',
+      'SMS'    => 'sa',
+      'SRM'    => 'srm',
+      'SP'     => 'sp',
+    }
 
-  def get_avg_completion_date(records)
-    sum = 0
-    count = 0
-    records.each do |record|
-      next if !['Closed', 'Completed'].include?(record.status) # skip if record is not completed
-      open_date = record.open_date rescue record.created_at    # use created_at date if open date is null
-      close_date = record.close_date rescue record.updated_at  # use updated_at date if close date is null
-      open_date ||= record.created_at
-      close_date ||= record.updated_at
-      sum += (close_date.to_date - open_date.to_date).to_i rescue next # skip if error
-      count = count + 1
+    statuses = eval "CONFIG.#{modules[session[:mode]]}::HIERARCHY[:objects]['#{records.first.class.name}'][:status]"
+    status_cases = statuses.map.with_index do |status, i|
+      "WHEN status = '#{status}' THEN #{i}"
     end
-    (sum.to_f / count).round(1) rescue 0
+    records.order("CASE #{status_cases.join(' ')} END")
   end
 
 
+  def get_avg_completion_date(records, start_date = 'created_at', end_date = 'updated_at')
+    records
+      .where("`#{records.table.name}`.status NOT IN (?)", ['Closed', 'Completed'])
+      .average("DATE(IFNULL(`#{records.table.name}`.#{end_date}, `#{records.table.name}`.updated_at)) - DATE(`#{records.table.name}`.#{start_date})")
+      .round(1)
+  end
 end

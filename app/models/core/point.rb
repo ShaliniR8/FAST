@@ -1,5 +1,7 @@
 class Point < ActiveRecord::Base
   belongs_to :owner,  polymorphic: true
+  belongs_to :submission_field, foreign_key: :owner_id, class_name: 'SubmissionField'
+  belongs_to :record_field, foreign_key: :owner_id, class_name: 'RecordField'
 
   validates :lat, presence: true
   validates :lng, presence: true
