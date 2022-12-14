@@ -6,6 +6,7 @@ class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
     enable_external_email:           true,
     show_event_title_in_query:       false,
     show_pdf_column_scoreboard:      true,
+    show_title_deid_pdf:             false
   })
 
   ASAP_LIBRARY_FIELD_NAMES = {
@@ -18,6 +19,16 @@ class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
     objects:{
       'Record' => {
         fields: {
+          asap: {
+            field: 'asap', title: 'Accepted Into ASAP',
+            num_cols: 6, type: 'boolean', visible: 'close',
+            required: false
+          },
+          narrative: {
+            field: 'narrative', title: 'Synopsis',
+            num_cols: 12, type: 'textarea', visible: 'close',
+            required: false
+          },
           likelihood: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Likelihood" },
           severity: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Severity" },
           risk_factor: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Risk" },
@@ -30,6 +41,16 @@ class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
 
       'Report' => {
         fields: {
+          asap: {
+            field: 'asap', title: 'Accepted Into ASAP',
+            num_cols: 6, type: 'boolean', visible: 'asap',
+            required: false
+          },
+          narrative: {
+            field: 'narrative', title: 'Synopsis',
+            num_cols: 12, type: 'textarea', visible: 'asap',
+            required: false
+          },
           likelihood: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Likelihood" },
           severity: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Severity" },
           risk_factor: { default: true, title: "#{CONFIG::MATRIX_INFO[:terminology]['Baseline']} Risk",

@@ -1,6 +1,6 @@
 <div class='col-xs-12 wrap'>
   <div class='title'>
-    <%="Report ##{@record.get_id}: #{@record.title}"%>
+    <%="Report ##{@record.get_id}#{CONFIG.sr::GENERAL[:show_title_deid_pdf].present? ? ": #{@record.title}" : ""}"%>
   </div>
   <div class="content">
     <%=render "pdfs/print_fields",

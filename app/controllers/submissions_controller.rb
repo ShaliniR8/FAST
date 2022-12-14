@@ -208,9 +208,10 @@ class SubmissionsController < ApplicationController
       all_templates.uniq!
     end
 
-    records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ? AND asap = ?", "closed", all_templates, false, true)
+    # records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ? AND asap = ?", "closed", all_templates, false, true)
+    records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ?", "closed", all_templates, false)
 
-    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", "Final Comment", "Narratives"]
+    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", "Final Comment", (CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title])]
     @entries = Hash.new
 
     records.each do |record|
@@ -219,7 +220,7 @@ class SubmissionsController < ApplicationController
       @entries[record.id]["Employee Group"] = record.template.emp_group
       @entries[record.id]["Year/Month"] = record.event_date.strftime("%Y/%m") rescue ""
       @entries[record.id]["Final Comment"] = record.final_comment
-      @entries[record.id]["Narratives"] = record.narrative
+      @entries[record.id][(CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title])] = record.narrative
 
       field_label_hash = CONFIG.sr::ASAP_LIBRARY_FIELD_NAMES
       record.record_fields.each do |rf|
@@ -734,12 +735,14 @@ class SubmissionsController < ApplicationController
         .where("disable is null or disable = 0")
         .keep_if{|x| x.privileges.map(&:id) & mailer_privileges != []}
 
+      user_ids = CONFIG.sr::GENERAL[:send_notifier_email_to_submitter].present? ? (notifiers.map(&:id) + [current_user.id]).uniq : notifiers.map(&:id).uniq
+
       case commit
       when "Submit"
         call_rake 'submission_notify',
             owner_type: owner.class.name,
             owner_id: owner.id,
-            users: (notifiers.map(&:id) + [current_user.id]).uniq,
+            users: user_ids,
             attach_pdf: CONFIG.sr::GENERAL[:attach_pdf_submission]
 
       when "Save for Later"

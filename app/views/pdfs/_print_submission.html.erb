@@ -1,6 +1,6 @@
 <div class = 'wrap'>
   <div class="title">
-    Submission <%="##{owner.get_id}: #{owner.template.name} - #{owner.get_description}"%> <b style="color:darkred; font-size:18px"><%=owner.confidential? ? "(This Submission is CONFIDENTIAL)" : ''%></b>
+    Submission <%="##{owner.get_id}: #{owner.template.name} #{(CONFIG.sr::GENERAL[:show_title_deid_pdf].present? || !deidentified.present?) ? "- #{owner.get_description}" : ""}"%> <b style="color:darkred; font-size:18px"><%=owner.confidential? ? "(This Submission is CONFIDENTIAL)" : ''%></b>
   </div>
 
   <div class="content">

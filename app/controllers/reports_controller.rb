@@ -821,6 +821,7 @@ class ReportsController < ApplicationController
         carry_over_baseline(owner, record)
         carry_over_mitigate(owner, record)
         record.update_attributes(params[:report]) if record.is_asap
+        record.update_attributes({final_comment: params[:report][:notes]}) if !record.final_comment.present?
         record.status = 'Closed'
         record.save
         submission = record.submission

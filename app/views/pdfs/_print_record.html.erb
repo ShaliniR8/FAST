@@ -13,7 +13,7 @@
   <%else%>
     <div class='title'>
       <%if owner_name == 'Report'%>
-        <%="#{owner_name} ##{owner.get_id}: #{owner.title}"%> <b style="color:darkred; font-size:18px"><%=owner.confidential? ? "(This Report is CONFIDENTIAL)" : ''%></b>
+        <%="#{owner_name} ##{owner.get_id}#{(CONFIG.sr::GENERAL[:show_title_deid_pdf].present? || !deidentified.present?) ? ": #{owner.title}" : ""}"%> <b style="color:darkred; font-size:18px"><%=owner.confidential? ? "(This Report is CONFIDENTIAL)" : ''%></b>
       <%else%>
         <%="#{owner_name} ##{owner.get_id}: #{owner.title}"%>
       <%end%>

@@ -10,6 +10,7 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
     dropdown_event_title_list:        true,
     show_pdf_column_scoreboard:       true,
     limit_reporting_title_length:     true,
+    send_notifier_email_to_submitter: true,
     # Airline-Specific Features:
   })
 
