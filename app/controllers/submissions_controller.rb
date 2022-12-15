@@ -211,7 +211,7 @@ class SubmissionsController < ApplicationController
     # records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ? AND asap = ?", "closed", all_templates, false, true)
     records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ?", "closed", all_templates, false)
 
-    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", "Final Comment", (CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title])]
+    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", (CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title]), "Final Comment"]
     @entries = Hash.new
 
     records.each do |record|
