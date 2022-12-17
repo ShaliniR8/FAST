@@ -69,6 +69,10 @@ class DefaultMobileConfig
     swq_dir: { label: 'Login with ProSafeT', subdomain: 'swq' },
     swq_sso: { label: 'Login with iAero Airways', subdomain: 'swq', sso: true},
 
+    #HAECO Portals
+    haeco_dir: { label: 'Login with ProSafeT', subdomain: 'haeco' },
+    haeco_sso: { label: 'Login with HAECO Americas', subdomain: 'haeco', sso: true},
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -225,8 +229,8 @@ class DefaultMobileConfig
     'HAECO Key' => { # 75D9-6E5F-83F4-885D
       key_name: 'HAECO Americas',
       portals: %i[
-        swq_dir
-        swq_sso
+        haeco_dir
+        haeco_sso
       ]
     },
 
