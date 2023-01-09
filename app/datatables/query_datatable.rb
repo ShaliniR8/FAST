@@ -63,6 +63,7 @@ class QueryDatatable
   def records
     search_params = handle_search
     search_string = search_params[:search_string]
+    search_string = search_string.map { |str| str.gsub('records.get_additional_info_html', 'record_fields.value') } unless search_string.empty?
     join_tables = prepare_join_tables(search_params)
     query_records_sql(search_string, join_tables)
   end
@@ -70,10 +71,11 @@ class QueryDatatable
 
   def prepare_join_tables(search_params)
     join_tables = columns.select.with_index { |column, index|
+      additional_info_search = column == 'get_additional_info_html'
       column = column.include?('#') ? column.split('#').second : column
       orderable = column == sort_column
       searchable = search_params[:search_columns_and_terms_map][index.to_s].present?
-      (orderable || searchable) && column.include?('.')
+      additional_info_search || ((orderable || searchable ) && column.include?('.'))
     }
     .map { |column|
       case column
@@ -91,6 +93,8 @@ class QueryDatatable
         "LEFT JOIN verifications ON #{object.table_name}.id = verifications.owner_id and verifications.owner_type = '#{object_name}'"
       when 'findings.id'
         "LEFT JOIN findings ON #{object.table_name}.id = findings.owner_id and findings.owner_type = '#{object_name}'"
+      when 'get_additional_info_html'
+        "LEFT JOIN record_fields ON #{object.table_name}.id = record_fields.records_id"
       else
         column.split('.').first.to_sym
       end
