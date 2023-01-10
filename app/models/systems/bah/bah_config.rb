@@ -18,9 +18,9 @@ class BAHConfig < DefaultConfig
     has_gmap:                      true,
     gis_layers:                    true,
 
-    lat:                           26.468719,
-    lng:                           49.800733,
-    gMapZoom:                      15,
+    lat:                           26.270101,
+    lng:                           50.632009,
+    gMapZoom:                      14,
 
     global_admin_default:          false,
   })
@@ -37,30 +37,86 @@ class BAHConfig < DefaultConfig
       title: 'SEVERITY EXERCISE',
 
       orientation: :horizontal,
-      direction: :left,
+      direction: :right,
       size: 'col-xs-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
       header_style: 'sevHeader',
       cell_name: 'severity_td',
 
-      row_header_name: ' ',
+      column_header_name: 'Severity / Consequence – Scope of Damage',
+      column_header: ['Negligible A', 'Minor B', 'Moderate C', 'Major D', 'Catastrophic E'],
+      row_header_name: 'Rank',
       row_header: [
-        'CLASS'
-      ],
-      column_header_name: 'SEVERITY',
-      column_header: ['Catastrophic', 'Hazardous', 'Major', 'Minor', 'Negligible'],
+        'Operations',
+        'Health & Safety',
+        'Environment',
+        'Reputation',
+        'Governance and Regulatory'],
       rows: [
-        [ 'A', 'B', 'C', 'D', 'E'],
+        # Operations
+        [ 
+          'No Damage Nuisance',
+          'Minor damage to an aircraft, equipment, or facility not requiring it to be taken out of service; or Minimal unplanned airport operations limitations (i.e., taxiway closure); or Minor incident involving the use of airport emergency procedures',
+          "Damage to an aircraft that is repairable. Damage to equipment or facility that is reparable within a short period of time; or Significant reduction in safety margins; or Deduction on the airport's ability to deal with adverse conditions; or Reduction in the ability to cope with adverse operating conditions as a result of an increase in workload or as a result of conditions impairing their efficiency",
+          'Damage to an aircraft taking it out of service for an extended period of time for repair; or Disruption of critical services for extended period of time; or Complete unplanned airport closure, or major unplanned operations limitations (i.e.. runway closure)',
+          'Loss of an aircraft; or Loss of critical system(s) for an extended period of time; or Complete unplanned airport closure and destruction of critical facilities'
+        ],
+        #Health & Safety
+        [
+          'No or minor injury (basic first aid treatment)',
+          'Minor injury or occupational illness',
+          'Serious non-permanent injuries requiring medical treatment',
+          'Permanent disability or Severe injuries, requiring hospitalization',
+          'Fatalities'
+        ],
+        #Environment
+        [
+          'No or negligible impact on the environment, or<br><br>
+          no or insignificant impact on air quality, or<br><br>
+          low noise',
+
+          'A spill or release that does not require a report, or<br><br>
+          minor impact on air quality, or<br><br>
+          low noise',
+
+          'A reportable spill or release that is contained, or<br><br>
+          moderate impact on air quality, or<br><br>
+          moderate noise level',
+
+          'A reportable spill or release that requires mitigation, or<br><br>
+          high impact on air quality, or<br><br>
+          high noise level',
+
+          'A spill or release that is not contained and results in long term damage to the environment and fines to the airport, or<br><br>
+          very high impact on air quality, or<br><br>
+          high noise levels'
+        ],
+        #Reputation
+        [
+          'Noticed internally, no public and/or media attention. Negligible or Isolated staff dissatisfaction. Insignificant impact on BAC’s reputation. No impact on stakeholder relations.',
+          'Noticed internally, no public and/or media attention. Negligible or Isolated staff dissatisfaction. Insignificant impact on BAC’s reputation as employer. No impact on customer and stakeholder relations.',
+          'Rumors and speculations, short term unease. Some community / customer concerns raised. Minor public relations issue.',
+          'Some national media coverage, considerable community concern and limited community / customer complaints. Negative press article in GCC media. Minor impact on stakeholder relationship (i.e. minor written stakeholder complaints).',
+          'Major public or media outcry; sustained, adverse and prolonged local / international / social media coverage. Loss of stakeholder.'
+        ],
+        #Governance and Regulatory
+        [
+          'Isolated, quickly remedied noncomplianc e with best practices, or national laws, international and local regulations.',
+          'Isolated, slowly remedied noncompliance with best practices, or national laws, or international and local regulations.',
+          'Repeated, slowly remedied noncompliance with best practices, or national laws, or international and local regulations.',
+          'Substantial, unmeasurable noncompliance with national laws, or international and local regulations System resulting in questioning the reliability of Bahrain International Airport services and loss of customers.',
+          'Substantial, noncompliance with international and local regulations resulting in questioning the reliability of Bahrain International Airport services and state decision to suspend the airport operations.'
+        ]
       ]
     },
 
     severity_table_dict: {
-      0 => 'Catastrophic A',
-      1 => 'Hazardous B',
-      2 => 'Major C',
-      3 => 'Minor D',
-      4 => 'Negligible E',
+      0 => "4",
+      1 => "3",
+      2 => "2",
+      3 => "1",
+      4 => "0",
     },
 
     probability_table: {
@@ -74,25 +130,36 @@ class BAHConfig < DefaultConfig
       header_style: 'probHeader',
       cell_name: 'probability_td',
 
-      row_header_name: 'PROBABILITY',
-      row_header: ['Frequent', 'Occasional', 'Remote', 'Improbable', 'Extremely Improbable'],
-      column_header_name: '',
-      column_header: ['CLASS'],
+      row_header_name: 'Rank',
+      row_header: ['5', '4', '3', '2', '1'],
+      column_header_name: 'Probability that an accident / damage occurs',
+      column_header: [''],
+
       rows: [
-        ['5'],
-        ['4'],
-        ['3'],
-        ['2'],
-        ['1'],
-      ]
+        [ #5
+          "<center><b>Frequent</b></center>Likely to occur many times - has occurred frequently<br>- Once in less than a year"
+        ],
+        [ #4
+          "<center><b>Likely</b></center>Likely to occur sometimes - has occurred infrequently<br>- Once in a year"
+        ],
+        [ #3
+          "<center><b>Remote</b></center>Unlikely to occur, but possible - has occurred rarely<br>- Once in 2 years"
+        ],
+        [ #2
+          "<center><b>Unlikely</b></center>Very unlikely to occur - not known to have occurred<br>- Once in 3 to 4 years"
+        ],
+        [ #1
+          "<center><b>Rare</b></center>Almost inconceivable that the event will occur<br>- Once in 5 years"
+        ]
+      ] #End of rows
     },
 
     probability_table_dict: {
-      0 => 'Frequent 5',
-      1 => 'Occasional 4',
-      2 => 'Remote 3',
-      3 => 'Improbable 2',
-      4 => 'Extremely Improbable 1',
+      0 => 'A - Improbable',
+      1 => 'B - Unlikely',
+      2 => 'C - Remote',
+      3 => 'D - Probable',
+      4 => 'E - Frequent',
     },
 
     risk_table: {
@@ -109,42 +176,72 @@ class BAHConfig < DefaultConfig
       severity_pos: 'column',
       likelihood_pos: 'row',
 
-      row_header_name: 'PROBABILITY',
-      row_header: ['Frequent 5', 'Occasional 4', 'Remote 3', 'Improbable 2', 'Extremely Improbable 1'],
       column_header_name: 'SEVERITY',
-      column_header: ['Catastrophic A', 'Hazardous B', 'Major C', 'Minor D', 'Negligible E'],
-      rows: [
-        ['5A',   '5B',    '5C',    '5D',    '5E'  ],
-        ['4A',   '4B',    '4C',    '4D',    '4E' ],
-        ['3A',   '3B',    '3C',    '3D',    '3E' ],
-        ['2A',   '2B',    '2C',    '2D',    '2E' ],
-        ['1A',   '1B',    '1C',    '1D',    '1E' ]
-      ],
+      column_header: ['Negligible A', 'Minor B', 'Moderate C', 'Major D', 'Catastrophic E'],
+      row_header_name: 'PROBABILITY',
+      row_header: ['Frequent 5', 'Likely 4', 'Remote 3', 'Unlikely 2', 'Rare 1'],
+
       rows_color: [
-        ['red',       'red',       'red',       'yellow',    'yellow'],
-        ['red',       'red',       'yellow',    'yellow',    'yellow'],
-        ['red',       'yellow',    'yellow',    'limegreen', 'limegreen'],
-        ['yellow',    'yellow',    'yellow',    'limegreen', 'limegreen'],
-        ['limegreen', 'limegreen', 'limegreen', 'limegreen', 'limegreen']
+        ['yellow',     'orange',     'orange',     'red',      'red'],
+        ['yellow',     'yellow',     'orange',     'orange',   'red'],
+        ['limegreen',  'yellow',     'yellow',     'orange',   'orange'],
+        ['limegreen',  'limegreen',  'yellow',     'yellow',   'orange'],
+        ['limegreen',  'limegreen',  'limegreen',  'yellow',   'yellow']
       ],
     },
 
     risk_definitions: {
-      red:       {rating: "HIGH",     cells: "A4, A3, B4",     description: "Cease or cut back operation promptly if necessary. Perform priority risk mitigation to ensure that additional or enhanced preventive controls are put in place to bring down the risk index to the moderate or low range."                 },
-      yellow:    {rating: "MODERATE", cells: "A2, B2, C4",     description: "Schedule performance of a safety assessment to bring down the risk index to the low range if viable."   },
-      limegreen: {rating: "LOW",      cells: "A1, B2, C3, D4", description: "Acceptable as is. No further risk mitigation required."                   },
+      red:   { 
+        rating: 'Very High',       
+        description: "<b>Intolerable:</b> Safety is not ensured. Enhanced protective measures are urgently required. Immediate action required by Executive Management with detailed planning, allocation of resources, and regular monitoring.
+        <br><br>
+        <b>Action</b>: Immediate attention required by BAC CEO, with detailed planning and allocation of resources." },
+      orange:      { 
+        rating: 'High',  
+        description: "<b>Undesirable:</b> Safety is not ensured. Protective measures are urgently required. Management responsibility must be specific.
+        <br><br>
+        <b>Action:</b> Direct involvement from Manager - Aerodrome Safety required, and regular monitoring." 
+      },
+      yellow:      { 
+        rating: 'Moderate',      
+        description: "<b>ALaRP:</b> Safety is partially guaranteed. Normal protective measures are required, Acceptable based on risk mitigation, provided it has been reduced to a level which is “As Low as Reasonably Practicable (ALaRP). Regular supervision by Manager - Aerodrome Safety, and performance monitoring of the implementation of the routine safety procedures.
+      <br><br>
+      <b>Action:</b> Allocation of responsibility by Manager - Aerodrome Safety must be specified" 
+      },
+      limegreen:         { 
+        rating: 'Low', 
+        description: "<b>Acceptable:</b> Safety is largely guaranteed. Organizational and staff-related measures may still be required. Managed by routine procedures.
+        <br><br>
+        <b>Action:</b> Monitor and manage through routine procedures" 
+      },
     },
 
     risk_table_index: {
+      'Orange - Unacceptable'                => 'orange',
+      'Yellow - Acceptable with mitigation'  => 'yellow',
+      'Green - Acceptable'                   => 'limegreen',
+      'Red - Unacceptable'                   => 'red',
+
+      'Orange'   => 'orange',
+      'Yellow'   => 'yellow',
+      'Green'    => 'limegreen',
+
+      'Moderate' => 'yellow',
+      'Low'      => 'limegreen',
+      'High'     => 'red',
+
       'MODERATE' => 'yellow',
       'LOW'      => 'limegreen',
       'HIGH'     => 'red',
     },
 
     risk_table_dict: {
-      limegreen:  'LOW',
-      yellow:     'MODERATE',
-      red:        'HIGH',
+      limegreen:  'Green - Acceptable',
+      red:        'Red - Unacceptable',
+      yellow:        'Yellow - Acceptable with mitigation',
+      orange:        'Orange - Unacceptable',
+
     }
   }
+
 end
