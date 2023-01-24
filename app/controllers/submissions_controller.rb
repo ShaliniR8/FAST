@@ -208,10 +208,15 @@ class SubmissionsController < ApplicationController
       all_templates.uniq!
     end
 
-    # records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ? AND asap = ?", "closed", all_templates, false, true)
-    records = Record.preload(:template, record_fields: :field).where("status = ? AND templates_id IN (?) AND scoreboard = ?", "closed", all_templates, false)
+    records = Record.preload(:template).where("status = ? AND templates_id IN (?) AND scoreboard = ? AND event_date >= ?", "closed",
+                                               all_templates, false, (Date.current - 6.months))
 
-    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", (CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title]), "Final Comment"]
+    all_record_fields = RecordField.preload(:field).where("records_id #{records.present? ? "IN (#{records.map(&:id).join(',')})" : "IS NULL"} AND fields_id IS NOT NULL")
+                                                   .keep_if{|rf| !rf.field.deleted && rf.field.label.present?}
+
+    narrative_label = CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title]
+
+    @headers = ["Departure", "Scheduled Landing", "Actual Landing", "Employee Group", "Year/Month", "#{narrative_label}", "Final Comment"]
     @entries = Hash.new
 
     records.each do |record|
@@ -220,19 +225,21 @@ class SubmissionsController < ApplicationController
       @entries[record.id]["Employee Group"] = record.template.emp_group
       @entries[record.id]["Year/Month"] = record.event_date.strftime("%Y/%m") rescue ""
       @entries[record.id]["Final Comment"] = record.final_comment
-      @entries[record.id][(CONFIG.hierarchy[session[:mode]][:objects]['Record'][:fields][:narrative][:title])] = record.narrative
+      @entries[record.id]["#{narrative_label}"] = record.narrative
+    end
 
-      field_label_hash = CONFIG.sr::ASAP_LIBRARY_FIELD_NAMES
-      record.record_fields.each do |rf|
-        if rf.field.present? && rf.field.label.present? && field_label_hash[:departure_names].include?(rf.field.label.strip)
-          @entries[record.id]["Departure"] = rf.value.to_s
-        elsif rf.field.present? && rf.field.label.present? && field_label_hash[:arrival_names].include?(rf.field.label.strip)
-          @entries[record.id]["Scheduled Landing"] = rf.value.to_s
-        elsif rf.field.present? && rf.field.label.present? && field_label_hash[:actual_names].include?(rf.field.label.strip)
-          @entries[record.id]["Actual Landing"] = rf.value.to_s
-        end
+    field_label_hash = CONFIG.sr::ASAP_LIBRARY_FIELD_NAMES
+    all_record_fields.each do |rf|
+      field_label = rf.field.label.strip
+      if field_label_hash[:departure_names].include?(field_label)
+        @entries[rf.records_id]["Departure"] = rf.value.to_s
+      elsif field_label_hash[:arrival_names].include?(field_label)
+        @entries[rf.records_id]["Scheduled Landing"] = rf.value.to_s
+      elsif field_label_hash[:actual_names].include?(field_label)
+        @entries[rf.records_id]["Actual Landing"] = rf.value.to_s
       end
     end
+
   end
 
 
