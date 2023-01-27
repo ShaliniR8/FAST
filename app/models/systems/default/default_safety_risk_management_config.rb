@@ -10,7 +10,8 @@ class DefaultSafetyRiskManagementConfig
     # Airline-Specific Features:
     risk_assess_sras:      false,
     add_reports_to_sra:    false,
-    enable_risk_register:  false
+    enable_risk_register:  false,
+    one_page_sra:          false
   }
 
 
