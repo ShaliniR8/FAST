@@ -368,6 +368,10 @@ class User < ActiveRecord::Base
     ['Global Admin', 'Admin'].include? self.level
   end
 
+  def sync_user_hook(prev_email=nil)
+    CONFIG.sync_user(self, prev_email)
+  end
+
   private
 
   def prepare_password

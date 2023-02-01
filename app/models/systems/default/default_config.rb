@@ -27,6 +27,7 @@ class DefaultConfig
     enable_mailer:                      true,    # Enables emails to be sent via the system - default on
     enable_sso:                         false,   # Enables Single Sign-On integration (req. _sso_config) - default off
     login_option:                       'prosafet', # Login page UI config => available options: dual, prosafet, sso
+    external_link:                      false,
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
     cisp_integration:                   false,

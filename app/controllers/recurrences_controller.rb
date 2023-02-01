@@ -202,7 +202,7 @@ class RecurrencesController < ApplicationController
           prev_days_to_complete = (previous_due_date.to_date - previous_next_date.to_date).to_i
           params[:inspection][:due_date] = previous_due_date.to_date + (params[:inspection][:due_date].to_i - prev_days_to_complete).days rescue 0
       elsif type == 'Evaluation'
-          previous_due_date = Inspection.where(id: recurrence.template_id).first.due_date rescue nil
+          previous_due_date = Evaluation.where(id: recurrence.template_id).first.due_date rescue nil
           prev_days_to_complete = (previous_due_date.to_date - previous_next_date.to_date).to_i
           params[:evaluation][:due_date] = previous_due_date.to_date + (params[:evaluation][:due_date].to_i - prev_days_to_complete).days rescue 0
       end

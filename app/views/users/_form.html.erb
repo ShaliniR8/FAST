@@ -104,7 +104,7 @@
                       </div>
 
 
-                    <%else%>
+                    <%elsif CONFIG::GENERAL[:login_option] != 'sso' %>
                       <div class="form-group row">
                         <%=f.label :password, "New Password", :class => "col-sm-4 col-form-label"%>
                         <div class="col-sm-8">

@@ -137,6 +137,7 @@ class UsersController < ApplicationController
       end
     end
     if @user.save
+      @user.sync_user_hook if CONFIG::GENERAL[:external_link]
       flash[:success] = "Account has been created."
       redirect_to user_path(@user)
     else
@@ -182,15 +183,24 @@ class UsersController < ApplicationController
   end
 
 
-
   def access_level
     @user = User.find(params[:id])
   end
 
+  def external_link
+    @user = User.find(params[:id])
+    link = CONFIG.external_link(@user)
 
+    if link.present?
+      redirect_to link
+    else
+      redirect_to @user, alert: 'External Account could not be found.'
+    end
+  end
 
   def update
     @user = User.find(params[:id])
+    prev_email = @user.email
     @departments = CONFIG.custom_options['Departments']
 
     # User entered wrong password, only works for the self edit page right now
@@ -225,6 +235,9 @@ class UsersController < ApplicationController
             u.role = params[:user][:role]
           end
         end
+
+        @user.sync_user_hook(prev_email) if CONFIG::GENERAL[:external_link]
+
         @user.save
         format.html {redirect_to(@user, :flash => {:success => "Changes saved."})}
         format.xml  { head :ok }
@@ -268,7 +281,6 @@ class UsersController < ApplicationController
   end
 
 
-
   def disable
     @user = User.find(params[:id])
     @user.disable = @user.disable ? 0 : 1
@@ -276,7 +288,6 @@ class UsersController < ApplicationController
     status = @user.disable ? "Disabled" : "Enabled"
     redirect_to user_path(@user), flash: { warning: "User has been #{status}."}
   end
-
 
 
   def simulate

@@ -4,7 +4,7 @@ class DACOConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_MODULES = %w[ASAP SMS]
+  MOBILE_MODULES = %w[]
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
@@ -15,6 +15,10 @@ class DACOConfig < DefaultConfig
     advanced_checklist_data_type:  true,
     checklist_query:               true,
 
+    enable_sso:                    true,
+    login_option:                  'sso',
+    external_link:                 true,
+
     has_gmap:                      true,
     gis_layers:                    true,
 
@@ -24,6 +28,49 @@ class DACOConfig < DefaultConfig
 
     global_admin_default:          false,
   })
+
+  EXTERNAL_LINK =
+    if Rails.env.production?
+      'https://daco.prodigiq.com'
+    else
+      'http://70.35.206.117:3001'
+    end
+
+  def self.sync_user(user, prev_email)
+    conn = Faraday.new(
+      url: "#{CONFIG::EXTERNAL_LINK}",
+      params: {
+      email: [prev_email || user.email, user.email],
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      level: user.level,
+      disable: user.disable
+    },
+      headers: {'Content-Type' => 'application/json'}
+    )
+    
+    response = conn.post('/api/dmm/users/sync') do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Client-ID'] = 'iISMSMHF3Aum7YyFG94d5kxA7zEfa831rKFg4n6g3l0'
+      req.headers['Client-Secret'] = 'It_Ux5q8RFtb-F7QvMSBD2NwDoUqZa-RutzTMaMftj0'
+    end
+  end
+
+  def self.external_link(user)
+    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/dmm/users/find", {
+      email: user.email
+    }.to_json, {
+      'Content-Type' => 'application/json',
+      'Client-ID' => 'iISMSMHF3Aum7YyFG94d5kxA7zEfa831rKFg4n6g3l0',
+      'Client-Secret' => 'It_Ux5q8RFtb-F7QvMSBD2NwDoUqZa-RutzTMaMftj0'
+    })
+
+    if res.success?
+      json = JSON.parse(res.body) rescue nil
+      "#{CONFIG::EXTERNAL_LINK}/users/#{json['id']}" if json.present?
+    end
+  end
 
   MATRIX_INFO = {
     terminology: {

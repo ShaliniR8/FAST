@@ -35,6 +35,8 @@ PrdgSession::Application.routes.draw do |map|
   namespace :api do
     namespace :v1 do
       match "data" => "data#show"
+      match "sync" => "users#sync"
+      match "find_user" => "users#find_user"
     end
   end
 
@@ -252,6 +254,7 @@ PrdgSession::Application.routes.draw do |map|
       get "simulate"
       get "stop_simulation"
       get 'access_level'
+      get 'external_link'
       #resources :password_resets, only: [:new, :create, :edit, :update]
     end
     collection do

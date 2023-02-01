@@ -15,16 +15,12 @@
               Account Summary
             </div>
             <div class="top_buttons pull-right">
+              <%if CONFIG::GENERAL[:external_link]%>
+                <%= link_to external_link_user_path(@user), class: 'btn btn-info' do %>
+                  <i class=" fa fa-arrow-right"></i>
+                <% end %>
+              <%end%>
               <%if current_user.global_admin?%>
-
-
-                <%#=link_to "Access Level",
-                  access_level_user_path(@user),
-                  :class => "btn btn-chocolate",
-                  :disable_with => "Redirecting..."%>
-
-
-
                 <%=link_to "All Users",
                   users_path,
                   :id => "index-btn",
