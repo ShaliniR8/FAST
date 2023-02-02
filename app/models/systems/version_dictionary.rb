@@ -1,8 +1,157 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.6',
+      title: 'Version 1.2.14',
       tag: 'New',
+      toggle: 'v1_2_14',
+      date: '12/15/2022',
+      sections: {
+        'What\'s New' => [
+          'Added new access control rules for every object(Override & Notify) - Anyone with the notify rule will get notified upon creation of that object and the override rule will facilitate overriding status',
+          'Added ability to create linked templates. Choosing an option in one template will take user to another appropriate template',
+          'Added Map Points Heatmap to Dashboard',
+        ],
+        'Optimizations & Fixes' => [
+          'Optimized Account Type and Privileges(Only Global Admins can add/update user accounts, Admins are able to edit System Configurations. Every other access based on privileges)',
+          'Changed names for access rules along with fixes for the same in order to make them more understandable and tied to the action they claim to control',
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.13',
+      toggle: 'v1_2_13',
+      date: '10/05/2022',
+      sections: {
+        'What\'s New' => [
+          'Added ability to add subscribers to queries who get Query PDFs emailed to them based on a set frequency per subscriber',
+          'Added ability to view nested fields in Safety Reporting Query Visualizations',
+          'Added ability to query Last N Days based on any anchor date for an object',
+          'Added ability to create PowerBI consumable export from Queries',
+        ],
+        'Optimizations & Fixes' => [
+          'ASAP Library performance optimizations',
+          'Added \'Additional Info\' column to Query Center for search feature'
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.12',
+      toggle: 'v1_2_12',
+      date: '06/21/2022',
+      sections: {
+        'What\'s New' => [
+          'Added ability to query Checklists and Verifications',
+          'Added ability to query Risk Matrices by column/row names(severity and likelihood)',
+          'Added ability to generate PDFs of Query Visualizations',
+          'Added ASAP Library (De-ID ASAP Closed Reports Marked for Inclusion in the ASAP Library)',
+          'Added ability to query Historical Data',
+        ],
+        'Optimizations & Fixes' => [
+          'Query computation and display performance optimization(removed background processing)',
+          'Fixed issues with Advanced Search on listing pages',
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.11',
+      toggle: 'v1_2_11',
+      date: '03/29/2022',
+      sections: {
+        'What\'s New' => [
+          'Added ability to create audit directly from accessible checklists',
+          'Added new Checklist access control rules along with individual checklist template access control rules',
+          'Added ability to flag ASAP reports as regulatory violations when closing ASAP reports which is to be used as a metric for FAA reports',
+          'Added submission widgets functionality for external submitters who are not users in the ProSafeT system, such as External Vendors',
+
+        ],
+        'Optimizations & Fixes' => [
+          "Optimized Recurring Audit creation to facilitate generation of multiple recurrence audits at once and ability to set 'assigned' status for spawned audits",
+          "Fixed checklist editing issues and recurrences deletion issues",
+          "Fixed SR and SRM meeting privileges discrepancy",
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.10',
+      toggle: 'v1_2_10',
+      date: '01/07/2022',
+      sections: {
+        'What\'s New' => [
+          'Safety Promotion module added(Distribute Newsletters and Safety Surveys to ProSafeT users)',
+          'Ability to risk assess SRAs',
+          'Ability to add reports to SRAs',
+          'Ability to add root causes and corrective actions to Submissions',
+        ],
+        'Optimizations & Fixes' => [
+          'Checklist load times and processing optimization (caching of rendered pages along with batch processing for long checklists)',
+          'Enhanced messages in order to mark and delete multiple messages at once within the system',
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.9',
+      toggle: 'v1_2_9',
+      date: '10/11/2021',
+      sections: {
+        'What\'s New' => [
+          "Added Task workflow to Safety Assurance objects - Users added to a task from a parent object will become part of the parent object's workflow",
+          "Added Viewer Access button for SRAs, Audits, Investigations, Evaluations and Inspections to allow special access viewing of the respective objects",
+          "Added ability to integrate Custom Options into Safety Reporting template field options",
+          "Added new data types for checklist cells (Airport, Employee, Custom Options etc)",
+
+        ],
+        'Optimizations & Fixes' => [
+          'App update for SA module(create audit directly from accessible checklists and complete audit)',
+          'Accounts can now be marked to not be updated by user import csv from daily feed',
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.8',
+      toggle: 'v1_2_8',
+      date: '07/19/2021',
+      sections: {
+        'What\'s New' => [
+          'Added ability to carryover events from one meeting to another',
+          'Added ability to send external email(bcc) when messaging submitter',
+          'SABRE Integration',
+          'NASA ASRS Integration',
+          'Added new fields to Safety Reporting Templates (Report Type and Employee Group) - These settings will affect FAA Reports',
+        ],
+        'Optimizations & Fixes' => [
+          'ProSafeT mobile app will now sync Safety Reports in the background',
+          'Fixed nested fields issue when creating/editing Safety Report templates',
+
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.7',
+      toggle: 'v1_2_7',
+      date: '04/02/2021',
+      sections: {
+        'What\'s New' => [
+          'ECCAIRS Integration',
+          'Number of attachments show on attachments panel',
+          'Creator of various objects in the system have now been added to automated notifications audience',
+          'Added ability to add 1 map point per report by dropping a pin on the airport map',
+        ],
+        'Optimizations & Fixes' => [
+          'Stopped page refresh when adding agenda/minutes to an event within a meeting',
+          'Listing pages performance and maintainability optimization',
+        ]
+      }
+    },
+
+    {
+      title: 'Version 1.2.6',
       toggle: 'v1_2_6',
       date: '01/28/2021',
       sections: {
