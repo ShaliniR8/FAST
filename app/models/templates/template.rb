@@ -32,7 +32,7 @@ class Template < ActiveRecord::Base
 
   def make_copy
     source_template = self
-    target_template = Template.create(name: self.name + ' -- copy')
+    target_template = Template.create(name: self.name + ' -- copy', description: self.description)
     target_template.update_attributes(users_id: self.users_id)
 
     AccessControl.get_template_opts.map { |disp, db_val|
@@ -77,6 +77,7 @@ class Template < ActiveRecord::Base
                      display_type: field.display_type,
                      label: field.label,
                      options: field.options,
+                     custom_option_id: field.custom_option_id,
                      display_size: field.display_size,
                      priority: field.priority,
                      description: field.description,
