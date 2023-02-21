@@ -20,9 +20,11 @@ module Concerns
           submodules = []
           case module_name
           when 'ASAP'
-            submodules.push('Submissions') if current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+            submodules.push('Submissions') if current_user.has_access('submissions', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && 
+                                              current_user.has_access('submissions', 'index', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           when 'Safety Assurance'
-            submodules.push('Audits') if current_user.has_access('audits', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+            submodules.push('Audits') if current_user.has_access('audits', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && 
+                                         current_user.has_access('audits', 'index', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           end
           module_access[module_name] = submodules if submodules.length > 0 &&
             CONFIG.mobile_modules.include?(module_name)

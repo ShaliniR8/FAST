@@ -762,7 +762,7 @@ class SubmissionsController < ApplicationController
           notify(owner, notice: {
             users_id: user.id,
             content: "Additional notes have been added to submission ##{owner.id}."},
-            mailer: true, subject: 'Additonal Notes Added to Submission')
+            mailer: true, subject: 'Additional Notes Added to Submission')
         end
       else
       end
