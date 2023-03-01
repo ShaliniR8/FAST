@@ -266,6 +266,7 @@ class ApplicationController < ActionController::Base
 
   def notify_on_object_creation(owner)
     name_of_controller = controller_name
+    object_type = owner.class.name
     if owner.class.name == 'SmsAction'
       object_title = 'Corrective Action (Safety Assurance)'
     elsif owner.class.name == 'CorrectiveAction'
@@ -286,7 +287,7 @@ class ApplicationController < ActionController::Base
       .keep_if{|x| x.privileges.map(&:id) & notify_privileges != []}
 
     call_rake 'notify',
-      owner_type: object_title,
+      owner_type: object_type,
       owner_id: owner.id,
       subject: "New #{object_title} created in ProSafeT",
       users_id: notifiers.map(&:id)
