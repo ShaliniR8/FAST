@@ -285,12 +285,12 @@ class ApplicationController < ActionController::Base
       .where("disable is null or disable = 0")
       .keep_if{|x| x.privileges.map(&:id) & notify_privileges != []}
 
-    notifiers.each do |user|
-      notify(owner, notice: {
-        users_id: user.id,
-        content: "A new #{object_title} has been created with ID ##{owner.id}."},
-        mailer: true, subject: "New #{object_title} created in ProSafeT")
-    end
+    call_rake 'notify',
+      owner_type: object_title,
+      owner_id: owner.id,
+      subject: "New #{object_title} created in ProSafeT",
+      users_id: notifiers.map(&:id)
+
   end
 
 
