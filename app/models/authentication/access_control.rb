@@ -79,7 +79,7 @@ class AccessControl < ActiveRecord::Base
       when 'admin'
         "This gives the user access to #{type}s that they are not associated with."
       when 'override'
-        "This gives the user access to see the \"Override\" button on the #{type} page and the ability to delete the #{type}."
+        "This gives the user access to see the \"Override\" button on the #{type} page."
       when 'notify'
         if ["a", "e", "i", "o", "u"].include?(type[0].downcase)
           "Users with this access rule will be notified when an #{type} is created."

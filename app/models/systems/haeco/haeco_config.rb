@@ -16,6 +16,8 @@ class HAECOConfig < DefaultConfig
     global_admin_default:          false,
     enable_sso:                    true,
     login_option:                  'dual',
+    has_mobile_app:                true,
+    sms_im_visibility:             false,
 
     hide_employee_group:           true,
     custom_uniq_id:                true,
@@ -78,7 +80,7 @@ class HAECOConfig < DefaultConfig
       cell_name: 'probability_td',
 
       row_header_name: 'PROBABILITY',
-      row_header: ['Frequent', 'Occasional', 'Remote', 'Improbable', 'Extremely'],
+      row_header: ['Frequent', 'Occasional', 'Remote', 'Improbable', 'Extremely Improbable'],
       column_header_name: '',
       column_header: ['CLASS'],
       rows: [
@@ -99,7 +101,7 @@ class HAECOConfig < DefaultConfig
       1 => 'Occasional',
       2 => 'Remote',
       3 => 'Improbable',
-      4 => 'Extremely',
+      4 => 'Extremely Improbable',
     },
 
     risk_table: {
@@ -117,7 +119,7 @@ class HAECOConfig < DefaultConfig
       likelihood_pos: 'row',
 
       row_header_name: 'PROBABILITY',
-      row_header: ['Frequent', 'Occasional', 'Remote', 'Improbable', 'Extremely'],
+      row_header: ['Frequent', 'Occasional', 'Remote', 'Improbable', 'Extremely Improbable'],
       column_header_name: 'SEVERITY',
       column_header: ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'],
       rows: [

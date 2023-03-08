@@ -1,53 +1,4 @@
-class DefaultSafetyReportingConfig
-  include ConfigTools
-  # DO NOT COPY THIS CONFIG AS A TEMPLATE FOR NEW AIRLINES
-    # Please look at other airline config definitions and mimic them or copy the template configs
-    # All configs inherit from their Default counterparts, then overload the default values when needed
-
-  GENERAL = {
-    # General Module Features:
-    enable_orm:                       false,     # Enables ORM Reports - default off
-    show_submitter_name:              true,      # Displays submitter names when access to show (admins will always see it)- default on
-    show_event_title_in_query:        true,
-    submission_description:           true,      # Changes Character Limit or adds General Description - default on
-    submission_description_required:  true,
-    submission_time_zone:             false,
-    submission_utc_time_zone:         false, 
-    template_nested_fields:           true,      # nested smart forms functionality - default ON
-    enable_dual_report:               true,
-    matrix_carry_over:                false,
-    configurable_agenda_dispositions: false,
-    share_meeting_agendas:            true,
-
-    # Airline-Specific Features:
-    attach_pdf_submission:     'ided',    # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
-    observation_phases_trend:  false,     # Specific Feature for BSK - default off
-    event_summary:             false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
-    event_tabulation:          false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
-    allow_event_reuse:         true,      # Specific Feature for TMC: Toggle adding Event to multiple meetings - default on
-    dropdown_event_title_list: false,     # Specific Feature for FFT - default off
-    match_submission_record_id: false,    # Display Record's ID on Submission pages (currently applied: ATN)
-    submission_corrective_action_root_cause:    false,    # Flag for corrective action and root causes at submission level
-    enable_external_email:     false,      # Enables bcc email to external email IDs from message submitter
-    show_pdf_column_scoreboard: false,
-    limit_reporting_title_length:   false,
-    show_title_deid_pdf:        true,      # Show the title of De-Id PDF. True by default but some carriers do not want this because users put identifying info on the title
-    send_notifier_email_to_submitter:        true, # Submitter will get a notifier email with or without PDF if this is set to true. So submitter will get 2 emails
-  }
-
-  OBSERVATION_PHASES = [
-    'Observation Phase',
-    'Condition',
-    'Threat', 'Sub Threat',
-    'Error', 'Sub Error',
-    'Human Factor', 'Comment'
-  ]
-
-  ASAP_LIBRARY_FIELD_NAMES = {
-    departure_names:                ["Departure Airport"],
-    arrival_names:                  ["Scheduled Arrival Airport"],
-    actual_names:                   ["Landing Airport"]
-  }
+class HAECOSafetyReportingConfig < DefaultSafetyReportingConfig
 
   HIERARCHY = {
     display_name: 'ASAP',
@@ -105,7 +56,6 @@ class DefaultSafetyReportingConfig
         }),
         panels: %i[causes].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
-
 
       'Record' => {
         title: 'Report',
@@ -345,15 +295,15 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true },
           response: {
-            field: 'response', title: 'Response',
-            num_cols: 12, type: 'textarea', visible: 'form,show',
-            required: false
+            field: 'response', title: 'Title',
+            num_cols: 6, type: 'text', visible: 'index,form,show',
+            required: true
           },
           status: { default: true, type: 'select', options: CorrectiveAction.getStatusOptions },
           created_by: { default: true },
           recommendation: {
             field: 'recommendation', title: 'Is this only a recommendation',
-            num_cols: 6,  type: 'boolean', visible: 'form,show',
+            num_cols: 6,  type: 'boolean', visible: '',
             required: false
           },
           due_date: { default: true, field: 'due_date' },
@@ -386,38 +336,38 @@ class DefaultSafetyReportingConfig
           },
           company: {
             field: 'company', title: 'Company Corrective Action',
-            num_cols: 6,  type: 'boolean', visible: 'form,show',
+            num_cols: 6,  type: 'boolean', visible: '',
             required: false, on_newline: true # for form and show
           },
           employee: {
             field: 'employee', title: 'Employee Corrective Action',
-            num_cols: 6,  type: 'boolean', visible: 'form,show',
+            num_cols: 6,  type: 'boolean', visible: '',
             required: false
           },
           bimmediate_action: {
             field: 'bimmediate_action', title: 'Immediate Action',
-            num_cols: 2,  type: 'boolean', visible: 'form,show',
+            num_cols: 6,  type: 'boolean_box', visible: '',
             required: false
           },
           immediate_action: {
-            field: 'immediate_action', title: 'Immediate Action Detail',
+            field: 'immediate_action', title: 'Findings & References',
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
           bcomprehensive_action: {
             field: 'bcomprehensive_action', title: 'Comprehensive Action',
-            num_cols: 2,  type: 'boolean', visible: 'form,show',
+            num_cols: 6,  type: 'boolean_box', visible: '',
             required: false, on_newline: true
           },
-          description: { default: true, title: 'Description', type: 'textarea', visible: 'index,form,show' },
+          description: { default: true, title: 'Description of Corrective Action', type: 'textarea', visible: 'index,form,show' },
           comprehensive_action: {
             field: 'comprehensive_action', title: 'Description of Preventive Action',
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
           action: {
-            field: 'action', title: 'Action',
-            num_cols: 6,  type: 'datalist', visible: 'index,form,show',
+            field: 'action', title: 'Action Taken',
+            num_cols: 12,  type: 'datalist', visible: 'index,form,show',
             required: false, options: "CONFIG.custom_options['Actions List for Corrective Actions']",
             on_newline: true # for form and show
           },
