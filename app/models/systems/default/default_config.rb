@@ -48,7 +48,7 @@ class DefaultConfig
     custom_uniq_id:                     false,
     attachment_identified_view_access:  true,
     hide_submission_in_dashboard:       false,
-    hide_findings_in_checklist:         false,     # 2. @sha - Added a flag to hide findings field in checklist
+    hide_findings_in_checklist:         false,
    
 
 
