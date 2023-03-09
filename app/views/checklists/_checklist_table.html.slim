@@ -13,7 +13,7 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
       - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
         th = header.title
       th Attachments
-      - if owner.class.name != 'SafetySurvey'
+      - if owner.class.name != 'SafetySurvey' && !CONFIG::GENERAL[:hide_findings_in_checklist]
         th Findings
   tbody
     - has_row = ![[1000], []].include?(checklist.checklist_rows.map(&:row_order).uniq.compact)
