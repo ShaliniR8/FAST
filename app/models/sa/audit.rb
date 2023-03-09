@@ -9,6 +9,7 @@ class Audit < Sa::SafetyAssuranceBase
   include Commentable
   include Contactable
   include SmsTaskable
+  include SmsActionable
   include Costable
   include Findingable
   include Noticeable
