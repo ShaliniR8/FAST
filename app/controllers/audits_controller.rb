@@ -54,26 +54,26 @@ class AuditsController < SafetyAssuranceController
   end
 
 
-  def index
-    respond_to do |format|
-      format.html do
-        @object_name = controller_name.classify
-        @table_name = controller_name
+  # def index
+  #   respond_to do |format|
+  #     format.html do
+  #       @object_name = controller_name.classify
+  #       @table_name = controller_name
 
-        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
-        @default_tab = params[:status]
-        # Datatable Column Info
-        @columns = get_data_table_columns(@object_name)
-        @column_titles = @columns.map { |col| col[:title] }
-        @date_type_column_indices = @column_titles.map.with_index { |val, inx|
-          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
-        }.select(&:present?)
-        @advance_search_params = params
-        render 'forms/index'
-      end
-      format.json { index_as_json }
-    end
-  end
+  #       @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+  #       @default_tab = params[:status]
+  #       # Datatable Column Info
+  #       @columns = get_data_table_columns(@object_name)
+  #       @column_titles = @columns.map { |col| col[:title] }
+  #       @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+  #         (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+  #       }.select(&:present?)
+  #       @advance_search_params = params
+  #       render 'forms/index'
+  #     end
+  #     format.json { index_as_json }
+  #   end
+  # end
 
 
   def new

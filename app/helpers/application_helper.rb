@@ -211,7 +211,7 @@ module ApplicationHelper
 
       fields.each do |field|
         field_name = field[:field]
-        field_value = record.send(field_name)
+        field_value = record.send(field_name) rescue byebug
         field_type = field[:type]
         field_display = field[:display]
 

@@ -48,6 +48,8 @@ class DefaultConfig
     custom_uniq_id:                     false,
     attachment_identified_view_access:  true,
     hide_submission_in_dashboard:       false,
+    # 2. Added a flag to hide findings field in checklist
+    hide_findings_in_checklist:         true,
 
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
