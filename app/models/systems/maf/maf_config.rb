@@ -21,6 +21,23 @@ class MAFConfig < DefaultConfig
     global_admin_default:          false,
   })
 
+  EMPLOYEE_GROUPS = {
+    "West Congo"  => "west-congo",
+    "East Congo"  => "east-congo",
+    "Lesotho"     => "lesotho",
+    "Mozambique"  => "mozambique",
+    "Guinea"      => "guinea",
+    "Liberia"     => "liberia",
+    "Afghanistan" => "afghanistan",
+    "Laos"        => "laos",
+    "Haiti"       => "haiti",
+    "Ecuador"     => "ecuador",
+    "Suriname"    => "suriname",
+    "Papua"       => "papua",
+    "Kalimantan"  => "kalimantan",
+    "Nampa"       => "nampa",
+  }
+
   EVENT_TITLE = 'Submission Title'
   EVENT_DATE = 'Date and Time of Occurrence/Observation'
 

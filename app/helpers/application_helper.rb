@@ -502,9 +502,9 @@ module ApplicationHelper
     case group_name
     when "flight-crew"
       "lightskyblue"
-    when "cabin", 'inflight'
+    when "cabin", "inflight", "afghanistan"
       "coral"
-    when "dispatch"
+    when "dispatch", "ecuador"
       "goldenrod"
     when "maintenance"
       "thistle"
@@ -512,8 +512,20 @@ module ApplicationHelper
       'mediumaquamarine'
     when "ground"
       'peru'
-    when "observation"
+    when "observation" #observation was added for a NAMS change request
       'crimson'
+    when "west-congo"
+      'seagreen'
+    when "east-congo", "nampa"
+      'darkturquoise'
+    when "lesotho", "liberia", "haiti"
+      'dodgerblue'
+    when "guinea", "kalimantan"
+      'yellow'
+    when "laos", "mozambique", "papua"
+      'salmon'
+    when "suriname"
+      'darkolivegreen'
     else
       "lightgray"
     end
