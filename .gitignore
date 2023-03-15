@@ -10,6 +10,7 @@ app/assets/**
 **/database.yml
 test_cache/**
 view_cache/**
+services/**
 
 mysqldumps/**
 mitre/**
