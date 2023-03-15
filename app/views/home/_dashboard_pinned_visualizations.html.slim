@@ -1,0 +1,96 @@
+.col-xs-12.mt10
+  hr
+.col-xs-12.mt20
+  .panel.panel-info
+    .panel-heading
+      .panel-title
+        .top_text
+          = "Pinned Visualizations"
+        .top_buttons.pull-right
+          - if QueryVisualization.where(dashboard_pin: true).count > 0 && current_user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])
+            = link_to "Refresh All", refresh_home_visualizations_home_index_path, id: "refresh_btn", confirm: "Refresh All Visualizations in this Module Dashboard?", class: "btn btn-default pull-right mr10"
+
+    .panel-body style="overflow-x: scroll;background-color: gainsboro;"
+      - if @pinned_visualizations.present?
+        - @pinned_visualizations = order_visualizations_by_pin_size(@pinned_visualizations)
+        - @pinned_visualizations.each do |vis|
+          - size_class = "col-xs-#{vis.dashboard_pin_size}"
+          .col-xs-2.pull-right
+            = link_to "".html_safe, "#",
+              class: "first_charts_btn hidden",
+              id: "generate_first_charts_btn_#{vis.id}",
+              "data-visualization-id" => vis.id
+
+          div class="#{size_class}"
+            .panel.panel-success
+              .panel-heading
+                .panel-title
+                  - if current_user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])
+                    = link_to '<span class="glyphicon glyphicon-remove" style="color:red;"></span>'.html_safe, unpin_visualization_home_index_path(visualization_id: vis.id),
+                        class: "unpin_chart_btn ml10 pull-right",
+                        confirm: "Unpin Visualization from Module Dashboard?",
+                        'data-toggle' => 'tooltip',
+                        'title' => "Unpin Visualization"
+                  .top_text id="vis_label_#{vis.id}" style="display:none;"
+
+                  .top_buttons.pull-right
+                    span class="pull-right mr5" id="vis_status_#{vis.id}" style="display:none;"
+
+              .panel-body
+                .col-xs-12.mt10
+                  div id="loader_#{vis.id}" style="display:none;"
+                    .centered.loader
+                    .loading-text
+                      | Loading
+                  .chart_area id="chart_area_#{vis.id}"
+      - else
+        div style="text-align: center"
+          h2 No Visualizations Pinned in this Module
+
+
+
+
+javascript:
+
+  $(function() {
+    let visualization_ids = "#{@pinned_visualizations.map(&:id)}"
+
+    visualization_ids = visualization_ids.replaceAll(' ', '');
+    visualization_ids = visualization_ids.replaceAll(']', '');
+    visualization_ids = visualization_ids.replaceAll('[', '');
+    visualization_ids = visualization_ids.split(',');
+
+    for (let i = 0; i < visualization_ids.length; i++) {
+      let visualization_id = visualization_ids[i];
+
+      $("#generate_first_charts_btn_" + visualization_id).on("click", function(e){
+        e.preventDefault();
+        var visualization_id = $(this).data("visualization-id");
+
+        $.ajax({
+          type: "POST",
+          url: "#{generate_visualization_home_index_path}",
+          data: {
+            "visualization_id": visualization_id,
+          },
+          beforeSend: function(){
+            $('#loader_' + visualization_id).show();
+            $("#chart_area_" + visualization_id).css({'opacity':0.5});
+          }, complete: function(){
+            $('#loader_' + visualization_id).hide();
+            $('#vis_label_' + visualization_id).show();
+            $('#vis_status_' + visualization_id).show();
+            $("#chart_area_" + visualization_id).css({'opacity':1});
+          }, success: function(response){
+            $("#vis_label_" + visualization_id).html(response["label"]);
+            $("#vis_status_" + visualization_id).html(response["status"]);
+            $("#chart_area_" + visualization_id).html(response["html"]);
+          }, error: function(response){
+            $("#chart_area_" + visualization_id).html(response["html"]);
+          },
+        });
+      });
+
+    }
+
+  });

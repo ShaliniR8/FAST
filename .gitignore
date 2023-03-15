@@ -3,6 +3,7 @@ tmp
 public/uploads/**
 public/exports/**
 public/queries/**
+public/query_vis/**
 cisp
 app/assets/**
 **/airline_code.yml

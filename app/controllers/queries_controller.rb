@@ -495,6 +495,56 @@ class QueriesController < ApplicationController
   end
 
 
+  def retrieve_pin_fields
+    @visualization = QueryVisualization.find(params[:visualization_id])
+    @chart_types = QueryVisualization.chart_types
+    render :partial => '/queries/retrieve_pin_fields'
+  end
+
+
+  def pin_visualization
+    @visualization = QueryVisualization.find(params[:visualization_id])
+    query = Query.find(@visualization.owner_id)
+
+    @visualization.dashboard_pin = true
+    @visualization.dashboard_pin_size = params[:dashboard_chart_size].to_i
+    @visualization.dashboard_default_chart = params[:default_dashboard_chart].to_i
+    @visualization.save
+
+    visualization_file_path = "/public/query_vis/#{@visualization.id}.yml"
+    visualization_file_full_path = File.join([Rails.root] + [visualization_file_path])
+    visualization_processing_file_full_path = visualization_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+    @visualization.delay.compute_visualization(current_user.id, @visualization.query.id, visualization_file_full_path,
+                                               visualization_processing_file_full_path, get_query_results_ids(query).split(','), query)
+
+    redirect_to query_path(@visualization.query), flash: {success: "Visualization recomputing for dashboard view."}
+  end
+
+
+  def unpin_visualization
+    @data = nil
+    @status_msg = ""
+    @visualization = QueryVisualization.find(params[:visualization_id])
+
+    @visualization.dashboard_pin = false
+    @visualization.save
+
+    visualization_file_path = "/public/query_vis/#{vis.id}.yml"
+    visualization_file_full_path = File.join([Rails.root] + [visualization_file_path])
+    visualization_processing_file_full_path = visualization_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+
+    if File.exist? visualization_processing_file_full_path
+      FileUtils.rm_rf(visualization_processing_file_full_path)
+    end
+
+    if File.exist? visualization_file_full_path
+      FileUtils.rm_rf(visualization_file_full_path)
+    end
+
+    render json: {message: "Visualization has been Un-Pinned from the Dashboard"}
+  end
+
+
   private
 
   # Set session[:mode] to match the mode of the target query

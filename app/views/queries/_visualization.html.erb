@@ -8,6 +8,8 @@
         <div class="top_buttons pull-right">
           <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, "#",
             :class => "remove_btn btn btn-danger pull-right",
+            'data-toggle' => "tooltip",
+            'title' => "Delete Visualization",
             "data-visualization-id" => "#{visualization.id}"%>
         </div>
       </div>
@@ -74,6 +76,24 @@
               'data-toggle' => "tooltip",
               'title' => "Generate/Refresh Charts",
               "data-visualization-id" => visualization.id%>
+
+            <%if CONFIG::GENERAL[:pin_dashboard_visualizations].present?%>
+              <%=link_to "<span class=\"glyphicon glyphicon-pushpin\"></span>".html_safe, "#",
+                class: "btn btn-success pin-vis-btn ml5",
+                id: "pin_charts_btn_#{visualization.id}",
+                'data-path' => retrieve_pin_fields_query_path(visualization_id: visualization.id),
+                'data-toggle' => "tooltip",
+                'title' => "Pin Visualization to Dashboard"%>
+
+              <%if visualization.dashboard_pin.present?%>
+                <%=link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, "#",
+                  class: "btn btn-danger unpin-btn ml5",
+                  id: "unpin_charts_btn_#{visualization.id}",
+                  'data-toggle' => "tooltip",
+                  'title' => "Unpin this Visualization from Dashboard",
+                  "data-visualization-id" => visualization.id%>
+              <%end%>
+            <%end%>
           </div>
 
           <div class="col-xs-12 mt10">
@@ -174,9 +194,11 @@
           beforeSend: function(){
             $('#loader_' + visualization_id).show();
             $("#chart_area_" + visualization_id).css({'opacity':0.5});
-          }, complete: function(){
+          },
+          complete: function(){
             $('#loader_' + visualization_id).hide();
-            $("#chart_area_" + visualization_id).css({'opacity':1});},
+            $("#chart_area_" + visualization_id).css({'opacity':1});
+          },
           success: function(response){},
           error: function(response){
             console.log('error deleting' + visualization_id + '!');

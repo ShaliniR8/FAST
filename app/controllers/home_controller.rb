@@ -18,6 +18,10 @@ class HomeController < ApplicationController
     @emp_groups = params[:emp_groups] ? params[:emp_groups] : nil
     @departments = params[:departments] ? params[:departments] : nil
 
+    types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
+    types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
+    @pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
+
     @notices = current_user.notices.where(status: 1).sort_by(&:created_at).reverse.first(6)
 
     prepare_data
@@ -694,6 +698,89 @@ class HomeController < ApplicationController
     @terms = @table.get_meta_fields(*meta_field_args).keep_if{|x| x[:field].present? && discard_terms_list.exclude?(x[:field])}
     @status = params[:status]
     render :partial => '/shared/advanced_search'
+  end
+
+
+  def generate_visualization
+    @visualization = QueryVisualization.find(params[:visualization_id])
+    @owner = Query.find(@visualization.owner_id)
+    visualization_file_path = "/public/query_vis/#{@visualization.id}.yml"
+    visualization_file_full_path = File.join([Rails.root] + [visualization_file_path])
+    visualization_processing_file_full_path = visualization_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+    @data = nil
+    @status_msg = ""
+
+    if File.exist? visualization_processing_file_full_path
+      @status_msg = 'STILL PROCESSING (Please revisit the page later)'
+    elsif File.exist? visualization_file_full_path
+      @data = YAML.load(File.read(visualization_file_full_path))
+
+      file_updated_at = File.mtime(visualization_file_full_path)
+                          .in_time_zone(CONFIG::GENERAL[:time_zone])
+                          .strftime('%a, %d %b %Y %l:%M %p')
+
+      @status_msg = "Last Updated At #{file_updated_at}"
+    else
+      @status_msg = "STILL PROCESSING (Please revisit the page later)"
+    end
+
+    @chart_types = QueryVisualization.chart_types
+    @data = @visualization.generate_vis([]) if !@data.present?
+    @options = {title: @visualization.x_axis }
+    html = render_to_string(template: '/home/_chart_view_home.html.erb', layout: false)
+
+    render json: {label: @visualization.get_home_label, status: @status_msg, html: html}
+  end
+
+
+  def refresh_home_visualizations
+    types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
+    types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
+    module_pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
+
+    module_pinned_visualizations.each do |vis|
+      visualization_file_path = "/public/query_vis/#{vis.id}.yml"
+      visualization_file_full_path = File.join([Rails.root] + [visualization_file_path])
+      visualization_processing_file_full_path = visualization_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+      query = Query.find(vis.owner_id)
+
+      if File.exist? visualization_processing_file_full_path
+        FileUtils.rm_rf(visualization_processing_file_full_path)
+      end
+
+      if File.exist? visualization_file_full_path
+        FileUtils.rm_rf(visualization_file_full_path)
+      end
+
+      vis.delay.compute_visualization(current_user.id, vis.query.id, visualization_file_full_path,
+                                      visualization_processing_file_full_path, get_query_results_ids(query).split(','), query)
+    end
+
+    respond_to do |format|
+      format.html { redirect_to request.referrer, notice: "All visualizations pinned on this Module Dashboard will recompute." }
+    end
+  end
+
+
+  def unpin_visualization
+    @visualization = QueryVisualization.find(params[:visualization_id])
+    @visualization.update_attributes({dashboard_pin: false})
+
+    visualization_file_path = "/public/query_vis/#{@visualization.id}.yml"
+    visualization_file_full_path = File.join([Rails.root] + [visualization_file_path])
+    visualization_processing_file_full_path = visualization_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
+
+    if File.exist? visualization_processing_file_full_path
+      FileUtils.rm_rf(visualization_processing_file_full_path)
+    end
+
+    if File.exist? visualization_file_full_path
+      FileUtils.rm_rf(visualization_file_full_path)
+    end
+
+    respond_to do |format|
+      format.html { redirect_to home_index_path, notice: "Visualization has been unpinned from dashboard." }
+    end
   end
 
 

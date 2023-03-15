@@ -82,6 +82,7 @@ class DefaultConfig
     global_admin_default:               true,   # Default value to use for admin parameter when calling has_access in user.rb
     sms_im_visibility:                  true,   # Default visibility of SMS IM --> ON
     safety_promotion_visibility:        false,  # Default visibility of Safety Promotion --> OFF
+    pin_dashboard_visualizations:       false,  # Ability to pin query visualizations to dashboard --> Default OFF
 
   }
 
