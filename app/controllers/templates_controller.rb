@@ -21,7 +21,7 @@ end
 class TemplatesController < ApplicationController
   # before_filter :login_required
   before_filter :oauth_load # Kaushik Mahorker KM
-
+  require 'yaml'
 
   def index
     @title = "Safety Reports Templates"
@@ -31,10 +31,111 @@ class TemplatesController < ApplicationController
     @records = Template.find(:all)
   end
 
+  def upload
+    yaml_attr = YAML.load_file(Dir.pwd + "/public/test.yaml")
+
+    @template = Template.new
+    fields, nested_fields, categories = Hash.new, Hash.new, []
+    Template.transaction do
+      begin
+        # Handles related templates
+        yaml_attr[:Template].each do |key, val| 
+          puts key, val
+          if key == :related_template
+            template = Template.where(name: val)[0]
+            val = template.id
+            key = :map_template_id
+          end
+          @template[key] = val 
+        end
+        @template.save!
+        # extract categories
+        yaml_attr[:Category].each do |category|
+          @category = Category.new 
+          category.each do |key, val|
+            @category[key] = category[key]
+          end
+
+          category_fields = []
+          # extract fields in a category
+          category[:Field].each do |field|
+            @field =  Field.new 
+            # TODO: 1. handle incorrect display_type, data_type, etc
+            field.each do |key, val|
+              unless key == :nested_fields
+                @field[key] = field[key]
+              end
+              # extract nested fields inside current field
+              if key == :nested_fields
+                field[key].each do |opt_name, field_nested_fields|
+                  field_nested_fields.each do |nested_field|
+                    @nested_field = Field.new
+                    @nested_field.nested_field_value = opt_name
+                    nested_field.each do |key_, val_|
+                      @nested_field[key_] = val_
+                    end
+                    (nested_fields[@field.object_id] ||= []) << @nested_field
+                  end
+                end
+              end
+            end
+            category_fields << @field
+          end
+          categories << @category
+          fields[@category.object_id] = category_fields
+        end
+
+        @template.created_by=current_user;
+      
+        # saving to db
+        if @template.save
+          template_id = @template.id 
+          categories.each do |category|
+            category.templates_id = template_id
+            if category.save
+              categories_id = category.id
+              category_fields = fields[category.object_id]
+              category_fields.each do |field|
+                field.categories_id = categories_id
+                field.save
+              end
+            else
+              # Handle error
+            end 
+          end
+          nested_fields.each do |field_obj_id, nested_fields|
+            @field = ObjectSpace._id2ref(field_obj_id)
+            field_id = @field.id
+            categories_id = @field.categories_id
+            nested_fields.each do |nested_field|
+              nested_field.nested_field_id = field_id
+              nested_field.categories_id = categories_id
+              nested_field.save
+            end
+          end
+          AccessControl.get_template_opts.map { |disp, db_val|
+            AccessControl.new({
+              list_type: 1,
+              action: db_val,
+              entry: @template[:name],
+              viewer_access: 1
+            }).save
+          }
+          redirect_to template_path(@template), flash: {success: "Template #{@template.id} created."}
+        else
+          # Handle Error
+        end
+      rescue
+        redirect_to templates_path, flash: {error: "Template creation error."}
+        raise ActiveRecord::Rollback
+      end
+    end
+  end
 
   def new
     @all_templates = Template.find(:all)
     @template = Template.new
+    upload
     @action = "new"
     @eccairs_attributes = EccairsAttribute.all
   end
