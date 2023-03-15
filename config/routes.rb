@@ -17,6 +17,7 @@ PrdgSession::Application.routes.draw do |map|
   match '/saml/logout',           :to => 'saml#logout',                 :as => :saml
   match '/mobile/initialize',     :to => 'sessions#mobile_initialize',  :as => :session
   match '/mobile/activate',       :to => 'sessions#mobile_activate',    :as => :session
+  match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
 
   map.signup 'signup', :controller => 'users', :action => 'new'
   map.logout 'logout', :controller => 'sessions', :action => 'destroy'
@@ -139,6 +140,9 @@ PrdgSession::Application.routes.draw do |map|
       post 'search_all'
       get 'draw_chart'
       get 'advanced_search'
+      get 'refresh_home_visualizations'
+      post 'generate_visualization'
+      get 'unpin_visualization'
     end
   end
   resources :recurrences
@@ -153,6 +157,9 @@ PrdgSession::Application.routes.draw do |map|
       post "enable"
       get "add_subscribers_view"
       get "print"
+      get 'retrieve_pin_fields'
+      post 'pin_visualization'
+      post 'unpin_visualization'
     end
     collection do
       get 'load_conditions_block'

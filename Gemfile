@@ -68,3 +68,5 @@ gem 'oauth', '~> 0.4.7'
 gem 'ruby-saml'
 
 gem 'roo', '2.7.0'
+gem 'delayed_job_active_record'
+gem 'delayed_job_web'

@@ -1,0 +1,40 @@
+<div class="item active mt50" style="height:auto;">
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <b>Pin Visualization to Dashboard</b>
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
+      </div>
+    </div>
+    <%=form_tag pin_visualization_query_path(visualization_id: @visualization.id), :method=>"post" do %>
+      <div class="panel-body" id="form_body">
+
+        <div class="col-xs-12 m10">
+
+          <div class="form-group row col-xs-6">
+            <%=label_tag :default_dashboard_chart, 'Dashboard Chart Type', class: "col-xs-4 col-form-label"%>
+            <div class="col-xs-6">
+              <%=select_tag :default_dashboard_chart,
+                options_for_select(@chart_types.collect{|chart| [chart[:chart_name], chart[:val]]}, @visualization.dashboard_default_chart),
+                class: "form-control"%>
+            </div>
+          </div>
+
+          <div class="form-group row col-xs-6">
+            <%=label_tag :dashboard_chart_size, 'Dashboard Chart Size', class: "col-xs-4 col-form-label"%>
+            <div class="col-xs-6">
+              <%=select_tag :dashboard_chart_size,
+                options_for_select([4,6,8,12], @visualization.dashboard_pin_size),
+                class: "form-control ml10"%>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-xs-12 mr10 mt10">
+          <%=submit_tag "Pin", :class => "btn btn-success pull-right", :disable_with => "Pinning..."%>
+        </div>
+      </div>
+    <%end%>
+  </div>
+</div>

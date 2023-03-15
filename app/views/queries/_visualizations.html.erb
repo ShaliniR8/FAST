@@ -44,6 +44,7 @@
   $(function(){
 
     $(".chart_btn").click();
+    set_pin_visualizations_listener();
 
     $("#add_btn").on("click", function(e){
       e.preventDefault();
@@ -51,11 +52,55 @@
         type: "POST",
         url: "<%=add_visualization_query_path(@owner)%>",
         data: {"records": "<%=@records_ids.map(&:to_i).join(',')%>"},
-        success: function(response){$("#visualizations").prepend(response);},
+        success: function(response){
+          $("#visualizations").prepend(response);
+          set_pin_visualizations_listener();
+        },
         error: function(response){console.log(response);}
       });
     });
+
+    $(".unpin-btn").on("click", function(e){
+      e.preventDefault();
+      var visualization_id = $(this).data("visualization-id");
+      if (confirm('Are you sure you want to Unpin this Visualization from the Module Dashboard?')) {
+        $.ajax({
+          type: "POST",
+          url: "<%=unpin_visualization_query_path(@owner)%>",
+          data: {
+            "visualization_id": visualization_id,
+          },
+          success: function(response){
+            alert(response['message']);
+          },
+          error: function(response){
+            console.log('error unpinning visualization!');
+          },
+        });
+      }
+    });
   });
+
+  function set_pin_visualizations_listener() {
+    $('.pin-vis-btn').on('click', function(e){
+      e.preventDefault();
+      if (confirm('Are you sure you want to Pin this Visualization to the Module Dashboard?')) {
+
+        $.ajax({
+          type: "GET",
+          url: $(this).data('path'),
+          success: function(response){
+            $('.modal').modal('toggle');
+            $('.modal-content').html(response);
+            $(window).trigger('resize');
+          },
+          error: function(response){
+            console.log('error pinning visualization!');
+          }
+        });
+      }
+    });
+  }
 </script>
 
 
