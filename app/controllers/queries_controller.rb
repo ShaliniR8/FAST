@@ -529,7 +529,7 @@ class QueriesController < ApplicationController
     @visualization.dashboard_pin = false
     @visualization.save
 
-    visualization_file_path = "/public/query_vis/#{vis.id}.yml"
+    visualization_file_path = "/public/query_vis/#{@visualization.id}.yml"
     visualization_file_full_path = File.join([Rails.root] + [visualization_file_path])
     visualization_processing_file_full_path = visualization_file_full_path.gsub(/\d+\.yml/) { |d| "processing_#{d}" }
 
@@ -541,7 +541,7 @@ class QueriesController < ApplicationController
       FileUtils.rm_rf(visualization_file_full_path)
     end
 
-    render json: {message: "Visualization has been Un-Pinned from the Dashboard"}
+    render json: {vis_id: @visualization.id, message: "Visualization has been Un-Pinned from the Dashboard"}
   end
 
 

@@ -72,6 +72,7 @@
           },
           success: function(response){
             alert(response['message']);
+            $('#unpin_charts_btn_' + response['vis_id']).hide();
           },
           error: function(response){
             console.log('error unpinning visualization!');
