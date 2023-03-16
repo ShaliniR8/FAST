@@ -59,6 +59,10 @@ class SmsAction < Sa::SafetyAssuranceBase
       "<a style='font-weight:bold' href='/findings/#{owner.id}'>
         Finding ##{owner.id}
       </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
+    when 'Audit'
+      "<a style='font-weight:bold' href='/audits/#{owner.id}'>
+        Audit ##{owner.id}
+      </a>".html_safe rescue "<b style='color:grey'>N/A</b>".html_safe
     else
       "<b style='color:grey'>N/A</b>".html_safe
     end

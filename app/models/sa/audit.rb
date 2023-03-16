@@ -66,12 +66,12 @@ class Audit < Sa::SafetyAssuranceBase
     current_year = Date.current.year
     last_index = 0
 
-    if Audit.last(2).size == 2 && Audit.last(2).first.uniq_custom_id.present?
-      last_year = Audit.last(2).first.uniq_custom_id.split('_').first
-      last_index = Audit.last(2).first.uniq_custom_id.split('_').last.to_i if last_year.to_i == current_year.to_i
+    if Audit.where(template:false).last(2).size == 2 && Audit.where(template:false).last(2).first.uniq_custom_id.present?
+      last_year = Audit.where(template:false).last(2).first.uniq_custom_id.split('_').first
+      last_index = Audit.where(template:false).last(2).first.uniq_custom_id.split('_').last.to_i if last_year.to_i == current_year.to_i
     end
 
-    self.uniq_custom_id = "#{current_year}_#{last_index+1}"
+    self.uniq_custom_id = "#{current_year}_#{last_index+1}" unless self.template
     self.save
   end
 

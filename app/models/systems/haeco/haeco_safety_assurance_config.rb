@@ -14,7 +14,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           :extension_requests],
         fields: {
           id: { default: true, visible: 'index'},
-          uniq_custom_id: { visible: 'index,show', title: 'Custom ID', field: 'uniq_custom_id' },
+          uniq_custom_id: { visible: 'index,show', title: 'Custom ID', field: 'uniq_custom_id', num_cols: 6 },
           title: { default: true },
           status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
