@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20210716215503) do
+ActiveRecord::Schema.define(:version => 20221024212812) do
 
   create_table "access_controls", :force => true do |t|
     t.boolean "list_type"
@@ -43,7 +43,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "status"
     t.boolean  "discussion"
     t.string   "accepted"
-    t.text     "comment"
+    t.text     "comment",    :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "obj_id"
@@ -86,9 +86,9 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "process"
     t.boolean  "planned"
     t.string   "supplier"
-    t.text     "objective"
-    t.text     "reference"
-    t.text     "instruction"
+    t.text     "objective",           :limit => 16777215
+    t.text     "reference",           :limit => 16777215
+    t.text     "instruction",         :limit => 16777215
     t.integer  "approver_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -97,24 +97,26 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "auditor_3_id"
     t.integer  "auditor_4_id"
     t.integer  "auditor_5_id"
-    t.string   "status",              :default => "New"
-    t.boolean  "viewer_access",       :default => false
-    t.text     "comment"
+    t.string   "status",                                  :default => "New"
+    t.boolean  "viewer_access",                           :default => false
+    t.text     "comment",             :limit => 16777215
     t.date     "schedule_date"
     t.date     "open_date"
-    t.text     "viewer_note"
+    t.text     "viewer_note",         :limit => 16777215
     t.integer  "custom_id"
     t.integer  "obj_id"
-    t.text     "auditor_comment"
-    t.text     "privileges"
-    t.text     "final_comment"
-    t.integer  "created_by_id"
-    t.boolean  "template",            :default => false
+    t.text     "auditor_comment",     :limit => 16777215
+    t.text     "privileges",          :limit => 16777215
     t.integer  "recurrence_id"
+    t.text     "final_comment",       :limit => 16777215
+    t.integer  "created_by_id"
+    t.boolean  "template",                                :default => false
     t.datetime "close_date"
+    t.date     "completion"
     t.integer  "auditor_poc_id"
     t.integer  "approver_poc_id"
-    t.integer  "spawn_id",            :default => 0
+    t.integer  "spawn_id",                                :default => 0
+    t.string   "uniq_custom_id"
   end
 
   create_table "automated_notifications", :force => true do |t|
@@ -127,12 +129,12 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "anchor_status"
     t.integer  "interval"
     t.string   "subject"
-    t.text     "content"
+    t.text     "content",           :limit => 16777215
   end
 
   create_table "canned_messages", :force => true do |t|
     t.string   "name"
-    t.text     "content"
+    t.text     "content",     :limit => 16777215
     t.integer  "user_id"
     t.string   "module"
     t.string   "report_type"
@@ -142,14 +144,14 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
 
   create_table "categories", :force => true do |t|
     t.string   "title"
-    t.text     "description"
+    t.text     "description",    :limit => 16777215
     t.integer  "templates_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "panel"
     t.boolean  "print"
     t.integer  "category_order"
-    t.boolean  "deleted",        :default => false
+    t.boolean  "deleted",                            :default => false
   end
 
   create_table "cause_options", :force => true do |t|
@@ -165,7 +167,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
 
   create_table "causes", :force => true do |t|
     t.string   "category"
-    t.text     "value"
+    t.text     "value",      :limit => 16777215
     t.integer  "owner_id"
     t.string   "owner_type"
     t.datetime "created_at"
@@ -179,11 +181,12 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   create_table "checklist_cells", :force => true do |t|
     t.integer  "checklist_row_id"
     t.integer  "checklist_header_item_id"
-    t.text     "value"
+    t.text     "value",                    :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "options"
+    t.text     "options",                  :limit => 16777215
     t.string   "data_type"
+    t.text     "custom_options"
   end
 
   create_table "checklist_header_items", :force => true do |t|
@@ -191,8 +194,8 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "checklist_header_id"
     t.string   "title"
     t.string   "data_type"
-    t.text     "options"
-    t.boolean  "editable",            :default => false
+    t.text     "options",             :limit => 16777215
+    t.boolean  "editable",                                :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "size"
@@ -215,17 +218,17 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "revision_level"
     t.date     "revision_date"
     t.string   "department"
-    t.text     "requirement"
+    t.text     "requirement",         :limit => 16777215
     t.string   "reference_number"
-    t.text     "reference"
-    t.text     "instructions"
+    t.text     "reference",           :limit => 16777215
+    t.text     "instructions",        :limit => 16777215
     t.string   "created_by"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "status",              :default => "New"
+    t.string   "status",                                  :default => "New"
     t.string   "level_of_compliance"
-    t.text     "comment"
+    t.text     "comment",             :limit => 16777215
     t.integer  "custom_id"
     t.integer  "obj_id"
     t.integer  "owner_obj_id"
@@ -253,8 +256,8 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "assessment"
     t.string   "faa_reference"
     t.string   "airline_reference"
-    t.text     "notes"
-    t.boolean  "header",            :default => false
+    t.text     "notes",             :limit => 16777215
+    t.boolean  "header",                                :default => false
   end
 
   create_table "checklist_rows", :force => true do |t|
@@ -270,8 +273,8 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name"
-    t.boolean  "archive",    :default => false
-    t.text     "notes"
+    t.boolean  "archive",                        :default => false
+    t.text     "notes",      :limit => 16777215
     t.integer  "created_by"
   end
 
@@ -284,7 +287,9 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "assignee_ids"
-    t.boolean  "table_view",          :default => true
+    t.boolean  "table_view",                                           :default => true
+    t.decimal  "completion_percentage", :precision => 10, :scale => 4, :default => 0.0
+    t.integer  "template_id"
   end
 
   create_table "children", :force => true do |t|
@@ -296,8 +301,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "updated_at"
   end
 
-  create_table "client_applications", :id => false, :force => true do |t|
-    t.integer  "id",                         :default => 0, :null => false
+  create_table "client_applications", :force => true do |t|
     t.string   "name"
     t.string   "url"
     t.string   "support_url"
@@ -305,6 +309,17 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "key",          :limit => 40
     t.string   "secret",       :limit => 40
     t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "client_applications", ["key"], :name => "index_client_applications_on_key", :unique => true
+
+  create_table "completions", :force => true do |t|
+    t.integer  "user_id"
+    t.date     "complete_date"
+    t.integer  "owner_id"
+    t.string   "owner_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -331,7 +346,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "city"
     t.string   "state"
     t.integer  "zip"
-    t.text     "notes"
+    t.text     "notes",            :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
@@ -353,23 +368,23 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "department"
     t.integer  "responsible_user_id"
     t.boolean  "bimmediate_action"
-    t.text     "immediate_action"
+    t.text     "immediate_action",           :limit => 16777215
     t.boolean  "bcomprehensive_action"
-    t.text     "comprehensive_action"
+    t.text     "comprehensive_action",       :limit => 16777215
     t.string   "action"
-    t.text     "description"
-    t.text     "response"
+    t.text     "description",                :limit => 16777215
+    t.text     "response",                   :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "designee"
     t.integer  "custom_id"
     t.integer  "obj_id"
     t.datetime "close_date"
-    t.text     "privileges"
+    t.text     "privileges",                 :limit => 16777215
     t.integer  "approver_id"
-    t.text     "final_comment"
+    t.text     "final_comment",              :limit => 16777215
     t.integer  "created_by_id"
-    t.boolean  "faa_approval",               :default => false
+    t.boolean  "faa_approval",                                   :default => false
     t.integer  "user_poc_id"
     t.integer  "approver_poc_id"
     t.integer  "submissions_id"
@@ -379,14 +394,14 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   create_table "costs", :force => true do |t|
     t.integer  "owner_id"
     t.string   "owner_type"
-    t.text     "description"
+    t.text     "description",   :limit => 16777215
     t.date     "cost_date"
     t.boolean  "direct_cost"
     t.boolean  "indirect_cost"
     t.string   "work_order"
     t.string   "vendor"
     t.string   "amount"
-    t.text     "notes"
+    t.text     "notes",         :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -394,12 +409,12 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   create_table "custom_options", :force => true do |t|
     t.string   "title"
     t.string   "field_type"
-    t.text     "options"
+    t.text     "options",         :limit => 16777215
     t.integer  "display_size"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "description"
-    t.text     "eccairs_mapping"
+    t.text     "eccairs_mapping", :limit => 16777215
   end
 
   create_table "distribution_list_connections", :force => true do |t|
@@ -466,25 +481,25 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "process"
     t.boolean  "planned"
     t.string   "supplier"
-    t.text     "objective"
-    t.text     "reference"
-    t.text     "instruction"
+    t.text     "objective",             :limit => 16777215
+    t.text     "reference",             :limit => 16777215
+    t.text     "instruction",           :limit => 16777215
     t.integer  "approver_id"
-    t.string   "status",                :default => "New"
-    t.boolean  "viewer_access",         :default => false
+    t.string   "status",                                    :default => "New"
+    t.boolean  "viewer_access",                             :default => false
     t.date     "open_date"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "comment"
+    t.text     "comment",               :limit => 16777215
     t.integer  "custom_id"
-    t.text     "privileges"
-    t.text     "evaluator_comment"
-    t.text     "final_comment"
+    t.text     "privileges",            :limit => 16777215
+    t.text     "evaluator_comment",     :limit => 16777215
+    t.text     "final_comment",         :limit => 16777215
     t.integer  "created_by_id"
-    t.boolean  "template",              :default => false
+    t.boolean  "template",                                  :default => false
     t.integer  "recurrence_id"
     t.datetime "close_date"
-    t.integer  "spawn_id",              :default => 0
+    t.integer  "spawn_id",                                  :default => 0
   end
 
   create_table "expectations", :force => true do |t|
@@ -495,9 +510,9 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.date     "revision_date"
     t.string   "department"
     t.string   "reference_number"
-    t.text     "reference"
-    t.text     "expectation"
-    t.text     "instruction"
+    t.text     "reference",        :limit => 16777215
+    t.text     "expectation",      :limit => 16777215
+    t.text     "instruction",      :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "analyst_id"
@@ -512,8 +527,8 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "requester_id"
     t.date     "request_date"
     t.integer  "approver_id"
-    t.text     "detail"
-    t.string   "status",          :default => "New"
+    t.text     "detail",          :limit => 16777215
+    t.string   "status",                              :default => "New"
     t.date     "address_date"
     t.string   "address_comment"
   end
@@ -534,35 +549,36 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "employee_group"
+    t.integer  "asap_reg_violation", :default => 0
   end
 
   create_table "fields", :force => true do |t|
     t.string   "data_type"
     t.string   "display_type"
-    t.text     "label"
-    t.text     "options"
+    t.text     "label",              :limit => 16777215
+    t.text     "options",            :limit => 16777215
     t.integer  "display_size"
     t.integer  "priority"
     t.integer  "categories_id"
-    t.text     "description"
+    t.text     "description",        :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "show_label",         :default => true
-    t.boolean  "print",              :default => true
+    t.boolean  "show_label",                             :default => true
+    t.boolean  "print",                                  :default => true
     t.integer  "convert_id"
     t.integer  "map_id"
-    t.string   "element_id",         :default => ""
-    t.string   "element_class",      :default => ""
+    t.string   "element_id",                             :default => ""
+    t.string   "element_class",                          :default => ""
     t.integer  "field_order"
-    t.boolean  "required",           :default => false
-    t.boolean  "deleted",            :default => false
+    t.boolean  "required",                               :default => false
+    t.boolean  "deleted",                                :default => false
     t.integer  "nested_field_id"
     t.string   "nested_field_value"
     t.integer  "max_length"
-    t.boolean  "additional_info",    :default => false
-    t.integer  "max_options",        :default => 1
-    t.string   "sabre_map"
+    t.boolean  "additional_info",                        :default => false
+    t.integer  "max_options",                            :default => 1
     t.integer  "custom_option_id"
+    t.string   "sabre_map"
   end
 
   add_index "fields", ["deleted", "nested_field_id"], :name => "index_fields_on_deleted_and_nested_field_id"
@@ -572,17 +588,17 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "title"
     t.integer  "responsible_user_id"
     t.date     "due_date"
-    t.text     "reference"
-    t.boolean  "regulatory_violation",               :default => false, :null => false
-    t.boolean  "policy_violation",                   :default => false, :null => false
+    t.text     "reference",                          :limit => 16777215
+    t.boolean  "regulatory_violation",                                   :default => false, :null => false
+    t.boolean  "policy_violation",                                       :default => false, :null => false
     t.boolean  "safety"
     t.string   "classification"
     t.boolean  "repeat"
     t.boolean  "immediate_action"
-    t.text     "action_taken"
+    t.text     "action_taken",                       :limit => 16777215
     t.string   "department"
     t.integer  "approver_id"
-    t.text     "description"
+    t.text     "description",                        :limit => 16777215
     t.boolean  "authority"
     t.boolean  "controls"
     t.boolean  "interfaces"
@@ -596,28 +612,28 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "risk_factor"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "statement"
-    t.string   "status",                             :default => "New"
+    t.text     "statement",                          :limit => 16777215
+    t.string   "status",                                                 :default => "New"
     t.date     "schedule_date"
     t.date     "open_date"
-    t.text     "narrative"
+    t.text     "narrative",                          :limit => 16777215
     t.string   "owner_type"
-    t.text     "analysis_result"
+    t.text     "analysis_result",                    :limit => 16777215
     t.integer  "custom_id"
     t.string   "likelihood_after"
     t.string   "severity_after"
     t.string   "risk_factor_after"
     t.integer  "obj_id"
     t.integer  "audit_obj_id"
-    t.text     "privileges"
-    t.text     "findings_comment"
+    t.text     "privileges",                         :limit => 16777215
+    t.text     "findings_comment",                   :limit => 16777215
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
     t.string   "extra_risk"
     t.string   "mitigated_risk"
-    t.text     "final_comment"
+    t.text     "final_comment",                      :limit => 16777215
     t.integer  "created_by_id"
     t.datetime "close_date"
     t.date     "anticipated_corrective_action_date"
@@ -629,14 +645,14 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "type"
     t.string   "title"
     t.integer  "sra_id"
-    t.text     "description"
+    t.text     "description",           :limit => 16777215
     t.integer  "severity"
     t.string   "likelihood"
     t.string   "risk_factor"
-    t.text     "statement"
+    t.text     "statement",             :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "status",                :default => "Open"
+    t.string   "status",                                    :default => "Open"
     t.integer  "custom_id"
     t.string   "likelihood_after"
     t.string   "severity_after"
@@ -651,7 +667,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.date     "due_date"
     t.integer  "responsible_user_id"
     t.integer  "approver_id"
-    t.text     "final_comment"
+    t.text     "final_comment",         :limit => 16777215
     t.text     "closing_comment"
   end
 
@@ -663,20 +679,20 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "location"
     t.string   "apply_to"
     t.string   "org_type"
-    t.text     "obj_scope"
-    t.text     "ref_req"
-    t.text     "instruction"
+    t.text     "obj_scope",             :limit => 16777215
+    t.text     "ref_req",               :limit => 16777215
+    t.text     "instruction",           :limit => 16777215
     t.integer  "pre_reviewer"
     t.string   "job_aid"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "status",                :default => "New"
+    t.string   "status",                                    :default => "New"
     t.date     "date_complete"
-    t.text     "comment"
+    t.text     "comment",               :limit => 16777215
     t.date     "date_open"
     t.integer  "custom_id"
     t.integer  "obj_id"
-    t.boolean  "viewer_access",         :default => false
+    t.boolean  "viewer_access",                             :default => false
     t.integer  "lead_evaluator_poc_id"
     t.integer  "pre_reviewer_poc_id"
   end
@@ -694,25 +710,25 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "process"
     t.boolean  "planned"
     t.string   "supplier"
-    t.text     "objective"
-    t.text     "reference"
-    t.text     "instruction"
+    t.text     "objective",             :limit => 16777215
+    t.text     "reference",             :limit => 16777215
+    t.text     "instruction",           :limit => 16777215
     t.integer  "approver_id"
-    t.string   "status",                :default => "New"
-    t.boolean  "viewer_access",         :default => false
+    t.string   "status",                                    :default => "New"
+    t.boolean  "viewer_access",                             :default => false
     t.date     "open_date"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "comment"
+    t.text     "comment",               :limit => 16777215
     t.integer  "custom_id"
-    t.text     "privileges"
-    t.text     "inspector_comment"
-    t.text     "final_comment"
+    t.text     "privileges",            :limit => 16777215
+    t.text     "inspector_comment",     :limit => 16777215
+    t.text     "final_comment",         :limit => 16777215
     t.integer  "created_by_id"
-    t.boolean  "template",              :default => false
+    t.boolean  "template",                                  :default => false
     t.integer  "recurrence_id"
     t.datetime "close_date"
-    t.integer  "spawn_id",              :default => 0
+    t.integer  "spawn_id",                                  :default => 0
   end
 
   create_table "investigations", :force => true do |t|
@@ -726,34 +742,34 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "source"
     t.datetime "event_occured"
     t.integer  "approver_id"
-    t.text     "approver_comment"
-    t.text     "notes"
+    t.text     "approver_comment",      :limit => 16777215
+    t.text     "notes",                 :limit => 16777215
     t.string   "likelihood"
     t.string   "severity"
     t.string   "risk_factor"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "local_event_occured"
-    t.text     "containment"
-    t.text     "description"
-    t.text     "statement"
-    t.string   "status",                :default => "New"
-    t.boolean  "viewer_access",         :default => false
+    t.text     "containment",           :limit => 16777215
+    t.text     "description",           :limit => 16777215
+    t.text     "statement",             :limit => 16777215
+    t.string   "status",                                    :default => "New"
+    t.boolean  "viewer_access",                             :default => false
     t.integer  "custom_id"
     t.string   "likelihood_after"
     t.string   "severity_after"
     t.string   "risk_factor_after"
     t.integer  "obj_id"
     t.integer  "owner_id"
-    t.text     "privileges"
-    t.text     "investigator_comment"
+    t.text     "privileges",            :limit => 16777215
+    t.text     "investigator_comment",  :limit => 16777215
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
-    t.text     "final_comment"
+    t.text     "final_comment",         :limit => 16777215
     t.integer  "created_by_id"
-    t.boolean  "template",              :default => false
+    t.boolean  "template",                                  :default => false
     t.integer  "recurrence_id"
     t.string   "owner_type"
     t.datetime "close_date"
@@ -764,8 +780,8 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "faa_report_id"
     t.date     "issue_date"
     t.string   "title"
-    t.text     "safety_issue"
-    t.text     "corrective_action"
+    t.text     "safety_issue",      :limit => 16777215
+    t.text     "corrective_action", :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
@@ -787,14 +803,14 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "meeting_end"
     t.string   "review_timezone"
     t.string   "meeting_timezone"
-    t.text     "notes"
+    t.text     "notes",            :limit => 16777215
     t.string   "status"
     t.string   "imp"
     t.datetime "closing_date"
     t.integer  "custom_id"
     t.integer  "obj_id"
-    t.text     "privileges"
-    t.text     "final_comment"
+    t.text     "privileges",       :limit => 16777215
+    t.text     "final_comment",    :limit => 16777215
     t.string   "title"
     t.string   "meeting_type"
   end
@@ -813,7 +829,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
 
   create_table "messages", :force => true do |t|
     t.string   "subject"
-    t.text     "content"
+    t.text     "content",            :limit => 16777215
     t.datetime "due"
     t.integer  "response_id"
     t.integer  "response_outbox_id"
@@ -823,31 +839,53 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "owner_id"
   end
 
+  create_table "newsletter_attachments", :force => true do |t|
+    t.string   "name"
+    t.string   "caption"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "newsletters", :force => true do |t|
+    t.string   "title"
+    t.string   "status"
+    t.text     "distribution_list"
+    t.date     "complete_by_date"
+    t.date     "publish_date"
+    t.date     "archive_date"
+    t.integer  "user_id"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "notices", :force => true do |t|
     t.integer  "users_id"
-    t.text     "content"
-    t.integer  "status",     :default => 1
+    t.text     "content",    :limit => 16777215
+    t.integer  "status",                         :default => 1
     t.string   "owner_type"
     t.integer  "owner_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "start_date"
-    t.integer  "category",   :default => 1
+    t.integer  "category",                       :default => 1
     t.date     "end_date"
   end
 
   add_index "notices", ["users_id", "status"], :name => "index_notices_on_users_id_and_status"
 
-  create_table "oauth_nonces", :id => false, :force => true do |t|
-    t.integer  "id",         :default => 0, :null => false
+  create_table "oauth_nonces", :force => true do |t|
     t.string   "nonce"
     t.integer  "timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "oauth_tokens", :id => false, :force => true do |t|
-    t.integer  "id",                                  :default => 0, :null => false
+  add_index "oauth_nonces", ["nonce", "timestamp"], :name => "index_oauth_nonces_on_nonce_and_timestamp", :unique => true
+
+  create_table "oauth_tokens", :force => true do |t|
     t.integer  "user_id"
     t.string   "type",                  :limit => 20
     t.integer  "client_application_id"
@@ -863,15 +901,17 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "updated_at"
   end
 
+  add_index "oauth_tokens", ["token"], :name => "index_oauth_tokens_on_token", :unique => true
+
   create_table "occurrence_templates", :force => true do |t|
     t.integer  "parent_id"
     t.string   "title"
     t.string   "format"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "options"
-    t.boolean  "archived",   :default => false
-    t.string   "label",      :default => "Category"
+    t.text     "options",    :limit => 16777215
+    t.boolean  "archived",                       :default => false
+    t.string   "label",                          :default => "Category"
   end
 
   create_table "occurrences", :force => true do |t|
@@ -880,7 +920,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "owner_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "value"
+    t.text     "value",       :limit => 16777215
   end
 
   create_table "orm_fields", :force => true do |t|
@@ -917,7 +957,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   create_table "orm_templates", :force => true do |t|
     t.string   "name"
     t.integer  "created_by"
-    t.text     "description"
+    t.text     "description", :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -927,13 +967,13 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "title"
     t.integer  "owner_id"
     t.string   "level_of_compliance"
-    t.text     "statement"
-    t.text     "description"
-    t.text     "plan"
-    t.text     "responsibility"
+    t.text     "statement",           :limit => 16777215
+    t.text     "description",         :limit => 16777215
+    t.text     "plan",                :limit => 16777215
+    t.text     "responsibility",      :limit => 16777215
     t.date     "plan_due_date"
-    t.text     "comment"
-    t.string   "status",              :default => "Open"
+    t.text     "comment",             :limit => 16777215
+    t.string   "status",                                  :default => "Open"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "meeting_id"
@@ -943,7 +983,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "owner_obj_id"
     t.integer  "obj_id"
     t.integer  "meeting_obj_id"
-    t.text     "minutes"
+    t.text     "minutes",             :limit => 16777215
   end
 
   create_table "parents", :force => true do |t|
@@ -988,10 +1028,10 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
 
   create_table "privileges", :force => true do |t|
     t.string   "name"
-    t.text     "description"
+    t.text     "description", :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "example"
+    t.text     "example",     :limit => 16777215
   end
 
   create_table "queries", :force => true do |t|
@@ -1000,9 +1040,9 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "title"
     t.integer  "created_by_id"
     t.string   "target"
-    t.text     "templates"
-    t.text     "old_vis"
-    t.boolean  "is_ready_to_export", :default => false
+    t.text     "templates",          :limit => 16777215
+    t.text     "old_vis",            :limit => 16777215
+    t.boolean  "is_ready_to_export",                     :default => false
   end
 
   create_table "query_conditions", :force => true do |t|
@@ -1022,7 +1062,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
-    t.text     "privileges"
+    t.text     "privileges",   :limit => 16777215
     t.string   "target_class"
   end
 
@@ -1037,7 +1077,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
 
   create_table "recommendations", :force => true do |t|
     t.integer  "owner_id"
-    t.string   "status",                  :default => "New"
+    t.string   "status",                                      :default => "New"
     t.string   "owner_type"
     t.string   "title"
     t.string   "department"
@@ -1045,7 +1085,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.date     "response_date"
     t.boolean  "immediate_action"
     t.string   "recommended_action"
-    t.text     "description"
+    t.text     "description",             :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "open_date"
@@ -1053,17 +1093,17 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "custom_id"
     t.integer  "obj_id"
     t.integer  "owner_obj_id"
-    t.text     "privileges"
-    t.text     "recommendations_comment"
+    t.text     "privileges",              :limit => 16777215
+    t.text     "recommendations_comment", :limit => 16777215
     t.integer  "approver_id"
-    t.text     "final_comment"
+    t.text     "final_comment",           :limit => 16777215
     t.integer  "created_by_id"
     t.datetime "close_date"
     t.integer  "user_poc_id"
   end
 
   create_table "record_fields", :force => true do |t|
-    t.text     "value"
+    t.text     "value",      :limit => 16777215
     t.integer  "records_id"
     t.integer  "fields_id"
     t.datetime "created_at"
@@ -1094,11 +1134,11 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "risk_factor_after"
     t.datetime "close_date"
     t.boolean  "anonymous"
-    t.string   "event_time_zone",       :default => "UTC"
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
+    t.string   "event_time_zone"
     t.text     "final_comment"
     t.string   "eir"
     t.boolean  "scoreboard"
@@ -1110,6 +1150,8 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.text     "regulation"
     t.text     "notes"
     t.boolean  "confidential",          :default => false
+    t.boolean  "asrs_sent"
+    t.boolean  "regulatory_violation"
   end
 
   add_index "records", ["reports_id"], :name => "index_records_on_reports_id"
@@ -1130,6 +1172,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.date     "next_date"
     t.date     "end_date"
     t.integer  "number_of_recurrencies_per_interval", :default => 1
+    t.boolean  "carryover_responsible_user",          :default => false
   end
 
   create_table "report_meetings", :force => true do |t|
@@ -1152,32 +1195,33 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.boolean  "scoreboard"
     t.boolean  "asap"
     t.boolean  "sole"
-    t.text     "narrative"
-    t.text     "regulation"
-    t.text     "notes"
+    t.text     "narrative",             :limit => 16777215
+    t.text     "regulation",            :limit => 16777215
+    t.text     "notes",                 :limit => 16777215
     t.string   "severity"
     t.string   "likelihood"
     t.string   "risk_factor"
-    t.text     "statement"
+    t.text     "statement",             :limit => 16777215
     t.integer  "custom_id"
     t.integer  "obj_id"
     t.string   "likelihood_after"
     t.string   "severity_after"
     t.string   "risk_factor_after"
-    t.text     "minutes"
+    t.text     "minutes",               :limit => 16777215
     t.datetime "close_date"
-    t.text     "privileges"
+    t.text     "privileges",            :limit => 16777215
+    t.string   "severity_extra"
+    t.string   "probability_extra"
+    t.string   "mitigated_severity"
+    t.string   "mitigated_probability"
     t.string   "venue"
     t.string   "crew"
     t.string   "icao"
     t.string   "event_label"
     t.datetime "event_date"
-    t.string   "severity_extra"
-    t.string   "probability_extra"
-    t.string   "mitigated_severity"
-    t.string   "mitigated_probability"
     t.string   "event_station"
-    t.boolean  "cisp_sent",             :default => false
+    t.boolean  "cisp_sent",                                 :default => false
+    t.boolean  "regulatory_violation"
   end
 
   create_table "risk_analyses", :force => true do |t|
@@ -1195,27 +1239,28 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   create_table "risk_controls", :force => true do |t|
     t.string   "title"
     t.integer  "hazard_id"
-    t.string   "status",              :default => "New"
+    t.string   "status",                                  :default => "New"
     t.integer  "responsible_user_id"
     t.integer  "approver_id"
     t.date     "due_date"
     t.string   "control_type"
-    t.text     "description"
-    t.text     "monitoring"
+    t.text     "description",         :limit => 16777215
+    t.text     "monitoring",          :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "approver_comment"
-    t.text     "follow_up"
-    t.text     "notes"
+    t.text     "approver_comment",    :limit => 16777215
+    t.text     "follow_up",           :limit => 16777215
+    t.text     "notes",               :limit => 16777215
     t.boolean  "action_implemented"
     t.date     "open_date"
     t.integer  "custom_id"
     t.date     "follow_up_date"
-    t.text     "final_comment"
+    t.text     "final_comment",       :limit => 16777215
     t.integer  "created_by_id"
     t.datetime "close_date"
     t.string   "departments"
-    t.boolean  "faa_approval",        :default => false
+    t.boolean  "faa_approval",                            :default => false
+    t.string   "risk_category"
     t.text     "closing_comment"
   end
 
@@ -1249,7 +1294,6 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.integer  "privileges_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "poc_id"
   end
 
   create_table "root_causes", :force => true do |t|
@@ -1276,32 +1320,42 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "updated_at"
   end
 
-  add_index "sabres", ["employee_number"], :name => "index_sabres_on_employee_number"
-  add_index "sabres", ["employee_title"], :name => "index_sabres_on_employee_title"
   add_index "sabres", ["flight_date"], :name => "index_sabres_on_flight_date"
-  add_index "sabres", ["flight_number"], :name => "index_sabres_on_flight_number"
-  add_index "sabres", ["tail_number"], :name => "index_sabres_on_tail_number"
 
   create_table "safety_plans", :force => true do |t|
     t.string   "title"
     t.string   "risk_factor"
-    t.text     "concern"
-    t.text     "objective"
-    t.text     "background"
+    t.text     "concern",           :limit => 16777215
+    t.text     "objective",         :limit => 16777215
+    t.text     "background",        :limit => 16777215
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "time_period"
     t.integer  "monitor_interval"
-    t.text     "evaluation_items"
+    t.text     "evaluation_items",  :limit => 16777215
     t.date     "date_started"
     t.string   "result"
     t.string   "risk_factor_after"
-    t.string   "status",            :default => "New"
-    t.text     "follow_up"
+    t.string   "status",                                :default => "New"
+    t.text     "follow_up",         :limit => 16777215
     t.integer  "custom_id"
     t.integer  "created_by_id"
     t.datetime "close_date"
+  end
+
+  create_table "safety_surveys", :force => true do |t|
+    t.string   "title"
+    t.string   "status"
+    t.text     "distribution_list"
+    t.text     "description"
+    t.date     "complete_by_date"
+    t.date     "publish_date"
+    t.date     "archive_date"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "anonymous",         :default => false
   end
 
   create_table "section_fields", :force => true do |t|
@@ -1318,7 +1372,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "title"
     t.integer  "assignee_id"
     t.integer  "approver_id"
-    t.text     "notes"
+    t.text     "notes",       :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1348,27 +1402,27 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "responsible_department"
     t.date     "due_date"
     t.boolean  "immediate_action"
-    t.text     "immediate_action_comment"
+    t.text     "immediate_action_comment",     :limit => 16777215
     t.boolean  "comprehensive_action"
-    t.text     "comprehensive_action_comment"
+    t.text     "comprehensive_action_comment", :limit => 16777215
     t.integer  "approver_id"
     t.string   "action_taken"
-    t.text     "description"
+    t.text     "description",                  :limit => 16777215
     t.integer  "owner_id"
-    t.string   "status",                       :default => "New"
+    t.string   "status",                                           :default => "New"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "responsible_user_id"
     t.boolean  "emp"
     t.boolean  "dep"
     t.string   "owner_type"
-    t.text     "comment"
+    t.text     "comment",                      :limit => 16777215
     t.date     "open_date"
     t.integer  "custom_id"
     t.integer  "owner_obj_id"
     t.integer  "obj_id"
-    t.text     "privileges"
-    t.text     "sms_actions_comment"
+    t.text     "privileges",                   :limit => 16777215
+    t.text     "sms_actions_comment",          :limit => 16777215
     t.string   "severity"
     t.string   "likelihood"
     t.string   "risk_factor"
@@ -1381,11 +1435,11 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "mitigated_probability"
     t.string   "extra_risk"
     t.string   "mitigated_risk"
-    t.text     "statement"
-    t.text     "final_comment"
+    t.text     "statement",                    :limit => 16777215
+    t.text     "final_comment",                :limit => 16777215
     t.integer  "created_by_id"
     t.datetime "close_date"
-    t.boolean  "faa_approval",                 :default => false
+    t.boolean  "faa_approval",                                     :default => false
     t.integer  "user_poc_id"
     t.integer  "approver_poc_id"
   end
@@ -1398,24 +1452,28 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.date     "due_date"
     t.integer  "app_id"
     t.string   "action"
-    t.text     "description"
+    t.text     "description",   :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "owner_type"
     t.integer  "owner_obj_id"
+    t.string   "status",                            :default => "New"
+    t.text     "res_comment"
+    t.text     "final_comment"
+    t.datetime "close_date"
   end
 
   create_table "sras", :force => true do |t|
     t.string   "title"
     t.string   "type_of_change"
-    t.text     "current_description"
-    t.text     "plan_description"
-    t.text     "departments"
-    t.text     "departments_comment"
-    t.text     "manuals"
-    t.text     "manuals_comment"
-    t.text     "programs"
-    t.text     "programs_comment"
+    t.text     "current_description",   :limit => 16777215
+    t.text     "plan_description",      :limit => 16777215
+    t.text     "departments",           :limit => 16777215
+    t.text     "departments_comment",   :limit => 16777215
+    t.text     "manuals",               :limit => 16777215
+    t.text     "manuals_comment",       :limit => 16777215
+    t.text     "programs",              :limit => 16777215
+    t.text     "programs_comment",      :limit => 16777215
     t.date     "due_date"
     t.integer  "approver_id"
     t.datetime "created_at"
@@ -1423,15 +1481,15 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "other_department"
     t.string   "other_manual"
     t.string   "other_program"
-    t.string   "status",                :default => "Open"
+    t.string   "status",                                    :default => "Open"
     t.integer  "reviewer_id"
     t.string   "system_task"
-    t.text     "compliances"
-    t.text     "compliances_comment"
+    t.text     "compliances",           :limit => 16777215
+    t.text     "compliances_comment",   :limit => 16777215
     t.string   "other_compliance"
-    t.text     "closing_comment"
-    t.text     "reviewer_comment"
-    t.text     "approver_comment"
+    t.text     "closing_comment",       :limit => 16777215
+    t.text     "reviewer_comment",      :limit => 16777215
+    t.text     "approver_comment",      :limit => 16777215
     t.integer  "responsible_user_id"
     t.integer  "meeting_id"
     t.integer  "custom_id"
@@ -1441,15 +1499,14 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "likelihood_after"
     t.string   "severity_after"
     t.string   "risk_factor_after"
-    t.text     "statement"
-    t.boolean  "viewer_access",         :default => false
-    t.text     "minutes"
+    t.text     "statement",             :limit => 16777215
+    t.boolean  "viewer_access",                             :default => false
+    t.text     "minutes",               :limit => 16777215
     t.integer  "owner_id"
     t.string   "severity_extra"
     t.string   "probability_extra"
     t.string   "mitigated_severity"
     t.string   "mitigated_probability"
-    t.datetime "followup_date"
     t.integer  "created_by_id"
     t.string   "owner_type"
     t.datetime "close_date"
@@ -1457,7 +1514,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   end
 
   create_table "submission_fields", :force => true do |t|
-    t.text     "value"
+    t.text     "value",          :limit => 16777215
     t.integer  "submissions_id"
     t.integer  "fields_id"
     t.datetime "created_at"
@@ -1472,7 +1529,7 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   create_table "submissions", :force => true do |t|
     t.integer  "records_id"
     t.integer  "templates_id"
-    t.text     "description"
+    t.text     "description",     :limit => 16777215
     t.datetime "event_date"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1481,10 +1538,10 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.boolean  "completed"
     t.integer  "custom_id"
     t.boolean  "anonymous"
-    t.string   "event_time_zone", :default => "UTC"
+    t.string   "event_time_zone"
     t.integer  "owner_id"
     t.string   "type"
-    t.boolean  "confidential",    :default => false
+    t.boolean  "confidential",                        :default => false
   end
 
   add_index "submissions", ["completed"], :name => "index_submissions_on_completed"
@@ -1493,11 +1550,21 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
   add_index "submissions", ["templates_id"], :name => "index_submissions_on_templates_id"
   add_index "submissions", ["user_id"], :name => "index_submissions_on_user_id"
 
+  create_table "subscriptions", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_id"
+    t.integer  "frequency"
+    t.string   "day"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+  end
+
   create_table "tax_attributes", :force => true do |t|
     t.string "category"
     t.string "label"
     t.string "url_reference"
-    t.text   "definition"
+    t.text   "definition",    :limit => 16777215
     t.string "control_class"
     t.string "source"
   end
@@ -1512,12 +1579,12 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "report_type"
     t.integer  "map_template_id"
     t.string   "js_link"
-    t.boolean  "archive",           :default => false
-    t.boolean  "allow_anonymous",   :default => false
-    t.string   "description"
+    t.boolean  "archive",                               :default => false
+    t.boolean  "allow_anonymous",                       :default => false
+    t.text     "description"
     t.string   "default_status"
-    t.text     "submitter_message"
-    t.text     "notifier_message"
+    t.text     "submitter_message", :limit => 16777215
+    t.text     "notifier_message",  :limit => 16777215
   end
 
   create_table "trackings", :force => true do |t|
@@ -1580,10 +1647,10 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.datetime "last_seen_at"
     t.string   "sso_id"
     t.datetime "privileges_last_updated"
-    t.integer  "mobile_fetch_months",                  :default => 3,     :null => false
-    t.text     "departments"
+    t.integer  "mobile_fetch_months",                         :default => 3,     :null => false
+    t.text     "departments",             :limit => 16777215
     t.integer  "poc_id"
-    t.boolean  "ignore_updates",                       :default => false
+    t.boolean  "ignore_updates",                              :default => false
   end
 
   create_table "verifications", :force => true do |t|
@@ -1592,18 +1659,18 @@ ActiveRecord::Schema.define(:version => 20210716215503) do
     t.string   "owner_type"
     t.integer  "owner_id"
     t.string   "users_id"
-    t.text     "detail"
-    t.string   "status",                :default => "New"
+    t.text     "detail",                :limit => 16777215
+    t.string   "status",                                    :default => "New"
     t.date     "verify_date"
     t.date     "address_date"
-    t.text     "address_comment"
-    t.text     "additional_validators"
+    t.text     "address_comment",       :limit => 16777215
+    t.text     "additional_validators", :limit => 16777215
   end
 
   create_table "viewer_comments", :force => true do |t|
     t.string   "owner_type"
     t.integer  "owner_id"
-    t.text     "content"
+    t.text     "content",    :limit => 16777215
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"

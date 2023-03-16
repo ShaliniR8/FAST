@@ -49,6 +49,7 @@ group :development, :test do
 #   gem 'webrat'
 end
 
+gem 'railties'
 
 #gem "nifty-generators", :group => :development
 gem "bcrypt-ruby", :require => "bcrypt"

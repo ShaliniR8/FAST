@@ -14,7 +14,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           :extension_requests],
         fields: {
           id: { default: true, visible: 'index'},
-          uniq_custom_id: { visible: 'index,show' },
+          uniq_custom_id: { visible: 'index,show', title: 'Custom ID', field: 'uniq_custom_id', num_cols: 6 },
           title: { default: true },
           status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
@@ -70,9 +70,9 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
           #INLINE
-          *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost sms_action comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[causes comments sras findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
+        panels: %i[causes comments sras sms_actions contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 

@@ -161,6 +161,7 @@ DEPENDENCIES
   pdfkit (= 0.5.0)
   prawn
   rails (= 3.0.5)
+  railties
   rake (= 0.9.6)
   roo (= 2.7.0)
   ruby-ole
