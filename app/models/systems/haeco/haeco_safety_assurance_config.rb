@@ -56,10 +56,9 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           instruction: { default: true, title: 'Audit Instructions' },
           comment: { default: true, title: "Auditor's Comments", visible: 'show' },
           final_comment: { default: true, title: "Final Approver's Comments" },
-          # 1. @sha - removed visibility of findings here
           findings: {
             field: 'included_findings', title: 'Included Findings',
-            num_cols: 6,  type: 'text', visible: '', 
+            num_cols: 6,  type: 'text', visible: 'index',
             required: false
           },
           verifications: { default: true },

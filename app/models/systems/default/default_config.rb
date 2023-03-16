@@ -49,8 +49,6 @@ class DefaultConfig
     attachment_identified_view_access:  true,
     hide_submission_in_dashboard:       false,
     hide_findings_in_checklist:         false,
-   
-
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,
