@@ -527,9 +527,9 @@ class DefaultSafetyAssuranceConfig
           responsible_user: { default: true },
           approver: { default: true, visible: 'index,form,show,auto', required: false },
           responsible_department: {
-            field: 'responsible_department', title: 'Classification',
+            field: 'responsible_department', title: 'Responsible Department',
             num_cols: 6, type: 'select', visible: 'form,show',
-            required: false, options: "CONFIG.custom_options['Classification']"
+            required: false, options: "CONFIG.custom_options['Departments']"
           },
           faa_approval: {
             field: 'faa_approval', title: 'Requires FAA Approval',
@@ -551,7 +551,7 @@ class DefaultSafetyAssuranceConfig
             required: false, on_newline: true
           },
           immediate_action_comment: {
-            field: 'immediate_action_comment', title: 'Findings & References',
+            field: 'immediate_action_comment', title: 'Immediate Action Comment',
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
@@ -560,13 +560,8 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6, type: 'boolean_box', visible: 'form,show',
             required: false
           },
-          description: {
-            field: 'description', title: 'Description of Corrective Action',
-            num_cols: 12, type: 'textarea', visible: 'form,show',
-            required: false
-          },
           comprehensive_action_comment: {
-            field: 'comprehensive_action_comment', title: 'Description of Preventive Action',
+            field: 'comprehensive_action_comment', title: 'Comprehensive Action Comment',
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
@@ -574,6 +569,11 @@ class DefaultSafetyAssuranceConfig
             field: 'action_taken', title: 'Action Taken',
             num_cols: 12, type: 'datalist', visible: 'form,show',
             required: false, options: "CONFIG.custom_options['Actions Taken']"
+          },
+          description: {
+            field: 'description', title: 'Description of Corrective Action',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
+            required: false
           },
           sms_actions_comment: {
             field: 'sms_actions_comment', title: "Responsible User's Comments",
@@ -600,7 +600,8 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           assign: {
             access: proc { |owner:,user:,**op|
-              DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op)
+              DICTIONARY::ACTION[:assign][:access].call(owner:owner,user:user,**op) &&
+              (owner.immediate_action || (%w[Completed].include? owner.owner.status rescue true))
             },
           },
         }),

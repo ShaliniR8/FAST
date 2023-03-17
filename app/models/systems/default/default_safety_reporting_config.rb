@@ -344,11 +344,6 @@ class DefaultSafetyReportingConfig
           :extension_requests],
         fields: {
           id: { default: true },
-          response: {
-            field: 'response', title: 'Response',
-            num_cols: 12, type: 'textarea', visible: 'form,show',
-            required: false
-          },
           status: { default: true, type: 'select', options: CorrectiveAction.getStatusOptions },
           created_by: { default: true },
           recommendation: {
@@ -373,16 +368,16 @@ class DefaultSafetyReportingConfig
             num_cols: 6,  type: 'date', visible: 'show',
             required: false
           },
+          department: {
+            field: 'department', title: 'Department',
+            num_cols: 6,  type: 'select', visible: 'form,show',
+            required: false, options: "CONFIG.custom_options['Departments']"
+          },
           responsible_user: { default: true, on_newline: true }, # for form and show
           approver: { default: true },
           faa_approval: {
             field: 'faa_approval', title: 'Requires FAA Approval',
             num_cols: 6,  type: 'boolean_box', visible: 'none',
-          },
-          department: {
-            field: 'department', title: 'Classification',
-            num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: "CONFIG.custom_options['Classification']"
           },
           company: {
             field: 'company', title: 'Company Corrective Action',
@@ -415,15 +410,20 @@ class DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
+          corrective_actions_comment: {
+            field: 'corrective_actions_comment', title: "Comprehensive Action Detail",
+            num_cols: 10, type: 'textarea', visible: 'show',
+            required: false
+          },
           action: {
             field: 'action', title: 'Action',
             num_cols: 6,  type: 'datalist', visible: 'index,form,show',
             required: false, options: "CONFIG.custom_options['Actions List for Corrective Actions']",
             on_newline: true # for form and show
           },
-          corrective_actions_comment: {
-            field: 'corrective_actions_comment', title: "Responsible User's Comments",
-            num_cols: 12, type: 'textarea', visible: 'show',
+          response: {
+            field: 'response', title: 'Response',
+            num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
