@@ -58,7 +58,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           final_comment: { default: true, title: "Final Approver's Comments" },
           findings: {
             field: 'included_findings', title: 'Included Findings',
-            num_cols: 6,  type: 'text', visible: 'index',
+            num_cols: 6,  type: 'text', visible: '',
             required: false
           },
           verifications: { default: true },
@@ -317,7 +317,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" },
           findings: {
             field: 'included_findings', title: 'Included Findings',
-            num_cols: 6,  type: 'text', visible: 'index',
+            num_cols: 6,  type: 'text', visible: '',
             required: false
           },
         }.reduce({}) { |acc,(key,data)|
@@ -327,9 +327,9 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #TOP
           *%i[delete override_status edit launch sign deid_pdf pdf view_parent viewer_access attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action finding comment],
+          *%i[assign complete request_extension schedule_verification approve_reject reopen recommendation contact task cost sms_action comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments occurrences source_of_input sras findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments occurrences source_of_input sras contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
