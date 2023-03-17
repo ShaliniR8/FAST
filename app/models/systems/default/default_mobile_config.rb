@@ -242,7 +242,6 @@ class DefaultMobileConfig
     key_name: 'Berry Aviation',
     portals: %i[
       bya_dir
-      bya_sso
     ]
     },
 
