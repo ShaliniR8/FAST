@@ -14,5 +14,6 @@ class ServicesGenerator < Rails::Generators::NamedBase
     puts "  sudo systemctl daemon-reload"
     puts "  sudo systemctl enable #{service}"
     puts "  sudo systemctl start #{service}"
+    puts "  sudo echo 'reluser ALL = NOPASSWD: /usr/bin/systemctl restart delayed_job_PST_#{AIRLINE_CODE}' | sudo EDITOR=\"tee -a\" visudo"
   end
 end
