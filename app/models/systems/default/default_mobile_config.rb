@@ -73,6 +73,10 @@ class DefaultMobileConfig
     haeco_dir: { label: 'Login with ProSafeT', subdomain: 'haeco' },
     haeco_sso: { label: 'Login with HAECO Americas', subdomain: 'haeco', sso: true},
 
+    #BYA(Berry) Portals
+    bya_dir: { label: 'Login with ProSafeT', subdomain: 'berry' },
+    bya_sso: { label: 'Login with Berry Aviation', subdomain: 'berry', sso: true},
+
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -232,6 +236,14 @@ class DefaultMobileConfig
         haeco_dir
         haeco_sso
       ]
+    },
+
+    'BYA Key' => { # CB98-66AC-D5F3-AFBE
+    key_name: 'Berry Aviation',
+    portals: %i[
+      bya_dir
+      bya_sso
+    ]
     },
 
   }.map{ |key, value|
