@@ -474,6 +474,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'clone'
     end
     collection do
+      post 'upload'
+      get 'upload_view'
       get "show_nested"
       post "edit_nested_fields"
     end
