@@ -37,32 +37,37 @@ class TemplatesController < ApplicationController
   end
 
   def upload
-    yaml_attr = YAML.load_file(params["temp_upload"].path)
-    Template.transaction do
-      begin
-        # extract template
-        t = Template.extract_template(yaml_attr, current_user)
-        @template = t[:template]
-        error_msg = t[:error_msg]
+    byebug
+    begin
+      yaml_attr = YAML.load_file(params["temp_upload"].path)
+      Template.transaction do
+        begin
+          # extract template
+          t = Template.extract_template(yaml_attr, current_user)
+          @template = t[:template]
+          error_msg = t[:error_msg]
 
 
-        if error_msg == ""
-          AccessControl.get_template_opts.map { |disp, db_val|
-            AccessControl.new({
-              list_type: 1,
-              action: db_val,
-              entry: @template[:name],
-              viewer_access: 1
-            }).save
-          }
-          redirect_to template_path(@template), flash: {success: "Template #{@template.id} created."}
-        else
+          if error_msg == ""
+            AccessControl.get_template_opts.map { |disp, db_val|
+              AccessControl.new({
+                list_type: 1,
+                action: db_val,
+                entry: @template[:name],
+                viewer_access: 1
+              }).save
+            }
+            redirect_to template_path(@template), flash: {success: "Template #{@template.id} created."}
+          else
+            raise ActiveRecord::Rollback
+          end
+        rescue
+          redirect_to templates_path, flash: {error: error_msg}
           raise ActiveRecord::Rollback
         end
-      rescue
-        redirect_to templates_path, flash: {error: error_msg}
-        raise ActiveRecord::Rollback
       end
+    rescue Psych::SyntaxError => e
+        redirect_to templates_path, flash: {error: e.message.split(':')[-1]}
     end
     @action = "upload"
     @eccairs_attributes = EccairsAttribute.all
