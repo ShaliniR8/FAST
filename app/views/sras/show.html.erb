@@ -100,5 +100,17 @@
         }
       });
     });
+
+    if ("<%= CONFIG.srm::GENERAL[:one_page_sra].present? %>" == "true") {
+      $('.click-heading').each(function(){
+        if(!$(this).hasClass('collapsed')){
+          $(this).trigger('click');
+        }
+      });
+      if ($('.show-risk-panel').hasClass('collapsed')){
+        $('.show-risk-panel').trigger('click');
+      }
+    }
+
   });
 </script>

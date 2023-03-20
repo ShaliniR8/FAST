@@ -33,29 +33,63 @@
             <div class="form-group col-xs-12">
               <div class="col-xs-12">
                 <label for="one_page_sra">
-                  <%=check_box_tag 'create_hazard', 0, false, class: 'form-control create_hazard col-xs-4'%>
-                  <span>Create Hazard alongside SRA?</span>
+                  <%=check_box_tag 'create_hazard_risk_control', 0, false, class: 'form-control create_hazard_risk_control col-xs-4'%>
+                  <span>Create Hazard and Risk Control alongside SRA?</span>
                 </label>
               </div>
             </div>
           <%end%>
 
-          <div class="form-group col-xs-6 hazard_fields" style="display:none;">
-            <%=label_tag 'htitle', "Hazard Title", :class => "required_label"%>
-            <%=text_field_tag 'hazard_title', nil, :class => "hazard_title form-control"%>
-          </div>
-
-          <div class="form-group col-xs-6 hazard_fields" style="display:none;">
-            <%=label_tag 'hdate', "Hazard Scheduled Completion Date", :class => "required_label"%>
-            <%=text_field_tag 'hazard_completion_date', nil, :class => "hazard_completion_date form-control field-date", 'data-format' => CONFIG.getTimeFormat[:datepicker]%>
-          </div>
-
-          <div class="form-group col-xs-12 hazard_fields" style="display:none;">
-            <%=label_tag 'hdesc', "Hazard Description"%>
-            <%=text_area_tag 'hazard_description', nil, :class => "hazard_description form-control", :rows => 4%>
-          </div>
-
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @sra%>
+
+          <div class="col-xs-12 hazard_risk_control_panel" style="display:none">
+            <div class="panel panel-lightskyblue mt10">
+              <div class="panel-heading click-heading">
+                <div class="panel-title">
+                  <b>Hazard and Risk Control Fields</b>
+                  <span class="pull-right clickable">
+                    <i class="mt5 glyphicon glyphicon-chevron-up"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div class="form-group col-xs-6">
+                      <%=label_tag 'htitle', "Hazard Title", :class => "required_label"%>
+                      <%=text_field_tag 'hazard_title', nil, :class => "hazard_title form-control"%>
+                    </div>
+
+                    <div class="form-group col-xs-6">
+                      <%=label_tag 'hdate', "Hazard Scheduled Completion Date", :class => "required_label"%>
+                      <%=text_field_tag 'hazard_completion_date', nil, :class => "hazard_completion_date form-control field-date", 'data-format' => CONFIG.getTimeFormat[:datepicker]%>
+                    </div>
+
+                    <div class="form-group col-xs-12">
+                      <%=label_tag 'hdesc', "Hazard Description"%>
+                      <%=text_area_tag 'hazard_description', nil, :class => "hazard_description form-control", :rows => 4%>
+                    </div>
+
+                    <div class="form-group col-xs-6">
+                      <%=label_tag 'rtitle', "Risk Control Title", :class => "required_label"%>
+                      <%=text_field_tag 'risk_title', nil, :class => "risk_title form-control"%>
+                    </div>
+
+                    <div class="form-group col-xs-6">
+                      <%=label_tag 'rdate', "Risk Control Scheduled Completion Date", :class => "required_label"%>
+                      <%=text_field_tag 'risk_completion_date', nil, :class => "risk_completion_date form-control field-date", 'data-format' => CONFIG.getTimeFormat[:datepicker]%>
+                    </div>
+
+                    <div class="form-group col-xs-12">
+                      <%=label_tag 'rdesc', "Risk Control Description"%>
+                      <%=text_area_tag 'risk_description', nil, :class => "risk_description form-control", :rows => 4%>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <%=render '/forms/attachments_form', :f => f, :owner => @sra%>
 
           <div class="mt10 mr10">
@@ -97,17 +131,49 @@
       reset_risk();
     });
 
-    $('.create_hazard').on('change', function(){
+    var approver_already_required = $('#empapprover_id').hasClass('required_field');
+    var responsible_already_required = $('#empresponsible_user_id').hasClass('required_field');
+    var original_approver_text = $('#empapprover_id').closest('.form-group').find('label').html();
+    var original_responsible_text = $('#empresponsible_user_id').closest('.form-group').find('label').html();
+    var added_text = " (This user will be mirrored on Hazard and Risk Control)"
+
+    $('.create_hazard_risk_control').on('change', function(){
       if($(this).is(':checked')){
-        $('.hazard_fields').show();
+        $('.hazard_risk_control_panel').show();
         $(this).val(1);
         $('.hazard_title').addClass('required_field');
         $('.hazard_completion_date').addClass('required_field');
+        $('.risk_title').addClass('required_field');
+        $('.risk_completion_date').addClass('required_field');
+
+        $('#empapprover_id').addClass('required_field');
+        $('#empapprover_id').closest('.form-group').find('label').html(original_approver_text + added_text);
+        $('#empapprover_id').closest('.form-group').find('label').addClass('required_label');
+
+        $('#empresponsible_user_id').addClass('required_field');
+        $('#empresponsible_user_id').closest('.form-group').find('label').html(original_responsible_text + added_text);
+        $('#empresponsible_user_id').closest('.form-group').find('label').addClass('required_label');
       } else{
-        $('.hazard_fields').hide();
+        $('.hazard_risk_control_panel').hide();
         $(this).val(0);
         $('.hazard_title').removeClass('required_field');
         $('.hazard_completion_date').removeClass('required_field');
+        $('.risk_title').removeClass('required_field');
+        $('.risk_completion_date').removeClass('required_field');
+        $('#empapprover_id').removeClass('required_field');
+        $('#empresponsible_user_id').removeClass('required_field');
+
+        if (!approver_already_required) {
+          $('#empapprover_id').removeClass('required_field');
+          $('#empapprover_id').closest('.form-group').find('label').html(original_approver_text);
+          $('#empapprover_id').closest('.form-group').find('label').removeClass('required_label');
+        }
+
+        if (!responsible_already_required) {
+          $('#empresponsible_user_id').removeClass('required_field');
+          $('#empresponsible_user_id').closest('.form-group').find('label').html(original_responsible_text);
+          $('#empresponsible_user_id').closest('.form-group').find('label').removeClass('required_label');
+        }
       }
     });
 
