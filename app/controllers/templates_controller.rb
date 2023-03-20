@@ -37,7 +37,6 @@ class TemplatesController < ApplicationController
   end
 
   def upload
-    byebug
     begin
       yaml_attr = YAML.load_file(params["temp_upload"].path)
       Template.transaction do
