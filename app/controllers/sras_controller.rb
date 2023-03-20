@@ -83,21 +83,6 @@ class SrasController < ApplicationController
   end
 
 
-# Hazard(id: integer, type: string, title: string, sra_id: integer, description: text, severity: integer, likelihood: string, risk_factor: string,
-#   statement: text, created_at: datetime, updated_at: datetime, status: string, custom_id: integer, likelihood_after: string, severity_after: string,
-#   risk_factor_after: string, close_date: datetime, severity_extra: string, probability_extra: string, mitigated_severity: string, mitigated_probability: string,
-#   created_by_id: integer, departments: string, due_date: date, responsible_user_id: integer, approver_id: integer, final_comment: text, closing_comment: text)
-
-# Parameters: {"utf8"=>"✓", "authenticity_token"=>"2VB8D3pdWv59U0lvkEQ8t4yQgldQKpb/cZvX49n7ffg=", "sra"=>{"created_by_id"=>"1", "parent_type"=>"", "parent_id"=>"",
-#   "title"=>"New Test Sra #1", "type_of_change"=>"Ineffective Risk Controls", "system_task"=>"", "responsible_user_id"=>"1330", "reviewer_id"=>"", "approver_id"=>"1",
-#   "due_date"=>"2023-01-21", "current_description"=>"", "plan_description"=>"", "departments"=>["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-#   "other_department"=>"", "departments_comment"=>"", "programs"=>["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], "other_program"=>"",
-#   "programs_comment"=>"", "manuals"=>["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-#     "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], "other_manual"=>"", "manuals_comment"=>"", "compliances"=>["", "", "", "", "", "", ""],
-#     "other_compliance"=>"", "compliances_comment"=>""}, "create_hazard"=>"1", "hazard_title"=>"Hazard Title #1", "hazard_completion_date"=>"2023-01-20",
-#     "hazard_description"=>"Hazard Description #1", "users_length"=>"5", "Responsible User"=>"Stephanie Gabert", "Quality Reviewer"=>"", "Final Approver"=>"ProSafeT Engineering",
-#     "commit"=>"Submit"}
-
   def create
     @sra = Sra.create(params[:sra])
     @sra.status = 'New'
@@ -110,7 +95,7 @@ class SrasController < ApplicationController
       connection.save
     end
     if @sra.save
-      if CONFIG.srm::GENERAL[:one_page_sra].present? && params[:create_hazard].present? && params[:create_hazard].to_i == 1
+      if CONFIG.srm::GENERAL[:one_page_sra].present? && params[:create_hazard_risk_control].present? && params[:create_hazard_risk_control].to_i == 1
         hazard = Hazard.new
         hazard.status = 'New'
         hazard.title = params[:hazard_title]
@@ -118,12 +103,26 @@ class SrasController < ApplicationController
         hazard.description = params[:hazard_description]
         hazard.sra_id = @sra.id
         hazard.created_by_id = params[:sra][:created_by_id]
-        hazard.responsible_user_id = params[:sra][:responsible_user_id] if params[:sra][:responsible_user_id].present?
-        hazard.approver_id = params[:sra][:approver_id] if params[:sra][:approver_id].present?
+        hazard.responsible_user_id = params[:sra][:responsible_user_id]
+        hazard.approver_id = params[:sra][:approver_id]
 
         hazard.save
         notify_on_object_creation(hazard)
-        message = "SRA (SRM) created along with associated Hazard."
+
+        risk_control = RiskControl.new
+        risk_control.status = 'New'
+        risk_control.title = params[:risk_title]
+        risk_control.due_date = params[:risk_completion_date]
+        risk_control.description = params[:risk_description]
+        risk_control.hazard_id = hazard.id
+        risk_control.created_by_id = params[:sra][:created_by_id]
+        risk_control.responsible_user_id = params[:sra][:responsible_user_id]
+        risk_control.approver_id = params[:sra][:approver_id]
+
+        risk_control.save
+        notify_on_object_creation(risk_control)
+
+        message = "SRA (SRM) created along with associated Hazard and Risk Control."
       end
       notify_on_object_creation(@sra)
       redirect_to sra_path(@sra), flash: {success: message}
