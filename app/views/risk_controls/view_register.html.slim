@@ -46,35 +46,17 @@
                                 | #{hazard.occurrences.map(&:value).join(",")}
                           - elsif head == 'owner_initial_risk'
                             - if hazard.risk_factor.present?
-                              - if hazard.risk_factor.downcase.include?("yellow") || hazard.risk_factor.downcase.include?("moderate")
-                                td style="background-color:yellow;"
-                                  | #{hazard[:risk_factor]}
-                              - elsif hazard.risk_factor.downcase.include?("green") || hazard.risk_factor.downcase.include?("low")
-                                td style="background-color:limegreen;"
-                                  | #{hazard[:risk_factor]}
-                              - elsif hazard.risk_factor.downcase.include?("red") || hazard.risk_factor.downcase.include?("high")
-                                td style="background-color:red;"
-                                  | #{hazard[:risk_factor]}
-                              - else
-                                td
-                                  | #{hazard[:risk_factor]}
+                              - risk_color = CONFIG::MATRIX_INFO[:risk_table_index][hazard.risk_factor]
+                              td style='background-color:#{risk_color};'
+                                | #{hazard[:risk_factor]}
                             - else
                               td
                                 | #{hazard[:risk_factor]}
                           - elsif head == 'owner_residual_risk'
                             - if hazard.risk_factor_after.present?
-                              - if hazard.risk_factor_after.downcase.include?("yellow") || hazard.risk_factor_after.downcase.include?("moderate")
-                                td style="background-color:yellow;"
-                                  | #{hazard[:risk_factor_after]}
-                              - elsif hazard.risk_factor_after.downcase.include?("green") || hazard.risk_factor_after.downcase.include?("low")
-                                td style="background-color:limegreen;"
-                                  | #{hazard[:risk_factor_after]}
-                              - elsif hazard.risk_factor_after.downcase.include?("red") || hazard.risk_factor_after.downcase.include?("high")
-                                td style="background-color:red;"
-                                  | #{hazard[:risk_factor_after]}
-                              - else
-                                td
-                                  | #{hazard[:risk_factor_after]}
+                              - risk_color = CONFIG::MATRIX_INFO[:risk_table_index][hazard.risk_factor_after]
+                              td style="background-color:#{risk_color};"
+                                | #{hazard[:risk_factor_after]}
                             - else
                               td
                                 | #{hazard[:risk_factor_after]}
