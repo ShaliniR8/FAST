@@ -472,6 +472,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'get_json'
       get "archive"
       get 'clone'
+      get 'export'
     end
     collection do
       post 'upload'

@@ -191,4 +191,8 @@ class TemplatesController < ApplicationController
     end
   end
 
+  def export
+    byebug
+    @template = Template.find(params[:id])
+  end
 end
