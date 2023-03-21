@@ -84,6 +84,8 @@ ruby:
   - when :deid_pdf
     = link_to 'De-ID PDF',
       eval("interpret_#{owner_class}_path(owner, act: :deid_pdf, format: :pdf, deidentified: true, op: op)"),
+      'data-toggle' => 'tooltip',
+      title: 'View De-Identified PDF',
       class: 'btn btn-darkturquoise pull-right mr5 mb5'
 
   - when :delete
