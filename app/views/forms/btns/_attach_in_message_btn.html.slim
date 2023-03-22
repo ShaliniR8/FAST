@@ -1,4 +1,6 @@
 = link_to 'Attach in Message',
   eval("new_message_path(owner_id: owner.id, owner_class: owner.class)"),
   class: 'btn btn-warning pull-right mb5 mr5',
+  'data-toggle' => 'tooltip',
+  title: "Send a message from the message center and attach the current #{owner.class.name.split('_').join(' ').upcase} to the message",
   disable_with: 'Redirecting...'
