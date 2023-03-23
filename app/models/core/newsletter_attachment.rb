@@ -5,6 +5,7 @@ class NewsletterAttachment < ActiveRecord::Base
 
   after_create :create_transaction
   before_destroy :delete_transaction
+  serialize :user_ids
 
   def self.image_extensions
     ['png', 'jpg', 'jpeg']
