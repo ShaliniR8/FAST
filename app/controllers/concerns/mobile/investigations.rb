@@ -5,6 +5,10 @@ module Concerns
   module Mobile
     module Investigations extend ActiveSupport::Concern
 
+      def update_as_json
+        render :json => { :success => 'Investigation Updated.' }, :status => 200
+      end
+
       def index_as_json
         fetch_months = current_user.mobile_fetch_months
         @records = fetch_months > 0 ? Investigation.where("created_at > ? AND status != ?", Time.now - fetch_months.months, "New")

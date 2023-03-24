@@ -36,6 +36,7 @@ class Investigation < Sa::SafetyAssuranceBase
 
   accepts_nested_attributes_for :causes
   accepts_nested_attributes_for :descriptions
+  accepts_nested_attributes_for :checklists
 
   after_create :create_transaction
   after_save :delete_cached_fragments

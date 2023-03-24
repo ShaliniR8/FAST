@@ -25,6 +25,8 @@ module Concerns
           when 'Safety Assurance'
             submodules.push('Audits') if current_user.has_access('audits', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && 
                                          current_user.has_access('audits', 'index', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+            submodules.push('Investigations') if current_user.has_access('investigations', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: true) && 
+                                              current_user.has_access('investigations', 'index', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
           end
           module_access[module_name] = submodules if submodules.length > 0 &&
             CONFIG.mobile_modules.include?(module_name)

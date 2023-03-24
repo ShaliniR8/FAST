@@ -175,13 +175,18 @@ class InvestigationsController < SafetyAssuranceController
 
 
   def show
-    @type = 'investigations'
-    @cause_headers = InvestigationCause.get_headers
-    @desc_headers = InvestigationDescription.get_headers
-    load_options
-    @fields = Investigation.get_meta_fields('show')
-    @recommendation_fields = Recommendation.get_meta_fields('show')
-    load_special_matrix(@investigation)
+    respond_to do |format|
+      format.html do
+        @type = 'investigations'
+        @cause_headers = InvestigationCause.get_headers
+        @desc_headers = InvestigationDescription.get_headers
+        load_options
+        @fields = Investigation.get_meta_fields('show')
+        @recommendation_fields = Recommendation.get_meta_fields('show')
+        load_special_matrix(@investigation)
+      end
+      format.json { show_as_json }
+    end
   end
 
 
