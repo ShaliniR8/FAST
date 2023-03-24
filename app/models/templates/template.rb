@@ -176,4 +176,15 @@ class Template < ActiveRecord::Base
     end
     {:template => @template, :error_msg => error_msg}
   end
+
+  def self.toJson(id)
+    @template = self.find(id)
+    excluded_fields = ["id", "created_at", "updated_at", "users_id", "map_template_id"]
+    json = JSON.parse(@template.to_json).except(*excluded_fields)
+    unless @template["map_template_id"] == nil
+      related_template = Template.find(@template["map_template_id"])["name"]
+      json[:related_template] = related_template
+    end
+    json
+  end
 end

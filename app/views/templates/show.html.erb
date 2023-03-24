@@ -52,12 +52,11 @@
                 :disable_with => "Editing..."%>
               <%if current_user.global_admin?%>
                 <%=link_to "Export",
-                  export_template_path(@template),
-                  :id => "export-btn",
+                  export_template_path(@template, :format => "yaml"),
                   'data-toggle' => 'tooltip',
                   title: "Export Template as YAML",
                   :class => "btn btn-outline-warning",
-                  :disable_with => "Exporting..."%>
+                  :download => "#{@template["name"]}.yaml"%>
               <%end%>
             </div>
           </div>

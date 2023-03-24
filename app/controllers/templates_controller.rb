@@ -192,7 +192,15 @@ class TemplatesController < ApplicationController
   end
 
   def export
-    byebug
-    @template = Template.find(params[:id])
+    json = {}
+    template_id = params[:id]
+    @template = Template.find(template_id)
+    name = @template["name"]
+    json[:Template] = Template.toJson(template_id)
+    json[:Category] = Category.toJson(template_id)
+
+    yaml_obj = YAML.dump(json)
+    output_file = "#{Rails.root}/app/views/templates/export.yaml"
+    File.open(output_file, "w") { |o| o.write(yaml_obj) }
   end
 end

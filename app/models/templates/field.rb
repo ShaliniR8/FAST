@@ -248,4 +248,39 @@ class Field < ActiveRecord::Base
       end
     end
   end
+
+  def self.nestedToJson(field_id, options)
+    json = {}
+    excluded_fields = ["id", "created_at", "updated_at", "categories_id", "nested_field_id", "nested_field_value"]
+    options.split(';').each do |option|
+      jsons = []
+      nestedFields_option = self.where(nested_field_id: field_id, nested_field_value: option)
+      unless nestedFields_option.empty?
+        nestedFields_option.each do |nested_field|
+          jsons << JSON.parse(nested_field.to_json).except(*excluded_fields)
+        end
+        json[option] = jsons
+      end
+    end
+    json == {} ? nil : json
+  end
+
+  def self.toJson(category_id)
+    fields = self.where(categories_id: category_id)
+		jsons = []
+    excluded_fields = ["id", "created_at", "updated_at", "categories_id", "nested_field_id", "nested_field_value"]
+		fields.each do |field|
+      if field["nested_field_id"] == nil
+        field_id = field.id
+        options = field["options"]
+        field_json = JSON.parse(field.to_json).except(*excluded_fields)
+        unless options == nil
+          nested_field_jsons = Field.nestedToJson(field_id, options)
+          field_json[:nested_fields] = nested_field_jsons
+        end
+        jsons << field_json
+      end
+		end
+    jsons
+  end
 end
