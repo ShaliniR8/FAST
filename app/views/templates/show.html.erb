@@ -99,11 +99,7 @@
           <%end%>
 
           <%@template.categories.where(deleted: false).order(:category_order).each do |cat|%>
-            <%if cat.id == 338%>
-              <%=render "observation_phases", :cat => cat%>
-            <%else%>
-              <%=render "category", :cat => cat%>
-            <%end%>
+            <%=render "category", :cat => cat%>
           <%end%>
 
         </div>
