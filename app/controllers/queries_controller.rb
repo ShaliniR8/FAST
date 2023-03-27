@@ -101,6 +101,7 @@ class QueriesController < ApplicationController
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
+    @owner.set_threshold_alert(params["threshold-alert"])
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -211,6 +212,7 @@ class QueriesController < ApplicationController
       }
     end
     @fields = @fields.sort_by{|field| (field[:title].present? ? field[:title] : "")}
+    @distribution_list = DistributionList.all.map{|d| [d.id, d.title]}.to_h
     render :partial => "building_query"
   end
 
@@ -352,7 +354,7 @@ class QueriesController < ApplicationController
 
     # REMOVE unnecessary quotes
     @data_ids = @data_ids.map{ |x| [x[0].gsub('"', '').gsub("\'", ''), x[1..-1]].flatten(1)}
-    
+
     @redirect_page = false
 
     if params[:nested_xaxis] == true.to_s && @x_axis_field.first.is_a?(Field)

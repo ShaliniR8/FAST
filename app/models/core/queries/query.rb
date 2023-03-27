@@ -8,6 +8,7 @@ class Query < ActiveRecord::Base
 
   serialize :templates, Array
   serialize :old_vis, Array
+  serialize :distribution_list_ids, Array
 
   accepts_nested_attributes_for :query_conditions
 
@@ -63,6 +64,15 @@ class Query < ActiveRecord::Base
     end
     query.save
     query
+  end
+
+  def set_threshold_alert(params)
+    self.threshold = params["threshold"]
+    self.distribution_list_ids = (self.distribution_list_ids == nil) ? Array.new : (self.distribution_list_ids)
+    params["distros"].each do |key, str|
+      self.distribution_list_ids << str.to_i
+    end
+    self.save
   end
 
 
