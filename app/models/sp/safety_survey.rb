@@ -75,4 +75,8 @@ class SafetySurvey < Sp::SafetyPromotionBase
     end
   end
 
+  def get_total_users
+    DistributionList.preload(:distribution_list_connections).where(id: distribution_list.split(',')).map{|d| d.get_user_ids}.flatten.uniq.count rescue 0
+  end
+
 end

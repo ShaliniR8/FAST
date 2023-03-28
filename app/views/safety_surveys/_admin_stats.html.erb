@@ -12,100 +12,106 @@
 
       <div class="panel-body" style="display:none;">
 
-        <div class="col-xs-12 mr15 mb15 mt15">
-          <%=label_tag "Choose Completion View"%>
-          <div class="col-xs-12">
-            <%=check_box_tag "by_user", "user", true%>
-            <%="View by User"%>
-            <%=check_box_tag "by_group", "group", false, :class => "ml10"%>
-            <%="View by Group"%>
+        <%if owner.anonymous.present?%>
+          <div style="text-align: center">
+            <h2> <b><%="#{owner.completions.keep_if{|c| c.complete_date.present?}.count} "%></b> out of <b><%=" #{owner.get_total_users}"%></b> users have taken/completed this Safety Survey</h2>
           </div>
-        </div>
+        <%else%>
+          <div class="col-xs-12 mr15 mb15 mt15">
+            <%=label_tag "Choose Completion View"%>
+            <div class="col-xs-12">
+              <%=check_box_tag "by_user", "user", true%>
+              <%="View by User"%>
+              <%=check_box_tag "by_group", "group", false, :class => "ml10"%>
+              <%="View by Group"%>
+            </div>
+          </div>
 
-        <div class="table-responsive user_table">
-          <table style="width:100%"
-            class="table table-bordered table-striped by-user-table">
-            <thead>
-              <tr>
-                <th style="width:10%">Serial</th>
-                <th style="width:45%">User</th>
-                <th style="width:45%">Read Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%ind = 0%>
-              <%owner.completions.reverse!.each_with_index do |c, index|%>
+          <div class="table-responsive user_table">
+            <table style="width:100%"
+              class="table table-bordered table-striped by-user-table">
+              <thead>
                 <tr>
-                  <%ind = ind + 1%>
-                  <td><%=ind%></td>
-                  <td><%=c.get_user_name%></td>
-                  <td>
-                    <%=c.complete_date.strftime("%Y-%m-%d") rescue "Not Completed"%>
-                  </td>
+                  <th style="width:10%">Serial</th>
+                  <th style="width:45%">User</th>
+                  <th style="width:45%">Read Date</th>
                 </tr>
-              <%end%>
-              <%if owner.class.name == 'Newsletter'%>
-                <%all_users = DistributionList.preload(:distribution_list_connections).where(id: owner.distribution_list.split(",")).map(&:get_user_ids).flatten%>
-                <%remaining_users = (all_users - owner.completions.map(&:user_id)) rescue []%>
-                <%remaining_users.each do |u|%>
+              </thead>
+              <tbody>
+                <%ind = 0%>
+                <%owner.completions.reverse!.each_with_index do |c, index|%>
                   <tr>
                     <%ind = ind + 1%>
                     <td><%=ind%></td>
-                    <td><%=User.find(u).full_name rescue "N/A"%></td>
-                    <td><%="Not Completed"%></td>
+                    <td><%=c.get_user_name%></td>
+                    <td>
+                      <%=c.complete_date.strftime("%Y-%m-%d") rescue "Not Completed"%>
+                    </td>
                   </tr>
                 <%end%>
-              <%end%>
-            </tbody>
-          </table>
-        </div>
+                <%if owner.class.name == 'Newsletter'%>
+                  <%all_users = DistributionList.preload(:distribution_list_connections).where(id: owner.distribution_list.split(",")).map(&:get_user_ids).flatten%>
+                  <%remaining_users = (all_users - owner.completions.map(&:user_id)) rescue []%>
+                  <%remaining_users.each do |u|%>
+                    <tr>
+                      <%ind = ind + 1%>
+                      <td><%=ind%></td>
+                      <td><%=User.find(u).full_name rescue "N/A"%></td>
+                      <td><%="Not Completed"%></td>
+                    </tr>
+                  <%end%>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
 
 
-        <div class="table-responsive group_table" style="display:none;">
-          <table style="width:100%"
-            class="table table-bordered table-striped by-distribution-table">
-            <thead>
-              <tr>
-                <th style="width:10%">Serial</th>
-                <th style="width:30%">Group Name</th>
-                <th style="width:30%"># of Users Completed</th>
-                <th style="width:30%"># of Users Not Completed</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%ind = 1%>
-              <%distros = DistributionList.preload(:distribution_list_connections).where(id: owner.distribution_list.split(","))%>
-              <%distro_id_and_title = Hash.new%>
-              <%distro_id_and_user_list = Hash.new%>
-              <%distros.each do |d|%>
-                <%distro_id_and_title[d.id] = d.title%>
-                <%distro_id_and_user_list[d.id] = d.get_user_ids%>
-              <%end%>
-              <%distro_id_and_user_list.each do |k, v|%>
-                <%comps = Completion.where({owner_type: owner.class.name, owner_id: owner.id, user_id: v})%>
-                <%non_completed = owner.class.name == 'SafetySurvey' ? (comps.select{|c| c.complete_date.nil?}.map(&:user_id) rescue []) : ((v.map(&:to_i) - comps.select{|c| c.complete_date.present?}.map(&:user_id)) rescue []) %>
-                <%completed = comps.select{|c| c.complete_date.present?}.map(&:user_id) rescue []%>
+          <div class="table-responsive group_table" style="display:none;">
+            <table style="width:100%"
+              class="table table-bordered table-striped by-distribution-table">
+              <thead>
                 <tr>
-                  <td><%=ind%></td>
-                  <td><%=distro_id_and_title[k]%></td>
-                  <td><%= link_to completed.count,
-                          "#",
-                          class: "user_list_link",
-                          "data-count" => completed.count,
-                          "data-list" => completed.join(',') rescue ""%>
-                  </td>
-                  <td><%= link_to non_completed.count,
-                          "#",
-                          class: "user_list_link",
-                          "data-count" => non_completed.count,
-                          "data-list" => non_completed.join(',') rescue ""%>
-                  </td>
+                  <th style="width:10%">Serial</th>
+                  <th style="width:30%">Group Name</th>
+                  <th style="width:30%"># of Users Completed</th>
+                  <th style="width:30%"># of Users Not Completed</th>
                 </tr>
-                <%ind = ind + 1%>
-              <%end%>
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                <%ind = 1%>
+                <%distros = DistributionList.preload(:distribution_list_connections).where(id: owner.distribution_list.split(","))%>
+                <%distro_id_and_title = Hash.new%>
+                <%distro_id_and_user_list = Hash.new%>
+                <%distros.each do |d|%>
+                  <%distro_id_and_title[d.id] = d.title%>
+                  <%distro_id_and_user_list[d.id] = d.get_user_ids%>
+                <%end%>
+                <%distro_id_and_user_list.each do |k, v|%>
+                  <%comps = Completion.where({owner_type: owner.class.name, owner_id: owner.id, user_id: v})%>
+                  <%non_completed = owner.class.name == 'SafetySurvey' ? (comps.select{|c| c.complete_date.nil?}.map(&:user_id) rescue []) : ((v.map(&:to_i) - comps.select{|c| c.complete_date.present?}.map(&:user_id)) rescue []) %>
+                  <%completed = comps.select{|c| c.complete_date.present?}.map(&:user_id) rescue []%>
+                  <tr>
+                    <td><%=ind%></td>
+                    <td><%=distro_id_and_title[k]%></td>
+                    <td><%= link_to completed.count,
+                            "#",
+                            class: "user_list_link",
+                            "data-count" => completed.count,
+                            "data-list" => completed.join(',') rescue ""%>
+                    </td>
+                    <td><%= link_to non_completed.count,
+                            "#",
+                            class: "user_list_link",
+                            "data-count" => non_completed.count,
+                            "data-list" => non_completed.join(',') rescue ""%>
+                    </td>
+                  </tr>
+                  <%ind = ind + 1%>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        <%end%>
       </div>
     </div>
   </div>
