@@ -182,9 +182,18 @@ class Submission < Sr::SafetyReportingBase
   end
 
 
+  def record_type
+    if session[:mode] == 'OSHA'
+      OshaRecord
+    else
+      Record
+    end
+  end
+
+
   def make_report
     if completed && records_id.blank?
-      self.record = Record.create(
+      record = record_type.create(
         templates_id:       templates_id,
         description:        description,
         event_date:         event_date,
@@ -195,6 +204,7 @@ class Submission < Sr::SafetyReportingBase
         event_time_zone:    event_time_zone,
       )
 
+      self.record = record
       self.attachments.each do |x|
         temp = Attachment.new(
           :name => x.name,

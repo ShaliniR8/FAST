@@ -277,7 +277,9 @@
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
           <%@owner = @record %>
-          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
+          <% unless Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha') %>
+            <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
+          <% end %>
 
           <%if @record.corrective_actions.present?%>
             <div class="col-xs-12 col-lg-12">

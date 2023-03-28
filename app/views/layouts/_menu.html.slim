@@ -3,7 +3,8 @@
 - when "SMS IM" then 'im'
 - when "SMS" then 'sa'
 - when "SRM" then 'srm'
-- when "SP" then 'sp' end
+- when "SP" then 'sp' 
+- when 'OSHA' then 'osha' end
 
 - menu_items = eval("CONFIG.#{module_name}::HIERARCHY[:menu_items].select{|key, item| item[:display].call(user: current_user)}")
 - menu_items.each do |key, item|

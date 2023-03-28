@@ -176,7 +176,12 @@ class SubmissionsController < ApplicationController
     else
       # @templates = Template.find(:all)
       templates = current_user.get_all_submitter_templates
-      @templates = Template.where(:name => templates)
+      if session[:mode] == 'OSHA'
+        @templates = Template.where(:name => templates, :report_type => 'osha')
+      else
+        @templates = Template.where(:name => templates)
+      end
+
       unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         @templates.keep_if{|x| current_user.has_template_access(x.name).include? 'submitter'}
         @templates.sort_by! {|x| x.name }
@@ -278,6 +283,8 @@ class SubmissionsController < ApplicationController
 
 
   def create
+    type = Template.find(params[:submission][:templates_id]).report_type
+
     params[:submission][:submission_fields_attributes].each_value do |field|
       if field[:value].is_a?(Array)
         field[:value].delete("")
@@ -338,7 +345,7 @@ class SubmissionsController < ApplicationController
 
     if params[:present_id].present? && params[:present_id].to_i != -1
       saved = false
-      @record = Submission.find(params[:present_id])
+      @record = submission_class_type(type).find(params[:present_id])
       if !@record.completed
         sub_fields = SubmissionField.where("submissions_id=?", params[:present_id])
         sub_fields.map(&:destroy)
@@ -347,7 +354,7 @@ class SubmissionsController < ApplicationController
         saved = @record.update_attributes(params[:submission])
       end
     else
-      @record = Submission.new(params[:submission])
+      @record = submission_class_type(type).new(params[:submission])
       if session[:platform] == Transaction::PLATFORMS[:mobile] # edge case to handle duplicate offline sync calls from mobile app
         if @record.check_immediate_duplicate
           saved = @record.save
@@ -371,7 +378,7 @@ class SubmissionsController < ApplicationController
           notify_notifiers(converted, params[:commit])
           NotifyMailer.send_submitter_confirmation(current_user, converted)
         end
-        Submission.find(@record.id).make_report
+        submission_class_type(type).find(@record.id).make_report
       end
 
       respond_to do |format|
@@ -714,6 +721,13 @@ class SubmissionsController < ApplicationController
 
 
   private
+    def submission_class_type(type=nil)
+      if type == 'osha'
+        OshaSubmission
+      else
+        Submission
+      end
+    end
 
     def event_date_to_utc
       # Store event_date as UTC

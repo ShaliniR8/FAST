@@ -29,6 +29,9 @@
   <%if CONFIG::GENERAL[:sabre_integration].present?%>
     <td><%=f.select     :sabre_map,     CONFIG::SABRE_MAPPABLE_FIELD_OPTIONS, {:include_blank => true}, {:class => "form-control #{changed}"}%> </td>
   <%end%>
+  <%if CONFIG::GENERAL[:osha_visibility].present?%>
+    <td><%=f.select     :osha_map,     CONFIG::OSHA_FIELD_OPTIONS, {:include_blank => true}, {:class => "form-control #{changed}"}%> </td>
+  <%end%>
   <td><%=f.text_area    :options,                                              class: "form-control #{changed}", rows: 3%>            </td>
   <td>
     <%=f.select :custom_option_id,

@@ -265,6 +265,7 @@ PrdgSession::Application.routes.draw do |map|
       #resources :password_resets, only: [:new, :create, :edit, :update]
     end
     collection do
+      post "filter_allowed_priv"
       get "users_index"
       get 'current_json'
       put 'mobile_months'
@@ -302,7 +303,32 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
 
-
+  resources :osha_submissions, :controller => "submissions", :type => "OshaSubmission"
+  resources :osha_records, :controller => "records", :type => "OshaRecord" do
+    member do
+      get 'launch'
+      get 'launch_new_object'
+      get "close"
+      get 'convert'
+      get 'mitigate'
+      get 'baseline'
+      get 'print'
+      get 'enable'
+      get 'comment'
+      get 'new_attachment'
+      get "reopen"
+      get "display"
+      get 'open'
+      get 'override_status'
+      put 'ajax_update'
+      get 'edit_field'
+      get 'library_deid_pdf'
+    end
+    collection do
+      get 'osha_300'
+      post 'osha_300_result'
+    end
+  end
 
   # Safety Reporting Module
   resources :submissions do
@@ -380,6 +406,7 @@ PrdgSession::Application.routes.draw do |map|
       get "draw_chart"
       post "get_dataset"
       get 'get_data'
+      # get 'osha_300'
     end
   end
   resources :reports do

@@ -1,0 +1,66 @@
+<%= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css" %>
+<%= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js" %>
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"></script>
+<script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+
+<div class="item active mt20" id="item1" style="height:auto;">
+  <div class="grid per90 center-block">
+
+    <div class="col-lg-12">
+      <div class="panel panel-steelblue">
+        <div class="panel-heading">
+          <div class="panel-title small-panel-title">
+            <div class="top_text">Search for OSHA's Form 300</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <%=form_tag osha_300_result_osha_records_path, :method => "post", :id => "search_form" do%>
+
+            <div class="form-group col-xs-6">
+              <%=label_tag :date, "Date", :class=>"required_label"%>
+              <%=text_field_tag :date, "",
+                {:class => "form-control required_label field-daterange", :id => "date", :include_blank => "Select"}%>
+            </div>
+
+            <div class="form-group col-xs-12">
+              <%=submit_tag "Search", :class => "btn btn-info mr10 pull-right"%>
+            </div>
+          <%end%>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-12">
+      <div id="loader1">
+        <div class="centered loader1"></div>
+        <div class="loading-text">Loading</div>
+      </div>
+      <div id="results"></div>
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+
+    // submit search flights form
+    $('#search_form').on("submit", function(e){
+      console.log("submit search form");
+
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "<%=osha_300_result_osha_records_path%>",
+        data: $(this).serialize(),
+        // beforeSend: function(){$("#flights").css({'opacity':0.5}); $('#loader1').show();},
+        // complete: function(){$('#loader1').hide();$("#flights").css({'opacity':1});},
+        success: function(response){$("#results").html(response);},
+        // error: function(response){console.log(response);}
+      });
+    });
+
+  });
+</script>
+

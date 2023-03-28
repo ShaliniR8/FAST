@@ -652,7 +652,19 @@ class ApplicationController < ActionController::Base
     elsif @sms_im_list.include? controller_name
       session[:mode] = 'SMS IM'
     elsif @asap_list.include? controller_name
-      session[:mode] = 'ASAP'
+      # TODO
+      is_osha_module = params[:type].present? && params[:type].include?('Osha')
+      if ['show', 'edit'].include?(params[:action]) && Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha')
+        is_osha_module = true
+      else
+        is_osha_module = params[:advance_search][:type].include?('Osha') if !is_osha_module && session[:mode] != 'ASAP'
+      end
+
+      if is_osha_module
+        session[:mode] = 'OSHA'
+      else
+        session[:mode] = 'ASAP'
+      end
     elsif @srm_list.include? controller_name
       session[:mode] = 'SRM'
     end
@@ -1016,9 +1028,14 @@ class ApplicationController < ActionController::Base
 
     case object_name
     when 'Submission'
-      render json: SubmissionDatatable.new(view_context, current_user)
+      if session[:mode] == 'OSHA'
+        render json: OshaSubmissionDatatable.new(view_context, current_user)
+      else
+        render json: SubmissionDatatable.new(view_context, current_user)
+      end
     when 'Record', 'Report'
       render json: SafetyReportingDatatable.new(view_context, current_user)
+      # render json: OshaRecordDatatable.new(view_context, current_user)
     when 'CorrectiveAction'
       render json: CorrectiveActionDatatable.new(view_context, current_user)
     when 'Query'

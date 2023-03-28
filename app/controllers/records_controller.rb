@@ -40,6 +40,102 @@ class RecordsController < ApplicationController
   end
 
 
+  def osha_300
+  end
+
+  def osha_300_result
+    @headers = [
+      '(A) Case No.',
+      '(B) Employee\' Name',
+      '(C) Job Title',
+      '(D) Date of injury or onset of illness',
+      '(E) Where the event occurred',
+      '(F) Describe injury or illness, parts of body affected, and object/substance that directly injured or made person ill',
+      '(G) Death',
+      '(H) Days away from work',
+      '(I) Job transfer or restriction',
+      '(J) Other recordable cases',
+      '(K) Away from works (days)',
+      '(L) On job transfer or restriction (days)',
+      '(1) Injury',
+      '(2) Skin Disorder',
+      '(3) Respiratory Condition',
+      '(4) Poisoning',
+      '(5) Hearing Loss',
+      '(6) All other illnesses'
+    ]
+
+    records = OshaRecord.all
+    @entries = Hash.new
+    records.each do |record|
+      @entries[record.id] = Hash.new
+      record.record_fields.each do |record_field|
+        field = record_field.field
+        field_value = record_field.value
+
+        case field.osha_map
+        when 'a' then @entries[record.id]['(A) Case No.'] = field_value
+        when 'b' then @entries[record.id]['(B) Employee\' Name'] = User.find(field_value).full_name
+        when 'c' then @entries[record.id]['(C) Job Title'] = field_value
+        when 'd' then @entries[record.id]['(D) Date of injury or onset of illness'] = field_value
+        when 'e' then @entries[record.id]['(E) Where the event occurred'] = field_value
+        when 'f' then @entries[record.id]['(F) Describe injury or illness, parts of body affected, and object/substance that directly injured or made person ill'] = field_value
+        when 'g_l'
+          @entries[record.id]['(G) Death'] = 0
+          @entries[record.id]['(H) Days away from work'] = 0
+          @entries[record.id]['(I) Job transfer or restriction'] = 0
+          @entries[record.id]['(J) Other recordable cases'] = 0
+          @entries[record.id]['(K) Away from works (days)'] = 0
+          @entries[record.id]['(L) On job transfer or restriction (days)'] = 0
+
+          days = Hash.new
+          field.nested_fields.each do |nested_field|
+            days[nested_field.nested_field_value] = nested_field.record_fields.first.value
+          end
+
+          case field_value
+          when 'Death'
+            @entries[record.id]['(G) Death'] = 1
+          when 'Days away from work'
+            @entries[record.id]['(H) Days away from work'] = 1
+            @entries[record.id]['(K) Away from works (days)'] = days['Days away from work']
+          when 'Remained at work (Job transfer or restriction)'
+            @entries[record.id]['(I) Job transfer or restriction'] = 1
+            @entries[record.id]['(L) On job transfer or restriction (days)'] = days['Remained at work (Job transfer or restriction)']
+          when 'Remained at work (Other record- able cases)'
+            @entries[record.id]['(J) Other recordable cases'] = 1
+          end
+       when '1_6'
+          @entries[record.id]['(1) Injury'] = 0
+          @entries[record.id]['(2) Skin Disorder'] = 0
+          @entries[record.id]['(3) Respiratory Condition'] = 0
+          @entries[record.id]['(4) Poisoning'] = 0
+          @entries[record.id]['(5) Hearing Loss'] = 0
+          @entries[record.id]['(6) All other illnesses'] = 0
+
+          case field_value
+          when 'Injury'
+            @entries[record.id]['(1) Injury'] = 1
+          when 'Skin Disorder'
+            @entries[record.id]['(2) Skin Disorder'] = 1
+          when 'Respiratory Condition'
+            @entries[record.id]['(3) Respiratory Condition'] = 1
+          when 'Poisoning'
+            @entries[record.id]['(4) Poisoning'] = 1
+          when 'Hearing Loss'
+            @entries[record.id]['(5) Hearing Loss'] = 1
+          when 'All other illnesses'
+            @entries[record.id]['(6) All other illnesses'] = 1
+          end
+        end
+      end
+
+    end
+
+    render :partial => 'osha_300_table'
+  end
+
+
   def load_options
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @suggestion_headers = RecordSuggestion.get_headers
@@ -510,9 +606,10 @@ class RecordsController < ApplicationController
 
     transaction = true
     @owner = Record.find(params[:id])
+    record = params[:record] || params[:osha_record]
 
-    if params[:record][:record_fields_attributes].present?
-      params[:record][:record_fields_attributes].each_value do |field|
+    if record[:record_fields_attributes].present?
+      record[:record_fields_attributes].each_value do |field|
         if field[:value].is_a?(Array)
           field[:value].delete("")
           field[:value] = field[:value].join(";")
@@ -520,10 +617,10 @@ class RecordsController < ApplicationController
       end
     end
 
-    transaction_content = params[:record][:final_comment] rescue nil
+    transaction_content = record[:final_comment] rescue nil
     if transaction_content.nil?
-      if params[:record][:comments_attributes].present?
-        params[:record][:comments_attributes].each do |key, val|
+      if record[:comments_attributes].present?
+        record[:comments_attributes].each do |key, val|
           transaction_content = val[:content] rescue nil
         end
       end
@@ -545,13 +642,13 @@ class RecordsController < ApplicationController
       end
       @owner.close_date = Time.now
     when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
-      params[:record][:close_date] = params[:record][:status] == 'Closed' ? Time.now : nil
+      transaction_content = "Status overriden from #{@owner.status} to #{record[:status]}"
+      record[:close_date] = record[:status] == 'Closed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
 
-    @owner.update_attributes(params[:record])
+    @owner.update_attributes(record)
 
 
     if transaction
@@ -563,7 +660,7 @@ class RecordsController < ApplicationController
       )
     end
 
-    event_date = params[:record][:event_date]
+    event_date = record[:event_date]
 
     if CONFIG.sr::GENERAL[:submission_time_zone] && event_date.present?
       @owner.event_date = convert_to_utc(date_time: event_date, time_zone: @owner.event_time_zone)

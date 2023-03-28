@@ -1,0 +1,3 @@
+class OshaSubmissionsController < SubmissionsController
+
+end

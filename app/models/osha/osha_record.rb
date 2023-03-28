@@ -1,0 +1,3 @@
+class OshaRecord < Record
+
+end
