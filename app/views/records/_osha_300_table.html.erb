@@ -1,8 +1,11 @@
 <div class="panel panel-lightskyblue">
-  <div class="panel-heading">
+  <div class="panel-heading pb10">
     <h4 class="panel-title">
       <div class="top_text">
         Log of Work-Related Injuries and Illnesses
+      </div>
+      <div class='top_buttons pull-right'>
+        <%=link_to 'OSHA Form 300A', osha_300a_osha_records_path(date_from: params[:date_from], date_to: params[:date_to]), class: 'btn btn-default'%>
       </div>
     </h4>
   </div>

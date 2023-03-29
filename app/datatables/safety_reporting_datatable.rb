@@ -16,8 +16,10 @@ class SafetyReportingDatatable < ApplicationDatatable
   def object
     if params[:advance_search][:type] == "OshaRecord"
       OshaRecord
-    else
-      Object.const_get(params[:controller].classify)
+    elsif params[:controller].classify == "Record"
+      Record.where(type: nil)
+    elsif params[:controller].classify == "Report"
+      Report
     end
   end
 

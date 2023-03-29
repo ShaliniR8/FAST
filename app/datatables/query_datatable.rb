@@ -29,7 +29,7 @@ class QueryDatatable
 
 
   def columns
-    if ["Record", "Submission"].include? (object.name)
+    if ["Record", "Submission", "OshaRecord"].include? (object.name)
       object.get_meta_fields_keys(['index'], @current_user)
     else
       object.get_meta_fields_keys('index')

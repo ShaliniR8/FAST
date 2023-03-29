@@ -2,24 +2,33 @@
 <%= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js" %>
 <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"></script>
 <script type="text/javascript" src="/javascripts/utility/format-builder.js"></script>
+<script type="text/javascript" src="/javascripts/utility/bootstrap-datepicker.js"></script>
+<%= stylesheet_link_tag "sweetalert2.min.css" %>
+<%= javascript_include_tag "sweetalert2.min.js" %>
 
 <div class="item active mt20" id="item1" style="height:auto;">
   <div class="grid per90 center-block">
 
     <div class="col-lg-12">
       <div class="panel panel-steelblue">
-        <div class="panel-heading">
+        <div class="panel-heading mt20">
           <div class="panel-title small-panel-title">
-            <div class="top_text">Search for OSHA's Form 300</div>
+            <div class="top_text">Search for OSHA Form 300</div>
           </div>
         </div>
         <div class="panel-body">
           <%=form_tag osha_300_result_osha_records_path, :method => "post", :id => "search_form" do%>
 
             <div class="form-group col-xs-6">
-              <%=label_tag :date, "Date", :class=>"required_label"%>
-              <%=text_field_tag :date, "",
-                {:class => "form-control required_label field-daterange", :id => "date", :include_blank => "Select"}%>
+              <%=label_tag :date_from, "FROM: Event Date (Date of Injury)", :class=>"required_label"%>
+              <%=text_field_tag :date_from, "",
+                {:class => "field-date form-control required_field", :id => "date_from", :include_blank => "Select"}%>
+            </div>
+
+            <div class="form-group col-xs-6">
+              <%=label_tag :date_to, "TO: Event Date (Date of Injury)", :class=>"required_label"%>
+              <%=text_field_tag :date_to, "",
+                {:class => "field-date form-control required_field", :id => "date_to", :include_blank => "Select"}%>
             </div>
 
             <div class="form-group col-xs-12">
@@ -42,22 +51,81 @@
   </div>
 </div>
 
+<style>
+  .centered {
+    margin: auto;
+    width: 50%;
+    border: 3px solid white;
+    padding: 10px;
+  }
+  .loading-text {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  #loader1 {
+    display: none;
+  }
+  .loader1 {
+    text-align: center;
+    animation: spin 1s ease-in-out infinite;
+    width: 50px;
+    height: 50px;
+    -webkit-animation: spin .8s ease-in-out infinite;
+  }
+  .loader1 {
+    border: 5px solid rgba(255,255,255,.5);
+    border-radius: 80%;
+    border-top-color: #33b5e5;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
 <script>
   $(document).ready(function(){
+    function createSwal(message){
+      swal({
+        title: "Error",
+        text: message,
+        type: "error",
+        customClass: 'custom-swal',
+      }).catch(swal.noop);
+    }
 
-    // submit search flights form
+    function requiredFieldError(event){
+      $(".required_field").css('border-color', '');
+      var error = false;
+      result = true;
+      $('.required_field').each(function(){
+        if ($(this).val() == ""){
+          error = true;
+          $(this).css('border-color', 'red');
+          event.preventDefault();
+          result = false
+        }
+      });
+      return error;
+    }
+
+
     $('#search_form').on("submit", function(e){
       console.log("submit search form");
-
+      if (requiredFieldError(e)){
+        createSwal("Please fill in all required fields.");
+        return false;
+      }
       e.preventDefault();
       $.ajax({
         type: 'POST',
         url: "<%=osha_300_result_osha_records_path%>",
         data: $(this).serialize(),
-        // beforeSend: function(){$("#flights").css({'opacity':0.5}); $('#loader1').show();},
-        // complete: function(){$('#loader1').hide();$("#flights").css({'opacity':1});},
+        beforeSend: function(){$('#loader1').show();},
+        complete: function(){$('#loader1').hide();},
         success: function(response){$("#results").html(response);},
-        // error: function(response){console.log(response);}
+        error: function(response){console.log(response);}
       });
     });
 

@@ -40,6 +40,68 @@ class RecordsController < ApplicationController
   end
 
 
+  def osha_300a
+    records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
+
+    @total_of_g = 0
+    @total_of_h = 0
+    @total_of_i = 0
+    @total_of_j = 0 
+    @total_of_k = 0
+    @total_of_l = 0
+    @total_of_1 = 0
+    @total_of_2 = 0
+    @total_of_3 = 0
+    @total_of_4 = 0
+    @total_of_5 = 0
+    @total_of_6 = 0
+
+    records.each do |record|
+      record.record_fields.each do |record_field|
+        field = record_field.field
+        field_value = record_field.value
+        next if field.nil?
+
+        case field.osha_map
+        when 'g_l'
+          days = Hash.new
+          field.nested_fields.each do |nested_field|
+            days[nested_field.nested_field_value] = nested_field.record_fields.first.value
+          end
+
+          case field_value
+          when 'Death'
+            @total_of_g += 1
+          when 'Days away from work'
+            @total_of_h += 1
+            @total_of_k += days['Days away from work'].to_i
+          when 'Remained at work (Job transfer or restriction)'
+            @total_of_i += 1
+            @total_of_l += days['Remained at work (Job transfer or restriction)'].to_i
+          when 'Remained at work (Other record- able cases)'
+            @total_of_j += 1
+          end
+        when '1_6'
+          case field_value
+          when 'Injury'
+            @total_of_1 += 1
+          when 'Skin Disorder'
+            @total_of_2 += 1
+          when 'Respiratory Condition'
+            @total_of_3 += 1
+          when 'Poisoning'
+            @total_of_4 += 1
+          when 'Hearing Loss'
+            @total_of_5 += 1
+          when 'All other illnesses'
+            @total_of_6 += 1
+          end
+        end
+      end
+    end
+  end
+
+
   def osha_300
   end
 
@@ -65,19 +127,21 @@ class RecordsController < ApplicationController
       '(6) All other illnesses'
     ]
 
-    records = OshaRecord.all
+    records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
     @entries = Hash.new
     records.each do |record|
       @entries[record.id] = Hash.new
+      @entries[record.id]['(D) Date of injury or onset of illness'] = record.event_date.to_date
       record.record_fields.each do |record_field|
         field = record_field.field
         field_value = record_field.value
+        next if field.nil?
 
         case field.osha_map
         when 'a' then @entries[record.id]['(A) Case No.'] = field_value
         when 'b' then @entries[record.id]['(B) Employee\' Name'] = User.find(field_value).full_name
         when 'c' then @entries[record.id]['(C) Job Title'] = field_value
-        when 'd' then @entries[record.id]['(D) Date of injury or onset of illness'] = field_value
+        # when 'd' then @entries[record.id]['(D) Date of injury or onset of illness'] = record.event_date.to_date #field_value
         when 'e' then @entries[record.id]['(E) Where the event occurred'] = field_value
         when 'f' then @entries[record.id]['(F) Describe injury or illness, parts of body affected, and object/substance that directly injured or made person ill'] = field_value
         when 'g_l'
@@ -105,7 +169,7 @@ class RecordsController < ApplicationController
           when 'Remained at work (Other record- able cases)'
             @entries[record.id]['(J) Other recordable cases'] = 1
           end
-       when '1_6'
+        when '1_6'
           @entries[record.id]['(1) Injury'] = 0
           @entries[record.id]['(2) Skin Disorder'] = 0
           @entries[record.id]['(3) Respiratory Condition'] = 0

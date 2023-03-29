@@ -100,6 +100,7 @@ class QueriesController < ApplicationController
   def create
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
+    params[:query][:templates] = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
     @owner = Query.create(params[:query])
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
@@ -144,6 +145,8 @@ class QueriesController < ApplicationController
     @target = params[:target]
     if @target == 'Report'
       @templates = Template.all
+    elsif @target == 'OshaRecord'
+      @templates = Template.where(report_type: 'osha')
     elsif @target == 'Checklist'
       @templates =  Checklist.where(id: params[:templates])
       @no_template_option = params[:templates].include?('-1') rescue false
@@ -413,8 +416,10 @@ class QueriesController < ApplicationController
     end
 
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
-    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
     @object_name = @owner.target
+    @object_name = "Record" if @object_name == "OshaRecord"
+
+    @title = CONFIG.hierarchy[session[:mode]][:objects][@object_name][:title].pluralize
     @object_type = Object.const_get(@object_name)
     @table_name = @object_type.table_name
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
@@ -575,6 +580,8 @@ class QueriesController < ApplicationController
       return
     end
     @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
+    @types["OSHA Report"] = "OshaRecord" if @types["OSHA Report"]
+    @types.delete("OSHA Submission")
     @types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
     @checklists = Checklist.includes(:checklist_header).where(owner_type: 'ChecklistHeader').sort_by{|x| x.title}.map{|checklist| ["#{checklist.title} [#{checklist.checklist_header.title}]", checklist.id]}.to_h

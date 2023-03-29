@@ -326,6 +326,7 @@ PrdgSession::Application.routes.draw do |map|
     end
     collection do
       get 'osha_300'
+      get 'osha_300a'
       post 'osha_300_result'
     end
   end

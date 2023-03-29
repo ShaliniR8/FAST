@@ -1,0 +1,56 @@
+<script type="text/javascript" src="/javascripts/utility/collapse-panel2.js"></script>
+<%=stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css"%>
+<%=javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js"%>
+<%=javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"%>
+<%=javascript_include_tag "/javascripts/utility/format-builder.js"%>
+
+
+<div class="item active mt50" style="height:auto;">
+  <div class="grid per90 center-block">
+    <div class="panel panel-steelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_text">
+            Summary of Work-Related Injuries and Illnesses <%= "(#{params[:date_from]} ~ #{params[:date_to]})"%>
+          </div>
+          <div class="top_buttons pull-right">
+            <%=link_to "PDF",
+              '#',
+              :class => 'btn btn-darkturquoise mr5 mb5 pull-right'%>
+            <%=link_to "Word",
+              '#',
+              :class => "btn btn-darkturquoise mb5 mr5 pull-right"%>
+
+            <%=link_to "Expand All",
+              "#",
+              :class => "btn btn-default expandall mb5 mr5 pull-right"%>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <%=render "osha_300a_description"%>
+        <%=render "osha_300a_number_of_cases"%>
+        <%=render "osha_300a_number_of_days"%>
+        <%=render "osha_300a_injury_illness_types"%>
+        <%=render "osha_300a_footer"%>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+  .underline {
+    position:relative;
+  }
+
+  .underline:before {
+      content: '';
+      position: absolute;
+      display: block;
+      bottom: -5px;
+      left: 10%;
+      width: 80%;
+      border-bottom: 1px solid #ccc;
+  }
+</style>

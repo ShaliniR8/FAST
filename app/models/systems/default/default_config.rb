@@ -239,7 +239,7 @@ class DefaultConfig
     '(C) Job Title'        => 'c',
 
     # Describe the case
-    '(D) Date of injury or onset of illness' => 'd',
+    # '(D) Date of injury or onset of illness' => 'd',
     '(E) Where the event occurred'           => 'e',
     '(F) Describe injury'                    => 'f',
 

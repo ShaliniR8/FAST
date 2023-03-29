@@ -321,7 +321,7 @@ module QueriesHelper
                                               AND record_fields.records_id #{sr_records.present? ? "IN (#{sr_records.join(',')})" : "IS NULL"})")
                                               .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
 
-      elsif target == 'Record'
+      elsif target == 'Record' || target == 'OshaRecord'
         values = RecordField.find_by_sql("SELECT record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
                                               record_fields.records_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
                                               .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
