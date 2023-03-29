@@ -101,8 +101,7 @@ class QueriesController < ApplicationController
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
-    threshold_alert_params = {:distros => params["distribution_list_ids"], :threshold => params["threshold"]}
-    @owner.set_threshold_alert(threshold_alert_params)
+    @owner.set_threshold_alert({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -119,6 +118,7 @@ class QueriesController < ApplicationController
     else
       @owner.update_attributes(params[:query])
     end
+    @owner.set_threshold_alert({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
     redirect_to query_path(@owner)
   end
 

@@ -74,10 +74,7 @@ class Query < ActiveRecord::Base
 
   def set_threshold_alert(params)
     self.threshold = params[:threshold]
-    self.distribution_list_ids = (self.distribution_list_ids == nil) ? Array.new : (self.distribution_list_ids)
-    params[:distros].each do |str|
-      self.distribution_list_ids << str.to_i
-    end
+    self.distribution_list_ids = params[:distros].map {|str| str.to_i}
     self.save
   end
 
