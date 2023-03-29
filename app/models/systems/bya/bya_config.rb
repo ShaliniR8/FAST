@@ -14,8 +14,8 @@ class BYAConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:                             true,
-    # enable_sso:                                 true,
-    # login_option:                               'dual',
+    enable_sso:                                 true,
+    login_option:                               'dual',
     # csv_user_import:                            true,
     # asrs_integration:                           true,
 
