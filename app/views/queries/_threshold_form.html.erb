@@ -37,7 +37,7 @@
                       :multiple => true}%>
                 <%when "text"%>
                   <%= label_tag(field_name, field_description, :class => field_required_label)%>
-                  <%=text_field_tag field_name, nil, {:class => "form-control " + field_required_field}%>
+                  <%=text_field_tag field_name, @owner.threshold, {:class => "form-control " + field_required_field}%>
                 <%else%>
               <%end%>
             </div>
