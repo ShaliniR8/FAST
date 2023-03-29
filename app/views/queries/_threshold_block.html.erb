@@ -1,40 +1,51 @@
-<div class="col-xs-12 mt10 to_delete">
-  <div class="panel panel-lightsteelblue">
-    <div class="panel-heading">
-      <div class="panel-title">
-        <div class="top_buttons pull-right">
-          <span class="pull-right" onclick="removepanel(this)">
-            <i class="glyphicon glyphicon-remove btn btn-danger"></i>
-          </span>
+<link rel="stylesheet" type="text/css" href="/javascripts/utility/select2.min.css"/>
+<script type="text/javascript" src="/javascripts/utility/select2.min.js"></script>
+
+<%query_meta_fields = Query.get_meta_fields('form')%>
+<%record = @owner%>
+
+  <div class="col-xs-12 mt10 to_delete">
+    <div class="panel panel-lightsteelblue">
+      <div class="panel-heading">
+        <div class="panel-title">
+          <div class="top_buttons pull-right">
+            <span class="pull-right" onclick="removepanel(this)">
+              <i class="glyphicon glyphicon-remove btn btn-danger"></i>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="panel-body">
-      <div class="col-xs-12 row">
-        <div id="threshold-alert">
-          <div class="form-group">
-            <div class = "col-6 form-inline">
-              <%=label_tag :threshold, "Threshold"%>
-              <%=text_field_tag "threshold-alert[threshold]", nil, {:class => "form-control ml5", :id => "threshold"}%>
-            </div>
-            <div class="col-xs-12">
-              <%distros = @owner.distribution_list_ids%>
-              <%@distribution_list.each do |key, title|%>
-                <div>
-                  <label class="checkbox">
-                    <%=check_box_tag "threshold-alert[distros[#{title}]]", key, false, class: 'form-control'%>
-                    <%=title%>
-                  </label>
-                </div>
+      <div class="panel-body">
+        <div class="col-xs-12 row">
+          <%query_meta_fields.each do |field_hash|%>
+            <%field_type            = field_hash[:type]%>
+            <%field_description     = field_hash[:title]%>
+            <%field_content         = field_hash[:content]%>
+            <%field_num_cols        = field_hash[:num_cols]%>
+            <%field_name            = field_hash[:field]%>
+            <%field_required_field  = field_hash[:required] ? "required_field" : ""%>
+            <%field_required_label  = field_hash[:required] ? "required_label" : ""%>
+            <%field_options         = (field_hash[:options].is_a? String) ? eval(field_hash[:options]).sort! : field_hash[:options].sort! rescue []%>
+            <div class="form-group col-xs-<%=field_num_cols%> <%=field_name%>">
+              <%case field_type%>
+                <%when "select_multiple"%>
+                  <%=label_tag(field_name, field_description, :class => field_required_label)%>
+                    <%=select_tag field_name,
+                      options_for_select(field_options, record.send(field_name)),
+                      {:class => "select-multiple field_select form-control " + field_required_field,
+                      :include_blank => "",
+                      :multiple => true}%>
+                <%when "text"%>
+                  <%= label_tag(field_name, field_description, :class => field_required_label)%>
+                  <%=text_field_tag field_name, nil, {:class => "form-control " + field_required_field}%>
+                <%else%>
               <%end%>
             </div>
-          </div>
+          <%end%>
         </div>
       </div>
     </div>
   </div>
-</div>
-
 
 
 
@@ -46,74 +57,74 @@
   }
 </style>
 
-
 <script>
-  $(function(){
+    $(document).ready(function() {
+      $('.select-multiple').select2();
+    });
+    var employee_table;
 
-    $(document).on("change", "#field_select_all", function(){
+    function build_user_table(){
+      employee_table = $('#users').DataTable({
+        "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+        "iDisplayLength": 5
+      });
+    }
 
-      var field_name = $(this).val();
-      var field_type = $("option[value='" + field_name + "']").data("fieldtype");
-      var field_value = $(this).parent().parent().find(".field_value");
-      var condition_type = $(this).parent().parent().find('.field-operator-all').val();
+    function clear_user_table(){
+      employee_table.destroy();
+    }
 
-      var name = $(this).attr("name").replace("field", "value");
+    $(function() {
+      $('.select-multiple').select2();
 
-      var html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="text">';
+      $(window).resize();
+      build_user_table();
 
-      if (field_type == "date" || field_type == "datetime") {
-        $(field_value).html(html);
-        if (condition_type == 'Last ( ) Days') {
-          html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number">';
-          $(field_value).html(html);
-        } else if (condition_type == '>=' || condition_type == '<') {
-          $(field_value).find(".value_field").flatpickr({
-            mode: "single",
-            dateFormat: 'Y-m-d',
+      $(this).find(".emp_button").each(function(index, item){
+        $(item).on("click", function(){
+          var field_id = $(this).prop('id');
+          $(".emp_modal").show();
+          clear_user_table();
+          $("#users tbody tr").unbind();
+          // $(".close").unbind();
+          $("#users tbody tr").on("click", function(){
+            $(item).parent().parent().find("#emp" + field_id).val($(this).find("td").eq(1).text());
+            $(item).parent().parent().find("#employee-select"+field_id).val($(this).find("td").eq(0).text());
+            $('#emp_div').hide();
+            $('.emp_modal').modal('toggle');
           });
-        } else {
-          $(field_value).find(".value_field").flatpickr({
-            mode: "range",
-            dateFormat: 'Y-m-d',
+          $('.close').on('click',function(){
+            $(item).parent().parent().find("#emp"+field_id).val("");
+            $(item).parent().parent().find("#employee-select"+field_id).val("");
+            $('#emp_div').hide();
           });
+          build_user_table();
+        });
+      });
+
+
+      $("form").on('submit', function(){
+        var error = false;
+        var result = true;
+        $(".required_field").css('border-color', '');
+        $(".int-val").css('border-color', '');
+        $(this).find('.required_field').each(function(){
+          if ($(this).val() == "" || $(this).val() == null){
+            error = true;
+            result = false;
+            $(this).css('border-color', 'red');
+            event.preventDefault();
+          }
+        });
+        if (error){
+          swal({
+            title: "Please fill in all required fields.",
+            type: "error",
+          });
+          return result;
         }
-
-      } else if (field_type == "boolean_box" || field_type == "boolean") {
-        html = '<select class="form-control value_field" id="' + name + '" name="' + name + '">' +
-          '<option value></option>' +
-          '<option value="Yes">Yes</option>' +
-          '<option value="No">No</option></select>';
-        $(field_value).html(html);
-
-      } else {
-        $(field_value).html(html);
-      }
+      });
 
     });
 
-
-    $(document).on("change", ".field-operator-all", function(){
-      let field_name = $(this).parent().parent().find("#field_select_all").val();
-      let field_type = $("option[value='" + field_name + "']").data("fieldtype");
-      let name = $(this).attr("name").replace("logic", "value");
-
-      if (($(this).val() == '<' || $(this).val() == '>=') && (field_type == "date" || field_type == "datetime")) {
-        let field_value = $(this).parent().parent().find(".field_value");
-        $(field_value).find(".value_field").flatpickr({
-          mode: "single",
-          dateFormat: 'Y-m-d',
-        });
-      } else if ($(this).val() == 'Last ( ) Days' && (field_type == "date" || field_type == "datetime")){
-        let field_value = $(this).parent().parent().find(".field_value");
-        let html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number">';
-        $(field_value).html(html);
-      } else if (($(this).val() != '<' && $(this).val() != '>=' && $(this).val() != 'Last ( ) Days') && (field_type == "date" || field_type == "datetime")) {
-        let field_value = $(this).parent().parent().find(".field_value");
-        $(field_value).find(".value_field").flatpickr({
-          mode: "range",
-          dateFormat: 'Y-m-d',
-        });
-      }
-    });
-  });
-</script>
+  </script>

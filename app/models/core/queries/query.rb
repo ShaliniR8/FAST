@@ -18,6 +18,8 @@ class Query < ActiveRecord::Base
     [
       {field: 'id',             title: 'ID',         num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'title',          title: 'Title',      num_cols: 12,  type: 'text', visible: 'index,show'},
+      {field: 'distribution_list_ids',  title: 'Distribution Lists', num_cols: 4, type: 'select_multiple', visible: 'form', required: false,  options: get_distribution_list},
+      {field: 'threshold',  title: 'Threshold', num_cols: 4, type: 'text', visible: 'form', required: false},
       {field: 'get_created_by', title: 'Created By', num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_target',     title: 'Target',     num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_templates',  title: 'Templates',  num_cols: 12,  type: 'text', visible: 'show'},
@@ -66,10 +68,14 @@ class Query < ActiveRecord::Base
     query
   end
 
+  def self.get_distribution_list
+    DistributionList.all.map{|d| [d.title, d.id]}
+  end
+
   def set_threshold_alert(params)
-    self.threshold = params["threshold"]
+    self.threshold = params[:threshold]
     self.distribution_list_ids = (self.distribution_list_ids == nil) ? Array.new : (self.distribution_list_ids)
-    params["distros"].each do |key, str|
+    params[:distros].each do |str|
       self.distribution_list_ids << str.to_i
     end
     self.save

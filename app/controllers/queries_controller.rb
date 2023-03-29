@@ -101,7 +101,8 @@ class QueriesController < ApplicationController
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
-    @owner.set_threshold_alert(params["threshold-alert"])
+    threshold_alert_params = {:distros => params["distribution_list_ids"], :threshold => params["threshold"]}
+    @owner.set_threshold_alert(threshold_alert_params)
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -141,7 +142,6 @@ class QueriesController < ApplicationController
     @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<', 'Last ( ) Days']
     @operators = ["AND", "OR"]
     @owner = params[:query_id].present? ? Query.find(params[:query_id]) : Query.new
-
     @target = params[:target]
     if @target == 'Report'
       @templates = Template.all
@@ -157,7 +157,6 @@ class QueriesController < ApplicationController
     if @target == 'Checklist' && params[:templates].present?
       @templates = Checklist.where(id: params[:templates])
       @fields = []
-
       params[:templates].each do |template_id|
         if template_id == '-1'
           ChecklistHeader.all.each do |header|

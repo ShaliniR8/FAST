@@ -24,7 +24,6 @@
           <%=f.text_field :title, class: "form-control form-control-plaintext"%>
         </div>
       </div>
-
       <div id="to_insert_base" class="row">
         <%@owner.query_conditions.each do |condition|%>
           <%=render "condition_form",
@@ -34,12 +33,13 @@
             is_operator: condition.query_conditions.present?%>
         <%end%>
       </div>
-      <div class="row">
-          <%=render "threshold_form",
-            threshold: @owner.threshold,
-            distribution_list_ids: @owner.distribution_list_ids%>
-      </div>
-
+      <% unless @owner.threshold == nil %>
+        <div class="row">
+            <%=render "threshold_form",
+              threshold: @owner.threshold,
+              distribution_list_ids: @owner.distribution_list_ids%>
+        </div>
+      <% end %>
 
       <div class="col-xs-12">
         <%=link_to_add_blocks "Add New Condition", "base", "base"%>
