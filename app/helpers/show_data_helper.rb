@@ -6,7 +6,7 @@
   def prepare_btns(owner, env, **op)
     owner_name = owner.class.name
     owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?
-    actions = CONFIG.object[owner_name][:actions].select{ |key, act|
+    actions = CONFIG.hierarchy[session[:mode]][:objects][owner_name][:actions].select{ |key, act|
        act[:btn_loc].include?(env) &&
        act[:access].call(owner: owner, user: current_user, **op)
     }.map {|key, act| key}
@@ -17,7 +17,7 @@
   def prepare_panels(owner, **op)
     owner_name = owner.class.name
     owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?    
-    panel_data = CONFIG.object[owner_name][:panels].values.select{ |data|
+    panel_data = CONFIG.hierarchy[session[:mode]][:objects][owner_name][:panels].values.select{ |data|
       data[:visible].call(owner: owner, user: current_user, **op) rescue nil
     }.map { |data|
       {
@@ -35,7 +35,7 @@
   def print_panels(owner, **op)
     owner_name = owner.class.name
     owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?    
-    hierarchy_object = CONFIG.object[owner_name]
+    hierarchy_object = CONFIG.hierarchy[session[:mode]][:objects][owner_name]
     # are custom print_panels defined ? print the custom panels : print the default panels
     if hierarchy_object.present?
       panels = hierarchy_object[:print_panels].present? ? :print_panels : :panels
