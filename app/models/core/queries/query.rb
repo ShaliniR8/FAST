@@ -25,7 +25,7 @@ class Query < ActiveRecord::Base
 
 
   def get_target
-    CONFIG.hierarchy.values.map{|x| x[:objects]}.compact.inject(:merge)[target][:title].pluralize rescue ""
+    CONFIG.hierarchy[session[:mode]][:objects][target][:title].pluralize rescue ""
   end
 
 
