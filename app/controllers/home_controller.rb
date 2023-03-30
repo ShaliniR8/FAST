@@ -191,7 +191,78 @@ class HomeController < ApplicationController
       @corrective_actions = CorrectiveAction.where(corrective_action_queries.join(' AND '))
       @grouped_corrective_actions = @corrective_actions.group_by(&:status)
       @corrective_actions_scheduled_completion_date = get_avg_completion_date(@corrective_actions)
+    when 'OSHA'
+      @title = "OSHA Dashboard"
 
+      @templates = Template.where(name: (@permissions['submitter'] || []).compact).where(report_type: 'osha')
+
+      # ############################ SUBMISSIONS ########################
+      submission_queries = []
+      submission_queries << "(completed = true)"
+      # template query
+      if params[:emp_groups].present?
+        templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact, emp_group: params[:emp_groups]).where(report_type: 'osha')
+      else
+        templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact).where(report_type: 'osha')
+      end
+      if templates.length > 0
+        submission_queries << "(templates_id in (#{templates.map(&:id).join(',')}) OR user_id = #{current_user.id})"
+      else
+        submission_queries << "(user_id = #{current_user.id})"
+      end
+
+
+      # time range
+      if @start_date.present? && @end_date.present?
+        submission_queries << "event_date >= '#{@start_date.strftime('%Y-%m-%d %H:%M:%S')}'"
+        submission_queries << "event_date <= '#{@end_date.strftime('%Y-%m-%d %H:%M:%S')}'"
+      end
+
+      if params[:data_access] == 'related_data'
+        @submissions = OshaSubmission.preload(:created_by, :template).where(user_id: current_user.id, completed: true)
+      else
+        @submissions = OshaSubmission.preload(:created_by, :template).where(submission_queries.join(' AND '))
+      end
+
+      @submissions = @submissions.joins(:template).order('templates.name')
+
+      @submissions = [] if CONFIG::GENERAL[:hide_submission_in_dashboard]
+
+
+      # ############################ RECORDS ########################
+      record_queries = []
+
+      # template query
+      if params[:emp_groups].present?
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact, emp_group: params[:emp_groups]).where(report_type: 'osha')
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact, emp_group: params[:emp_groups]).where(report_type: 'osha')
+      else
+        full_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_id] || []).compact).where(report_type: 'osha')
+        viewer_template = Template.where(name: (current_user.get_all_templates_hash[:viewer_template_deid] || []).compact).where(report_type: 'osha')
+      end
+
+      template_query = []
+
+      if full_template.length > 0
+        template_query << "(templates_id in (#{full_template.map(&:id).join(',')}) OR `records`.users_id = #{current_user.id})"
+      end
+      if viewer_template.length > 0
+        template_query << "(templates_id in (#{viewer_template.map(&:id).join(',')}) AND viewer_access = true)"
+      end
+      record_queries << "(#{template_query.join(' AND ')})"
+      record_queries.delete("()")
+
+      # time range
+      if @start_date.present? && @end_date.present?
+        record_queries << "event_date >= '#{@start_date.utc.strftime('%Y-%m-%d %H:%M:%S')}'"
+        record_queries << "event_date <= '#{@end_date.utc.strftime('%Y-%m-%d %H:%M:%S')}'"
+      end
+
+      if params[:data_access] == 'related_data'
+        @records = OshaRecord.preload(:created_by, :template).where(users_id: current_user.id)
+      else
+        @records = OshaRecord.preload(:created_by, :template).where(record_queries.join(' AND '))
+      end
     when 'SMS IM'
       @title = "SMS IM Dashboard"
 
@@ -222,7 +293,6 @@ class HomeController < ApplicationController
 
       jap=JobAidPackage.within_timerange(@start_date, @end_date).sort{|x,y| status_index(x)<=>status_index(y)}
       @japs=@jap=jap.group_by{|x| x.status}
-
     when 'SMS'
       @title = "Safety Assurance Dashboard"
 
@@ -275,7 +345,6 @@ class HomeController < ApplicationController
           @grouped_investigations["Overdue"] = temp
         end
       end
-
     when 'SRM'
       @title = "SRA (SRM) Dashboard"
       @sras = sort_by_status(Sra.within_timerange(@start_date, @end_date).by_departments(params[:departments]))
@@ -298,7 +367,6 @@ class HomeController < ApplicationController
 
       @safety_plans = sort_by_status(SafetyPlan.within_timerange(@start_date, @end_date))
       @grouped_safety_plans = @safety_plans.group_by{|x| x.status}
-
     when 'SP'
       @title = "Safety Promotion Dashboard"
 
@@ -433,6 +501,34 @@ class HomeController < ApplicationController
               :title => "#{x.titleize} ##{record.id}: (#{record.status})"
             })
           end
+        end
+      end
+    elsif session[:mode] == "OSHA"
+
+      if current_user.has_access("submissions", "index") && !@submissions.empty?
+        @submissions.joins(:template).each do |a|
+          @calendar_entries.push({
+            :url => submission_path(a),
+            :start => a.get_date,
+            :title => "Submission: #{a.template.name} ##{a.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}",
+            :textColor => "darkslategrey",
+            :description => "<b>#{a.template.name} ##{a.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])}</b>: #{a.description}",
+            :color => group_to_color(a.template.emp_group)
+          }) if a.get_date.present?
+        end
+      end
+
+      if current_user.has_access("records", "index")
+        @records.select {|x| x.template}.each do |a|
+          title_status = a.status == 'Closed' ? "#{a.template.name} ##{a.get_id} (Closed)" : "#{a.template.name} ##{a.get_id}"
+          @calendar_entries.push({
+            :url => record_path(a),
+            :start => a.get_date,
+            :title => title_status,
+            :textColor => "darkslategrey",
+            :description => "Report: <b>#{a.template.name} ##{a.get_id}</b>: #{a.description}",
+            :color => group_to_color(a.template.emp_group)
+          }) if a.get_date.present?
         end
       end
 
