@@ -884,6 +884,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'remind'
       get 'override_status'
       get 'new_attachment'
+      post 'attachment_read'
       get 'new_newsletter_attachment'
     end
     collection do
