@@ -12,7 +12,7 @@
 
       <div class="panel-body" style="display:none;">
 
-        <%if owner.anonymous.present?%>
+        <%if owner.is_a?(Object.const_get("SafetySurvey")) && owner.anonymous.present?%>
           <div style="text-align: center">
             <h2> <b><%="#{owner.completions.keep_if{|c| c.complete_date.present?}.count} "%></b> out of <b><%=" #{owner.get_total_users}"%></b> users have taken/completed this Safety Survey</h2>
           </div>
