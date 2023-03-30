@@ -657,7 +657,7 @@ class ApplicationController < ActionController::Base
       if ['show', 'edit'].include?(params[:action]) && Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha')
         is_osha_module = true
       else
-        is_osha_module = params[:advance_search][:type].include?('Osha') if !is_osha_module && session[:mode] != 'ASAP'
+        is_osha_module = params[:advance_search][:type].include?('Osha') if !is_osha_module && session[:mode] == 'OSHA'
       end
 
       if is_osha_module
