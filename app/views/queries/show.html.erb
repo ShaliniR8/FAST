@@ -31,9 +31,9 @@
               'data-toggle' => 'modal',
               'data-target' => '.bs-example-modal-lg',
               :route => add_subscribers_view_query_path(@owner)%>
-            <%=link_to 'PDF', print_query_path(@owner, format: :pdf), class: 'btn btn-info'%>
-            <%=link_to "Make a Copy", clone_query_path(@owner), class: "btn btn-info", confirm: "Are you sure?"%>
-            <%=link_to "Edit", edit_query_path(@owner), class: "btn btn-warning", disable_with: "Editing..."%>
+            <%=link_to 'PDF', print_query_path(@owner, format: :pdf), class: 'btn btn-info', 'data-toggle'=>'tooltip', 'title'=> "Print as PDF"%>
+            <%=link_to "Make a Copy", clone_query_path(@owner), class: "btn btn-info", 'data-toggle'=>'tooltip', 'title'=> "Create a duplicate query", confirm: "Are you sure?"%>
+            <%=link_to "Edit", edit_query_path(@owner), class: "btn btn-warning", 'data-toggle'=>'tooltip', 'title'=> "Edit Queries", disable_with: "Editing..."%>
             <%=link_to "Delete", query_path(@owner), method: :delete, class: "btn btn-danger", confirm: "Are you sure?"%>
           </div>
         </div>
