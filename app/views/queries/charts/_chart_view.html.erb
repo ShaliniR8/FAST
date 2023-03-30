@@ -156,7 +156,7 @@
                 if ( index == 0) {
                   google.visualization.events.addListener(pieChart, 'ready', function () {
                     document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
-                      '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                      '<a href="' + pieChart.getImageURI() + '"download><u>Download Pie Chart</u></a>';
                   });
                 } else {
                   // Cretate Div for the additional pie charts
@@ -168,7 +168,7 @@
 
                   google.visualization.events.addListener(pieChart, 'ready', function () {
                     document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download-" + index).innerHTML =
-                      '<a href="' + pieChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                      '<a href="' + pieChart.getImageURI() + '"download><u>Download Pie Chart</u></a>';
                   });
                 }
 
@@ -221,7 +221,7 @@
 
               google.visualization.events.addListener(barChart, 'ready', function () {
                 document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
-                  '<a href="' + barChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                  '<a href="' + barChart.getImageURI() + '"download><u>Download Column Chart</u></a>';
               });
 
               google.visualization.events.addListener(barChart, 'select', function() {
@@ -265,7 +265,7 @@
 
               google.visualization.events.addListener(lineChart, 'ready', function () {
                 document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
-                  '<a href="' + lineChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                  '<a href="' + lineChart.getImageURI() + '"download><u>Download Line Chart</u></a>';
               });
 
               google.visualization.events.addListener(lineChart, 'select', function() {
@@ -309,7 +309,7 @@
 
               google.visualization.events.addListener(stackedChart, 'ready', function () {
                 document.getElementById("<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>-download").innerHTML =
-                  '<a href="' + stackedChart.getImageURI() + '"download><u>Download Chart</u></a>';
+                  '<a href="' + stackedChart.getImageURI() + '"download><u>Download Stacked Chart</u></a>';
               });
 
               google.visualization.events.addListener(stackedChart, 'select', function() {

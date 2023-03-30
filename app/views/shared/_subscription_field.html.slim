@@ -15,7 +15,7 @@ tr.field-group.deletable
       {include_blank:''}, {class: "field_select form-control required_field"}
 
   td style=style
-    = f.text_field :day, class: 'form-control'
+    = f.text_field :day, placeholder: "Special characters and alphabets are invalid inputs", class: 'form-control'
 
   td
     = f.hidden_field :_destroy, class: "archived-field #{locals[:existing].present? ? "db-record" : ""}"
