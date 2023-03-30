@@ -15,7 +15,7 @@ ruby:
     video style="width: 100%; height: #{from_mini.present? ? "50px" : "auto"};" controls=true autostart=false
       source src=url type='video/mp4'
   - when *Attachment.pdf_extensions
-    object style="width: 100%; height: #{from_mini.present? ? "50px" : "auto"};" data=url type='application/pdf'
+    object style="width: 100%; height: #{from_mini.present? ? "50px" : "calc(100vh - 210px)"};" data=url type='application/pdf'
       a href=url = "#{attachment.document_filename}.pdf"
   - else
     font style='color: red; font-weight: bold;' No Preview Available
