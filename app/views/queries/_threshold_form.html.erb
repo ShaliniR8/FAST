@@ -8,9 +8,13 @@
     <div class="panel panel-lightsteelblue">
       <div class="panel-heading">
         <div class="panel-title">
+          <div class="top_text">
+            Set Threshold for Notification
+          </div>
+
           <div class="top_buttons pull-right">
-            <span class="pull-right" onclick="removepanel(this)">
-              <i class="glyphicon glyphicon-remove btn btn-danger"></i>
+            <span class="pull-right">
+              <i class="glyphicon glyphicon-info-sign btn btn-warning" data-toggle="tooltip" title="This will notify when number of results under this query exceeds the threshold."></i>
             </span>
           </div>
         </div>
@@ -58,6 +62,7 @@
 </style>
 
 <script>
+    $('[data-toggle="tooltip"]').tooltip()
     $(document).ready(function() {
       $('.select-multiple').select2();
     });

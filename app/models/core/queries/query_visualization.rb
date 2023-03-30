@@ -156,5 +156,8 @@ class QueryVisualization < ActiveRecord::Base
     )
   end
 
+  def set_threshold(threshold)
+    self.threshold = threshold
+  end
 
 end

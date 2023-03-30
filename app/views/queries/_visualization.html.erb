@@ -96,6 +96,21 @@
             <%end%>
           </div>
 
+          <div class="form-group" id="visualization_threshold_<%=visualization.id%>" style="display:none">
+            <div class="row col-xs-10">
+              <%=label_tag :threshold, 'Threshold', class: "col-sm-4 col-form-label"%>
+              <div class="col-sm-8">
+                <%=text_field_tag "visualization_threshold_input_#{visualization.id}", visualization.threshold, {:class => "form-control ml5"}%>
+              </div>
+            </div>
+            <div class="col-sm-2 pull-right">
+              <%=link_to "Save", '#',
+                id: "visualization_threshold_submit_#{visualization.id}",
+                class: "btn btn-warning",
+                "data-visualization-id" => visualization.id%>
+            </div>
+          </div>
+
           <div class="col-xs-12 mt10">
             <div id="loader_<%=visualization.id%>" style="display:none">
               <div class="centered loader"></div>
@@ -149,10 +164,32 @@
 
   $(function(){
 
+    $("#visualization_threshold_submit_<%=visualization.id%>").on("click", function(e){
+      e.preventDefault();
+      var visualization_id = $(this).data("visualization-id");
+      var threshold = $("#visualization_threshold_input_"+visualization_id).val()
+      var x_axis_val = $("#x_axis_" + visualization_id).val()
+      $.ajax({
+        type: "POST",
+        url: "<%=visualization_threshold_query_path(@owner)%>",
+        data: {
+          "visualization_id": visualization_id,
+          "threshold": threshold,
+          "x_axis": x_axis_val,
+          "records": "<%=records%>",
+        },
+         success: function(response){
+          $("visualization_threshold_"+visualization_id).html(response)
+        }, error: function(response){
+          $("visualization_threshold_"+visualization_id).html(response)
+        },
+      });
+    });
+
     $("#generate_charts_btn_<%=visualization.id%>").on("click", function(e){
       e.preventDefault();
       var visualization_id = $(this).data("visualization-id");
-
+      var series_present = $('#series_' + visualization_id).val() === "" ? true : false
       $.ajax({
         type: "POST",
         url: "<%=generate_visualization_query_path(@owner)%>",
@@ -170,9 +207,16 @@
           $("#chart_area_" + visualization_id).css({'opacity':0.5});
         }, complete: function(){
           $('#loader_' + visualization_id).hide();
+          if (series_present){
+            $("#visualization_threshold_"+visualization_id).show()
+          }
+          else {
+            $("#visualization_threshold_"+visualization_id).hide()
+          }
           $("#chart_area_" + visualization_id).css({'opacity':1});
         }, success: function(response){
           $("#chart_area_" + visualization_id).html(response);
+
         }, error: function(response){
           $("#chart_area_" + visualization_id).html(response);
         },

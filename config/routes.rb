@@ -153,6 +153,7 @@ PrdgSession::Application.routes.draw do |map|
       post "add_visualization"
       get "remove_visualization"
       post "generate_visualization"
+      post "visualization_threshold"
       post "display_chart_result"
       post "enable"
       get "add_subscribers_view"

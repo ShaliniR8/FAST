@@ -18,8 +18,8 @@ class Query < ActiveRecord::Base
     [
       {field: 'id',             title: 'ID',         num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'title',          title: 'Title',      num_cols: 12,  type: 'text', visible: 'index,show'},
-      {field: 'distribution_list_ids',  title: 'Distribution Lists', num_cols: 4, type: 'select_multiple', visible: 'form', required: false,  options: get_distribution_list},
-      {field: 'threshold',  title: 'Threshold', num_cols: 4, type: 'text', visible: 'show,form', required: false},
+      {field: 'distribution_list_ids',  title: 'Distribution Lists', num_cols: 5, type: 'select_multiple', visible: 'form', required: false,  options: get_distribution_list},
+      {field: 'threshold',  title: 'Threshold', num_cols: 2, type: 'text', visible: 'show,form', required: false},
       {field: 'get_created_by', title: 'Created By', num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_target',     title: 'Target',     num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_templates',  title: 'Templates',  num_cols: 12,  type: 'text', visible: 'show'},
@@ -72,7 +72,7 @@ class Query < ActiveRecord::Base
     DistributionList.all.map{|d| [d.title, d.id]}
   end
 
-  def set_threshold_alert(params)
+  def set_threshold(params)
     self.threshold = params[:threshold]
     self.distribution_list_ids = params[:distros].map {|str| str.to_i}
     self.save
