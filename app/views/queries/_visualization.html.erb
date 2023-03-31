@@ -220,6 +220,8 @@
           $('#loader_' + visualization_id).hide();
           if (threshold_visible){
             $("#visualization_threshold_"+visualization_id).show()
+            document.querySelector("#visualization_threshold_input_"+visualization_id).setAttribute("value", "<%=visualization.threshold%>");
+            $("#visualization_threshold_submit_"+visualization_id).trigger("click")
           }
           else {
             $("#visualization_threshold_"+visualization_id).hide()
