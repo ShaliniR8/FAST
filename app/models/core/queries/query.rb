@@ -74,7 +74,11 @@ class Query < ActiveRecord::Base
 
   def set_threshold(params)
     self.threshold = params[:threshold]
-    self.distribution_list_ids = params[:distros].map {|str| str.to_i}
+    if params[:distros] == nil
+      self.distribution_list_ids = nil
+    else
+      self.distribution_list_ids = params[:distros].map {|str| str.to_i}
+    end
     self.save
   end
 
