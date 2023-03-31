@@ -100,11 +100,13 @@ class QueriesController < ApplicationController
   def create
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
-    params[:query][:templates] = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
     @owner = Query.create(params[:query])
     unless params["distribution_list_ids"] == "" || (params["threshold"]) == ""
       @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
     end
+    @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
+    @owner.save
+
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -124,6 +126,8 @@ class QueriesController < ApplicationController
     unless params["distribution_list_ids"] == "" || (params["threshold"]) == ""
       @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
     end
+    @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
+    @owner.save
     redirect_to query_path(@owner)
   end
 
@@ -629,6 +633,7 @@ class QueriesController < ApplicationController
     field = object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close')
       .keep_if{|f| f[:title] == label}.first
     # else check template fields
+
     field = Template.preload(:categories, :fields)
       .where(id: query.templates)
       .map(&:fields)
@@ -636,6 +641,7 @@ class QueriesController < ApplicationController
       .select{|x| x.label.strip == label.strip}
       .first if field.nil?
     # [field, field_label.split(',').map(&:strip)[1]]
+
     [field, field_label]
   end
 

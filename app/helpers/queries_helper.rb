@@ -6,7 +6,8 @@ module QueriesHelper
       if value.is_a? Integer
         User.find_by_id(value).full_name rescue ''
       else
-        User.find_by_full_name(value).full_name rescue ''
+        # User.find_by_full_name(value).full_name rescue ''
+        User.find_by_id(value).full_name rescue ''
       end
     when 'datetime', 'date'
       value.strftime("%Y-%m") rescue 'N/A'
