@@ -100,13 +100,15 @@
             <div class="row col-xs-10">
               <%=label_tag :threshold, 'Threshold', class: "col-sm-4 col-form-label"%>
               <div class="col-sm-8">
-                <%=text_field_tag "visualization_threshold_input_#{visualization.id}", visualization.threshold, {:class => "form-control ml5"}%>
+                <%=text_field_tag "visualization_threshold_input_#{visualization.id}", nil, {:class => "form-control ml5"}%>
               </div>
             </div>
             <div class="col-sm-2 pull-right">
-              <%=link_to "Save", '#',
+              <%=link_to "<span class=\"glyphicon glyphicon-bell\"></span>".html_safe, '#',
                 id: "visualization_threshold_submit_#{visualization.id}",
                 class: "btn btn-warning",
+                'data-toggle' => 'tooltip',
+                title: "Save and set notification for this threshold",
                 "data-visualization-id" => visualization.id%>
             </div>
           </div>
@@ -163,7 +165,7 @@
 
 
   $(function(){
-
+    $('[data-toggle="tooltip"]').tooltip()
     $("#visualization_threshold_submit_<%=visualization.id%>").on("click", function(e){
       e.preventDefault();
       var visualization_id = $(this).data("visualization-id");

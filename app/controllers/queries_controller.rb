@@ -307,12 +307,11 @@ class QueriesController < ApplicationController
 
   # generate indivisual visualization blocks
   def generate_visualization
-
     @visualization = QueryVisualization.find(params[:visualization_id]).tap do |vis|
       vis.x_axis = params[:x_axis]
       vis.series = params[:series]
       vis.default_chart = params[:default_chart]
-      if params[:series].present?
+      if params["series"].present?
         vis.set_threshold(nil)
       end
       vis.save
