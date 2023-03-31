@@ -102,6 +102,9 @@ class QueriesController < ApplicationController
     params[:query][:templates] = params[:query][:templates].split(",")
     params[:query][:templates] = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
     @owner = Query.create(params[:query])
+    unless params["distribution_list_ids"] == "" || (params["threshold"]) == ""
+      @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
+    end
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -117,6 +120,9 @@ class QueriesController < ApplicationController
       params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     else
       @owner.update_attributes(params[:query])
+    end
+    unless params["distribution_list_ids"] == "" || (params["threshold"]) == ""
+      @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
     end
     redirect_to query_path(@owner)
   end
@@ -141,7 +147,6 @@ class QueriesController < ApplicationController
     @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<', 'Last ( ) Days']
     @operators = ["AND", "OR"]
     @owner = params[:query_id].present? ? Query.find(params[:query_id]) : Query.new
-
     @target = params[:target]
     if @target == 'Report'
       @templates = Template.all
@@ -159,7 +164,6 @@ class QueriesController < ApplicationController
     if @target == 'Checklist' && params[:templates].present?
       @templates = Checklist.where(id: params[:templates])
       @fields = []
-
       params[:templates].each do |template_id|
         if template_id == '-1'
           ChecklistHeader.all.each do |header|
@@ -214,6 +218,7 @@ class QueriesController < ApplicationController
       }
     end
     @fields = @fields.sort_by{|field| (field[:title].present? ? field[:title] : "")}
+    @distribution_list = DistributionList.all.map{|d| [d.id, d.title]}.to_h
     render :partial => "building_query"
   end
 
@@ -293,14 +298,18 @@ class QueriesController < ApplicationController
     render :json => true
   end
 
-
   # generate indivisual visualization blocks
   def generate_visualization
-
     @visualization = QueryVisualization.find(params[:visualization_id]).tap do |vis|
       vis.x_axis = params[:x_axis]
       vis.series = params[:series]
       vis.default_chart = params[:default_chart]
+      if params["series"].present?
+        vis.set_threshold(nil)
+      end
+      if params["threshold"].present?
+        vis.set_threshold(params["threshold"])
+      end
       vis.save
     end
     @owner = Query.find(params[:id])
@@ -355,7 +364,7 @@ class QueriesController < ApplicationController
 
     # REMOVE unnecessary quotes
     @data_ids = @data_ids.map{ |x| [x[0].gsub('"', '').gsub("\'", ''), x[1..-1]].flatten(1)}
-    
+
     @redirect_page = false
 
     if params[:nested_xaxis] == true.to_s && @x_axis_field.first.is_a?(Field)
