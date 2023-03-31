@@ -482,8 +482,9 @@ class SubmissionsController < ApplicationController
 
   def update
     alert = ''
-    if params[:submission][:submission_fields_attributes].present?
-      params[:submission][:submission_fields_attributes].each_value do |field|
+    param_submission = params[:submission] || params[:osha_submission]
+    if param_submission[:submission_fields_attributes].present?
+      param_submission[:submission_fields_attributes].each_value do |field|
         if field[:value].is_a?(Array)
           field[:value].delete("")
           field[:value]=field[:value].join(";")
@@ -495,13 +496,13 @@ class SubmissionsController < ApplicationController
     create_notice = true
     if params[:is_autosave].present? && params[:is_autosave] == "2"
       params[:commit] = 'Save for Later'
-      params[:submission].delete(:attachments_attributes)
+      param_submission.delete(:attachments_attributes)
       create_notice = false
     end
 
-    if params[:submission][:attachments_attributes].present?
+    if param_submission[:attachments_attributes].present?
       if session[:platform] == Transaction::PLATFORMS[:mobile]
-        params[:submission][:attachments_attributes].each do |key, attachment|
+        param_submission[:attachments_attributes].each do |key, attachment|
         # File is a base64 string
           if attachment[:name].present? && attachment[:name].is_a?(Hash)
             file_params = attachment[:name]
@@ -520,15 +521,15 @@ class SubmissionsController < ApplicationController
               :type     => mime_type)
 
             # Replace attachment parameter with the created file
-            params[:submission][:attachments_attributes][key][:name] = uploaded_file
+            param_submission[:attachments_attributes][key][:name] = uploaded_file
           end
         end
       else
-        params[:submission][:attachments_attributes].each do |key, attachment|
+        param_submission[:attachments_attributes].each do |key, attachment|
           if attachment[:name].present?
-            params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+            param_submission[:attachments_attributes][key][:name] = attachment[:name]
           else
-            params[:submission][:attachments_attributes].delete(key)
+            param_submission[:attachments_attributes].delete(key)
           end
         end
       end
@@ -539,15 +540,15 @@ class SubmissionsController < ApplicationController
     params[:commit] = 'Submit' if !@record.completed? && params[:commit] != 'Save for Later'
 
     if params[:commit] != 'Add Notes'
-      params[:submission][:completed] = params[:commit] != 'Save for Later'
-      params[:submission][:anonymous] = params[:anonymous] == '1'
-      params[:submission][:confidential] = params[:confidential] == '1'
+      param_submission[:completed] = params[:commit] != 'Save for Later'
+      param_submission[:anonymous] = params[:anonymous] == '1'
+      param_submission[:confidential] = params[:confidential] == '1'
     end
 
     event_date_to_utc
 
     if !@record.completed || params[:commit] == 'Add Notes'
-      if @record.update_attributes(params[:submission])
+      if @record.update_attributes(param_submission)
         if create_notice
           notify_notifiers(@record, params[:commit])
         end
@@ -577,7 +578,7 @@ class SubmissionsController < ApplicationController
             NotifyMailer.send_submitter_confirmation(current_user, converted)
           end
           respond_to do |format|
-            flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
+            flash = { success: param_submission[:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
             format.html { redirect_to submission_path(@record), flash: flash }
             format.json { update_as_json(flash) }
           end
@@ -731,12 +732,13 @@ class SubmissionsController < ApplicationController
 
     def event_date_to_utc
       # Store event_date as UTC
-      date_time = params[:submission]["event_date"]
+      param_submission = params[:submission] || params[:osha_submission]
+      date_time = param_submission["event_date"]
 
       if CONFIG.sr::GENERAL[:submission_time_zone] && date_time.present?
-        time_zone = params[:submission]["event_time_zone"]
+        time_zone = param_submission["event_time_zone"]
         utc_time  = convert_to_utc(date_time: date_time, time_zone: time_zone)
-        params[:submission]["event_date"] = utc_time
+        param_submission["event_date"] = utc_time
       end
     end
 
