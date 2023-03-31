@@ -620,6 +620,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'load_records'
       get "advanced_search"
       post "get_dataset"
+      post 'complete'
     end
   end
   resources :findings do

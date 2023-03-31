@@ -29,6 +29,7 @@ class DefaultConfig
     login_option:                       'prosafet', # Login page UI config => available options: dual, prosafet, sso
     external_link:                      false,
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
+    has_investigations_app:             false,   # Enables Investigations feature within app
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
     cisp_integration:                   false,
     asrs_integration:                   false,

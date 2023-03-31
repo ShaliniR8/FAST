@@ -34,6 +34,38 @@ class InvestigationsController < SafetyAssuranceController
   before_filter(only: [:create]) {set_parent(:investigation)}
   after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @investigation)}
 
+  include Concerns::Mobile # used for [method]_as_json
+
+  def index
+    respond_to do |format|
+      format.html do
+        @object_name = controller_name.classify
+        @table_name = controller_name
+
+        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+        @default_tab = params[:status]
+
+        # Datatable Column Info
+        @columns = get_data_table_columns(@object_name)
+
+        @column_titles = @columns.map { |col| col[:title] }
+        @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+        }.select(&:present?)
+
+        @source_column_indices = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('source of input')) ? inx : nil
+        }.select(&:present?)
+
+        @advance_search_params = params
+
+        render 'forms/index'
+      end
+      format.json { index_as_json }
+    end
+  end
+
+
   def define_owner
     @class = Object.const_get('Investigation')
     @owner = Investigation.find(params[:id])
@@ -77,6 +109,14 @@ class InvestigationsController < SafetyAssuranceController
     load_options
     @fields = Investigation.get_meta_fields('form')
     load_special_matrix_form('investigation', 'baseline', @owner)
+  end
+
+  def complete
+    record = Investigation.find(params[:id])
+    send_notification(record, 'Complete')
+    respond_to do |format|
+      format.json { complete_as_json }
+    end
   end
 
   def create
@@ -143,13 +183,18 @@ class InvestigationsController < SafetyAssuranceController
 
 
   def show
-    @type = 'investigations'
-    @cause_headers = InvestigationCause.get_headers
-    @desc_headers = InvestigationDescription.get_headers
-    load_options
-    @fields = Investigation.get_meta_fields('show')
-    @recommendation_fields = Recommendation.get_meta_fields('show')
-    load_special_matrix(@investigation)
+    respond_to do |format|
+      format.html do
+        @type = 'investigations'
+        @cause_headers = InvestigationCause.get_headers
+        @desc_headers = InvestigationDescription.get_headers
+        load_options
+        @fields = Investigation.get_meta_fields('show')
+        @recommendation_fields = Recommendation.get_meta_fields('show')
+        load_special_matrix(@investigation)
+      end
+      format.json { show_as_json }
+    end
   end
 
 
