@@ -20,7 +20,11 @@ class HomeController < ApplicationController
 
     types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
-    @pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
+    if session[:mode] == 'OSHA'
+      @pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| ['OshaRecord'].include?(qv.query[:target])}
+    else
+      @pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
+    end
 
     @notices = current_user.notices.where(status: 1).sort_by(&:created_at).reverse.first(6)
 
