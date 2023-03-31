@@ -199,6 +199,30 @@ module Concerns
         json
       end
 
+      def complete_as_json
+        record = Investigation.find(params[:id])
+        record.investigator_comment = params[:investigator_comment][:inputText].to_s
+        if !record.approver
+          record.status = 'Completed'
+          record.close_date = Time.now
+        else
+          record.status = 'Pending Approval'
+        end
+
+        Transaction.build_for(
+          record,
+          'Complete',
+          current_user.id,
+          params[:investigator_comment][:inputText].to_s,
+          nil,
+          current_user,
+          session[:platform]
+        )
+
+        saved = record.save
+        render :json => { :success => saved ? 'Investigation Completed.' : 'Investigation could not be completed' }, :status => 200
+      end
+
     end
   end
 end

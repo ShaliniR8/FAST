@@ -111,6 +111,14 @@ class InvestigationsController < SafetyAssuranceController
     load_special_matrix_form('investigation', 'baseline', @owner)
   end
 
+  def complete
+    record = Investigation.find(params[:id])
+    send_notification(record, 'Complete')
+    respond_to do |format|
+      format.json { complete_as_json }
+    end
+  end
+
   def create
     convert_from_risk_value_to_risk_index
     @investigation = Investigation.create(params[:investigation])

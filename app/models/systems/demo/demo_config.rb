@@ -15,6 +15,7 @@ class DemoConfig < DefaultConfig
     # SYSTEM CONFIGS
     enable_mailer:                false,
     has_mobile_app:               true,
+    has_investigations_app:       true,
     track_log:                    true,
 
     # Third Party Integrations:
