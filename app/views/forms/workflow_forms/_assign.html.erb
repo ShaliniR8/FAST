@@ -74,7 +74,7 @@
               </tr>
             </thead>
             <tbody class="xbody">
-              <%User.all.each do |u|%>
+              <%User.includes(:privileges).all.each do |u|%>
                 <tr uid="<%=u.id%>" class="list_tr">
                   <%User.get_headers.values.each do |v|%>
                     <td><%=u.send(v)%></td>

@@ -170,7 +170,20 @@ class InvestigationsController < SafetyAssuranceController
     @privileges.keep_if{|p| keep_privileges(p, 'investigations')}.sort_by!{|a| a.name}
     # @types = Investigation.types
     # @sources = Investigation.sources
-    @users = User.find(:all)
+
+    @user_groups = {}
+    user_groups = UserGroup.where(object_name: params[:controller])
+    if user_groups.size == 2 # SRA has 3 users
+      user_groups.each { |user_group|
+        @user_groups[user_group.user_field] = user_group.privileges_id
+      }
+      priv_ids = @user_groups.values.flatten
+    else
+      priv_ids = Privilege.all.map(&:id)
+    end
+
+    @users = User.includes(:privileges).active.where(privileges: {id: priv_ids})
+
     @users.keep_if{|u| !u.disable && u.has_access('investigations', 'edit')}
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse

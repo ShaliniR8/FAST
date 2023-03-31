@@ -196,6 +196,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'reload'
     end
   end
+
   resources :occurrence_templates do
     collection do
       post 'new_root'
@@ -265,7 +266,8 @@ PrdgSession::Application.routes.draw do |map|
       #resources :password_resets, only: [:new, :create, :edit, :update]
     end
     collection do
-      post "filter_allowed_priv"
+      get 'user_groups'
+      post 'update_user_group'
       get "users_index"
       get 'current_json'
       put 'mobile_months'
