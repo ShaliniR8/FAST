@@ -170,20 +170,30 @@
       e.preventDefault();
       var visualization_id = $(this).data("visualization-id");
       var threshold = $("#visualization_threshold_input_"+visualization_id).val()
-      var x_axis_val = $("#x_axis_" + visualization_id).val()
       $.ajax({
         type: "POST",
-        url: "<%=visualization_threshold_query_path(@owner)%>",
+        url: "<%=generate_visualization_query_path(@owner)%>",
         data: {
           "visualization_id": visualization_id,
-          "threshold": threshold,
-          "x_axis": x_axis_val,
+          "x_axis": $("#x_axis_" + visualization_id).val(),
+          "series": $('#series_' + visualization_id).val(),
+          "threshold": $("#visualization_threshold_input_"+visualization_id).val(),
+          "nested_xaxis": $("#nested_visualization_xaxis_" + visualization_id).is(":checked"),
+          "nested_series": $('#nested_visualization_series_' + visualization_id).is(":checked"),
+          "default_chart": $('#default_chart_' + visualization_id).val(),
           "records": "<%=records%>",
         },
-         success: function(response){
-          $("visualization_threshold_"+visualization_id).html(response)
+        beforeSend: function(){
+          $('#loader_' + visualization_id).show();
+          $("#chart_area_" + visualization_id).css({'opacity':0.5});
+        }, complete: function(){
+          $('#loader_' + visualization_id).hide();
+          $("#chart_area_" + visualization_id).css({'opacity':1});
+        }, success: function(response){
+          $("#chart_area_" + visualization_id).html(response);
+
         }, error: function(response){
-          $("visualization_threshold_"+visualization_id).html(response)
+          $("#chart_area_" + visualization_id).html(response);
         },
       });
     });

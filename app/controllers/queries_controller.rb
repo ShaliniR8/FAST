@@ -311,7 +311,9 @@ class QueriesController < ApplicationController
       vis.x_axis = params[:x_axis]
       vis.series = params[:series]
       vis.default_chart = params[:default_chart]
-      if params["series"].present?
+      if params["threshold"].present?
+        vis.set_threshold(params["threshold"])
+      else
         vis.set_threshold(nil)
       end
       vis.save
