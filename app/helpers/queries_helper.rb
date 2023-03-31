@@ -1531,6 +1531,24 @@ module QueriesHelper
     mapping_hash['Record']["Additional Info"] = 'additional_info'
     mapping_hash['Record']["Type"] = 'record_type'
 
+    mapping_hash['OshaRecord'] = Hash.new
+    mapping_hash['OshaRecord']['Submitted By'] = 'users_id'
+    mapping_hash['OshaRecord']['Accepted Into ASAP'] = 'asap'
+    mapping_hash['OshaRecord']["#{Record.find_top_level_section.label}"] = 'included_occurrences'
+    mapping_hash['OshaRecord']["Full #{Record.find_top_level_section.label}"] = 'included_occurrences'
+    mapping_hash['OshaRecord']["EIR Number"] = 'eir'
+    mapping_hash['OshaRecord']['Event Date/Time'] = 'event_date'
+    mapping_hash['OshaRecord']['Event Title'] = 'description'
+    mapping_hash['OshaRecord']['Exclude From ASAP Library'] = 'scoreboard'
+    mapping_hash['OshaRecord']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
+    mapping_hash['OshaRecord']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
+    mapping_hash['OshaRecord']['Sole Source'] = 'sole'
+    mapping_hash['OshaRecord']["Additional Info"] = 'additional_info'
+    mapping_hash['OshaRecord']["Type"] = 'record_type'
 
     mapping_hash['Report'] = Hash.new
     mapping_hash['Report']['Accepted Into ASAP'] = 'asap'

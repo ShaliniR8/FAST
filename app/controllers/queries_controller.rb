@@ -209,7 +209,7 @@ class QueriesController < ApplicationController
     end
 
     if @templates.length > 0 && @target != 'Checklist'
-      @templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
+      @templates.map(&:fields).flatten.select{ |field| !field.deleted }.uniq{|field| field.label}.each{|field|
         @fields << {
           title: field.label,
           field: field.label,

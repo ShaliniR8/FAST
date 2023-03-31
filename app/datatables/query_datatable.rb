@@ -130,7 +130,7 @@ class QueryDatatable
       res = object.joins(join_tables)
             .where(search_string.join(' and '))
 
-      @count = res.count
+      @count = res.uniq.count
 
       res = res.order("#{sort_column} #{sort_direction}")
                .group("#{object.table_name}.id")
