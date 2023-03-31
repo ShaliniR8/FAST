@@ -41,6 +41,8 @@ class RecordsController < ApplicationController
 
 
   def osha_300a
+    @title = 'Reports - OSHA 300A'
+    
     records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
 
     @total_of_g = 0
@@ -103,6 +105,7 @@ class RecordsController < ApplicationController
 
 
   def osha_300
+    @title = 'Reports - OSHA 300'
   end
 
   def osha_300_result
@@ -139,7 +142,7 @@ class RecordsController < ApplicationController
 
         case field.osha_map
         when 'a' then @entries[record.id]['(A) Case No.'] = field_value
-        when 'b' then @entries[record.id]['(B) Employee\' Name'] = User.find(field_value).full_name
+        when 'b' then @entries[record.id]['(B) Employee\' Name'] = User.find(field_value).full_name rescue ''
         when 'c' then @entries[record.id]['(C) Job Title'] = field_value
         # when 'd' then @entries[record.id]['(D) Date of injury or onset of illness'] = record.event_date.to_date #field_value
         when 'e' then @entries[record.id]['(E) Where the event occurred'] = field_value
