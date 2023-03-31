@@ -44,7 +44,7 @@
                         <%if col_index == 0%>
                           <td><%=value%></td>
                         <%else%>
-                          <%style = value > vis_threshold ? "color:red" : ("")%>
+                          <%style = value >= vis_threshold ? "color:red" : ("")%>
                           <td><a href="javascript:void(0)" class="gridRow" data-row="<%=row_index%>" data-col="<%=col_index%>" data-vis="<%=@visualization.id%>" style=<%=style%>><%=value%></a></td>
                         <%end%>
                       <%end%>

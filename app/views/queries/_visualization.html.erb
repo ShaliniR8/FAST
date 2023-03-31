@@ -95,12 +95,11 @@
               <%end%>
             <%end%>
           </div>
-
           <div class="form-group" id="visualization_threshold_<%=visualization.id%>" style="display:none">
             <div class="row col-xs-10">
               <%=label_tag :threshold, 'Threshold', class: "col-sm-4 col-form-label"%>
               <div class="col-sm-8">
-                <%=text_field_tag "visualization_threshold_input_#{visualization.id}", nil, {:class => "form-control ml5"}%>
+                <%=text_field_tag "visualization_threshold_input_#{visualization.id}", visualization.threshold, {:class => "form-control ml5"}%>
               </div>
             </div>
             <div class="col-sm-2 pull-right">
@@ -201,7 +200,7 @@
     $("#generate_charts_btn_<%=visualization.id%>").on("click", function(e){
       e.preventDefault();
       var visualization_id = $(this).data("visualization-id");
-      var series_present = $('#series_' + visualization_id).val() === "" ? true : false
+      var threshold_visible = $('#series_' + visualization_id).val() === "" ? true : false
       $.ajax({
         type: "POST",
         url: "<%=generate_visualization_query_path(@owner)%>",
@@ -219,7 +218,7 @@
           $("#chart_area_" + visualization_id).css({'opacity':0.5});
         }, complete: function(){
           $('#loader_' + visualization_id).hide();
-          if (series_present){
+          if (threshold_visible){
             $("#visualization_threshold_"+visualization_id).show()
           }
           else {
@@ -228,7 +227,6 @@
           $("#chart_area_" + visualization_id).css({'opacity':1});
         }, success: function(response){
           $("#chart_area_" + visualization_id).html(response);
-
         }, error: function(response){
           $("#chart_area_" + visualization_id).html(response);
         },
