@@ -44,7 +44,8 @@
                     tr
                       - @record.checklist_header.checklist_header_items.each do |item|
                         th width="#{item.size}%" = item.title
-                      th Attachments
+                      - unless ['Completion', 'SafetySurvey'].include?(@record.owner_type)
+                        th Attachments
                   tbody.checklist_rows#checklist_rows
                     - @record.checklist_rows.each do |checklist_row|
                       = f.fields_for :checklist_rows, checklist_row do |row_form|

@@ -44,7 +44,7 @@ ruby:
               = checklist.assignees.map(&:full_name).join(', ')
 
               - if owner.my_action(current_user.id) == "Not Completed"
-                = link_to "Address", address_checklist_path(checklist),
+                = link_to "Take Survey", address_checklist_path(checklist),
                   class: 'btn btn-success pull-right mr5'
 
               - if owner.status == 'New'
@@ -61,9 +61,10 @@ ruby:
                   :disable_with => 'Deleting...',
                   :class => 'btn btn-danger pull-right mr5'
 
-              = link_to "Export CSV", export_checklist_path(checklist, format: "csv"),
-                class: "btn btn-success pull-right mr5 mb10",
-                target: "_blank"
+              - if owner.my_action(current_user.id) == "Creator"
+                = link_to "Export CSV", export_checklist_path(checklist, format: "csv"),
+                  class: "btn btn-success pull-right mr5 mb10",
+                  target: "_blank"
 
               - if checklist.table_view
                 = render '/checklists/checklist_table', checklist: checklist, owner: owner

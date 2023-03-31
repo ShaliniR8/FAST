@@ -43,15 +43,14 @@
               <%end%>
 
               <%if @newsletter.status == "Published"%>
+                <%if show_complete_button(@newsletter.id, current_user.id) == 1 && (@newsletter.my_action(current_user.id) == "Unread") %>
+                  <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5", id: "complete_newsletter_btn"%>
+                <%end%>
                 <%=link_to "Unpublish",unpublish_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
                 <%=link_to "Archive",archive_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
                 <%=link_to "Remind Users",remind_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5","data-toggle" => "tooltip","data-placement" => "top","title" => "Send reminder to users within the Distribution Groups that have not read this Newsletter"%>
               <%end%>
 
-            <%end%>
-
-            <%if @newsletter.my_action(current_user.id) == 'Unread'%>
-              <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5", id: "complete_newsletter_btn", :style=>"display:none"%>
             <%end%>
 
             <%=link_to "Add Comment",
@@ -163,20 +162,6 @@
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
-    });
-
-    $('.accept_read_receipt').on('change', function(){
-      let accept_all = true;
-      $('.accept_read_receipt').each(function(){
-        if($(this).prop('checked') == false) {
-          accept_all = false;
-        }
-      });
-      if (accept_all == true) {
-        $('#complete_newsletter_btn').show();
-      } else {
-        $('#complete_newsletter_btn').hide();
-      }
     });
 
   });

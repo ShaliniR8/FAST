@@ -725,7 +725,7 @@ class HomeController < ApplicationController
     end
 
     @chart_types = QueryVisualization.chart_types
-    @data = @visualization.generate_vis([]) if !@data.present?
+    @data = @visualization.generate_vis([], @owner) if !@data.present?
     @options = {title: @visualization.x_axis }
     html = render_to_string(template: '/home/_chart_view_home.html.erb', layout: false)
 

@@ -238,6 +238,26 @@ class NewslettersController < ApplicationController
     render :partial=>"shared/attachment_modal"
   end
 
+  def attachment_read
+    attachment_id = params[:newsletter_attachment_id]
+    @attachment = NewsletterAttachment.find(attachment_id)
+
+    if @attachment.user_ids == nil
+      @attachment.user_ids = Array.new
+    end
+
+    @newsletter = @table.find(params[:id])
+    if params.keys.include? "read_receipt_#{attachment_id}"
+      if params["read_receipt_#{attachment_id}"] == "on" && (!@attachment.user_ids.include? current_user.id)
+        @attachment.user_ids << current_user.id
+      else
+        idx = @attachment.user_ids.index(current_user.id)
+        deleted_user_id = @attachment.user_ids.delete_at(idx)
+      end
+    end
+    @attachment.save
+    redirect_to newsletter_path(@newsletter)
+  end
 
   def new_newsletter_attachment
     @owner=@table.find(params[:id])

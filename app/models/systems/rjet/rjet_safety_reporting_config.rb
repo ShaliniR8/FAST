@@ -5,7 +5,6 @@ class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
     attach_pdf_submission:           'ided',      # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
     enable_external_email:           true,
     show_event_title_in_query:       false,
-    show_pdf_column_scoreboard:      true,
     show_title_deid_pdf:             false
   })
 

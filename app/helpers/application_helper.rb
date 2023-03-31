@@ -1012,4 +1012,16 @@ module ApplicationHelper
     %w(a e i o u).include?(str[0].downcase) ? "an #{str}" : "a #{str}"
   end
 
+  def show_complete_button(newsletter_id, current_user_id)
+    attachments = NewsletterAttachment.where(owner_id: newsletter_id)
+    flag = 1
+    attachments.each do |a|
+      if a.user_ids == nil || (!a.user_ids.include? current_user_id)
+        flag = 0
+        break
+      end
+    end
+    flag
+  end
+
 end

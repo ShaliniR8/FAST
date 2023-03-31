@@ -28,9 +28,6 @@ ruby:
                 | Caption
               th style="width=30%;"
                 | Action
-              - if owner.my_action(current_user.id) == 'Unread'
-                th style="width=30%;"
-                  | Read Receipt(Acknowledge all Documents)
           tbody
             - attachments.each do |attachment|
               tr attachment_id=attachment.id
@@ -49,17 +46,27 @@ ruby:
                       .panel-body style='max-height: calc(100vh - 210px); overflow-y: auto;'
                         .col-xs-12 align='center'
                           = render 'forms/attachments_preview', attachment: attachment, from_mini: false
+                      - if owner.my_action(current_user.id) == 'Unread'
+                        .panel-footer style="color: red"
+                          .row-12
+                            = form_tag action: :attachment_read
+                              = hidden_field_tag :newsletter_attachment_id, attachment.id
+                              - if attachment.user_ids != nil && (attachment.user_ids.include? current_user.id)
+                                = hidden_field_tag "read_receipt_#{attachment.id}", false
+                                = check_box_tag "read_receipt_#{attachment.id}", nil, true, class: 'accept_read_receipt mr10'
+                              -else
+                                = check_box_tag "read_receipt_#{attachment.id}", nil, false, class: 'accept_read_receipt mr10'
+                              b I hereby acknowledge that I have read the document captioned #{(attachment.caption.upcase) rescue "N/A"} in its entirety
+                              .pull-right style='color: black' title="This will save changes to your acknowledgement"
+                                = submit_tag 'Save Acknowledgment',
+                                              disable_with: 'Saving...',
+                                              class: "btn btn-success panel-button m10"
                   = link_to 'Preview', '#',
                     class: 'btn btn-info show_preview_btn',
                     'data-toggle' => 'modal',
                     'data-target' => '.bs-example-modal-lg'
                   = link_to 'Download', attachment.name.url,
                     class: 'btn btn-success m5'
-                - if owner.my_action(current_user.id) == 'Unread'
-                  td style="text-align:center;width=30%;"
-                    = check_box_tag "read_receipt_#{attachment.id}", nil, false, class: 'accept_read_receipt mr10'
-                    b I hereby acknowledge that I have read the document captioned #{(attachment.caption.upcase) rescue "N/A"} in its entirety
-
 javascript:
   $(function() {
     $('.show_preview_btn').click(function() {

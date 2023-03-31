@@ -10,8 +10,33 @@
           span class="glyphicon glyphicon-remove"
 
     .panel-body
+      .col-xs-12
+        .span4.collapse-group
+          a class="btn" data-toggle="collapse" data-target="#viewinstruction"
+            | View Instructions &raquo;
+          .collapse id="viewinstruction"
+            .col-xs-12
+              .col-xs-12.well
+                ol
+                  li Click on +Subscriber to add a new subscription
+                  li Select a Subscriber from the dropdown menu
+                  li Select a Frequency: Daily, Weekly, or Monthly
+                  li Selecting Day:
+                  ul
+                    li Daily - Day Field is left empty
+                    li Weekly - Enter a day from 1 to 7. For example, 1 for <i>Monday</i>, 2 for <i>Tuesday</i>, 7 for <i>Sunday</i>. Mail is not sent if no input is given.
+                    li Monthly - Enter the day of the Month to send mail. For example, 12 for the 12th day of a month. Mail is not sent if no input is given.<br><span style="color:red">Do not</span> enter a series of numbers in this field. For example, "1,2,3", "1-3", "1;2;3" are <span style="color:red">invalid inputs</span>. To send mail on multiple days weekly or monthly to the same subscriber, click on +Subscriber and select the same subscriber and frequency again. Then input a new number to the Day field.</br>
+
+                  li To delete a Subscriber click on the delete button <span class="glyphicon glyphicon-trash"/> under Actions
+                .div style="padding:10px; background-color:white"
+                  b Note
+                  ul
+                    li If no Visualization is added to Query, then the mailed attachment will have an empty Visualization section.
       = f.submit 'Save Subscription List',
         class: 'btn btn-success pull-right mb20',
+        "data-tt-toggle"=>"tooltip",
+        "data-placement"=>"top",
+        "title"=>"Subscribers will receive aggregated data updates from Added Visualizations",
         disable_with: 'Saving...'
 
       .col-xs-12.subscriptions.insertposition
@@ -44,7 +69,7 @@ datalist id="users_list"
 
 
 javascript:
-
+  $('[data-tt-toggle="tooltip"]').tooltip()
   $(function(e) {
 
     $(document).on('change', '.user_field', function(){
