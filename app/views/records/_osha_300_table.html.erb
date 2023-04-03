@@ -1,0 +1,103 @@
+<div class="panel panel-lightskyblue">
+  <div class="panel-heading pb10">
+    <h4 class="panel-title">
+      <div class="top_text">
+        Log of Work-Related Injuries and Illnesses
+      </div>
+      <div class='top_buttons pull-right'>
+        <%=link_to 'OSHA Form 300A', osha_300a_osha_records_path(date_from: params[:date_from], date_to: params[:date_to]), class: 'btn btn-default'%>
+      </div>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <div class="table-responsive">
+      <table id="osha_table" class="table table-hover table-bordered table-striped">
+        <thead>
+          <tr>
+            <%@headers.each do |header|%>
+              <th><%=header%></th>
+            <%end%>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <%@headers.each do |header|%>
+              <th><%=header%></th>
+            <%end%>
+          </tr>
+        </tfoot>
+        <tbody>
+          <%@entries.each do |key, value|%>
+            <tr record_id="<%=key%>">
+              <%@headers.each do |header|%>
+                <td><%=value[header]%></td>
+              <%end%>
+            </tr>
+          <%end%>
+        </tbody> 
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  .index_table > thead > tr > th,
+  .index_table > tbody > tr > th,
+  .index_table > tfoot > tr > th,
+  .index_table > thead > tr > td,
+  .index_table > tbody > tr > td,
+  .index_table > tfoot > tr > td {
+    padding: 5px !important;
+  }
+</style>
+
+
+<script>
+  $(function(){
+    $('#osha_table').DataTable({
+      dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
+           "<'row'<'col-sm-12'tr>>" +
+           "<'row'<'col-sm-5'i><'col-sm-7'p>>" +
+           "<'row'<'col-sm-12'B>>",
+      buttons: ['copy', 'csv', 'excel', 'print'],
+      "aLengthMenu": [[10, 15, 50, 100, -1], [10, 15, 50, 100, "All"]],
+      "iDisplayLength": 10,
+      "aaSorting": [[0, "desc"]],
+      "columnDefs": [{ type: 'natural', targets: 0 }],
+        initComplete: function(){
+          this.api().columns().every(function(){
+            addIndividualColumnSearchField();
+            hidePDFColumnSearchField();
+            columnSearch();
+          });
+        },
+    });
+  });
+
+  function addIndividualColumnSearchField() {
+    $('#osha_table tfoot th').each(function(index) {
+      $(this).html('<input type="text" class="form-control" />');
+    });
+  }
+
+  function hidePDFColumnSearchField() {
+    let is_pdf_column_shown = <%=CONFIG.sr::GENERAL[:show_pdf_column_scoreboard]%>
+    if (is_pdf_column_shown) {
+      $('#osha_table tfoot tr th:last-child').children().hide();
+    }
+  }
+
+  function columnSearch() {
+    $('#osha_table').dataTable().api().columns().every(function() {
+      var column = this;
+
+      $('input', this.footer()).on('keyup change', function(e) {
+        // keyCode 13 is 'Enter'
+        if(e.keyCode == 13 && column.search() !== this.value){
+          search_term = this.value
+          column.search(search_term).draw();
+        }
+      });
+    });
+  }
+</script>

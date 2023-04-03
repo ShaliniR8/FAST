@@ -1,7 +1,7 @@
 <body>
   <div id="page" class="item active mt50" style="height:auto;">
     <div class="grid per90 center-block">
-      <div class="row">
+      <div class="row icon-container">
         <%if current_user.has_access('ASAP', 'module', admin: CONFIG::GENERAL[:global_admin_default])%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'ASAP')%>" style="border:none;text-decoration:none;">
@@ -10,14 +10,6 @@
             <div id="asap">Safety Reporting</div>
           </div>
         <%end%>
-        <%if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
-          <div class="<%=@size%> module_block">
-            <a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
-              <img style="border:none" src="/SMSIM.png" width="150" height="150" />
-            </a>
-            <div id="smsim">SMS IM</div>
-          </div>
-        <% end %>
         <%if current_user.has_access('Safety Assurance', 'module', admin: CONFIG::GENERAL[:global_admin_default])%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SMS')%>" style="border:none;text-decoration:none;">
@@ -34,6 +26,16 @@
             <div id="srm">SRA (SRM)</div>
           </div>
         <%end%>
+      </div>
+      <div class="row icon-container">
+        <%if CONFIG::GENERAL[:sms_im_visibility] && current_user.has_access('SMS IM', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'SMS IM')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/SMSIM.png" width="150" height="150" />
+            </a>
+            <div id="smsim">SMS IM</div>
+          </div>
+        <% end %>
         <%if CONFIG::GENERAL[:safety_promotion_visibility] && current_user.has_access('Safety Promotion', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'SP')%>" style="border:none;text-decoration:none;">
@@ -42,6 +44,14 @@
             <div id="sp">Safety Promotion</div>
           </div>
         <%end%>
+        <%if CONFIG::GENERAL[:osha_visibility] && current_user.has_access('OSHA', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+          <div class="<%=@size%> module_block">
+            <a href="<%=choose_module_home_index_path(:mode => 'OSHA')%>" style="border:none;text-decoration:none;">
+              <img style="border:none" src="/OSHA.png" width="150" height="150" />
+            </a>
+            <div id="osha">OSHA / OJI</div>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
@@ -51,6 +61,14 @@
 
 
 <style>
+
+  .icon-container {
+    display: flex;
+    flex-direction: row;     /* make main axis horizontal (default setting) */
+    justify-content: center; /* center items horizontally, in this case */
+    align-items: center;     /* center items vertically, in this case */
+    height: 300px;
+  }
 
   footer {
     position: relative;
@@ -97,6 +115,10 @@
     font-size: 180%;
     padding-top: 10px;
     color: #74b1c7;
+  }#osha{
+    font-size: 180%;
+    padding-top: 10px;
+    color: #1e63b7;
   }
   #sa{
     font-size: 180%;

@@ -40,6 +40,169 @@ class RecordsController < ApplicationController
   end
 
 
+  def osha_300a
+    @title = 'Reports - OSHA 300A'
+    
+    records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
+
+    @total_of_g = 0
+    @total_of_h = 0
+    @total_of_i = 0
+    @total_of_j = 0 
+    @total_of_k = 0
+    @total_of_l = 0
+    @total_of_1 = 0
+    @total_of_2 = 0
+    @total_of_3 = 0
+    @total_of_4 = 0
+    @total_of_5 = 0
+    @total_of_6 = 0
+
+    records.each do |record|
+      record.record_fields.each do |record_field|
+        field = record_field.field
+        field_value = record_field.value
+        next if field.nil?
+
+        case field.osha_map
+        when 'g_l'
+          days = Hash.new
+          field.nested_fields.each do |nested_field|
+            days[nested_field.nested_field_value] = nested_field.record_fields.first.value
+          end
+
+          case field_value
+          when 'Death'
+            @total_of_g += 1
+          when 'Days away from work'
+            @total_of_h += 1
+            @total_of_k += days['Days away from work'].to_i
+          when 'Remained at work (Job transfer or restriction)'
+            @total_of_i += 1
+            @total_of_l += days['Remained at work (Job transfer or restriction)'].to_i
+          when 'Remained at work (Other record- able cases)'
+            @total_of_j += 1
+          end
+        when '1_6'
+          case field_value
+          when 'Injury'
+            @total_of_1 += 1
+          when 'Skin Disorder'
+            @total_of_2 += 1
+          when 'Respiratory Condition'
+            @total_of_3 += 1
+          when 'Poisoning'
+            @total_of_4 += 1
+          when 'Hearing Loss'
+            @total_of_5 += 1
+          when 'All other illnesses'
+            @total_of_6 += 1
+          end
+        end
+      end
+    end
+  end
+
+
+  def osha_300
+    @title = 'Reports - OSHA 300'
+  end
+
+  def osha_300_result
+    @headers = [
+      '(A) Case No.',
+      '(B) Employee\' Name',
+      '(C) Job Title',
+      '(D) Date of injury or onset of illness',
+      '(E) Where the event occurred',
+      '(F) Describe injury or illness, parts of body affected, and object/substance that directly injured or made person ill',
+      '(G) Death',
+      '(H) Days away from work',
+      '(I) Job transfer or restriction',
+      '(J) Other recordable cases',
+      '(K) Away from works (days)',
+      '(L) On job transfer or restriction (days)',
+      '(1) Injury',
+      '(2) Skin Disorder',
+      '(3) Respiratory Condition',
+      '(4) Poisoning',
+      '(5) Hearing Loss',
+      '(6) All other illnesses'
+    ]
+
+    records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
+    @entries = Hash.new
+    records.each do |record|
+      @entries[record.id] = Hash.new
+      @entries[record.id]['(D) Date of injury or onset of illness'] = record.event_date.to_date
+      record.record_fields.each do |record_field|
+        field = record_field.field
+        field_value = record_field.value
+        next if field.nil?
+
+        case field.osha_map
+        when 'a' then @entries[record.id]['(A) Case No.'] = field_value
+        when 'b' then @entries[record.id]['(B) Employee\' Name'] = User.find(field_value).full_name rescue ''
+        when 'c' then @entries[record.id]['(C) Job Title'] = field_value
+        # when 'd' then @entries[record.id]['(D) Date of injury or onset of illness'] = record.event_date.to_date #field_value
+        when 'e' then @entries[record.id]['(E) Where the event occurred'] = field_value
+        when 'f' then @entries[record.id]['(F) Describe injury or illness, parts of body affected, and object/substance that directly injured or made person ill'] = field_value
+        when 'g_l'
+          @entries[record.id]['(G) Death'] = 0
+          @entries[record.id]['(H) Days away from work'] = 0
+          @entries[record.id]['(I) Job transfer or restriction'] = 0
+          @entries[record.id]['(J) Other recordable cases'] = 0
+          @entries[record.id]['(K) Away from works (days)'] = 0
+          @entries[record.id]['(L) On job transfer or restriction (days)'] = 0
+
+          days = Hash.new
+          field.nested_fields.each do |nested_field|
+            days[nested_field.nested_field_value] = nested_field.record_fields.first.value
+          end
+
+          case field_value
+          when 'Death'
+            @entries[record.id]['(G) Death'] = 1
+          when 'Days away from work'
+            @entries[record.id]['(H) Days away from work'] = 1
+            @entries[record.id]['(K) Away from works (days)'] = days['Days away from work']
+          when 'Remained at work (Job transfer or restriction)'
+            @entries[record.id]['(I) Job transfer or restriction'] = 1
+            @entries[record.id]['(L) On job transfer or restriction (days)'] = days['Remained at work (Job transfer or restriction)']
+          when 'Remained at work (Other record- able cases)'
+            @entries[record.id]['(J) Other recordable cases'] = 1
+          end
+        when '1_6'
+          @entries[record.id]['(1) Injury'] = 0
+          @entries[record.id]['(2) Skin Disorder'] = 0
+          @entries[record.id]['(3) Respiratory Condition'] = 0
+          @entries[record.id]['(4) Poisoning'] = 0
+          @entries[record.id]['(5) Hearing Loss'] = 0
+          @entries[record.id]['(6) All other illnesses'] = 0
+
+          case field_value
+          when 'Injury'
+            @entries[record.id]['(1) Injury'] = 1
+          when 'Skin Disorder'
+            @entries[record.id]['(2) Skin Disorder'] = 1
+          when 'Respiratory Condition'
+            @entries[record.id]['(3) Respiratory Condition'] = 1
+          when 'Poisoning'
+            @entries[record.id]['(4) Poisoning'] = 1
+          when 'Hearing Loss'
+            @entries[record.id]['(5) Hearing Loss'] = 1
+          when 'All other illnesses'
+            @entries[record.id]['(6) All other illnesses'] = 1
+          end
+        end
+      end
+
+    end
+
+    render :partial => 'osha_300_table'
+  end
+
+
   def load_options
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @suggestion_headers = RecordSuggestion.get_headers
@@ -292,7 +455,11 @@ class RecordsController < ApplicationController
   def destroy
     @record = Record.find(params[:id])
     @record.destroy
-    redirect_to records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
+    if @record.class.name.include?('Osha')
+      redirect_to osha_records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
+    else
+      redirect_to records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
+    end
   end
 
 
@@ -443,7 +610,7 @@ class RecordsController < ApplicationController
     # category and field hash
     @template_hash = @template.categories.sort_by(&:category_order).map{|cat| [cat, cat.fields]}.to_h
     @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
-
+    @osha_module = @record.class.name.include?('Osha')
     load_special_matrix(@record)
   end
 
@@ -510,9 +677,10 @@ class RecordsController < ApplicationController
 
     transaction = true
     @owner = Record.find(params[:id])
+    record = params[:record] || params[:osha_record]
 
-    if params[:record][:record_fields_attributes].present?
-      params[:record][:record_fields_attributes].each_value do |field|
+    if record[:record_fields_attributes].present?
+      record[:record_fields_attributes].each_value do |field|
         if field[:value].is_a?(Array)
           field[:value].delete("")
           field[:value] = field[:value].join(";")
@@ -520,10 +688,10 @@ class RecordsController < ApplicationController
       end
     end
 
-    transaction_content = params[:record][:final_comment] rescue nil
+    transaction_content = record[:final_comment] rescue nil
     if transaction_content.nil?
-      if params[:record][:comments_attributes].present?
-        params[:record][:comments_attributes].each do |key, val|
+      if record[:comments_attributes].present?
+        record[:comments_attributes].each do |key, val|
           transaction_content = val[:content] rescue nil
         end
       end
@@ -545,13 +713,13 @@ class RecordsController < ApplicationController
       end
       @owner.close_date = Time.now
     when 'Override Status'
-      transaction_content = "Status overriden from #{@owner.status} to #{params[:record][:status]}"
-      params[:record][:close_date] = params[:record][:status] == 'Closed' ? Time.now : nil
+      transaction_content = "Status overriden from #{@owner.status} to #{record[:status]}"
+      record[:close_date] = record[:status] == 'Closed' ? Time.now : nil
     when 'Add Attachment'
       transaction = false
     end
 
-    @owner.update_attributes(params[:record])
+    @owner.update_attributes(record)
 
 
     if transaction
@@ -563,7 +731,7 @@ class RecordsController < ApplicationController
       )
     end
 
-    event_date = params[:record][:event_date]
+    event_date = record[:event_date]
 
     if CONFIG.sr::GENERAL[:submission_time_zone] && event_date.present?
       @owner.event_date = convert_to_utc(date_time: event_date, time_zone: @owner.event_time_zone)

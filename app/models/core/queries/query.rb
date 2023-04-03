@@ -8,6 +8,7 @@ class Query < ActiveRecord::Base
 
   serialize :templates, Array
   serialize :old_vis, Array
+  serialize :distribution_list_ids, Array
 
   accepts_nested_attributes_for :query_conditions
 
@@ -17,6 +18,8 @@ class Query < ActiveRecord::Base
     [
       {field: 'id',             title: 'ID',         num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'title',          title: 'Title',      num_cols: 12,  type: 'text', visible: 'index,show'},
+      {field: 'distribution_list_ids',  title: 'Distribution Lists', num_cols: 5, type: 'select_multiple', visible: 'form', required: false,  options: get_distribution_list},
+      {field: 'threshold',  title: 'Threshold', num_cols: 2, type: 'text', visible: 'show,form', required: false},
       {field: 'get_created_by', title: 'Created By', num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_target',     title: 'Target',     num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_templates',  title: 'Templates',  num_cols: 12,  type: 'text', visible: 'show'},
@@ -25,7 +28,11 @@ class Query < ActiveRecord::Base
 
 
   def get_target
-    CONFIG.hierarchy.values.map{|x| x[:objects]}.compact.inject(:merge)[target][:title].pluralize rescue ""
+    if session[:mode] == "OSHA"
+      '(OSHA) Reports'
+    else
+      CONFIG.hierarchy[session[:mode]][:objects][target][:title].pluralize rescue ""
+    end
   end
 
 
@@ -63,6 +70,20 @@ class Query < ActiveRecord::Base
     end
     query.save
     query
+  end
+
+  def self.get_distribution_list
+    DistributionList.all.map{|d| [d.title, d.id]}
+  end
+
+  def set_threshold(params)
+    self.threshold = params[:threshold]
+    if params[:distros] == nil
+      self.distribution_list_ids = nil
+    else
+      self.distribution_list_ids = params[:distros].map {|str| str.to_i}
+    end
+    self.save
   end
 
 

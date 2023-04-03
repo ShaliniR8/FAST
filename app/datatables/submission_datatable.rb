@@ -3,7 +3,7 @@ class SubmissionDatatable < ApplicationDatatable
   private
 
   def records_total
-    counts = Submission.can_be_accessed(@current_user).count
+    counts = Submission.where(type: nil).can_be_accessed(@current_user).count
     { 'All' => counts }
   end
 
@@ -54,6 +54,7 @@ class SubmissionDatatable < ApplicationDatatable
       if has_date_range
         Submission.joins(join_tables)
               .where(id: @recs.map(&:id))
+              .where(type: nil)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -64,6 +65,7 @@ class SubmissionDatatable < ApplicationDatatable
       else
         Submission.joins(join_tables)
               .where(id: @recs.map(&:id))
+              .where(type: nil)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -75,6 +77,7 @@ class SubmissionDatatable < ApplicationDatatable
       if has_date_range
         Submission.joins(join_tables)
               .where(id: @recs.map(&:id))
+              .where(type: nil)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -85,6 +88,7 @@ class SubmissionDatatable < ApplicationDatatable
       else
         Submission.joins(join_tables)
               .where(id: @recs.map(&:id))
+              .where(type: nil)
               .where(search_string.join(' and '))
               .order("#{sort_column} #{sort_direction}")
               .can_be_accessed(@current_user)
@@ -101,6 +105,7 @@ class SubmissionDatatable < ApplicationDatatable
     when 'All'
       Submission.joins(join_tables)
                 .order("#{sort_column} #{sort_direction}")
+                .where(type: nil)
                 .can_be_accessed(@current_user)
                 .group("#{Submission.table_name}.id")
                 .limit(params['length'].to_i)
@@ -108,6 +113,7 @@ class SubmissionDatatable < ApplicationDatatable
     else
       Submission.joins(join_tables)
                 .order("#{sort_column} #{sort_direction}")
+                .where(type: nil)
                 .can_be_accessed(@current_user)
                 .group("#{Submission.table_name}.id")
                 .limit(params['length'].to_i)
@@ -121,6 +127,7 @@ class SubmissionDatatable < ApplicationDatatable
       {
         'All' => Submission.joins(join_tables)
                        .where(id: @recs.map(&:id))
+                       .where(type: nil)
                        .where(search_string.join(' and '))
                        .can_be_accessed(@current_user)
                        .count
@@ -129,6 +136,7 @@ class SubmissionDatatable < ApplicationDatatable
       {
         'All' => Submission.joins(join_tables)
                        .where(id: @recs.map(&:id))
+                       .where(type: nil)
                        .where(search_string.join(' and '))
                        .can_be_accessed(@current_user)
                        .within_timerange(start_date, end_date)

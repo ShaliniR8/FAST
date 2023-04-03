@@ -176,7 +176,12 @@ class SubmissionsController < ApplicationController
     else
       # @templates = Template.find(:all)
       templates = current_user.get_all_submitter_templates
-      @templates = Template.where(:name => templates)
+      if session[:mode] == 'OSHA'
+        @templates = Template.where(:name => templates, :report_type => 'osha')
+      else
+        @templates = Template.where(:name => templates)
+      end
+
       unless current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         @templates.keep_if{|x| current_user.has_template_access(x.name).include? 'submitter'}
         @templates.sort_by! {|x| x.name }
@@ -278,6 +283,8 @@ class SubmissionsController < ApplicationController
 
 
   def create
+    type = Template.find(params[:submission][:templates_id]).report_type
+
     params[:submission][:submission_fields_attributes].each_value do |field|
       if field[:value].is_a?(Array)
         field[:value].delete("")
@@ -338,7 +345,7 @@ class SubmissionsController < ApplicationController
 
     if params[:present_id].present? && params[:present_id].to_i != -1
       saved = false
-      @record = Submission.find(params[:present_id])
+      @record = submission_class_type(type).find(params[:present_id])
       if !@record.completed
         sub_fields = SubmissionField.where("submissions_id=?", params[:present_id])
         sub_fields.map(&:destroy)
@@ -347,7 +354,7 @@ class SubmissionsController < ApplicationController
         saved = @record.update_attributes(params[:submission])
       end
     else
-      @record = Submission.new(params[:submission])
+      @record = submission_class_type(type).new(params[:submission])
       if session[:platform] == Transaction::PLATFORMS[:mobile] # edge case to handle duplicate offline sync calls from mobile app
         if @record.check_immediate_duplicate
           saved = @record.save
@@ -371,7 +378,7 @@ class SubmissionsController < ApplicationController
           notify_notifiers(converted, params[:commit])
           NotifyMailer.send_submitter_confirmation(current_user, converted)
         end
-        Submission.find(@record.id).make_report
+        submission_class_type(type).find(@record.id).make_report
       end
 
       respond_to do |format|
@@ -444,7 +451,11 @@ class SubmissionsController < ApplicationController
     @categories = Category.find(:all)
     @headers = Submission.get_headers
     @fields = Field.find(:all)
-    @records = Submission.where("user_id=? AND completed is not true ",current_user.id)
+    if params[:type] == "OSHA"
+      @records = OshaSubmission.where("user_id=? AND completed is not true ",current_user.id)
+    else
+      @records = Submission.where("user_id=? AND completed is not true ",current_user.id)
+    end
   end
 
 
@@ -475,8 +486,9 @@ class SubmissionsController < ApplicationController
 
   def update
     alert = ''
-    if params[:submission][:submission_fields_attributes].present?
-      params[:submission][:submission_fields_attributes].each_value do |field|
+    param_submission = params[:submission] || params[:osha_submission]
+    if param_submission[:submission_fields_attributes].present?
+      param_submission[:submission_fields_attributes].each_value do |field|
         if field[:value].is_a?(Array)
           field[:value].delete("")
           field[:value]=field[:value].join(";")
@@ -488,13 +500,13 @@ class SubmissionsController < ApplicationController
     create_notice = true
     if params[:is_autosave].present? && params[:is_autosave] == "2"
       params[:commit] = 'Save for Later'
-      params[:submission].delete(:attachments_attributes)
+      param_submission.delete(:attachments_attributes)
       create_notice = false
     end
 
-    if params[:submission][:attachments_attributes].present?
+    if param_submission[:attachments_attributes].present?
       if session[:platform] == Transaction::PLATFORMS[:mobile]
-        params[:submission][:attachments_attributes].each do |key, attachment|
+        param_submission[:attachments_attributes].each do |key, attachment|
         # File is a base64 string
           if attachment[:name].present? && attachment[:name].is_a?(Hash)
             file_params = attachment[:name]
@@ -513,15 +525,15 @@ class SubmissionsController < ApplicationController
               :type     => mime_type)
 
             # Replace attachment parameter with the created file
-            params[:submission][:attachments_attributes][key][:name] = uploaded_file
+            param_submission[:attachments_attributes][key][:name] = uploaded_file
           end
         end
       else
-        params[:submission][:attachments_attributes].each do |key, attachment|
+        param_submission[:attachments_attributes].each do |key, attachment|
           if attachment[:name].present?
-            params[:submission][:attachments_attributes][key][:name] = attachment[:name]
+            param_submission[:attachments_attributes][key][:name] = attachment[:name]
           else
-            params[:submission][:attachments_attributes].delete(key)
+            param_submission[:attachments_attributes].delete(key)
           end
         end
       end
@@ -532,15 +544,15 @@ class SubmissionsController < ApplicationController
     params[:commit] = 'Submit' if !@record.completed? && params[:commit] != 'Save for Later'
 
     if params[:commit] != 'Add Notes'
-      params[:submission][:completed] = params[:commit] != 'Save for Later'
-      params[:submission][:anonymous] = params[:anonymous] == '1'
-      params[:submission][:confidential] = params[:confidential] == '1'
+      param_submission[:completed] = params[:commit] != 'Save for Later'
+      param_submission[:anonymous] = params[:anonymous] == '1'
+      param_submission[:confidential] = params[:confidential] == '1'
     end
 
     event_date_to_utc
 
     if !@record.completed || params[:commit] == 'Add Notes'
-      if @record.update_attributes(params[:submission])
+      if @record.update_attributes(param_submission)
         if create_notice
           notify_notifiers(@record, params[:commit])
         end
@@ -570,7 +582,7 @@ class SubmissionsController < ApplicationController
             NotifyMailer.send_submitter_confirmation(current_user, converted)
           end
           respond_to do |format|
-            flash = { success: params[:submission][:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
+            flash = { success: param_submission[:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }
             format.html { redirect_to submission_path(@record), flash: flash }
             format.json { update_as_json(flash) }
           end
@@ -714,15 +726,23 @@ class SubmissionsController < ApplicationController
 
 
   private
+    def submission_class_type(type=nil)
+      if type == 'osha'
+        OshaSubmission
+      else
+        Submission
+      end
+    end
 
     def event_date_to_utc
       # Store event_date as UTC
-      date_time = params[:submission]["event_date"]
+      param_submission = params[:submission] || params[:osha_submission]
+      date_time = param_submission["event_date"]
 
       if CONFIG.sr::GENERAL[:submission_time_zone] && date_time.present?
-        time_zone = params[:submission]["event_time_zone"]
+        time_zone = param_submission["event_time_zone"]
         utc_time  = convert_to_utc(date_time: date_time, time_zone: time_zone)
-        params[:submission]["event_date"] = utc_time
+        param_submission["event_date"] = utc_time
       end
     end
 

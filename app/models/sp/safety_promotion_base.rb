@@ -46,7 +46,7 @@ module Sp
     end
 
     def get_tooltip
-      "#{self.class.name} #{title}"
+      "#{self.class.name == 'SafetySurvey' ? 'Safety Survey' : self.class.name} #{title}"
     end
 
   end

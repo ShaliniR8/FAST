@@ -34,23 +34,23 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-xs-12 mb15">
-
             <%if current_user.has_access(Object.const_get('Newsletter').rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])%>
-
               <%if @newsletter.status == "New"%>
                 <%=link_to "Edit",edit_newsletter_path(@newsletter),:class=>"btn btn-warning pull-right mr10 mb5"%>
                 <%=link_to "Publish",publish_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
               <%end%>
 
               <%if @newsletter.status == "Published"%>
-                <%if show_complete_button(@newsletter.id, current_user.id) == 1 && (@newsletter.my_action(current_user.id) == "Unread") %>
-                  <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5", id: "complete_newsletter_btn"%>
-                <%end%>
                 <%=link_to "Unpublish",unpublish_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
                 <%=link_to "Archive",archive_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5"%>
                 <%=link_to "Remind Users",remind_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5","data-toggle" => "tooltip","data-placement" => "top","title" => "Send reminder to users within the Distribution Groups that have not read this Newsletter"%>
               <%end%>
+            <%end%>
 
+            <%if @newsletter.status == "Published"%>
+              <%if show_complete_button(@newsletter.id, current_user.id) == 1 && (@newsletter.my_action(current_user.id) == "Unread") %>
+                  <%=link_to "Complete",complete_newsletter_path(@newsletter),:confirm=>'Are you sure?',:class=>"btn btn-warning pull-right mr5 mb5", id: "complete_newsletter_btn"%>
+                <%end%>
             <%end%>
 
             <%=link_to "Add Comment",
@@ -135,7 +135,6 @@
 </style>
 <script>
   $(document).ready(function(){
-
     $('#comment_btn').on('click',function(){
       $.get("<%=comment_newsletter_path(@newsletter)%>",function(data){
         $(".modal-content").html(data);

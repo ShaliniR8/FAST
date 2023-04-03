@@ -13,6 +13,16 @@ class SafetyReportingDatatable < ApplicationDatatable
 
   private
 
+  def object
+    if params[:advance_search][:type] == "OshaRecord"
+      OshaRecord
+    elsif params[:controller].classify == "Record"
+      Record.where(type: nil)
+    elsif params[:controller].classify == "Report"
+      Report
+    end
+  end
+
   def handle_search
     search_columns_and_terms_map = params[:columns].reduce({}) { |acc, (key,value)|
       acc.merge({key => value[:search][:value]})

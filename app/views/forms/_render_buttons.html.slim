@@ -1,6 +1,8 @@
 ruby:
   op ||= {} # In case no options were passed
-  owner_class = owner.class.name.underscore
+  owner_name = owner.class.name
+  owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil? 
+  owner_class = owner_name.underscore
   permission = "#{owner_class}s"
   btns = prepare_btns(owner, env, **op)
 / All Renderable Buttons

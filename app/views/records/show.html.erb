@@ -41,7 +41,6 @@
               Report #<%=@record.get_id%>: <%=@record.template.name%> <b style="color:darkred; font-size:18px"><%=@record.confidential? ? "(This Report is CONFIDENTIAL)" : ''%></b>
             </div>
             <div class="top_buttons pull-right">
-
               <%if template_full_access || template_viewer_access || report_admin_access%>
 
                 <%if record_delete_access%>
@@ -104,7 +103,7 @@
                     :disable_with => "Redirecting..." %>
                 <%end%>
 
-                <%if @record.report.present? && report_show_access%>
+                <%if !@osha_module && @record.report.present? && report_show_access%>
                   <%=link_to "View Event",
                     report_path(@record.report),
                     :id=>"report-btn",
@@ -178,7 +177,7 @@
               <%end%>
 
 
-              <%if record_edit_access #&& @record.status == "Open"%>
+              <%if !@osha_module && record_edit_access #&& @record.status == "Open"%>
                 <%=link_to "Create Event",
                   new_report_path(:template=>@record.template,:base_record=>@record),
                   :id => "report-btn",
@@ -197,7 +196,7 @@
                   style: "display:#{@record.status == "Open" ? 'block' : 'none'}"%>
               <%end%>
 
-              <%if record_edit_access%>
+              <%if !@osha_module && record_edit_access%>
                 <%record_status = @record.status%>
                 <%show_ca_btn = record_status != 'Closed' && record_status != 'New'%>
                 <%if @record.report.present?%>
@@ -283,7 +282,9 @@
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
           <%@owner = @record %>
-          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
+          <% unless Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha') %>
+            <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
+          <% end %>
 
           <%if @record.corrective_actions.present?%>
             <div class="col-xs-12 col-lg-12">

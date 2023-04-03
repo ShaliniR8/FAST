@@ -75,6 +75,9 @@
               <%if CONFIG::GENERAL[:sabre_integration].present?%>
                 <th width="10%">Map to Sabre Field</th>
               <%end%>
+              <%if CONFIG::GENERAL[:osha_visibility].present?%>
+                <th width="10%">Map to OSHA Field</th>
+              <%end%>
               <th>Options (split by semicolon)</th>
               <th>Predefined Options</th>
               <th class="extra_info">Show Label</th>

@@ -6,7 +6,8 @@ module QueriesHelper
       if value.is_a? Integer
         User.find_by_id(value).full_name rescue ''
       else
-        User.find_by_full_name(value).full_name rescue ''
+        # User.find_by_full_name(value).full_name rescue ''
+        User.find_by_id(value).full_name rescue ''
       end
     when 'datetime', 'date'
       value.strftime("%Y-%m") rescue 'N/A'
@@ -321,7 +322,7 @@ module QueriesHelper
                                               AND record_fields.records_id #{sr_records.present? ? "IN (#{sr_records.join(',')})" : "IS NULL"})")
                                               .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
 
-      elsif target == 'Record'
+      elsif target == 'Record' || target == 'OshaRecord'
         values = RecordField.find_by_sql("SELECT record_fields.value FROM record_fields WHERE record_fields.fields_id IN (#{fields_ids.join(',')}) AND
                                               record_fields.records_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
                                               .map{|r| format_val(r.value, field_type, field_param) if r.value.present?} rescue []
@@ -1531,6 +1532,24 @@ module QueriesHelper
     mapping_hash['Record']["Additional Info"] = 'additional_info'
     mapping_hash['Record']["Type"] = 'record_type'
 
+    mapping_hash['OshaRecord'] = Hash.new
+    mapping_hash['OshaRecord']['Submitted By'] = 'users_id'
+    mapping_hash['OshaRecord']['Accepted Into ASAP'] = 'asap'
+    mapping_hash['OshaRecord']["#{Record.find_top_level_section.label}"] = 'included_occurrences'
+    mapping_hash['OshaRecord']["Full #{Record.find_top_level_section.label}"] = 'included_occurrences'
+    mapping_hash['OshaRecord']["EIR Number"] = 'eir'
+    mapping_hash['OshaRecord']['Event Date/Time'] = 'event_date'
+    mapping_hash['OshaRecord']['Event Title'] = 'description'
+    mapping_hash['OshaRecord']['Exclude From ASAP Library'] = 'scoreboard'
+    mapping_hash['OshaRecord']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
+    mapping_hash['OshaRecord']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.baseline.title')} Severity"] = 'risk_severity'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.mitigated.title')} Severity"] = 'risk_severity_after'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.baseline.title')} Likelihood"] = 'risk_likelihood'
+    mapping_hash['OshaRecord']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
+    mapping_hash['OshaRecord']['Sole Source'] = 'sole'
+    mapping_hash['OshaRecord']["Additional Info"] = 'additional_info'
+    mapping_hash['OshaRecord']["Type"] = 'record_type'
 
     mapping_hash['Report'] = Hash.new
     mapping_hash['Report']['Accepted Into ASAP'] = 'asap'
