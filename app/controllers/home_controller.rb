@@ -842,7 +842,12 @@ class HomeController < ApplicationController
   def refresh_home_visualizations
     types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
-    module_pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
+
+    if session[:mode] == 'OSHA'
+      module_pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| ['OshaRecord'].include?(qv.query[:target])}
+    else
+      module_pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
+    end
 
     module_pinned_visualizations.each do |vis|
       visualization_file_path = "/public/query_vis/#{vis.id}.yml"
