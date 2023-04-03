@@ -25,7 +25,7 @@
       <%=render "draw_chart" %>
       <%=render "statistics"%>
       <%=render "risk_matrices/dashboard_matrix/risk_matrices"%>
-      <%if CONFIG::GENERAL[:pin_dashboard_visualizations].present?%>
+      <%if CONFIG::GENERAL[:pin_dashboard_visualizations].present? && ['SP'].exclude?(session[:mode])%>
         <%=render "dashboard_pinned_visualizations"%>
       <%end%>
     </div>

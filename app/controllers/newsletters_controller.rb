@@ -32,7 +32,7 @@ class NewslettersController < ApplicationController
       recs = []
       @records.each do |r|
         distro_list = DistributionList.preload(:distribution_list_connections).where(id: r.distribution_list.split(',')).map{|d| d.get_user_ids}.flatten rescue []
-        recs << r if (distro_list.include?(current_user.id) || r.user_id == current_user.id)
+        recs << r if ((r.status != 'New' && distro_list.include?(current_user.id)) || r.user_id == current_user.id)
       end
       @records = recs
     end
