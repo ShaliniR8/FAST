@@ -101,7 +101,7 @@ class QueriesController < ApplicationController
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
-    unless params["distribution_list_ids"] == "" || (params["threshold"]) == ""
+    if params["distribution_list_ids"].present? && (params["threshold"].present?)
       @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
     end
     @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
@@ -114,20 +114,20 @@ class QueriesController < ApplicationController
 
   def update
     @owner = Query.find(params[:id])
-    if params[:commit] != 'Save Subscription List'
+    if params[:commit] == 'Save'
       params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
       params[:query][:templates] = params[:query][:templates].split(",")
       @owner.update_attributes(params[:query])
       @owner.query_conditions.destroy_all
       params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
-    else
+      if params["threshold"].empty? || !params["distribution_list_ids"].present?
+        @owner.set_threshold({:distros => nil, :threshold => nil})
+      elsif params["distribution_list_ids"].present? && params["threshold"].present?
+        @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
+      end
+    elsif params[:commit] == 'Save Subscription List'
       @owner.update_attributes(params[:query])
     end
-    unless params["distribution_list_ids"] == "" || (params["threshold"]) == ""
-      @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
-    end
-    @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
-    @owner.save
     redirect_to query_path(@owner)
   end
 
