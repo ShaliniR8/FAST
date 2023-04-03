@@ -53,7 +53,6 @@
   <%elsif field_type == 'select_multiple'%>
     <div class="form-group col-xs-<%=field_col%> <%=field_name%>">
       <%if field_description == "Distribution List for Notification" %>
-
         <%if field_value.present?%>
           <%selected_options = field_hash[:options].select {|option| field_value.include? option[1]}%>
           <%selected_options_value = selected_options.map {|option| option[0]}%>
