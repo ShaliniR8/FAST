@@ -455,7 +455,11 @@ class RecordsController < ApplicationController
   def destroy
     @record = Record.find(params[:id])
     @record.destroy
-    redirect_to records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
+    if @record.class.name.include?('Osha')
+      redirect_to osha_records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
+    else
+      redirect_to records_path(status: 'All'), flash: {danger: "Report ##{params[:id]} deleted."}
+    end
   end
 
 
@@ -606,7 +610,7 @@ class RecordsController < ApplicationController
     # category and field hash
     @template_hash = @template.categories.sort_by(&:category_order).map{|cat| [cat, cat.fields]}.to_h
     @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).nonempty.group_by(&:field)
-
+    @osha_module = @record.class.name.include?('Osha')
     load_special_matrix(@record)
   end
 

@@ -92,6 +92,10 @@ class HomeController < ApplicationController
       else
         templates = Template.where(name: (@permissions['viewer_template_id'] || []).compact)
       end
+
+      osha_template = Template.where(report_type: 'osha')
+      templates = templates - osha_template
+
       if templates.length > 0
         submission_queries << "(templates_id in (#{templates.map(&:id).join(',')}) OR user_id = #{current_user.id})"
       else
@@ -106,9 +110,9 @@ class HomeController < ApplicationController
       end
 
       if params[:data_access] == 'related_data'
-        @submissions = Submission.preload(:created_by, :template).where(user_id: current_user.id, completed: true)
+        @submissions = Submission.preload(:created_by, :template).where(type: nil).where(user_id: current_user.id, completed: true)
       else
-        @submissions = Submission.preload(:created_by, :template).where(submission_queries.join(' AND '))
+        @submissions = Submission.preload(:created_by, :template).where(type: nil).where(submission_queries.join(' AND '))
       end
 
       @submissions = @submissions.joins(:template).order('templates.name')
@@ -142,6 +146,8 @@ class HomeController < ApplicationController
       record_queries << "(#{template_query.join(' AND ')})"
       record_queries.delete("()")
 
+      full_template = viewer_template - osha_template
+      viewer_template = viewer_template - osha_template
 
       # time range
       if @start_date.present? && @end_date.present?
@@ -150,9 +156,9 @@ class HomeController < ApplicationController
       end
 
       if params[:data_access] == 'related_data'
-        @records = Record.preload(:created_by, :template).where(users_id: current_user.id)
+        @records = Record.preload(:created_by, :template).where(type: nil).where(users_id: current_user.id)
       else
-        @records = Record.preload(:created_by, :template).where(record_queries.join(' AND '))
+        @records = Record.preload(:created_by, :template).where(type: nil).where(record_queries.join(' AND '))
       end
 
       @grouped_records = @records.order(:status).group_by(&:status)

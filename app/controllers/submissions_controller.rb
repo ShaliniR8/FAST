@@ -451,7 +451,11 @@ class SubmissionsController < ApplicationController
     @categories = Category.find(:all)
     @headers = Submission.get_headers
     @fields = Field.find(:all)
-    @records = Submission.where("user_id=? AND completed is not true ",current_user.id)
+    if params[:type] == "OSHA"
+      @records = OshaSubmission.where("user_id=? AND completed is not true ",current_user.id)
+    else
+      @records = Submission.where("user_id=? AND completed is not true ",current_user.id)
+    end
   end
 
 

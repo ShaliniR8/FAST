@@ -10,7 +10,7 @@ class DefaultOshaConfig
 
 
   HIERARCHY = {
-    display_name: 'OSHA',
+    display_name: 'OSHA / OJI',
     objects: {
       'Submission' => {
         title: 'OSHA Submission',
@@ -165,7 +165,7 @@ class DefaultOshaConfig
         subMenu: [
           {title: 'All', path: 'osha_submissions_path(status: "All")',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
-          {title: 'In Progress', path: 'incomplete_submissions_path',
+          {title: 'In Progress', path: 'incomplete_submissions_path(type: "OSHA")',
             # display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
             display: proc{|user:,**op| user.get_all_submitter_templates.size > 0}},
           {title: 'New', path: 'new_submission_path',

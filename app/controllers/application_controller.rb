@@ -647,19 +647,14 @@ class ApplicationController < ActionController::Base
 
   def adjust_session
     load_controller_list
-    if @sms_list.include? controller_name
+    if params[:type].present? && params[:type].include?('Osha')
+      session[:mode] = 'OSHA'
+    elsif @sms_list.include? controller_name
       session[:mode] = 'SMS'
     elsif @sms_im_list.include? controller_name
       session[:mode] = 'SMS IM'
     elsif @asap_list.include? controller_name
-      # TODO
-      is_osha_module = params[:type].present? && params[:type].include?('Osha')
-      if ['show', 'edit'].include?(params[:action]) && Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha')
-        is_osha_module = true
-      else
-        is_osha_module = params[:advance_search][:type].include?('Osha') if !is_osha_module && session[:mode] == 'OSHA'
-      end
-
+      is_osha_module = params[:id].present? && Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha')
       if is_osha_module
         session[:mode] = 'OSHA'
       else
