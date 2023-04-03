@@ -67,7 +67,8 @@ class UsersController < ApplicationController
       usergroup = UserGroup.create(object_name: params[:object_name], user_field: params[:user_field])
     end
 
-    head :no_content
+    flash[:success] =  "The target privilege is updated."
+    redirect_to user_groups_users_path
   end
 
 

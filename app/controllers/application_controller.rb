@@ -53,6 +53,7 @@ class ApplicationController < ActionController::Base
     }.select(&:present?)
 
     @advance_search_params = params
+    @hide_advance_search = ['OSHA'].include? session[:mode]
 
     render 'forms/index'
   end

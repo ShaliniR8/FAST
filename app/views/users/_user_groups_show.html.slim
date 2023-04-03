@@ -7,7 +7,7 @@
           -  priv_id = UserGroup.where(object_name: form_name.underscore.pluralize, user_field: user_field).first.privileges_id.first rescue ''
           - priv_name = Privilege.find(priv_id).name rescue ''
           - privs = Privilege.all.map{ |x| [x.name, x.id]}
-          = form_tag update_user_group_users_path, :method => "post", remote: true, :class => "priv_form" do 
+          = form_tag update_user_group_users_path, :method => "post", :class => "priv_form" do 
             = hidden_field_tag 'user_field', user_field
             = hidden_field_tag 'object_name', form_name.underscore.pluralize  
             = select_tag :priv_id, options_for_select(privs, [priv_name, priv_id]), { :class => "form-control field_select", include_blank: true, :onchange => "this.form.submit();" }
