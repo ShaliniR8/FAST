@@ -58,4 +58,17 @@ table.table.table-striped.table-bordered id="#{table_id}"
 
         td
           - btns.each do |btn|
-            = link_to btn[:btn_name].html_safe, btn[:btn_path], class: btn[:btn_class]
+            = link_to btn[:btn_name].html_safe, btn[:btn_path], title: btn[:title], class: btn[:btn_class]
+
+javascript:
+  $(function() {
+    $(".action-btn").on("click",function(){
+      var action_table=$(this).closest("table");
+      if (action_table.attr('id')=="included"){
+				$(this).prop("title", "Remove Report from this Event")
+      }
+      else{
+				$(this).prop("title", "Add Report to the Event")
+      }
+    })
+  })
