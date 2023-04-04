@@ -69,5 +69,23 @@ namespace :notifications do
     end
   end
 
+  desc 'Send notification to distribution list groups when Query threshold is reached'
+  task :query_threshold_alert => :environment do
+    include QueriesHelper
+    begin
+      queries = Query.find(:all).select {|instance| instance[:threshold] != nil}
+      threshold_exceeded = queries.select {|query| QueriesHelper.get_query_results_ids(query).size >= query.threshold}
+      threshold_exceeded.each do |query|
+        distros_ids = query.distribution_list_ids
+        distros = DistributionList.preload(:distribution_list_connections).where(id: distros_ids)
+        user_ids = distros.map(&:get_user_ids).flatten.uniq()
+        user_ids.each do |user_id|
+          subject = "Query ##{query.id} threshold alert"
+          NotifyMailer.automated_reminder(User.find(user_id), subject, "", query)
+        end
+      end
+    end
+  end
+
 end
 

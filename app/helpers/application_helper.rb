@@ -581,6 +581,8 @@ module ApplicationHelper
       entry_url = newsletter_url(entry)
     when 'SafetySurvey'
       entry_url = safety_survey_url(entry)
+    when 'Query'
+      entry_url = query_url(entry)
     else
       entry_url = "N/A"
     end
