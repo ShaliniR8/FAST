@@ -80,11 +80,52 @@ namespace :notifications do
         distros = DistributionList.preload(:distribution_list_connections).where(id: distros_ids)
         user_ids = distros.map(&:get_user_ids).flatten.uniq()
         user_ids.each do |user_id|
-          subject = "Query ##{query.id} threshold alert"
+          subject = "Threshold alert for Query ##{query.id}"
           NotifyMailer.automated_reminder(User.find(user_id), subject, "", query)
         end
       end
     end
+  end
+
+  desc 'Send notification to distribution list groups when Visualization threshold is reached'
+  task :visualization_threshold_alert => :environment do
+    include QueriesHelper
+    begin
+      visualizations = QueryVisualization.find(:all).select {|instance| instance[:threshold] != nil}
+      threshold_exceeded = visualizations.select {|viz| get_counts(viz).max >= viz.threshold}
+      threshold_exceeded = threshold_exceeded.group_by(&:owner_id)
+      controller = QueriesController.new
+      threshold_exceeded.each do |owner_id, visualizations|
+        @query = Query.find(owner_id)
+        distros = DistributionList.preload(:distribution_list_connections).where(id: @query.distribution_list_ids)
+        user_ids = distros.map(&:get_user_ids).flatten.uniq()
+        user_ids.each do |user_id|
+          subject = "Threshold alert for Visualizations in Query ##{owner_id}"
+          html = controller.render_to_string(
+            template: 'queries/_visualizations_pdf.html.slim',
+            locals: {owner: @query, visualizations: visualizations },
+            layout: false
+          )
+          pdf = PDFKit.new(html)
+          pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+          pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+          attachment = pdf.to_pdf
+          filename = "Query_#{@query.id}_visualizations_alert.pdf"
+          message = "Some of the visualizations in Query ##{@query.id} have reached or exceeded the set threshold."
+          NotifyMailer.automated_reminder(User.find(user_id), subject, message , @query, attachment, filename)
+        end
+      end
+    end
+  end
+
+  def get_counts(viz)
+    @query = Query.find(viz.owner_id)
+    @object_type = Object.const_get(@query.target)
+    field_label = viz.x_axis
+    @x_axis_field = QueryVisualization.get_field(@query, @object_type, field_label)
+    records_ids = QueriesHelper.get_query_results_ids(@query)
+    table = QueriesHelper.get_data_table_for_google_visualization_sql(x_axis_field_arr:@x_axis_field, records_ids:records_ids, query: @query)
+    table[1..-1].map {|t| t[1]}
   end
 
 end

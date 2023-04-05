@@ -66,11 +66,11 @@ class NotifyMailer < ApplicationMailer
   end
 
 
-  def automated_reminder(user, subject, message, record)
+  def automated_reminder(user, subject, message, record, attachment = nil, filename = 0)
     @user = user
     @message = message.gsub('\n', '<br>') rescue ''
     @record = record
-
+    attachments["#{filename}"] = attachment unless attachment.nil?
     case @record.class.name.demodulize
     when 'Verification'
       @record_url = g_link(record.owner)
