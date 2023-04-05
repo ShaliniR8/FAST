@@ -274,7 +274,7 @@
 
                 <%end%>
               <%else%>
-                <%event_time_zone = 'Local' if event_time_zone.blank?%>
+                <%event_time_zone = 'Local' if (event_time_zone.blank? || CONFIG.sr::GENERAL[:submission_local_time_zone])%>
                 <%event_time_zone = 'UTC' if CONFIG.sr::GENERAL[:submission_utc_time_zone]%>
                 <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
                 <button

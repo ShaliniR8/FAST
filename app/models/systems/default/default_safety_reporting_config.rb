@@ -12,7 +12,8 @@ class DefaultSafetyReportingConfig
     submission_description:           true,      # Changes Character Limit or adds General Description - default on
     submission_description_required:  true,
     submission_time_zone:             false,
-    submission_utc_time_zone:         false, 
+    submission_utc_time_zone:         false,
+    submission_local_time_zone:       false,
     template_nested_fields:           true,      # nested smart forms functionality - default ON
     enable_dual_report:               true,
     matrix_carry_over:                false,
