@@ -274,8 +274,7 @@
 
                 <%end%>
               <%else%>
-                <%event_time_zone = 'Local' if (event_time_zone.blank? || CONFIG.sr::GENERAL[:submission_local_time_zone])%>
-                <%event_time_zone = 'UTC' if CONFIG.sr::GENERAL[:submission_utc_time_zone]%>
+                <%event_time_zone = CONFIG.sr::GENERAL[:submission_local_time_zone] ? "Local" : "UTC"%>
                 <%=f.hidden_field :event_time_zone, :value => event_time_zone%>
                 <button
                   id="time-zone-toggle-btn"
@@ -460,7 +459,7 @@
     if (timeZoneToggleBtn != null) {
       <% unless CONFIG.sr::GENERAL[:submission_utc_time_zone] %>
         $('#time-zone-toggle-btn').on('click', function() {
-          if (timeZoneToggleBtn.innerHTML == 'Local') {
+          if (timeZoneToggleBtn.innerHTML.replace(/\s/g, "") == 'Local') {
             timeZoneToggleBtn.innerHTML = 'UTC'
             $('#submission_event_time_zone').val('UTC')
           } else {
@@ -555,7 +554,6 @@
           var cboxes = $(this).find('.checkbox_mul').get();
           var radios = $(this).find('.radio_req').get();
           if($(this).closest('div.nested_field_area').css('display') != 'none') {
-            console.log("Not getting in here");
             if (radios == null || radios.length == 0) {
               if (cboxes == null || cboxes.length == 0) {
                 if ($(this).val() == "") {
@@ -707,7 +705,6 @@
             url: "<%=flight_selected_submissions_path%>" + "?flight_record_id="+id,
             dataType: 'json',
             success: function(data) {
-              console.log(data['usernames']);
               for (let i = 0; i < sabre_fields.length; i++){
                 let attr = $(sabre_fields[i]).attr("sabre-map")
                 let value = fill_sabre_data(data, attr);
@@ -955,9 +952,6 @@
         if (i == 0) {
           map.setMapTypeId(markers[i].map_type);
         }
-
-        console.log("Existing Marker ID: " + markers[i].id);
-
         var marker = new google.maps.Marker({
           id: markers[i].id,
           position: new google.maps.LatLng(markers[i].lat, markers[i].lng),
@@ -985,7 +979,6 @@
   }
 
   function delMarker(id) {
-    console.log("Deleting Marker ID: " + id);
     var pinContainer = $('#pin-holder[name="'+clicked_map_field_id+'"] .pin-container[data-id="'+id+'"]');
 
     var pinDestroy = $('.pin-destroy', pinContainer)
@@ -1000,7 +993,6 @@
   }
 
   function update_cb_rb_nested(field, isRadio) {
-    console.log('update_cb_rb_nested');
     var field_id = $(field).attr("data-id");
     var field_value = $(field).attr("data-option");
     if (isRadio){
@@ -1015,7 +1007,6 @@
 
 
   function update_nested_fields(field) {
-    console.log('update_nested_fields');
     var field_id = $(field).attr("data-id");
     var field_value = $(field).find('option:selected').attr("data-option");
     $(".nested_field_" + field_id).closest('.nested_field_area').hide();
