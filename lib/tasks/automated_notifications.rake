@@ -81,7 +81,9 @@ namespace :notifications do
         user_ids = distros.map(&:get_user_ids).flatten.uniq()
         user_ids.each do |user_id|
           subject = "Threshold alert for Query ##{query.id}"
-          NotifyMailer.automated_reminder(User.find(user_id), subject, "", query)
+          n_results = QueriesHelper.get_query_results_ids(query).size
+          message = "Query ##{query.id} threshold was set at #{query.threshold}. There are #{n_results} results under this query now."
+          NotifyMailer.automated_reminder(User.find(user_id), subject, message, query)
         end
       end
     end
