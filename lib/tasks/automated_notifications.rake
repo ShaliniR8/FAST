@@ -110,7 +110,6 @@ namespace :notifications do
           )
           pdf = PDFKit.new(html)
           pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-          pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
           attachment = pdf.to_pdf
           filename = "Query_#{@query.id}_visualizations_alert.pdf"
           message = "Some of the visualizations in Query ##{@query.id} have reached or exceeded the set threshold."

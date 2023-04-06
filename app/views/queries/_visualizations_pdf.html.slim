@@ -3,8 +3,15 @@ h3: b Query Detail
 - Query.get_meta_fields('show').each do |field|
   - unless (['get_target', 'threshold'].include? field[:field])
     .col-xs-12
-      .sub_sub_title = "#{field[:title]}:"
-      = owner.send(field[:field])
+      .sub_sub_title
+        b = "#{field[:title]}:"
+      - if field[:field] == "distribution_list_ids"
+        - distros = field[:options].select {|d| owner.distribution_list_ids.include? d[1]}
+        - distros = distros.map {|d| d[0]}
+        - distros = distros.join(", ")
+        = distros
+      - else
+        = owner.send(field[:field])
 
 .col-xs-12
   .sub_sub_title = "Conditions"
@@ -12,7 +19,6 @@ h3: b Query Detail
     ul
       - owner.query_conditions.each_with_index do |condition, index|
         = render 'condition', condition: condition, index: index
-
 
 h3: b Visualizations
 
@@ -22,8 +28,11 @@ h3: b Visualizations
     - data = generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids)
     - if data.present?
       .col-xs-12
-        .sub_sub_title = visualization_title_helper(visualization.x_axis, visualization.series)
-        b Threshold: #{visualization.threshold}
+        hr
+        .sub_sub_title
+          <p><b> X-Axis: </b> #{visualization_title_helper(visualization.x_axis, visualization.series)}</p>
+          <p><b> Threshold on X-Axis:</b> #{visualization.threshold}</p>
+        hr
         br
         .col-xs-12
           table.table.table-striped.bordered
