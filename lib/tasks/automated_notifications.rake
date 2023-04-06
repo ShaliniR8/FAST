@@ -75,16 +75,22 @@ namespace :notifications do
     begin
       queries = Query.find(:all).select {|instance| instance[:threshold] != nil}
       threshold_exceeded = queries.select {|query| QueriesHelper.get_query_results_ids(query).size >= query.threshold}
+      map_user_query = Hash.new
       threshold_exceeded.each do |query|
         distros_ids = query.distribution_list_ids
         distros = DistributionList.preload(:distribution_list_connections).where(id: distros_ids)
         user_ids = distros.map(&:get_user_ids).flatten.uniq()
-        user_ids.each do |user_id|
-          subject = "Threshold alert for Query ##{query.id}"
-          n_results = QueriesHelper.get_query_results_ids(query).size
-          message = "Query ##{query.id} threshold was set at #{query.threshold}. There are #{n_results} results under this query now."
-          NotifyMailer.automated_reminder(User.find(user_id), subject, message, query)
+        user_ids.each do |u|
+          if map_user_query[u] == nil
+            map_user_query[u] = [{query_id:query.id, message: " => Threshold: #{query.threshold}, Total results under query: #{QueriesHelper.get_query_results_ids(query).size}"}]
+          else
+            map_user_query[u] << {query_id:query.id, message: " => Threshold: #{query.threshold}, Total results under query: #{QueriesHelper.get_query_results_ids(query).size}"}
+          end
         end
+      end
+      map_user_query.each do |user_id, queries|
+        subject = "Threshold alert for Queries"
+        NotifyMailer.automated_reminder(User.find(user_id), subject, "The following Queries have exceeded their thresholds.", queries)
       end
     end
   end
@@ -97,12 +103,12 @@ namespace :notifications do
       threshold_exceeded = visualizations.select {|viz| get_counts(viz).max >= viz.threshold}
       threshold_exceeded = threshold_exceeded.group_by(&:owner_id)
       controller = QueriesController.new
+      map_user_query = Hash.new
       threshold_exceeded.each do |owner_id, visualizations|
         @query = Query.find(owner_id)
         distros = DistributionList.preload(:distribution_list_connections).where(id: @query.distribution_list_ids)
         user_ids = distros.map(&:get_user_ids).flatten.uniq()
-        user_ids.each do |user_id|
-          subject = "Threshold alert for Visualizations in Query ##{owner_id}"
+        user_ids.each do |u|
           html = controller.render_to_string(
             template: 'queries/_visualizations_pdf.html.slim',
             locals: {owner: @query, visualizations: visualizations },
@@ -111,10 +117,26 @@ namespace :notifications do
           pdf = PDFKit.new(html)
           pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
           attachment = pdf.to_pdf
-          filename = "Query_#{@query.id}_visualizations_alert.pdf"
-          message = "Some of the visualizations in Query ##{@query.id} have reached or exceeded the set threshold."
-          NotifyMailer.automated_reminder(User.find(user_id), subject, message , @query, attachment, filename)
+          filename = "Query_#{@query.id}_visualizations_threshold_alert.pdf"
+          if map_user_query[u] == nil
+            map_user_query[u] = {
+              :query_ids => [{query_id:owner_id}],
+              :attachments => [{:attachment => attachment, :filename => filename}]
+            }
+          else
+            map_user_query[u][:query_ids] << {query_id:owner_id}
+            map_user_query[u][:attachments] << {:attachment => attachment, :filename => filename}
+            map_user_query[u] = {
+              :query_ids => map_user_query[u][:query_ids],
+              :attachments => map_user_query[u][:attachments]
+            }
+          end
         end
+      end
+      map_user_query.each do |user_id, record|
+        subject = "Threshold alert for Query Visualizations"
+        message = "Some of the visualizations under the following queries have reached or exceeded the set visualization threshold. Please open attachments to inspect visualizations for each query."
+        NotifyMailer.automated_reminder(User.find(user_id), subject, message , record[:query_ids], record[:attachments])
       end
     end
   end

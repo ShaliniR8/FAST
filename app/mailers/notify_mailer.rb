@@ -68,16 +68,34 @@ class NotifyMailer < ApplicationMailer
 
   def automated_reminder(user, subject, message, record, attachment = nil, filename = 0)
     @user = user
-    @message = message.gsub('\n', '<br>') rescue ''
-    @record = record
-    attachments["#{filename}"] = attachment unless attachment.nil?
-    case @record.class.name.demodulize
-    when 'Verification'
-      @record_url = g_link(record.owner)
+    if record.class == Array && record[0][:query_id].present?
+      @message = "<p> #{message} </p> <ul>"
+      record.each do |r|
+        query = Query.find(r[:query_id])
+        url = generate_link_to("Query ##{query.id}", query, true)
+        message = "<li> " + url
+        unless !r[:message]
+          message << r[:message] + " "
+        end
+        @message << message
+      end
+      @message  << "</ul>"
+      unless !attachment
+        attachment.each do |a|
+          attachments[a[:filename]] = a[:attachment]
+        end
+      end
     else
-      @record_url = g_link(record)
+      @message = message.gsub('\n', '<br>') rescue ''
+      @record = record
+      attachments["#{filename}"] = attachment unless attachment.nil?
+      case @record.class.name.demodulize
+      when 'Verification'
+        @record_url = g_link(record.owner)
+      else
+        @record_url = g_link(record)
+      end
     end
-
     subject = "ProSafeT: #{subject}"
     mail(**to_email(user.email), subject: subject).deliver
   end
