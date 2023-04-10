@@ -101,8 +101,12 @@ class QueriesController < ApplicationController
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
-    if params["distribution_list_ids"].present? && (params["threshold"].present?)
+    if params["distribution_list_ids"].present? && params["threshold"].present?
       @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
+    elsif params["distribution_list_ids"].present?
+      @owner.set_threshold({:distros =>  params["distribution_list_ids"]})
+    else
+      @owner.set_threshold({:distros => nil, :threshold => nil})
     end
     @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
     @owner.save
@@ -120,10 +124,12 @@ class QueriesController < ApplicationController
       @owner.update_attributes(params[:query])
       @owner.query_conditions.destroy_all
       params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
-      if params["threshold"].empty? || !params["distribution_list_ids"].present?
-        @owner.set_threshold({:distros => nil, :threshold => nil})
-      elsif params["distribution_list_ids"].present? && params["threshold"].present?
+      if params["distribution_list_ids"].present? && params["threshold"].present?
         @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
+      elsif params["distribution_list_ids"].present?
+        @owner.set_threshold({:distros =>  params["distribution_list_ids"]})
+      else
+        @owner.set_threshold({:distros => nil, :threshold => nil})
       end
     elsif params[:commit] == 'Save Subscription List'
       @owner.update_attributes(params[:query])
