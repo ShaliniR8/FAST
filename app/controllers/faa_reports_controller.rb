@@ -202,8 +202,10 @@ class FaaReportsController < ApplicationController
       p.text = p.to_s.sub("$asap_submit$", @report.asap_submit.to_s)
       p.text = p.to_s.sub("$asap_accept$", @report.asap_accept.to_s)
       p.text = p.to_s.sub("$sole$", @report.sole.to_s)
+      p.text = p.to_s.sub("$asap_closed$", @report.asap_close.to_s)
       p.text = p.to_s.sub("$asap_emp$", @report.asap_emp.to_s)
       p.text = p.to_s.sub("$asap_com$", @report.asap_com.to_s)
+      p.text = p.to_s.sub("$asap_reg$", @report.asap_reg_violation.to_s)
 
       # Corrective Actions
       # p.text = p.to_s.sub("$corrective_actions$", @report.car_docx)
