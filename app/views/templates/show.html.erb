@@ -50,6 +50,14 @@
                 :id => "edit-btn",
                 :class => "btn btn-warning",
                 :disable_with => "Editing..."%>
+              <%if current_user.global_admin?%>
+                <%=link_to "Export",
+                  export_template_path(@template, :format => "yaml"),
+                  'data-toggle' => 'tooltip',
+                  title: "Export Template as YAML",
+                  :class => "btn btn-outline-warning",
+                  :download => "#{@template["name"]}.yaml"%>
+              <%end%>
             </div>
           </div>
         </div>
@@ -90,11 +98,7 @@
           <%end%>
 
           <%@template.categories.where(deleted: false).order(:category_order).each do |cat|%>
-            <%if cat.id == 338%>
-              <%=render "observation_phases", :cat => cat%>
-            <%else%>
-              <%=render "category", :cat => cat%>
-            <%end%>
+            <%=render "category", :cat => cat%>
           <%end%>
 
         </div>

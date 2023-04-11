@@ -2,6 +2,20 @@
   <div class="grid per90 center-block">
     <%=render "/forms/index_fields", :btns => [
         {btn_name: 'New', btn_path: new_template_path, btn_class: 'btn-success'},
+        {btn_name: 'Upload', modal: true, btn_class: 'btn-primary', class_id: 'upload_template_btn'},
       ]%>
   </div>
 </div>
+
+
+<script>
+$(function(){
+  $('#upload_template_btn').on('click',function(){
+    $.get("<%=upload_view_templates_path%>",
+      function(data){
+      $(".modal-content").html(data);
+      $(window).trigger('resize');
+    });
+  });
+});
+</script>

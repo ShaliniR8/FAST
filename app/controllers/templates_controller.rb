@@ -21,7 +21,7 @@ end
 class TemplatesController < ApplicationController
   # before_filter :login_required
   before_filter :oauth_load # Kaushik Mahorker KM
-
+  require 'yaml'
 
   def index
     @title = "Safety Reports Templates"
@@ -31,6 +31,46 @@ class TemplatesController < ApplicationController
     @records = Template.find(:all)
   end
 
+  def upload_view
+    @path = upload_templates_path
+    render 'upload_view', layout: false
+  end
+
+  def upload
+    begin
+      yaml_attr = YAML.load_file(params["temp_upload"].path)
+      Template.transaction do
+        begin
+          # extract template
+          t = Template.extract_template(yaml_attr, current_user)
+          @template = t[:template]
+          error_msg = t[:error_msg]
+
+
+          if error_msg == ""
+            AccessControl.get_template_opts.map { |disp, db_val|
+              AccessControl.new({
+                list_type: 1,
+                action: db_val,
+                entry: @template[:name],
+                viewer_access: 1
+              }).save
+            }
+            redirect_to template_path(@template), flash: {success: "Template #{@template.id} created."}
+          else
+            raise ActiveRecord::Rollback
+          end
+        rescue
+          redirect_to templates_path, flash: {error: error_msg}
+          raise ActiveRecord::Rollback
+        end
+      end
+    rescue Psych::SyntaxError => e
+        redirect_to templates_path, flash: {error: e.message.split(':')[-1]}
+    end
+    @action = "upload"
+    @eccairs_attributes = EccairsAttribute.all
+  end
 
   def new
     @all_templates = Template.find(:all)
@@ -151,4 +191,16 @@ class TemplatesController < ApplicationController
     end
   end
 
+  def export
+    json = {}
+    template_id = params[:id]
+    @template = Template.find(template_id)
+    name = @template["name"]
+    json[:Template] = Template.toJson(template_id)
+    json[:Category] = Category.toJson(template_id)
+
+    yaml_obj = YAML.dump(json)
+    output_file = "#{Rails.root}/app/views/templates/export.yaml"
+    File.open(output_file, "w") { |o| o.write(yaml_obj) }
+  end
 end

@@ -135,4 +135,56 @@ class Template < ActiveRecord::Base
   def updated
     updated_at.strftime("%Y-%m-%d")
   end
+
+  def self.extract_template(yaml_attr, current_user)
+    template_error, category_error, field_error, nested_field_error = "", "", "", ""
+    @template = self.new
+    puts yaml_attr[:Template]
+    yaml_attr[:Template].each do |key, val|
+      if key == :report_type
+        unless ["asap", "non-asap"].include? val
+          template_error << "Incorrect Report Type: #{val}\n"
+          raise ActiveRecord::Rollback
+        end
+      end
+      if key == :emp_group and val != ""
+        unless CONFIG::EMPLOYEE_GROUPS.values.include? val
+          template_error << "Incorrect Employee Group: #{val}\n"
+          raise ActiveRecord::Rollback
+        end
+      end
+      if key == :related_template
+        templates = self.where(name: val)
+        if templates.empty?
+          template_error << "Related Template \"#{val}\" not found\n"
+          raise ActiveRecord::Rollback
+        end
+        val = templates[0].id
+        key = :map_template_id
+      end
+      @template[key] = val
+    end
+
+    @template.created_by=current_user;
+    @template.save
+
+    # extract categories
+    Category.extract_category(yaml_attr, @template.id, category_error, field_error, nested_field_error)
+    error_msg = ""
+    unless (template_error == "" && category_error == "" && field_error == "" && nested_field_error == "")
+     error_msg = "Template creation error.\n #{template_error} #{category_error} #{field_error} #{nested_field_error}"
+    end
+    {:template => @template, :error_msg => error_msg}
+  end
+
+  def self.toJson(id)
+    @template = self.find(id)
+    excluded_fields = ["id", "created_at", "updated_at", "users_id", "map_template_id"]
+    json = JSON.parse(@template.to_json).except(*excluded_fields)
+    unless @template["map_template_id"] == nil
+      related_template = Template.find(@template["map_template_id"])["name"]
+      json[:related_template] = related_template
+    end
+    json
+  end
 end

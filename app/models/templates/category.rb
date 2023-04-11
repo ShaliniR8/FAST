@@ -136,4 +136,44 @@ class Category < ActiveRecord::Base
       return false
     end
   end
+
+	def self.extract_category(yaml_attr, template_id, category_error, field_error, nested_field_error)
+		yaml_attr[:Category].each do |category|
+			self.transaction do
+				begin
+					@category = self.new
+					category.each do |key, val|
+						if key == :panel
+							unless self.getColor.values.include? val
+								category_error << "Incorrect panel color: #{val}\n"
+								raise ActiveRecord::Rollback
+							end
+						end
+						@category[key] = category[key]
+					end
+					@category.templates_id = template_id
+					@category.save
+
+					# extract fields
+					Field.extract_field(category, @category.id, field_error, nested_field_error)
+				rescue
+					raise ActiveRecord::Rollback
+				end
+			end
+		end
+	end
+
+	def self.toJson(template_id)
+		categories = self.where(templates_id: template_id)
+		jsons = []
+    excluded_fields = ["id", "created_at", "updated_at", "templates_id"]
+		categories.each do |category|
+			category_id = category.id
+			category_json = JSON.parse(category.to_json).except(*excluded_fields)
+			field_jsons = Field.toJson(category_id)
+			category_json[:Field] = field_jsons
+			jsons << category_json
+		end
+    jsons
+	end
 end

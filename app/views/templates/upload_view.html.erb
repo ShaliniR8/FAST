@@ -1,0 +1,22 @@
+<%=form_tag @path,:method=>"post",:multipart => true do%>
+  <div class="panel-warning">
+    <div class="panel-heading">
+      <div class="panel-title">Upload Template
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+        <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+    </div>
+    <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+      <div class="row">
+        <div class="form-inline form-group col-xs-10">
+          <%=file_field_tag :temp_upload,
+          :class => "ml5",
+          :style => "display:inline-block",
+          :accept => ".yaml" %>
+        </div>
+      </div>
+      <%=submit_tag "Upload",:class=>"btn btn-success pull-right mt5", disable_with: "Uploading..."%>
+    </div>
+  </div>
+<%end%>
