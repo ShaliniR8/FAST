@@ -45,7 +45,7 @@ ruby:
 
               - if owner.my_action(current_user.id) == "Not Completed"
                 = link_to "Take Survey", address_checklist_path(checklist),
-                  class: 'btn btn-success pull-right mr5'
+                  class: 'btn btn-success pull-right mr5 mb10'
 
               - if owner.status == 'New'
                 = link_to "Edit", '#',

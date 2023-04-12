@@ -38,6 +38,7 @@ class DemoConfig < DefaultConfig
     lng:                          -95.2768951, #HOU
     gMapZoom:                     15,
     checklist_query:              true,
+    osha_visibility:              true,
 
     # TO BE REMOVED:
     allow_set_alert:              true,
