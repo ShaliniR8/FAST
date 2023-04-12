@@ -14,12 +14,6 @@ class JEDConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:               false,
-    # drop_down_risk_selection:     true,
-
-    # TO BE REMOVED
-    base_risk_matrix:             false,
-    has_verification:             true,
-    hazard_root_cause_lock:       true
   })
 
   MATRIX_INFO = {
@@ -127,9 +121,9 @@ class JEDConfig < DefaultConfig
       likelihood_pos: 'row',
 
       column_header_name: 'SEVERITY',
-      column_header: ['Catastrophic','Hazardous','Major','Minor','Negligible'],
+      column_header: ['Catastrophic A','Hazardous B','Major C','Minor D','Negligible E'],
       row_header_name: 'PROBABILITY',
-      row_header: ['5 - Frequent', '4 - Occasional', '3 - Remote', '2 - Improbable', '1 - Extremely Improbable'],
+      row_header: ['5 Frequent', '4 Occasional', '3 Remote', '2 Improbable', '1 Extremely Improbable'],
       rows: [
         ['5A',     '5B',     '5C',    '5D',      '5E'],
         ['4A',     '4B',     '4C',    '4D',      '4E'],
