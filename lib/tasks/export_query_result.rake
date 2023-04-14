@@ -387,44 +387,6 @@ def emit_helper_basic(search_value, records, field, xor, logic_type)
   return []
 end
 
-
-def get_records
-  adjust_session_to_target(@owner.target) if CONFIG.hierarchy[@module_name][:objects].exclude?(@owner.target)
-  @title = CONFIG.hierarchy[@module_name][:objects][@owner.target][:title].pluralize
-  @object_type = Object.const_get(@owner.target)
-  @table_name = @object_type.table_name
-  @headers = @object_type.get_meta_fields('index')
-  @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query').keep_if{|x| x[:field]}
-  @template_fields = []
-  Template.preload(:categories, :fields)
-    .where(id:  @owner.templates)
-    .map(&:fields)
-    .flatten
-    .uniq{|field| field.label}
-    .each{|field|
-    @template_fields << {
-      title: field.label,
-      field: field.label,
-      data_type: field.data_type,
-      field_type: field.display_type,
-    }
-  }
-  @fields = @target_fields + @template_fields
-
-  if @title == "Submissions"
-    records = @object_type.preload(:submission_fields).where(completed: true, templates_id: @owner.templates)
-  elsif @title == "Reports"
-    records = @object_type.preload(:record_fields).where(:templates_id => @owner.templates)
-  else
-    records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
-  end
-  # byebug
-  @owner.query_conditions.each do |condition|
-    records = records & expand_emit(condition, records)
-  end
-  @records = records
-end
-
 def get_field(query, object_type, field_label)
   label = field_label.split(',').map(&:strip)[0]
   # if top level field
@@ -632,6 +594,7 @@ def get_query_detail_json(owner, total_records)
   }
 end
 
+# no issues, combined get_visualization_w_series and wo_series into one function
 def get_visualization_json(data, visualization)
   visualization_hash = {}
   visualization_hash[:x_axis] = visualization.x_axis
@@ -671,7 +634,6 @@ def get_visualizations_json(owner)
   query_result_visualizations = []
 
   owner.visualizations.each do |visualization|
-
     data = get_data(visualization)
     query_result_visualizations << get_visualization_json(data, visualization)
   end
@@ -684,6 +646,7 @@ require 'stringio'
 
 desc 'Export the query result as JSON'
 task export_query_result: :environment do
+  include QueriesHelper
 
   #------------------------------#
   host = "secure.flyfrontier.com"
@@ -713,9 +676,8 @@ task export_query_result: :environment do
     when 'Sra', 'Hazard', 'RiskControl', 'SafetyPlan'
       'SRM'
     end
-
-    records = get_records # get @records
-    total_records = records.size
+    @records = QueriesHelper.get_query_results(query) # get @records
+    total_records = @records.size
 
     query_result[:query_detail] = get_query_detail_json(@owner, total_records) #no issues
     query_result[:visualizations] = get_visualizations_json(@owner)
