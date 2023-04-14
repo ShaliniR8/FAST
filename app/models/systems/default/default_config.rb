@@ -84,6 +84,10 @@ class DefaultConfig
     safety_promotion_visibility:        false,  # Default visibility of Safety Promotion --> OFF
     pin_dashboard_visualizations:       false,  # Ability to pin query visualizations to dashboard --> Default OFF
 
+    # export query credentials
+    export_query_username:        "F9ProsafeT",
+    export_query_password:        "OwTX4NX&",
+    export_query_host:            "secure.flyfrontier.com"
   }
 
   DOCUMENT_CATEGORIES = ["ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
@@ -426,5 +430,4 @@ class DefaultConfig
       return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
     end
   end
-
 end

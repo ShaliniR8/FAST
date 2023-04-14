@@ -73,15 +73,15 @@ task export_query_result: :environment do
   include QueriesHelper
 
   #------------------------------#
-  host = "secure.flyfrontier.com"
-  username = "F9ProsafeT"
-  password = "OwTX4NX&"
+  host = CONFIG::GENERAL[:export_query_host]
+  username = CONFIG::GENERAL[:export_query_username]
+  password = CONFIG::GENERAL[:export_query_password]
   #------------------------------#
 
   all_queries_result = {}
   logger = Logger.new("log/export_query_benchmark.log")
   @query_fields = Query.get_meta_fields('show')
-  start = Time.now
+  # start = Time.now
   Query.all.select { |query| query.is_ready_to_export }.each do |query|
     puts " Query ##{query.id}"
 
@@ -109,16 +109,16 @@ task export_query_result: :environment do
 
     all_queries_result[@owner.id] = query_result
   end
-  stop = Time.now
-  logger.info "Time taken for loop : #{stop - start}"
+  # stop = Time.now
+  # logger.info "Time taken for loop : #{stop - start}"
   Net::SFTP.start(host, username, :password => password) do |sftp|
     begin
       io = StringIO.new all_queries_result.to_json
-      logger.info "#{all_queries_result.to_json}"
+      # logger.info "#{all_queries_result.to_json}"
       file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
       target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
 
-      # sftp.upload!(io, target)
+      sftp.upload!(io, target)
 
       p 'UPLOAD SUCCESSFUL'
     rescue Exception => e
