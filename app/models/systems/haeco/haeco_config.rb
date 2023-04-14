@@ -18,6 +18,7 @@ class HAECOConfig < DefaultConfig
     login_option:                  'dual',
     has_mobile_app:                true,
     sms_im_visibility:             false,
+    checklist_query:               true,
 
     hide_employee_group:           true,
     custom_uniq_id:                true,
