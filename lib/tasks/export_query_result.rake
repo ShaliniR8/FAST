@@ -130,7 +130,7 @@ def checklist_equals?(checklist_row, headers, search_value)
     .checklist_cells.flatten
     .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
 
-  case cells.map(&:data_type).first 
+  case cells.map(&:data_type).first
   when 'employee'
     values = cells.map(&:value).compact.map(&:downcase).map(&:strip).map{ |val| User.find(val).full_name rescue '' }.first.downcase
     values == search_value
@@ -146,7 +146,7 @@ def checklist_contains?(checklist_row, headers, search_value)
     .checklist_cells.flatten
     .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
 
-  case cells.map(&:data_type).first 
+  case cells.map(&:data_type).first
   when 'employee'
     values = cells.map(&:value).compact.map(&:downcase).map{ |val| User.find(val).full_name rescue '' }.first.downcase
     values.include? search_value
@@ -167,7 +167,7 @@ def checklist_compare?(checklist_row, headers, search_value)
     .select { |cell| headers.map(&:id).include? cell.checklist_header_item_id }
   values = cells.map(&:value).compact.map(&:downcase)
 
-  case cells.map(&:data_type).first 
+  case cells.map(&:data_type).first
   when 'date'
     values.each do |value|
       found = value.to_date >= search_value.to_date rescue false
@@ -418,11 +418,10 @@ def get_records
   else
     records = @object_type.select{|x| ((defined? x.template) && x.template.present?) ? x.template == false : true}
   end
-
+  # byebug
   @owner.query_conditions.each do |condition|
     records = records & expand_emit(condition, records)
   end
-
   @records = records
 end
 
@@ -619,7 +618,7 @@ def get_data(visualization)
   end
 end
 
-
+#no issues
 def get_query_detail_json(owner, total_records)
   attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
 
@@ -633,43 +632,35 @@ def get_query_detail_json(owner, total_records)
   }
 end
 
-
-def get_visualization_w_series_json(data, visualization)
+def get_visualization_json(data, visualization)
   visualization_hash = {}
   visualization_hash[:x_axis] = visualization.x_axis
-  visualization_hash[:series] = visualization.series
   visualization_hash[:data] = {}
 
-  series_names = data[0]
-  x_axis_names_with_count = data[1..-1]
+  if visualization.series.present?
+    visualization_hash[:series] = visualization.series
+    series_names = data[0]
+    x_axis_names_with_count = data[1..-1]
 
-  x_axis_names_with_count.each do |x_axis|
-
-    x_axis_name = x_axis[0]
-    x_axis_counts = x_axis[1..-1]
-
-    visualization_hash[:data][x_axis_name] = {}
-
-    series_names.each_with_index do |series, index|
-      visualization_hash[:data][x_axis_name][series] = x_axis_counts[index]
+    x_axis_names_with_count.each do |x_axis|
+      x_axis_name = x_axis[0]
+      x_axis_counts = x_axis[1..-1]
+      visualization_hash[:data][x_axis_name] = {}
+      series_names.each_with_index do |series, index|
+        visualization_hash[:data][x_axis_name][series] = x_axis_counts[index]
+      end
     end
-  end
 
-  visualization_hash
-end
+  else
+    visualization_hash[:series] = "N/A"
 
+    data.each do |x_axis|
+      x_axis_name = x_axis[0]
+      x_axis_count = x_axis[1]
 
-def get_visualization_wo_series_json(data, visualization)
-  visualization_hash = {}
-  visualization_hash[:x_axis] = visualization.x_axis
-  visualization_hash[:series] = "N/A"
-  visualization_hash[:data] = {}
+      visualization_hash[:data][x_axis_name] = x_axis_count
+    end
 
-  data.each do |x_axis|
-    x_axis_name = x_axis[0]
-    x_axis_count = x_axis[1]
-
-    visualization_hash[:data][x_axis_name] = x_axis_count
   end
 
   visualization_hash
@@ -682,12 +673,7 @@ def get_visualizations_json(owner)
   owner.visualizations.each do |visualization|
 
     data = get_data(visualization)
-
-    if visualization.series.present?
-      query_result_visualizations << get_visualization_w_series_json(data, visualization)
-    else
-      query_result_visualizations << get_visualization_wo_series_json(data, visualization)
-    end
+    query_result_visualizations << get_visualization_json(data, visualization)
   end
 
   query_result_visualizations
@@ -706,44 +692,48 @@ task export_query_result: :environment do
   #------------------------------#
 
   all_queries_result = {}
+  logger = Logger.new("log/export_query_benchmark.log")
   @query_fields = Query.get_meta_fields('show')
-
+  start = Time.now
   Query.all.select { |query| query.is_ready_to_export }.each do |query|
+    puts " Query ##{query.id}"
 
     query_result = {
       query_detail: {},
       visualizations:[]
     }
-
     @owner = query
     @object_type = Object.const_get(@owner.target)
 
     @module_name = case @object_type.name
-      when 'Submission', 'Record', 'Report', 'CorrectiveAction'
-        'ASAP'
-      when 'Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation'
-        'SMS'
-      when 'Sra', 'Hazard', 'RiskControl', 'SafetyPlan'
-        'SRM'
-      end
+    when 'Submission', 'Record', 'Report', 'CorrectiveAction'
+      'ASAP'
+    when 'Audit', 'Inspection', 'Evaluation', 'Investigation', 'Finding', 'SmsAction', 'Recommendation'
+      'SMS'
+    when 'Sra', 'Hazard', 'RiskControl', 'SafetyPlan'
+      'SRM'
+    end
 
     records = get_records # get @records
     total_records = records.size
 
-    query_result[:query_detail] = get_query_detail_json(@owner, total_records)
+    query_result[:query_detail] = get_query_detail_json(@owner, total_records) #no issues
     query_result[:visualizations] = get_visualizations_json(@owner)
 
 
     all_queries_result[@owner.id] = query_result
   end
-
+  stop = Time.now
+  # puts "Time taken for loop : #{stop - start}"
+  logger.info "Time taken for loop : #{stop - start}"
   Net::SFTP.start(host, username, :password => password) do |sftp|
     begin
       io = StringIO.new all_queries_result.to_json
+      logger.info "#{all_queries_result.to_json}"
       file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
       target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
 
-      sftp.upload!(io, target)
+      # sftp.upload!(io, target)
 
       p 'UPLOAD SUCCESSFUL'
     rescue Exception => e
