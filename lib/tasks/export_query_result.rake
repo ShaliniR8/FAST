@@ -1,4 +1,3 @@
-# no issues
 def get_query_detail_json(owner, total_records)
   attributes = @query_fields.map { |field| [field[:field], field[:field]] }.to_h
 
@@ -12,7 +11,6 @@ def get_query_detail_json(owner, total_records)
   }
 end
 
-# no issues, combined get_visualization_w_series and wo_series into one function
 def get_visualization_json(data, visualization)
   visualization_hash = {}
   visualization_hash[:x_axis] = visualization.x_axis
@@ -81,7 +79,6 @@ task export_query_result: :environment do
   all_queries_result = {}
   logger = Logger.new("log/export_query_benchmark.log")
   @query_fields = Query.get_meta_fields('show')
-  # start = Time.now
   Query.all.select { |query| query.is_ready_to_export }.each do |query|
     puts " Query ##{query.id}"
 
@@ -109,12 +106,9 @@ task export_query_result: :environment do
 
     all_queries_result[@owner.id] = query_result
   end
-  # stop = Time.now
-  # logger.info "Time taken for loop : #{stop - start}"
   Net::SFTP.start(host, username, :password => password) do |sftp|
     begin
       io = StringIO.new all_queries_result.to_json
-      # logger.info "#{all_queries_result.to_json}"
       file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
       target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
 
