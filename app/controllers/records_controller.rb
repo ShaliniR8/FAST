@@ -42,13 +42,12 @@ class RecordsController < ApplicationController
 
   def osha_300a
     @title = 'Reports - OSHA 300A'
-    
     records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
 
     @total_of_g = 0
     @total_of_h = 0
     @total_of_i = 0
-    @total_of_j = 0 
+    @total_of_j = 0
     @total_of_k = 0
     @total_of_l = 0
     @total_of_1 = 0
@@ -196,12 +195,73 @@ class RecordsController < ApplicationController
           end
         end
       end
-
     end
 
     render :partial => 'osha_300_table'
   end
 
+  def osha_300a_pdf_export
+    html = render_to_string(:template=>"/pdfs/osha_300a.html.erb")
+    # if CONFIG::GENERAL[:has_pdf_footer]
+    #   pdf_options.merge!({
+    #     footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+    #     footer_spacing:  3,
+    #   })
+    # end
+    pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    # pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    byebug
+    send_file pdf.to_pdf, disposition: 'attachment'
+  end
+
+  def osha_300a_word_export
+    # require "docx"
+    # @report = FaaReport.find(params[:id])
+    # @report.set_statistics
+    # doc = Docx::Document.open("#{Rails.root}/public/test.docx")
+    # doc.paragraphs.each do |p|
+
+    #   # Identification
+    #   p.text = p.to_s.sub("$chdo$", CONFIG::FAA_INFO["CHDO"])
+    #   p.text = p.to_s.sub("$region$", CONFIG::FAA_INFO["Region"])
+    #   p.text = p.to_s.sub("$fiscal_year$", @report.year.to_s)
+    #   p.text = p.to_s.sub("$fiscal_quarter$", @report.get_fiscal_quarter )
+    #   p.text = p.to_s.sub("$holder_name$", CONFIG::FAA_INFO["ASAP MOU Holder Name"])
+    #   p.text = p.to_s.sub("$faa_designator$", CONFIG::FAA_INFO["ASAP MOU Holder FAA Designator"])
+    #   p.text = p.to_s.sub("$employee_group$", @report.employee_group)
+
+    #   # ASAP ERC Contact Information & Present Quarter Statistics
+    #   p.text = p.to_s.sub("$faa_member$", @report.faa)
+    #   p.text = p.to_s.sub("$company_member$", @report.company)
+    #   p.text = p.to_s.sub("$labor_member$", @report.labor)
+    #   p.text = p.to_s.sub("$asap_manager$", @report.asap)
+
+    #   # Statistics
+    #   p.text = p.to_s.sub("$asap_submit$", @report.asap_submit.to_s)
+    #   p.text = p.to_s.sub("$asap_accept$", @report.asap_accept.to_s)
+    #   p.text = p.to_s.sub("$sole$", @report.sole.to_s)
+    #   p.text = p.to_s.sub("$asap_closed$", @report.asap_close.to_s)
+    #   p.text = p.to_s.sub("$asap_emp$", @report.asap_emp.to_s)
+    #   p.text = p.to_s.sub("$asap_com$", @report.asap_com.to_s)
+    #   p.text = p.to_s.sub("$asap_reg$", @report.asap_reg_violation.to_s)
+
+    #   # Corrective Actions
+    #   # p.text = p.to_s.sub("$corrective_actions$", @report.car_docx)
+
+    #   # Safety Enhancement
+    #   p.text = p.to_s.sub("$safety_enhancements$", @report.safety_enhencement)
+
+    # end
+    # doc.save("#{Rails.root}/public/test-edited.docx")
+    # output_file = "#{Rails.root}/public/test-edited.docx"
+
+    # respond_to do |format|
+    #   format.docx do
+    #     send_file(output_file, filename: "faa_report.docx")
+    #   end
+    # end
+  end
 
   def load_options
     @action_headers = CorrectiveAction.get_meta_fields('index')
@@ -601,9 +661,9 @@ class RecordsController < ApplicationController
       redirect_to errors_path unless current_user.has_access('records', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: false) &&
                                 (access_level.split(';').include?('viewer_template_id') ||
                                 (access_level.split(';').include?('viewer_template_deid') && @record.viewer_access) ||
-                                (access_level.split(';').include?('confidential') && @record.confidential)) 
+                                (access_level.split(';').include?('confidential') && @record.confidential))
     end
-    
+
     @corrective_actions = @record.corrective_actions
     @corrective_actions << @record.report.corrective_actions if @record.report.present?
 

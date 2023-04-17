@@ -4,7 +4,6 @@
 <%=javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"%>
 <%=javascript_include_tag "/javascripts/utility/format-builder.js"%>
 
-
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
     <div class="panel panel-steelblue">
@@ -16,7 +15,9 @@
           <div class="top_buttons pull-right">
             <%=link_to "PDF",
               '#',
-              :class => 'btn btn-darkturquoise mr5 mb5 pull-right'%>
+              :id => 'export-pdf',
+              :class => 'btn btn-darkturquoise mr5 mb5 pull-right',
+              :download => "OSHA_300A.pdf"%>
             <%=link_to "Word",
               '#',
               :class => "btn btn-darkturquoise mb5 mr5 pull-right"%>
@@ -54,3 +55,24 @@
       border-bottom: 1px solid #ccc;
   }
 </style>
+
+<script>
+  $(document).ready(function(){
+    $('#export-pdf').on('click', function(e){
+      e.preventDefault();
+      $.ajax({
+          type: "GET",
+          url: "<%=osha_300a_pdf_export_osha_records_path(format: :pdf)%>",
+          data: {
+            'title': "<%=@title%>",
+            "total_of_g":  "<%=@total_of_g%>",
+            "total_of_h": "<%=@total_of_h%>"
+          },
+          success: function(response){},
+          error: function(response){
+            console.log('Error Exporting PDF');
+          }
+        });
+    })
+  })
+</script>
