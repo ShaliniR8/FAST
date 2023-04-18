@@ -100,6 +100,21 @@ class RecordsController < ApplicationController
         end
       end
     end
+    @osha_300a_contents = {
+      :title => @title,
+      :total_of_g => @total_of_g,
+      :total_of_h => @total_of_h,
+      :total_of_i => @total_of_i,
+      :total_of_j => @total_of_j,
+      :total_of_k => @total_of_k,
+      :total_of_l => @total_of_l,
+      :total_of_1 => @total_of_1,
+      :total_of_2 => @total_of_2,
+      :total_of_3 => @total_of_3,
+      :total_of_4 => @total_of_4,
+      :total_of_5 => @total_of_5,
+      :total_of_6 => @total_of_6
+    }
   end
 
 
@@ -201,22 +216,18 @@ class RecordsController < ApplicationController
   end
 
   def osha_300a_pdf_export
-    html = render_to_string(:template=>"/pdfs/osha_300a.html.erb")
-    # if CONFIG::GENERAL[:has_pdf_footer]
-    #   pdf_options.merge!({
-    #     footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
-    #     footer_spacing:  3,
-    #   })
-    # end
+    content = params[:content]
+    @osha_300a_contents = content
+    html = render_to_string(:template=>"records/print_osha_300a.html.erb")
+    # File.open("#{Rails.root}/public/osha_pdf.html", "w") { |o| o.write(html) }
     pdf = PDFKit.new(html)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-    # pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    byebug
-    send_file pdf.to_pdf, disposition: 'attachment'
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    send_data pdf.to_pdf, :filename => "OSHA_300A_[#{content[:date_from]} to #{content[:date_to]}].pdf"
   end
 
   def osha_300a_word_export
-    # require "docx"
+    require "docx"
     # @report = FaaReport.find(params[:id])
     # @report.set_statistics
     # doc = Docx::Document.open("#{Rails.root}/public/test.docx")

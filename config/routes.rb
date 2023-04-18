@@ -331,6 +331,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'osha_300a'
       post 'osha_300_result'
       get 'osha_300a_pdf_export'
+      get 'osha_300a_word_export'
     end
   end
 
