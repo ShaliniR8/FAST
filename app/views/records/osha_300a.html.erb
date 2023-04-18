@@ -15,10 +15,9 @@
           <div class="top_buttons pull-right">
             <%=link_to "PDF",
               osha_300a_pdf_export_osha_records_path(content: @osha_300a_contents.merge({:date_from => params[:date_from], :date_to => params[:date_to] }), format: :pdf),
-              # :id => 'export-pdf',
               :class => 'btn btn-darkturquoise mr5 mb5 pull-right'%>
             <%=link_to "Word",
-              osha_300a_word_export_osha_records_path(content: @osha_300a_contents.merge({:date_from => params[:date_from], :date_to => params[:date_to] }), format: :pdf),
+              osha_300a_word_export_osha_records_path(content: @osha_300a_contents.merge({:date_from => params[:date_from], :date_to => params[:date_to] }), format: :docx),
               :class => "btn btn-darkturquoise mb5 mr5 pull-right"%>
             <%=link_to "Expand All",
               "#",
@@ -53,24 +52,3 @@
       border-bottom: 1px solid #ccc;
   }
 </style>
-
-<script>
-  $(document).ready(function(){
-    $('#export-pdf').on('click', function(e){
-      e.preventDefault();
-      $.ajax({
-          type: "GET",
-          url: "<%=osha_300a_pdf_export_osha_records_path(format: :pdf)%>",
-          data: {
-            'title': "<%=@title%>",
-            "total_of_g":  "<%=@total_of_g%>",
-            "total_of_h": "<%=@total_of_h%>"
-          },
-          success: function(response){},
-          error: function(response){
-            console.log('Error Exporting PDF');
-          }
-        });
-    })
-  })
-</script>
