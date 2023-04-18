@@ -28,13 +28,13 @@
         </tfoot>
         <tbody>
           <%@entries.each do |key, value|%>
-            <tr record_id="<%=key%>">
+            <tr record_id="<%=key%>" data-link="<%=record_path(Record.find(key))%>">
               <%@headers.each do |header|%>
                 <td><%=value[header]%></td>
               <%end%>
             </tr>
           <%end%>
-        </tbody> 
+        </tbody>
       </table>
     </div>
   </div>
@@ -53,6 +53,9 @@
 
 
 <script>
+  $("tr[data-link]").click(function() {
+      window.open($(this).data('link'), '_blank');
+    });
   $(function(){
     $('#osha_table').DataTable({
       dom: "<'row'<'col-xs-6'l><'col-sm-6'f>>" +
