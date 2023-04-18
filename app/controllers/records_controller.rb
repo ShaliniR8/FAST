@@ -223,55 +223,44 @@ class RecordsController < ApplicationController
     pdf = PDFKit.new(html)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-    send_data pdf.to_pdf, :filename => "OSHA_300A_[#{content[:date_from]} to #{content[:date_to]}].pdf"
+    send_data pdf.to_pdf, :filename => "OSHA_300A__[#{content[:date_from]} to #{content[:date_to]}].pdf"
   end
 
   def osha_300a_word_export
     require "docx"
-    # @report = FaaReport.find(params[:id])
-    # @report.set_statistics
-    # doc = Docx::Document.open("#{Rails.root}/public/test.docx")
-    # doc.paragraphs.each do |p|
+    content = params[:content]
+    doc = Docx::Document.open("#{Rails.root}/public/osha_300a.docx")
+    doc.paragraphs.each do |p|
+      # Dates
+      p.text = p.to_s.sub("$date_from$", content[:date_from])
+      p.text = p.to_s.sub("$date_to$", content[:date_to])
 
-    #   # Identification
-    #   p.text = p.to_s.sub("$chdo$", CONFIG::FAA_INFO["CHDO"])
-    #   p.text = p.to_s.sub("$region$", CONFIG::FAA_INFO["Region"])
-    #   p.text = p.to_s.sub("$fiscal_year$", @report.year.to_s)
-    #   p.text = p.to_s.sub("$fiscal_quarter$", @report.get_fiscal_quarter )
-    #   p.text = p.to_s.sub("$holder_name$", CONFIG::FAA_INFO["ASAP MOU Holder Name"])
-    #   p.text = p.to_s.sub("$faa_designator$", CONFIG::FAA_INFO["ASAP MOU Holder FAA Designator"])
-    #   p.text = p.to_s.sub("$employee_group$", @report.employee_group)
+      # Number of Cases
+      p.text = p.to_s.sub("$total_of_g$", content[:total_of_g]) # Total number of deaths
+      p.text = p.to_s.sub("$total_of_h$", content[:total_of_h]) # Total number of cases with days away from work
+      p.text = p.to_s.sub("$total_of_i$", content[:total_of_i]) # Total number of cases with job transfer or restriction
+      p.text = p.to_s.sub("$total_of_j$", content[:total_of_j]) # Total number of other recordable cases
 
-    #   # ASAP ERC Contact Information & Present Quarter Statistics
-    #   p.text = p.to_s.sub("$faa_member$", @report.faa)
-    #   p.text = p.to_s.sub("$company_member$", @report.company)
-    #   p.text = p.to_s.sub("$labor_member$", @report.labor)
-    #   p.text = p.to_s.sub("$asap_manager$", @report.asap)
+      # Number of Days
+      p.text = p.to_s.sub("$total_of_k$", content[:total_of_k]) # Total number of days away from work
+      p.text = p.to_s.sub("$total_of_l$", content[:total_of_l]) # Total number of days of job transfer or restriction
 
-    #   # Statistics
-    #   p.text = p.to_s.sub("$asap_submit$", @report.asap_submit.to_s)
-    #   p.text = p.to_s.sub("$asap_accept$", @report.asap_accept.to_s)
-    #   p.text = p.to_s.sub("$sole$", @report.sole.to_s)
-    #   p.text = p.to_s.sub("$asap_closed$", @report.asap_close.to_s)
-    #   p.text = p.to_s.sub("$asap_emp$", @report.asap_emp.to_s)
-    #   p.text = p.to_s.sub("$asap_com$", @report.asap_com.to_s)
-    #   p.text = p.to_s.sub("$asap_reg$", @report.asap_reg_violation.to_s)
+      # Injury and Illness Types
+      p.text = p.to_s.sub("$total_of_1$", content[:total_of_1]) # (1) Injury
+      p.text = p.to_s.sub("$total_of_2$", content[:total_of_2]) # (2) Skin Disorder
+      p.text = p.to_s.sub("$total_of_3$", content[:total_of_3]) # (3) Respiratory Conditions
+      p.text = p.to_s.sub("$total_of_4$", content[:total_of_4]) # (4) Poisoning
+      p.text = p.to_s.sub("$total_of_5$", content[:total_of_5]) # (5) Hearing Loss
+      p.text = p.to_s.sub("$total_of_6$", content[:total_of_6]) # (6) All Other Illnesses
+    end
+    doc.save("#{Rails.root}/public/osha_300a_edited.docx")
+    output_file = "#{Rails.root}/public/osha_300a_edited.docx"
 
-    #   # Corrective Actions
-    #   # p.text = p.to_s.sub("$corrective_actions$", @report.car_docx)
-
-    #   # Safety Enhancement
-    #   p.text = p.to_s.sub("$safety_enhancements$", @report.safety_enhencement)
-
-    # end
-    # doc.save("#{Rails.root}/public/test-edited.docx")
-    # output_file = "#{Rails.root}/public/test-edited.docx"
-
-    # respond_to do |format|
-    #   format.docx do
-    #     send_file(output_file, filename: "faa_report.docx")
-    #   end
-    # end
+    respond_to do |format|
+      format.docx do
+        send_file(output_file, filename: "OSHA_300A__[#{content[:date_from]} to #{content[:date_to]}].docx")
+      end
+    end
   end
 
   def load_options
