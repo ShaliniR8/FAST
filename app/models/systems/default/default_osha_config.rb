@@ -168,7 +168,7 @@ class DefaultOshaConfig
           {title: 'In Progress', path: 'incomplete_submissions_path(type: "OSHA")',
             # display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
             display: proc{|user:,**op| user.get_all_submitter_templates.size > 0}},
-          {title: 'New', path: 'new_submission_path',
+          {title: 'New', path: 'new_osha_submission_path',
             # display: proc{|user:,**op| priv_check.call(Object.const_get('Submission'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
             display: proc{|user:,**op| user.get_all_submitter_templates.size > 0}},
         ]
@@ -179,8 +179,7 @@ class DefaultOshaConfig
       },
       'OSHA Reports' => {
         title: 'OSHA 300 Reports', path: 'osha_300_osha_records_path',
-        display: proc{|user:,**op| user.has_access('faa_reports', 'index', admin: CONFIG::GENERAL[:global_admin_default]) ||
-                                   user.has_access('faa_reports', 'new', admin: CONFIG::GENERAL[:global_admin_default])}
+        display: proc{|user:,**op| user.has_access('osha_reports', 'index', admin: CONFIG::GENERAL[:global_admin_default]) }
       },
       'Query Center' => {
         title: 'Query Center', path: '#',

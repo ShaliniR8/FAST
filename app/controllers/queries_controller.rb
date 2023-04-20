@@ -134,6 +134,9 @@ class QueriesController < ApplicationController
     elsif params[:commit] == 'Save Subscription List'
       @owner.update_attributes(params[:query])
     end
+    @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
+    @owner.save 
+
     redirect_to query_path(@owner)
   end
 

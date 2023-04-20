@@ -387,6 +387,10 @@ class AccessControl < ActiveRecord::Base
         "notify"              => generate_desc("Safety Badge", "notify"),
        },
 
+      "osha_reports"=>{
+        "index"               => generate_desc("OSHA 300 Report", "index"),
+      },
+
        'ASAP' =>{
         'module'              => generate_desc("Safety Reporting", "module"),
        },
@@ -405,6 +409,10 @@ class AccessControl < ActiveRecord::Base
 
        'Safety Promotion'=>{
         'module'              => generate_desc("Safety Promotion", "module"),
+       },
+
+       'OSHA'=>{
+        'module'              => generate_desc("OSHA/OJI", "module"),
        },
 
        'trackings'=>{
@@ -764,6 +772,7 @@ class AccessControl < ActiveRecord::Base
       "SRA(SRM)"                              => "Safety Risk Management",
       "Safety Promotion"                      => "Safety Promotion",
       "Query Center"                          => "home",
+      "OSHA 300 Reports"                      => "osha_reports",
     }.sort.to_h
   end
 
