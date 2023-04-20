@@ -71,9 +71,15 @@ task export_query_result: :environment do
   include QueriesHelper
 
   #------------------------------#
-  host = CONFIG::GENERAL[:export_query_host]
-  username = CONFIG::GENERAL[:export_query_username]
-  password = CONFIG::GENERAL[:export_query_password]
+  host = ""
+  username = ""
+  password = ""
+  if defined? (Object.const_get("#{AIRLINE_CODE}Config")::EXPORT_QUERY_CRED)
+    creds = Object.const_get("#{AIRLINE_CODE}Config")::EXPORT_QUERY_CRED
+    host = creds[:export_query_host]
+    username = creds[:export_query_username]
+    password = creds[:export_query_password]
+  end
   #------------------------------#
 
   all_queries_result = {}
@@ -102,7 +108,6 @@ task export_query_result: :environment do
 
     query_result[:query_detail] = get_query_detail_json(@owner, total_records) #no issues
     query_result[:visualizations] = get_visualizations_json(@owner)
-
 
     all_queries_result[@owner.id] = query_result
   end

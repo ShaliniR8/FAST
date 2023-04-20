@@ -355,5 +355,11 @@ class FFTConfig < DefaultConfig
     ],
   }
 
+  # export query credentials
+  EXPORT_QUERY_CRED = {
+    export_query_username:        "F9ProsafeT",
+    export_query_password:        "OwTX4NX&",
+    export_query_host:            "secure.flyfrontier.com"
+  }
 
 end
