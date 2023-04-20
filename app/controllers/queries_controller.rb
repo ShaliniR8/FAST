@@ -170,7 +170,6 @@ class QueriesController < ApplicationController
     end
 
     @target_display_name = params[:target_display_name]
-
     if @target == 'Checklist' && params[:templates].present?
       @templates = Checklist.where(id: params[:templates])
       @fields = []
@@ -214,6 +213,8 @@ class QueriesController < ApplicationController
 
 
       # @fields = @fields.uniq
+    elsif @target == 'OshaRecord'
+      @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
     else
       @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible', 'close').keep_if{|x| x[:field]}
     end
@@ -285,7 +286,11 @@ class QueriesController < ApplicationController
     @owner = Query.find(params[:id])
     @chart_types = QueryVisualization.chart_types
     @object_type = Object.const_get(@owner.target)
-    @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
+    if @object_type == OshaRecord
+      @fields = @object_type.get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
+    else
+      @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
+    end
     templates = Template.preload(:categories, :fields).where(:id => @owner.templates)
     templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @fields << {
