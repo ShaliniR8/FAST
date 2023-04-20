@@ -112,6 +112,9 @@ class NewslettersController < ApplicationController
 
   def show
     @newsletter = @table.find(params[:id])
+    if (@newsletter.status == "Published" && (show_complete_button(@newsletter.id, current_user.id) == 1))
+      flash[:notice] = "Please hit the Complete button to notify the creator of this Newsletter that you have acknowledged and completed your reading of this Newsletter."
+    end
   end
 
 

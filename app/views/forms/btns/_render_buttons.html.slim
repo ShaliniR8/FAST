@@ -30,6 +30,8 @@ ruby:
     = link_to 'Attach in Message',
       eval("new_message_path(owner_id: owner.id, owner_class: owner.class)"),
       class: 'btn btn-warning pull-right mb5 mr5',
+      'data-toggle' => 'tooltip',
+      title: "Send a message from the message center and attach the current #{owner_class.split('_').join(' ').upcase} to the message",
       disable_with: 'Redirecting...'
 
   - when :comment
@@ -110,7 +112,7 @@ ruby:
       'data-target' => '.bs-example-modal-lg'
 
   - when :override_status
-      
+
     = link_to 'Override Status',
       '#',
       class: 'btn btn-danger pull-right mr5 mb5',

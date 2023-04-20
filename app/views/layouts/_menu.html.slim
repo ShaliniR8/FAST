@@ -3,7 +3,7 @@
 - when "SMS IM" then 'im'
 - when "SMS" then 'sa'
 - when "SRM" then 'srm'
-- when "SP" then 'sp' 
+- when "SP" then 'sp'
 - when 'OSHA' then 'osha' end
 
 - menu_items = eval("CONFIG.#{module_name}::HIERARCHY[:menu_items].select{|key, item| item[:display].call(user: current_user)}")
@@ -18,7 +18,14 @@
               - if subItem[:header]
                 li = link_to subItem[:title], '#', class: "dropdown-menu-header", disabled: true
               - else
-                li = link_to subItem[:title], eval(subItem[:path])
+                - if key == 'Recommendations' && subItem[:title] == "For Findings"
+                  li
+                    = link_to "#{i=subItem[:title]} <i class='glyphicon glyphicon-info-sign' data-toggle = 'tooltip' title='You can find Recommendations added for Findings here. Note that Findings need to be Assigned before having the ability to add Recommendations to.'></i>".html_safe, eval(subItem[:path])
+                - elsif key == 'Recommendations' && subItem[:title] == "For Investigations"
+                  li
+                    = link_to "#{i=subItem[:title]} <i class='glyphicon glyphicon-info-sign' data-toggle = 'tooltip' title='You can find Recommendations added for Investigations here. Note that Investigations need to be Assigned before having the ability to add Recommendations to.'></i>".html_safe, eval(subItem[:path])
+                - else
+                  li = link_to subItem[:title], eval(subItem[:path])
     - else
       - if item[:display].call(user: current_user)
         li = link_to item[:title], eval(item[:path])

@@ -52,6 +52,8 @@
               "data-target" => ".bs-example-modal-lg"%>
             <%=link_to "Reset",
               path,
+            'data-toggle' => 'tooltip',
+            title: 'Remove all Filters',
               :disable_with => 'Resetting...',
               :class => "btn btn-default pull-right mr5"%>
           <%end%>

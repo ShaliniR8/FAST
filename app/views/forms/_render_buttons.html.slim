@@ -34,7 +34,10 @@ ruby:
   - when :attach_in_message
     = link_to 'Attach in Message',
       eval("interpret_#{owner_class}_path(act: :attach_in_message)"),
+      'data-toggle' => 'tooltip',
+      title: "Send a message from the message center and attach the current #{owner_class.split('_').join(' ').upcase} to the message",
       class: 'btn btn-warning pull-right mb5 mr5',
+
       disable_with: 'Redirecting...'
 
   - when :comment
@@ -86,6 +89,8 @@ ruby:
   - when :deid_pdf
     = link_to 'De-ID PDF',
       eval("interpret_#{owner_class}_path(owner, act: :deid_pdf, format: :pdf, deidentified: true, op: op)"),
+      'data-toggle' => 'tooltip',
+      title: 'View De-Identified PDF',
       class: 'btn btn-darkturquoise pull-right mr5 mb5'
 
   - when :delete
