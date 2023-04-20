@@ -201,7 +201,6 @@
       e.preventDefault();
 
       var visualization_id = $(this).data("visualization-id");
-      console.log(visualization_id)
       var threshold_visible = $('#series_' + visualization_id).val() === "" ? true : false
       $.ajax({
         type: "POST",

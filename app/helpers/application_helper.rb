@@ -581,6 +581,8 @@ module ApplicationHelper
       entry_url = newsletter_url(entry)
     when 'SafetySurvey'
       entry_url = safety_survey_url(entry)
+    when 'Query'
+      entry_url = query_url(entry)
     else
       entry_url = "N/A"
     end
@@ -594,7 +596,6 @@ module ApplicationHelper
     class_name = entry.class.name.demodulize
     if class_name == "Fixnum"
     end
-
     case class_name
     # when "CorrectiveAction"
     #   entry_url=use_url ? corrective_action_url(entry) : corrective_action_path(entry)
@@ -652,6 +653,8 @@ module ApplicationHelper
       entry_url = use_url ? recommendation_url(entry) : recommendation_path(entry)
     when "InvestigationRecommendation"
       entry_url = use_url ? recommendation_url(entry) : recommendation_path(entry)
+    when 'Query'
+      entry_url = use_url ? query_url(entry) : query_path(entry)
     end
     "    <a href='#{entry_url}'>#{message}</a>"
   end

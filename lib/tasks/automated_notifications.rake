@@ -69,5 +69,87 @@ namespace :notifications do
     end
   end
 
+  desc 'Send notification to distribution list groups when Query threshold is reached'
+  task :query_threshold_alert => :environment do
+    include QueriesHelper
+    begin
+      queries = Query.find(:all).select {|instance| instance[:threshold] != nil}
+      threshold_exceeded = queries.select {|query| QueriesHelper.get_query_results_ids(query).size >= query.threshold}
+      map_user_query = Hash.new
+      threshold_exceeded.each do |query|
+        distros_ids = query.distribution_list_ids
+        distros = DistributionList.preload(:distribution_list_connections).where(id: distros_ids)
+        user_ids = distros.map(&:get_user_ids).flatten.uniq()
+        user_ids.each do |u|
+          if map_user_query[u] == nil
+            map_user_query[u] = [{query_id:query.id, message: " => Threshold: #{query.threshold}, Total results under query: #{QueriesHelper.get_query_results_ids(query).size}"}]
+          else
+            map_user_query[u] << {query_id:query.id, message: " => Threshold: #{query.threshold}, Total results under query: #{QueriesHelper.get_query_results_ids(query).size}"}
+          end
+        end
+      end
+      map_user_query.each do |user_id, queries|
+        subject = "Threshold alert for Queries"
+        NotifyMailer.automated_reminder(User.find(user_id), subject, "The following Queries have exceeded their thresholds.", queries)
+      end
+    end
+  end
+
+  desc 'Send notification to distribution list groups when Visualization threshold is reached'
+  task :visualization_threshold_alert => :environment do
+    include QueriesHelper
+    begin
+      visualizations = QueryVisualization.find(:all).select {|instance| instance[:threshold] != nil}
+      threshold_exceeded = visualizations.select {|viz| get_counts(viz).max >= viz.threshold}
+      threshold_exceeded = threshold_exceeded.group_by(&:owner_id)
+      controller = QueriesController.new
+      map_user_query = Hash.new
+      threshold_exceeded.each do |owner_id, visualizations|
+        @query = Query.find(owner_id)
+        distros = DistributionList.preload(:distribution_list_connections).where(id: @query.distribution_list_ids)
+        user_ids = distros.map(&:get_user_ids).flatten.uniq()
+        user_ids.each do |u|
+          html = controller.render_to_string(
+            template: 'queries/_visualizations_pdf.html.slim',
+            locals: {owner: @query, visualizations: visualizations },
+            layout: false
+          )
+          pdf = PDFKit.new(html)
+          pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+          attachment = pdf.to_pdf
+          filename = "Query_#{@query.id}_visualizations_threshold_alert.pdf"
+          if map_user_query[u] == nil
+            map_user_query[u] = {
+              :query_ids => [{query_id:owner_id}],
+              :attachments => [{:attachment => attachment, :filename => filename}]
+            }
+          else
+            map_user_query[u][:query_ids] << {query_id:owner_id}
+            map_user_query[u][:attachments] << {:attachment => attachment, :filename => filename}
+            map_user_query[u] = {
+              :query_ids => map_user_query[u][:query_ids],
+              :attachments => map_user_query[u][:attachments]
+            }
+          end
+        end
+      end
+      map_user_query.each do |user_id, record|
+        subject = "Threshold alert for Query Visualizations"
+        message = "Some of the visualizations under the following queries have reached or exceeded the set visualization threshold. Please open attachments to inspect visualizations for each query."
+        NotifyMailer.automated_reminder(User.find(user_id), subject, message , record[:query_ids], record[:attachments])
+      end
+    end
+  end
+
+  def get_counts(viz)
+    @query = Query.find(viz.owner_id)
+    @object_type = Object.const_get(@query.target)
+    field_label = viz.x_axis
+    @x_axis_field = QueryVisualization.get_field(@query, @object_type, field_label)
+    records_ids = QueriesHelper.get_query_results_ids(@query)
+    table = QueriesHelper.get_data_table_for_google_visualization_sql(x_axis_field_arr:@x_axis_field, records_ids:records_ids, query: @query)
+    table[1..-1].map {|t| t[1]}
+  end
+
 end
 
