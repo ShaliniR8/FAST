@@ -42,13 +42,12 @@ class RecordsController < ApplicationController
 
   def osha_300a
     @title = 'Reports - OSHA 300A'
-    
     records = OshaRecord.where('DATE(event_date) >= ? and DATE(event_date) <= ?', params[:date_from].to_date, params[:date_to].to_date)
 
     @total_of_g = 0
     @total_of_h = 0
     @total_of_i = 0
-    @total_of_j = 0 
+    @total_of_j = 0
     @total_of_k = 0
     @total_of_l = 0
     @total_of_1 = 0
@@ -101,6 +100,21 @@ class RecordsController < ApplicationController
         end
       end
     end
+    @osha_300a_contents = {
+      :title => @title,
+      :total_of_g => @total_of_g,
+      :total_of_h => @total_of_h,
+      :total_of_i => @total_of_i,
+      :total_of_j => @total_of_j,
+      :total_of_k => @total_of_k,
+      :total_of_l => @total_of_l,
+      :total_of_1 => @total_of_1,
+      :total_of_2 => @total_of_2,
+      :total_of_3 => @total_of_3,
+      :total_of_4 => @total_of_4,
+      :total_of_5 => @total_of_5,
+      :total_of_6 => @total_of_6
+    }
   end
 
 
@@ -196,12 +210,58 @@ class RecordsController < ApplicationController
           end
         end
       end
-
     end
 
     render :partial => 'osha_300_table'
   end
 
+  def osha_300a_pdf_export
+    content = params[:content]
+    @osha_300a_contents = content
+    html = render_to_string(:template=>"records/print_osha_300a.html.erb")
+    # File.open("#{Rails.root}/public/osha_pdf.html", "w") { |o| o.write(html) }
+    pdf = PDFKit.new(html)
+    pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+    pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+    send_data pdf.to_pdf, :filename => "OSHA_300A__[#{content[:date_from]} to #{content[:date_to]}].pdf"
+  end
+
+  def osha_300a_word_export
+    require "docx"
+    content = params[:content]
+    doc = Docx::Document.open("#{Rails.root}/public/osha_300a.docx")
+    doc.paragraphs.each do |p|
+      # Dates
+      p.text = p.to_s.sub("$date_from$", content[:date_from])
+      p.text = p.to_s.sub("$date_to$", content[:date_to])
+
+      # Number of Cases
+      p.text = p.to_s.sub("$total_of_g$", content[:total_of_g]) # Total number of deaths
+      p.text = p.to_s.sub("$total_of_h$", content[:total_of_h]) # Total number of cases with days away from work
+      p.text = p.to_s.sub("$total_of_i$", content[:total_of_i]) # Total number of cases with job transfer or restriction
+      p.text = p.to_s.sub("$total_of_j$", content[:total_of_j]) # Total number of other recordable cases
+
+      # Number of Days
+      p.text = p.to_s.sub("$total_of_k$", content[:total_of_k]) # Total number of days away from work
+      p.text = p.to_s.sub("$total_of_l$", content[:total_of_l]) # Total number of days of job transfer or restriction
+
+      # Injury and Illness Types
+      p.text = p.to_s.sub("$total_of_1$", content[:total_of_1]) # (1) Injury
+      p.text = p.to_s.sub("$total_of_2$", content[:total_of_2]) # (2) Skin Disorder
+      p.text = p.to_s.sub("$total_of_3$", content[:total_of_3]) # (3) Respiratory Conditions
+      p.text = p.to_s.sub("$total_of_4$", content[:total_of_4]) # (4) Poisoning
+      p.text = p.to_s.sub("$total_of_5$", content[:total_of_5]) # (5) Hearing Loss
+      p.text = p.to_s.sub("$total_of_6$", content[:total_of_6]) # (6) All Other Illnesses
+    end
+    doc.save("#{Rails.root}/public/osha_300a_edited.docx")
+    output_file = "#{Rails.root}/public/osha_300a_edited.docx"
+
+    respond_to do |format|
+      format.docx do
+        send_file(output_file, filename: "OSHA_300A__[#{content[:date_from]} to #{content[:date_to]}].docx")
+      end
+    end
+  end
 
   def load_options
     @action_headers = CorrectiveAction.get_meta_fields('index')
@@ -601,9 +661,9 @@ class RecordsController < ApplicationController
       redirect_to errors_path unless current_user.has_access('records', 'show', admin: CONFIG::GENERAL[:global_admin_default], strict: false) &&
                                 (access_level.split(';').include?('viewer_template_id') ||
                                 (access_level.split(';').include?('viewer_template_deid') && @record.viewer_access) ||
-                                (access_level.split(';').include?('confidential') && @record.confidential)) 
+                                (access_level.split(';').include?('confidential') && @record.confidential))
     end
-    
+
     @corrective_actions = @record.corrective_actions
     @corrective_actions << @record.report.corrective_actions if @record.report.present?
 

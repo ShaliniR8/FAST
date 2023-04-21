@@ -4,7 +4,6 @@
 <%=javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"%>
 <%=javascript_include_tag "/javascripts/utility/format-builder.js"%>
 
-
 <div class="item active mt50" style="height:auto;">
   <div class="grid per90 center-block">
     <div class="panel panel-steelblue">
@@ -15,12 +14,11 @@
           </div>
           <div class="top_buttons pull-right">
             <%=link_to "PDF",
-              '#',
+              osha_300a_pdf_export_osha_records_path(content: @osha_300a_contents.merge({:date_from => params[:date_from], :date_to => params[:date_to] }), format: :pdf),
               :class => 'btn btn-darkturquoise mr5 mb5 pull-right'%>
             <%=link_to "Word",
-              '#',
+              osha_300a_word_export_osha_records_path(content: @osha_300a_contents.merge({:date_from => params[:date_from], :date_to => params[:date_to] }), format: :docx),
               :class => "btn btn-darkturquoise mb5 mr5 pull-right"%>
-
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default expandall mb5 mr5 pull-right"%>
