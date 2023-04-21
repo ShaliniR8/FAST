@@ -1,3 +1,4 @@
+<%vis_threshold = @visualization.threshold == nil ? (Float::INFINITY) : (@visualization.threshold)%>
 <div class="row">
   <ul class="nav nav-tabs">
     <%@chart_types.each do |chart|%>
@@ -43,7 +44,8 @@
                         <%if col_index == 0%>
                           <td><%=value%></td>
                         <%else%>
-                          <td><a href="javascript:void(0)" class="gridRow" data-row="<%=row_index%>" data-col="<%=col_index%>" data-vis="<%=@visualization.id%>"><%=value%></a></td>
+                          <%style = value >= vis_threshold ? "color:red" : ("")%>
+                          <td><a href="javascript:void(0)" class="gridRow" data-row="<%=row_index%>" data-col="<%=col_index%>" data-vis="<%=@visualization.id%>" style=<%=style%>><%=value%></a></td>
                         <%end%>
                       <%end%>
                     </tr>
@@ -205,6 +207,7 @@
           </script>
         <%when 3%>
           <script>
+            google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawBarChart);
 
             $(window).bind('resizeEnd', function(){
@@ -212,9 +215,21 @@
             });
 
             function drawBarChart(){
-              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
-              var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
+              var base = "#8cc1e4"
+              var overline = "#ff0000"
+              var unmodified_data = <%=raw @data.as_json%>
+              var modified_data = unmodified_data
+              var modify = <%= @visualization.threshold == nil ? (false):(true) %>
               var options = <%=raw options.to_json%>;
+
+              if (modify === true) {
+                var threshold = <%=raw @visualization.threshold %>
+                modified_data = modified_data.map((val, idx) => idx === 0? [...val,'Threshold'] : [...val, threshold])
+                options = {...options, colors: [base, overline], series: {1: {type: 'line'}}}
+              }
+
+              var data = new google.visualization.arrayToDataTable(modified_data);
+              var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
 
               var barChart = new google.visualization.ComboChart(document.getElementById(
                 '<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>'));
@@ -256,9 +271,19 @@
             });
 
             function drawLineChart(){
-              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var unmodified_data = <%=raw @data.as_json%>
+              var modified_data = unmodified_data
+              var modify = <%= @visualization.threshold == nil ? (false):(true) %>
               var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
               var options = <%=raw options.to_json%>;
+
+              if (modify === true) {
+                var threshold = <%=raw @visualization.threshold %>
+                modified_data = modified_data.map((val, idx) => idx === 0? [...val,'Threshold'] : [...val, threshold])
+                options = {...options, series: {1: {type: 'line'}}}
+              }
+
+              var data = new google.visualization.arrayToDataTable(modified_data);
 
               var lineChart = new google.visualization.ComboChart(document.getElementById(
                 "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));
@@ -300,9 +325,24 @@
             });
 
             function drawStackedChart(){
-              var data = new google.visualization.arrayToDataTable(<%=raw @data.as_json%>);
+              var base = "#8cc1e4"
+              var overline = "#ff0000"
+              var xBeg;
+              var xWidth;
+
+              var unmodified_data = <%=raw @data.as_json%>
+              var modified_data = unmodified_data
+              var modify = <%= @visualization.threshold == nil ? (false):(true) %>
               var data_ids = new google.visualization.arrayToDataTable(<%=raw @data_ids.as_json%>);
               var options = <%=raw options.to_json%>;
+
+              if (modify === true) {
+                var threshold = <%=raw @visualization.threshold %>
+                modified_data = modified_data.map((val, idx) => idx === 0? [...val,'Threshold'] : [...val, threshold])
+                options = {...options, colors: [base, overline], series: {1: {type: 'line'}}}
+              }
+
+              var data = new google.visualization.arrayToDataTable(modified_data);
 
               var stackedChart = new google.visualization.ColumnChart(document.getElementById(
                 "<%=chart[:chart_name].parameterize%>-<%=@visualization.id%>"));

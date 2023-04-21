@@ -29,7 +29,7 @@ class QueryDatatable
 
 
   def columns
-    if ["Record", "Submission"].include? (object.name)
+    if ["Record", "Submission", "OshaRecord"].include? (object.name)
       object.get_meta_fields_keys(['index'], @current_user)
     else
       object.get_meta_fields_keys('index')
@@ -130,7 +130,7 @@ class QueryDatatable
       res = object.joins(join_tables)
             .where(search_string.join(' and '))
 
-      @count = res.count
+      @count = res.uniq.count
 
       res = res.order("#{sort_column} #{sort_direction}")
                .group("#{object.table_name}.id")

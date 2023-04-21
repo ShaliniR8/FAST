@@ -1,8 +1,7 @@
 <div class="panel panel-info">
   <div class="panel-heading">
     <div class="panel-title"><b>Employee Search</b>
-      <%@users = User.find(:all)%>
-      <%@users.keep_if{|u| !u.disable }%>
+      <%@users = User.includes(:privileges).active%>
       <%@headers = User.get_headers%>
       <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button>
     </div>

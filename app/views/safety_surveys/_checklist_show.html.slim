@@ -45,11 +45,11 @@ ruby:
 
               - if owner.my_action(current_user.id) == "Not Completed"
                 = link_to "Take Survey", address_checklist_path(checklist),
-                  class: 'btn btn-success pull-right mr5'
+                  class: 'btn btn-success pull-right mr5 mb10'
 
               - if owner.status == 'New'
                 = link_to "Edit", '#',
-                  :class => 'btn btn-warning pull-right mr5 update_btn',
+                  :class => 'btn btn-warning pull-right mr5 update_btn mb10',
                   'data-path' => edit_checklist_path(checklist),
                   'data-toggle' => 'modal',
                   'data-target' => '.bs-example-modal-lg'
@@ -59,7 +59,7 @@ ruby:
                   :method => 'delete',
                   :confirm => 'Are you sure?',
                   :disable_with => 'Deleting...',
-                  :class => 'btn btn-danger pull-right mr5'
+                  :class => 'btn btn-danger pull-right mr5 mb10'
 
               - if owner.my_action(current_user.id) == "Creator"
                 = link_to "Export CSV", export_checklist_path(checklist, format: "csv"),

@@ -1,6 +1,5 @@
 
 <%fields.each do |field_hash|%>
-
   <%field_type            = field_hash[:type]%>
   <%field_description     = field_hash[:title]%>
 
@@ -48,6 +47,16 @@
             <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
             <%=x%>
           </div>
+        <%end%>
+      <%end%>
+    </div>
+  <%elsif field_type == 'select_multiple'%>
+    <div class="form-group col-xs-<%=field_col%> <%=field_name%>">
+      <%if field_description == "Distribution List for Notification" %>
+        <%if field_value.present?%>
+          <%selected_options = field_hash[:options].select {|option| field_value.include? option[1]}%>
+          <%selected_options_value = selected_options.map {|option| option[0]}%>
+            <b><%=field_description%> </b> <%= selected_options_value.join(", ")%>
         <%end%>
       <%end%>
     </div>

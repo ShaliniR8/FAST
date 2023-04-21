@@ -19,7 +19,7 @@
           <%#=User.where(employee_number: value).first.full_name rescue nil%>
           <%#=value%>
           <%if value.present?%>
-            <%user_name = User.where(employee_number: value).first.full_name rescue nil%>
+            <%user_name = User.where(employee_number: value).first.full_name rescue (User.where(id: value).first.full_name rescue nil)%>
             <%value = "(#{value})"%>
             <%if user_name.present?%>
               <%value = user_name + " #{value}" %>

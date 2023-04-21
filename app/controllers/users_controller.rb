@@ -52,6 +52,46 @@ class UsersController < ApplicationController
   end
 
 
+  def update_user_group
+    usergroup = UserGroup.where(object_name: params[:object_name], user_field: params[:user_field])
+
+    if usergroup.present?
+      usergroup = usergroup.first
+      if params[:object_name].present? && params[:priv_id].empty?
+        usergroup.destroy
+      else
+        usergroup.privileges_id = [params[:priv_id]]
+        usergroup.save
+      end
+    else
+      usergroup = UserGroup.create(object_name: params[:object_name], user_field: params[:user_field])
+    end
+
+    flash[:success] =  "The target privilege is updated."
+    redirect_to user_groups_users_path
+  end
+
+
+  def user_groups
+    @forms = {
+      'SMS' => {
+        'Audit' => ['responsible_user', 'approver'],
+        'Inspection' => ['responsible_user', 'approver'],
+        'Evaluation' => ['responsible_user', 'approver'],
+        'Investigation' => ['responsible_user', 'approver'],
+        'Finding' => ['responsible_user', 'approver'],
+        'SmsAction' => ['responsible_user', 'approver'],
+        'Recommendation' => ['responsible_user', 'approver'],
+      },
+      'SRM' => {
+        'Sra' => ['responsible_user', 'reviewer', 'approver'],
+        'Hazard' => ['responsible_user', 'approver'],
+        'RiskControl' => ['responsible_user', 'approver'],
+      }
+    }
+
+    @user_groups = UserGroup.group(:object_name)
+  end
 
   def new
     @levels = User.get_levels
@@ -79,13 +119,11 @@ class UsersController < ApplicationController
   end
 
 
-
   def edit_privilege
     @user = User.find(params[:id])
     @headers = Privilege.get_headers
     @roles = Privilege.find(:all)
   end
-
 
 
   def update_privilege

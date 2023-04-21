@@ -16,24 +16,38 @@
       </div>
     </div>
   </div>
-  <div class="panel-body" id="visualizations">
+  <div class="panel-body">
     <div class="span4 collapse-group">
-      <a class="btn" data-toggle="collapse" data-target="#viewnotes" style="color:red"> Notes &raquo;</a>
+      <a class="btn" data-toggle="collapse" data-target="#viewnotes"> Instructions &raquo;</a>
       <div class="collapse" id="viewnotes">
         <div class="col-xs-12">
           <div class="col-xs-12 well">
-            Please add subscribers to mail visualizations added in this section. <b>All visualizations are mailed as grid charts in PDF file.</b>
+            <ol>
+              <li> Select a field for X-axis
+              <li> Select the optional Series field if required
+              <li> Select the optional Default Chart Type. The 'Grid' option is preselected.
+              <li> Select a Threshold for the visualization. If the optional series field is provided, then the threshold is not set and the input is disabled.
+            </ol>
+            <b> Note </b>
+            <div style="padding:10px; background-color:white">
+              <ul>
+                <li>Please add subscribers to mail visualizations added in this section. <b>All visualizations are mailed as grid charts in PDF file.</b>
+                <li>If threshold exceeds for a visualization then a notification is sent to selected Distribution List groups.
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <%if @owner.visualizations.present?%>
-      <%@owner.visualizations.each do |visualization|%>
-        <%=render "visualization",
-          records: @records_ids.join(","),
-          visualization: visualization%>
+    <div id="visualizations">
+      <%if @owner.visualizations.present?%>
+        <%@owner.visualizations.each do |visualization|%>
+          <%=render "visualization",
+            records: @records_ids.join(","),
+            visualization: visualization%>
+        <%end%>
       <%end%>
-    <%end%>
+    </div>
   </div>
 </div>
 

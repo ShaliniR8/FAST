@@ -15,6 +15,7 @@ class DemoConfig < DefaultConfig
     # SYSTEM CONFIGS
     enable_mailer:                false,
     has_mobile_app:               true,
+    has_investigations_app:       true,
     track_log:                    true,
 
     # Third Party Integrations:
@@ -33,10 +34,15 @@ class DemoConfig < DefaultConfig
     # lng:                        -95.3502256, #IAH #1
     # lat:                        29.9866102,
     # lng:                        -95.3476103, #IAH #2
-    lat:                          29.6459141,
-    lng:                          -95.2768951, #HOU
-    gMapZoom:                     15,
+    # lat:                          29.6459141,
+    # lng:                          -95.2768951, #HOU
+    lat:                          33.9440661,
+    lng:                          -118.4037650, #LAX
+    gMapZoom:                     14,
+    sabre_integration:            true,
+    sabre_reports_recommendation: true,
     checklist_query:              true,
+    osha_visibility:              true,
 
     # TO BE REMOVED:
     allow_set_alert:              true,
@@ -108,5 +114,20 @@ class DemoConfig < DefaultConfig
     'ASAP MOU Holder Name'           => 'ProSafeT',
     'ASAP MOU Holder FAA Designator' => 'ProSafeT'
   })
+
+
+  # SABRE INTEGRATION
+  SABRE_MAPPABLE_FIELD_OPTIONS = {
+    "Flight Date"        => "flight_date",
+    "Flight Number"      => "flight_number",
+    "Tail Number"        => "tail_number",
+    "Departure Airport"  => "departure_airport",
+    "Arrival Airport"    => "arrival_airport",
+    "Landing Airport"    => "landing_airport",
+    "Captain"            => "ca",
+    "First Officer"      => "fo",
+    "Flight Attendant 1" => "fa_1",
+    "Flight Attendant 2" => "fa_2"
+  }
 
 end

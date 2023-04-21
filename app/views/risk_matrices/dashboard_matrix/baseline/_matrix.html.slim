@@ -99,6 +99,28 @@ javascript:
       });
     });
 
+    $("#matrix_switch").on('mouseenter', function(){
+      // Safety Assurance Module
+      // Safety Assurance Module
+      if ($(this).hasClass('show_finding')) {
+        $(this).prop('title', 'Go To Initial Risk Analysis: Investigations');
+      }
+      else if ($(this).hasClass("show_car")) {
+        $(this).prop('title', 'Go To Initial Risk Analysis: Findings');
+      }
+      else if ($(this).hasClass("show_inv")) {
+        $(this).prop('title', 'Go To Initial Risk Analysis: Corrective Actions');
+      }
+
+      // Safety Reporting Module
+      else if ($(this).hasClass("show_record")) {
+        $(this).prop('title', 'Go To Initial Risk Analysis: Events');
+      }
+      else if ($(this).hasClass("show_report")) {
+        $(this).prop('title', 'Go To Initial Risk Analysis: Reports');
+      }
+    })
+
     $("#matrix_switch").on('click',function(){
       // Safety Assurance Module
       if ($(this).hasClass('show_finding')) {

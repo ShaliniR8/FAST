@@ -4,7 +4,9 @@
   #Called in form/render_buttons; pass the owner and form location to automatically find which
     #buttons should be displayed
   def prepare_btns(owner, env, **op)
-    actions = CONFIG.object[owner.class.name][:actions].select{ |key, act|
+    owner_name = owner.class.name
+    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?
+    actions = CONFIG.hierarchy[session[:mode]][:objects][owner_name][:actions].select{ |key, act|
        act[:btn_loc].include?(env) &&
        act[:access].call(owner: owner, user: current_user, **op)
     }.map {|key, act| key}
@@ -13,7 +15,9 @@
 
   #Called in panel/show_panels; pass the owner and it will initialize all locals for each panel
   def prepare_panels(owner, **op)
-    panel_data = CONFIG.object[owner.class.name][:panels].values.select{ |data|
+    owner_name = owner.class.name
+    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?    
+    panel_data = CONFIG.hierarchy[session[:mode]][:objects][owner_name][:panels].values.select{ |data|
       data[:visible].call(owner: owner, user: current_user, **op) rescue nil
     }.map { |data|
       {
@@ -29,7 +33,9 @@
   #  this is used to prevent an infinite loop caused by printing
   #    an owner's children's source_of_input, which is owner
   def print_panels(owner, **op)
-    hierarchy_object = CONFIG.object[owner.class.name]
+    owner_name = owner.class.name
+    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?    
+    hierarchy_object = CONFIG.hierarchy[session[:mode]][:objects][owner_name]
     # are custom print_panels defined ? print the custom panels : print the default panels
     if hierarchy_object.present?
       panels = hierarchy_object[:print_panels].present? ? :print_panels : :panels

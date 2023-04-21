@@ -278,10 +278,15 @@ class User < ActiveRecord::Base
     h["Name"] = "full_name"
     h["Email"] = "email"
     h["Employee No."] = "employee_number" if CONFIG::GENERAL[:sabre_integration].present?
+    h["Privileges"] = "show_all_privileges"
 
     return h
   end
 
+
+  def show_all_privileges
+    self.privileges.map(&:name).join(', ')
+  end
 
   def account_status
     if self.disable?

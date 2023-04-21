@@ -70,7 +70,7 @@ class RiskControlsController < ApplicationController
   def view_register
     @table = Object.const_get("RiskControl")
     @table_name = "RiskControl"
-    @header_labels = ['Hazard', 'Risk Description', 'Control Measures', 'Initial Risk', 'Latest Risk']
+    @header_labels = ['Hazard', 'Risk Category', 'Control Measures', 'Initial Risk', 'Latest Risk']
     @headers = ['owner_title', 'risk_category', 'title', 'owner_initial_risk', 'owner_residual_risk']
     @title = "Risk Register"
     @adv_path = advanced_search_home_index_path(:table => @table_name, status: 'All')

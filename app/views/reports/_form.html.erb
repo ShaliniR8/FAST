@@ -38,8 +38,8 @@
               <div class="panel-body">
 
                 <%btns = [
-                  {btn_name: '<span class="glyphicon glyphicon-search"></span>', btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
-                  {btn_name: '<span class="glyphicon glyphicon-remove"></span>', btn_path: '#', btn_class: 'btn btn-danger action-btn mr5'},
+                  {btn_name: '<span class="glyphicon glyphicon-search"></span>', title: "View Report", btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
+                  {btn_name: '<span class="glyphicon glyphicon-remove"></span>',  title: "Remove Report from this Event", btn_path: '#', btn_class: 'btn btn-danger action-btn mr5'},
                 ]%>
 
                 <%=render 'forms/show_fields_table_view',
@@ -52,8 +52,8 @@
           </div>
 
           <%btns = [
-            {btn_name: '<span class="glyphicon glyphicon-search"></span>', btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
-            {btn_name: '<span class="glyphicon glyphicon-plus"></span>', btn_path: '#', btn_class: 'btn btn-warning action-btn mr5'},
+            {btn_name: '<span class="glyphicon glyphicon-search"></span>', title: "View Report", btn_path: '#', btn_class: 'btn btn-info view_btn mr5'},
+            {btn_name: '<span class="glyphicon glyphicon-plus"></span>', title: "Add Report to the Event", btn_path: '#', btn_class: 'btn btn-warning action-btn mr5'},
           ]%>
 
           <% if CONFIG::GENERAL[:sabre_reports_recommendation] %>
@@ -86,7 +86,7 @@
                         <b>
                           * The relevant reports are for the events happening between <%=@timewindow_from.strftime("%Y/%m/%d")%> and <%=@timewindow_to.strftime("%Y/%m/%d")%>.
                           <br>
-                          * If multiple attributes are matching to a report, the report is highlighted with the color of the first matching attribute. 
+                          * If multiple attributes are matching to a report, the report is highlighted with the color of the first matching attribute.
                         </b>
                       </div>
                     </div>

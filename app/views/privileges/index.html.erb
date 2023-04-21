@@ -63,6 +63,8 @@
                           :disable_with => "Editing..."%>
                         <%=link_to "Copy Privilege",
                           copy_privilege_path(a),
+                          'data-toggle' => 'tooltip',
+                          title: 'Clone this User Privilege',
                           :class=>"btn mb5 btn-warning",
                           :disable_with => "Making a copy..."%>
                         <%=link_to "Delete",

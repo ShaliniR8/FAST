@@ -29,6 +29,7 @@ class DefaultConfig
     login_option:                       'prosafet', # Login page UI config => available options: dual, prosafet, sso
     external_link:                      false,
     has_mobile_app:                     false,   # Enables Mobile App Subsystems for app usage - default off
+    has_investigations_app:             false,   # Enables Investigations feature within app
     track_log:                          false,   # Enables Daily Log Digest of User access/usage - default off
     cisp_integration:                   false,
     asrs_integration:                   false,
@@ -49,6 +50,7 @@ class DefaultConfig
     attachment_identified_view_access:  true,
     hide_submission_in_dashboard:       false,
     hide_findings_in_checklist:         false,
+    osha_visibility:                    false,
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,
@@ -140,6 +142,7 @@ class DefaultConfig
     "ASAP" => "asap",
     "Non-ASAP" => "non-asap",
   }
+  REPORT_TYPES['OSHA'] = 'osha' if true
 
   EMPLOYEE_GROUPS = {
     "Flight Crew" => "flight-crew",
@@ -176,6 +179,11 @@ class DefaultConfig
     Object.const_get("#{AIRLINE_CODE}SafetyPromotionConfig") rescue DefaultSafetyPromotionConfig
   end
 
+  # To access OSHA Configs use the constant defined below (use CONFIG.osha in code)
+  def self.osha
+    Object.const_get("#{AIRLINE_CODE}OshaConfig") rescue DefaultOshaConfig
+  end
+
   # To access Mobile Configs use the constant defined below (use CONFIG.mobile)
   def self.mobile
     Object.const_get("#{AIRLINE_CODE}MobileConfig") rescue DefaultMobileConfig
@@ -209,7 +217,8 @@ class DefaultConfig
       'SMS IM'  => self.im::HIERARCHY,
       'SMS'     => self.sa::HIERARCHY,
       'SRM'     => self.srm::HIERARCHY,
-      'SP'      => self.sp::HIERARCHY
+      'SP'      => self.sp::HIERARCHY,
+      'OSHA'    => self.osha::HIERARCHY
     }
   end
 
@@ -220,6 +229,39 @@ class DefaultConfig
   def self.check_action(user,action,obj,**op)
     self.object[obj.class.name][:actions][action][:access].call(owner:obj,user:user,**op)
   end
+  
+  ###################################
+  ###        OSHA MAPPING         ###
+  ###################################
+  OSHA_FIELD_OPTIONS = {
+    # Identify the person
+    '(A) Case No.'         => 'a',
+    '(B) Employee\'s Name' => 'b',
+    '(C) Job Title'        => 'c',
+
+    # Describe the case
+    # '(D) Date of injury or onset of illness' => 'd',
+    '(E) Where the event occurred'           => 'e',
+    '(F) Describe injury'                    => 'f',
+
+    # Classify the case
+    '(G-L) Classify the case 1' => 'g_l',
+    '(1-6) Classify the case 2' => '1_6',
+      # '(G) Death'                                         => 'g',
+      # '(H) Days away from work'                           => 'h',
+      # '(I) Remained at work: Job transfer or restriction' => 'i',
+      # '(J) Remained at work: Other recordable cases'      => 'j',
+
+      # '(K) Away from work (days)'                 => 'k',
+      # '(L) On Job transfer or restriction (days)' => 'l',
+
+      # '(1) Injury'                => '1',
+      # '(2) Skin disorder'         => '2',
+      # '(3) Respiratory condition' => '3',
+      # '(4) Poisoning'             => '4',
+      # '(5) Hearing loss'          => '5',
+      # '(6) All other illness'     => '6',
+  }
 
   ###################################
   ###        CISP MAPPING         ###

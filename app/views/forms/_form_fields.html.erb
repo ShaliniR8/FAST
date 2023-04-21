@@ -234,10 +234,13 @@
     });
     var employee_table;
 
-    function build_user_table(){
+    function build_user_table(searchValue = ''){
       employee_table = $('#users').DataTable({
         "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-        "iDisplayLength": 5
+        "iDisplayLength": 5,
+        "search": {
+          "search": searchValue
+        }
       });
     }
 
@@ -254,6 +257,8 @@
       $(this).find(".emp_button").each(function(index, item){
         $(item).on("click", function(){
           var field_id = $(this).prop('id');
+
+          $(".users").data = field_id
           $(".emp_modal").show();
           clear_user_table();
           $("#users tbody tr").unbind();
@@ -269,7 +274,20 @@
             $(item).parent().parent().find("#employee-select"+field_id).val("");
             $('#emp_div').hide();
           });
-          build_user_table();
+
+          searchValue = ''
+          // $('.user_field_name').html(field_id);
+          if (field_id == 'responsible_user_id') {
+            <% priv_id = UserGroup.where(object_name: params[:controller], user_field: 'responsible_user_id').first.privileges_id.first rescue nil %>
+            searchValue = "<%=Privilege.find(priv_id).name rescue ''%>"
+          } else if (field_id == 'reviewer_id') {
+            <% priv_id = UserGroup.where(object_name: params[:controller], user_field: 'reviewer_id').first.privileges_id.first rescue nil %>
+            searchValue = "<%=Privilege.find(priv_id).name rescue ''%>"
+          } else {
+            <% priv_id = UserGroup.where(object_name: params[:controller], user_field: 'approver_id').first.privileges_id.first rescue nil %>
+            searchValue = "<%=Privilege.find(priv_id).name rescue ''%>"
+          }
+          build_user_table(searchValue);
         });
       });
 

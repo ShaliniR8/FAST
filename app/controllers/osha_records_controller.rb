@@ -1,0 +1,3 @@
+class OshaRecordsController < RecordsController
+
+end

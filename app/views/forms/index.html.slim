@@ -8,14 +8,15 @@
   .grid.per90.center-block
     = render 'shared/alerts'
     = render 'access_controls/new_modal'
-
+    - @hide_advance_search ||= false
     .panel.panel-primary
       .panel-body
         h4 class="pull-right mr10" style="font-weight:bold;color:#0bacd3" = @object[:title]
-        = link_to "Advanced Search", '#',
-          class: "btn btn-default pull-right mr10 ml10", id: "adv",
-          "data-toggle" => "modal",
-          "data-target" => ".bs-example-modal-lg"
+        - unless @hide_advance_search
+          = link_to "Advanced Search", '#',
+            class: "btn btn-default pull-right mr10 ml10", id: "adv",
+            "data-toggle" => "modal",
+            "data-target" => ".bs-example-modal-lg"
 
         ul class="nav nav-pills"
           - @object[:status].each do |status|

@@ -44,16 +44,19 @@
             <%path = request.path%>
           <%end%>
 
-
-          <%=link_to "Advanced Search", '#',
-            :class => "btn btn-warning pull-right mr5",
-            :id => "adv",
-            "data-toggle" => "modal",
-            "data-target" => ".bs-example-modal-lg"%>
-          <%=link_to "Reset",
-            path,
-            :disable_with => 'Resetting...',
-            :class => "btn btn-default pull-right mr5"%>
+          <%if ['SP', 'OSHA'].exclude?(session[:mode])%>
+            <%=link_to "Advanced Search", '#',
+              :class => "btn btn-warning pull-right mr5",
+              :id => "adv",
+              "data-toggle" => "modal",
+              "data-target" => ".bs-example-modal-lg"%>
+            <%=link_to "Reset",
+              path,
+            'data-toggle' => 'tooltip',
+            title: 'Remove all Filters',
+              :disable_with => 'Resetting...',
+              :class => "btn btn-default pull-right mr5"%>
+          <%end%>
           <%if defined? from_user%>
             <%if @disabled.present? %>
               <%=link_to "Show Active",

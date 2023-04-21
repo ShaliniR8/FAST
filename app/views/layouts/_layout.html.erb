@@ -407,6 +407,9 @@
                   <li>
                     <%=link_to "Safety Reports Templates", templates_path%>
                   </li>
+                  <li>
+                    <%=link_to "Target Privileges for User Assignments", user_groups_users_path%>
+                  </li>
                   <li style="display:<%=CONFIG.sr::GENERAL[:enable_orm] ? 'block' : 'none'%>">
                     <%=link_to "ORM Templates", orm_templates_path%>
                   </li>
@@ -493,6 +496,9 @@
                 <% if CONFIG::GENERAL[:safety_promotion_visibility] && current_user.has_access('Safety Promotion','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
                   <li class="menu-link"><%= link_to 'Safety Promotion', switch_modes_path(:mode=>"SP") %></li>
                 <%end%>
+                <%if current_user.has_access('OSHA','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
+                  <li class="menu-link"><%= link_to 'OSHA / OJI', switch_modes_path(mode: 'OSHA') %></li>
+                <%end%>
 
                 <li><a href="#" class="dropdown-menu-header">Reference</a></li>
                 <li class="menu-link"><%=link_to "User Guides", user_guides_documents_path%></li>
@@ -527,6 +533,8 @@
             "#{prefix}SRA (SRM) Module".html_safe
           when 'SP'
             "#{prefix}Safety Promotion Module".html_safe
+          when 'OSHA'
+            "#{prefix}OSHA Module".html_safe
           end
         %>
 

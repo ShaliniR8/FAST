@@ -1,0 +1,79 @@
+= stylesheet_link_tag "/plugins/tables/datatables-1.10.16/datatables.min.css"
+= javascript_include_tag "/plugins/tables/datatables-1.10.16/datatables.min.js"
+= javascript_include_tag "//cdn.datatables.net/plug-ins/1.10.16/sorting/natural.js"
+= javascript_include_tag "/javascripts/utility/format-builder.js"
+
+css:
+  .btn{
+    display: inline!important;
+  }
+  .list-group{
+    margin-bottom: 0;
+  }
+  .list-group.well{
+    padding: 0;
+    overflow: hidden;
+  }
+  .list-group-item{
+    border-radius: 0;
+    border-width: 1px 0 0 0;
+    padding-bottom: 22px;
+  }
+  .list-group-item .glyphicon {
+    margin-right: 5px;
+  }
+  .list-group-item li {
+    font-weight: normal;
+  }
+  th {
+    min-height: 25px;
+  }
+
+.item.active.mt50 style="height:auto;"
+  .grid.per90.center-block
+    = render "shared/alerts"
+    = render "access_controls/new_modal"
+    .col-xs-12
+      .panel.panel-steelblue
+        .panel-heading
+          .panel-title
+            .top_text
+              b Target Privileges for User Assignments
+
+        .panel-body
+          .alert.alert-warning role="alert"
+            | For each of the modules listed below (i.e Safety Assurance), select the privileges from the drop down menu for the respective user assignments for each object (i.e. FInal Approver for Audits).
+          - @forms.each do |module_name, forms|
+            - hierarchy_hash = CONFIG.hierarchy[module_name]
+            .col-xs-12 style="margin: 10px"
+              .list-group.well
+                .list-group-item
+                  a href="#list_#{module_name.underscore}" class="module cat_#{module_name.underscore} glyphicon glyphicon-chevron-right" data-toggle="collapse"
+                  b = hierarchy_hash[:display_name]
+                  - forms.each do |form_name, user_fields|
+                    .col-xs-12 style="margin: 3px"
+                      .list-group.well
+                        .list-group-item
+                          a href="#list_#{form_name.underscore}" class="module cat_#{form_name.underscore} glyphicon glyphicon-chevron-right" data-toggle="collapse"
+                          b = hierarchy_hash[:objects][form_name][:title]
+
+                          .pull-right
+                            / = link_to 'Edit'
+                          .list-group.collapse id="list_#{form_name.underscore}"
+                            - user_fields.each do |user_field|
+                              = render 'user_groups_show', user_label: hierarchy_hash[:objects][form_name][:fields][user_field.to_sym][:title], user_field: hierarchy_hash[:objects][form_name][:fields][user_field.to_sym][:field], form_name: form_name
+
+javascript:
+  $(function(){
+    $('.module').on('click', function(){
+      $(this)
+        .toggleClass('glyphicon-chevron-right')
+        .toggleClass('glyphicon-chevron-down');
+    });
+  });
+
+
+
+
+
+

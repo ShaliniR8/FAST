@@ -42,6 +42,8 @@
                 @corrective_action,
                 :deidentified => true,
                 :format => :pdf),
+              'data-toggle' => 'tooltip',
+              title: 'View De-Identified PDF',
               :class => "btn btn-darkturquoise pull-right mr5 mb5"%>
             <%=link_to "PDF",
               print_corrective_action_path(

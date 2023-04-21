@@ -41,7 +41,6 @@
               Report #<%=@record.get_id%>: <%=@record.template.name%> <b style="color:darkred; font-size:18px"><%=@record.confidential? ? "(This Report is CONFIDENTIAL)" : ''%></b>
             </div>
             <div class="top_buttons pull-right">
-
               <%if template_full_access || template_viewer_access || report_admin_access%>
 
                 <%if record_delete_access%>
@@ -74,6 +73,8 @@
                     @record,
                     :deidentified => true,
                     :format => :pdf),
+                  'data-toggle' => 'tooltip',
+                  title: 'View De-Identified PDF',
                   :class=>'btn btn-darkturquoise pull-right mr5 mb5'%>
 
                 <%if record_edit_access%>
@@ -102,7 +103,7 @@
                     :disable_with => "Redirecting..." %>
                 <%end%>
 
-                <%if @record.report.present? && report_show_access%>
+                <%if !@osha_module && @record.report.present? && report_show_access%>
                   <%=link_to "View Event",
                     report_path(@record.report),
                     :id=>"report-btn",
@@ -176,22 +177,26 @@
               <%end%>
 
 
-              <%if record_edit_access #&& @record.status == "Open"%>
+              <%if !@osha_module && record_edit_access #&& @record.status == "Open"%>
                 <%=link_to "Create Event",
                   new_report_path(:template=>@record.template,:base_record=>@record),
                   :id => "report-btn",
                   :class => "event-btn btn btn-success mr5 mb5 pull-right",
+                  'data-toggle' => "tooltip",
+                  title: 'Creates an event with the report included in the event. Changes the status of the report from “Open” to “Linked”',
                   :disable_with => "Creating...",
                   style: "display:#{@record.status == "Open" ? 'block' : 'none'}"%>
                 <%=link_to "Add to Event",
                   add_reports_path(template: @record.template, record: @record),
                   :id => "report-btn",
                   :class => "event-btn btn btn-success mr5 mb5 pull-right",
+                  'data-toggle' => "tooltip",
+                  title: 'Adds the report to an existing event. Changes the status of the report from “Open” to “Linked”',
                   :disable_with => "Adding...",
                   style: "display:#{@record.status == "Open" ? 'block' : 'none'}"%>
               <%end%>
 
-              <%if record_edit_access%>
+              <%if !@osha_module && record_edit_access%>
                 <%record_status = @record.status%>
                 <%show_ca_btn = record_status != 'Closed' && record_status != 'New'%>
                 <%if @record.report.present?%>
@@ -277,7 +282,9 @@
           <%can_change = record_edit_access && @record.status != "Closed"%>
 
           <%@owner = @record %>
-          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
+          <% unless Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha') %>
+            <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !record_edit_access%>
+          <% end %>
 
           <%if @record.corrective_actions.present?%>
             <div class="col-xs-12 col-lg-12">

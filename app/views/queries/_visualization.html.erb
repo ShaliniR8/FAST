@@ -95,6 +95,22 @@
               <%end%>
             <%end%>
           </div>
+          <div class="form-group" id="visualization_threshold_<%=visualization.id%>">
+            <div class="row col-xs-10">
+              <%=label_tag :threshold, 'Threshold', class: "col-sm-4 col-form-label"%>
+              <div class="col-sm-8">
+                <%=text_field_tag "visualization_threshold_input_#{visualization.id}", visualization.threshold, {:class => "form-control ml5"}%>
+              </div>
+            </div>
+            <div class="col-sm-2 pull-right">
+              <%=link_to "<span class=\"glyphicon glyphicon-bell\"></span>".html_safe, '#',
+                id: "visualization_threshold_submit_#{visualization.id}",
+                class: "btn btn-warning",
+                'data-toggle' => 'tooltip',
+                title: "Save and set notification for this threshold",
+                "data-visualization-id" => visualization.id%>
+            </div>
+          </div>
 
           <div class="col-xs-12 mt10">
             <div id="loader_<%=visualization.id%>" style="display:none">
@@ -148,11 +164,44 @@
 
 
   $(function(){
+    $('[data-toggle="tooltip"]').tooltip()
+    $("#visualization_threshold_submit_<%=visualization.id%>").on("click", function(e){
+      e.preventDefault();
+      var visualization_id = $(this).data("visualization-id");
+      var threshold = $("#visualization_threshold_input_"+visualization_id).val()
+      $.ajax({
+        type: "POST",
+        url: "<%=generate_visualization_query_path(@owner)%>",
+        data: {
+          "visualization_id": visualization_id,
+          "x_axis": $("#x_axis_" + visualization_id).val(),
+          "series": $('#series_' + visualization_id).val(),
+          "threshold": $("#visualization_threshold_input_"+visualization_id).val(),
+          "nested_xaxis": $("#nested_visualization_xaxis_" + visualization_id).is(":checked"),
+          "nested_series": $('#nested_visualization_series_' + visualization_id).is(":checked"),
+          "default_chart": $('#default_chart_' + visualization_id).val(),
+          "records": "<%=records%>",
+        },
+        beforeSend: function(){
+          $('#loader_' + visualization_id).show();
+          $("#chart_area_" + visualization_id).css({'opacity':0.5});
+        }, complete: function(){
+          $('#loader_' + visualization_id).hide();
+          $("#chart_area_" + visualization_id).css({'opacity':1});
+        }, success: function(response){
+          $("#chart_area_" + visualization_id).html(response);
+
+        }, error: function(response){
+          $("#chart_area_" + visualization_id).html(response);
+        },
+      });
+    });
 
     $("#generate_charts_btn_<%=visualization.id%>").on("click", function(e){
       e.preventDefault();
-      var visualization_id = $(this).data("visualization-id");
 
+      var visualization_id = $(this).data("visualization-id");
+      var threshold_visible = $('#series_' + visualization_id).val() === "" ? true : false
       $.ajax({
         type: "POST",
         url: "<%=generate_visualization_query_path(@owner)%>",
@@ -170,6 +219,18 @@
           $("#chart_area_" + visualization_id).css({'opacity':0.5});
         }, complete: function(){
           $('#loader_' + visualization_id).hide();
+          if (threshold_visible){
+            $("#visualization_threshold_"+visualization_id).show()
+            document.querySelector("#visualization_threshold_input_"+visualization_id).disabled = false
+            document.querySelector("#visualization_threshold_input_"+visualization_id).setAttribute("placeholder", "Set a threshold to alert Distribution List groups when selected X-axis field exceeds value.");
+            $("#visualization_threshold_submit_"+visualization_id).trigger("click")
+          }
+          else {
+            // $("#visualization_threshold_"+visualization_id).hide()
+            document.querySelector("#visualization_threshold_input_"+visualization_id).disabled = true
+            document.querySelector("#visualization_threshold_input_"+visualization_id).value = ''
+            document.querySelector("#visualization_threshold_input_"+visualization_id).setAttribute("placeholder", "Threshold disabled for Series data");
+          }
           $("#chart_area_" + visualization_id).css({'opacity':1});
         }, success: function(response){
           $("#chart_area_" + visualization_id).html(response);

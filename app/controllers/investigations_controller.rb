@@ -34,6 +34,38 @@ class InvestigationsController < SafetyAssuranceController
   before_filter(only: [:create]) {set_parent(:investigation)}
   after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @investigation)}
 
+  include Concerns::Mobile # used for [method]_as_json
+
+  def index
+    respond_to do |format|
+      format.html do
+        @object_name = controller_name.classify
+        @table_name = controller_name
+
+        @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+        @default_tab = params[:status]
+
+        # Datatable Column Info
+        @columns = get_data_table_columns(@object_name)
+
+        @column_titles = @columns.map { |col| col[:title] }
+        @date_type_column_indices = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('date') || val.downcase.include?('time')) ? inx : nil
+        }.select(&:present?)
+
+        @source_column_indices = @column_titles.map.with_index { |val, inx|
+          (val.downcase.include?('source of input')) ? inx : nil
+        }.select(&:present?)
+
+        @advance_search_params = params
+
+        render 'forms/index'
+      end
+      format.json { index_as_json }
+    end
+  end
+
+
   def define_owner
     @class = Object.const_get('Investigation')
     @owner = Investigation.find(params[:id])
@@ -77,6 +109,14 @@ class InvestigationsController < SafetyAssuranceController
     load_options
     @fields = Investigation.get_meta_fields('form')
     load_special_matrix_form('investigation', 'baseline', @owner)
+  end
+
+  def complete
+    record = Investigation.find(params[:id])
+    send_notification(record, 'Complete')
+    respond_to do |format|
+      format.json { complete_as_json }
+    end
   end
 
   def create
@@ -130,7 +170,20 @@ class InvestigationsController < SafetyAssuranceController
     @privileges.keep_if{|p| keep_privileges(p, 'investigations')}.sort_by!{|a| a.name}
     # @types = Investigation.types
     # @sources = Investigation.sources
-    @users = User.find(:all)
+
+    @user_groups = {}
+    user_groups = UserGroup.where(object_name: params[:controller])
+    if user_groups.size == 2 # SRA has 3 users
+      user_groups.each { |user_group|
+        @user_groups[user_group.user_field] = user_group.privileges_id
+      }
+      priv_ids = @user_groups.values.flatten
+    else
+      priv_ids = Privilege.all.map(&:id)
+    end
+
+    @users = User.includes(:privileges).active.where(privileges: {id: priv_ids})
+
     @users.keep_if{|u| !u.disable && u.has_access('investigations', 'edit')}
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse
@@ -143,13 +196,18 @@ class InvestigationsController < SafetyAssuranceController
 
 
   def show
-    @type = 'investigations'
-    @cause_headers = InvestigationCause.get_headers
-    @desc_headers = InvestigationDescription.get_headers
-    load_options
-    @fields = Investigation.get_meta_fields('show')
-    @recommendation_fields = Recommendation.get_meta_fields('show')
-    load_special_matrix(@investigation)
+    respond_to do |format|
+      format.html do
+        @type = 'investigations'
+        @cause_headers = InvestigationCause.get_headers
+        @desc_headers = InvestigationDescription.get_headers
+        load_options
+        @fields = Investigation.get_meta_fields('show')
+        @recommendation_fields = Recommendation.get_meta_fields('show')
+        load_special_matrix(@investigation)
+      end
+      format.json { show_as_json }
+    end
   end
 
 

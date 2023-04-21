@@ -101,6 +101,16 @@ class QueriesController < ApplicationController
     params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
+    if params["distribution_list_ids"].present? && params["threshold"].present?
+      @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
+    elsif params["distribution_list_ids"].present?
+      @owner.set_threshold({:distros =>  params["distribution_list_ids"]})
+    else
+      @owner.set_threshold({:distros => nil, :threshold => nil})
+    end
+    @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
+    @owner.save
+
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -108,15 +118,25 @@ class QueriesController < ApplicationController
 
   def update
     @owner = Query.find(params[:id])
-    if params[:commit] != 'Save Subscription List'
+    if params[:commit] == 'Save'
       params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
       params[:query][:templates] = params[:query][:templates].split(",")
       @owner.update_attributes(params[:query])
       @owner.query_conditions.destroy_all
       params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
-    else
+      if params["distribution_list_ids"].present? && params["threshold"].present?
+        @owner.set_threshold({:distros => params["distribution_list_ids"], :threshold => params["threshold"]})
+      elsif params["distribution_list_ids"].present?
+        @owner.set_threshold({:distros =>  params["distribution_list_ids"]})
+      else
+        @owner.set_threshold({:distros => nil, :threshold => nil})
+      end
+    elsif params[:commit] == 'Save Subscription List'
       @owner.update_attributes(params[:query])
     end
+    @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
+    @owner.save 
+
     redirect_to query_path(@owner)
   end
 
@@ -140,10 +160,11 @@ class QueriesController < ApplicationController
     @logical_types = ['Equals To', 'Not Equal To', 'Contains', 'Does Not Contain', '>=', '<', 'Last ( ) Days']
     @operators = ["AND", "OR"]
     @owner = params[:query_id].present? ? Query.find(params[:query_id]) : Query.new
-
     @target = params[:target]
     if @target == 'Report'
       @templates = Template.all
+    elsif @target == 'OshaRecord'
+      @templates = Template.where(report_type: 'osha')
     elsif @target == 'Checklist'
       @templates =  Checklist.where(id: params[:templates])
       @no_template_option = params[:templates].include?('-1') rescue false
@@ -152,11 +173,9 @@ class QueriesController < ApplicationController
     end
 
     @target_display_name = params[:target_display_name]
-
     if @target == 'Checklist' && params[:templates].present?
       @templates = Checklist.where(id: params[:templates])
       @fields = []
-
       params[:templates].each do |template_id|
         if template_id == '-1'
           ChecklistHeader.all.each do |header|
@@ -197,12 +216,14 @@ class QueriesController < ApplicationController
 
 
       # @fields = @fields.uniq
+    elsif @target == 'OshaRecord'
+      @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
     else
       @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible', 'close').keep_if{|x| x[:field]}
     end
 
     if @templates.length > 0 && @target != 'Checklist'
-      @templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
+      @templates.map(&:fields).flatten.select{ |field| !field.deleted }.uniq{|field| field.label}.each{|field|
         @fields << {
           title: field.label,
           field: field.label,
@@ -211,6 +232,7 @@ class QueriesController < ApplicationController
       }
     end
     @fields = @fields.sort_by{|field| (field[:title].present? ? field[:title] : "")}
+    @distribution_list = DistributionList.all.map{|d| [d.id, d.title]}.to_h
     render :partial => "building_query"
   end
 
@@ -267,7 +289,11 @@ class QueriesController < ApplicationController
     @owner = Query.find(params[:id])
     @chart_types = QueryVisualization.chart_types
     @object_type = Object.const_get(@owner.target)
-    @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
+    if @object_type == OshaRecord
+      @fields = @object_type.get_meta_fields('show', 'index', 'query', 'invisible').keep_if{|x| x[:field]}
+    else
+      @fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
+    end
     templates = Template.preload(:categories, :fields).where(:id => @owner.templates)
     templates.map(&:fields).flatten.uniq{|field| field.label}.each{|field|
       @fields << {
@@ -290,14 +316,17 @@ class QueriesController < ApplicationController
     render :json => true
   end
 
-
   # generate indivisual visualization blocks
   def generate_visualization
-
     @visualization = QueryVisualization.find(params[:visualization_id]).tap do |vis|
       vis.x_axis = params[:x_axis]
       vis.series = params[:series]
       vis.default_chart = params[:default_chart]
+      if params["series"].present? || (params["threshold"].empty?)
+        vis.set_threshold(nil)
+      else
+        vis.set_threshold(params["threshold"])
+      end
       vis.save
     end
     @owner = Query.find(params[:id])
@@ -352,7 +381,7 @@ class QueriesController < ApplicationController
 
     # REMOVE unnecessary quotes
     @data_ids = @data_ids.map{ |x| [x[0].gsub('"', '').gsub("\'", ''), x[1..-1]].flatten(1)}
-    
+
     @redirect_page = false
 
     if params[:nested_xaxis] == true.to_s && @x_axis_field.first.is_a?(Field)
@@ -413,8 +442,10 @@ class QueriesController < ApplicationController
     end
 
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
-    @title = CONFIG.hierarchy[session[:mode]][:objects][@owner.target][:title].pluralize
     @object_name = @owner.target
+    @object_name = "Record" if @object_name == "OshaRecord"
+
+    @title = CONFIG.hierarchy[session[:mode]][:objects][@object_name][:title].pluralize
     @object_type = Object.const_get(@object_name)
     @table_name = @object_type.table_name
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
@@ -575,6 +606,8 @@ class QueriesController < ApplicationController
       return
     end
     @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
+    @types["OSHA Report"] = "OshaRecord" if @types["OSHA Report"]
+    @types.delete("OSHA Submission")
     @types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
     @checklists = Checklist.includes(:checklist_header).where(owner_type: 'ChecklistHeader').sort_by{|x| x.title}.map{|checklist| ["#{checklist.title} [#{checklist.checklist_header.title}]", checklist.id]}.to_h
@@ -613,6 +646,7 @@ class QueriesController < ApplicationController
     field = object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close')
       .keep_if{|f| f[:title] == label}.first
     # else check template fields
+
     field = Template.preload(:categories, :fields)
       .where(id: query.templates)
       .map(&:fields)
@@ -620,6 +654,7 @@ class QueriesController < ApplicationController
       .select{|x| x.label.strip == label.strip}
       .first if field.nil?
     # [field, field_label.split(',').map(&:strip)[1]]
+
     [field, field_label]
   end
 

@@ -99,6 +99,27 @@ javascript:
       });
     });
 
+    $("#after_switch").on('mouseenter', function(){
+      // Safety Assurance Module
+      if ($(this).hasClass('show_finding')) {
+        $(this).prop('title', 'Go To Mitigated Risk Analysis: Investigations');
+      }
+      else if ($(this).hasClass("show_car")) {
+        $(this).prop('title', 'Go To Mitigated Risk Analysis: Findings');
+      }
+      else if ($(this).hasClass("show_inv")) {
+        $(this).prop('title', 'Go To Mitigated Risk Analysis: Corrective Actions');
+      }
+
+      // Safety Reporting Module
+      else if ($(this).hasClass("show_record")) {
+        $(this).prop('title', 'Go To Mitigated Risk Analysis: Events');
+      }
+      else if ($(this).hasClass("show_report")) {
+        $(this).prop('title', 'Go To Mitigated Risk Analysis: Reports');
+      }
+    })
+
     $("#after_switch").on('click',function(){
       // Safety Assurance Module
       if ($(this).hasClass('show_finding')){
@@ -118,9 +139,9 @@ javascript:
         $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Corrective Actions</b>");
         $('.inv_after_cell').hide();
         $('.car_after_cell').show();
+      }
 
       // Safety Reporting Module
-      }
       else if($(this).hasClass("show_record")){
         $(this).removeClass("show_record").addClass("show_report").text("Reports");
         $(this).closest('.panel-title').find('.top_text').html("<b>Mitigated Risk Analysis: Events</b>");

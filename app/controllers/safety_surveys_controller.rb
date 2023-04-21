@@ -32,7 +32,7 @@ class SafetySurveysController < ApplicationController
       recs = []
       @records.each do |r|
         distro_list = DistributionList.preload(:distribution_list_connections).where(id: r.distribution_list.split(',')).map{|d| d.get_user_ids}.flatten rescue []
-        recs << r if (distro_list.include?(current_user.id) || r.user_id == current_user.id)
+        recs << r if ((r.status != 'New' && distro_list.include?(current_user.id)) || r.user_id == current_user.id)
       end
       @records = recs
     end
@@ -112,6 +112,9 @@ class SafetySurveysController < ApplicationController
 
   def show
     @survey = @table.find(params[:id])
+    if (current_user.has_access(Object.const_get('SafetySurvey').rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default]) && @survey.my_action(current_user.id) == 'Not Completed')
+      flash[:notice] = "Please hit the Complete button to notify the creator that you have completed the Safety Survey."
+    end
   end
 
 

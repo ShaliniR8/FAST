@@ -19,7 +19,7 @@
 <%if !hide_panel_head%>
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <div class="panel <%=@cat.panel%>">
-      <div class="panel-heading click-heading">
+      <div class="panel-heading click-heading collapsed">
         <div class="panel-title">
           <b><%=@cat.title%></b>
           <span class="pull-right clickable">
@@ -27,7 +27,7 @@
           </span>
         </div>
       </div>
-      <div class="panel-body">
+      <div class="panel-body" style="display:none">
         <div class="row" id="fields" style="word-wrap: break-word">
           <%@cat.fields.each do |field|%>
             <%if field.print || !deid%>

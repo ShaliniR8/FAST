@@ -95,7 +95,7 @@ class ApplicationDatatable
 
 
   def columns
-    if ["Record", "Submission"].include? (object.name)
+    if ["Record", "Submission", "OshaRecord", "OshaSubmission"].include? (object.name)
       object.get_meta_fields_keys(['index'], @current_user)
     else
       object.get_meta_fields_keys('index')
@@ -134,6 +134,10 @@ class ApplicationDatatable
       return Object.const_get(params[:controller].classify).where("inspections.id not in (?)", Recurrence.where(form_type: "Inspection").map(&:template_id).size == 0 ? [0] : Recurrence.where(form_type: "Inspection").map(&:template_id))
     elsif params[:controller] == 'evaluations'
       return Object.const_get(params[:controller].classify).where("evaluations.id not in (?)", Recurrence.where(form_type: "Evaluation").map(&:template_id).size == 0 ? [0] : Recurrence.where(form_type: "Evaluation").map(&:template_id))
+    # elsif params[:controller] == 'submissions'
+    #   return OshaSubmission
+    elsif params[:controller] == 'submissions'
+      return Submission
     else
       return Object.const_get(params[:controller].classify)
     end

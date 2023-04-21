@@ -2,7 +2,7 @@
   <div class="panel-heading">
     <div class="panel-title">
       <b>Employee Search</b>
-      <%@users = User.active%>
+      <%@users  ||= User.includes(:privileges).active%>
       <%@headers = User.get_headers%>
       <button type="button"
         class="close pull-right"
@@ -13,6 +13,7 @@
     </div>
   </div>
   <div class="panel-body" style="max-height: calc(100vh - 210px);overflow-y:auto">
+
     <div class="row">
       <div class='col-xs-12'>
         <table class="table table-hover table-striped table-bordered" id="users">

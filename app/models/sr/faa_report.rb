@@ -79,8 +79,8 @@ class FaaReport < ActiveRecord::Base
   def set_statistics
     asap_reports = self.select_records_in_date_range(self.get_start_date, self.get_end_date)
       .select{|x|
-        (x.template.name.include? "ASAP") &&
-        (x.template.name.include? "#{self.employee_group}")}
+        (x.template.report_type.present? && x.template.report_type == "asap") &&
+        (x.template.emp_group.present? && x.template.emp_group == "#{self.employee_group}")}
     stats = self.statistics(asap_reports)
     self.asap_submit           = stats[:asap_submitted].size
     self.asap_accept           = stats[:asap_accepted].size
@@ -213,8 +213,8 @@ class FaaReport < ActiveRecord::Base
     result = ""
     asap_reports = select_records_in_date_range(self.get_start_date, self.get_end_date)
       .select{|x|
-        (x.template.name.include? "ASAP") &&
-        (x.template.name.include? "#{self.employee_group}")}
+        (x.template.report_type.present? && x.template.report_type == "asap") &&
+        (x.template.emp_group.present? && x.template.emp_group == "#{self.employee_group}")}
     asap_events = asap_reports.map{|x| x.report}.uniq.compact
     asap_events.each do |event|
       if event.corrective_actions.length > 0

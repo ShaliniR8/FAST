@@ -196,6 +196,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'reload'
     end
   end
+
   resources :occurrence_templates do
     collection do
       post 'new_root'
@@ -265,6 +266,8 @@ PrdgSession::Application.routes.draw do |map|
       #resources :password_resets, only: [:new, :create, :edit, :update]
     end
     collection do
+      get 'user_groups'
+      post 'update_user_group'
       get "users_index"
       get 'current_json'
       put 'mobile_months'
@@ -302,7 +305,35 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
 
-
+  resources :osha_submissions, :controller => "submissions", :type => "OshaSubmission"
+  resources :osha_records, :controller => "records", :type => "OshaRecord" do
+    member do
+      get 'launch'
+      get 'launch_new_object'
+      get "close"
+      get 'convert'
+      get 'mitigate'
+      get 'baseline'
+      get 'print'
+      get 'enable'
+      get 'comment'
+      get 'new_attachment'
+      get "reopen"
+      get "display"
+      get 'open'
+      get 'override_status'
+      put 'ajax_update'
+      get 'edit_field'
+      get 'library_deid_pdf'
+    end
+    collection do
+      get 'osha_300'
+      get 'osha_300a'
+      post 'osha_300_result'
+      get 'osha_300a_pdf_export'
+      get 'osha_300a_word_export'
+    end
+  end
 
   # Safety Reporting Module
   resources :submissions do
@@ -380,6 +411,7 @@ PrdgSession::Application.routes.draw do |map|
       get "draw_chart"
       post "get_dataset"
       get 'get_data'
+      # get 'osha_300'
     end
   end
   resources :reports do
@@ -595,6 +627,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'load_records'
       get "advanced_search"
       post "get_dataset"
+      post 'complete'
     end
   end
   resources :findings do
