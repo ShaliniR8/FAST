@@ -1660,6 +1660,7 @@ module QueriesHelper
     mapping_hash['Investigation']['Local Time When Event Occurred'] = 'local_event_occured'
     mapping_hash['Investigation']['Investigation Type'] = 'inv_type'
     mapping_hash['Investigation']['Regulatory Violation'] = 'ntsb' # SCX modification
+    mapping_hash['Investigation']['Regulator Reportable'] = 'ntsb' # MAF modification
     mapping_hash['Investigation']['NTSB Reportable'] = 'ntsb'
     mapping_hash['Investigation']['Description of Event'] = 'description'
     mapping_hash['Investigation']['Investigator\'s Comments'] = 'investigator_comment'
