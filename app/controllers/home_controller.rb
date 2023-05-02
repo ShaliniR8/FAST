@@ -170,7 +170,7 @@ class HomeController < ApplicationController
         @lng = CONFIG::GENERAL[:lng]
         @zoom = CONFIG::GENERAL[:gMapZoom]
 
-        @coords = Point.joins(record_field: { record: :template }).where(records: { id: @records }).map do |point|
+        @coords = Point.joins(record_field: { record: :template }).where(records: { id: @records }, owner_type: 'RecordField').map do |point|
           {
             lat: point.lat.to_f,
             lng: point.lng.to_f,

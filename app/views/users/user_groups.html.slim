@@ -48,7 +48,7 @@ css:
             .col-xs-12 style="margin: 10px"
               .list-group.well
                 .list-group-item
-                  a href="#list_#{module_name.underscore}" class="module cat_#{module_name.underscore} glyphicon glyphicon-chevron-right" data-toggle="collapse"
+                  div href="#list_#{module_name.underscore}" class="glyphicon glyphicon-chevron-down"
                   b = hierarchy_hash[:display_name]
                   - forms.each do |form_name, user_fields|
                     .col-xs-12 style="margin: 3px"

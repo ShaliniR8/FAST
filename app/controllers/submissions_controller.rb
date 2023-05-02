@@ -439,6 +439,7 @@ class SubmissionsController < ApplicationController
 
         redirect_to errors_path unless @template_access
 
+        @osha_module = @record.class.name.include?('Osha')
       end
       format.json { show_as_json }
     end

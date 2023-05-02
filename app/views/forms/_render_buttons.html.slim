@@ -278,15 +278,17 @@ ruby:
         - else
           - parent_name = parent_class
 
-        = link_to "View Source #{parent_name.titleize}",
-          eval("#{parent_class.underscore}_path(owner.get_parent)"),
-          class: 'btn btn-info pull-right mr5 mb5',
-          disable_with: 'Redirecting...'
+        - if owner.get_parent
+          = link_to "View Source #{parent_name.titleize}",
+            eval("#{parent_class.underscore}_path(owner.get_parent)"),
+            class: 'btn btn-info pull-right mr5 mb5',
+            disable_with: 'Redirecting...'
       - else
-        = link_to "View Source #{parent_class.titleize}",
-          eval("#{parent_class.underscore}_path(owner.get_parent)"),
-          class: 'btn btn-info pull-right mr5 mb5',
-          disable_with: 'Redirecting...'
+        - if owner.get_parent
+          = link_to "View Source #{parent_class.titleize}",
+            eval("#{parent_class.underscore}_path(owner.get_parent)"),
+            class: 'btn btn-info pull-right mr5 mb5',
+            disable_with: 'Redirecting...'
     - else
       - parent_class = owner.owner.class.name
       - if parent_class == 'ChecklistRow'
