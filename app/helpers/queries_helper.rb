@@ -1557,6 +1557,8 @@ module QueriesHelper
     mapping_hash['Report']["Full #{Report.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Report']['Event Date'] = 'event_date'
     mapping_hash['Report']['Event Title'] = 'name'
+    mapping_hash['Report']['Department'] = 'event_type'
+    mapping_hash['Report']['Program'] = 'event_type' # MAF Modification
     mapping_hash['Report']['Event Description'] = 'narrative'
     mapping_hash['Report']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Report']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'

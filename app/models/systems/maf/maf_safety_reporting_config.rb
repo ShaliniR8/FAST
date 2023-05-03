@@ -1,6 +1,17 @@
 class MAFSafetyReportingConfig < DefaultSafetyReportingConfig
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
+    objects: {
+      'Report' => {
+        fields: {
+          event_type: {
+            field: 'event_type', title: 'Program', num_cols: 6, type: 'select',
+            visible: 'index,form', required: true,
+            options: "CONFIG::EMPLOYEE_GROUPS.keys"
+          }
+        }
+      }
+    },
     menu_items: {
       'Submissions' => {
         subMenu: [

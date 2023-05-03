@@ -220,6 +220,10 @@ class DefaultSafetyReportingConfig
             num_cols: 6, type: 'date', visible: 'index,form,meeting_form,show',
             required: true
           },
+          event_type: {
+            field: 'event_type', title: 'Department', num_cols: 6, type: 'text', visible: '',
+            options: "CONFIG.custom_options['Departments']"
+          },
           reports: {
             field: 'included_reports', title: 'Included Reports',
             num_cols: 6, type: 'text', visible: 'index,meeting_form',
