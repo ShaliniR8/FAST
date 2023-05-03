@@ -24,7 +24,7 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
             required: true, on_newline: true, options: CONFIG.custom_options['Event Titles']
           },
           event_types: {
-            field: 'event_type', title: 'Event Type',
+            field: 'first_template_type', title: 'Event Type',
             num_cols: 12, type: 'text', visible: 'query',
             required: false
           },

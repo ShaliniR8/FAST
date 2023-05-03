@@ -204,7 +204,7 @@ class Report < Sr::SafetyReportingBase
   end
 
 
-  def event_type
+  def first_template_type
     records.map{|record| record.get_template}.uniq.first
   end
 
