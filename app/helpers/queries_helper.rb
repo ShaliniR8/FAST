@@ -1599,7 +1599,9 @@ module QueriesHelper
     mapping_hash['Audit']['Auditor'] = 'responsible_user_id'
     mapping_hash['Audit']['Final Approver'] = 'approver_id'
     mapping_hash['Audit']['Auditing Department'] = 'department'
+    mapping_hash['Audit']['Auditing Program'] = 'department' #MAF Modification
     mapping_hash['Audit']['Department being Audited'] = 'audit_department'
+    mapping_hash['Audit']['Program being Audited'] = 'audit_department' #MAF Modification
     mapping_hash['Audit']['Internal/External/Supplier'] = 'supplier'
     mapping_hash['Audit']['Objective and Scope'] = 'objective'
     mapping_hash['Audit']['References and Requirements'] = 'reference'
@@ -1619,7 +1621,9 @@ module QueriesHelper
     mapping_hash['Inspection']['Lead Inspector'] = 'responsible_user_id'
     mapping_hash['Inspection']['Final Approver'] = 'approver_id'
     mapping_hash['Inspection']['Inspection Department'] = 'department'
+    mapping_hash['Inspection']['Inspection Program'] = 'department' #MAF Modification
     mapping_hash['Inspection']['Department being Inspected'] = 'inspection_department'
+    mapping_hash['Inspection']['Program being Inspected'] = 'inspection_department' #MAF Modification
     mapping_hash['Inspection']['Type'] = 'inspection_type'
     mapping_hash['Inspection']['Internal/External/Supplier'] = 'supplier'
     mapping_hash['Inspection']['Objective and Scope'] = 'objective'
@@ -1640,7 +1644,9 @@ module QueriesHelper
     mapping_hash['Evaluation']['Lead Evaluator'] = 'responsible_user_id'
     mapping_hash['Evaluation']['Final Approver'] = 'approver_id'
     mapping_hash['Evaluation']['Evaluation Department'] = 'department'
+    mapping_hash['Evaluation']['Evaluation Program'] = 'department' #MAf Modification
     mapping_hash['Evaluation']['Department being Inspected'] = 'evaluation_department'
+    mapping_hash['Evaluation']['Program being Inspected'] = 'evaluation_department'#Maf Modification
     mapping_hash['Evaluation']['Type'] = 'evaluation_type'
     mapping_hash['Evaluation']['Internal/External/Supplier'] = 'supplier'
     mapping_hash['Evaluation']['Objective and Scope'] = 'objective'
@@ -1737,6 +1743,7 @@ module QueriesHelper
     mapping_hash['Recommendation']['Responsible User'] = 'responsible_user_id'
     mapping_hash['Recommendation']['Final Approver'] = 'approver_id'
     mapping_hash['Recommendation']['Responsible Department'] = 'department'
+    mapping_hash['Recommendation']['Responsible Program'] = 'department'
     mapping_hash['Recommendation']['Immediate Action Required'] = 'immediate_action'
     mapping_hash['Recommendation']['Action'] = 'recommended_action'
     mapping_hash['Recommendation']['Description of Recommendation'] = 'description'
