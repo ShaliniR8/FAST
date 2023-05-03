@@ -34,7 +34,7 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         fields: {
           department: {
             field: 'department', title: 'Program',
-            num_cols: 6, type: 'select', visible: 'form,show',
+            num_cols: 6, type: 'select', visible: 'index,form,show',
             required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }
