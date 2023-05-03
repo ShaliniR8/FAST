@@ -60,7 +60,7 @@ module Concerns
         # change when configs are updated to v1.2
         mobile_user_info[:enable_dual_report] = CONFIG.sr::GENERAL[:enable_dual_report]
 
-        if CONFIG::MOBILE_MODULES.include?('SMS')
+        if CONFIG::MOBILE_MODULES.include?('SMS') && !CONFIG::GENERAL[:hide_findings_in_checklist].present?
           finding_json = Finding.get_meta_fields('form').as_json
           finding_json.each do |ffield|
             ffield.delete('num_cols') if ffield['num_cols'].present?
