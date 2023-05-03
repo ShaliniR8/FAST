@@ -1788,6 +1788,7 @@ module QueriesHelper
     mapping_hash['Hazard']['Creator'] = 'created_by_id'
     mapping_hash['Hazard']['Hazard Title'] = 'title'
     mapping_hash['Hazard']['Department'] = 'departments'
+    mapping_hash['Hazard']['Program'] = 'departments' #MAF modification
     mapping_hash['Hazard']['Lead Analyst'] = 'responsible_user_id' # FFT modification
     mapping_hash['Hazard']['Risk Leader'] = 'responsible_user_id' # RUH modification
     mapping_hash['Hazard']['Responsible User'] = 'responsible_user_id'
@@ -1816,6 +1817,7 @@ module QueriesHelper
     mapping_hash['RiskControl']['Creator'] = 'created_by_id'
     mapping_hash['RiskControl']['Hazard Title'] = 'title'
     mapping_hash['RiskControl']['Department'] = 'departments'
+    mapping_hash['RiskControl']['Program'] = 'departments' # MAF modification
     mapping_hash['RiskControl']['Scheduled Completion Date'] = 'due_date'
     mapping_hash['RiskControl']['Date for Follow-Up/Monitor Plan'] = 'follow_up_date'
     mapping_hash['RiskControl']['Lead Analyst'] = 'responsible_user_id' # FFT modification
