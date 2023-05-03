@@ -7,7 +7,7 @@ class MAFSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
           departments: {
             field: 'departments', title: 'Program',
             num_cols: 6, type: 'select', visible: 'form,index,show',
-            required: false, options: "CONFIG.custom_options['Departments']"
+            required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }
       },
@@ -16,7 +16,7 @@ class MAFSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
           departments: {
             field: 'departments', title: 'Program',
             num_cols: 6, type: 'select', visible: 'form,index,show',
-            required: false, options: "CONFIG.custom_options['Departments']"
+            required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           },
         }
       }
