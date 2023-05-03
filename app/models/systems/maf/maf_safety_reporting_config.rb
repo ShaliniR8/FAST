@@ -10,6 +10,15 @@ class MAFSafetyReportingConfig < DefaultSafetyReportingConfig
             options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }
+      },
+      'CorrectiveAction' => {
+        fields: {
+          department: {
+            field: 'department', title: 'Program',
+            num_cols: 6,  type: 'select', visible: 'form,show',
+            required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
+          },
+        }
       }
     },
     menu_items: {
