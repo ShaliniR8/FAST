@@ -55,6 +55,11 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
       },
       'Investigation' => {
           fields: {
+            department: {
+              field: 'department', title: 'Program',
+              num_cols: 6, type: 'select', visible: 'index,form,show',
+              required: true,  options: "CONFIG::EMPLOYEE_GROUPS.keys"
+            },
             ntsb: {
               field: 'ntsb', title: 'Regulator Reportable',
               num_cols: 6, type: 'boolean_box', visible: 'form,show',
@@ -75,7 +80,7 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         fields:{
           responsible_department: {
             field: 'responsible_department', title: 'Responsible Program',
-            num_cols: 6, type: 'select', visible: 'form,show',
+            num_cols: 6, type: 'select', visible: 'form,show,index',
             required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }

@@ -15,7 +15,7 @@ class MAFSafetyReportingConfig < DefaultSafetyReportingConfig
         fields: {
           department: {
             field: 'department', title: 'Program',
-            num_cols: 6,  type: 'select', visible: 'form,show',
+            num_cols: 6,  type: 'select', visible: 'form,show,index',
             required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           },
         }
