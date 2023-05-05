@@ -571,6 +571,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
           likelihood_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Likelihood" },
+          occurrences: {default: true, title: "Root Causes", visible: 'index'},
           severity_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Severity" },
           risk_factor_after: { default: true, title: "#{I18n.t("sa.risk.mitigated.title")} Risk" }
         }.reduce({}) { |acc,(key,data)|
@@ -589,7 +590,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[causes comments costs extension_requests verifications attachments transaction_log
+        panels: %i[causes comments costs extension_requests occurrences verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
@@ -673,7 +674,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
     menu_items: {
       'Audits' => {
         title: 'Audits', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) || 
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Checklist'), user, 'add', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [

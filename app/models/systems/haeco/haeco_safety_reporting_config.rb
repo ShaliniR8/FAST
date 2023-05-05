@@ -376,6 +376,7 @@ class HAECOSafetyReportingConfig < DefaultSafetyReportingConfig
             num_cols: 12, type: 'textarea', visible: 'show',
             required: false
           },
+          occurrences: {default: true, title: "Root Causes", visible: 'index'},
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
         }.reduce({}) { |acc,(key,data)|
