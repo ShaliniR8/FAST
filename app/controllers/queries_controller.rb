@@ -33,6 +33,7 @@ class QueriesController < ApplicationController
     redirect_to errors_path unless has_access
 
     @headers = @table.get_meta_fields('index')
+    params.delete(:type)
     handle_search
   end
 

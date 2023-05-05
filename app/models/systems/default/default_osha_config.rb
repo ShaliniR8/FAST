@@ -185,9 +185,9 @@ class DefaultOshaConfig
         title: 'Query Center', path: '#',
         display: proc{|user:,**op| user.has_access('home', 'query_all', admin: CONFIG::GENERAL[:global_admin_default])},
         subMenu: [
-          {title: 'All', path: 'queries_path',
+          {title: 'All', path: 'queries_path(type: "Osha")',
             display: proc{|user:,**op| true}},
-          {title: 'New', path: 'new_query_path',
+          {title: 'New', path: 'new_query_path(type: "Osha")',
             display: proc{|user:,**op| true}},
         ]
       },
