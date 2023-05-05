@@ -443,8 +443,6 @@ class QueriesController < ApplicationController
 
     adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
     @object_name = @owner.target
-    @object_name = "Record" if @object_name == "OshaRecord"
-
     @title = CONFIG.hierarchy[session[:mode]][:objects][@object_name][:title].pluralize
     @object_type = Object.const_get(@object_name)
     @table_name = @object_type.table_name

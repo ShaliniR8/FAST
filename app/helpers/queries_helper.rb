@@ -1531,6 +1531,8 @@ module QueriesHelper
     mapping_hash['Record']['Sole Source'] = 'sole'
     mapping_hash['Record']["Additional Info"] = 'additional_info'
     mapping_hash['Record']["Type"] = 'record_type'
+    mapping_hash['Record'][CONFIG::EVENT_DATE] = 'event_date'
+    mapping_hash['Record'][CONFIG::EVENT_TITLE] = 'description'
 
     mapping_hash['OshaRecord'] = Hash.new
     mapping_hash['OshaRecord']['Submitted By'] = 'users_id'

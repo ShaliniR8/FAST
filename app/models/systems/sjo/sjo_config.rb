@@ -31,6 +31,7 @@ class SJOConfig < DefaultConfig
     has_root_causes:                   false,
     global_admin_default:              false,
     sms_im_visibility:                 false,
+    export_query_daily_digest_in_csv:  true,
   })
 
 

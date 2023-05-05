@@ -129,11 +129,11 @@ class NotifyMailer < ApplicationMailer
     attachments[filename] = file
     mail(to: email, subject: 'Report Export Complete').deliver
   end
+  
 
-
-  def send_query_digest(users:users, query:query, file:file)
+  def send_query_digest(users:users, query:query, file:file, filename:filename)
     emails = users.map(&:email).uniq
-    attachments["Query_#{query.id}.pdf"] = file
+    attachments[filename] = file
     @query = query
     default = 'noc@prosafet.com'
     subject = "#{CONFIG::GENERAL[:name]} Query Digest for #{query.title}"

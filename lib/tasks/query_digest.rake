@@ -19,16 +19,22 @@ task :send_daily_digest => :environment do
   subscriptions.group_by(&:owner).each do |query, subs|
     @log.info "[#{Time.now}] Query: #{query.id}, subscribers: #{subs.map(&:user_id)}"
     begin
-      html = controller.render_to_string(template: 'queries/_pdf.html.slim', locals: {
-        owner: query,
-      }, layout: false)
+      if CONFIG::GENERAL[:export_query_daily_digest_in_csv]
+        filename = "Query ##{query.id}.csv"
+        attachment = query.to_csv
+      else
+        html = controller.render_to_string(template: 'queries/_pdf.html.slim', locals: {
+          owner: query,
+        }, layout: false)
 
-      pdf = PDFKit.new(html)
-      pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-      pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-      filename = "Query ##{query.id}"
-      attachment = pdf.to_pdf
-      NotifyMailer.send_query_digest(users: subs.map(&:user), query: query, file: attachment)
+        pdf = PDFKit.new(html)
+        pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+        pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+        filename = "Query ##{query.id}.pdf"
+        attachment = pdf.to_pdf
+      end
+
+      NotifyMailer.send_query_digest(users: subs.map(&:user), query: query, file: attachment, filename: filename)
     rescue => error
       @log.info "[#{Time.now}] ERROR: #{error}"
       @log.info "[#{Time.now}] ERROR_MESSAGE: #{error.message}"

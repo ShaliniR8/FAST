@@ -1,5 +1,6 @@
 class Query < ActiveRecord::Base
 
+  include ApplicationHelper
   include Subscriptionable
 
   has_many :query_conditions, foreign_key: :query_id, class_name: 'QueryCondition', dependent: :destroy
@@ -38,6 +39,21 @@ class Query < ActiveRecord::Base
 
   def get_created_by
     created_by.present? ? created_by.full_name : ""
+  end
+
+
+  def to_csv
+    visualization = self.visualizations.first
+    records_ids = get_query_results_ids_helper(self.id)
+    data = generate_visualization_helper(self.id, visualization.x_axis, visualization.series, records_ids)
+
+    csv_data = CSV.generate(headers: false) do |csv|
+      data.each do |row|
+        csv << row
+      end
+    end
+
+    csv_data
   end
 
 

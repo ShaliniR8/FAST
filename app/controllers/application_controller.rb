@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   def index
-    @object_name = controller_name.classify
+    @object_name = params[:type] || controller_name.classify
     @table_name = controller_name
 
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
@@ -427,7 +427,7 @@ class ApplicationController < ActionController::Base
       name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
       owner_name = name_mapping.present? ? name_mapping : owner_class_name
       # Only for SA and SRM
-      if mod != 'ASAP' && mod != 'SMS IM'
+      if mod != 'ASAP' && mod != 'SMS IM' && mod != 'OSHA'
         # begin action specific behavior
         print_special_matrix(@owner) if owner_class_name == 'Hazard'
         # end
@@ -452,7 +452,7 @@ class ApplicationController < ActionController::Base
         filename = "#{owner_name}_#{@owner.get_id}" + (@deidentified ? '(de-identified)' : '')
         send_data pdf.to_pdf, :filename => "#{filename}.pdf"
       else
-        redirect_to eval("print_#{owner_class_name.downcase}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
+        redirect_to eval("print_#{owner_class_name.underscore}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
         return false
       end
 
@@ -463,7 +463,7 @@ class ApplicationController < ActionController::Base
       name_mapping = CONFIG::OBJECT_NAME_MAP[owner_class_name]
       owner_name = name_mapping.present? ? name_mapping : owner_class_name
       # Only for SA and SRM
-      if mod != 'ASAP' && mod != 'SMS IM'
+      if mod != 'ASAP' && mod != 'SMS IM' && mod != 'OSHA'
         # begin action specific behavior
         print_special_matrix(@owner) if owner_class_name == 'Hazard'
         # end
@@ -488,7 +488,7 @@ class ApplicationController < ActionController::Base
         filename = "#{owner_name}_#{@owner.get_id}" + (@deidentified ? '(de-identified)' : '')
         send_data pdf.to_pdf, :filename => "#{filename}.pdf"
       else
-        redirect_to eval("print_#{owner_class_name.downcase}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
+        redirect_to eval("print_#{owner_class_name.underscore}_path(@owner, format: :pdf, deidentified: params[:deidentified])")
         return false
       end
     # :finding redirect handled in render_buttons

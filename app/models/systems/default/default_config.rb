@@ -51,6 +51,7 @@ class DefaultConfig
     hide_submission_in_dashboard:       false,
     hide_findings_in_checklist:         false,
     osha_visibility:                    false,
+    export_query_daily_digest_in_csv:   false,
 
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,
@@ -104,10 +105,13 @@ class DefaultConfig
   }
 
   OBJECT_NAME_MAP = {
-    'Sra'       => 'SRA',
-    'SmsAction' => 'Corrective Action',
-    'Record'    => 'Report',
-    'Report'    => 'Event'
+    'Sra'            => 'SRA',
+    'SmsAction'      => 'Corrective Action',
+    'Record'         => 'Report',
+    'Report'         => 'Event',
+    'OshaSubmission' => 'Submission',
+    'OshaRecord'     => 'Report',
+
   }
 
   CAUSE_LABEL = 'Causes'

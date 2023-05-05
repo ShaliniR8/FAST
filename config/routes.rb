@@ -305,7 +305,41 @@ PrdgSession::Application.routes.draw do |map|
     end
   end
 
-  resources :osha_submissions, :controller => "submissions", :type => "OshaSubmission"
+  resources :osha_submissions, :controller => "submissions", :type => "OshaSubmission" do
+    member do
+      get 'interpret'
+      get 'print'
+      get 'export'
+      get 'continue'
+      get 'get_json'
+      get 'fsap'
+      get 'msap'
+      get 'csap'
+      get 'dsap'
+      get 'comment'
+      get 'discard'
+    end
+    collection do
+      post 'load_records'
+      get 'query'
+      get 'advanced_search'
+      get "detailed_search"
+      get "custom_view"
+      get 'dynamic_categories'
+      get 'incomplete'
+      get 'export_all'
+      get 'airport_data'
+      get "fsap_all"
+      post 'search'
+      get "template_json" #Added by BP Aug 8 render the json of templates accessible to current user
+      get "user_submission_json" #Added by BP Aug 15 render the json of submissions of current user
+      post "get_dataset"
+      get 'flight_selected'
+      get 'asap_library'
+    end
+  end
+
+
   resources :osha_records, :controller => "records", :type => "OshaRecord" do
     member do
       get 'launch'

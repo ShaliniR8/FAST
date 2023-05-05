@@ -43,7 +43,7 @@ class SubmissionsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @object_name = controller_name.classify
+        @object_name =  params[:type] || controller_name.classify
         @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
 
         @table_name = Object.const_get(@object_name).table_name
@@ -271,7 +271,7 @@ class SubmissionsController < ApplicationController
   def destroy
     @record=Submission.find(params[:id])
     @record.destroy
-    redirect_to submissions_path(status: 'All'), flash: {danger: "Submission ##{params[:id]} deleted."}
+    redirect_to submissions_path(status: 'All', type: params[:type]), flash: {danger: "Submission ##{params[:id]} deleted."}
   end
 
 
@@ -390,7 +390,7 @@ class SubmissionsController < ApplicationController
           format.json { render :json => { success: 'Submission submitted.', record_id: @record.id, sub_fields: @record.submission_fields, attach: @record.attachments, comms: @record.comments }}
         else
           flash = { success: 'Submission created in progress.' }
-          format.html { redirect_to incomplete_submissions_path, flash: flash }
+          format.html { redirect_to incomplete_submissions_path(type: params[:type]), flash: flash }
           format.json {  render :json => { :result => 'success', success: 'Submission created in progress.', :redirect => continue_submission_path(@record.id),
                                            :record_id => @record.id, :record => @record, sub_fields: @record.submission_fields, :attach => @record.attachments,
                                            :comms => @record.comments } }
@@ -561,7 +561,7 @@ class SubmissionsController < ApplicationController
         if params[:commit] == "Save for Later"
           respond_to do |format|
             flash = { success: "Submission ##{@record.id} updated." }
-            format.html { redirect_to incomplete_submissions_path, flash: flash }
+            format.html { redirect_to incomplete_submissions_path(type: params[:type]), flash: flash }
             format.json { update_as_json(flash) }
           end
         else
@@ -592,7 +592,7 @@ class SubmissionsController < ApplicationController
     else
       respond_to do |format|
         flash = { success: '' }
-        format.html { redirect_to incomplete_submissions_path, flash: flash }
+        format.html { redirect_to incomplete_submissions_path(type: params[:type]), flash: flash }
         format.json { update_as_json(flash) }
       end
     end
@@ -616,7 +616,7 @@ class SubmissionsController < ApplicationController
 
 
   def advanced_search
-    @path = submissions_path
+    @path = submissions_path(type: params[:type])
     @search_terms = {
       'Type'              => 'get_template',
       'Submitted By'      => 'submit_name',

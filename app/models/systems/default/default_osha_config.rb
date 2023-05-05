@@ -12,7 +12,7 @@ class DefaultOshaConfig
   HIERARCHY = {
     display_name: 'OSHA / OJI',
     objects: {
-      'Submission' => {
+      'OshaSubmission' => {
         title: 'OSHA Submission',
         status: ['All'],
         preload: [:created_by, :template, :submission_fields],
@@ -64,7 +64,7 @@ class DefaultOshaConfig
         }),
         panels: %i[causes].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
-      'Record' => {
+      'OshaRecord' => {
         title: 'OSHA Report',
         status: ['New', 'Open', 'Linked', 'Closed', 'All'],
         preload: [:created_by, :template, :occurrences, :record_fields],
