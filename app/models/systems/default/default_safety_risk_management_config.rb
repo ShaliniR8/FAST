@@ -8,10 +8,11 @@ class DefaultSafetyRiskManagementConfig
     # General Module Features:
 
     # Airline-Specific Features:
-    risk_assess_sras:      false,
-    add_reports_to_sra:    false,
-    enable_risk_register:  false,
-    one_page_sra:          false
+    risk_assess_sras:         false,
+    add_reports_to_sra:       false,
+    enable_risk_register:     false,
+    one_page_sra:             false,
+    enable_sra_viewer_access: false # by default Viewer Access on SRAs will be enabled if true. Needed for SCX workflow
   }
 
 
