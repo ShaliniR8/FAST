@@ -86,6 +86,7 @@ class SrasController < ApplicationController
   def create
     @sra = Sra.create(params[:sra])
     @sra.status = 'New'
+    @sra.viewer_access = true if CONFIG.srm::GENERAL[:enable_sra_viewer_access]
     message = "SRA (SRM) created."
 
     if params[:matrix_id].present?
