@@ -10,18 +10,20 @@
     </thead>
     <tbody>
       <%@sras.each do |sra|%>
-        <tr sra="<%=sra.id%>">
-          <%@sra_headers.each do |header|%>
-            <td>
-              <%=render "forms/show_field", :field_hash => header, :record => sra%>
-            </td>
-          <%end%>
-          <%if sra.meeting.present?%>
-            <td><b style="color:green">Added</b></td>
-          <%else%>
-            <td><a class="btn btn-info add_btn">Add</a></td>
-          <%end%>
-        </tr>
+        <%if sra.status != "Completed"%>
+          <tr sra="<%=sra.id%>">
+            <%@sra_headers.each do |header|%>
+              <td>
+                <%=render "forms/show_field", :field_hash => header, :record => sra%>
+              </td>
+            <%end%>
+            <%if sra.meeting.present?%>
+              <td><b style="color:green">Added</b></td>
+            <%else%>
+              <td><a class="btn btn-info add_btn">Add</a></td>
+            <%end%>
+          </tr>
+        <%end%>
       <%end%>
     </tbody>
   </table>

@@ -44,12 +44,5 @@
         $(':checkbox', this).trigger('click');
       }
     });
-
-    $('form').on('submit',function(){
-      var form = $(this);
-      dt.rows().nodes().to$().each(function(){
-        form.append($(this).find(".add_sra"));
-      });
-    });
   });
 </script>
