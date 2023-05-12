@@ -532,7 +532,6 @@ class SrasController < ApplicationController
       "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
     )
     sra.meeting_id = nil
-    sra.status = "Assigned"
     sra.save
     render status: 200
   end
