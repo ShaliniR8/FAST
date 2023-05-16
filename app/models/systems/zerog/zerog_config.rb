@@ -16,6 +16,7 @@ class ZEROGConfig < DefaultConfig
     # SYSTEM CONFIGS
     has_mobile_app:               true,
     drop_down_risk_selection:     true,
+    asrs_integration:             true,
 
     # TO BE REMOVED
     base_risk_matrix:             false,
