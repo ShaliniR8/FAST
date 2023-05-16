@@ -18,6 +18,9 @@ class ZEROGConfig < DefaultConfig
     drop_down_risk_selection:     true,
     asrs_integration:             true,
 
+    # Customizable features
+    safety_promotion_visibility:  true,
+
     # TO BE REMOVED
     base_risk_matrix:             false,
     has_verification:             true,
