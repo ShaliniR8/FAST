@@ -1,5 +1,9 @@
 class RJETSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
+  GENERAL = DefaultSafetyRiskManagementConfig::GENERAL.merge({
+    enable_risk_register:     false,
+  })
+
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
     objects:{
       'Hazard' => {

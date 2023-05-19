@@ -1,8 +1,5 @@
 class BYASafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
-  GENERAL = DefaultSafetyRiskManagementConfig::GENERAL.merge({
-    enable_risk_register:  true,
-  })
 
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
     objects: {
