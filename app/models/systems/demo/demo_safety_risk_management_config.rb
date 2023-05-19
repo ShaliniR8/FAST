@@ -2,8 +2,7 @@ class DemoSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
   GENERAL = DefaultSafetyRiskManagementConfig::GENERAL.merge({
     risk_assess_sras:      true,
-    add_reports_to_sra:    true,
-    enable_risk_register:  true
+    add_reports_to_sra:    true
   })
 
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
