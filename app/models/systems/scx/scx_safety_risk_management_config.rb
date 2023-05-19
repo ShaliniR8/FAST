@@ -4,7 +4,8 @@ class SCXSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
     risk_assess_sras:         true,
     one_page_sra:             true,
-    enable_sra_viewer_access: true
+    enable_sra_viewer_access: true,
+    enable_risk_register:     false,
   })
 
 end
