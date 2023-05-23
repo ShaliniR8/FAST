@@ -5,7 +5,7 @@ class RZNConfig < DefaultConfig
   #used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
-  MOBILE_MODULES = %w[]
+  MOBILE_MODULES = %w[ASAP SMS]
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
