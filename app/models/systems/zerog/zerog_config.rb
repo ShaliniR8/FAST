@@ -67,11 +67,11 @@ class ZEROGConfig < DefaultConfig
     },
 
     severity_table_dict: {
-      0 => "0",
-      1 => "1",
-      2 => "2",
-      3 => "3",
-      4 => "4",
+      0 => '0',
+      1 => '1',
+      2 => '2',
+      3 => '3',
+      4 => '4',
     },
 
     probability_table: {
@@ -117,11 +117,11 @@ class ZEROGConfig < DefaultConfig
     },
 
     probability_table_dict: {
-      0 => '(E) Frequent',
-      1 => '(D) Probable',
+      0 => '(A) Improbable',
+      1 => '(B) Seldom',
       2 => '(C) Occasional',
-      3 => '(B) Seldom',
-      4 => '(A) Improbable',
+      3 => '(D) Probable',
+      4 => '(E) Frequent',
     },
 
     risk_table: {
@@ -151,27 +151,27 @@ class ZEROGConfig < DefaultConfig
         ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen'],
         ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen'],
         ['limegreen',   'limegreen',    'yellow',       'yellow',       'red' ],
-        ['limegreen',   'yellow',       'yellow',       'red',       'red' ],
+        ['limegreen',   'yellow',       'yellow',       'red',          'red' ],
         ['yellow',      'yellow',       'red',          'red',          'red' ],
       ],
     },
 
     risk_table_index: {
-      "HIGH RISK" => 'red',
+      "LOW RISK" => 'limegreen',
       "MEDIUM RISK" => 'yellow',
-      "LOW RISK" => 'limegreen'
+      "HIGH RISK" => 'red',
     },
 
     risk_table_dict: {
-      red:          'HIGH RISK' ,
+      limegreen:    'LOW RISK',
       yellow:       'MEDIUM RISK',
-      limegreen:    'LOW RISK'
+      red:          'HIGH RISK' ,
     },
 
     risk_definitions: {
-      red:          { rating: 'HIGH RISK' },
-      yellow:       { rating: 'MEDIUM RISK' },
       limegreen:    { rating: 'LOW RISK'},
+      yellow:       { rating: 'MEDIUM RISK' },
+      red:          { rating: 'HIGH RISK' },
     },
   }
 
