@@ -85,33 +85,34 @@ class ZEROGConfig < DefaultConfig
       cell_name: 'probability_td',
       row_header: ['Meaning'],
       column_header_name: 'Qualitative Definition',
-      column_header: ['(E) Frequent', '(D) Probable', '(C) Occasional', '(B) Seldom', '(A) Improbable'],
+      column_header: ['(A) Improbable' , '(B) Seldom', '(C) Occasional', '(D) Probable', '(E) Frequent'   ],
       row_header_name: 'Meaning',
 
       rows: [
         [
-        #5
-          'Likely to occur many times (occurs frequently) </br>
-           Will be continuously experienced unless action is taken to change events </br>
-           Quantitative - Greater than or equal to 10<sup>-2</sup> (1/100) or once per day',
-        #4
-          'Likely to occur sometimes (occurs infrequently) </br>
-           Will occur often if events follow normal patterns of process or procedure. Event is repeatable. </br>
-           Auditor/Regulator have potential of issue discovery with minimal audit activity </br>
-           Quantitative - Greater than or equal to 10<sup>-3</sup> (1/1000) or once per week',
-         #3
-          'Unlikely, but possible to occur (occurs rarely) </br>
-          An activity or event that occurs infrequently, or irregularly. Sporadic in nature </br>
-          Auditor/Regulator have potential of issue discovery during focused or specialized review </br>
-          Quantitative - Greater than or equal to 10<sup>-4</sup> or once per month',
-         #2
-          'Very unlikely to occur (not known it has occured) </br>
-          An activity or event that occurs intemittently </br>
-          Regulator/Auditor have low likelihood of issue identification during any general or focused review </br>
-          Quantitative - Greater than or equal to 10<sup>-5</sup> (1/100,000) or once per year',
-         #1
-          'A remote likelihood, being almost inconceivable that event will occur </br>
-          Quantitative - Greater than or equal to 10<sup>-6</sup> (1/1,000,000) or once per 10 years' ]
+          #1
+           'A remote likelihood, being almost inconceivable that event will occur </br>
+            Quantitative - Greater than or equal to 10<sup>-6</sup> (1/1,000,000) or once per 10 years',
+          #2
+            'Very unlikely to occur (not known it has occured) </br>
+            An activity or event that occurs intemittently </br>
+            Regulator/Auditor have low likelihood of issue identification during any general or focused review </br>
+            Quantitative - Greater than or equal to 10<sup>-5</sup> (1/100,000) or once per year',
+          #3
+            'Unlikely, but possible to occur (occurs rarely) </br>
+            An activity or event that occurs infrequently, or irregularly. Sporadic in nature </br>
+            Auditor/Regulator have potential of issue discovery during focused or specialized review </br>
+            Quantitative - Greater than or equal to 10<sup>-4</sup> or once per month',
+          #4
+            'Likely to occur sometimes (occurs infrequently) </br>
+            Will occur often if events follow normal patterns of process or procedure. Event is repeatable. </br>
+            Auditor/Regulator have potential of issue discovery with minimal audit activity </br>
+            Quantitative - Greater than or equal to 10<sup>-3</sup> (1/1000) or once per week',
+          #5
+            'Likely to occur many times (occurs frequently) </br>
+            Will be continuously experienced unless action is taken to change events </br>
+            Quantitative - Greater than or equal to 10<sup>-2</sup> (1/100) or once per day',
+        ]
       ], #End of rows
     },
 
