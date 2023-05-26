@@ -813,6 +813,7 @@ module QueriesHelper
       query_string.gsub!(to_replace, replace_with)
     end
 
+
     return query_string
   end
 
@@ -1611,6 +1612,11 @@ module QueriesHelper
     mapping_hash['Audit']["#{CONFIG::CAUSE_LABEL} Value"] = 'cause_value'
     mapping_hash['Audit']["Verifications"] = 'included_verifications'
 
+    # HAECO
+    mapping_hash['Audit']['Custom ID'] = 'uniq_custom_id'
+    mapping_hash['Audit']['Vendor/Customer'] = 'vendor'
+    mapping_hash['Audit']['Audit Rating'] = 'process'
+    mapping_hash['Audit']['Aircraft Number'] = 'supplier'
 
     mapping_hash['Inspection'] = Hash.new
     mapping_hash['Inspection']['Creator'] = 'created_by_id'
@@ -1707,7 +1713,6 @@ module QueriesHelper
     mapping_hash['Finding']['Source of Input'] = 'source_of_input'
     mapping_hash['Finding']["Verifications"] = 'included_verifications'
 
-
     mapping_hash['SmsAction'] = Hash.new
     mapping_hash['SmsAction']['Creator'] = 'created_by_id'
     mapping_hash['SmsAction']['Scheduled Completion Date'] = 'due_date'
@@ -1717,7 +1722,7 @@ module QueriesHelper
     mapping_hash['SmsAction']['Employee Corrective Action'] = 'emp'
     mapping_hash['SmsAction']['Company Corrective Action'] = 'dep'
     mapping_hash['SmsAction']['Description of Corrective Action'] = 'description'
-    mapping_hash['SmsAction']['Responsible User\'s Comments'] = 'corrective_actions_comment'
+    mapping_hash['SmsAction']['Responsible User\'s Comments'] = 'sms_actions_comment'
     mapping_hash['SmsAction']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.mitigated.title')} Risk"] = 'risk_factor_after'
@@ -1728,6 +1733,10 @@ module QueriesHelper
     mapping_hash['SmsAction']['Source of Input'] = 'source_of_input'
     mapping_hash['SmsAction']["Verifications"] = 'included_verifications'
 
+    # HAECO
+    mapping_hash['SmsAction']['Classification'] = 'responsible_department'
+    mapping_hash['SmsAction']['Findings & References'] = 'immediate_action_comment'
+    mapping_hash['SmsAction']['Description of Preventive Action'] = 'comprehensive_action_comment'
 
     mapping_hash['Recommendation'] = Hash.new
     mapping_hash['Recommendation']['Creator'] = 'created_by_id'
@@ -1846,12 +1855,20 @@ module QueriesHelper
     mapping_hash['SrmMeeting']['Host'] = 'meeting_host'
 
 
+    mapping_hash['Meeting'] = Hash.new
+    mapping_hash['Meeting']['Review Start Date'] = 'review_start'
+    mapping_hash['Meeting']['Review End Date'] = 'review_end'
+    mapping_hash['Meeting']['Meeting Start Date'] = 'meeting_start'
+    mapping_hash['Meeting']['Meeting End Date'] = 'meeting_end'
+    mapping_hash['Meeting']['Host'] = 'meeting_host'
+
+
     mapping_hash['Checklist'] = Hash.new
     mapping_hash['Checklist']['Source of Input'] = 'checklist_get_owner'
     mapping_hash['Checklist']['Checklist Header'] = 'checklist_get_header'
     mapping_hash['Checklist']['Template'] = 'checklist_get_template'
 
-    return mapping_hash[target][condition_field].present? ? mapping_hash[target][condition_field] : condition_field.downcase.gsub(' ','_')
+    return (mapping_hash[target].present? && mapping_hash[target][condition_field].present?) ? mapping_hash[target][condition_field] : condition_field.downcase.gsub(' ','_')
   end
 
 

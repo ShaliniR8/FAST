@@ -809,7 +809,8 @@ module ApplicationHelper
   end
 
   def module_display_to_mode module_display
-    mode, val = CONFIG.hierarchy.find{|k, hash| hash[:display_name] == module_display}
+    module_display = 'OSHA / OJI' if module_display == 'OSHA'
+    mode, val = CONFIG.hierarchy.find{ |k, hash| hash[:display_name] == module_display}
     mode
   end
 

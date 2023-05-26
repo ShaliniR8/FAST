@@ -44,7 +44,7 @@
             <div id="sp">Safety Promotion</div>
           </div>
         <%end%>
-        <%if CONFIG::GENERAL[:osha_visibility] && current_user.has_access('OSHA', 'module', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
+        <%if CONFIG::GENERAL[:osha_visibility] && current_user.has_access('OSHA', 'module', admin: CONFIG::GENERAL[:global_admin_default])%>
           <div class="<%=@size%> module_block">
             <a href="<%=choose_module_home_index_path(:mode => 'OSHA')%>" style="border:none;text-decoration:none;">
               <img style="border:none" src="/OSHA.png" width="150" height="150" />

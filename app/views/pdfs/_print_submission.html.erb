@@ -66,7 +66,7 @@
                         <b><%=field.label.present? ? (field.label + ":") : ""%></b>
                         <%if field.display_type == "employee"%>
                           <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                            <%if CONFIG::GENERAL[:sabre_integration].present?%>
+                            <%if CONFIG::GENERAL[:sabre_integration].present? && AIRLINE_CODE == 'RJET'%>
                               <%#=User.where(employee_number: value).first.full_name rescue nil%>
                               <%#=value%>
                               <%if value.present?%>
@@ -125,7 +125,7 @@
                                 <b><%=nested_field.label.present? ? (nested_field.label + ":") : ""%></b>
                                 <%if nested_field.display_type == "employee"%>
                                   <%if value.match(/\A[+-]?\d+?(\.\d+)?\Z/)%>
-                                    <%if CONFIG::GENERAL[:sabre_integration].present?%>
+                                    <%if CONFIG::GENERAL[:sabre_integration].present? && AIRLINE_CODE == 'RJET'%>
                                       <%#=User.where(employee_number: value).first.full_name rescue nil%>
                                       <%#=value%>
                                       <%if value.present?%>

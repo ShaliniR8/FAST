@@ -85,7 +85,6 @@
 
 <script>
   $(function(){
-
     update_input_field($("#to_delete_<%=insert_space%> #field_select_all"), "<%=condition.value%>");
 
     $(document).on("change", "#field_select_all", function(){
@@ -120,9 +119,8 @@
 
 
   function update_input_field(field, value) {
-
     var field_name = $(field).val();
-    var field_type = $("option[value='" + field_name + "']").data("fieldtype");
+    var field_type = $("option[value='" + field_name.replace("'", "\\'") + "']").data("fieldtype");
     var field_value = $(field).parent().parent().find(".field_value");
     var condition_type = $(field).parent().parent().find('.field-operator-all').val();
 
