@@ -46,7 +46,7 @@ class ZEROGConfig < DefaultConfig
       title: 'SEVERITY EXERCISE',
 
       orientation: :vertical,
-      direction: :up,
+      direction: :down,
       size: 'col-xs-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
