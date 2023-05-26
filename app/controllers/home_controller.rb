@@ -26,7 +26,7 @@ class HomeController < ApplicationController
       @pinned_visualizations = QueryVisualization.preload(:query).where({dashboard_pin: true}).keep_if{|qv| types.values.include?(qv.query[:target])}
     end
 
-    @notices = current_user.notices.where(status: 1).sort_by(&:created_at).reverse.first(6)
+    # @notices = current_user.notices.where(status: 1).sort_by(&:created_at).reverse.first(6)
 
     prepare_data
     prepare_calendar
@@ -51,8 +51,7 @@ class HomeController < ApplicationController
 
 
   def prepare_data
-
-    @notices = Notice.where(status: 1, users_id: current_user.id).reverse.first(6)
+    @notices = get_only_current_module_notices(current_module: session[:mode], unread: 1).reverse.first(6)
 
     @permissions = JSON.parse(session[:permissions])
 

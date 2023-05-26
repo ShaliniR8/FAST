@@ -2,7 +2,7 @@ class NoticesController < ApplicationController
 
 
   def index
-    @records = current_user.notices.sort_by(&:created_at).reverse
+    @records = get_only_current_module_notices(current_module: session[:mode]).reverse
   end
 
 

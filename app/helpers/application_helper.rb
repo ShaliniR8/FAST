@@ -46,6 +46,11 @@ module ApplicationHelper
     data
   end
 
+  def get_only_current_module_notices(current_module:, unread: [1, 2])
+    current_module_owner_types = CONFIG.hierarchy[current_module][:objects].keys
+    current_user.notices.where(status: unread).where(owner_type: current_module_owner_types).sort_by(&:created_at)
+  end
+
 
   def handle_search_term(term, search_value, columns)
     value = 1
@@ -658,7 +663,6 @@ module ApplicationHelper
     end
     "    <a href='#{entry_url}'>#{message}</a>"
   end
-
 
   # def link_to_add_fields(name, f, association, locals={}, linkOptions={}, customTarget=nil, partial:nil)
   #   target = customTarget || association.to_s
