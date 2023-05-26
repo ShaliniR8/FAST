@@ -142,7 +142,7 @@ class ZEROGConfig < DefaultConfig
       row_header: ['0', '1', '2', '3', '4'],
       column_header_name: 'LIKELIHOOD LEVELS',
       column_header: [
-        'A <br> IMPROBABLE',
+        '<br> A <br> IMPROBABLE <br><br>',
         'B <br> SELDOM',
         'C <br> OCCASIONAL',
         'D <br> PROBABLE',
