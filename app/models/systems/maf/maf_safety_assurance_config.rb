@@ -6,7 +6,7 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         fields: {
           department: {
             field: 'department', title: 'Auditing Program',
-            num_cols: 6,  type: 'select', visible: 'index,form,show',
+            num_cols: 6,  type: 'select', visible: '',
             required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           },
           audit_department: {
