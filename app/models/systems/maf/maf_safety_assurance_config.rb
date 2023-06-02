@@ -7,11 +7,11 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           department: {
             field: 'department', title: 'Auditing Program',
             num_cols: 6,  type: 'select', visible: '',
-            required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
+            required: false, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           },
           audit_department: {
             field: 'audit_department', title: 'Program being Audited',
-            num_cols: 6,  type: 'select', visible: 'form,show',
+            num_cols: 6,  type: 'select', visible: 'form,show,index',
             required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }
@@ -20,12 +20,12 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         fields: {
           department: {
             field: 'department', title: 'Evaluation Program',
-            num_cols: 6, type: 'select', visible: 'index,form,show',
-            required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
+            num_cols: 6, type: 'select', visible: '',
+            required: false, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           },
           evaluation_department: {
             field: 'evaluation_department', title: 'Program being Evaluated',
-            num_cols: 6, type: 'select', visible: 'form,show',
+            num_cols: 6, type: 'select', visible: 'form,show,index',
             required: true, options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }
@@ -43,12 +43,12 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         fields:{
           department: {
             field: 'department', title: 'Inspection Program',
-            num_cols: 6,  type: 'select', visible: 'index,form,show',
-            required: true,      options: "CONFIG::EMPLOYEE_GROUPS.keys"
+            num_cols: 6,  type: 'select', visible: '',
+            required: false,      options: "CONFIG::EMPLOYEE_GROUPS.keys"
           },
           inspection_department: {
             field: 'inspection_department', title: 'Program being Inspected',
-            num_cols: 6,  type: 'select', visible: 'form,show',
+            num_cols: 6,  type: 'select', visible: 'form,show,index',
             required: true,      options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }
@@ -57,8 +57,8 @@ class MAFSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           fields: {
             department: {
               field: 'department', title: 'Program',
-              num_cols: 6, type: 'select', visible: 'index,form,show',
-              required: true,  options: "CONFIG::EMPLOYEE_GROUPS.keys"
+              num_cols: 6, type: 'select', visible: '',
+              required: false,  options: "CONFIG::EMPLOYEE_GROUPS.keys"
             },
             ntsb: {
               field: 'ntsb', title: 'Regulator Reportable',
