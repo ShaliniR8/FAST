@@ -6,7 +6,7 @@ class MAFSafetyReportingConfig < DefaultSafetyReportingConfig
         fields: {
           event_type: {
             field: 'event_type', title: 'Program', num_cols: 6, type: 'select',
-            visible: 'index,form', required: true,
+            visible: 'index,form,show', required: true,
             options: "CONFIG::EMPLOYEE_GROUPS.keys"
           }
         }

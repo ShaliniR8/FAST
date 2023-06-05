@@ -38,7 +38,7 @@ class MAFSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
             required: false
           },
           programs_comment: {
-            field: 'programs_comment', title: 'Affected Processes/Systems',
+            field: 'programs_comment', title: 'Affected Processes/Systems Comments',
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
           },
