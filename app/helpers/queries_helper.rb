@@ -859,7 +859,7 @@ module QueriesHelper
             str = ""
           end
         else
-          str = "LOWER(#{table_name}.#{field_name}) = \'#{search_value}\'"
+          str = "LOWER(TRIM(#{table_name}.#{field_name})) = \'#{search_value}\'"
         end
 
       when "Not Equal To"
