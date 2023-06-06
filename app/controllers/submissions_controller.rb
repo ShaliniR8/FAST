@@ -447,7 +447,7 @@ class SubmissionsController < ApplicationController
 
 
   def incomplete
-    @title = "Submissions In Progress"
+    @title = AIRLINE_CODE == 'MAF' ? "Submissions In Draft" : "Submissions In Progress"
     @action = "continue"
     @categories = Category.find(:all)
     @headers = Submission.get_headers
