@@ -205,8 +205,9 @@
 
       <%when "number"%>
         <%=f.label(field_name, field_description, :class => field_required_label)%>
-        <%=f.text_field field_name,
-          :class => "form-control number-field" + field_required_field,
+        <%=f.number_field field_name,
+          :class => "form-control" + field_required_field,
+          "step" => "any",
           "data-toggle" => "tooltip",
           "title" => "Please enter a numeric value"
         %>
@@ -298,25 +299,6 @@
           }
           build_user_table(searchValue);
         });
-      });
-
-      $('.number-field').on('input', function() {
-        var enteredValue = $(this).val();
-        var error = false;
-        var result = true;
-        if (isNaN(enteredValue)) {
-          error = true;
-          result = false;
-          $(this).css('border-color', 'red');
-          $(this).val(''); 
-        }
-        if (error){
-          swal({
-            title: "Please enter a valid numeric value",
-            type: "error",
-          });
-          return result;
-        }
       });
 
       $("form").on('submit', function(){

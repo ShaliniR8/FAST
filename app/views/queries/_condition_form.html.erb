@@ -153,32 +153,12 @@
       $(field_value).html(html);
 
     } else if (field_type == "number") {
-      html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="text" oninput="validateInput(this)" value="' + value + '">';
+      html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number" step="any"" value="' + value + '">';
       $(field_value).html(html);
     } 
     else {
       $(field_value).html(html);
     }
-  }
-
-  function validateInput(input){
-    // Remove any non-digit and non-decimal characters, except the first dash if present
-    input.value = input.value.replace(/[^\d.-]|(?<=.)-+/g, '');
-
-    // Ensure that there's only one decimal point
-    input.value = input.value.replace(/(\..*)\./g, '$1');
-
-    // Ensure that the minus sign is at the beginning or follows the decimal point
-    input.value = input.value.replace(/(?!^)-/g, '');
-
-    // Ensure that the minus sign is not followed by a zero at the beginning
-    input.value = input.value.replace(/^-(?=0+)/g, '');
-
-    // Ensure that the input doesn't start with a decimal point
-    input.value = input.value.replace(/^\./g, '');
-
-    // Ensure that the input doesn't start with multiple zeros
-    input.value = input.value.replace(/^0+(?=\d)/g, '');
   }
 
 </script>
