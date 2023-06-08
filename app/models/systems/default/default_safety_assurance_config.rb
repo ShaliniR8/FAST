@@ -292,6 +292,11 @@ class DefaultSafetyAssuranceConfig
             num_cols: 6, type: 'boolean_box', visible: 'form,show',
             required: false
           },
+          department: {
+            field: 'department', title: 'Department',
+            num_cols: 6, type: 'select', visible: '',
+            required: false, options: "CONFIG.custom_options['Departments']"
+          },
           safety_hazard: {
             field: 'safety_hazard', title: 'Safety Hazard',
             num_cols: 6, type: 'boolean_box', visible: 'form,show',
@@ -689,7 +694,7 @@ class DefaultSafetyAssuranceConfig
     menu_items: {
       'Audits' => {
         title: 'Audits', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) || 
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Checklist'), user, 'add', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [

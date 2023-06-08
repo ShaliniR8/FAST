@@ -315,7 +315,7 @@
               :disable_with => "Saving...",
               "data-toggle" => "tooltip",
               "data-placement" => "top",
-              "title" => "This will save the Submission to In Progress"%>
+              "title" => "This will save the Submission to #{CONFIG::LABELS[:incomplete]}"%>
 
             <%if @action == "new"%>
               <%if !params[:home]%>

@@ -53,6 +53,7 @@ class DefaultConfig
     osha_visibility:                    false,
     export_query_daily_digest_in_csv:   false,
 
+
     # Map Configs. Needed in default config to avoid javascript undefined errors
     has_gmap:                           false,
     gis_layers:                         false,
@@ -86,13 +87,12 @@ class DefaultConfig
     sms_im_visibility:                  true,   # Default visibility of SMS IM --> ON
     safety_promotion_visibility:        false,  # Default visibility of Safety Promotion --> OFF
     pin_dashboard_visualizations:       false,  # Ability to pin query visualizations to dashboard --> Default OFF
-
   }
 
   DOCUMENT_CATEGORIES = ["ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
 
   LABELS = {
-
+    incomplete:                         'In Progress'
   }
 
   LAUNCH_OBJECTS = {
@@ -233,7 +233,7 @@ class DefaultConfig
   def self.check_action(user,action,obj,**op)
     self.object[obj.class.name][:actions][action][:access].call(owner:obj,user:user,**op)
   end
-  
+
   ###################################
   ###        OSHA MAPPING         ###
   ###################################

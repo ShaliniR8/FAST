@@ -447,7 +447,7 @@ class SubmissionsController < ApplicationController
 
 
   def incomplete
-    @title = "Submissions In Progress"
+    @title = "#{CONFIG::LABELS[:incomplete]} Submissions"
     @action = "continue"
     @categories = Category.find(:all)
     @headers = Submission.get_headers

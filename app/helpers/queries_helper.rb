@@ -1560,6 +1560,8 @@ module QueriesHelper
     mapping_hash['Report']["Full #{Report.find_top_level_section.label}"] = 'included_occurrences'
     mapping_hash['Report']['Event Date'] = 'event_date'
     mapping_hash['Report']['Event Title'] = 'name'
+    mapping_hash['Report']['Department'] = 'event_type'
+    mapping_hash['Report']['Program'] = 'event_type' # MAF Modification
     mapping_hash['Report']['Event Description'] = 'narrative'
     mapping_hash['Report']["#{I18n.t('sr.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['Report']["#{I18n.t('sr.risk.mitigated.title')} Risk"] = 'risk_factor_after'
@@ -1591,6 +1593,7 @@ module QueriesHelper
     mapping_hash['CorrectiveAction']['Responsible User\'s Comments'] = 'corrective_actions_comment'
     mapping_hash['CorrectiveAction']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['CorrectiveAction']["Verifications"] = 'included_verifications'
+    mapping_hash['CorrectiveAction']["Program"] = 'department'
 
 
     mapping_hash['Audit'] = Hash.new
@@ -1600,7 +1603,9 @@ module QueriesHelper
     mapping_hash['Audit']['Auditor'] = 'responsible_user_id'
     mapping_hash['Audit']['Final Approver'] = 'approver_id'
     mapping_hash['Audit']['Auditing Department'] = 'department'
+    mapping_hash['Audit']['Auditing Program'] = 'department' #MAF Modification
     mapping_hash['Audit']['Department being Audited'] = 'audit_department'
+    mapping_hash['Audit']['Program being Audited'] = 'audit_department' #MAF Modification
     mapping_hash['Audit']['Internal/External/Supplier'] = 'supplier'
     mapping_hash['Audit']['Objective and Scope'] = 'objective'
     mapping_hash['Audit']['References and Requirements'] = 'reference'
@@ -1625,7 +1630,9 @@ module QueriesHelper
     mapping_hash['Inspection']['Lead Inspector'] = 'responsible_user_id'
     mapping_hash['Inspection']['Final Approver'] = 'approver_id'
     mapping_hash['Inspection']['Inspection Department'] = 'department'
+    mapping_hash['Inspection']['Inspection Program'] = 'department' #MAF Modification
     mapping_hash['Inspection']['Department being Inspected'] = 'inspection_department'
+    mapping_hash['Inspection']['Program being Inspected'] = 'inspection_department' #MAF Modification
     mapping_hash['Inspection']['Type'] = 'inspection_type'
     mapping_hash['Inspection']['Internal/External/Supplier'] = 'supplier'
     mapping_hash['Inspection']['Objective and Scope'] = 'objective'
@@ -1646,7 +1653,9 @@ module QueriesHelper
     mapping_hash['Evaluation']['Lead Evaluator'] = 'responsible_user_id'
     mapping_hash['Evaluation']['Final Approver'] = 'approver_id'
     mapping_hash['Evaluation']['Evaluation Department'] = 'department'
+    mapping_hash['Evaluation']['Evaluation Program'] = 'department' #MAf Modification
     mapping_hash['Evaluation']['Department being Inspected'] = 'evaluation_department'
+    mapping_hash['Evaluation']['Program being Evaluated'] = 'evaluation_department'#Maf Modification
     mapping_hash['Evaluation']['Type'] = 'evaluation_type'
     mapping_hash['Evaluation']['Internal/External/Supplier'] = 'supplier'
     mapping_hash['Evaluation']['Objective and Scope'] = 'objective'
@@ -1668,6 +1677,8 @@ module QueriesHelper
     mapping_hash['Investigation']['Local Time When Event Occurred'] = 'local_event_occured'
     mapping_hash['Investigation']['Investigation Type'] = 'inv_type'
     mapping_hash['Investigation']['Regulatory Violation'] = 'ntsb' # SCX modification
+    mapping_hash['Investigation']['Regulator Reportable'] = 'ntsb' # MAF modification
+    mapping_hash['Investigation']['Program'] = 'department' # MAF modification
     mapping_hash['Investigation']['NTSB Reportable'] = 'ntsb'
     mapping_hash['Investigation']['Description of Event'] = 'description'
     mapping_hash['Investigation']['Investigator\'s Comments'] = 'investigator_comment'
@@ -1695,6 +1706,7 @@ module QueriesHelper
     mapping_hash['Finding']['Safety Hazard'] = 'safety'
     mapping_hash['Finding']['Repeat Finding'] = 'repeat'
     mapping_hash['Finding']['Procedure'] = 'procedures'
+    mapping_hash['Finding']['Program'] = 'department' #MAF Modification
     mapping_hash['Finding']['Immediate Action Required'] = 'immediate_action'
     mapping_hash['Finding']['Immediate Action Taken'] = 'action_taken'
     mapping_hash['Finding']['Description of Finding'] = 'description'
@@ -1732,6 +1744,7 @@ module QueriesHelper
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.mitigated.title')} Likelihood"] = 'risk_likelihood_after'
     mapping_hash['SmsAction']['Source of Input'] = 'source_of_input'
     mapping_hash['SmsAction']["Verifications"] = 'included_verifications'
+    mapping_hash['SmsAction']["Responsible Program"] = 'responsible_department' #MAF Modification
 
     # HAECO
     mapping_hash['SmsAction']['Classification'] = 'responsible_department'
@@ -1745,6 +1758,7 @@ module QueriesHelper
     mapping_hash['Recommendation']['Responsible User'] = 'responsible_user_id'
     mapping_hash['Recommendation']['Final Approver'] = 'approver_id'
     mapping_hash['Recommendation']['Responsible Department'] = 'department'
+    mapping_hash['Recommendation']['Responsible Program'] = 'department'
     mapping_hash['Recommendation']['Immediate Action Required'] = 'immediate_action'
     mapping_hash['Recommendation']['Action'] = 'recommended_action'
     mapping_hash['Recommendation']['Description of Recommendation'] = 'description'
@@ -1752,6 +1766,7 @@ module QueriesHelper
     mapping_hash['Recommendation']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['Recommendation']['Source of Input'] = 'source_of_input'
     mapping_hash['Recommendation']["Verifications"] = 'included_verifications'
+    mapping_hash['Recommendation']["Responsible Program"] = 'department' #MAF Modification
 
 
     mapping_hash['Sra'] = Hash.new
@@ -1792,12 +1807,22 @@ module QueriesHelper
     mapping_hash['Sra']['Source of Input'] = 'source_of_input'
     mapping_hash['Sra']["Verifications"] = 'included_verifications'
 
+    #MAF Modification
+    if AIRLINE_CODE == 'MAF'
+      mapping_hash['Sra']['Affected Programs'] ='departments'
+      mapping_hash['Sra']['Other Affected Programs'] = 'other_department'
+      mapping_hash['Sra']['Affected Programs Comments'] = 'departments_comment'
+      mapping_hash['Sra']['Affected Processes/Systems'] = 'programs'
+      mapping_hash['Sra']['Other Processes/Systems'] = 'other_program'
+      mapping_hash['Sra']['Affected Processes/Systems Comments'] = 'programs_comment'
+    end
 
     mapping_hash['Hazard'] = Hash.new
     mapping_hash['Hazard']['Hazard ID'] = 'id'
     mapping_hash['Hazard']['Creator'] = 'created_by_id'
     mapping_hash['Hazard']['Hazard Title'] = 'title'
     mapping_hash['Hazard']['Department'] = 'departments'
+    mapping_hash['Hazard']['Program'] = 'departments' #MAF modification
     mapping_hash['Hazard']['Lead Analyst'] = 'responsible_user_id' # FFT modification
     mapping_hash['Hazard']['Risk Leader'] = 'responsible_user_id' # RUH modification
     mapping_hash['Hazard']['Responsible User'] = 'responsible_user_id'
@@ -1826,6 +1851,7 @@ module QueriesHelper
     mapping_hash['RiskControl']['Creator'] = 'created_by_id'
     mapping_hash['RiskControl']['Hazard Title'] = 'title'
     mapping_hash['RiskControl']['Department'] = 'departments'
+    mapping_hash['RiskControl']['Program'] = 'departments' # MAF modification
     mapping_hash['RiskControl']['Scheduled Completion Date'] = 'due_date'
     mapping_hash['RiskControl']['Date for Follow-Up/Monitor Plan'] = 'follow_up_date'
     mapping_hash['RiskControl']['Lead Analyst'] = 'responsible_user_id' # FFT modification

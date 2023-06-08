@@ -11,7 +11,8 @@ class MAFConfig < DefaultConfig
     name:                         'Mission Aviation Fellowship',
     time_zone:                    'Eastern Time (US & Canada)',
 
-    # SYSTEM CONFIGS    
+
+    # SYSTEM CONFIGS
     enable_sso:                         true,
     login_option:                       'dual',
     advanced_checklist_data_type:  true,
@@ -19,6 +20,11 @@ class MAFConfig < DefaultConfig
     has_mobile_app:                true,
 
     global_admin_default:          false,
+
+    })
+
+  LABELS = DefaultConfig::LABELS.merge({
+    incomplete:                   'Draft'
   })
 
   EMPLOYEE_GROUPS = {
@@ -131,7 +137,7 @@ class MAFConfig < DefaultConfig
           'Unusual event that affects operations – no  injuries some damage',
           'Routine event for the context'
         ],
-        [ #'Other events' 
+        [ #'Other events'
           'Country wide anarchy',
           'Loss of staff contact or government detention >72 hrs,  widespread rioting, looting civil unrest',
           'Staff in accident that kills a national, loss of staff contact <72hrs, government detention 12hrs to 72hrs, bloodless coup, racial targeting, localised rioting',
