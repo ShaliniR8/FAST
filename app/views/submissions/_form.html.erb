@@ -310,13 +310,12 @@
               "data-toggle" => "tooltip",
               "data-placement" => "top",
               "title" => "This will file the Submission and notify the Analysts"%>
-              <%title = AIRLINE_CODE == 'MAF' ? "This will save the Submission to Draft" : "This will save the Submission to In Progress" %>
             <%= f.submit "Save for Later",
               :class => "btn btn-info pull-right mr5 submit_btn",
               :disable_with => "Saving...",
               "data-toggle" => "tooltip",
               "data-placement" => "top",
-              "title" => title%>
+              "title" => "This will save the Submission to #{CONFIG::LABELS[:incomplete]}"%>
 
             <%if @action == "new"%>
               <%if !params[:home]%>
