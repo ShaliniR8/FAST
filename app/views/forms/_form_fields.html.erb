@@ -202,6 +202,16 @@
               :id => "#{field_name}"%>
           </span>
         </div>
+
+      <%when "number"%>
+        <%=f.label(field_name, field_description, :class => field_required_label)%>
+        <%=f.number_field field_name,
+          :class => "form-control" + field_required_field,
+          "step" => "any",
+          "data-toggle" => "tooltip",
+          "title" => "Please enter a numeric value"
+        %>
+
       <%else%>
     <%end%>
   </div>
@@ -290,7 +300,6 @@
           build_user_table(searchValue);
         });
       });
-
 
       $("form").on('submit', function(){
         var error = false;

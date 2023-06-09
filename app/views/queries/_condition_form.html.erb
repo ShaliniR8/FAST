@@ -152,7 +152,11 @@
         '<option ' + (value == "No" ? "selected" : "") + ' value="No">No</option>';
       $(field_value).html(html);
 
-    } else {
+    } else if (field_type == "number") {
+      html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number" step="any"" value="' + value + '">';
+      $(field_value).html(html);
+    } 
+    else {
       $(field_value).html(html);
     }
   }

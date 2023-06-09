@@ -44,7 +44,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             required: false, options: "CONFIG.custom_options['Station Codes']"
           },
           vendor: { default: true, title: 'Vendor/Customer' },
-          process: { default: true, title: 'Audit Rating' },
+          process: { default: true, type: 'number', title: 'Audit Rating' },
           supplier: {
             field: 'supplier', title: 'Aircraft Number',
             num_cols: 6,  type: 'text', visible: 'form,show',

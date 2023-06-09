@@ -108,7 +108,12 @@
           '<option value="No">No</option></select>';
         $(field_value).html(html);
 
-      } else {
+      } 
+      else if (field_type == "number") {
+        html = '<input class="form-control value_field" id="' + name + '" name="' + name + '" type="number" step="any"">';
+        $(field_value).html(html);
+      } 
+      else {
         $(field_value).html(html);
       }
 
@@ -139,4 +144,5 @@
       }
     });
   });
+
 </script>
