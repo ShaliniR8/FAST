@@ -92,12 +92,14 @@
         } else if (condition_type == '>=' || condition_type == '<') {
           $(field_value).find(".value_field").flatpickr({
             mode: "single",
-            dateFormat: 'Y-m-d',
+            enableTime: field_type === 'datetime',
+            dateFormat: (field_type === 'datetime') ? 'Y-m-d H:i' : 'Y-m-d',
           });
         } else {
           $(field_value).find(".value_field").flatpickr({
             mode: "range",
-            dateFormat: 'Y-m-d',
+            enableTime: field_type === 'datetime',
+            dateFormat: (field_type === 'datetime') ? 'Y-m-d H:i' : 'Y-m-d',
           });
         }
 
@@ -129,7 +131,8 @@
         let field_value = $(this).parent().parent().find(".field_value");
         $(field_value).find(".value_field").flatpickr({
           mode: "single",
-          dateFormat: 'Y-m-d',
+          enableTime: field_type === 'datetime',
+          dateFormat: (field_type === 'datetime') ? 'Y-m-d H:i' : 'Y-m-d',
         });
       } else if ($(this).val() == 'Last ( ) Days' && (field_type == "date" || field_type == "datetime")){
         let field_value = $(this).parent().parent().find(".field_value");
@@ -139,7 +142,8 @@
         let field_value = $(this).parent().parent().find(".field_value");
         $(field_value).find(".value_field").flatpickr({
           mode: "range",
-          dateFormat: 'Y-m-d',
+          enableTime: field_type === 'datetime',
+          dateFormat: (field_type === 'datetime') ? 'Y-m-d H:i' : 'Y-m-d',
         });
       }
     });

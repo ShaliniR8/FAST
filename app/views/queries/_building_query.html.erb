@@ -58,7 +58,6 @@
 
 
 <script>
-
   function add_blocks(base_area, namespace, insert_space){
     var content = "<%=escape_javascript(render('condition_block'))%>";
     var uid = new Date().getTime();
@@ -70,24 +69,15 @@
     var deleteposition = $("#to_delete_" + insert_space);
     var insertspace = insert_space + "_" + uid;
     $(content.replace(regexp, name_space).replace(regexp2, insertspace)).appendTo(insertposition);
+    if ($(`#to_delete_${insert_space} #field_select_all`).val()) {
+      populate_nested_block(deleteposition, $(`#to_delete_${insertspace}`))
+    }
+    else {
+      inject(insertspace);
+    }
     $(deleteposition).remove();
-    inject(insertspace);
   }
 
-  function add_threshold_block(base_area, namespace, insert_space){
-    var content = "<%=escape_javascript(render('threshold_block'))%>";
-    var uid = new Date().getTime();
-    var name_space = namespace + "[" + uid + "]";
-    var regexp = new RegExp("name_space", "g");
-    var regexp2 = new RegExp("insert_space", "g");
-    var insertposition = $("#to_insert_" + insert_space);
-    $(insertposition).show();
-    var deleteposition = $("#to_delete_" + insert_space);
-    var insertspace = insert_space + "_" + uid;
-    $(content.replace(regexp, name_space).replace(regexp2, insertspace)).appendTo(insertposition);
-    $(deleteposition).remove();
-    inject(insertspace);
-  }
 
   function inject(insert_space){
     var id_space = "#" + insert_space;
@@ -113,6 +103,57 @@
       }
     });
   }
+
+  function populate_nested_block(deleteposition, insertposition){
+    // copy field name, condition and value from deleteposition
+    let field = deleteposition.find("#field_select_all")
+    let field_name = field.val();
+    let field_type = $("option[value='" + field_name + "']").data("fieldtype");
+
+    let condition_type = deleteposition.find(".field-operator-all").val()
+    let value = deleteposition.find(".value_field").val()
+
+    // fill inserposition with copied contents
+    insertposition.find("#field_select_all").val(field_name)
+    insertposition.find(".field-operator-all").val(condition_type)
+    if (field_type === 'datetime' || field_type === 'date'){
+      if (condition_type === 'Last ( ) Days'){
+        insertposition.find(".value_field").attr("type", "number")
+      }
+      else if (condition_type == '>=' || condition_type == '<') {
+        insertposition.find(".value_field").flatpickr({
+          mode: "single",
+          enableTime: field_type === 'datetime',
+          dateFormat: (field_type === 'datetime') ? 'Y-m-d H:i' : 'Y-m-d',
+        });
+      }
+      else {
+        insertposition.find(".value_field").flatpickr({
+          mode: "range",
+          enableTime: field_type === 'datetime',
+          dateFormat: (field_type === 'datetime') ? 'Y-m-d H:i' : 'Y-m-d',
+        })
+      }
+    }
+    insertposition.find(".value_field").val(value)
+  }
+
+  $('#query_submit').on('click', function(e){
+    var labels = document.querySelectorAll('label[for="operator"]')
+    var flag = 0
+    labels = $(labels).filter(function() { return this.parentNode.parentNode.parentNode.style.display !== 'none'})
+
+    for(let i = 0; i<labels.length; i++){
+      if ($(labels[i].nextElementSibling).val() === ""){
+        e.preventDefault()
+        labels[i].nextElementSibling.style.borderColor = "red"
+        flag = 1
+      }
+    }
+    if (flag == 1) {
+      alert("You have left one or more blank Nested Operator.")
+    }
+  })
 
 </script>
 

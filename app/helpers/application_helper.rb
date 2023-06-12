@@ -709,11 +709,7 @@ module ApplicationHelper
 
 
   def link_to_add_blocks(name, name_space, insert_space)
-    if name == "Add Threshold"
-      link_to_function(name, "add_threshold_block(this, \"#{name_space}\", \"#{insert_space}\")")
-    else
-      link_to_function(name, "add_blocks(this, \"#{name_space}\", \"#{insert_space}\")")
-    end
+    link_to_function(name, "add_blocks(this, \"#{name_space}\", \"#{insert_space}\")")
   end
 
 
