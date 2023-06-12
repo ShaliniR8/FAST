@@ -728,7 +728,6 @@ module QueriesHelper
     target_table = Object.const_get(query.target)
     target_table_name = target_table.table_name
     ids = []
-
     if query.query_conditions.present?
       cond_str = generate_ids_string(query, generate_parseable_string(query))
       cond_str.gsub!('AND', '&') if cond_str.include?('AND')
@@ -743,7 +742,11 @@ module QueriesHelper
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name} WHERE
             #{target_table_name}.id #{checklist_ids.present? ? "IN (#{checklist_ids.join(',')})" : "IS NULL"}").map(&:id)
     else
-      ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name}").map(&:id)
+      str = "SELECT #{target_table_name}.id FROM #{target_table_name}"
+      if target_table == Meeting and session[:mode] == "SRM"
+        str << " WHERE type = 'SrmMeeting'"
+      end
+      ids = target_table.find_by_sql(str).map(&:id)
     end
 
     ids.compact.uniq
@@ -813,14 +816,12 @@ module QueriesHelper
       query_string.gsub!(to_replace, replace_with)
     end
 
-
     return query_string
   end
 
 
   def generate_single_condition_ids(query, condition)
     field_name = map_condition_field(query.target, condition.field_name)
-
     if check_mapped_condition_field(query.target, field_name)
       generate_attribute_sql(query, condition)
     else
@@ -835,9 +836,7 @@ module QueriesHelper
     object_type = Object.const_get(query.target)
     search_value = condition.value.downcase.strip rescue ""
     str = ""
-
     target_field = object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field].present? && x[:title] == condition.field_name}.first rescue nil
-
     if target_field.present?
       case condition.logic
       when "Equals To"
@@ -968,7 +967,6 @@ module QueriesHelper
         end
       end
     end
-
     if str.present?
       case query.target
       when 'Submission'
@@ -979,10 +977,13 @@ module QueriesHelper
         str = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE (#{str}
                 AND #{table_name}.templates_id IN (#{query.templates.present? ? query.templates.join(',') : Template.find_by_sql("SELECT templates.id FROM templates").map(&:id).join(',')}))").map(&:id).to_s rescue []
       else
-        str = object_type.find_by_sql("SELECT #{table_name}.id FROM #{table_name} WHERE #{str}").map(&:id).to_s rescue []
+        str = "SELECT #{table_name}.id FROM #{table_name} WHERE #{str}"
+        if table_name == "meetings" and session[:mode] == "SRM"
+          str << " AND type = 'SrmMeeting'"
+        end
+        str = object_type.find_by_sql(str).map(&:id).to_s rescue []
       end
     end
-
     str
   end
 
@@ -1304,7 +1305,10 @@ module QueriesHelper
         ids = generate_checklist_sql(query, condition)
       end
     end
-
+    if table_name == "meetings" && session[:mode] == "SRM"
+      srm_meeting_ids = object_type.find_by_sql("SELECT id FROM meetings WHERE type = 'SrmMeeting'").map(&:id)
+      ids = srm_meeting_ids & ids
+    end
     ids.to_s
   end
 
@@ -1513,7 +1517,6 @@ module QueriesHelper
     mapping_hash['Submission']['Event Title'] = 'description'
     mapping_hash['Submission']['Submission Type'] = 'record_type'
 
-
     mapping_hash['Record'] = Hash.new
     mapping_hash['Record']['Submitted By'] = 'users_id'
     mapping_hash['Record']['Accepted Into ASAP'] = 'asap'
@@ -1573,7 +1576,6 @@ module QueriesHelper
     mapping_hash['Report']["Included Reports"] = 'included_reports'
     mapping_hash['Report']["Included Reports Types"] = 'included_reports_types'
 
-
     mapping_hash['CorrectiveAction'] = Hash.new
     mapping_hash['CorrectiveAction']['Creator'] = 'created_by_id'
     mapping_hash['CorrectiveAction']['Is this only a recommendation'] = 'recommendation'
@@ -1594,7 +1596,6 @@ module QueriesHelper
     mapping_hash['CorrectiveAction']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['CorrectiveAction']["Verifications"] = 'included_verifications'
     mapping_hash['CorrectiveAction']["Program"] = 'department'
-
 
     mapping_hash['Audit'] = Hash.new
     mapping_hash['Audit']['Creator'] = 'created_by_id'
@@ -1645,7 +1646,6 @@ module QueriesHelper
     mapping_hash['Inspection']["#{CONFIG::CAUSE_LABEL} Value"] = 'cause_value'
     mapping_hash['Inspection']["Verifications"] = 'included_verifications'
 
-
     mapping_hash['Evaluation'] = Hash.new
     mapping_hash['Evaluation']['Creator'] = 'created_by_id'
     mapping_hash['Evaluation']['Scheduled Completion Date'] = 'due_date'
@@ -1665,7 +1665,6 @@ module QueriesHelper
     mapping_hash['Evaluation']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['Evaluation']['Included Findings'] = 'included_findings'
     mapping_hash['Evaluation']["Verifications"] = 'included_verifications'
-
 
     mapping_hash['Investigation'] = Hash.new
     mapping_hash['Investigation']['Creator'] = 'created_by_id'
@@ -1694,7 +1693,6 @@ module QueriesHelper
     mapping_hash['Investigation']['Source of Input'] = 'source_of_input'
     mapping_hash['Investigation']['Included Findings'] = 'included_findings'
     mapping_hash['Investigation']["Verifications"] = 'included_verifications'
-
 
     mapping_hash['Finding'] = Hash.new
     mapping_hash['Finding']['Creator'] = 'created_by_id'
@@ -1734,7 +1732,7 @@ module QueriesHelper
     mapping_hash['SmsAction']['Employee Corrective Action'] = 'emp'
     mapping_hash['SmsAction']['Company Corrective Action'] = 'dep'
     mapping_hash['SmsAction']['Description of Corrective Action'] = 'description'
-    mapping_hash['SmsAction']['Responsible User\'s Comments'] = 'sms_actions_comment'
+    mapping_hash['SmsAction']['Responsible User\'s Comments'] = 'corrective_actions_comment'
     mapping_hash['SmsAction']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.baseline.title')} Risk"] = 'risk_factor'
     mapping_hash['SmsAction']["#{I18n.t('sa.risk.mitigated.title')} Risk"] = 'risk_factor_after'
@@ -1758,7 +1756,6 @@ module QueriesHelper
     mapping_hash['Recommendation']['Responsible User'] = 'responsible_user_id'
     mapping_hash['Recommendation']['Final Approver'] = 'approver_id'
     mapping_hash['Recommendation']['Responsible Department'] = 'department'
-    mapping_hash['Recommendation']['Responsible Program'] = 'department'
     mapping_hash['Recommendation']['Immediate Action Required'] = 'immediate_action'
     mapping_hash['Recommendation']['Action'] = 'recommended_action'
     mapping_hash['Recommendation']['Description of Recommendation'] = 'description'
@@ -1767,7 +1764,6 @@ module QueriesHelper
     mapping_hash['Recommendation']['Source of Input'] = 'source_of_input'
     mapping_hash['Recommendation']["Verifications"] = 'included_verifications'
     mapping_hash['Recommendation']["Responsible Program"] = 'department' #MAF Modification
-
 
     mapping_hash['Sra'] = Hash.new
     mapping_hash['Sra']['SRM Triggers'] = 'type_of_change' # AJT modification
@@ -1846,7 +1842,6 @@ module QueriesHelper
     mapping_hash['Hazard']["#{I18n.t('srm.risk.mitigated.title')} Risk Score"] = 'mitigated_risk_score'
     mapping_hash['Hazard']["Verifications"] = 'included_verifications'
 
-
     mapping_hash['RiskControl'] = Hash.new
     mapping_hash['RiskControl']['Creator'] = 'created_by_id'
     mapping_hash['RiskControl']['Hazard Title'] = 'title'
@@ -1865,21 +1860,11 @@ module QueriesHelper
     mapping_hash['RiskControl']['Source of Input'] = 'source_of_input'
     mapping_hash['RiskControl']["Verifications"] = 'included_verifications'
 
-
-    mapping_hash['Safety Plan'] = Hash.new
-    mapping_hash['Safety Plan']["#{I18n.t('srm.risk.baseline.title')} Risk"] = 'risk_factor'
-    mapping_hash['Safety Plan']['Time Period (Days)'] = 'time_period'
-    mapping_hash['Safety Plan']['Date Completed'] = 'close_date'
-    mapping_hash['Safety Plan']["#{I18n.t('srm.risk.mitigated.title')} Risk"] = 'risk_factor_after'
-
-
-    mapping_hash['SrmMeeting'] = Hash.new
-    mapping_hash['SrmMeeting']['Review Start Date'] = 'review_start'
-    mapping_hash['SrmMeeting']['Review End Date'] = 'review_end'
-    mapping_hash['SrmMeeting']['Meeting Start Date'] = 'meeting_start'
-    mapping_hash['SrmMeeting']['Meeting End Date'] = 'meeting_end'
-    mapping_hash['SrmMeeting']['Host'] = 'meeting_host'
-
+    mapping_hash['SafetyPlan'] = Hash.new
+    mapping_hash['SafetyPlan']["#{I18n.t('srm.risk.baseline.title')} Risk"] = 'risk_factor'
+    mapping_hash['SafetyPlan']['Time Period (Days)'] = 'time_period'
+    mapping_hash['SafetyPlan']['Date Completed'] = 'close_date'
+    mapping_hash['SafetyPlan']["#{I18n.t('srm.risk.mitigated.title')} Risk"] = 'risk_factor_after'
 
     mapping_hash['Meeting'] = Hash.new
     mapping_hash['Meeting']['Review Start Date'] = 'review_start'
@@ -1887,7 +1872,6 @@ module QueriesHelper
     mapping_hash['Meeting']['Meeting Start Date'] = 'meeting_start'
     mapping_hash['Meeting']['Meeting End Date'] = 'meeting_end'
     mapping_hash['Meeting']['Host'] = 'meeting_host'
-
 
     mapping_hash['Checklist'] = Hash.new
     mapping_hash['Checklist']['Source of Input'] = 'checklist_get_owner'
