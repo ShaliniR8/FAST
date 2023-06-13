@@ -733,6 +733,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'mitigate'
       get 'baseline'
       get 'carryover'
+      get "carryover_another_meeting"
+      post "carryover_to_another_meeting"
       get "new_minutes"
       get 'reopen'
       get 'new_hazard'
