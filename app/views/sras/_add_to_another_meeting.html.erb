@@ -85,7 +85,7 @@
 
   function serialize_meeting_ids() {
     /// Need to disable multiple meetings allowed
-    let multiple_meetings_allowed = <%=CONFIG.sr::GENERAL[:allow_event_reuse]%>;
+    let multiple_meetings_allowed = <%=CONFIG.srm::GENERAL[:allow_sra_reuse]%>;
     let meeting_items = '';
     let meeting_elems = $("input.meetings:checked");
 
