@@ -12,8 +12,7 @@ class DefaultSafetyRiskManagementConfig
     add_reports_to_sra:       false,
     enable_risk_register:     true,
     one_page_sra:             false,
-    enable_sra_viewer_access: false, # by default Viewer Access on SRAs will be enabled if true. Needed for SCX workflow
-    allow_sra_reuse:          false
+    enable_sra_viewer_access: false # by default Viewer Access on SRAs will be enabled if true. Needed for SCX workflow
   }
 
 

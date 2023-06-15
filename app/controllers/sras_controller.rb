@@ -518,69 +518,24 @@ class SrasController < ApplicationController
 
 
 
-  def carryover_another_meeting
-    @owner = Sra.find(params[:id]) ## SRA object
-    @meeting = SrmMeeting.find(params[:meeting]) ## Current meeting of SRA object
-    @instruction = "<p> Click anywhere on the <b>ROW</b> of the meeting to which you want to carry this event over.</p>"
-    @excluded_meeting_ids = [@owner.meeting_id]
-    @meetings = SrmMeeting.where('status = ? and id NOT IN (?)', "Open", @excluded_meeting_ids)
-    render :partial => 'add_to_another_meeting'
-  end
-
-  def carryover_to_another_meeting
+  def carryover
     sra = Sra.find(params[:id])
-    @srm_meeting = SrmMeeting.find(params[:meeting_id])
-
-    ## deleting sra from meeting id
-    @srm_meeting.sras.delete(sra)
-    @srm_meeting.save
-
-    ## Updating 
-    meetings_added = SrmMeeting.where(id: params[:meetings_selected].chomp(',').split(','))
-    meetings_added.each do |m|
-      sra.meeting = m
-      m.sras<<sra
-      m.save
-    end
-    sra.save
     Transaction.build_for(
-      @srm_meeting,
-      'Carried Over SRA',
+      sra.meeting,
+      'Carry Over SRA',
       current_user.id,
       "SRA ##{sra.get_id} Carried Over"
     )
-
     Transaction.build_for(
       sra,
       'Carried Over',
       current_user.id,
-      "SRA Carried Over from Meeting ##{@srm_meeting.id} to Meetings with IDs ##{params[:meetings_selected].chomp(',')}"
+      "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
     )
-    @sra_headers = Sra.get_meta_fields('index')
-    respond_to do |format|
-      format.js
-    end
+    sra.meeting_id = nil
+    sra.save
+    render status: 200
   end
-
-  # def carryover
-
-  #   sra = Sra.find(params[:id])
-  #   Transaction.build_for(
-  #     sra.meeting,
-  #     'Carry Over SRA',
-  #     current_user.id,
-  #     "SRA ##{sra.get_id} Carried Over"
-  #   )
-  #   Transaction.build_for(
-  #     sra,
-  #     'Carried Over',
-  #     current_user.id,
-  #     "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
-  #   )
-  #   sra.meeting_id = nil
-  #   sra.save
-  #   render status: 200
-  # end
 
 
 

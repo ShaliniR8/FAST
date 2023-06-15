@@ -13,7 +13,7 @@
 
         <thead>
           <tr>
-            <%sra_headers.each do |h|%>
+            <%@sra_headers.each do |h|%>
               <th><%=h[:title]%></th>
             <%end%>
             <th>Meeting Minutes</th>
@@ -21,10 +21,10 @@
           </tr>
         </thead>
 
-        <tbody id="all_meeting_sras">
-          <%meeting.sras.each do |sra|%>
+        <tbody>
+          <%@meeting.sras.each do |sra|%>
             <tr>
-              <%sra_headers.each do |h|%>
+              <%@sra_headers.each do |h|%>
                 <td class="<%=h[:html_class].present? ? sra.send(h[:html_class]) : ''%>">
                   <%=render '/forms/show_field', :field_hash => h, :record => sra%>
                 </td>
@@ -32,17 +32,16 @@
               <td><%if sra.minutes.present?%><%=sra.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
               <td>
                 <%=link_to "View", sra_path(sra), :class => "btn btn-info mb5", :disable_with => "Redirecting..."%>
-                <%if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && meeting.status == 'Open' && meeting.has_user(current_user)%>
-                  <%if meeting.status != "Closed" && sra.srm_agendas.blank?%>
+                <%if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && @meeting.status == 'Open' && @meeting.has_user(current_user)%>
+                  <%if @meeting.status != "Closed" && sra.srm_agendas.blank?%>
                     <%=link_to "Carryover",
                       "#",
-                      "data-toggle" => "modal",
-                      "data-target" => ".bs-example-modal-lg",
+                      'data-toggle' => 'tooltip',
                       title: 'Carry Over this SRA so that it can be added to another meeting',
                       :class => "btn btn-danger carryover_btn mb5",
-                      :route => carryover_another_meeting_sra_path(sra, :meeting => meeting)%>
+                      :route => carryover_sra_path(sra.id)%>
                   <%end%>
-                  <%=link_to "Agenda","#",:class => "btn btn-warning agenda_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:route => get_agenda_sra_path(sra,:meeting => meeting.id)%>
+                  <%=link_to "Agenda","#",:class => "btn btn-warning agenda_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:route => get_agenda_sra_path(sra,:meeting => @meeting.id)%>
                   <%=link_to "Add Minutes",
                     "#",
                     :class => "btn btn-success minutes_btn mb5",
@@ -50,7 +49,7 @@
                     "data-target" => ".bs-example-modal-lg",
                     'data-m-toggle' => "tooltip",
                     title: 'Allot minutes for this SRA',
-                    :route => new_minutes_sra_path(sra, :meeting => meeting) %>
+                    :route => new_minutes_sra_path(sra, :meeting => @meeting) %>
                 <%end%>
               </td>
             </tr>
@@ -74,11 +73,13 @@
       });
     });
     $('.carryover_btn').on('click',function(){
-      path=$(this).attr('route');
-      $.get(path,function(data){
-        $(".modal-content").html(data);
-        $(window).trigger('resize');
-      });
+      if (confirm('Are you sure?')) {
+        path=$(this).attr('route');
+        current=$(this).closest('tr');
+        $.get(path,function(data){
+          current.hide();
+        });
+      }
     });
     $(".minutes_btn").on('click',function(){
       $.get($(this).attr('route'),function(data){

@@ -32,14 +32,13 @@ class Meeting < ProsafetBase
 
 
   def self.get_meta_fields(*args)
-    @@MEETING_TYPE_CUSTOM_OPTION_ID = 46
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     [
       {field: 'id',               title: 'ID',                 num_cols: 6,  type: 'text',       visible: 'index,show',      required: true},
       {field: 'status',           title: 'Status',             num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
       {field: 'get_host',         title: 'Host',               num_cols: 6,  type: 'text',       visible: 'index,show',      required: false},
       # {field: 'meeting_type',     title: 'Meeting Type',       num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: ['ASAP', 'non-ASAP']},
-      {field: 'meeting_type',     title: 'Meeting Type',       num_cols: 6,  type: 'select',   visible: 'index,show,form', required: false, options: CONFIG.custom_options_by_id[@@MEETING_TYPE_CUSTOM_OPTION_ID].options.split(";") },
+      {field: 'meeting_type',     title: 'Meeting Type',       num_cols: 6,  type: 'text',   visible: 'index,show,form', required: false},
       {field: 'title',            title: 'Title',              num_cols: 6,  type: 'datalist',   visible: 'index,show,form', required: false, options: CONFIG.custom_options['Meeting Titles']},
       {                                                                      type: 'newline',    visible: 'form,show'},
       {field: 'review_start',     title: 'Review Start Date',  num_cols: 6,  type: 'datetimez',  visible: 'index,form,show', required: true},
