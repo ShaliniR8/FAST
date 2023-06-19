@@ -24,9 +24,9 @@ class FFTSafetyReportingConfig < DefaultSafetyReportingConfig
             required: true, on_newline: true, options: CONFIG.custom_options['Event Titles']
           },
           event_types: {
-            field: 'first_template_type', title: 'Event Type',
-            num_cols: 12, type: 'text', visible: 'query',
-            required: false
+            field: 'event_type', title: 'Event Type',
+            num_cols: 12, type: 'select', visible: 'query',
+            required: false, options: Template.all.map(&:name)
           },
         },
         print_panels: %w[risk_matrix occurrences records ]

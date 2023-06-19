@@ -13,7 +13,7 @@ class DefaultDictionary
       btn: :approve_reject,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        form_confirmed = owner.status == 'Pending Approval' || op[:form_conds] 
+        form_confirmed = owner.status == 'Pending Approval' || op[:form_conds]
         user_confirmed = [owner.approver_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
@@ -725,6 +725,11 @@ class DefaultDictionary
       field: 'event_date', title: 'Event Date/Time',
       num_cols: 6, type: 'datetime', visible: 'index,show',
       required: false
+    },
+    event_type: {
+      field: 'event_type', title: 'Event Type',
+      num_cols: 6, type: 'select', visible: '',
+      required: false, options: ""
     },
     # root_causes_full: {
     #   field: 'get_root_causes_full', title: 'Full Root Causes',

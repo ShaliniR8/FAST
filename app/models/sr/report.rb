@@ -204,11 +204,6 @@ class Report < Sr::SafetyReportingBase
   end
 
 
-  def first_template_type
-    records.map{|record| record.get_template}.uniq.first
-  end
-
-
   def reopen(new_status)
     self.status = new_status
     self.close_date = nil
