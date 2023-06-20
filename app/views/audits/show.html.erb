@@ -30,13 +30,24 @@
       </div>
 
       <div class="panel-body">
+
+        <div class="col-xs-12">
+            <%instruction = "<p>"
+              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+              instruction = instruction + "</p>"
+              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100%/>"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
+        </div>
+
         <div class="col-xs-12 mb15">
           <%= render '/forms/render_buttons', owner: @owner, env: :inline %>
 
         </div>
 
         <%=render '/forms/show_fields', :fields => @fields, :record => @owner%>
-        <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
+        <%=render '/checklists/checklist_types', :owner => @owner, :type => @owner.class.name%>
         <%=render '/panels/show_panels', owner: @owner%>
 
       </div>
@@ -44,9 +55,20 @@
   </div>
 </div>
 
+<style>
+  #workflowImage{
+    display: none;
+  }
+</style>
 
 <script>
   $(document).ready(function(){
+    var curr_status = "<%= @owner.status.downcase%>"
+    <% status_field_name = CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
+    <% curr_status = @owner.send(status_field_name).downcase %>
+    console.log(curr_status)
+    $("#workflowImage").attr('src', "<%=CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:workflow_images][curr_status]%>")
+    // $("#workflowImage").attr('src', "<%=CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:workflow_images]["#{@owner.status.downcase}"]%>")
 
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_audit_path(@owner)%>",function(data){
@@ -65,5 +87,18 @@
 
 
     $('#item_table').dataTable();
+
+     $("#toggleWorkflowImageButton").on('click', function(event){
+        event.preventDefault();
+    
+        if($("#workflowImage").is(":visible")){
+          $("#workflowImage").delay(1).hide("slow")
+          $("#toggleWorkflowImageButton").html("Show Workflow Image")
+        }else{
+          $("#workflowImage").delay(1).show("slow")
+          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+        }
+      })
+
   });
 </script>

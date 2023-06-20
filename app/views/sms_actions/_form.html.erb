@@ -21,6 +21,17 @@
       <div class="panel-body">
 
         <%=form_for @owner.becomes(SmsAction), :html => {:multipart => true} do |f|%>
+
+          <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction%>
+            </div>
+
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
           <%end%>
@@ -66,4 +77,31 @@
   td,th{
     text-align: center;
   }
+  #workflowImage{
+    display: none;
+  }
 </style>
+
+
+<script>
+  $("#toggleWorkflowImageButton").on('click', function(event){
+      event.preventDefault();
+      <% if action_name == 'new' %>
+          $("#workflowImage").attr('src', "<%= CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:workflow_images][action_name] %>" )
+      <% end %>
+
+      <% if action_name == 'edit' %>
+        <% status_field_name = CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
+        <% curr_status = @owner.send(status_field_name).downcase %>
+        $("#workflowImage").attr('src', "<%=CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:workflow_images][curr_status]%>")
+      <% end %>
+
+      if($("#workflowImage").is(":visible")){
+        $("#workflowImage").delay(1).hide("slow")
+        $("#toggleWorkflowImageButton").html("Show Workflow Image")
+      }else{
+        $("#workflowImage").delay(1).show("slow")
+        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+      }
+    });
+</script>

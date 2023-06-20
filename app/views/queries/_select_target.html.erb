@@ -78,6 +78,27 @@
     $("#templates tbody tr td").on("click", function(){selectTemplates($(this));});
   });
 
+    var imageMap = null
+    <% if session[:mode] == "SRM"%>
+          imageMap = <%=CONFIG.srm::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+          $("#workflowImage").attr('src', imageMap['default'])
+      <% end %>
+    <%if session[:mode] == "SMS"%>
+        imageMap = <%=CONFIG.sa::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+        $("#workflowImage").attr('src', imageMap['default'])
+    <%end%>
+
+  $("#toggleWorkflowImageButton").on('click', function(event){
+          event.preventDefault();
+
+        if($("#workflowImage").is(":visible")){
+          $("#workflowImage").delay(1).hide("slow")
+          $("#toggleWorkflowImageButton").html("Show Workflow Image")
+        }else{
+          $("#workflowImage").delay(1).show("slow")
+          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+        }
+  });
 
   function selectTemplates(cell) {
     if($(cell).css("background-color") === "rgb(173, 216, 230)")
@@ -115,6 +136,10 @@
     var target = $(cell).attr("data-target-name");
     var target_name = getSelectedTargetName("targets");
 
+    <% if session[:mode] == "SMS" || session[:mode] == "SRM" %>
+      $("#workflowImage").attr('src', imageMap[target])
+    <%end%>
+    
     $.ajax({
       url: "<%=load_conditions_block_queries_path%>",
       type: 'GET',

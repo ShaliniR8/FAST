@@ -223,6 +223,14 @@ class DefaultSafetyRiskManagementConfig
         }),
         panels: %i[agendas comments source_of_input hazards contacts costs tasks extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SRA_Workflow/Sra_New.png",
+          "assigned"=> "/images/SRA_Workflow/Sra_Assigned.png",
+          "completed"=> "/images/SRA_Workflow/Sra_completed.png",
+          "pending review" => "/images/SRA_Workflow/Sra_pendingReview.png",
+          "pending approval"=> "/images/SRA_Workflow/Sra_PendingApproval.png",
+          "completed, verification required"=> "/images/SRA_Workflow/Sra_verificationRequired.png"
+        }
       },
       'Hazard' => {
         title: 'Hazard',
@@ -313,6 +321,13 @@ class DefaultSafetyRiskManagementConfig
         }),
         panels: %i[risk_controls occurrences comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SRA_Workflow/Hazard_new.png",
+          "assigned"=> "/images/SRA_Workflow/Hazard_Assigned.png",
+          "completed"=> "/images/SRA_Workflow/Hazard_Completed.png",
+          "pending approval"=> "/images/SRA_Workflow/Hazard_PendingApproval.png",
+          "completed, verification required"=> "/images/SRA_Workflow/Hazard_VerificationRequired.png"
+        }
       },
       'RiskControl' => {
         title: 'Risk Control',
@@ -406,6 +421,13 @@ class DefaultSafetyRiskManagementConfig
         }),
         panels: %i[costs comments occurrences safety_plans extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SRA_Workflow/RiskControl_New.png",
+          "assigned"=> "/images/SRA_Workflow/RiskControl_Assigned.png",
+          "completed"=> "/images/SRA_Workflow/RiskControl_Completed.png",
+          "pending approval"=> "/images/SRA_Workflow/RiskControl_PendingApproval.png",
+          "completed, verification required"=> "/images/SRA_Workflow/RiskControl_VerificationRequired.png"
+        }
       },
       'SafetyPlan' => {
         title: 'Safety Plan',
@@ -495,6 +517,11 @@ class DefaultSafetyRiskManagementConfig
         }),
         panels: %i[comments source_of_input contacts costs tasks attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SRA_Workflow/SafetyPlan_New.png",
+          "evaluated"=> "/images/SRA_Workflow/SafetyPlan_Evaluated.png",
+          "completed"=> "/images/SRA_Workflow/SafetyPlan_Completed.png",
+        }
       },
       'Meeting' => {
         title: 'Meeting',
@@ -512,6 +539,11 @@ class DefaultSafetyRiskManagementConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[included_sras participants attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "open"=> "/images/SRA_Workflow/Meeting_Open.png",
+          "closed"=> "/images/SRA_Workflow/Meeting_Closed.png",
+          "new"=> "/images/SRA_Workflow/Meeting_Open.png"
+        }
       }
     },
     menu_items: {
@@ -569,7 +601,15 @@ class DefaultSafetyRiskManagementConfig
             display: proc{|user:,**op| true}},
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
-        ]
+        ],
+        workflow_images: {
+          "Sra"         => "/images/SRA_Workflow/QC_SRA.png",
+          "Hazard"      => "/images/SRA_Workflow/QC_Hazard.png",
+          "RiskControl" => "/images/SRA_Workflow/QC_RiskControl.png",
+          "SafetyPlan"  => "/images/SRA_Workflow/QC_SafetyPlan.png",
+          "Meeting"     => "/images/SRA_Workflow/QC_Meetings.png",
+          "default"     => "/images/SRA_Workflow/QC_SRA_default.png"
+        }
       },
     }
   }

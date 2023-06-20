@@ -23,6 +23,15 @@
       </div>
 
       <div class="panel-body" id="form_body">
+        <div class="col-xs-12">
+            <%instruction = "<p>"
+              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+              instruction = instruction + "</p>"
+              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
+        </div>
         <div class="col-xs-12 mb20">
           <%= render '/forms/render_buttons', owner: @safety_plan, env: :inline %>
         </div>
@@ -36,6 +45,11 @@
 </div>
 
 
+<style>
+  #workflowImage{
+    display: none;
+  }
+</style>
 
 <script>
   $(document).ready(function(){
@@ -45,5 +59,23 @@
         $(window).trigger('resize');
       });
     });
+
+    var curr_status = "<%= @safety_plan.status.downcase%>"
+    <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@safety_plan.class.name][:fields][:status][:field]%>
+    <% curr_status = @safety_plan.send(status_field_name).downcase %>
+    $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@safety_plan.class.name][:workflow_images][curr_status]%>")
+
+    $("#toggleWorkflowImageButton").on('click', function(event){
+      event.preventDefault();
+  
+      if($("#workflowImage").is(":visible")){
+        $("#workflowImage").delay(1).hide("slow")
+        $("#toggleWorkflowImageButton").html("Show Workflow Image")
+      }else{
+        $("#workflowImage").delay(1).show("slow")
+        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+      }
+    })
+
   });
 </script>
