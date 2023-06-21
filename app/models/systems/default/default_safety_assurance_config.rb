@@ -652,6 +652,7 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
           "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
+          "pending approval, verification required"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
           "completed, verification required"=> "/images/SA_Workflow/CorrectiveActionRecommendation_VerificationRequired.png"
         }
       },

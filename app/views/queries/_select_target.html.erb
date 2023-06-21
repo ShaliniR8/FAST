@@ -83,6 +83,10 @@
           imageMap = <%=CONFIG.srm::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
           $("#workflowImage").attr('src', imageMap['default'])
       <% end %>
+    <% if session[:mode] == "ASAP"%>
+        imageMap = <%=CONFIG.sr::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+        $("#workflowImage").attr('src', imageMap['default'])
+    <% end %>
     <%if session[:mode] == "SMS"%>
         imageMap = <%=CONFIG.sa::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
         $("#workflowImage").attr('src', imageMap['default'])
@@ -136,7 +140,7 @@
     var target = $(cell).attr("data-target-name");
     var target_name = getSelectedTargetName("targets");
 
-    <% if session[:mode] == "SMS" || session[:mode] == "SRM" %>
+    <% if session[:mode] == "SMS" || session[:mode] == "SRM" || session[:mode] == "ASAP"%>
       $("#workflowImage").attr('src', imageMap[target])
     <%end%>
     

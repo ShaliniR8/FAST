@@ -34,6 +34,7 @@ class DefaultSafetyReportingConfig
     limit_reporting_title_length:   false,
     show_title_deid_pdf:        true,      # Show the title of De-Id PDF. True by default but some carriers do not want this because users put identifying info on the title
     send_notifier_email_to_submitter:        true, # Submitter will get a notifier email with or without PDF if this is set to true. So submitter will get 2 emails
+    display_workflow_diagram:                 true, # Display workflow diagrams in the instruction panels in this module
   }
 
   OBSERVATION_PHASES = [
@@ -105,6 +106,10 @@ class DefaultSafetyReportingConfig
           },
         }),
         panels: %i[causes].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SR_Workflow/Submission.png",
+          "continue"=> "/images/SR_Workflow/Submission.png",
+        }
       },
 
 
@@ -197,6 +202,12 @@ class DefaultSafetyReportingConfig
         },
         panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SR_Workflow/Report_New.png",
+          "open"=> "/images/SR_Workflow/Report_Open.png",
+          "linked"=> "/images/SR_Workflow/Report_Linked.png",
+          "closed"=> "/images/SR_Workflow/Report_Closed.png",
+        }
       },
 
       'Report' => {
@@ -338,7 +349,13 @@ class DefaultSafetyReportingConfig
         },
         panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        print_panels: %w[risk_matrix occurrences corrective_actions records]
+        print_panels: %w[risk_matrix occurrences corrective_actions records],
+        workflow_images: {
+          "new"=> "/images/SR_Workflow/Event_New.png",
+          "under review"=> "/images/SR_Workflow/Event_UnderReview.png",
+          "meeting ready"=> "/images/SR_Workflow/Event_MeetingReady.png",
+          "closed"=> "/images/SR_Workflow/Event_Closed.png",
+        }
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',
@@ -438,6 +455,13 @@ class DefaultSafetyReportingConfig
         },
         panels: %i[occurrences
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: {
+          "new"=> "/images/SR_Workflow/CorrectiveAction_New.png",
+          "pending approval"=> "/images/SR_Workflow/CorrectiveAction_PendingApproval.png",
+          "assigned"=> "/images/SR_Workflow/CorrectiveAction_Assigned.png",
+          "completed"=> "/images/SR_Workflow/CorrectiveAction_Completed.png",
+          "completed, verification required"=> "/images/SR_Workflow/CorrectiveAction_VerificationRequired.png"
+        }
       },
     },
     menu_items: {
@@ -496,7 +520,12 @@ class DefaultSafetyReportingConfig
             display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_meeting_path',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
-        ]
+        ],
+        workflow_images: {
+          "new"=> "/images/SR_Workflow/Meeting_Open.png",
+          "open"=> "/images/SR_Workflow/Meeting_Open.png",
+          "closed"=> "/images/SR_Workflow/Meeting_Closed.png",
+        }
       },
       'Corrective Actions' => {
         title: 'Corrective Actions', path: 'corrective_actions_path(status: "New")',
@@ -521,7 +550,14 @@ class DefaultSafetyReportingConfig
             display: proc{|user:,**op| true}},
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
-        ]
+        ],
+        workflow_images: {
+          "Submission"              => "/images/SR_Workflow/QC_Submission.png",
+          "Record"                  => "/images/SR_Workflow/QC_Report.png", ## This is Report
+          "Report"                  => "/images/SR_Workflow/QC_Event.png", ## This is event
+          "CorrectiveAction"        => "/images/SR_Workflow/QC_CorrectiveAction.png",
+          "default"                 => "/images/SR_Workflow/QC_default.png"
+        }
       },
     }
   }

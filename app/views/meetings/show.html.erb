@@ -53,6 +53,15 @@
       </div>
 
       <div class="panel-body">
+        <div class="col-xs-12">
+            <%instruction = "<p>"
+              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+              instruction = instruction + "</p>"
+              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
+        </div>
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
             <% if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
@@ -153,7 +162,12 @@
 </div>
 
 
-
+<style>
+  #workflowImage{
+    display: none;
+    margin-top: 10px;
+  }
+</style>
 
 <script>
   function delete_report(report_id, meeting_id,btn){
@@ -165,6 +179,21 @@
     }
   }
   $(document).ready(function(){
+    <% curr_status = @meeting.status.downcase%>
+    $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images][curr_status]%>")
+
+    $("#toggleWorkflowImageButton").on('click', function(event){
+      event.preventDefault();
+  
+      if($("#workflowImage").is(":visible")){
+        $("#workflowImage").delay(1).hide("slow")
+        $("#toggleWorkflowImageButton").html("Show Workflow Image")
+      }else{
+        $("#workflowImage").delay(1).show("slow")
+        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+      }
+    })   
+
     $("#message-btn").on('click',function(){
       $.get("<%=message_meeting_path(@meeting)%>",function(data){
         $(".modal-content").html(data);

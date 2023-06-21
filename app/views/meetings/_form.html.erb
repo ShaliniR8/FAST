@@ -35,7 +35,15 @@
           :html => {:multipart => true} do |f|%>
 
           <%#=render "shared/privilege_form", :target => "meeting[privileges][]", :owner => @meeting, :f => f%>
-
+          <div class="col-xs-12">
+            <%instruction = "<p>"
+              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+              instruction = instruction + "</p>"
+              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
+          </div>
           <%if @action == "new"%>
             <%=f.fields_for :host, Host.new do |ff|%>
               <%=ff.hidden_field :users_id, :value => current_user.id%>
@@ -108,9 +116,35 @@
   </div>
 </div>
 
+<style>
+  #workflowImage{
+    display: none;
+    margin-top: 10px;
+  }
+</style>
 
 <script>
   $(document).ready(function(){
+
+    $("#toggleWorkflowImageButton").on('click', function(event){
+        event.preventDefault();
+        <% if action_name == 'new' %>
+            $("#workflowImage").attr('src', "<%= CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images][action_name] %>" )
+        <% end %>
+
+        <% if action_name == 'edit' %>
+          <% curr_status = @meeting.status.downcase%>
+          $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images][curr_status]%>")
+        <% end %>
+
+        if($("#workflowImage").is(":visible")){
+          $("#workflowImage").delay(1).hide("slow")
+          $("#toggleWorkflowImageButton").html("Show Workflow Image")
+        }else{
+          $("#workflowImage").delay(1).show("slow")
+          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+        }
+    });
 
     $(".add_btn").on("click",function(){
       if ($(this).text()=="Add"){

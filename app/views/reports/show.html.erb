@@ -101,6 +101,15 @@
           </div>
         </div>
         <div class="panel-body collapse in" id="form_body">
+        <div class="col-xs-12">
+            <%instruction = "<p>"
+              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+              instruction = instruction + "</p>"
+              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
+        </div>
           <div class="col-xs-12 mb20">
             <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.occurrence_lock? %></b>
             <%if current_user.has_access('reports','edit', admin: CONFIG::GENERAL[:global_admin_default])%>
@@ -237,9 +246,34 @@
 </div>
 
 
+<style>
+  #workflowImage{
+    display: none;
+    margin-top: 10px;
+  }
+</style>
+
 
 <script>
   $(document).ready(function() {
+
+    var curr_status = "<%= @report.status.downcase%>"
+    <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@report.class.name][:fields][:status][:field]%>
+    <% curr_status = @report.send(status_field_name).downcase %>
+    $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@report.class.name][:workflow_images][curr_status]%>")
+
+    $("#toggleWorkflowImageButton").on('click', function(event){
+      event.preventDefault();
+  
+      if($("#workflowImage").is(":visible")){
+        $("#workflowImage").delay(1).hide("slow")
+        $("#toggleWorkflowImageButton").html("Show Workflow Image")
+      }else{
+        $("#workflowImage").delay(1).show("slow")
+        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+      }
+    })   
+
     $('#launch_btn').on('click',function(){
       $(".modal-content").html('');
       $.get("<%= eval("launch_report_path(@report)")%>", function(data){

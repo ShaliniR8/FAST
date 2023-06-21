@@ -75,6 +75,16 @@
 
       <div class="panel-body">
 
+        <div class="col-xs-12">
+            <%instruction = "<p>"
+              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+              instruction = instruction + "</p>"
+              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+            %>
+            <%=render "shared/instructions",
+              :instruction => instruction%>
+        </div>
+        
         <div class="col-xs-12 mb15">
 
             <% if @corrective_action.status == "New" %>
@@ -144,11 +154,33 @@
   </div>
 </div>
 
-
+<style>
+  #workflowImage{
+    display: none;
+    margin-top: 10px;
+  }
+</style>
 
 
 <script>
   $(function(){
+
+     var curr_status = "<%= @corrective_action.status.downcase%>"
+    <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@corrective_action.class.name][:fields][:status][:field]%>
+    <% curr_status = @corrective_action.send(status_field_name).downcase %>
+    $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@corrective_action.class.name][:workflow_images][curr_status]%>")
+
+    $("#toggleWorkflowImageButton").on('click', function(event){
+      event.preventDefault();
+  
+      if($("#workflowImage").is(":visible")){
+        $("#workflowImage").delay(1).hide("slow")
+        $("#toggleWorkflowImageButton").html("Show Workflow Image")
+      }else{
+        $("#workflowImage").delay(1).show("slow")
+        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+      }
+    })   
 
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_corrective_action_path(@corrective_action)%>",function(data){

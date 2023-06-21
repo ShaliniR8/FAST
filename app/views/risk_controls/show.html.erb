@@ -67,7 +67,6 @@
     var curr_status = "<%= @risk_control.status.downcase%>"
     <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@risk_control.class.name][:fields][:status][:field]%>
     <% curr_status = @risk_control.send(status_field_name).downcase %>
-    console.log(curr_status)
     $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@risk_control.class.name][:workflow_images][curr_status]%>")
 
     $("#toggleWorkflowImageButton").on('click', function(event){
