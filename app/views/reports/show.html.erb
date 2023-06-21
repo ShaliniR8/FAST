@@ -101,15 +101,17 @@
           </div>
         </div>
         <div class="panel-body collapse in" id="form_body">
-        <div class="col-xs-12">
-            <%instruction = "<p>"
-              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-              instruction = instruction + "</p>"
-              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
-            %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-        </div>
+        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+          <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction%>
+          </div>
+        <% end %>
           <div class="col-xs-12 mb20">
             <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.occurrence_lock? %></b>
             <%if current_user.has_access('reports','edit', admin: CONFIG::GENERAL[:global_admin_default])%>
@@ -257,10 +259,11 @@
 <script>
   $(document).ready(function() {
 
-    var curr_status = "<%= @report.status.downcase%>"
-    <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@report.class.name][:fields][:status][:field]%>
-    <% curr_status = @report.send(status_field_name).downcase %>
-    $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@report.class.name][:workflow_images][curr_status]%>")
+    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+      <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@report.class.name][:fields][:status][:field]%>
+      <% curr_status = @report.send(status_field_name).downcase %>
+      $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@report.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+    <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();

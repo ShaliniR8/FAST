@@ -34,7 +34,6 @@ class DefaultSafetyReportingConfig
     limit_reporting_title_length:   false,
     show_title_deid_pdf:        true,      # Show the title of De-Id PDF. True by default but some carriers do not want this because users put identifying info on the title
     send_notifier_email_to_submitter:        true, # Submitter will get a notifier email with or without PDF if this is set to true. So submitter will get 2 emails
-    display_workflow_diagram:                 true, # Display workflow diagrams in the instruction panels in this module
   }
 
   OBSERVATION_PHASES = [
@@ -460,7 +459,6 @@ class DefaultSafetyReportingConfig
           "pending approval"=> "/images/SR_Workflow/CorrectiveAction_PendingApproval.png",
           "assigned"=> "/images/SR_Workflow/CorrectiveAction_Assigned.png",
           "completed"=> "/images/SR_Workflow/CorrectiveAction_Completed.png",
-          "completed, verification required"=> "/images/SR_Workflow/CorrectiveAction_VerificationRequired.png"
         }
       },
     },

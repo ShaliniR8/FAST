@@ -31,15 +31,17 @@
       </div>
 
       <div class="panel-body">
-      <div class="col-xs-12">
-            <%instruction = "<p>"
-              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-              instruction = instruction + "</p>"
-              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
-            %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-        </div>
+      <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+        <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction%>
+          </div>
+        <% end %>
         <div class="col-xs-12 mb20">
         <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before Completing/Rejecting" if @hazard.occurrence_lock? %></b>
           <%= render '/forms/render_buttons', owner: @hazard, env: :inline %>
@@ -64,12 +66,11 @@
 <script>
   $(document).ready(function(){
 
-
-    var curr_status = "<%= @owner.status.downcase%>"
-    <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
-    <% curr_status = @owner.send(status_field_name).downcase %>
-    console.log(curr_status)
-    $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:workflow_images][curr_status]%>")
+    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+      <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
+      <% curr_status = @owner.send(status_field_name).downcase %>
+      $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+    <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();

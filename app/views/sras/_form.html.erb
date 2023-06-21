@@ -19,15 +19,17 @@
       </div>
       <div class="panel-body" id="form_body">
         <%=form_for @sra ,:html => {:multipart => true} do |f|%>
-          <div class="col-xs-12">
-            <%instruction = "<p>"
-              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-              instruction = instruction + "</p>"
-              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
-            %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-          </div>
+          <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+            <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction%>
+            </div>
+          <% end %>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
             <%=f.hidden_field :parent_type, :value => @parent_type%>
@@ -152,13 +154,13 @@
     $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
         <% if action_name == 'new' %>
-            $("#workflowImage").attr('src', "<%= CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:workflow_images][action_name] %>" )
+            $("#workflowImage").attr('src', "<%= CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:workflow_images].select {|key| action_name.include? key}.values[0]%>")
         <% end %>
 
         <% if action_name == 'edit' %>
           <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
           <% curr_status = @owner.send(status_field_name).downcase %>
-          $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:workflow_images][curr_status]%>")
+          $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
         <% end %>
 
         if($("#workflowImage").is(":visible")){

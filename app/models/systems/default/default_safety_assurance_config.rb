@@ -94,7 +94,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
           "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_VerificationRequired.png"
         }
       },
 
@@ -175,7 +174,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
           "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_VerificationRequired.png"
         }
       },
 
@@ -260,7 +258,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
           "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_VerificationRequired.png"
         }
       },
 
@@ -377,7 +374,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/Investigation_Assigned.png",
           "completed"=> "/images/SA_Workflow/Investigation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/Investigation_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/Investigation_VerificationRequired.png"
         }
       },
 
@@ -540,7 +536,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/Finding_Assigned.png",
           "completed"=> "/images/SA_Workflow/Finding_Completed.png",
           "pending approval"=> "/images/SA_Workflow/Finding_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/Finding_VerificationRequired.png"
         }
       },
 
@@ -652,8 +647,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
           "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
-          "pending approval, verification required"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/CorrectiveActionRecommendation_VerificationRequired.png"
         }
       },
 
@@ -733,7 +726,6 @@ class DefaultSafetyAssuranceConfig
           "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
           "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
           "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
-          "completed, verification required"=> "/images/SA_Workflow/CorrectiveActionRecommendation_VerificationRequired.png"
         }
       },
 

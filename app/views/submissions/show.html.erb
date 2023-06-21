@@ -31,15 +31,17 @@
         </div>
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
-            <div class="col-xs-12">
-                <%instruction = "<p>"
-                  instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                  instruction = instruction + "</p>"
-                  instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
-                %>
-                <%=render "shared/instructions",
-                  :instruction => instruction%>
-            </div>
+            <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+              <div class="col-xs-12">
+                  <%instruction = "<p>"
+                    instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                    instruction = instruction + "</p>"
+                    instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+                  %>
+                  <%=render "shared/instructions",
+                    :instruction => instruction%>
+              </div>
+            <% end %>
             <%if current_user.id == @record.created_by.id ||
               current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
               <span data-toggle="modal" data-target=".bs-example-modal-lg">
@@ -146,8 +148,9 @@
         $(window).trigger('resize');
       });
     });
-
-    $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images]["new"]%>")
+    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+      $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| "new".include? key}.values[0]%>")
+    <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();

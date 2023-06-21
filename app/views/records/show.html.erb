@@ -148,15 +148,17 @@
         </div>
 
         <div class="panel-body collapse in" id="form_body">
-        <div class="col-xs-12">
-            <%instruction = "<p>"
-              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-              instruction = instruction + "</p>"
-              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
-            %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-        </div>
+        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+          <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction%>
+          </div>
+        <% end %>
           <div class="col-xs-12">
             <%if (template_full_access || template_viewer_access || report_admin_access) && record_edit_access%>
               <%record_status = @record.status%>
@@ -436,7 +438,7 @@
       console.log("<%= curr_status%>")
       if( open_button_clicked === false || "<%=curr_status%>" !== "new" )
       {
-          $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images][curr_status]%>")
+          $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
           open_button_clicked = false
       }
 

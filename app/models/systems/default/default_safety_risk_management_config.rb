@@ -229,7 +229,6 @@ class DefaultSafetyRiskManagementConfig
           "completed"=> "/images/SRA_Workflow/Sra_completed.png",
           "pending review" => "/images/SRA_Workflow/Sra_pendingReview.png",
           "pending approval"=> "/images/SRA_Workflow/Sra_PendingApproval.png",
-          "completed, verification required"=> "/images/SRA_Workflow/Sra_verificationRequired.png"
         }
       },
       'Hazard' => {
@@ -326,7 +325,6 @@ class DefaultSafetyRiskManagementConfig
           "assigned"=> "/images/SRA_Workflow/Hazard_Assigned.png",
           "completed"=> "/images/SRA_Workflow/Hazard_Completed.png",
           "pending approval"=> "/images/SRA_Workflow/Hazard_PendingApproval.png",
-          "completed, verification required"=> "/images/SRA_Workflow/Hazard_VerificationRequired.png"
         }
       },
       'RiskControl' => {
@@ -426,7 +424,6 @@ class DefaultSafetyRiskManagementConfig
           "assigned"=> "/images/SRA_Workflow/RiskControl_Assigned.png",
           "completed"=> "/images/SRA_Workflow/RiskControl_Completed.png",
           "pending approval"=> "/images/SRA_Workflow/RiskControl_PendingApproval.png",
-          "completed, verification required"=> "/images/SRA_Workflow/RiskControl_VerificationRequired.png"
         }
       },
       'SafetyPlan' => {

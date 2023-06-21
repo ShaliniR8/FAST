@@ -79,18 +79,20 @@
   });
 
     var imageMap = null
-    <% if session[:mode] == "SRM"%>
-          imageMap = <%=CONFIG.srm::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+      <% if session[:mode] == "SRM"%>
+            imageMap = <%=CONFIG.srm::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+            $("#workflowImage").attr('src', imageMap['default'])
+        <% end %>
+      <% if session[:mode] == "ASAP"%>
+          imageMap = <%=CONFIG.sr::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
           $("#workflowImage").attr('src', imageMap['default'])
       <% end %>
-    <% if session[:mode] == "ASAP"%>
-        imageMap = <%=CONFIG.sr::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
-        $("#workflowImage").attr('src', imageMap['default'])
+      <%if session[:mode] == "SMS"%>
+          imageMap = <%=CONFIG.sa::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+          $("#workflowImage").attr('src', imageMap['default'])
+      <%end%>
     <% end %>
-    <%if session[:mode] == "SMS"%>
-        imageMap = <%=CONFIG.sa::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
-        $("#workflowImage").attr('src', imageMap['default'])
-    <%end%>
 
   $("#toggleWorkflowImageButton").on('click', function(event){
           event.preventDefault();
@@ -139,10 +141,11 @@
 
     var target = $(cell).attr("data-target-name");
     var target_name = getSelectedTargetName("targets");
-
-    <% if session[:mode] == "SMS" || session[:mode] == "SRM" || session[:mode] == "ASAP"%>
-      $("#workflowImage").attr('src', imageMap[target])
-    <%end%>
+    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+      <% if session[:mode] == "SMS" || session[:mode] == "SRM" || session[:mode] == "ASAP"%>
+        $("#workflowImage").attr('src', imageMap[target])
+      <%end%>
+    <% end %>
     
     $.ajax({
       url: "<%=load_conditions_block_queries_path%>",

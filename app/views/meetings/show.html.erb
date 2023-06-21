@@ -53,15 +53,17 @@
       </div>
 
       <div class="panel-body">
-        <div class="col-xs-12">
-            <%instruction = "<p>"
-              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-              instruction = instruction + "</p>"
-              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
-            %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-        </div>
+        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+          <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction%>
+          </div>
+        <% end %>
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
             <% if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
@@ -179,8 +181,10 @@
     }
   }
   $(document).ready(function(){
-    <% curr_status = @meeting.status.downcase%>
-    $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images][curr_status]%>")
+    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+      <% curr_status = @meeting.status.downcase%>
+      $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+    <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();
