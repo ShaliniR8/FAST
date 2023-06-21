@@ -5,7 +5,8 @@ class RJETSafetyReportingConfig < DefaultSafetyReportingConfig
     attach_pdf_submission:           'ided',      # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
     enable_external_email:           true,
     show_event_title_in_query:       false,
-    show_title_deid_pdf:             false
+    show_title_deid_pdf:             false,
+    deidentifying_templates:         [2, 4, 5, 6], # template types whose reports have to be deidentified. RJET feature. Default is empty.
   })
 
   ASAP_LIBRARY_FIELD_NAMES = {
