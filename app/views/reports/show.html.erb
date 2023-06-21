@@ -158,8 +158,6 @@
                 <%=link_to "Send CISP Reports",
                   "#",
                   :class => "btn btn-success pull-right ml5 mr5 mb5",
-                  :confirm => "Are you sure?",
-                  :disable_with => "Sending to CISP...",
                   :id => "send_cisp_btn"%>
               <%end%>
             <%end%>
@@ -271,26 +269,32 @@
         $(window).trigger('resize');
       });
     });
-    $("#send_cisp_btn").on("click",function(){
-      $.ajax({
-        type: "POST",
-        url: "<%=send_cisp_reports_path%>"+ "?id=" + <%=@report.id%>,
-        dataType: 'json',
-        success: function(data) {
-          let icon = 'error';
-          if(data['success'] == true) {
-            $("#send_cisp_btn").hide();
-            icon = 'success';
+    $("#send_cisp_btn").on("click",function(e){
+      var btn = $(document.getElementById('send_cisp_btn'))
+      if (confirm("Are You Sure?") == true){
+        $.ajax({
+          type: "POST",
+          url: "<%=send_cisp_reports_path%>"+ "?id=" + <%=@report.id%>,
+          dataType: 'json',
+          beforeSend: function(){
+            btn.attr('disabled','disabled')
+            btn.text('Sending to CISP...')
+          },
+          success: function(data) {
+            let icon = 'error';
+            if(data['success'] == true) {
+              btn.hide()
+              icon = 'success';
+            }
+            Swal.fire({
+              position: 'top-end',
+              icon: icon,
+              title: data['message'],
+              showConfirmButton: false,
+              timer: 1500
+            });
           }
-          Swal.fire({
-            position: 'top-end',
-            icon: icon,
-            title: data['message'],
-            showConfirmButton: false,
-            timer: 1500
-          });
-        }
-      });
+        })}
     });
     $(".close_event_btn").on('click',function(){
       $(".modal-content").html('');
