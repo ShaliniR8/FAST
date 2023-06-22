@@ -77,7 +77,7 @@ link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bo
                   - else
                     th Attachments
               tbody.checklist_rows.draggableChecklistItemsList#checklist_rows
-                - @record.checklist_rows.each_with_index do |checklist_row, index|
+                - @record.checklist_rows.order(:row_order).each_with_index do |checklist_row, index|
                   = f.fields_for :checklist_rows, checklist_row do |row_form|
                     = render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing', checklist_index: index
 
