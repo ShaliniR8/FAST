@@ -32,18 +32,22 @@ task :deidentify_reports_and_submissions => :environment do
 
     if records.present?
       record_fields = records.map(&:record_fields).flatten.keep_if{|rf| rf.field.present? && !rf.field.print.present? && rf.value.present?}
+      record_transactions = Transaction.where({owner_type: 'Record', owner_id: records.map(&:id), users_id: records.map(&:users_id)})
       submissions = records.map(&:submission).compact
       submission_fields = submissions.map(&:submission_fields).flatten.keep_if{|sf| sf.field.present? && !sf.field.print.present? && sf.value.present?}
+      submission_transactions = Transaction.where({owner_type: 'Submission', owner_id: submissions.map(&:id), users_id: submissions.map(&:user_id)})
       corrective_actions = records.map(&:corrective_actions).flatten.compact
       attachments = (records.map(&:attachments) + submissions.map(&:attachments)).flatten.compact.uniq
 
       @log.info "Records to De-Identify: #{records.map(&:id)}"
-      @log.info "De-Identifying #{records.size} records, #{record_fields.size} record_fields, #{submissions.size} submissions, #{submission_fields.size} submission_fields, #{corrective_actions.size} corrective actions and deleting #{attachments.size} attachments"
+      @log.info "De-Identifying #{records.size} records, #{record_fields.size} record_fields, #{record_transactions.size} record transactions, #{submissions.size} submissions, #{submission_fields.size} submission_fields, #{submission_transactions.size} submission transactions, #{corrective_actions.size} corrective actions and deleting #{attachments.size} attachments"
 
       records.map{|r| r.update_attributes({users_id: dummy_user.id, event_date: (r.event_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month)})}
       record_fields.map{|rf| rf.update_attributes({value: dummy_value})}
+      record_transactions.map{|rt| rt.update_attributes({users_id: dummy_user.id})}
       submissions.map{|s| s.update_attributes({user_id: dummy_user.id, event_date: (s.event_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month)})}
       submission_fields.map{|sf| sf.update_attributes({value: dummy_value})}
+      submission_transactions.map{|st| st.update_attributes({users_id: dummy_user.id})}
       corrective_actions.map{|ca| ca.update_attributes({due_date: (ca.due_date.present? ? (ca.due_date.beginning_of_month) : nil),
                                                         opened_date: (ca.opened_date.present? ? (ca.opened_date.beginning_of_month) : nil),
                                                         assigned_date: (ca.assigned_date.present? ? (ca.assigned_date.beginning_of_month) : nil),
@@ -51,12 +55,12 @@ task :deidentify_reports_and_submissions => :environment do
                                                         revised_due_date: (ca.revised_due_date.present? ? (ca.revised_due_date.beginning_of_month) : nil),
                                                         close_date: (ca.close_date.present? ? (ca.close_date.beginning_of_month) : nil)})}
 
-      # attachments.map{|a| a.update_attributes({attachment_id: a.owner_id, owner_id: nil})} # dissociate attachment from record but keep id within attachment_id in case we need to restore. No files will actually be deleted.
-      attachments.map(&:delete) # deletes object. destroy will throw session error. Using shell commands to actually delete attachment
       attachments.each do |att|
         cmd = "rm -rf public/uploads/attachment/name/#{att.id}"
         system cmd
       end
+      # attachments.map{|a| a.update_attributes({attachment_id: a.owner_id, owner_id: nil})} # dissociate attachment from record but keep id within attachment_id in case we need to restore. No files will actually be deleted.
+      attachments.map(&:delete) # deletes object. destroy will throw session error. Using shell commands to actually delete attachment
     else
       @log.info "No Reports to De-Identify"
     end
