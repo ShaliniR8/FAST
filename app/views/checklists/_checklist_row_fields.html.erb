@@ -63,6 +63,10 @@
         :class => "btn #{is_header ? 'btn-success' : 'btn-default'} header_toggle_btn mt5"%>
       <%=f.hidden_field :_destroy, :id => "delete_row", :class => 'changed'%>
       <%=link_to "<i class='glyphicon glyphicon-trash'></i>".html_safe, '#', :class => "btn btn-danger remove_btn mt5"%>
+      <% if source == 'Existing'%>
+        <%= f.hidden_field :row_order, :value => checklist_index, :class => "form-template-order" %>
+        <span class="drag_and_drop glyphicon glyphicon-move pull-left mt10 mr10"></span>
+      <%end%>
     </td>
   <%end%>
 

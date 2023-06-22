@@ -76,10 +76,10 @@ link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bo
                     th Actions
                   - else
                     th Attachments
-              tbody.checklist_rows#checklist_rows
-                - @record.checklist_rows.each do |checklist_row|
+              tbody.checklist_rows.draggableChecklistItemsList#checklist_rows
+                - @record.checklist_rows.each_with_index do |checklist_row, index|
                   = f.fields_for :checklist_rows, checklist_row do |row_form|
-                    = render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing'
+                    = render 'checklist_row_fields', checklist_row: checklist_row, f: row_form, source: 'Existing', checklist_index: index
 
             - if action_name == 'edit'
               = link_to_add_fields 'Add a Row', f, :checklist_rows, {checklist_header: @record.checklist_header}, partial: 'checklist_row_fields'
@@ -130,6 +130,11 @@ script src="/js/libs/typeahead.bundle.js"
 
 javascript:
   $(function(){
+
+    $(document).on('click', '.drag_and_drop', function(e) {
+      e.preventDefault();
+    });
+
      $('.tooltip-wrapper').tooltip();
 
     $("#page-view-update-#{@record.id}").DataTable({
@@ -141,5 +146,26 @@ javascript:
     $('#submit-form').on('submit', function (e) {
       // e.preventDefault();
     })
+
+    var checklistItemsList = $(".draggableChecklistItemsList");
+    checklistItemsList.each(function(){
+        $(this).sortable({
+          handle: $(this, ".drag_and_drop"),
+          forcePlaceholderSize: true,
+          cursor: "move",
+          start: function(event, ui){
+              ui.placeholder.height(ui.item.height());
+              ui.placeholder.width(ui.item.width());
+          },
+          update: function(event, ui){
+            $('.panel', this).each(function(index, elem){
+                $('.form-checklistrow-order',this).val(index);
+                $('.form-checklistrow-order',this).addClass('changed');
+            });
+          }
+        })
+    });
+
+
   })
 
