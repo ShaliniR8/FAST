@@ -7,8 +7,8 @@ task :deidentify_reports_and_submissions => :environment do
   @log.info "======================================================"
 
   look_back_years = 2
-  # first_time = false
-  first_time = true
+  first_time = false
+  # first_time = true
   dummy_user = User.where({username: "prdg_deid_user"}).first
   dummy_value = "#########"
 
@@ -44,12 +44,12 @@ task :deidentify_reports_and_submissions => :environment do
       record_fields.map{|rf| rf.update_attributes({value: dummy_value})}
       submissions.map{|s| s.update_attributes({user_id: dummy_user.id, event_date: (s.event_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month)})}
       submission_fields.map{|sf| sf.update_attributes({value: dummy_value})}
-      corrective_actions.map{|ca| ca.update_attributes({due_date: (ca.due_date.present? ? (ca.due_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month) : nil),
-                                                        opened_date: (ca.opened_date.present? ? (ca.opened_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month) : nil),
-                                                        assigned_date: (ca.assigned_date.present? ? (ca.assigned_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month) : nil),
-                                                        decision_date: (ca.decision_date.present? ? (ca.decision_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month) : nil),
-                                                        revised_due_date: (ca.revised_due_date.present? ? (ca.revised_due_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month) : nil),
-                                                        close_date: (ca.close_date.present? ? (ca.close_date.in_time_zone(CONFIG::GENERAL[:time_zone]).beginning_of_month) : nil)})}
+      corrective_actions.map{|ca| ca.update_attributes({due_date: (ca.due_date.present? ? (ca.due_date.beginning_of_month) : nil),
+                                                        opened_date: (ca.opened_date.present? ? (ca.opened_date.beginning_of_month) : nil),
+                                                        assigned_date: (ca.assigned_date.present? ? (ca.assigned_date.beginning_of_month) : nil),
+                                                        decision_date: (ca.decision_date.present? ? (ca.decision_date.beginning_of_month) : nil),
+                                                        revised_due_date: (ca.revised_due_date.present? ? (ca.revised_due_date.beginning_of_month) : nil),
+                                                        close_date: (ca.close_date.present? ? (ca.close_date.beginning_of_month) : nil)})}
 
       # attachments.map{|a| a.update_attributes({attachment_id: a.owner_id, owner_id: nil})} # dissociate attachment from record but keep id within attachment_id in case we need to restore. No files will actually be deleted.
       attachments.map(&:delete) # deletes object. destroy will throw session error. Using shell commands to actually delete attachment
