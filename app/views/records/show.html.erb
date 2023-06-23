@@ -432,15 +432,18 @@
 
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();
-      <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
-      <% curr_status = @record.send(status_field_name).downcase %>
-      console.log("curr_status:" )
-      console.log("<%= curr_status%>")
-      if( open_button_clicked === false || "<%=curr_status%>" !== "new" )
-      {
-          $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
-          open_button_clicked = false
-      }
+      <% if  CONFIG::GENERAL[:display_workflow_diagram]%>
+
+        <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
+        <% curr_status = @record.send(status_field_name).downcase %>
+        console.log("curr_status:" )
+        console.log("<%= curr_status%>")
+        if( open_button_clicked === false || "<%=curr_status%>" !== "new" )
+        {
+            $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+            open_button_clicked = false
+        }
+      <% end %>
 
       if($("#workflowImage").is(":visible")){
         $("#workflowImage").delay(1).hide("slow")

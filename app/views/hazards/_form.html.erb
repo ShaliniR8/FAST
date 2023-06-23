@@ -115,11 +115,11 @@
     reset_risk();
     $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
-        <% if action_name == 'new' %>
+        <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'new' %>
             $("#workflowImage").attr('src', "<%= CONFIG.srm::HIERARCHY[:objects][@hazard.class.name][:workflow_images].select {|key| action_name.include? key}.values[0] %>" )
         <% end %>
 
-        <% if action_name == 'edit' %>
+        <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'edit' %>
           <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@hazard.class.name][:fields][:status][:field]%>
           <% curr_status = @hazard.send(status_field_name).downcase %>
           $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@hazard.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")

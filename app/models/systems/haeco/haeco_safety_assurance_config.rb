@@ -74,6 +74,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[causes comments sras sms_actions contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['Audit'][:workflow_images]
       },
 
       'Inspection' => {
@@ -148,6 +149,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[causes comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['Inspection'][:workflow_images]
       },
 
       'Evaluation' => {
@@ -226,6 +228,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['Evaluation'][:workflow_images]
       },
 
       'Investigation' => {
@@ -331,6 +334,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[comments occurrences source_of_input sras contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['Investigation'][:workflow_images]
       },
 
       'Finding' => {
@@ -487,6 +491,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         }),
         panels: %i[checklists comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['Finding'][:workflow_images]
       },
 
       'SmsAction' => {
@@ -591,7 +596,8 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           },
         }),
         panels: %i[causes comments costs extension_requests occurrences verifications attachments transaction_log
-        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['SmsAction'][:workflow_images]
       },
 
       'Recommendation' => {
@@ -664,7 +670,8 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           },
         }),
         panels: %i[comments extension_requests verifications attachments transaction_log
-        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:objects]['Recommendation'][:workflow_images]
       },
 
       'Checklist' => {
@@ -780,7 +787,8 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             display: proc{|user:,**op| true}},
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
-        ]
+        ],
+        workflow_images: DefaultSafetyAssuranceConfig::HIERARCHY[:menu_items]["Query Center"][:workflow_images]
       },
     }
   }

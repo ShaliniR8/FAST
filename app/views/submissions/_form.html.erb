@@ -377,14 +377,16 @@
 
   $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
-        <% if action_name == 'new' || action_name == 'continue'%>
-            $("#workflowImage").attr('src', "<%= CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| action_name.include? key}.values[0]%>")
-        <% end %>
+        <% if  CONFIG::GENERAL[:display_workflow_diagram] %>
+          <% if action_name == 'new' || action_name == 'continue'%>
+              $("#workflowImage").attr('src', "<%= CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| action_name.include? key}.values[0]%>")
+          <% end %>
 
-        <% if action_name == 'edit' %>
-          <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
-          <% curr_status = @record.send(status_field_name).downcase %>
-          $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+          <% if action_name == 'edit' %>
+            <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
+            <% curr_status = @record.send(status_field_name).downcase %>
+            $("#workflowImage").attr('src', "<%=CONFIG.srm::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+          <% end %>
         <% end %>
 
         if($("#workflowImage").is(":visible")){

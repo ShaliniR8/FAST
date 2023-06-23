@@ -72,7 +72,7 @@
         $(window).trigger('resize');
       });
     });
-    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+    <% if CONFIG::GENERAL[:display_workflow_diagram] &&  CONFIG::GENERAL[:display_workflow_diagram] %>
       var curr_status = "<%= @owner.status.downcase%>"
       <% status_field_name = CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
       <% curr_status = @owner.send(status_field_name).downcase %>
