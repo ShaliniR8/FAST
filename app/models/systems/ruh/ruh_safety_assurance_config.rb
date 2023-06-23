@@ -9,6 +9,7 @@ class RUHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             num_cols: 6,  type: 'datalist', visible: '',
             required: false, options: "CONFIG.custom_options['Station Codes']"
           },
+          location: { default: true, type: 'select', options: "CONFIG.custom_options['Locations']" },
         }
       },
       'Inspection' => {
@@ -18,6 +19,7 @@ class RUHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             num_cols: 6,  type: 'datalist', visible: '',
             required: false, options: "CONFIG.custom_options['Station Codes']"
           },
+          location: { default: true, type: 'select', options: "CONFIG.custom_options['Locations']" },
         }
       },
       'Evaluation' => {
@@ -26,6 +28,11 @@ class RUHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             field: 'station_code', title: 'Station Code',
             num_cols: 6,  type: 'datalist', visible: '',
             required: false, options: "CONFIG.custom_options['Station Codes']"
+          },
+          location: {
+            field: 'location', title: 'Location',
+            num_cols: 6, type: 'select', visible: 'form,show',
+            required: false, options: "CONFIG.custom_options['Locations']"
           },
         }
       },
