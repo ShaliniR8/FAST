@@ -22,9 +22,13 @@ class HAECOConfig < DefaultConfig
 
     hide_employee_group:           true,
     custom_uniq_id:                true,
-    hide_findings_in_checklist:    true
+    hide_findings_in_checklist:    true,
+    display_workflow_diagram:      false,   # Display workflow diagrams in the instruction panels in this module
   })
 
+  LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
+    sms_actions: ['Audits']
+  })
   DOCUMENT_CATEGORIES = ["HAECO References Information", "ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
 
 

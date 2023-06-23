@@ -271,6 +271,12 @@ class DefaultDictionary
     #     title: 'Report'
     #   }},
     # },
+    audits: {
+      partial: '/panels/audits',
+      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Audit').present?},
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { audits: owner.get_children(child_type: 'Audit') } },
+    },
     source_of_input: {
       partial: '/panels/source_of_input',
       visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
