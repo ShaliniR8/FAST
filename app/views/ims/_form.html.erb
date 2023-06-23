@@ -56,11 +56,11 @@
               </div>
               <div class="form-group form-inline col-xs-6">
                 <%=f.label :apply_to,"Plan Applies To"%>
-                <%=f.select :apply_to,@apply,{:include_blank=>true},:class=>"form-control ml5"%>
+                <%=f.select :apply_to, CONFIG.custom_options['Departments'],{:include_blank=>true},:class=>"form-control ml5"%>
               </div>
               <div class="form-group form-inline col-xs-6">
                 <%=f.label :org_type,"Organization Type"%>
-                <%=f.select :org_type,@org,{:include_blank=>true},:class=>"form-control ml5"%>
+                <%=f.select :org_type,CONFIG.custom_options['Internal Departments'],{:include_blank=>true},:class=>"form-control ml5"%>
               </div>
             <%end%>
             <div class="form-group col-xs-12">
