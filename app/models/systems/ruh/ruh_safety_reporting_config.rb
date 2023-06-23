@@ -8,6 +8,7 @@ class RUHSafetyReportingConfig < DefaultSafetyReportingConfig
     submission_description_required:  true,
     configurable_agenda_dispositions: true,
     # Airline-Specific Features:
+    hide_faa_reports:                 true,
   })
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({

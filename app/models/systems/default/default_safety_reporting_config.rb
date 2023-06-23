@@ -34,6 +34,7 @@ class DefaultSafetyReportingConfig
     limit_reporting_title_length:   false,
     show_title_deid_pdf:        true,      # Show the title of De-Id PDF. True by default but some carriers do not want this because users put identifying info on the title
     send_notifier_email_to_submitter:        true, # Submitter will get a notifier email with or without PDF if this is set to true. So submitter will get 2 emails
+    hide_faa_reports:                 false,
   }
 
   OBSERVATION_PHASES = [
