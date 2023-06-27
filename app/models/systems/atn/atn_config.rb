@@ -28,21 +28,29 @@ class ATNConfig < DefaultConfig
 
 
   P_CODE = {
-    'Flight Crew ASAP' => 'A9T2N7'
+    'ASAP - Flight' => 'A9T2N7'
   }
 
   AIRLINE_ID = {
-    'Flight Crew ASAP' => 'ATN',
+    'ASAP - Flight' => 'ATN',
   }
 
-  CISP_TITLE_PARSE = DefaultConfig::CISP_TITLE_PARSE.deep_merge({})
-  CISP_FIELD_PARSE = DefaultConfig::CISP_FIELD_PARSE.deep_merge({
-    'Flight Crew ASAP' => {
+  CISP_TITLE_PARSE = {
+    'ASAP - Flight'   => 'flightcrew',
+  }
+  CISP_FIELD_PARSE = {
+    'ASAP - Flight' => {
+      'Event Information' => {
+        'flightNumber'  => 'Flight Number',
+        'departure'     => 'Departure Airport',
+        'arrival'       => 'Landing Airport',
+        'flightPhase'   => 'Phase of Flight'
+      },
       'Narratives' => {
         'eventDescription' => "Describe the Event",
       }
     }
-  })
+  }
 
   FAA_INFO = {
     'CMO'=>'DFW Certificate Management Office, 8700 Freeport Parkway, Suite 200A, Irving, TX 75063',
