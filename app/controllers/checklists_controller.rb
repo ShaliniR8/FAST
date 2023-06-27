@@ -276,15 +276,20 @@ class ChecklistsController < ApplicationController
     else
       # reset checklist cell value when data type is changed
       if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+        curr_row_index = 0
         params[:checklist][:checklist_rows_attributes].each do |key, checklist_row|
           if checklist_row[:checklist_cells_attributes].present?
             checklist_row[:checklist_cells_attributes].each do |key, checklist_cell|
               ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present? && checklist_cell[:id].present?
             end
           end
+          if checklist_row[:row_order].present? && checklist_row[:row_order] == "10000"
+            byebug
+            checklist_row[:row_order] = curr_row_index.to_s
+          end
+          curr_row_index += 1
         end
       end
-
       if params[:template_names].present?
         template_id = Checklist.where(owner_type: 'ChecklistHeader').where(title: (params[:template_names])).first.id
         params[:checklist][:template_id] = template_id
