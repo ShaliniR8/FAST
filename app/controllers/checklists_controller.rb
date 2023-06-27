@@ -284,8 +284,7 @@ class ChecklistsController < ApplicationController
             end
           end
           if checklist_row[:row_order].present? && checklist_row[:row_order] == "10000"
-            byebug
-            checklist_row[:row_order] = curr_row_index.to_s
+            checklist_row[:row_order] = curr_row_index
           end
           curr_row_index += 1
         end
