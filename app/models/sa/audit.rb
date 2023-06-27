@@ -25,6 +25,7 @@ class Audit < Sa::SafetyAssuranceBase
   belongs_to  :approver,            foreign_key: 'approver_id',           class_name: 'User'
   belongs_to  :responsible_user,    foreign_key: 'responsible_user_id',   class_name: 'User'
   belongs_to  :created_by,          foreign_key: 'created_by_id',         class_name: 'User'
+  belongs_to :owner,                  polymorphic: true
   has_many    :requirements,        foreign_key: 'owner_id',              class_name: 'AuditRequirement',       dependent: :destroy
   has_many    :items,               foreign_key: 'owner_id',              class_name: 'AuditItem',              dependent: :destroy
   has_many    :checklist_records,   foreign_key: 'owner_id',              class_name: 'AuditChecklistRecord',   dependent: :destroy
