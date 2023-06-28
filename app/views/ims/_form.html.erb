@@ -52,7 +52,7 @@
             <%if @im.type!="JobAid"%>
               <div class="form-group form-inline col-xs-6">
                 <%=f.label :location%>
-                <%=f.text_field :location,:class=>"form-control ml5"%>
+                <%=f.select :location, CONFIG.custom_options['Locations'], {:include_blank=>true}, :class=>"form-control ml5"%>
               </div>
               <div class="form-group form-inline col-xs-6">
                 <%=f.label :apply_to,"Plan Applies To"%>

@@ -87,8 +87,8 @@ class Im < Sim::ImplementationManagementBase
 
   def self.get_org
     [
-      'Air Carrier',
-      'MRO'
+      'Internal Departments',
+      'Stakeholders'
     ]
   end
 

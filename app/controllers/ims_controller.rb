@@ -185,7 +185,7 @@ class ImsController < ApplicationController
     @users = User.find(:all)
     @users.keep_if{|u| !u.disable && u.has_access('ims', 'edit')}
     @headers = User.get_headers
-    @apply = Im.get_apply
+    @apply = CONFIG.custom_options['Departments']
     @org = Im.get_org
     @aid = Im.get_aid
   end
