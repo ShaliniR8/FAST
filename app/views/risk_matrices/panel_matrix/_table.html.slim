@@ -2,7 +2,7 @@ ruby:
   is_row_header_col_empty = table[:row_header].size == 1 && table[:row_header][0] == ''
   is_col_header_row_empty = table[:column_header].size == 1 && table[:column_header][0] == ''
 
-div class="#{table[:size]}"
+div class="#{table[:size]} tableContainer"
   hr
   h4 class="#{table[:title_style]}"
     b = "#{table[:title]}"
@@ -92,4 +92,8 @@ css:
   }
   .probHeader {
     background-color: #FEF5E7;
+  }
+
+  .tableContainer{
+    overflow: auto;
   }
