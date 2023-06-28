@@ -46,7 +46,7 @@ class ZEROGConfig < DefaultConfig
       title: 'SEVERITY EXERCISE',
 
       orientation: :horizontal,
-      direction: :up,
+      direction: :left,
       size: 'col-xs-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
@@ -71,11 +71,10 @@ class ZEROGConfig < DefaultConfig
     },
 
     severity_table_dict: {
-      0 => '0',
-      1 => '1',
-      2 => '2',
-      3 => '3',
-      4 => '4',
+      0 => 'I',
+      1 => 'II',
+      2 => 'III',
+      3 => 'IV',
     },
 
     probability_table: {
@@ -113,11 +112,10 @@ class ZEROGConfig < DefaultConfig
     },
 
     probability_table_dict: {
-      0 => '(A) Improbable',
-      1 => '(B) Seldom',
-      2 => '(C) Occasional',
-      3 => '(D) Probable',
-      4 => '(E) Frequent',
+      0 => 'A',
+      1 => 'B',
+      2 => 'C',
+      3 => 'D',
     },
 
     risk_table: {
@@ -144,27 +142,31 @@ class ZEROGConfig < DefaultConfig
         'D'],
       rows_color: [
         ['red',       'red',    'orange',     'yellow'],
-        ['red',       'orange',  'yellow',    '#0096FF'],
-        ['orange',    'yellow',  '#0096FF',  'limegreen'],
-        ['yellow',    '#0096FF','limegreen', 'limegreen']
+        ['red',       'orange',  'yellow',    'aqua'],
+        ['orange',    'yellow',  'aqua',  'limegreen'],
+        ['yellow',    'aqua','limegreen', 'limegreen']
       ],
     },
 
     risk_table_index: {
-      "LOW RISK" => 'limegreen',
-      "MEDIUM RISK" => 'yellow',
-      "HIGH RISK" => 'red',
+      "NEGLIGIBLE" => 'limegreen',
+      "MINOR" => 'aqua',
+      "MODERATE" => 'yellow',
+      "HIGH" => 'orange',
+      "SEVERE" => "red"
     },
 
     risk_table_dict: {
-      limegreen:    'LOW RISK',
-      yellow:       'MEDIUM RISK',
-      red:          'HIGH RISK' ,
+      limegreen:    'NEGLIGIBLE',
+      aqua:         'MINOR',
+      yellow:       'MODERATE',
+      orange:       'HIGH',
+      red:          'SEVERE' ,
     },
 
     risk_definitions: {
       limegreen:    { rating: 'NEGLIGIBLE', description: 'Requires tracking (REQUIRED ACTION) <hr class="defn_hr"/> Acceptable at all levels (RISK ACCEPTANCE AUTHORITY)'},
-      '#0096FF' =>    { rating: 'MINOR', description: 'Requires tracking and possible action. There are acceptable policies and procedures in place. (REQUIRED ACTION) <hr class="defn_hr"/> Requires review and approval by Departmental Manager (RISK ACCEPTANCE AUTHORITY)' },
+      aqua:         { rating: 'MINOR', description: 'Requires tracking and possible action. There are acceptable policies and procedures in place. (REQUIRED ACTION) <hr class="defn_hr"/> Requires review and approval by Departmental Manager (RISK ACCEPTANCE AUTHORITY)' },
       yellow:       { rating: 'MODERATE', description: 'Requires review and approval by Departmental Manager in conjunction with the Safety Department (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Departmental Director in conjunction with the Director of Safety.(RISK ACCEPTANCE AUTHORITY)' },
       orange:       { rating: 'HIGH', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking review, and approval by Accountable Executive in conjunction with the VP Safety and Regulatory Compliance (RISK ACCEPTANCE AUTHORITY)' },
       red:          { rating: 'SEVERE', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Accountable Executive in conjunction with the VP Safety and Regulatory Compliance (RISK ACCEPTANCE AUTHORITY)' },
