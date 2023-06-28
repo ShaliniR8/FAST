@@ -904,7 +904,7 @@ class ApplicationController < ActionController::Base
     @sms_list=['sms_actions','findings','audits','inspections','recommendations','investigations','evaluations']
     @sms_im_list=['ims']
     # @asap_list=['reports','records','corrective_actions','trackings','faa_reports','templates','fields']
-    @asap_list=['reports','records','corrective_actions','trackings','faa_reports']
+    @asap_list=['submissions','reports','records','corrective_actions','trackings','faa_reports']
     @srm_list=['sras','hazards','risk_controls','safety_plans']
   end
 
