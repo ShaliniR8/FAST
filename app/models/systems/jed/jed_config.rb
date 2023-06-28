@@ -11,10 +11,58 @@ class JEDConfig < DefaultConfig
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'King Abdulaziz International Airport',
     time_zone:                    'Riyadh',
-
+    
     # SYSTEM CONFIGS
     has_mobile_app:               false,
+    
+    external_link:                true,
+    enable_sso:                   true,
+    login_option:                 'sso',
+    safety_promotion_visibility:  true,
+    sms_im_visibility:            false,
   })
+
+  EXTERNAL_LINK =
+    if Rails.env.production?
+      'https://jed.prodigiq.com'
+    else
+      'http://192.168.254.27:3002/'
+    end
+
+  def self.sync_user(user, prev_email)
+    conn = Faraday.new(
+      url: "#{CONFIG::EXTERNAL_LINK}",
+      params: {
+      email: [prev_email || user.email, user.email],
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      level: user.level,
+      disable: user.disable
+    },
+      headers: {'Content-Type' => 'application/json'}
+    )
+    response = conn.post('/api/jed/users/sync') do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Client-ID'] = 'VcuOWeajgfgTZcG2ak8Hatl9npc7IZ1CW-tdBoX4NUc'
+      req.headers['Client-Secret'] = 'vcAhVjM9ysZAFG9RNTV-vlo1uFwc-dymDMdEuH0DMQs'
+    end
+    response
+  end
+
+  def self.external_link(user)
+    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/jed/users/find", 
+      {email: user.email}.to_json, 
+        {
+          'Content-Type' => 'application/json',
+          'Client-ID' => 'VcuOWeajgfgTZcG2ak8Hatl9npc7IZ1CW-tdBoX4NUc',
+          'Client-Secret' => 'vcAhVjM9ysZAFG9RNTV-vlo1uFwc-dymDMdEuH0DMQs'})
+    if res.success?
+      json = JSON.parse(res.body) rescue nil
+      "#{CONFIG::EXTERNAL_LINK}/users/#{json['id']}" if json.present?
+    end
+  end
+
 
   MATRIX_INFO = {
     terminology: {
