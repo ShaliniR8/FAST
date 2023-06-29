@@ -17,6 +17,11 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           uniq_custom_id: { visible: 'index,show', title: 'Custom ID', field: 'uniq_custom_id', num_cols: 6 },
           title: { default: true },
           status: { default: true, on_newline: true, field: 'get_status' },
+          get_source: {
+            field: 'get_source', title: 'Source of Input',
+            num_cols: 6, type: 'text', visible: 'index,show',
+            required: false
+          },
           created_by: { default: true },
           due_date: {default: true, on_newline: true },
           close_date: { default: true },

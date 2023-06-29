@@ -201,5 +201,24 @@ class Audit < Sa::SafetyAssuranceBase
     ActionController::Base.new.expire_fragment(fragment_name)
   end
 
+  def get_source
+    if self.owner.present?
+      "<a style='font-weight:bold' href='/#{owner_type.downcase.pluralize}/#{self.owner_id}'>
+        #{self.owner_titleize} ##{self.owner_id}
+      </a>".html_safe
+    elsif self.get_parent.present?
+      obejct_name =
+        if CONFIG::OBJECT_NAME_MAP[self.get_parent.class.name].present?
+          CONFIG::OBJECT_NAME_MAP[self.get_parent.class.name]
+        else
+          self.get_parent.class.name
+        end
+      "<a style='font-weight:bold' href='/#{self.get_parent.class.name.underscore.pluralize}/#{self.get_parent.id}'>
+        #{obejct_name} ##{self.get_parent.id}
+      </a>".html_safe
+    else
+      "<b style='color:grey'>N/A</b>".html_safe
+    end
+  end
 
 end

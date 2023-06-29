@@ -22,8 +22,7 @@ class HAECOConfig < DefaultConfig
 
     hide_employee_group:           true,
     custom_uniq_id:                true,
-    hide_findings_in_checklist:    true,
-    display_workflow_diagram:      false,   # Display workflow diagrams in the instruction panels in this module
+    hide_findings_in_checklist:    true
   })
 
   LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
