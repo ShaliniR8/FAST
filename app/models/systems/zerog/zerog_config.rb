@@ -45,83 +45,77 @@ class ZEROGConfig < DefaultConfig
     severity_table: {
       title: 'SEVERITY EXERCISE',
 
-      orientation: :vertical,
-      direction: :down,
+      orientation: :horizontal,
+      direction: :left,
       size: 'col-xs-6',
       title_style: 'severityTitle',
       main_header_style: 'sevMainHeader',
       header_style: 'sevHeader',
       cell_name: 'severity_td',
 
-      row_header_name: 'RATING',
-      row_header: ['0', '1', '2', '3', '4'],
-      column_header_name: 'SEVERITY LEVELS',
-      column_header: ['PHYSICAL INJURY','SAFETY OF FLIGHT','DAMAGE TO ASSETS','POTENTIAL INCREASED COST OR REVENUE LOSS','OPERATIONAL RELIABILITY'],
+      column_header_name: 'RATING',
+      column_header: ['I','II', 'III', 'IV'],
+      row_header_name: 'SEVERITY LEVELS',
+      row_header: ['Accident or Incident','Injury','Airworthiness','Systems Operations','Security', 'Damage To Assets', 'Compliance/Audit', 'Operation', 'General'],
       rows: [
-          ['NO INJURY',      'NO EFFECT',       'NO DAMAGE',               'NO INCREASED COST OR LOST REVENUE',       'NO EFFECT' ],
-          ['MINOR INJURY',   'MARGIN DEGRADED', 'MINOR DAMAGE < US $50K',  'MINOR LOSS < US $50K',                    'DELAYS' ],
-          ['SERIOUS INJURY','INCIDENT POTENTIAL','SUBSTANTIAL DAMAGE < US $250K','SUBSTANTIAL LOSS < US $250K', 'CANCELLATION' ],
-          ['SINGLE FATALITY','ACCIDENT POTENTIAL','MAJOR DAMAGE < US $1M',  'MAJOR LOSS < US $1M',   'REGIONAL SCHEDULE IMPACT'],
-          ['MULTIPLE FATALITIES','LOSS OF AIRCRAFT','CATASTROPHIC DAMAGE > US $1M','MASSIVE LOSS > US $1M','SYSTEMWIDE SCHEDULE IMPACT']
-        ],
+        ["Accident with serious injuries or fatalities, or significant damage to aircraft", "Accident / Serious incident with injuries and/or moderate damage to aircraft", "Accident/Incident with minor injury and/or minor aircraft damage", "Less than minor injury and/or less than minor damage"], 
+        ["Death, total disability of an employee or passenger", "Partial disability, temporary disability > 3 mo. of an employee or passenger", "Lost workday injury of an employee", "Any injury to employee or passenger"], 
+        ["Operating an aircraft in an unairworthy and unsafe condition", "Operating an aircraft in an unairworthy but not unsafe condition", "Returning an aircraft to service in an unairworthy condition, not operated", "Affecting aircraft or systems reliability above established control limits but no effect on airworthiness or safety of operation"], 
+        ["Loss or breakdown of entire system or sub-systems", "Partial breakdown of a system or sub-system", "System deficiencies leading to poor dependability or disruption to the schedules", "Little or no effect on system or sub-system, or for general informational purpose only"], 
+        ["Attempted or actual breach of the flight deck", "Life threatening behaviour", "Physically abusive behaviour", "Disruptive/verbally abusive behaviour"], 
+        ["Catastrophic damage > US $1M", "Major damage < US $1M", "Substantial damage < US $250K", "Minor Damage &lt; US $50K"], 
+        ["Non-Compliance with major impact on safety of operations, item warrants immediate attention and remedy", "Non-Compliance with minor impact on safety of operations. No immediate adverse consequence currently exists.", "Non-Conformance with negligible safety implication", "Observation/Non-Conformance with recommended best practice. No safety implication."], 
+        ["Aircraft Structural integrity or Safety of Crew/Passengers directly at Risk", "Aircraft structural integrity and life of crew and passenger indirectly at risk", "Operation beyond operating limitations; Use of abnormal procedures", "Policy or procedure deviation with limited safety implication"], 
+        ["Catastrophic loss of aircraft or life Any NTSB Reportable Event", "SRC Investigation required, FAA or Foreign Regulatory Investigation", "Voluntary Disclosure required", "Informational Only"]
+      ],
     },
 
     severity_table_dict: {
-      0 => '0',
-      1 => '1',
-      2 => '2',
-      3 => '3',
-      4 => '4',
+      0 => 'I',
+      1 => 'II',
+      2 => 'III',
+      3 => 'IV',
     },
 
     probability_table: {
       title: 'Likelihood Levels/ Probability of Occurences',
-      orientation: :horizontal,
+      orientation: :vertical,
       direction: :up,
       size: 'col-xs-6',
       title_style: 'probabilityTitle',
       main_header_style: 'probMainHeader',
       header_style: 'probHeader',
       cell_name: 'probability_td',
-      row_header: ['Meaning'],
+      column_header: ['REACTIVE Assessment (Control Effectiveness)', 'PROACTIVE Assessment (Likelihood)'],
       column_header_name: 'Qualitative Definition',
-      column_header: ['(A) Improbable' , '(B) Seldom', '(C) Occasional', '(D) Probable', '(E) Frequent'   ],
+      row_header: ['A' , 'B', 'C', 'D'  ],
       row_header_name: 'Meaning',
 
       rows: [
+        [ 
+          "<b> NOT EFFECTIVE </b> <br/> Remaining controls were ineffective or No controls remained.", 
+          "<b> LIKELY </b> <br/> to occur ( Will occur in most circumstances, not surprised if it happens) or Occurs <span>&#8805;</span> 1 in 100."
+        ], 
         [
-          #1
-           'A remote likelihood, being almost inconceivable that event will occur </br>
-            Quantitative - Greater than or equal to 10<sup>-6</sup> (1/1,000,000) or once per 10 years',
-          #2
-            'Very unlikely to occur (not known it has occured) </br>
-            An activity or event that occurs intemittently </br>
-            Regulator/Auditor have low likelihood of issue identification during any general or focused review </br>
-            Quantitative - Greater than or equal to 10<sup>-5</sup> (1/100,000) or once per year',
-          #3
-            'Unlikely, but possible to occur (occurs rarely) </br>
-            An activity or event that occurs infrequently, or irregularly. Sporadic in nature </br>
-            Auditor/Regulator have potential of issue discovery during focused or specialized review </br>
-            Quantitative - Greater than or equal to 10<sup>-4</sup> or once per month',
-          #4
-            'Likely to occur sometimes (occurs infrequently) </br>
-            Will occur often if events follow normal patterns of process or procedure. Event is repeatable. </br>
-            Auditor/Regulator have potential of issue discovery with minimal audit activity </br>
-            Quantitative - Greater than or equal to 10<sup>-3</sup> (1/1000) or once per week',
-          #5
-            'Likely to occur many times (occurs frequently) </br>
-            Will be continuously experienced unless action is taken to change events </br>
-            Quantitative - Greater than or equal to 10<sup>-2</sup> (1/100) or once per day',
+          "<b> MINIMAL </b> <br/> Some controls left but their total effectiveness were minimal.", 
+          "<b> POSSIBLE </b> <br/> to occur (might occur in some circumstances) or Occurs 1 in 100 to 1,000."
+        ], 
+        [
+          "<b> LIMITED </b> <br/> Abnormal situation more demanding to manage. Still a considerate remaining margin.", 
+          "<b> UNLIKELY </b> <br/> to occur (Could occur in some circumstances, surprised if it happens) or Occurs 1 in 1,000 to 10,000."
+        ],
+        [
+          "<b> EFFECTIVE </b> <br/> Consisting of several good controls.", 
+          "<b> RARE </b> <br/> to occur (May occur in exceptional circumstances, would be highly unexpected) or Occurs 1 in 10,000 to 1,000,000."
         ]
       ], #End of rows
     },
 
     probability_table_dict: {
-      0 => '(A) Improbable',
-      1 => '(B) Seldom',
-      2 => '(C) Occasional',
-      3 => '(D) Probable',
-      4 => '(E) Frequent',
+      0 => 'A',
+      1 => 'B',
+      2 => 'C',
+      3 => 'D',
     },
 
     risk_table: {
@@ -138,40 +132,44 @@ class ZEROGConfig < DefaultConfig
       severity_pos: 'row',
       likelihood_pos: 'column',
 
-      row_header_name: 'RATING',
-      row_header: ['0', '1', '2', '3', '4'],
-      column_header_name: 'LIKELIHOOD LEVELS',
-      column_header: [
-        '<br> A <br> IMPROBABLE <br><br>',
-        'B <br> SELDOM',
-        'C <br> OCCASIONAL',
-        'D <br> PROBABLE',
-        'E <br> FREQUENT'],
+      column_header_name: 'RATING',
+      column_header: ['I', 'II', 'III', 'IV'],
+      row_header_name: 'PROBABILITY',
+      row_header: [
+        'A',
+        'B',
+        'C',
+        'D'],
       rows_color: [
-        ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen'],
-        ['limegreen',   'limegreen',    'limegreen',    'limegreen',    'limegreen'],
-        ['limegreen',   'limegreen',    'yellow',       'yellow',       'red' ],
-        ['limegreen',   'yellow',       'yellow',       'red',          'red' ],
-        ['yellow',      'yellow',       'red',          'red',          'red' ],
+        ['red',       'red',    'orange',     'yellow'],
+        ['red',       'orange',  'yellow',    'aqua'],
+        ['orange',    'yellow',  'aqua',  'limegreen'],
+        ['yellow',    'aqua','limegreen', 'limegreen']
       ],
     },
 
     risk_table_index: {
-      "LOW RISK" => 'limegreen',
-      "MEDIUM RISK" => 'yellow',
-      "HIGH RISK" => 'red',
+      "NEGLIGIBLE" => 'limegreen',
+      "MINOR" => 'aqua',
+      "MODERATE" => 'yellow',
+      "HIGH" => 'orange',
+      "SEVERE" => "red"
     },
 
     risk_table_dict: {
-      limegreen:    'LOW RISK',
-      yellow:       'MEDIUM RISK',
-      red:          'HIGH RISK' ,
+      limegreen:    'NEGLIGIBLE',
+      aqua:         'MINOR',
+      yellow:       'MODERATE',
+      orange:       'HIGH',
+      red:          'SEVERE' ,
     },
 
     risk_definitions: {
-      limegreen:    { rating: 'LOW RISK'},
-      yellow:       { rating: 'MEDIUM RISK' },
-      red:          { rating: 'HIGH RISK' },
+      limegreen:    { rating: 'NEGLIGIBLE', description: 'Requires tracking (REQUIRED ACTION) <hr class="defn_hr"/> Acceptable at all levels (RISK ACCEPTANCE AUTHORITY)'},
+      aqua:         { rating: 'MINOR', description: 'Requires tracking and possible action. There are acceptable policies and procedures in place. (REQUIRED ACTION) <hr class="defn_hr"/> Requires review and approval by Departmental Manager (RISK ACCEPTANCE AUTHORITY)' },
+      yellow:       { rating: 'MODERATE', description: 'Requires review and approval by Departmental Manager in conjunction with the Safety Department (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Departmental Director in conjunction with the Director of Safety.(RISK ACCEPTANCE AUTHORITY)' },
+      orange:       { rating: 'HIGH', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking review, and approval by Accountable Executive in conjunction with the VP Safety and Regulatory Compliance (RISK ACCEPTANCE AUTHORITY)' },
+      red:          { rating: 'SEVERE', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Accountable Executive in conjunction with the VP Safety and Regulatory Compliance (RISK ACCEPTANCE AUTHORITY)' },
     },
   }
 
