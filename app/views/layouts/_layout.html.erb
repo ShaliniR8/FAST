@@ -496,7 +496,7 @@
                 <% if CONFIG::GENERAL[:safety_promotion_visibility] && current_user.has_access('Safety Promotion','module', admin: CONFIG::GENERAL[:global_admin_default], strict: true) %>
                   <li class="menu-link"><%= link_to 'Safety Promotion', switch_modes_path(:mode=>"SP") %></li>
                 <%end%>
-                <%if current_user.has_access('OSHA','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
+                <%if CONFIG::GENERAL[:osha_visibility] && current_user.has_access('OSHA','module', admin: CONFIG::GENERAL[:global_admin_default]) %>
                   <li class="menu-link"><%= link_to 'OSHA / OJI', switch_modes_path(mode: 'OSHA') %></li>
                 <%end%>
 
