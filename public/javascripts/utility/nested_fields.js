@@ -6,3 +6,11 @@ function add_fields(link, association, content, target) {
   console.log(insertposition);
   $(content.replace(regexp, new_id)).appendTo($(link).closest(".panel-body").find(insertposition));
 }
+
+function update_row_order_checklist_row(table_class){
+  $(".row_order_new_checklist_row").each(function(){
+    var currIndex = $(`#${table_class} tbody tr`).index($(this).closest('tr'));
+    $(this).val(currIndex);
+  })
+  $(".row_order_new_checklist_row").removeClass("row_order_new_checklist_row")
+}
