@@ -149,7 +149,7 @@
       });
     });
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@record.class.name][:workflow_images].select {|key| "new".include? key}.values[0]%>")
+      $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@record.class.name].select {|key| "new".include? key}.values[0]%>")
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

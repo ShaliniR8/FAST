@@ -76,7 +76,7 @@
       var curr_status = "<%= @owner.status.downcase%>"
       <% status_field_name = CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
       <% curr_status = @owner.send(status_field_name).downcase %>
-      $("#workflowImage").attr('src', "<%=CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', "<%=CONFIG.sa::WORKFLOW_IMAGES[@owner.class.name].select {|key| curr_status.include? key}.values[0]%>")
     <% end %>
 
      $("#toggleWorkflowImageButton").on('click', function(event){

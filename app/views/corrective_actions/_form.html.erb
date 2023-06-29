@@ -82,13 +82,13 @@
    $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
         <% if CONFIG::GENERAL[:display_workflow_diagram] &&  action_name == 'new' %>
-            $("#workflowImage").attr('src', "<%= CONFIG.sr::HIERARCHY[:objects][@corrective_action.class.name][:workflow_images].select {|key| action_name.include? key}.values[0] %>" )
+            $("#workflowImage").attr('src', "<%= CONFIG.sr::WORKFLOW_IMAGES[@corrective_action.class.name].select {|key| action_name.include? key}.values[0] %>" )
         <% end %>
 
         <% if CONFIG::GENERAL[:display_workflow_diagram] &&  action_name == 'edit' %>
           <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@corrective_action.class.name][:fields][:status][:field]%>
           <% curr_status = @corrective_action.send(status_field_name).downcase %>
-          $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@corrective_action.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+          $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@corrective_action.class.name].select {|key| curr_status.include? key}.values[0]%>")
         <% end %>
 
         if($("#workflowImage").is(":visible")){

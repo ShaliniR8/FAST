@@ -131,12 +131,12 @@
     $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'new' %>
-            $("#workflowImage").attr('src', "<%= CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images].select {|key| action_name.include? key}.values[0] %>" )
+            $("#workflowImage").attr('src', "<%= CONFIG.sr::WORKFLOW_IMAGES['Meetings'].select {|key| action_name.include? key}.values[0] %>" )
         <% end %>
 
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'edit' %>
           <% curr_status = @meeting.status.downcase%>
-          $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+          $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES['Meetings'].select {|key| curr_status.include? key}.values[0]%>")
         <% end %>
 
         if($("#workflowImage").is(":visible")){

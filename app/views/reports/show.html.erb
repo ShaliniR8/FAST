@@ -262,7 +262,7 @@
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
       <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@report.class.name][:fields][:status][:field]%>
       <% curr_status = @report.send(status_field_name).downcase %>
-      $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:objects][@report.class.name][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@report.class.name].select {|key| curr_status.include? key}.values[0]%>")
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

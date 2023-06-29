@@ -183,7 +183,7 @@
   $(document).ready(function(){
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
       <% curr_status = @meeting.status.downcase%>
-      $("#workflowImage").attr('src', "<%=CONFIG.sr::HIERARCHY[:menu_items]['Meetings'][:workflow_images].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES['Meetings'].select {|key| curr_status.include? key}.values[0]%>")
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

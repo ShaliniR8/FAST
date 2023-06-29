@@ -81,15 +81,15 @@
     var imageMap = null
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
       <% if session[:mode] == "SRM" &&  CONFIG::GENERAL[:display_workflow_diagram] %>
-            imageMap = <%=CONFIG.srm::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+            imageMap = <%=CONFIG.srm::WORKFLOW_IMAGES['Query Center'].to_json.html_safe%>
             $("#workflowImage").attr('src', imageMap['default'])
         <% end %>
       <% if session[:mode] == "ASAP" &&  CONFIG::GENERAL[:display_workflow_diagram] %>
-          imageMap = <%=CONFIG.sr::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+          imageMap = <%=CONFIG.sr::WORKFLOW_IMAGES['Query Center'].to_json.html_safe%>
           $("#workflowImage").attr('src', imageMap['default'])
       <% end %>
       <%if session[:mode] == "SMS" &&  CONFIG::GENERAL[:display_workflow_diagram] %>
-          imageMap = <%=CONFIG.sa::HIERARCHY[:menu_items]["Query Center"][:workflow_images].to_json.html_safe%>
+          imageMap = <%=CONFIG.sa::WORKFLOW_IMAGES['Query Center'].to_json.html_safe%>
           $("#workflowImage").attr('src', imageMap['default'])
       <%end%>
     <% end %>

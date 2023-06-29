@@ -15,6 +15,62 @@ class DefaultSafetyAssuranceConfig
     daily_weekly_recurrence_frequecies: false,
   }
 
+  WORKFLOW_IMAGES = {
+    'Audit' => {
+        "new"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
+        "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
+        "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
+        "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
+    },
+    "Inspection" => {
+        "new" => "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
+         "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
+         "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
+         "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
+    },
+    'Evaluation' => {
+          "new"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
+          "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
+          "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
+          "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",      
+    },
+    'Investigation' => {
+          "new"=> "/images/SA_Workflow/Investigation_New.png",
+          "assigned"=> "/images/SA_Workflow/Investigation_Assigned.png",
+          "completed"=> "/images/SA_Workflow/Investigation_Completed.png",
+          "pending approval"=> "/images/SA_Workflow/Investigation_PendingApproval.png",      
+    },
+    'Finding' => {
+          "new"=> "/images/SA_Workflow/Finding_New.png",
+          "assigned"=> "/images/SA_Workflow/Finding_Assigned.png",
+          "completed"=> "/images/SA_Workflow/Finding_Completed.png",
+          "pending approval"=> "/images/SA_Workflow/Finding_PendingApproval.png",      
+    },
+    'SmsAction' => {
+          "new"=> "/images/SA_Workflow/CorrectiveActionRecommendation_New.png",
+          "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
+          "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
+          "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",      
+    },
+    'Recommendation' => {
+          "new"=> "/images/SA_Workflow/CorrectiveActionRecommendation_New.png",
+          "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
+          "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
+          "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",      
+    },
+    'Query Center' => {
+          "Audit"             => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
+          "Inspection"        => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
+          "Evaluation"        => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
+          "Investigation"     => "/images/SA_Workflow/QC_Investigation.png",
+          "Finding"           => "/images/SA_Workflow/QC_Finding.png",
+          "SmsAction"         => "/images/SA_Workflow/QC_CorrectiveactionRecommendation.png",
+          "Recommendation"    => "/images/SA_Workflow/QC_CorrectiveactionRecommendation.png",
+          "default"           => "/images/SA_Workflow/QC_SA_default.png"      
+    }
+
+  }
+
   HIERARCHY = {
     display_name: 'Safety Assurance',
     objects: {
@@ -89,12 +145,6 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[causes comments sras findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
-          "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-        }
       },
 
       'Inspection' => {
@@ -169,12 +219,6 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[causes comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new" => "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
-          "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-        }
       },
 
       'Evaluation' => {
@@ -253,12 +297,6 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[comments sras findings contacts costs tasks requirements signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
-          "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-        }
       },
 
       'Investigation' => {
@@ -369,12 +407,6 @@ class DefaultSafetyAssuranceConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[comments occurrences source_of_input sras findings contacts costs tasks sms_actions recommendations signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new"=> "/images/SA_Workflow/Investigation_New.png",
-          "assigned"=> "/images/SA_Workflow/Investigation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Investigation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Investigation_PendingApproval.png",
-        }
       },
 
       'Finding' => {
@@ -531,12 +563,6 @@ class DefaultSafetyAssuranceConfig
         }),
         panels: %i[checklists comments occurrences sms_actions recommendations extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new"=> "/images/SA_Workflow/Finding_New.png",
-          "assigned"=> "/images/SA_Workflow/Finding_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Finding_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Finding_PendingApproval.png",
-        }
       },
 
       'SmsAction' => {
@@ -642,12 +668,6 @@ class DefaultSafetyAssuranceConfig
         }),
         panels: %i[causes comments costs extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new"=> "/images/SA_Workflow/CorrectiveActionRecommendation_New.png",
-          "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
-        }
       },
 
       'Recommendation' => {
@@ -721,12 +741,6 @@ class DefaultSafetyAssuranceConfig
         }),
         panels: %i[comments extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        workflow_images: {
-          "new"=> "/images/SA_Workflow/CorrectiveActionRecommendation_New.png",
-          "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",
-        }
       },
 
       'Checklist' => {
@@ -857,16 +871,6 @@ class DefaultSafetyAssuranceConfig
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
         ],
-        workflow_images: {
-          "Audit"             => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
-          "Inspection"        => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
-          "Evaluation"        => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
-          "Investigation"     => "/images/SA_Workflow/QC_Investigation.png",
-          "Finding"           => "/images/SA_Workflow/QC_Finding.png",
-          "SmsAction"         => "/images/SA_Workflow/QC_CorrectiveactionRecommendation.png",
-          "Recommendation"    => "/images/SA_Workflow/QC_CorrectiveactionRecommendation.png",
-          "default"           => "/images/SA_Workflow/QC_SA_default.png"
-        }
       },
     }
   }
