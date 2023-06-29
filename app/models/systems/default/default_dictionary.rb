@@ -226,7 +226,7 @@ class DefaultDictionary
     view_parent: {
       btn: :view_parent,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
+      access: proc { |owner:,user:,**op| owner.parents.present? || (defined?(owner.owner) && owner.owner.present?) },
     },
     view_sra: {
       btn: :view_sra,
