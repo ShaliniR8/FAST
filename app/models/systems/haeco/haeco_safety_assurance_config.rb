@@ -17,6 +17,11 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           uniq_custom_id: { visible: 'index,show', title: 'Custom ID', field: 'uniq_custom_id', num_cols: 6 },
           title: { default: true },
           status: { default: true, on_newline: true, field: 'get_status' },
+          get_source: {
+            field: 'get_source', title: 'Source of Input',
+            num_cols: 6, type: 'text', visible: 'index,show',
+            required: false
+          },
           created_by: { default: true },
           due_date: {default: true, on_newline: true },
           close_date: { default: true },
@@ -68,11 +73,11 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
         actions: [
           #TOP
-          *%i[delete override_status edit launch sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
+          *%i[delete override_status edit view_parent launch sign deid_pdf pdf viewer_access attach_in_message expand_all private_link],
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost sms_action comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[causes comments sras sms_actions contacts costs tasks signatures extension_requests verifications attachments transaction_log
+        panels: %i[ source_of_input causes comments sras sms_actions contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 
@@ -590,7 +595,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             },
           },
         }),
-        panels: %i[causes comments costs extension_requests occurrences verifications attachments transaction_log
+        panels: %i[audits causes comments costs extension_requests occurrences verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 

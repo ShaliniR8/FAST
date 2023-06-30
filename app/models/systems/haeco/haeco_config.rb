@@ -25,6 +25,9 @@ class HAECOConfig < DefaultConfig
     hide_findings_in_checklist:    true
   })
 
+  LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
+    sms_actions: ['Audits']
+  })
   DOCUMENT_CATEGORIES = ["HAECO References Information", "ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
 
 

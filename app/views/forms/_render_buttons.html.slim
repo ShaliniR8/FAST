@@ -268,13 +268,15 @@ ruby:
   - when :view_parent
     - if owner.parents.present?
       - parent_class = owner.get_parent.class.name
-      - if ['Investigation', 'Sra'].include?(owner.class.name)
+      - if ['Investigation', 'Sra', 'Audit'].include?(owner.class.name)
         - parent_name = ""
         - case owner.get_parent.class.name
         - when 'Record'
           - parent_name = 'Report'
         - when 'Report'
           - parent_name = 'Event'
+        - when 'SmsAction'
+          - parent_name = 'Corrective Action'
         - else
           - parent_name = parent_class
 
