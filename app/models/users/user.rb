@@ -316,8 +316,8 @@ class User < ActiveRecord::Base
 
 
   def num_unread()
-    self.cc_messages.select{|x| x.status == "Unread"}.length +
-      self.inbox_messages.select{|x| x.status == "Unread"}.length
+    self.cc_messages.select{|x| x.status == "Unread" && x.visible }.length +
+      self.inbox_messages.select{|x| x.status == "Unread" && x.visible }.length
   end
 
 
