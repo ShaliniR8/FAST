@@ -385,6 +385,23 @@ class HAECOSafetyReportingConfig < DefaultSafetyReportingConfig
         panels: %i[occurrences
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
+      'Meeting' => {
+        title: 'Meeting',
+        fields: {
+          id: { default: true },
+          status: { default: true },
+        }.reduce({}) { |acc,(key,data)|
+          acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
+        },
+        actions: [
+          #TOP
+          *%i[],
+          #INLINE
+          *%i[pdf],
+        ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
+        panels: %i[included_reports participants attachments transaction_log
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+      }
     },
     menu_items: {
       'Submissions' => {
