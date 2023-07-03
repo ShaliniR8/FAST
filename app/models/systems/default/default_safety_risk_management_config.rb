@@ -568,7 +568,7 @@ class DefaultSafetyRiskManagementConfig
             display: proc{|user:,**op| true}},
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
-        ],
+        ]
       },
     }
   }

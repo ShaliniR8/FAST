@@ -338,7 +338,7 @@ class DefaultSafetyReportingConfig
         },
         panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
-        print_panels: %w[risk_matrix occurrences corrective_actions records],
+        print_panels: %w[risk_matrix occurrences corrective_actions records]
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',
@@ -496,7 +496,7 @@ class DefaultSafetyReportingConfig
             display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'index', CONFIG::GENERAL[:global_admin_default], true)}},
           {title: 'New', path: 'new_meeting_path',
             display: proc{|user:,**op| priv_check.call(Object.const_get('Meeting'), user, 'new', CONFIG::GENERAL[:global_admin_default], true)}},
-        ],
+        ]
       },
       'Corrective Actions' => {
         title: 'Corrective Actions', path: 'corrective_actions_path(status: "New")',
@@ -521,7 +521,7 @@ class DefaultSafetyReportingConfig
             display: proc{|user:,**op| true}},
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
-        ],
+        ]
       },
     }
   }
