@@ -77,7 +77,7 @@
               <%instruction = "<p>"
                 instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
                 instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg mt-4'>"
               %>
               <%=render "shared/instructions",
                 :instruction => instruction%>
@@ -190,7 +190,9 @@
 <style>
   #workflowImage{
     display: none;
-    margin-top: 10px;
+    width: 100%;
+    height: auto;
+    padding: 4%
   }
 </style>
 
@@ -213,13 +215,11 @@
     $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'new' %>
-            $("#workflowImage").attr('src', "<%= CONFIG.sr::WORKFLOW_IMAGES[@record.class.name].select {|key| action_name.include? key}.values[0] %>" )
+            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_#{action_name}.png" %>')
         <% end %>
 
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'edit' %>
-          <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
-          <% curr_status = @record.send(status_field_name).downcase %>
-          $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@record.class.name].select {|key| curr_status.include? key}.values[0]%>")
+          $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_#{@record.status.downcase.parameterize.underscore}.png" %>')
         <% end %>
 
         if($("#workflowImage").is(":visible")){

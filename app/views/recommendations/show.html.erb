@@ -54,15 +54,16 @@
 <style>
   #workflowImage{
     display: none;
+    width: 100%;
+    height: auto;
+    padding: 4%;
   }
 </style>
 
 <script>
   $(document).ready(function(){
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% status_field_name = CONFIG.sa::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
-      <% curr_status = @owner.send(status_field_name).downcase %>
-      $("#workflowImage").attr('src', "<%=CONFIG.sa::WORKFLOW_IMAGES[@owner.class.name].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@owner.class.name}_#{@owner.status.downcase.parameterize.underscore}.png" %>')
     <% end %>
 
      $("#toggleWorkflowImageButton").on('click', function(event){

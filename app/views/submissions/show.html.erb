@@ -136,7 +136,9 @@
 <style>
   #workflowImage{
     display: none;
-    margin-top:10px;
+    padding: 4%;
+    width: 100%;
+    height: auto;
   }
 </style>
 
@@ -149,7 +151,7 @@
       });
     });
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@record.class.name].select {|key| "new".include? key}.values[0]%>")
+      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_new.png" %>')
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

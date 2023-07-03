@@ -336,7 +336,9 @@
  }
   #workflowImage{
     display: none;
-    margin-top: 10px;
+    width: 100%;
+    height: auto;
+    padding: 4%;
   }
 </style>
 
@@ -440,7 +442,7 @@
         console.log("<%= curr_status%>")
         if( open_button_clicked === false || "<%=curr_status%>" !== "new" )
         {
-            $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@record.class.name].select {|key| curr_status.include? key}.values[0]%>")
+            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_#{@record.status.downcase.parameterize.underscore}.png" %>')
             open_button_clicked = false
         }
       <% end %>

@@ -48,6 +48,9 @@
 <style>
   #workflowImage{
     display: none;
+    width: 100%;
+    height: auto;
+    padding: 4%;
   }
 </style>
 
@@ -65,9 +68,7 @@
     });
 
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@risk_control.class.name][:fields][:status][:field]%>
-      <% curr_status = @risk_control.send(status_field_name).downcase %>
-      $("#workflowImage").attr('src', "<%=CONFIG.srm::WORKFLOW_IMAGES[@risk_control.class.name].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@risk_control.class.name}_#{@risk_control.status.downcase.parameterize.underscore}.png" %>')
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

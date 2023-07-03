@@ -251,7 +251,9 @@
 <style>
   #workflowImage{
     display: none;
-    margin-top: 10px;
+    padding: 4%;
+    width: 100%;
+    height: auto;
   }
 </style>
 
@@ -260,9 +262,7 @@
   $(document).ready(function() {
 
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@report.class.name][:fields][:status][:field]%>
-      <% curr_status = @report.send(status_field_name).downcase %>
-      $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@report.class.name].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@report.class.name}_#{@report.status.downcase.parameterize.underscore}.png" %>')
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

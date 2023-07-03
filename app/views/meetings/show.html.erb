@@ -167,7 +167,9 @@
 <style>
   #workflowImage{
     display: none;
-    margin-top: 10px;
+    width: 100%;
+    height: auto;
+    padding: 4%;
   }
 </style>
 
@@ -182,8 +184,7 @@
   }
   $(document).ready(function(){
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% curr_status = @meeting.status.downcase%>
-      $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES['Meetings'].select {|key| curr_status.include? key}.values[0]%>")
+      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@meeting.class.name}_#{@meeting.status.downcase.parameterize.underscore}.png" %>')
     <% end %>
 
     $("#toggleWorkflowImageButton").on('click', function(event){

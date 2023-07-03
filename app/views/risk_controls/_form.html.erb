@@ -62,6 +62,9 @@
 <style>
   #workflowImage{
     display: none;
+    width: 100%;
+    height: auto;
+    padding: 4%;
   }
 </style>
 
@@ -70,13 +73,11 @@
 $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'new' %>
-            $("#workflowImage").attr('src', "<%= CONFIG.srm::WORKFLOW_IMAGES[@risk_control.class.name].select {|key| action_name.include? key}.values[0] %>" )
+            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@risk_control.class.name}_#{action_name}.png" %>')
         <% end %>
 
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'edit' %>
-          <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@risk_control.class.name][:fields][:status][:field]%>
-          <% curr_status = @risk_control.send(status_field_name).downcase %>
-          $("#workflowImage").attr('src', "<%=CONFIG.srm::WORKFLOW_IMAGES[@risk_control.class.name].select {|key| curr_status.include? key}.values[0]%>")
+          $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@risk_control.class.name}_#{@risk_control.status.downcase.parameterize.underscore}.png" %>')
         <% end %>
 
         if($("#workflowImage").is(":visible")){

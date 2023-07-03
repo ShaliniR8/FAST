@@ -165,7 +165,9 @@
   }
   #workflowImage{
     display: none;
-    margin-top: 10px;
+    padding: 4%;
+    width: 100%;
+    height: auto;
   }
 </style>
 
@@ -180,13 +182,11 @@
     $("#toggleWorkflowImageButton").on('click', function(event){
         event.preventDefault();
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'new' %>
-            $("#workflowImage").attr('src', "<%= CONFIG.sr::WORKFLOW_IMAGES[@report.class.name].select {|key| action_name.include? key}.values[0] %>" )
+            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@report.class.name}_#{action_name}.png" %>')
         <% end %>
 
         <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'edit' %>
-          <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@report.class.name][:fields][:status][:field]%>
-          <% curr_status = @report.send(status_field_name).downcase %>
-          $("#workflowImage").attr('src', "<%=CONFIG.sr::WORKFLOW_IMAGES[@report.class.name].select {|key| curr_status.include? key}.values[0]%>")
+          $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@report.class.name}_#{@report.status.downcase.parameterize.underscore}.png" %>')
         <% end %>
 
         if($("#workflowImage").is(":visible")){

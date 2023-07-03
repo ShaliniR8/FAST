@@ -78,20 +78,8 @@
     $("#templates tbody tr td").on("click", function(){selectTemplates($(this));});
   });
 
-    var imageMap = null
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% if session[:mode] == "SRM" &&  CONFIG::GENERAL[:display_workflow_diagram] %>
-            imageMap = <%=CONFIG.srm::WORKFLOW_IMAGES['Query Center'].to_json.html_safe%>
-            $("#workflowImage").attr('src', imageMap['default'])
-        <% end %>
-      <% if session[:mode] == "ASAP" &&  CONFIG::GENERAL[:display_workflow_diagram] %>
-          imageMap = <%=CONFIG.sr::WORKFLOW_IMAGES['Query Center'].to_json.html_safe%>
-          $("#workflowImage").attr('src', imageMap['default'])
-      <% end %>
-      <%if session[:mode] == "SMS" &&  CONFIG::GENERAL[:display_workflow_diagram] %>
-          imageMap = <%=CONFIG.sa::WORKFLOW_IMAGES['Query Center'].to_json.html_safe%>
-          $("#workflowImage").attr('src', imageMap['default'])
-      <%end%>
+      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/QC_#{session[:mode]}_default.png" %>')
     <% end %>
 
   $("#toggleWorkflowImageButton").on('click', function(event){
@@ -142,9 +130,7 @@
     var target = $(cell).attr("data-target-name");
     var target_name = getSelectedTargetName("targets");
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% if session[:mode] == "SMS" || session[:mode] == "SRM" || session[:mode] == "ASAP"%>
-        $("#workflowImage").attr('src', imageMap[target])
-      <%end%>
+      $("#workflowImage").attr('src', `<%= "/images/workflow_diagram/#{AIRLINE_CODE}/QC_#{session[:mode]}_" %>${target}.png`)
     <% end %>
     
     $.ajax({
