@@ -153,7 +153,7 @@
               <%instruction = "<p>"
                 instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
                 instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' >"
               %>
               <%=render "shared/instructions",
                 :instruction => instruction%>
@@ -438,8 +438,6 @@
 
         <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
         <% curr_status = @record.send(status_field_name).downcase %>
-        console.log("curr_status:" )
-        console.log("<%= curr_status%>")
         if( open_button_clicked === false || "<%=curr_status%>" !== "new" )
         {
             $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_#{@record.status.downcase.parameterize.underscore}.png" %>')

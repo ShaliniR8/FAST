@@ -50,43 +50,6 @@ class DefaultSafetyReportingConfig
     actual_names:                   ["Landing Airport"]
   }
 
-  WORKFLOW_IMAGES = {
-      'Submission' => {
-        "new"=> "/images/SR_Workflow/Submission.png",
-        "continue"=> "/images/SR_Workflow/Submission.png",
-      },
-      'Record' => {
-        "new"=> "/images/SR_Workflow/Report_New.png",
-        "open"=> "/images/SR_Workflow/Report_Open.png",
-        "linked"=> "/images/SR_Workflow/Report_Linked.png",
-        "closed"=> "/images/SR_Workflow/Report_Closed.png",
-      },
-      'Report' => {
-        "new"=> "/images/SR_Workflow/Event_New.png",
-        "under review"=> "/images/SR_Workflow/Event_UnderReview.png",
-        "meeting ready"=> "/images/SR_Workflow/Event_MeetingReady.png",
-        "closed"=> "/images/SR_Workflow/Event_Closed.png",
-      },
-      'CorrectiveAction' => {
-        "new"=> "/images/SR_Workflow/CorrectiveAction_New.png",
-        "pending approval"=> "/images/SR_Workflow/CorrectiveAction_PendingApproval.png",
-        "assigned"=> "/images/SR_Workflow/CorrectiveAction_Assigned.png",
-        "completed"=> "/images/SR_Workflow/CorrectiveAction_Completed.png",        
-      },
-      'Meetings' => {
-          "new"=> "/images/SR_Workflow/Meeting_Open.png",
-          "open"=> "/images/SR_Workflow/Meeting_Open.png",
-          "closed"=> "/images/SR_Workflow/Meeting_Closed.png",
-      },
-      "Query Center" => {
-        "Submission"              => "/images/SR_Workflow/QC_Submission.png",
-        "Record"                  => "/images/SR_Workflow/QC_Report.png", ## This is Report
-        "Report"                  => "/images/SR_Workflow/QC_Event.png", ## This is event
-        "CorrectiveAction"        => "/images/SR_Workflow/QC_CorrectiveAction.png",
-        "default"                 => "/images/SR_Workflow/QC_default.png"        
-      }
-  }
-
   HIERARCHY = {
     display_name: 'ASAP',
     objects: {

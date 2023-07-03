@@ -15,62 +15,6 @@ class DefaultSafetyAssuranceConfig
     daily_weekly_recurrence_frequecies: false,
   }
 
-  WORKFLOW_IMAGES = {
-    'Audit' => {
-        "new"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
-        "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
-        "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
-        "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-    },
-    "Inspection" => {
-        "new" => "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
-         "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
-         "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
-         "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",
-    },
-    'Evaluation' => {
-          "new"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_New.png",
-          "assigned"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Audit_Inspection_Evaluation_PendingApproval.png",      
-    },
-    'Investigation' => {
-          "new"=> "/images/SA_Workflow/Investigation_New.png",
-          "assigned"=> "/images/SA_Workflow/Investigation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Investigation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Investigation_PendingApproval.png",      
-    },
-    'Finding' => {
-          "new"=> "/images/SA_Workflow/Finding_New.png",
-          "assigned"=> "/images/SA_Workflow/Finding_Assigned.png",
-          "completed"=> "/images/SA_Workflow/Finding_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/Finding_PendingApproval.png",      
-    },
-    'SmsAction' => {
-          "new"=> "/images/SA_Workflow/CorrectiveActionRecommendation_New.png",
-          "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",      
-    },
-    'Recommendation' => {
-          "new"=> "/images/SA_Workflow/CorrectiveActionRecommendation_New.png",
-          "assigned"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Assigned.png",
-          "completed"=> "/images/SA_Workflow/CorrectiveActionRecommendation_Completed.png",
-          "pending approval"=> "/images/SA_Workflow/CorrectiveActionRecommendation_PendingApproval.png",      
-    },
-    'Query Center' => {
-          "Audit"             => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
-          "Inspection"        => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
-          "Evaluation"        => "/images/SA_Workflow/QC_AuditInspectionEvaluation.png",
-          "Investigation"     => "/images/SA_Workflow/QC_Investigation.png",
-          "Finding"           => "/images/SA_Workflow/QC_Finding.png",
-          "SmsAction"         => "/images/SA_Workflow/QC_CorrectiveactionRecommendation.png",
-          "Recommendation"    => "/images/SA_Workflow/QC_CorrectiveactionRecommendation.png",
-          "default"           => "/images/SA_Workflow/QC_SA_default.png"      
-    }
-
-  }
-
   HIERARCHY = {
     display_name: 'Safety Assurance',
     objects: {
@@ -667,7 +611,7 @@ class DefaultSafetyAssuranceConfig
           },
         }),
         panels: %i[causes comments costs extension_requests verifications attachments transaction_log
-        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
       'Recommendation' => {
@@ -740,7 +684,7 @@ class DefaultSafetyAssuranceConfig
           },
         }),
         panels: %i[comments extension_requests verifications attachments transaction_log
-        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
+        ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc }
       },
 
       'Checklist' => {
@@ -870,7 +814,7 @@ class DefaultSafetyAssuranceConfig
             display: proc{|user:,**op| true}},
           {title: 'New', path: 'new_query_path',
             display: proc{|user:,**op| true}},
-        ],
+        ]
       },
     }
   }

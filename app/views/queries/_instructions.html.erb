@@ -48,7 +48,7 @@
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
       <% if session[:mode] == "SMS" || session[:mode] == "SRM" || session[:mode] == "ASAP"%>
         <button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>
-        <img id='workflowImage' class = 'workflowImg' height=800 width= 100% >
+        <img id='workflowImage' class = 'workflowImg' >
       <% end %>
     <% end %>
   </div>

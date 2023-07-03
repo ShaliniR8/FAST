@@ -15,46 +15,6 @@ class DefaultSafetyRiskManagementConfig
     enable_sra_viewer_access: false # by default Viewer Access on SRAs will be enabled if true. Needed for SCX workflow
   }
 
-  WORKFLOW_IMAGES = {
-    'Sra' => {
-      "new"=> "/images/SRA_Workflow/Sra_New.png",
-      "assigned"=> "/images/SRA_Workflow/Sra_Assigned.png",
-      "completed"=> "/images/SRA_Workflow/Sra_completed.png",
-      "pending review" => "/images/SRA_Workflow/Sra_pendingReview.png",
-      "pending approval"=> "/images/SRA_Workflow/Sra_PendingApproval.png",      
-    },
-    'Hazard' => {
-      "new"=> "/images/SRA_Workflow/Hazard_new.png",
-      "assigned"=> "/images/SRA_Workflow/Hazard_Assigned.png",
-      "completed"=> "/images/SRA_Workflow/Hazard_Completed.png",
-      "pending approval"=> "/images/SRA_Workflow/Hazard_PendingApproval.png",      
-    },
-    'RiskControl' => {
-      "new"=> "/images/SRA_Workflow/RiskControl_New.png",
-      "assigned"=> "/images/SRA_Workflow/RiskControl_Assigned.png",
-      "completed"=> "/images/SRA_Workflow/RiskControl_Completed.png",
-      "pending approval"=> "/images/SRA_Workflow/RiskControl_PendingApproval.png",      
-    },
-    'SafetyPlan' => {
-      "new"=> "/images/SRA_Workflow/SafetyPlan_New.png",
-      "evaluated"=> "/images/SRA_Workflow/SafetyPlan_Evaluated.png",
-      "completed"=> "/images/SRA_Workflow/SafetyPlan_Completed.png",      
-    },
-    'Meetings' => {
-      "open"=> "/images/SRA_Workflow/Meeting_Open.png",
-      "closed"=> "/images/SRA_Workflow/Meeting_Closed.png",
-      "new"=> "/images/SRA_Workflow/Meeting_Open.png"      
-    },
-    "Query Center" => {
-      "Sra"         => "/images/SRA_Workflow/QC_SRA.png",
-      "Hazard"      => "/images/SRA_Workflow/QC_Hazard.png",
-      "RiskControl" => "/images/SRA_Workflow/QC_RiskControl.png",
-      "SafetyPlan"  => "/images/SRA_Workflow/QC_SafetyPlan.png",
-      "Meeting"     => "/images/SRA_Workflow/QC_Meetings.png",
-      "default"     => "/images/SRA_Workflow/QC_SRA_default.png"
-    }
-  }
-
   HIERARCHY = {
     display_name: 'Safety Risk Management',
     objects: {

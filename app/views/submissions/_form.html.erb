@@ -99,7 +99,7 @@
               instruction = instruction + "<br/> <b>#{@record.template.name} Instructions:</b> <br/>" + @record.template.description if @record.template.description.present?
               if CONFIG::GENERAL[:display_workflow_diagram]
                 instruction = instruction + "<br/><button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg'>"
               end
               instruction = instruction + "</p>"
             %>

@@ -36,7 +36,7 @@
               <%instruction = "<p>"
                 instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
                 instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100% >"
+                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' >"
               %>
               <%=render "shared/instructions",
                 :instruction => instruction%>
@@ -70,8 +70,6 @@
   $(document).ready(function(){
 
     <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      <% status_field_name = CONFIG.srm::HIERARCHY[:objects][@owner.class.name][:fields][:status][:field]%>
-      <% curr_status = @owner.send(status_field_name).downcase %>
       $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@owner.class.name}_#{@owner.status.downcase.parameterize.underscore}.png" %>')
     <% end %>
 

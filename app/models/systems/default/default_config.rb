@@ -87,7 +87,7 @@ class DefaultConfig
     sms_im_visibility:                  true,   # Default visibility of SMS IM --> ON
     safety_promotion_visibility:        false,  # Default visibility of Safety Promotion --> OFF
     pin_dashboard_visualizations:       false,  # Ability to pin query visualizations to dashboard --> Default OFF
-    display_workflow_diagram:           true,   # Display workflow diagrams in the instruction panels in this module
+    display_workflow_diagram:           false,   # Display workflow diagrams in the instruction panels in this module
   }
 
   DOCUMENT_CATEGORIES = ["ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
