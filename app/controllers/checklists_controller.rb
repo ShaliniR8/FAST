@@ -286,9 +286,7 @@ class ChecklistsController < ApplicationController
           if checklist_row['_destroy'] == "true"
               next
           end
-          if checklist_row[:row_order].present?
-            checklist_row[:row_order] = curr_row_index
-          end
+          checklist_row.merge!(row_order: curr_row_index)
           curr_row_index += 1
         end
       end
@@ -344,7 +342,6 @@ class ChecklistsController < ApplicationController
         if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
           AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
         end
-        
         @record.update_attributes(params[:checklist])
         redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
       end

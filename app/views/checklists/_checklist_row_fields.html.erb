@@ -1,6 +1,6 @@
 <% is_header = (defined? checklist_row) && checklist_row.is_header || false %>
 
-<tr class='field_group to_delete <%= is_header ? 'header-row' : '' %>'>
+<tr class='field_group to_delete panel<%= is_header ? 'header-row' : '' %>'>
   <%if ["address", "address_raw", "edit"].include? action_name%>
     <%=f.hidden_field :id, class: 'row-id changed'%>
   <%end%>
