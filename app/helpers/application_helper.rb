@@ -680,12 +680,12 @@ module ApplicationHelper
     fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
       render partial, f:builder, source:'New', guest:@guest, locals: locals
     end
-    function = "add_fields(this, '#{association}', '#{escape_javascript(fields)}', '#{target}')",
+    func = "add_fields(this, '#{association}', '#{escape_javascript(fields)}', '#{target}')"
     if association.to_s == "checklist_rows"
-        function = "add_fields(this, '#{association}', '#{escape_javascript(fields)};', '#{target}');update_row_order_checklist_row('table-view-#{@record.id}');"
+        func = "add_fields(this, '#{association}', '#{escape_javascript(fields)};', '#{target}');update_row_order_checklist_row('table-view-#{@record.id}');"
     end  
     link_to_function name,
-      function,
+      func,
       **linkOptions
   end
 
