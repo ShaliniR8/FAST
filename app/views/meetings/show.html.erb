@@ -94,6 +94,12 @@
           </div>
         </div>
 
+        <%if @current_inv.present?%>
+          <div class="col-xs-12">
+            <%=render "meetings/invitation_form"%>
+          </div>
+        <%end%>
+
         <div class="col-xs-12">
 
           <div class="panel panel-lightskyblue">

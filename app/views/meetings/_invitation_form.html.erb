@@ -27,10 +27,13 @@
     clicked="Rejected";
   })
   $(document).ajaxSuccess(function(){
-    $("tr[user=<%=@current_inv.users_id%>] td").eq(3).text(clicked);
-    $("#inv_form").hide();
-    $("#inv_txt").text("You have "+clicked.toLowerCase()+" the invitation. Thank you.");
-    location.reload();
-    $(".inv_panel").delay(3000).fadeOut(1000);
+    if(clicked === "Accepted" || clicked === "Rejected")
+    {
+      $("tr[user=<%=@current_inv.users_id%>] td").eq(3).text(clicked);
+      $("#inv_form").hide();
+      $("#inv_txt").text("You have "+clicked.toLowerCase()+" the invitation. Thank you.");
+      location.reload();
+      $(".inv_panel").delay(3000).fadeOut(1000);
+    }
   });
 </script>
