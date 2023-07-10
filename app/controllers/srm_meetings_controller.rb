@@ -350,7 +350,7 @@ class SrmMeetingsController < ApplicationController
 
   def sras
     meeting = Meeting.find(params[:id])
-    if params[:sras].present?
+    if params[:sras].present? 
       params[:sras].each do |sid|
         sra = Sra.find(sid)
         sra.meeting_id = meeting.id

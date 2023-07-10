@@ -754,6 +754,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'add_record'
       get 'remove_record'
       put 'ajax_update'
+      get "add_meeting"
+      get "carryover"
     end
     collection do
       post 'load_records'

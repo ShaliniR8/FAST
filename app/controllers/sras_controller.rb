@@ -385,6 +385,48 @@ class SrasController < ApplicationController
     render :partial => 'add_record'
   end
 
+  def add_meeting
+    sra_headers = Sra.get_meta_fields('index')
+    meeting = Meeting.find(params[:meeting])
+    sra = Sra.find(params[:id])
+    sra.meeting_id = meeting.id
+    Transaction.build_for(
+      sra,
+      'Add to Meeting',
+      current_user.id,
+      "Add to Meeting ##{meeting.id}"
+    )
+    Transaction.build_for(
+      meeting,
+      'Added SRA',
+      current_user.id,
+      "SRA ##{sra.get_id}"
+    )
+
+    if sra.save
+      render partial: '/srm_meetings/sra', locals: {sra_headers: sra_headers, sra: sra, meeting: meeting}
+    end
+  end
+
+  def carryover
+    meeting = Meeting.find(params[:meeting_id])
+    sra = Sra.find(params[:id])
+    meeting.sras.delete(sra)
+    Transaction.build_for(
+      meeting,
+      'Remove SRA',
+      current_user.id,
+      "SRA ##{sra.get_id} Removed"
+    )
+    Transaction.build_for(
+      sra,
+      'Remove from Meeting',
+      current_user.id,
+      "SRA Removed from Meeting ##{meeting.id}"
+    )
+  end
+
+
 
   def add_all_records
     @sra = Sra.find(params[:sra_id])

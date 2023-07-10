@@ -31,6 +31,12 @@
           <i class='glyphicon glyphicon-list btn btn-sm btn-warning mb5 mr5 ml5'></i>
           <b>Agendas </b>- View or add Meeting Agendas
         </td>
+
+        <td>
+          <i class='glyphicon glyphicon-minus btn btn-sm btn-danger mb5 ml5 mr5'></i>
+          <b>Remove SRA </b>- Remove an SRA from the meeting.
+        </td>
+
       </tr>
     </table>
 
@@ -49,61 +55,7 @@
 
         <tbody id="all_meeting_sras">
           <%meeting.sras.each do |sra|%>
-            <tr>
-              <%sra_headers.each do |h|%>
-                <td class="<%=h[:html_class].present? ? sra.send(h[:html_class]) : ''%>">
-                  <%=render '/forms/show_field', :field_hash => h, :record => sra%>
-                </td>
-              <%end%>
-              <td><%if sra.minutes.present?%><%=sra.minutes.gsub(/\n/, '<br/>').html_safe%><%end%></td>
-              <td>
-                <%#=link_to "View", sra_path(sra), :class => "btn btn-info mb5", :disable_with => "Redirecting..."%>
-                <%=link_to "<i class='fa fa-link'></i>".html_safe,
-                    sra_path(sra),
-                    target: :_blank,
-                    'hover' => 'tooltip',
-                    title: 'View Sra',
-                    :class => "btn btn-sm btn-info mb5"%>
-                <% if  meeting.has_user(current_user)%>
-                  <%if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && meeting.status == 'Open'%>
-                    <%if meeting.status != "Closed" && sra.srm_agendas.blank?%>
-
-                        <%=link_to "<i class='glyphicon glyphicon-road'></i>".html_safe, "#",
-                          :class=>"btn btn-sm btn-success carryover_btn mb5",
-                          "data-toggle" => "modal",
-                          "data-target" => ".bs-example-modal-lg",
-                          'hover' => 'tooltip',
-                          title: 'Carryover SRA',
-                          :route => carryover_another_meeting_sra_path(sra, :meeting => meeting)%>
-                    <%end%>
-                    <%#=link_to "Agenda","#",:class => "btn btn-warning agenda_btn mb5","data-toggle"=>"modal","data-target"=>".bs-example-modal-lg",:route => get_agenda_sra_path(sra,:meeting => meeting.id)%>
-
-                    <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
-                      :class => "btn btn-sm btn-success minutes_btn mb5",
-                      "data-toggle" => "modal",
-                      "data-target" => ".bs-example-modal-lg",
-                      'hover' => 'tooltip',
-                      title: 'Add Meeting Minutes',
-                      :route => new_minutes_sra_path(sra, :meeting => meeting) %>
-                    <%#=link_to "Add Minutes",
-                      "#",
-                      :class => "btn btn-success minutes_btn mb5",
-                      "data-toggle" => "modal",
-                      "data-target" => ".bs-example-modal-lg",
-                      'data-m-toggle' => "tooltip",
-                      title: 'Allot minutes for this SRA',
-                      :route => new_minutes_sra_path(sra, :meeting => meeting) %>
-                  <%end%>
-                    <%=link_to "<i class='glyphicon glyphicon-list'></i>".html_safe,"#",
-                      :class => "btn btn-sm btn-warning agenda_btn mb5",
-                      "data-toggle" => "modal",
-                      "data-target" => ".bs-example-modal-lg",
-                      'hover' => 'tooltip',
-                      title: 'View/Add Meeting Agenda',
-                      :route => get_agenda_sra_path(sra,:meeting => meeting.id)%>
-                <%end%>
-              </td>
-            </tr>
+            <%=render partial: 'sra', locals: {sra_headers: sra_headers, sra: sra, meeting: meeting} %>
           <%end%>
         </tbody>
       </table>

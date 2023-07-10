@@ -14,13 +14,14 @@
                   <th><%=h[:title]%></th>
                 <%end%>
                 <th>Comment</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="agendas">
               <%@sra.srm_agendas.each do |a|%>
                 <%if a.user_id == current_user.id%>
                   <%=f.fields_for :srm_agendas,a do |x|%>
-                    <tr>
+                    <tr data-agendaid="<%=a.id%>">
                       <td><%=x.text_field :title, :class => "form-control"%></td>
                       <td><%=x.select :status, options_for_select(@status,a.status),{:include_blank => ""}, :class => "form-control"%></td>
                       <td><%=a.get_user%></td>
@@ -29,6 +30,10 @@
                       <td><%=x.select :discussion, options_for_select(@tof,a.discussion),{:include_blank => ""}, :class => "form-control"%></td>
                       <td><%=x.select :accepted, options_for_select(@accept_deline,a.accepted),{:include_blank => ""}, :class => "form-control"%></td>
                       <td><%=x.text_area :comment, :rows => "2",:class => "form-control"%></td>
+                      <td>
+                          <%=link_to "<i class='mt5 glyphicon glyphicon-remove close_icon'></i>".html_safe, '#', :class => "close close_btn", "aria-label" => "Close", :id => "delete_srm_btn"%>
+                          <%=x.hidden_field :_destroy, :id => "delete_srm_agenda_#{a.id}"%>
+                      </td>
                     </tr>
                   <%end%>
                 <%else%>
@@ -56,3 +61,54 @@
     </div>
   </div>
 </div>
+
+<style>
+.close_btn {
+    color: red;
+    font-size: 23px;
+  }
+  .close_icon {
+    top: 10px;
+    right: 10px;
+  }
+  .removed {
+    opacity: 0.4;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.close_btn').forEach( close_btn => {
+    close_btn.addEventListener("click", function(event) {
+
+      const row = event.srcElement.closest("tr")
+      let result = row.classList.toggle("removed");
+
+      if (result) {
+        row.classList.add('removed')
+        row.querySelectorAll(".form-control").forEach( input_field => {
+          input_field.disabled = true
+        })
+      } else {
+        row.classList.remove('removed')
+        row.querySelectorAll(".form-control").forEach( input_field => {
+          input_field.disabled = false
+        })
+      }
+
+    })
+  })
+
+  document.querySelector('form').addEventListener('submit', function() {
+    console.log("#####################################")
+    document.querySelectorAll('.removed').forEach( element => {
+      console.log(`@@@`)
+      console.log($(element))
+      let agenda_id = $(element).data('agendaid')
+      console.log(`@@@${agenda_id}`)
+      $(`delete_srm_agenda_${agenda_id}`).val(true)
+      element.querySelector("[type='hidden']").value = true
+    })
+  })
+
+
+</script>
