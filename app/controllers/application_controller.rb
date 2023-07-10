@@ -440,6 +440,9 @@ class ApplicationController < ActionController::Base
           header_spacing:  2,
           header_right: '[page] of [topage]'
         }
+        if CONFIG::GENERAL[:has_pdf_logo]
+          pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+        end
         if CONFIG::GENERAL[:has_pdf_footer]
           pdf_options.merge!({
             footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
@@ -476,6 +479,9 @@ class ApplicationController < ActionController::Base
           header_spacing:  2,
           header_right: '[page] of [topage]'
         }
+        if CONFIG::GENERAL[:has_pdf_logo]
+          pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+        end
         if CONFIG::GENERAL[:has_pdf_footer]
           pdf_options.merge!({
             footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
@@ -1132,7 +1138,7 @@ class ApplicationController < ActionController::Base
           end
         end
       end
-      
+
       # @owner.update_attributes(params[object_name.to_sym])
       # @record = @owner
       # category = Category.find(params[:category_id])

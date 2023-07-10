@@ -66,7 +66,17 @@ class PackagesController < ApplicationController
   def print
       @package=Package.find(params[:id])
       html=render_to_string(:template=>"/packages/print.html.erb")
-      pdf=PDFKit.new(html)
+      pdf_options = {}
+      if CONFIG::GENERAL[:has_pdf_logo]
+        pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+      end
+      if CONFIG::GENERAL[:has_pdf_footer]
+        pdf_options.merge!({
+          footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+          footer_spacing:  3,
+        })
+      end
+      pdf = PDFKit.new(html, pdf_options)
       pdf.stylesheets <<("#{Rails.root}/public/css/bootstrap.css")
       title = ''
       if @package.class.display_name == "VP/Part 5 IM Package"
