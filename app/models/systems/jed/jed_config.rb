@@ -11,15 +11,23 @@ class JEDConfig < DefaultConfig
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'King Abdulaziz International Airport',
     time_zone:                    'Riyadh',
-    
+
     # SYSTEM CONFIGS
     has_mobile_app:               false,
-    
+    has_pdf_logo:                 true,
+    has_pdf_footer:               true,
     external_link:                true,
     enable_sso:                   true,
     login_option:                 'sso',
     safety_promotion_visibility:  true,
     sms_im_visibility:            false,
+
+    #Map
+    has_gmap:                           true,
+    gis_layers:                         true,
+    lat:                                21.674331,
+    lng:                                39.153999,
+    gMapZoom:                           14,
   })
 
   EXTERNAL_LINK =
@@ -51,8 +59,8 @@ class JEDConfig < DefaultConfig
   end
 
   def self.external_link(user)
-    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/jed/users/find", 
-      {email: user.email}.to_json, 
+    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/jed/users/find",
+      {email: user.email}.to_json,
         {
           'Content-Type' => 'application/json',
           'Client-ID' => 'VcuOWeajgfgTZcG2ak8Hatl9npc7IZ1CW-tdBoX4NUc',

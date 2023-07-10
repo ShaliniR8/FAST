@@ -308,7 +308,7 @@ class ReportsController < ApplicationController
                   @relevant_reports_colors[candidate.id] = field.field.sabre_map
                 end
               end
-            end 
+            end
           end
         end
       end
@@ -393,7 +393,7 @@ class ReportsController < ApplicationController
                   @relevant_reports_colors[candidate.id] = field.field.sabre_map
                 end
               end
-            end 
+            end
           end
         end
       end
@@ -569,6 +569,11 @@ class ReportsController < ApplicationController
       header_spacing:  2,
       header_right: '[page] of [topage]'
     }
+
+    if CONFIG::GENERAL[:has_pdf_logo]
+      pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+    end
+
     if CONFIG::GENERAL[:has_pdf_footer]
       pdf_options.merge!({
         footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
