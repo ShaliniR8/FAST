@@ -10,8 +10,10 @@ class BAHConfig < DefaultConfig
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'Bahrain Airport Company',
     time_zone:                    'Riyadh',
+    has_pdf_logo:                  true,
+    has_pdf_footer:                  true,
 
-    # SYSTEM CONFIGS    
+    # SYSTEM CONFIGS
     advanced_checklist_data_type:  true,
     checklist_query:               true,
 
@@ -55,7 +57,7 @@ class BAHConfig < DefaultConfig
         'Governance and Regulatory'],
       rows: [
         # Operations
-        [ 
+        [
           'No Damage Nuisance',
           'Minor damage to an aircraft, equipment, or facility not requiring it to be taken out of service; or Minimal unplanned airport operations limitations (i.e., taxiway closure); or Minor incident involving the use of airport emergency procedures',
           "Damage to an aircraft that is repairable. Damage to equipment or facility that is reparable within a short period of time; or Significant reduction in safety margins; or Deduction on the airport's ability to deal with adverse conditions; or Reduction in the ability to cope with adverse operating conditions as a result of an increase in workload or as a result of conditions impairing their efficiency",
@@ -191,28 +193,28 @@ class BAHConfig < DefaultConfig
     },
 
     risk_definitions: {
-      red:   { 
-        rating: 'Very High',       
+      red:   {
+        rating: 'Very High',
         description: "<b>Intolerable:</b> Safety is not ensured. Enhanced protective measures are urgently required. Immediate action required by Executive Management with detailed planning, allocation of resources, and regular monitoring.
         <br><br>
         <b>Action</b>: Immediate attention required by BAC CEO, with detailed planning and allocation of resources." },
-      orange:      { 
-        rating: 'High',  
+      orange:      {
+        rating: 'High',
         description: "<b>Undesirable:</b> Safety is not ensured. Protective measures are urgently required. Management responsibility must be specific.
         <br><br>
-        <b>Action:</b> Direct involvement from Manager - Aerodrome Safety required, and regular monitoring." 
+        <b>Action:</b> Direct involvement from Manager - Aerodrome Safety required, and regular monitoring."
       },
-      yellow:      { 
-        rating: 'Moderate',      
+      yellow:      {
+        rating: 'Moderate',
         description: "<b>ALaRP:</b> Safety is partially guaranteed. Normal protective measures are required, Acceptable based on risk mitigation, provided it has been reduced to a level which is “As Low as Reasonably Practicable (ALaRP). Regular supervision by Manager - Aerodrome Safety, and performance monitoring of the implementation of the routine safety procedures.
       <br><br>
-      <b>Action:</b> Allocation of responsibility by Manager - Aerodrome Safety must be specified" 
+      <b>Action:</b> Allocation of responsibility by Manager - Aerodrome Safety must be specified"
       },
-      limegreen:         { 
-        rating: 'Low', 
+      limegreen:         {
+        rating: 'Low',
         description: "<b>Acceptable:</b> Safety is largely guaranteed. Organizational and staff-related measures may still be required. Managed by routine procedures.
         <br><br>
-        <b>Action:</b> Monitor and manage through routine procedures" 
+        <b>Action:</b> Monitor and manage through routine procedures"
       },
     },
 

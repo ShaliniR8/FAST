@@ -15,7 +15,7 @@ class RecurrencesController < ApplicationController
   end
   helper_method :child_access_validation
 
-  
+
   def create
     @template = params[:audit] || params[:investigation] || params[:evaluation] || params[:inspection]
     params.each do |key, data|
@@ -45,13 +45,13 @@ class RecurrencesController < ApplicationController
     template.save!
 
     if @selected_checklists
-      add_checklist_template_to_recurrence(@selected_checklists, template)   
+      add_checklist_template_to_recurrence(@selected_checklists, template)
     end
 
     if @checklist_header.present?
       create_custom_checklist(template, @checklist_header, @checklist_title, @checklist_upload)
     end
- 
+
     @recurrence = Recurrence.create(params[:recurrence])
     @recurrence.template_id = template.id
     @recurrence.created_by_id = current_user.id
@@ -79,7 +79,7 @@ class RecurrencesController < ApplicationController
     child_access_validation(@type,'admin')
   end
 
-  
+
   def index
     if params.key? :form_type
       child_access_validation(params[:form_type].downcase.pluralize,'index')
@@ -114,7 +114,7 @@ class RecurrencesController < ApplicationController
     @fields = Recurrence.get_meta_fields('form')
     @type = params[:form_type]
     @table = Object.const_get(@type)
-    @user_id = current_user.id 
+    @user_id = current_user.id
     if CONFIG.sa::GENERAL[:recurring_item_checklist]
       @fields = Recurrence.get_meta_fields_spawns('form')
     end
@@ -153,7 +153,8 @@ class RecurrencesController < ApplicationController
     @template = @type.find(@recurrence.template_id)
     template = params[:audit] || params[:investigation] || params[:evaluation] || params[:inspection]
     calculate_due_date_updates(@recurrence.form_type, params, @recurrence)
-    @template.update_attributes(template)
+    # Rails 3 bug bypass. When updating to Rails 6 remove rescue.
+    @template.update_attributes(template) rescue @template.update_attributes(template)
     child_access_validation(@type.name,'admin')
     redirect_to recurrence_path(@recurrence)
   end
@@ -168,7 +169,7 @@ class RecurrencesController < ApplicationController
     redirect_to "/recurrences?form_type=#{@type}", flash: {danger: "Recurrence ##{params[:id]} deleted."}
   end
 
- 
+
   private
 
   def get_days_to_complete(template, recurrence)
@@ -182,7 +183,7 @@ class RecurrencesController < ApplicationController
       elsif type == 'Inspection'
         params[:inspection][:due_date] = params[:recurrence][:next_date].to_date + params[:inspection][:due_date].to_i.days rescue 0
       elsif type == 'Evaluation'
-        params[:evaluation][:due_date] = params[:recurrence][:next_date].to_date + params[:evaluation][:due_date].to_i.days rescue 0     
+        params[:evaluation][:due_date] = params[:recurrence][:next_date].to_date + params[:evaluation][:due_date].to_i.days rescue 0
       end
     end
   end
