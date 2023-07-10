@@ -1,0 +1,2 @@
+$("#close_agenda_modal").trigger("click");
+$("#all_meeting_sras").html("<%= escape_javascript(render partial: 'included_sras', locals: {sra_headers: @sra_headers, meeting: @meeting})%>");

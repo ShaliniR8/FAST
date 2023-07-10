@@ -854,6 +854,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'sras'
       get "reopen"
       get 'override_status'
+      post "save_agenda"
     end
     collection do
     end

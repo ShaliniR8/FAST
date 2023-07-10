@@ -41,7 +41,7 @@
     </table>
 
     <div class="row col-xs-12">
-      <table class="table table-striped table-bordered" width="100%">
+      <table id="sras_table" class="table table-striped table-bordered width="100%">
 
         <thead>
           <tr>
@@ -54,9 +54,7 @@
         </thead>
 
         <tbody id="all_meeting_sras">
-          <%meeting.sras.each do |sra|%>
-            <%=render partial: 'sra', locals: {sra_headers: sra_headers, sra: sra, meeting: meeting} %>
-          <%end%>
+            <%= render partial: 'included_sras', locals: {sra_headers: sra_headers, meeting: meeting}%>
         </tbody>
       </table>
       </div>
@@ -68,14 +66,18 @@
 <script>
   $('[data-m-toggle="tooltip"]').tooltip();
   $(document).ready(function(){
-    $('.agenda_btn').on('click',function(){
+    sras_table = $('#sras_table').dataTable({
+      "paging": false,
+      "columnDefs": [{ type: 'natural', targets: 0 }]
+    });
+    $("#sras_table").on('click', ".agenda_btn", function(){
       path=$(this).attr('route');
       $.get(path,function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
-    $('.carryover_btn').on('click',function(event){
+    $("#sras_table").on('click', ".carryover_btn", function(){
       event.preventDefault();
       path=$(this).attr('route');
       $.get(path,function(data){
@@ -83,11 +85,19 @@
         $(window).trigger('resize');
       });
     });
-    $(".minutes_btn").on('click',function(){
+    $("#sras_table").on('click', ".minutes_btn", function(){
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');
       });
     });
+
+    $("#sras_table").on('click', ".close_sra_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+
   });
 </script>

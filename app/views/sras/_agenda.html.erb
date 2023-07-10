@@ -1,11 +1,11 @@
-<div class="panel panel-info">
+<div class="panel panel-warning">
   <div class="panel-heading">
     <div class="panel-title">Agendas
-    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
+    <button type="button" id="close_agenda_modal" class="close pull-right" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove"></span></button></div>
   </div>
   <div class="panel-body">
     <div class="row">
-      <%=form_for @meeting do |f|%>
+      <%=form_tag save_agenda_srm_meeting_path(@meeting), :remote=>true  do%>
         <div class="col-xs-12" style="max-height:400px;overflow-y:auto">
           <table class="table table-striped table-bordered">
             <thead>
@@ -20,22 +20,20 @@
             <tbody id="agendas">
               <%@sra.srm_agendas.each do |a|%>
                 <%if a.user_id == current_user.id%>
-                  <%=f.fields_for :srm_agendas,a do |x|%>
-                    <tr data-agendaid="<%=a.id%>">
-                      <td><%=x.text_field :title, :class => "form-control"%></td>
-                      <td><%=x.select :status, options_for_select(@status,a.status),{:include_blank => ""}, :class => "form-control"%></td>
-                      <td><%=a.get_user%></td>
-                      <td><%=a.get_created%></td>
-                      <td><%=a.get_updated%></td>
-                      <td><%=x.select :discussion, options_for_select(@tof,a.discussion),{:include_blank => ""}, :class => "form-control"%></td>
-                      <td><%=x.select :accepted, options_for_select(@accept_deline,a.accepted),{:include_blank => ""}, :class => "form-control"%></td>
-                      <td><%=x.text_area :comment, :rows => "2",:class => "form-control"%></td>
-                      <td>
-                          <%=link_to "<i class='mt5 glyphicon glyphicon-remove close_icon'></i>".html_safe, '#', :class => "close close_btn", "aria-label" => "Close", :id => "delete_srm_btn"%>
-                          <%=x.hidden_field :_destroy, :id => "delete_srm_agenda_#{a.id}"%>
-                      </td>
-                    </tr>
-                  <%end%>
+                  <tr data-agendaid="<%=a.id%>">
+                    <td><%= text_field_tag "title", a.title, :name=>"title_#{a.id}", :class=>"form-control" %></td>
+                    <td> <%= select_tag "status_#{a.id}", options_for_select(@status, a.status), :include_blank=>"", :class=>"form-control" %> </td>
+                    <td><%=a.get_user%></td>
+                    <td><%=a.get_created%></td>
+                    <td><%=a.get_updated%></td>
+                    <td><%=select_tag "discussion_#{a.id}",options_for_select(@tof,a.discussion), :include_blank=>"",:class=>"form-control"%></td>
+                    <td><%=select_tag "accepted_#{a.id}", options_for_select(@accept_deline, a.accepted), :include_blank=>"", :class=>"form-control"%></td>
+                    <td> <%= text_area_tag "comment_#{a.id}", a.comment, :rows=>"2", :class=>"form_control"%> </td>
+                    <td>
+                        <%=link_to "<i class='mt5 glyphicon glyphicon-remove close_icon'></i>".html_safe, '#', :class=>"close close_btn", "aria-label"=>"Close", :id=>"delete_srm_btn"%>
+                        <%=hidden_field_tag "destroy_#{a.id}", :value=>false%>
+                    </td>
+                  </tr>
                 <%else%>
                   <tr>
                     <td><%=a.title%></td>
@@ -53,9 +51,9 @@
           </table>
         </div>
         <div class="col-xs-12">
-          <%=hidden_field_tag :sra_id, @sra.id%>
-          <%=f.submit "Save Agenda",:class=>"btn btn-success pull-right", :disable_with => "Submitting..."%>
-          <%=link_to_fields "Add",f,:srm_agendas,"SmsAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5"%>
+          <%=hidden_field_tag :event_id, @sra.id%>
+          <%=submit_tag "Save Agenda",:class=>"btn btn-success pull-right", :disable_with=>"Submitting..."%>
+          <%= link_to_agenda_fields "Add", :srm_agendas, "SrmAgenda", "agenda_fields", "agendas", :class=>"btn btn-info pull-right mr5" %>
         </div>
       <%end%>
     </div>
@@ -99,16 +97,10 @@
   })
 
   document.querySelector('form').addEventListener('submit', function() {
-    console.log("#####################################")
     document.querySelectorAll('.removed').forEach( element => {
-      console.log(`@@@`)
-      console.log($(element))
       let agenda_id = $(element).data('agendaid')
-      console.log(`@@@${agenda_id}`)
       $(`delete_srm_agenda_${agenda_id}`).val(true)
       element.querySelector("[type='hidden']").value = true
     })
   })
-
-
 </script>
