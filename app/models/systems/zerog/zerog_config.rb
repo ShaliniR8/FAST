@@ -61,12 +61,12 @@ class ZEROGConfig < DefaultConfig
         ["Accident with serious injuries or fatalities, or significant damage to aircraft", "Accident / Serious incident with injuries and/or moderate damage to aircraft", "Accident/Incident with minor injury and/or minor aircraft damage", "Less than minor injury and/or less than minor damage"], 
         ["Death, total disability of an employee or passenger", "Partial disability, temporary disability > 3 mo. of an employee or passenger", "Lost workday injury of an employee", "Any injury to employee or passenger"], 
         ["Operating an aircraft in an unairworthy and unsafe condition", "Operating an aircraft in an unairworthy but not unsafe condition", "Returning an aircraft to service in an unairworthy condition, not operated", "Affecting aircraft or systems reliability above established control limits but no effect on airworthiness or safety of operation"], 
-        ["Loss or breakdown of entire system or sub-systems", "Partial breakdown of a system or sub-system", "System deficiencies leading to poor dependability or disruption to the schedules", "Little or no effect on system or sub-system, or for general informational purpose only"], 
+        ["Loss or breakdown of entire system or sub-systems", "Partial breakdown of a system or sub-system", "System deficiencies leading to poor dependability or disruption to the schedules", "Little to no effect on system or sub-system, or for general informational purpose only"], 
         ["Attempted or actual breach of the flight deck", "Life threatening behaviour", "Physically abusive behaviour", "Disruptive/verbally abusive behaviour"], 
         ["Catastrophic damage > US $1M", "Major damage < US $1M", "Substantial damage < US $250K", "Minor Damage &lt; US $50K"], 
-        ["Non-Compliance with major impact on safety of operations, item warrants immediate attention and remedy", "Non-Compliance with minor impact on safety of operations. No immediate adverse consequence currently exists.", "Non-Conformance with negligible safety implication", "Observation/Non-Conformance with recommended best practice. No safety implication."], 
+        ["Non-Compliance with major impact on safety of operations. Item warrants immediate attention and remedy.", "Non-Compliance with minor impact on safety of operations. No immediate adverse consequence currently exists.", "Non-Conformance with negligible safety implication", "Observation/Non-Conformance with recommended best practice. No safety implication."], 
         ["Aircraft Structural integrity or Safety of Crew/Passengers directly at Risk", "Aircraft structural integrity and life of crew and passenger indirectly at risk", "Operation beyond operating limitations; Use of abnormal procedures", "Policy or procedure deviation with limited safety implication"], 
-        ["Catastrophic loss of aircraft or life Any NTSB Reportable Event", "SRC Investigation required, FAA or Foreign Regulatory Investigation", "Voluntary Disclosure required", "Informational Only"]
+        ["Catastrophic loss of aircraft or life. Any NTSB Reportable Event", "Safety Investigation required, FAA or Foreign Regulatory Investigation", "Voluntary Disclosure required", "Informational Only"]
       ],
     },
 
@@ -94,14 +94,14 @@ class ZEROGConfig < DefaultConfig
       rows: [
         [ 
           "<b> NOT EFFECTIVE </b> <br/> Remaining controls were ineffective or No controls remained.", 
-          "<b> LIKELY </b> <br/> to occur ( Will occur in most circumstances, not surprised if it happens) or Occurs <span>&#8805;</span> 1 in 100."
+          "<b> LIKELY </b> <br/> to occur ( Will occur in most circumstances, not surprised if it happens) or Occurs > 1 in 100."
         ], 
         [
-          "<b> MINIMAL </b> <br/> Some controls left but their total effectiveness were minimal.", 
+          "<b> MINIMAL </b> <br/> Some controls left but their total effectiveness was minimal.", 
           "<b> POSSIBLE </b> <br/> to occur (might occur in some circumstances) or Occurs 1 in 100 to 1,000."
         ], 
         [
-          "<b> LIMITED </b> <br/> Abnormal situation more demanding to manage. Still a considerate remaining margin.", 
+          "<b> LIMITED </b> <br/> Abnormal situation, more demanding to manage, still a considerate remaining margin.", 
           "<b> UNLIKELY </b> <br/> to occur (Could occur in some circumstances, surprised if it happens) or Occurs 1 in 1,000 to 10,000."
         ],
         [
@@ -167,9 +167,9 @@ class ZEROGConfig < DefaultConfig
     risk_definitions: {
       limegreen:    { rating: 'NEGLIGIBLE', description: 'Requires tracking (REQUIRED ACTION) <hr class="defn_hr"/> Acceptable at all levels (RISK ACCEPTANCE AUTHORITY)'},
       aqua:         { rating: 'MINOR', description: 'Requires tracking and possible action. There are acceptable policies and procedures in place. (REQUIRED ACTION) <hr class="defn_hr"/> Requires review and approval by Departmental Manager (RISK ACCEPTANCE AUTHORITY)' },
-      yellow:       { rating: 'MODERATE', description: 'Requires review and approval by Departmental Manager in conjunction with the Safety Department (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Departmental Director in conjunction with the Director of Safety.(RISK ACCEPTANCE AUTHORITY)' },
-      orange:       { rating: 'HIGH', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking review, and approval by Accountable Executive in conjunction with the VP Safety and Regulatory Compliance (RISK ACCEPTANCE AUTHORITY)' },
-      red:          { rating: 'SEVERE', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Accountable Executive in conjunction with the VP Safety and Regulatory Compliance (RISK ACCEPTANCE AUTHORITY)' },
+      yellow:       { rating: 'MODERATE', description: 'May be acceptable without mitigation. There may be acceptable policies and procedures in place. (REQUIRED ACTION) <hr class="defn_hr"/> Requires review and approval by Departmental Manager in conjunction with the Safety Department.(RISK ACCEPTANCE AUTHORITY)' },
+      orange:       { rating: 'HIGH', description: 'Generally unacceptable without mitigation, requires investigation, resources, and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review and approval by 119 in conjunction with the Director of Safety. (RISK ACCEPTANCE AUTHORITY)' },
+      red:          { rating: 'SEVERE', description: 'Imminent Danger, unacceptable, and/or requires the highest priority for investigation, resources and corrective action. (REQUIRED ACTION) <hr class="defn_hr"/> Requires tracking, review, and approval by Accountable Executive in conjunction with the Director of Safety (RISK ACCEPTANCE AUTHORITY)' },
     },
   }
 
