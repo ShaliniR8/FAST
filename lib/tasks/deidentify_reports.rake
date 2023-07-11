@@ -7,10 +7,9 @@ task :deidentify_reports_and_submissions => :environment do
   @log.info "======================================================"
 
   look_back_years = 2
-  first_time = false
-  # first_time = true
   dummy_user = User.where({username: "prdg_deid_user"}).first
   dummy_value = "#########"
+  first_time = !(Record.where({users_id: dummy_user.id}).present?)
 
   begin
     start_date = nil
@@ -20,8 +19,8 @@ task :deidentify_reports_and_submissions => :environment do
       start_date = Date.today - 10.years
       end_date = Date.today - look_back_years.years
     else
-      start_date = Date.today - 2.years - 1.day
-      end_date = Date.today - 2.years
+      start_date = Date.today - look_back_years.years - 1.day
+      end_date = Date.today - look_back_years.years
     end
 
     @log.info "Start Date: #{start_date}"
@@ -62,7 +61,7 @@ task :deidentify_reports_and_submissions => :environment do
         system cmd
       end
       # attachments.map{|a| a.update_attributes({attachment_id: a.owner_id, owner_id: nil})} # dissociate attachment from record but keep id within attachment_id in case we need to restore. No files will actually be deleted.
-      attachments.map(&:delete) # deletes object. destroy will throw session error. Using shell commands to actually delete attachment
+      attachments.map(&:delete) # deletes object. destroy will throw session error. Used shell commands to actually delete attachment
     else
       @log.info "No Reports to De-Identify"
     end
