@@ -18,7 +18,9 @@
       <% if widget && ['employee', 'airport'].include?(field.display_type) %>
         <% field.display_type = "text" %>
       <% end %>
-
+      <%if field.display_type == 'number'%>
+        <%=rf.number_field :value, {class: "form-control #{required}", step: "any", id: field.id}%>
+      <%end%>
       <% if field.display_type == "text"%>
         <%if field.data_type == 'date'%>
           <%field_class = 'field-date form-control'%>

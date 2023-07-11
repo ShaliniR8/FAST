@@ -10,6 +10,10 @@
 
   <%required = field.required? ? "required_field" : "" %>
 
+  <%if field.display_type == 'number'%>
+    <%=number_field_tag :value, nil, {class: "form-control #{required}", step: "any"}%>
+  <%end%>
+
   <%if field.display_type == 'text'%>
     <%if field.data_type == 'date'%>
       <%field_class = 'field-date form-control'%>
