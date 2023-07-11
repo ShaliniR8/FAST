@@ -440,7 +440,7 @@ class ApplicationController < ActionController::Base
           header_spacing:  2,
           header_right: '[page] of [topage]'
         }
-        if CONFIG::GENERAL[:has_pdf_logo]
+        if CONFIG::GENERAL[:has_pdf_header]
           pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
         end
         if CONFIG::GENERAL[:has_pdf_footer]
@@ -479,7 +479,7 @@ class ApplicationController < ActionController::Base
           header_spacing:  2,
           header_right: '[page] of [topage]'
         }
-        if CONFIG::GENERAL[:has_pdf_logo]
+        if CONFIG::GENERAL[:has_pdf_header]
           pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
         end
         if CONFIG::GENERAL[:has_pdf_footer]

@@ -302,7 +302,7 @@ class ImsController < ApplicationController
     @im = Im.find(params[:id])
     html = render_to_string(:template=>"/ims/print.html.erb")
     pdf_options = {}
-    if CONFIG::GENERAL[:has_pdf_logo]
+    if CONFIG::GENERAL[:has_pdf_header]
       pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
     end
     if CONFIG::GENERAL[:has_pdf_footer]

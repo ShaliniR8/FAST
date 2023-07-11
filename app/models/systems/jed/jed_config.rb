@@ -14,7 +14,7 @@ class JEDConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:               false,
-    has_pdf_logo:                 true,
+    has_pdf_header:                 true,
     has_pdf_footer:               true,
     external_link:                true,
     enable_sso:                   true,
@@ -26,9 +26,9 @@ class JEDConfig < DefaultConfig
     #Map
     has_gmap:                           true,
     gis_layers:                         true,
-    lat:                                21.674331,
-    lng:                                39.153999,
-    gMapZoom:                           14,
+    lat:                                21.685000,
+    lng:                                39.164999,
+    gMapZoom:                           13,
   })
 
   EXTERNAL_LINK =

@@ -37,7 +37,7 @@ class DefaultConfig
     sabre_reports_recommendation:       false,
     hide_asap_submissions_in_dashboard: false,
     has_pdf_footer:                     false,    # Enables custom airline footer
-    has_pdf_logo:                       false,
+    has_pdf_header:                     false,
     power_bi_integration:               false,
     has_confidential_forms:             false,
     csv_user_import:                    false,

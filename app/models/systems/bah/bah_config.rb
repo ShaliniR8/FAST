@@ -10,7 +10,7 @@ class BAHConfig < DefaultConfig
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'Bahrain Airport Company',
     time_zone:                    'Riyadh',
-    has_pdf_logo:                  true,
+    has_pdf_header:                  true,
     has_pdf_footer:                  true,
 
     # SYSTEM CONFIGS
