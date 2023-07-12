@@ -1,7 +1,7 @@
 class SrmMeeting < Meeting
   has_many :srm_agendas,foreign_key: "owner_id",class_name: "SrmAgenda",:dependent=>:destroy
   has_many :sras,foreign_key:"meeting_id",class_name:"Sra"
-  accepts_nested_attributes_for :srm_agendas, allow_destroy: true
+  accepts_nested_attributes_for :srm_agendas
   #validates :imp, presence: true
 
 

@@ -1,4 +1,3 @@
-<%#=form_tag sras_srm_meeting_path(@meeting),:method=>"post" do%>
 <div class="panel-warning">
   <div class="panel-heading">
     <div class="panel-title">
@@ -27,7 +26,6 @@
                   </td>
                 <%end%>
                 <td>
-                  <%#=check_box_tag "sras[]", p.id, false, :class => "add_sra"%>
                   <%=link_to "Add", "#",
                     :class => "btn btn-sm btn-success add_sra_btn mb5",
                     :disable_with => "Adding..."%>
@@ -42,10 +40,8 @@
             <%end%>
           </tbody>
         </table>
-      <%#=submit_tag "Submit", :class => "btn btn-success pull-right", :disable_with => "Submitting..."%>
   </div>
 </div>
-<%#end%>
 
 
 <script>
