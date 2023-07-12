@@ -68,9 +68,6 @@
       var tr = $(this).closest('tr')
       $.get("/reports/"+$(this).closest('tr').attr('uid')+"/add_meeting?meeting=<%=@meeting.id%>", function(data){
         tr.hide(100);
-        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        console.log($(data))
-        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
         $('#reports_table').append($(data));
       });
     })

@@ -604,26 +604,6 @@ class SrasController < ApplicationController
     end
   end
 
-  # def carryover
-
-  #   sra = Sra.find(params[:id])
-  #   Transaction.build_for(
-  #     sra.meeting,
-  #     'Carry Over SRA',
-  #     current_user.id,
-  #     "SRA ##{sra.get_id} Carried Over"
-  #   )
-  #   Transaction.build_for(
-  #     sra,
-  #     'Carried Over',
-  #     current_user.id,
-  #     "SRA Carried Over from Meeting ##{sra.meeting.get_id}"
-  #   )
-  #   sra.meeting_id = nil
-  #   sra.save
-  #   render status: 200
-  # end
-
 
 
   # def mitigate
