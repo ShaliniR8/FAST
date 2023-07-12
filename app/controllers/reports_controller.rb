@@ -566,7 +566,8 @@ class ReportsController < ApplicationController
     html = render_to_string(:template => "/pdfs/print_report.html.erb")
     pdf_options = {
       header_html:  'app/views/pdfs/print_header.html',
-      header_spacing:  2,
+      header_spacing:  1,
+
       header_right: '[page] of [topage]'
     }
 

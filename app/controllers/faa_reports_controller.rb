@@ -57,7 +57,8 @@ class FaaReportsController < ApplicationController
     html = render_to_string(:template=>"/faa_reports/print.html.erb")
     pdf_options = {
       header_html:  'app/views/pdfs/print_header.html',
-      header_spacing:  2,
+      header_spacing:  1,
+
       header_right: '[page] of [topage]'
     }
     if CONFIG::GENERAL[:has_pdf_header]

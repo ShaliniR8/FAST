@@ -437,7 +437,8 @@ class ApplicationController < ActionController::Base
         html = render_to_string(:template=>"/pdfs/print.html.slim")
         pdf_options = {
           header_html:  'app/views/pdfs/print_header.html',
-          header_spacing:  2,
+          header_spacing:  1,
+
           header_right: '[page] of [topage]'
         }
         if CONFIG::GENERAL[:has_pdf_header]
@@ -476,7 +477,8 @@ class ApplicationController < ActionController::Base
         html = render_to_string(:template=>"/pdfs/print.html.slim")
         pdf_options = {
           header_html:  'app/views/pdfs/print_header.html',
-          header_spacing:  2,
+          header_spacing:  1,
+
           header_right: '[page] of [topage]'
         }
         if CONFIG::GENERAL[:has_pdf_header]
