@@ -31,7 +31,7 @@
                     <td> <%= text_area_tag "comment_#{a.id}", a.comment, :rows=>"2", :class=>"form_control"%> </td>
                     <td>
                         <%=link_to "<i class='mt5 glyphicon glyphicon-remove close_icon'></i>".html_safe, '#', :class=>"close close_btn", "aria-label"=>"Close", :id=>"delete_srm_btn"%>
-                        <%=hidden_field_tag "destroy_#{a.id}", :value=>false%>
+                        <%=hidden_field_tag "destroy_#{a.id}", :value=>false %>
                     </td>
                   </tr>
                 <%else%>
@@ -75,6 +75,7 @@
 </style>
 
 <script>
+ $(document).ready(function(){
   document.querySelectorAll('.close_btn').forEach( close_btn => {
     close_btn.addEventListener("click", function(event) {
 
@@ -96,11 +97,13 @@
     })
   })
 
-  document.querySelector('form').addEventListener('submit', function() {
-    document.querySelectorAll('.removed').forEach( element => {
-      let agenda_id = $(element).data('agendaid')
-      $(`delete_srm_agenda_${agenda_id}`).val(true)
-      element.querySelector("[type='hidden']").value = true
-    })
-  })
+  $("form").on("submit", function(event){
+      $('.removed').each( function(){
+          let agenda_id = $(this).data('agendaid');
+          console.log(`#destroy_${agenda_id}`);
+          $(`#destroy_${agenda_id}`).val(true);
+      })
+  });
+  
+});
 </script>

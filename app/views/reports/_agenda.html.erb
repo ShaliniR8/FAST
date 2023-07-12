@@ -20,7 +20,7 @@
             <tbody id="agendas">
               <%@agendas.each do |a|%>
                 <%if a.user_id==current_user.id%>
-                  <tr id="agenda_<%= a.id %>">
+                  <tr id="agends_<%= a.id %>">
                     <td><%=text_field_tag "title",a.title,:name=>"title_#{a.id}",:class=>"form-control"%></td>
                     <td width=8%><%=select_tag "status_#{a.id}",options_for_select(@status,a.status),:include_blank=>true,:class=>"form-control"%></td>
                     <td><%=a.get_user%></td>

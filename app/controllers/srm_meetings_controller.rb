@@ -198,7 +198,6 @@ class SrmMeetingsController < ApplicationController
         end
       end
     end
-
     deleted_agenda_ids.each do |a_id|
       ag = SrmAgenda.find(a_id)
       if ag.present?

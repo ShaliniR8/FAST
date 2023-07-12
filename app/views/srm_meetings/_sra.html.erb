@@ -28,7 +28,7 @@
             
             <!-- Remove SRA -->
             <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
-              :class=>"btn btn-sm btn-danger mb5 close_sra_btn",
+              :class=>"btn btn-sm btn-danger mb5",
               :onclick=>"delete_sra(#{sra.id}, #{meeting.id},this)",
               'hover' => 'tooltip',
               title: 'Remove SRA'%>
