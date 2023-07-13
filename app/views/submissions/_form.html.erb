@@ -91,21 +91,14 @@
           <%=hidden_field_tag 'is_autosave', 1%>
           <%=hidden_field_tag 'present_id', ""%>
 
-          <div class="col-xs-12">
             <%instruction = "<p>
                 Click on the <b>category panels</b> to expand the accordion tab and see the content.</br>
                 Items in <b>red</b> are required. </br>
                 Scroll to the bottom of the page to <b>Submit/Save</b> the submission.</br>"
               instruction = instruction + "<br/> <b>#{@record.template.name} Instructions:</b> <br/>" + @record.template.description if @record.template.description.present?
-              if CONFIG::GENERAL[:display_workflow_diagram]
-                instruction = instruction + "<br/><button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg'>"
-              end
               instruction = instruction + "</p>"
             %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-          </div>
+            <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @record, :action_name => action_name, :instruction => instruction }%>
 
           <%if @template.allow_anonymous%>
             <div class="col-xs-12">
@@ -362,41 +355,7 @@
   </div>
 </div>
 
-<style>
-  #workflowImage{
-    display: none;
-    padding: 4%;
-    width: 100%;
-    height: auto;
-  }
-  #toggleWorkflowImageButton {
-    margin-top: 10px;
-  }
-</style>
-
 <script type="text/javascript">
-
-
-  $("#toggleWorkflowImageButton").on('click', function(event){
-        event.preventDefault();
-        <% if  CONFIG::GENERAL[:display_workflow_diagram] %>
-          <% if action_name == 'new' || action_name == 'continue'%>
-              $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_#{action_name}.png" %>')
-          <% end %>
-
-          <% if action_name == 'edit' %>
-            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@meeting.class.name}_#{@meeting.status.downcase.parameterize.underscore}.png" %>')
-          <% end %>
-        <% end %>
-
-        if($("#workflowImage").is(":visible")){
-          $("#workflowImage").delay(1).hide("slow")
-          $("#toggleWorkflowImageButton").html("Show Workflow Image")
-        }else{
-          $("#workflowImage").delay(1).show("slow")
-          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
-        }
-    });
 
   var airport_table;
   var map,

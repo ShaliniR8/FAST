@@ -24,17 +24,7 @@
       </div>
 
       <div class="panel-body">
-        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-          <div class="col-xs-12">
-              <%instruction = "<p>"
-                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' height=800 width= 100%/>"
-              %>
-              <%=render "shared/instructions",
-                :instruction => instruction%>
-          </div>
-        <% end %>
+        <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @owner, :action_name => params[:action] }%>
 
         <div class="col-xs-12 mb15">
           <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
@@ -63,34 +53,11 @@
   .datepicker{
     z-index: 1200!important;
   }
-  #workflowImage{
-    display: none;
-    width: 100%;
-    height: auto;
-    padding: 4%;
-  }
 </style>
 
 
 <script>
   $(document).ready(function(){
-
-
-    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@owner.class.name}_#{@owner.status.downcase.parameterize.underscore}.png" %>')
-    <% end %>
-
-     $("#toggleWorkflowImageButton").on('click', function(event){
-        event.preventDefault();
-    
-        if($("#workflowImage").is(":visible")){
-          $("#workflowImage").delay(1).hide("slow")
-          $("#toggleWorkflowImageButton").html("Show Workflow Image")
-        }else{
-          $("#workflowImage").delay(1).show("slow")
-          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
-        }
-      })
 
     $("#reassign_btn").on('click',function(){
       $.get("<%=reassign_sms_action_path(@owner)%>",

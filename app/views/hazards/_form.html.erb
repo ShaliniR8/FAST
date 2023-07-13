@@ -19,18 +19,7 @@
       </div>
       <div class="panel-body" id="form_body">
         <%form_for @hazard, :html => {:multipart => true} do |f|%>
-          <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-            <div class="panel-body" id="form_body">
-            <div class="col-xs-12">
-              <%instruction = "<p>"
-                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' >"
-              %>
-              <%=render "shared/instructions",
-                :instruction => instruction%>
-            </div>
-          <% end %>
+          <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @hazard, :action_name => action_name }%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
             <%=f.hidden_field :parent_type, :value => @parent_type%>
@@ -62,16 +51,6 @@
     </div>
   </div>
 </div>
-
-
-<style>
-  #workflowImage{
-    display: none;
-    width: 100%;
-    height: auto;
-    padding: 4%;
-  }
-</style>
 
 <script>
   function reset_risk(){
@@ -116,25 +95,6 @@
   }
   $(document).ready(function(){
     reset_risk();
-    $("#toggleWorkflowImageButton").on('click', function(event){
-        event.preventDefault();
-        <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'new' %>
-            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@hazard.class.name}_#{action_name}.png" %>')
-        <% end %>
-
-        <% if CONFIG::GENERAL[:display_workflow_diagram] && action_name == 'edit' %>
-          $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@hazard.class.name}_#{@hazard.status.downcase.parameterize.underscore}.png" %>')
-        <% end %>
-
-        if($("#workflowImage").is(":visible")){
-          $("#workflowImage").delay(1).hide("slow")
-          $("#toggleWorkflowImageButton").html("Show Workflow Image")
-        }else{
-          $("#workflowImage").delay(1).show("slow")
-          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
-        }
-    });
-
     $('#sev').on('change',function(){
       reset_risk();
     });

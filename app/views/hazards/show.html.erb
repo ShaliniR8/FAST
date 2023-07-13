@@ -31,17 +31,7 @@
       </div>
 
       <div class="panel-body">
-      <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-        <div class="col-xs-12">
-              <%instruction = "<p>"
-                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' >"
-              %>
-              <%=render "shared/instructions",
-                :instruction => instruction%>
-          </div>
-        <% end %>
+        <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @hazard, :action_name => params[:action] }%>
         <div class="col-xs-12 mb20">
         <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before Completing/Rejecting" if @hazard.occurrence_lock? %></b>
           <%= render '/forms/render_buttons', owner: @hazard, env: :inline %>
@@ -56,34 +46,9 @@
   </div>
 </div>
 
-<style>
-  #workflowImage{
-    display: none;
-    width: 100%;
-    padding: 4%;
-    height: auto;
-  }
-</style>
-
 
 <script>
   $(document).ready(function(){
-
-    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@owner.class.name}_#{@owner.status.downcase.parameterize.underscore}.png" %>')
-    <% end %>
-
-    $("#toggleWorkflowImageButton").on('click', function(event){
-        event.preventDefault();
-    
-        if($("#workflowImage").is(":visible")){
-          $("#workflowImage").delay(1).hide("slow")
-          $("#toggleWorkflowImageButton").html("Show Workflow Image")
-        }else{
-          $("#workflowImage").delay(1).show("slow")
-          $("#toggleWorkflowImageButton").html("Hide Workflow Image")
-        }
-      })
 
     $(".modal").on("hidden.bs.modal", function(){
       $(".modal-content").html("");

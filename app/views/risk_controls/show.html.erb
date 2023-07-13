@@ -22,17 +22,7 @@
       </div>
 
       <div class="panel-body">
-        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-         <div class="col-xs-12">
-            <%instruction = "<p>"
-              instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-              instruction = instruction + "</p>"
-              instruction = instruction + "<img id='workflowImage' class = 'workflowImg' >"
-            %>
-            <%=render "shared/instructions",
-              :instruction => instruction%>
-        </div>
-        <% end %>
+        <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @risk_control, :action_name => params[:action] }%>
         <div class="col-xs-12 mb20">
           <%= render '/forms/render_buttons', owner: @risk_control, env: :inline %>
         </div>
@@ -45,14 +35,6 @@
   </div>
 </div>
 
-<style>
-  #workflowImage{
-    display: none;
-    width: 100%;
-    height: auto;
-    padding: 4%;
-  }
-</style>
 
 <script>
   $(document).ready(function(){
@@ -66,22 +48,6 @@
         $(window).trigger('resize');
       });
     });
-
-    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@risk_control.class.name}_#{@risk_control.status.downcase.parameterize.underscore}.png" %>')
-    <% end %>
-
-    $("#toggleWorkflowImageButton").on('click', function(event){
-      event.preventDefault();
-  
-      if($("#workflowImage").is(":visible")){
-        $("#workflowImage").delay(1).hide("slow")
-        $("#toggleWorkflowImageButton").html("Show Workflow Image")
-      }else{
-        $("#workflowImage").delay(1).show("slow")
-        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
-      }
-    })
 
 
   });

@@ -53,17 +53,7 @@
       </div>
 
       <div class="panel-body">
-        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-          <div class="col-xs-12">
-              <%instruction = "<p>"
-                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
-                instruction = instruction + "</p>"
-                instruction = instruction + "<img id='workflowImage' class = 'workflowImg' >"
-              %>
-              <%=render "shared/instructions",
-                :instruction => instruction%>
-          </div>
-        <% end %>
+        <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @meeting, :action_name => params[:action] }%>
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
             <% if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
@@ -164,15 +154,6 @@
 </div>
 
 
-<style>
-  #workflowImage{
-    display: none;
-    width: 100%;
-    height: auto;
-    padding: 4%;
-  }
-</style>
-
 <script>
   function delete_report(report_id, meeting_id,btn){
     var result = confirm("Are you sure?");
@@ -183,21 +164,6 @@
     }
   }
   $(document).ready(function(){
-    <% if CONFIG::GENERAL[:display_workflow_diagram] %>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@meeting.class.name}_#{@meeting.status.downcase.parameterize.underscore}.png" %>')
-    <% end %>
-
-    $("#toggleWorkflowImageButton").on('click', function(event){
-      event.preventDefault();
-  
-      if($("#workflowImage").is(":visible")){
-        $("#workflowImage").delay(1).hide("slow")
-        $("#toggleWorkflowImageButton").html("Show Workflow Image")
-      }else{
-        $("#workflowImage").delay(1).show("slow")
-        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
-      }
-    })   
 
     $("#message-btn").on('click',function(){
       $.get("<%=message_meeting_path(@meeting)%>",function(data){
