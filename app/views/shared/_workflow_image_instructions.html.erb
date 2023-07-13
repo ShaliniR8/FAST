@@ -1,4 +1,5 @@
 
+
 <% if CONFIG::GENERAL[:display_workflow_diagram] %>
     <% if defined?(instruction) %>
       <%instruction = instruction + "<br/><br/><p>" %>
@@ -10,9 +11,11 @@
         instruction = instruction + "<img id='workflowImage' class = 'workflowImg' src = ''>"
     %>
 <% end %>
-<div class="col-xs-12">
-  <%=render "shared/instructions", :instruction => instruction%>
-</div>
+<% if !instruction.nil? %>
+  <div class="col-xs-12">
+    <%=render "shared/instructions", :instruction => instruction%>
+  </div>
+<% end %>
 
 <style>
   #workflowImage{
