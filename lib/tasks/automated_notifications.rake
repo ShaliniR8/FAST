@@ -2,6 +2,8 @@ namespace :notifications do
 
   desc "Send automated notifications/reminders."
   task :automated_notifications => :environment do
+    @logger = Logger.new('log/automated_notifications.log')
+    @logger.info "\n---------------------------------- \n\n #{Time.now}"
     begin
       all_rules = AutomatedNotification.all
 
@@ -18,9 +20,12 @@ namespace :notifications do
           .where("status = ? AND DATE(#{anchor_date_field}) = ?",
             anchor_status, Time.now.in_time_zone.to_date + interval.days)
 
-        puts "Alert ##{rule.id} count: #{records.length}"
+        puts "Alert Rule ##{rule.id} count: #{records.length}"
+        @logger.info "Alert Rule ##{rule.id} count: #{records.length}"
+        @logger.info "#{object_type.classify}: #{records.map {|r| r.id}}"
         records.each do |record|
           user_or_users = record.send(audience_field)
+          @logger.info "User or Users: #{user_or_users}"
           if user_or_users.is_a?(Array)
             user_or_users.each do |u|
               if u.is_a?(User)
@@ -44,6 +49,7 @@ namespace :notifications do
       location = "notifications:automated_notifications"
       subject = "Rake Task Error Encountered In #{location.upcase}"
       error_message = error.message
+      @logger.error "Rake Task Error Encountered In #{location.upcase} : #{error_message}"
       NotifyMailer.notify_rake_errors(subject, error_message, location)
     end
   end
