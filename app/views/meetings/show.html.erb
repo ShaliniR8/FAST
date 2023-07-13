@@ -53,7 +53,7 @@
       </div>
 
       <div class="panel-body">
-        <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @meeting, :action_name => params[:action] }%>
+        <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => params[:action], :include_workflow_diagram => true }%>
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
             <% if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&

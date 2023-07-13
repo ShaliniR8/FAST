@@ -101,7 +101,7 @@
           </div>
         </div>
         <div class="panel-body collapse in" id="form_body">
-        <%= render partial: "shared/workflow_image_instructions", :locals => { :owner => @report, :action_name => params[:action] }%>
+        <%= render partial: "shared/instructions", :locals => { :owner => @report, :action_name => params[:action], :include_workflow_diagram => true }%>
           <div class="col-xs-12 mb20">
             <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before making Meeting Ready or Closing" if @report.occurrence_lock? %></b>
             <%if current_user.has_access('reports','edit', admin: CONFIG::GENERAL[:global_admin_default])%>
