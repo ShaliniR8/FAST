@@ -1,9 +1,4 @@
-class BAHSafetyReportingConfig < DefaultSafetyReportingConfig
-
-  GENERAL = DefaultSafetyReportingConfig::GENERAL.merge({
-    # General Module Features:
-    submission_local_time_zone:       true
-  })
+class JEDSafetyReportingConfig < DefaultSafetyReportingConfig
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
     menu_items: {
@@ -13,5 +8,4 @@ class BAHSafetyReportingConfig < DefaultSafetyReportingConfig
       },
     }
   })
-
 end

@@ -684,9 +684,14 @@ class RecordsController < ApplicationController
     html = render_to_string(:template => "/pdfs/print_record.html.erb")
     pdf_options = {
       header_html:  'app/views/pdfs/print_header.html',
-      header_spacing:  2,
+      header_spacing:  1,
+
       header_right: '[page] of [topage]'
     }
+    if CONFIG::GENERAL[:has_pdf_header]
+      pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+    end
+
     if CONFIG::GENERAL[:has_pdf_footer]
       pdf_options.merge!({
         footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
@@ -708,7 +713,8 @@ class RecordsController < ApplicationController
     html = render_to_string(:template => "/pdfs/_print_library_deidentified_record.html.erb", layout: false)
     pdf_options = {
       header_html: "app/views/pdfs/print_header.html",
-      header_spacing:  2,
+      header_spacing:  1,
+
       header_right: '[page] of [topage]'
     }
     if CONFIG::GENERAL[:has_pdf_footer]

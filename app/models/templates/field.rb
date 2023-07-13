@@ -70,6 +70,7 @@ class Field < ActiveRecord::Base
     h["Check Boxes"] = "checkbox"
     h["Text Area"] = "textarea"
     h["Map Points"] = "map" if CONFIG::GENERAL[:has_gmap].present?
+    h["Number"] = "number"
     return h.sort_by{|k, v| k}
   end
 
@@ -83,7 +84,8 @@ class Field < ActiveRecord::Base
       # "Numeric (Integer)"=>"int",
       # "Numeric (Decimal)"=>"float",
       # "Y/N"  =>"bool",
-      "Time Zone"     => "timezone"
+      "Time Zone"     => "timezone",
+      "Decimal"        => "decimal"
     }.sort_by{|k, v| k}
   end
 

@@ -136,7 +136,7 @@ class QueriesController < ApplicationController
       @owner.update_attributes(params[:query])
     end
     @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
-    @owner.save 
+    @owner.save
 
     redirect_to query_path(@owner)
   end
@@ -241,7 +241,17 @@ class QueriesController < ApplicationController
   def print
     @owner = @table.find(params[:id])
     html = render_to_string(template: 'queries/print.html.slim')
-    pdf = PDFKit.new(html)
+    pdf_options = {}
+    if CONFIG::GENERAL[:has_pdf_header]
+      pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+    end
+    if CONFIG::GENERAL[:has_pdf_footer]
+      pdf_options.merge!({
+        footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+        footer_spacing:  3,
+      })
+    end
+    pdf = PDFKit.new(html, pdf_options)
     pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
     pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
     filename = "Query ##{@owner.id}"
