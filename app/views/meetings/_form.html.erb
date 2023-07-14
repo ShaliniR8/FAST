@@ -35,7 +35,7 @@
           :html => {:multipart => true} do |f|%>
 
           <%#=render "shared/privilege_form", :target => "meeting[privileges][]", :owner => @meeting, :f => f%>
-          <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
           <%if @action == "new"%>
             <%=f.fields_for :host, Host.new do |ff|%>
               <%=ff.hidden_field :users_id, :value => current_user.id%>

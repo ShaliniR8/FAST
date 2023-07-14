@@ -12,7 +12,7 @@ class DefaultSafetyPromotionConfig
 
   HIERARCHY = {
     display_name: 'Safety Promotion',
-    display_workflow_diagram: false,
+    display_workflow_diagram_module: false,
     objects: {
       'Newsletter' => {
       },

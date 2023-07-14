@@ -17,7 +17,7 @@ class DefaultSafetyAssuranceConfig
 
   HIERARCHY = {
     display_name: 'Safety Assurance',
-    display_workflow_diagram: true,
+    display_workflow_diagram_module: true,
     objects: {
 
       'Audit' => {

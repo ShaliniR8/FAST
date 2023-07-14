@@ -72,7 +72,7 @@
       <div class="panel-body" id="form_body">
 
         <%=form_for @record ,:html => {:multipart => true} do |f|%>
-          <%= render partial: "shared/instructions", :locals => { :owner => @record, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @record, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
 
           <%=f.hidden_field :templates_id, :value => @template.id%>
           <%if @action == "new"%>

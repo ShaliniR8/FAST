@@ -13,7 +13,7 @@ class DefaultImplementationManagementConfig
 
   HIERARCHY = {
     display_name: 'SMS IM',
-    display_workflow_diagram: false,
+    display_workflow_diagram_module: false,
     objects: {
 
     },

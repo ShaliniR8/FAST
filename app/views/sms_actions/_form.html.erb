@@ -21,7 +21,7 @@
       <div class="panel-body">
 
         <%=form_for @owner.becomes(SmsAction), :html => {:multipart => true} do |f|%>
-          <%= render partial: "shared/instructions", :locals => { :owner => @owner, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @owner, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
 
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>

@@ -31,7 +31,7 @@
         </div>
         <div class="panel-body collapse in" id="form_body">
           <div class="col-xs-12 mb20">
-            <%= render partial: "shared/instructions", :locals => { :owner => @record, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
+            <%= render partial: "shared/instructions", :locals => { :owner => @record, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
             <%if current_user.id == @record.created_by.id ||
               current_user.has_access('submissions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
               <span data-toggle="modal" data-target=".bs-example-modal-lg">
