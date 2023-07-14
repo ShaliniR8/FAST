@@ -449,6 +449,7 @@ class RecordsController < ApplicationController
     # load_special_matrix_form("record", "baseline", @record)
 
     @action = "edit"
+    @has_status = true
     @record = Record.find(params[:id])
     @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).group_by(&:fields_id)
 
@@ -652,6 +653,7 @@ class RecordsController < ApplicationController
 
 
   def show
+    
     @i18nbase = 'sr.report'
     @record = Record.preload(:record_fields).find(params[:id])
     @template = Template.preload(categories: [:fields]).find(@record.templates_id)

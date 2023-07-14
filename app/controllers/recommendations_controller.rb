@@ -96,12 +96,14 @@ class RecommendationsController < SafetyAssuranceController
 
 
   def show
+    @has_status = true
     @type = @owner.owner_type
     @fields = Recommendation.get_meta_fields('show')
   end
 
 
   def edit
+    @has_status = true
     @privileges = Privilege.find(:all)
     @users = User.find(:all)
     @users.keep_if{|u| !u.disable}

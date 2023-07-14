@@ -26,7 +26,7 @@
 
       <div class="panel-body" id="form_body">
         <%=form_for @report, :html => {:multipart => true} do |f|%>
-          <%= render partial: "shared/instructions", :locals => { :owner => @report, :action_name => action_name, :include_workflow_diagram => true }%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @report, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
           <%=render "shared/privilege_form", target: "report[privileges][]", owner: @report, f: f%>
           <%=render '/forms/form_fields', fields: @fields, f: f, record: @report%>
 

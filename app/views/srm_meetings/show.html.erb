@@ -42,7 +42,7 @@
       </div>
 
       <div class="panel-body">
-          <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => params[:action], :include_workflow_diagram => true }%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => params[:action], :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
           <%if current_user.has_access("srm_meetings","edit", admin: CONFIG::GENERAL[:global_admin_default]) &&
                 @meeting.has_user(current_user)%>
             <%if @meeting.status == "Open"%>

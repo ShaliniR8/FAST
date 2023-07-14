@@ -156,7 +156,7 @@
                 instruction = instruction + "<div class='workflow-image-container'><div class='workflow-image'><img id='workflowImage' src = ''></div></div>"
               %>
               <%=render "shared/instructions",
-                :instruction => instruction%>
+                :instruction => instruction, :include_workflow_diagram => false%>
           </div>
         <% end %>
           <div class="col-xs-12">

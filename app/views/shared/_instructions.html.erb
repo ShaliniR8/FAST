@@ -1,6 +1,4 @@
-
-
-<% if CONFIG::GENERAL[:display_workflow_diagram] && ( defined?(include_workflow_diagram) && include_workflow_diagram == true)%>
+<% if CONFIG::GENERAL[:display_workflow_diagram] && CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] && include_workflow_diagram == true %>
     <% if defined?(instruction) %>
       <%instruction = instruction + "<br/><br/><p>" %>
     <% else %>
@@ -55,23 +53,23 @@
 
 <script> 
   $(document).ready(function(){
-    <% if CONFIG::GENERAL[:display_workflow_diagram] &&  defined?(include_workflow_diagram) && include_workflow_diagram == true && owner.class.name == "Submission"%>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_new.png" %>')
-    <% elsif CONFIG::GENERAL[:display_workflow_diagram] &&  defined?(include_workflow_diagram) && include_workflow_diagram == true && (action_name == 'new' || action_name == 'continue') %>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{action_name}.png" %>')
-    <% elsif CONFIG::GENERAL[:display_workflow_diagram] &&  defined?(include_workflow_diagram) && include_workflow_diagram == true && (action_name == 'edit' || action_name == "show")  %>
-      $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{owner.status.downcase.parameterize.underscore}.png" %>')
+    
+    <% if CONFIG::GENERAL[:display_workflow_diagram] && include_workflow_diagram == true %>
+      
+      <% if @has_status == true%>
+        $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{owner.status.downcase.parameterize.underscore}.png" %>')
+      <% else %>
+        $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{action_name}.png" %>')
+      <% end %>
     <% end %>
+
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();
-
-      if($("#workflowImage").is(":visible"))
-      {
+      if ($("#workflowImage").is(":visible")){
         $("#workflowImage").delay(1).hide("slow")
         $("#toggleWorkflowImageButton").html("Show Workflow Image")
       }
-      else
-      {
+      else{
         $("#workflowImage").delay(1).show("slow")
         $("#toggleWorkflowImageButton").html("Hide Workflow Image")
       }

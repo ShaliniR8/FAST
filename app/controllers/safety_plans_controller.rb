@@ -58,6 +58,7 @@ class SafetyPlansController < ApplicationController
 
 
   def edit
+    @has_status = true
     @safety_plan = SafetyPlan.find(params[:id])
     @evaluate = params[:evaluate]
     @results = SafetyPlan.results
@@ -99,6 +100,7 @@ class SafetyPlansController < ApplicationController
 
 
   def show
+    @has_status = true
     @safety_plan=SafetyPlan.find(params[:id])
     @fields=SafetyPlan.get_meta_fields('show')
   end

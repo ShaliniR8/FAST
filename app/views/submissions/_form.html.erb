@@ -98,7 +98,7 @@
               instruction = instruction + "<br/> <b>#{@record.template.name} Instructions:</b> <br/>" + @record.template.description if @record.template.description.present?
               instruction = instruction + "</p>"
             %>
-            <%= render partial: "shared/instructions", :locals => { :owner => @record, :action_name => action_name, :instruction => instruction, :include_workflow_diagram => true }%>
+            <%= render partial: "shared/instructions", :locals => { :owner => @record, :action_name => action_name, :instruction => instruction, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
 
           <%if @template.allow_anonymous%>
             <div class="col-xs-12">

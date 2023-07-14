@@ -102,6 +102,7 @@ class RiskControlsController < ApplicationController
 
 
   def edit
+    @has_status = true
     @risk_control = RiskControl.find(params[:id])
     @users = User
       .find(:all)
@@ -212,6 +213,7 @@ class RiskControlsController < ApplicationController
 
 
   def show
+    @has_status = true
     @risk_control = RiskControl.find(params[:id])
     @fields = RiskControl.get_meta_fields('show')
   end

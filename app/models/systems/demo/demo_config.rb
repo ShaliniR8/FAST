@@ -52,7 +52,7 @@ class DemoConfig < DefaultConfig
     safety_promotion_visibility:  true,
     global_admin_default:         false,
     pin_dashboard_visualizations: true,
-    display_workflow_diagram:      false,   # Display workflow diagrams in the instruction panels in this module
+    display_workflow_diagram:      true,   # Display workflow diagrams in the instruction panels in this module
   })
 
   RISK_MATRIX = {

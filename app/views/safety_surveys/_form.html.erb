@@ -31,7 +31,8 @@
           <%=form_for @survey, :html => {:multipart => true} do |f|%>
             <%=render "shared/instructions",
               :instruction =>
-              'Create a Safety Survey and assign groups for Distribution.</br>Add 1 checklist for survey content after Safety Survey has been created.</br>Remember to PUBLISH Safety Survey after it is created in order to notify distributees.</br>Safety Survey cannot be edited once it is Published.'%>
+              'Create a Safety Survey and assign groups for Distribution.</br>Add 1 checklist for survey content after Safety Survey has been created.</br>Remember to PUBLISH Safety Survey after it is created in order to notify distributees.</br>Safety Survey cannot be edited once it is Published.', 
+              :include_workflow_diagram => false%>
 
             <div class="col-xs-12">
               <div class="form-inline col-xs-4">

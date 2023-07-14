@@ -350,6 +350,7 @@ class ReportsController < ApplicationController
 
 
   def edit
+    @has_status =  true
     load_options
     @privileges = Privilege
       .find(:all)
@@ -497,7 +498,7 @@ class ReportsController < ApplicationController
     @action = "show"
     @title = "Included Reports"
     @table_name = "reports"
-
+    @has_status = true
     @i18nbase = 'sr.event'
     @report = Report.preload(records: [:attachments, :occurrences]).find(params[:id])
     @owner = @report

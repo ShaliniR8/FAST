@@ -63,6 +63,7 @@ class InspectionsController < SafetyAssuranceController
 
   def edit
     load_options
+    @has_status = true
     @fields = Inspection.get_meta_fields('form')
   end
 
@@ -125,6 +126,7 @@ class InspectionsController < SafetyAssuranceController
 
   def show
     load_options
+    @has_status = true
     @fields = Inspection.get_meta_fields('show')
     @checklist_headers = InspectionRequirement.get_meta_fields('show')
   end

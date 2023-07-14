@@ -2,6 +2,7 @@ class HAECOSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
   HIERARCHY = {
     display_name: 'Safety Assurance',
+    display_workflow_diagram: true,
     objects: {
 
       'Audit' => {

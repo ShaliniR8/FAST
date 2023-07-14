@@ -17,6 +17,7 @@ class DefaultSafetyRiskManagementConfig
 
   HIERARCHY = {
     display_name: 'Safety Risk Management',
+    display_workflow_diagram: false,
     objects: {
 
       'Sra' => {

@@ -25,7 +25,8 @@
           <%=form_for @template, html: {id: 'submit-form', class: 'dirty-submit', multipart: true} do |f|%>
             <%=render "shared/instructions",
               :instruction =>
-              'Use  <span class="glyphicon glyphicon-move"></span>  to reorder Fields and Categories</br>Nested fields can be added to dropdown, checkbox and radio fields only</br>'%>
+              'Use  <span class="glyphicon glyphicon-move"></span>  to reorder Fields and Categories</br>Nested fields can be added to dropdown, checkbox and radio fields only</br>',
+              :include_workflow_diagram => false%>
 
             <div class="col-xs-12">
               <div class="form-inline col-xs-4">

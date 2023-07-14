@@ -165,6 +165,7 @@ class SubmissionsController < ApplicationController
   def new
     @action = "new"
     @has_template = false
+    @has_status = false
     if !params[:template].blank?
       if CONFIG::GENERAL[:sabre_integration].present?
         prepare_flight_data(current_user.employee_number)
@@ -408,6 +409,7 @@ class SubmissionsController < ApplicationController
 
 
   def show
+    @has_status = true
     respond_to do |format|
       format.html do
         @meta_field_args = ['show']
@@ -670,6 +672,7 @@ class SubmissionsController < ApplicationController
 
 
   def continue
+    @has_status = false
     @action="Continue"
     if CONFIG::GENERAL[:sabre_integration].present?
       prepare_flight_data(current_user.employee_number)

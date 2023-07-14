@@ -290,6 +290,7 @@ class SrasController < ApplicationController
 
 
   def show
+    @has_status = true
     @root_cause_headers = HazardRootCause.get_headers
     @description_headers = Cause.get_meta_fields('show')
     @agenda_headers = SrmAgenda.get_headers
@@ -368,6 +369,7 @@ class SrasController < ApplicationController
 
   def edit
     load_options
+    @has_status = true
     @fields = Sra.get_meta_fields('form')
     @sra = Sra.find(params[:id])
     @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''

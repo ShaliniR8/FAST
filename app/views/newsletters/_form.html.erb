@@ -31,7 +31,8 @@
           <%=form_for @newsletter, :html => {:multipart => true} do |f|%>
             <%=render "shared/instructions",
               :instruction =>
-              'Create a Newsletter and assign groups for Distribution.</br>Remember to PUBLISH newsletter after it is created in order to notify distributees.</br>Newsletter cannot be edited once it is Published.'%>
+              'Create a Newsletter and assign groups for Distribution.</br>Remember to PUBLISH newsletter after it is created in order to notify distributees.</br>Newsletter cannot be edited once it is Published.', 
+              :include_workflow_diagram => false%>
 
             <div class="col-xs-12">
               <div class="form-inline col-xs-4">

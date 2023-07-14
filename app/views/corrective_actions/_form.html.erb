@@ -20,7 +20,7 @@
 
       <div class="panel-body" id="form_body">
         <%= form_for @corrective_action,:html => {:multipart => true} do |f|%>
-          <%= render partial: "shared/instructions", :locals => { :owner => @corrective_action, :action_name => action_name, :include_workflow_diagram => true }%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @corrective_action, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
           <%end%>

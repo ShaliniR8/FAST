@@ -52,6 +52,7 @@ class DefaultSafetyReportingConfig
 
   HIERARCHY = {
     display_name: 'ASAP',
+    display_workflow_diagram: false,
     objects: {
 
       'Submission' => {

@@ -11,6 +11,7 @@ class DefaultOshaConfig
 
   HIERARCHY = {
     display_name: 'OSHA / OJI',
+    display_workflow_diagram: false,
     objects: {
       'OshaSubmission' => {
         title: 'OSHA Submission',

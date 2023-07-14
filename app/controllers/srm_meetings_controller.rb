@@ -130,6 +130,7 @@ class SrmMeetingsController < ApplicationController
      return
     end
     @action = "show"
+    @has_status = true
     @headers = User.invite_headers
     @available_participants = @meeting.invitations.map{|x| x.user}
     @current_inv = @meeting.invitations.select{|x| x.user==current_user&&x.status=="Pending"}.first
@@ -257,6 +258,7 @@ class SrmMeetingsController < ApplicationController
 
 
   def edit
+    @has_status = true
     @meeting = Meeting.find(params[:id])
     @action = "edit"
     @headers = User.invite_headers

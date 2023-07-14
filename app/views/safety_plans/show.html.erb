@@ -23,7 +23,7 @@
       </div>
 
       <div class="panel-body" id="form_body">
-        <%= render partial: "shared/instructions", :locals => { :owner => @safety_plan, :action_name => params[:action], :include_workflow_diagram => true }%>
+        <%= render partial: "shared/instructions", :locals => { :owner => @safety_plan, :action_name => params[:action], :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram] }%>
         <div class="col-xs-12 mb20">
           <%= render '/forms/render_buttons', owner: @safety_plan, env: :inline %>
         </div>
