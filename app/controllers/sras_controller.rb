@@ -647,10 +647,29 @@ class SrasController < ApplicationController
   def new_minutes
     @owner = Sra.find(params[:id])
     @meeting = Meeting.find(params[:meeting])
-    render :partial => "shared/add_minutes"
+    render :partial => "add_minutes"
   end
 
+  def add_meeting_minutes
+    @sra = Sra.find(params[:id])
+    @meeting = Meeting.find(params[:meeting_id])
+    @sra_headers = Sra.get_meta_fields('index')
 
+    @sra.minutes = params[:minutes]
+    @sra.save
+    @sras = @meeting.sras.sort_by{|x| x.id}
+    byebug
+    Transaction.build_for(
+      @sra.meeting,
+      params[:commit],
+      current_user.id,
+      "SRA ##{@sra.get_id}"
+    )
+
+    respond_to do |format|
+      format.js
+    end
+  end
 
   def reopen
     @sra = Sra.find(params[:id])

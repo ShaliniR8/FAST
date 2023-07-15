@@ -11,7 +11,7 @@
         sra_path(sra),
         target: :_blank,
         'hover' => 'tooltip',
-        title: 'View Sra',
+        title: 'View SRA',
         :class => "btn btn-sm btn-info mb5"%>
     <% if  meeting.has_user(current_user)%>
         <%if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && meeting.status == 'Open'%>
