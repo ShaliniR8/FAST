@@ -434,8 +434,7 @@
           $('#edit-btn').show();
           $('#ca-btn').show();
           $('.edit-category-btn').show();
-          if('workflow_diagram' in data)
-          {
+          if('workflow_diagram' in data){
             $("#workflowImage").attr('src', data['workflow_diagram'])
           }
         }
@@ -444,7 +443,7 @@
 
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();
-      <% if  CONFIG::GENERAL[:display_workflow_diagram]%>
+      <% if CONFIG::GENERAL[:display_workflow_diagram]%>
 
         <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
         <% curr_status = @record.send(status_field_name).downcase %>
