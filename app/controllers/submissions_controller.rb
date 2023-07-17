@@ -409,7 +409,7 @@ class SubmissionsController < ApplicationController
 
 
   def show
-    @has_status = true
+    @has_status = false
     respond_to do |format|
       format.html do
         @meta_field_args = ['show']
