@@ -47,7 +47,7 @@ class NotifyMailer < ApplicationMailer
       title = record.owner.description rescue ''
       filename = "#{record.owner.class.name}_#{record.owner.id}_#{title}"
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?
-    elsif object_name == "Meeting" && (notice.content.include? 'invited')
+    elsif (object_name == "Meeting" || object_name == "SrmMeeting") && (notice.content.include? 'invited')
       url = meeting_url(notice.owner)
       attachments["#{filename}.ics"] = { mime_type: 'text/calendar', content: create_calendar_invite(record, url) }
     end
