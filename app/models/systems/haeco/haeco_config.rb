@@ -22,8 +22,7 @@ class HAECOConfig < DefaultConfig
 
     hide_employee_group:           true,
     custom_uniq_id:                true,
-    hide_findings_in_checklist:    true,
-    display_workflow_diagram:      true,   # Display workflow diagrams in the instruction panels in this module
+    hide_findings_in_checklist:    true
   })
 
   DOCUMENT_CATEGORIES = ["HAECO References Information", "ProSafeT Information", "General Information", "Safety Reporting Guides Information", "Safety Assurance Guides Information", "SRA(SRM) Guides Information", "SMS IM Guides Information", "Other"]
