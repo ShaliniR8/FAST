@@ -1,4 +1,4 @@
-<% if CONFIG::GENERAL[:display_workflow_diagram] && CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] && include_workflow_diagram == true %>
+<% if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] %>
     <% if defined?(instruction) %>
       <%instruction = instruction + "<br/><br/><p>" %>
     <% else %>
@@ -54,7 +54,7 @@
 <script> 
   $(document).ready(function(){
     
-    <% if CONFIG::GENERAL[:display_workflow_diagram] && include_workflow_diagram == true %>
+    <% if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] %>
       
       <% if @has_status == true%>
         $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{owner.status.downcase.parameterize.underscore}.png" %>')

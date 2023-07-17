@@ -337,7 +337,7 @@ class RecordsController < ApplicationController
       message: 'Report Opened',
       html: "<b>Status:</b> #{@record.status}",
     }
-    response[:workflow_diagram] = "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_open.png" if CONFIG::GENERAL[:display_workflow_diagram]
+    response[:workflow_diagram] = "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_open.png" if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module]
     render json: response
 
     #redirect_to @record, flash: {success: "Report Opened."}

@@ -148,7 +148,7 @@
         </div>
 
         <div class="panel-body collapse in" id="form_body">
-        <% if CONFIG::GENERAL[:display_workflow_diagram] %>
+        <% if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] %>
           <div class="col-xs-12">
               <%instruction = "<p>"
                 instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
@@ -443,7 +443,7 @@
 
     $("#toggleWorkflowImageButton").on('click', function(event){
       event.preventDefault();
-      <% if CONFIG::GENERAL[:display_workflow_diagram]%>
+      <% if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module]%>
 
         <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
         <% curr_status = @record.send(status_field_name).downcase %>
