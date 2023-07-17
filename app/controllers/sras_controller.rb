@@ -658,7 +658,6 @@ class SrasController < ApplicationController
     @sra.minutes = params[:minutes]
     @sra.save
     @sras = @meeting.sras.sort_by{|x| x.id}
-    byebug
     Transaction.build_for(
       @sra.meeting,
       params[:commit],
