@@ -4,7 +4,7 @@
 
 <% if include_workflow_diagram %>
     
-    <% if instruction.length > 0 %>
+    <% if instruction.present? %>
       <%instruction = instruction + "<br/><br/>" %>
     <%end%>
 
@@ -59,7 +59,7 @@
   $(document).ready(function(){
     
     <% if include_workflow_diagram %>
-      <% if @has_status == true%>
+      <% if @has_status%>
         $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{owner.status.downcase.parameterize.underscore}.png" %>')
       <% else %>
         $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{owner.class.name}_#{action_name}.png" %>')
