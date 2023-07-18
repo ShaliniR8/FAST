@@ -1,35 +1,39 @@
+<% if !defined?(instruction) %>
+    <% instruction = "" %>
+<% end%>
+
 <% if include_workflow_diagram %>
-    <% if defined?(instruction) %>
-      <%instruction = instruction + "<br/><br/><p>" %>
-    <% else %>
-      <% instruction = "<p>" %>
+    
+    <% if instruction.length > 0 %>
+      <%instruction = instruction + "<br/><br/>" %>
     <%end%>
-    <%  instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+
+    <%  instruction = instruction + "<p><button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
         instruction = instruction + "</p>"
         instruction = instruction + "<div class='workflow-image-container'><div class='workflow-image'><img id='workflowImage' src = ''></div></div>"
     %>
 <% end %>
 
-<% if !instruction.nil? %>
-  <div class="col-xs-12">
-    <div class='col-xs-12'>
-      <div class="col-xs-12 alert alert-info alert-dismissible show" role="alert">
-        <h4>
-          <b>Instructions:</b>
-          <button type="button"
-            class="close pull-right mr20"
-            data-dismiss="alert"
-            aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </h4>
-        <p>
-          <%=instruction.html_safe%>
-        </p>
-      </div>
+
+<div class="col-xs-12">
+  <div class='col-xs-12'>
+    <div class="col-xs-12 alert alert-info alert-dismissible show" role="alert">
+      <h4>
+        <b>Instructions:</b>
+        <button type="button"
+          class="close pull-right mr20"
+          data-dismiss="alert"
+          aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </h4>
+      <p>
+        <%=instruction.html_safe%>
+      </p>
     </div>
   </div>
-<% end %>
+</div>
+
 
 <style>
   #workflowImage{
