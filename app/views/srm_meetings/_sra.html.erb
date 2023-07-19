@@ -13,9 +13,9 @@
         'hover' => 'tooltip',
         title: 'View SRA',
         :class => "btn btn-sm btn-info mb5"%>
-    <% if  meeting.has_user(current_user)%>
+    <% if  meeting.has_user(current_user) || meeting.host.users_id == current_user.id%>
         <%if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && meeting.status == 'Open'%>
-            <%if sra.srm_agendas.blank?%>
+
                 <!-- Carryover SRA -->
                 <%=link_to "<i class='glyphicon glyphicon-road'></i>".html_safe, "#",
                     :class=>"btn btn-sm btn-success carryover_btn mb5",
@@ -24,7 +24,6 @@
                     'hover' => 'tooltip',
                     title: 'Carryover SRA',
                     :route => carryover_another_meeting_sra_path(sra, :meeting => meeting)%>
-            <%end%>
             
             <!-- Remove SRA -->
             <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
@@ -32,15 +31,17 @@
               :onclick=>"delete_sra(#{sra.id}, #{meeting.id},this)",
               'hover' => 'tooltip',
               title: 'Remove SRA'%>
-
-            <!-- Add Minutes -->
-            <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
-                :class => "btn btn-sm btn-success minutes_btn mb5",
-                "data-toggle" => "modal",
-                "data-target" => ".bs-example-modal-lg",
-                'hover' => 'tooltip',
-                title: 'Add Meeting Minutes',
-                :route => new_minutes_sra_path(sra, :meeting => meeting) %>
+            
+            <% if sra.status != 'Completed'%>
+                <!-- Add Minutes -->
+                <%=link_to "<i class='glyphicon glyphicon-pencil'></i>".html_safe, "#",
+                    :class => "btn btn-sm btn-success minutes_btn mb5",
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg",
+                    'hover' => 'tooltip',
+                    title: 'Add Meeting Minutes',
+                    :route => new_minutes_sra_path(sra, :meeting => meeting) %>
+            <% end %>
 
         <%end%>
         <!-- View/Add Meeting Agenda -->
