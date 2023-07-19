@@ -29,10 +29,14 @@ class Query < ActiveRecord::Base
 
 
   def get_target
-    if session[:mode] == "OSHA"
-      '(OSHA) Reports'
-    else
-      CONFIG.hierarchy[session[:mode]][:objects][target][:title].pluralize rescue ""
+    begin
+      if session[:mode] == "OSHA"
+        '(OSHA) Reports'
+      else
+        CONFIG.hierarchy[session[:mode]][:objects][target][:title].pluralize rescue ""
+      end
+    rescue => e 
+      self.target.pluralize rescue ""
     end
   end
 
