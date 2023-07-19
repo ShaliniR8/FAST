@@ -179,10 +179,6 @@ class SrmMeetingsController < ApplicationController
             if key_parts[0] == 'destroy'
               if eval(value) == true
                 deleted_agenda_ids << agenda_id
-              else
-                if eval(value)[:value].present? && eval(value)[:value] == 1
-                  deleted_agenda_ids << agenda_id
-                end
               end
             else
               update_hash[agenda_id][key_parts[0].to_sym] = value
