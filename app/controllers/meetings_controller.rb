@@ -179,6 +179,7 @@ class MeetingsController < ApplicationController
 
 
   def show
+    @has_status = true
     @meeting = Meeting.find(params[:id])
     if @meeting.type.present?
       case @meeting.type
@@ -419,6 +420,7 @@ class MeetingsController < ApplicationController
 
 
   def edit
+    @has_status = true
     @privileges = Privilege.find(:all)
     @meeting = Meeting.find(params[:id])
     @action = 'edit'

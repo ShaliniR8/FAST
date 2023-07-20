@@ -19,6 +19,7 @@
       </div>
       <div class="panel-body" id="form_body">
         <%=form_for @owner ,:html => {:multipart => true} do |f|%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @owner, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
             <%=f.hidden_field :parent_type, :value => @parent_type%>
@@ -82,6 +83,8 @@
     $(".basic-datepicker").datepicker({format: "YYYY-MM-DD"}).on('focus', function() {
       $(this).trigger('blur');
     });
+
+
   });
 </script>
 

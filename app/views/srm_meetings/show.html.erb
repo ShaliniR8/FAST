@@ -42,8 +42,7 @@
       </div>
 
       <div class="panel-body">
-        <div class="col-xs-12 mb15">
-
+          <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => params[:action], :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
           <%if current_user.has_access("srm_meetings","edit", admin: CONFIG::GENERAL[:global_admin_default]) &&
                 @meeting.has_user(current_user)%>
             <%if @meeting.status == "Open"%>
@@ -144,7 +143,6 @@
 
 <%=render "access_controls/new_modal"%>
 
-
 <script>
   function delete_report(report_id,btn)
   {
@@ -153,6 +151,7 @@
     });
   }
   $(document).ready(function(){
+
     $("#message-btn").on('click',function(){
       $.get("<%=message_meeting_path(@meeting)%>",function(data){
         $(".modal-content").html(data);

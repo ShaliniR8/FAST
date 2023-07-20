@@ -25,6 +25,7 @@
         </div>
 
         <div class="panel-body">
+          <%= render partial: "shared/instructions", :locals => { :owner => @owner, :action_name => params[:action], :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
           <div class="col-xs-12 mb20">
 
             <%= render 'forms/render_buttons', owner: @owner, env: :inline %>
@@ -64,6 +65,7 @@
 
 <script>
   $(document).ready(function(){
+
     $('#att_btn').on('click',function(){
       $.get("<%=new_attachment_finding_path(@owner)%>",function(data){
         $(".modal-content").html(data);

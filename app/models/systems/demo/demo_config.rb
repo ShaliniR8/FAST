@@ -51,7 +51,7 @@ class DemoConfig < DefaultConfig
     sms_im_visibility:            false,
     safety_promotion_visibility:  true,
     global_admin_default:         false,
-    pin_dashboard_visualizations: true,
+    pin_dashboard_visualizations: true
   })
 
   RISK_MATRIX = {

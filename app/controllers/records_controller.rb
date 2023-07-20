@@ -333,11 +333,12 @@ class RecordsController < ApplicationController
     rescue
     end
     @record.save
-
-    render json: {
-        message: 'Report Opened',
-        html: "<b>Status:</b> #{@record.status}"
-      }
+    response = {
+      message: 'Report Opened',
+      html: "<b>Status:</b> #{@record.status}",
+    }
+    response[:workflow_diagram] = "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_open.png" if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module]
+    render json: response
 
     #redirect_to @record, flash: {success: "Report Opened."}
   end
@@ -448,6 +449,7 @@ class RecordsController < ApplicationController
     # load_special_matrix_form("record", "baseline", @record)
 
     @action = "edit"
+    @has_status = true
     @record = Record.find(params[:id])
     @record_fields_hash = RecordField.preload(:field).where(records_id: @record.id).group_by(&:fields_id)
 
@@ -651,6 +653,7 @@ class RecordsController < ApplicationController
 
 
   def show
+    
     @i18nbase = 'sr.report'
     @record = Record.preload(:record_fields).find(params[:id])
     @template = Template.preload(categories: [:fields]).find(@record.templates_id)

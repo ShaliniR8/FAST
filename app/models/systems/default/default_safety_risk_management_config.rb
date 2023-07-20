@@ -15,9 +15,9 @@ class DefaultSafetyRiskManagementConfig
     enable_sra_viewer_access: false # by default Viewer Access on SRAs will be enabled if true. Needed for SCX workflow
   }
 
-
   HIERARCHY = {
     display_name: 'Safety Risk Management',
+    display_workflow_diagram_module: false,
     objects: {
 
       'Sra' => {

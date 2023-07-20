@@ -19,6 +19,7 @@
       </div>
       <div class="panel-body" id="form_body">
         <%=form_for @sra ,:html => {:multipart => true} do |f|%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @sra, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
             <%=f.hidden_field :parent_type, :value => @parent_type%>
@@ -122,7 +123,7 @@
 <script>
 
   $(document).ready(function(){
-
+    
     $("#<%=@sra.severity%>-<%=Investigation.get_likelihood.index(@sra.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
     $('#sev').on('change',function(){
       reset_risk();

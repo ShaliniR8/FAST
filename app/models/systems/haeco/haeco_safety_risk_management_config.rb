@@ -1,6 +1,7 @@
 class HAECOSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
 
   HIERARCHY = DefaultSafetyRiskManagementConfig::HIERARCHY.deep_merge({
+    display_workflow_diagram_module: true,
     objects: {
       'RiskControl' => {
         fields: {

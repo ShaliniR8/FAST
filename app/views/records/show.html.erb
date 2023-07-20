@@ -148,6 +148,17 @@
         </div>
 
         <div class="panel-body collapse in" id="form_body">
+        <% if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] %>
+          <div class="col-xs-12">
+              <%instruction = "<p>"
+                instruction = instruction + "<button id ='toggleWorkflowImageButton' type='button' class='btn btn-light' >Show Workflow Image</button>"
+                instruction = instruction + "</p>"
+                instruction = instruction + "<div class='workflow-image-container'><div class='workflow-image'><img id='workflowImage' src = ''></div></div>"
+              %>
+              <%=render "shared/instructions",
+                :instruction => instruction, :include_workflow_diagram => false%>
+          </div>
+        <% end %>
           <div class="col-xs-12">
             <%if (template_full_access || template_viewer_access || report_admin_access) && record_edit_access%>
               <%record_status = @record.status%>
@@ -323,11 +334,28 @@
  .datepicker{
   z-index: 1200!important;
  }
+  #workflowImage{
+    display: none;
+    width: 100%;
+    height: auto;
+    padding: 2%;
+  }
+
+  .workflow-image-container {
+    width: 60%;
+    height: auto;
+  }
+  .workflow-image {
+    position: relative;
+    top: 50%;
+    left: 35%;
+  }
 </style>
 
 
 <script>
   $(document).ready(function(){
+    var open_button_clicked = false;
     $('#launch_btn').on('click',function(){
       $.get("<%= eval("launch_record_path(@record)")%>", function(data){
           $(".modal-content").html(data);
@@ -386,6 +414,7 @@
 
     $(document).on('click', '.open-btn', function(e) {
       console.log('open-btn clicked!');
+      open_button_clicked = true
       var btn = $(this);
       e.preventDefault();
       $.ajax({
@@ -405,10 +434,34 @@
           $('#edit-btn').show();
           $('#ca-btn').show();
           $('.edit-category-btn').show();
+          if('workflow_diagram' in data){
+            $("#workflowImage").attr('src', data['workflow_diagram'])
+          }
         }
       });
     });
 
+    $("#toggleWorkflowImageButton").on('click', function(event){
+      event.preventDefault();
+      <% if CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module]%>
+
+        <% status_field_name = CONFIG.sr::HIERARCHY[:objects][@record.class.name][:fields][:status][:field]%>
+        <% curr_status = @record.send(status_field_name).downcase %>
+        if( open_button_clicked === false || "<%=curr_status%>" !== "new" )
+        {
+            $("#workflowImage").attr('src', '<%= "/images/workflow_diagram/#{AIRLINE_CODE}/#{@record.class.name}_#{@record.status.downcase.parameterize.underscore}.png" %>')
+            open_button_clicked = false
+        }
+      <% end %>
+
+      if($("#workflowImage").is(":visible")){
+        $("#workflowImage").delay(1).hide("slow")
+        $("#toggleWorkflowImageButton").html("Show Workflow Image")
+      }else{
+        $("#workflowImage").delay(1).show("slow")
+        $("#toggleWorkflowImageButton").html("Hide Workflow Image")
+      }
+    })   
 
 
 

@@ -121,6 +121,7 @@ class AuditsController < SafetyAssuranceController
 
 
   def edit
+    @has_status = true
     load_options
     @fields = Audit.get_meta_fields('form')
   end
@@ -191,6 +192,7 @@ class AuditsController < SafetyAssuranceController
 
 
   def show
+    @has_status = true
     respond_to do |format|
       format.html do
         load_options

@@ -2,6 +2,7 @@ class HAECOSafetyReportingConfig < DefaultSafetyReportingConfig
 
   HIERARCHY = {
     display_name: 'ASAP',
+    display_workflow_diagram_module: true,
     objects: {
 
       'Submission' => {

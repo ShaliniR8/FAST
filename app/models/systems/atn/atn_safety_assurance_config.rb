@@ -12,6 +12,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
   HIERARCHY = {
     display_name: 'Safety Assurance',
+    display_workflow_diagram_module: false,
     objects: {
 
       'Audit' => {

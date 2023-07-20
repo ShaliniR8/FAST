@@ -24,7 +24,7 @@ ruby:
             | #{title}
   .panel-body
     .col-xs-12
-      = render "shared/instructions", :instruction => instruction
+      = render "shared/instructions", :instruction => instruction, :include_workflow_diagram => false
       table id="records_table" class="table table-bordered table-striped"
         thead
           tr

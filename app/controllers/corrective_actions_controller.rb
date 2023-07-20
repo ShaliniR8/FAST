@@ -91,6 +91,7 @@ class CorrectiveActionsController < ApplicationController
   end
 
   def show
+    @has_status = true
     @fields = CorrectiveAction.get_meta_fields('show')
     @corrective_action = CorrectiveAction.find(params[:id])
 
@@ -198,6 +199,7 @@ class CorrectiveActionsController < ApplicationController
 
 
   def edit
+    @has_status = true
     @privileges = Privilege.find(:all)
     @corrective_action = CorrectiveAction.find(params[:id])
     @report = @corrective_action.report

@@ -22,6 +22,7 @@
       </div>
       <div class="panel-body" id="form_body">
         <%= form_for @meeting,:html => {:multipart => true} do |f|%>
+          <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
           <%if @action=="new"%>
             <%=f.fields_for :host,Host.new do |ff|%>
               <%=ff.hidden_field :users_id,:value=>current_user.id%>
@@ -96,10 +97,10 @@
 </div>
 
 
-
 <script>
   $(document).ready(
     function(){
+
       $(".add_btn").on("click",function(){
         if ($(this).text()=="Add"){
           $(this).text("Added");

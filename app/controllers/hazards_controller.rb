@@ -64,6 +64,7 @@ class HazardsController < ApplicationController
 
 
   def show
+    @has_status = true
     @hazard = Hazard.find(params[:id])
     @owner = @hazard
     @i18nbase = 'srm.hazard'
@@ -102,6 +103,7 @@ class HazardsController < ApplicationController
 
 
   def edit
+    @has_status = true
     @risk_type = 'Baseline'
     @hazard = Hazard.find(params[:id])
     @owner = @hazard

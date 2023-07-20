@@ -31,6 +31,7 @@
       </div>
 
       <div class="panel-body">
+        <%= render partial: "shared/instructions", :locals => { :owner => @hazard, :action_name => params[:action], :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
         <div class="col-xs-12 mb20">
         <b> <%= "*At least one #{I18n.t("#{@i18nbase}.root_cause.title")} must be assigned before Completing/Rejecting" if @hazard.occurrence_lock? %></b>
           <%= render '/forms/render_buttons', owner: @hazard, env: :inline %>
@@ -46,10 +47,9 @@
 </div>
 
 
-
-
 <script>
   $(document).ready(function(){
+
     $(".modal").on("hidden.bs.modal", function(){
       $(".modal-content").html("");
     });

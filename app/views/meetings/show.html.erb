@@ -53,6 +53,7 @@
       </div>
 
       <div class="panel-body">
+        <%= render partial: "shared/instructions", :locals => { :owner => @meeting, :action_name => params[:action], :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
         <div class="col-xs-12 mb15">
           <div class="pull-right mb10">
             <% if current_user.has_access('meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) &&
@@ -153,8 +154,6 @@
 </div>
 
 
-
-
 <script>
   function delete_report(report_id, meeting_id,btn){
     var result = confirm("Are you sure?");
@@ -165,6 +164,7 @@
     }
   }
   $(document).ready(function(){
+
     $("#message-btn").on('click',function(){
       $.get("<%=message_meeting_path(@meeting)%>",function(data){
         $(".modal-content").html(data);

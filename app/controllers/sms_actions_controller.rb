@@ -96,6 +96,7 @@ class SmsActionsController < SafetyAssuranceController
 
   def show
     load_special_matrix(@owner)
+    @has_status = true
     load_options
     @fields = SmsAction.get_meta_fields('show')
     @type = get_car_owner(@owner) || 'sms_actions'
@@ -105,6 +106,7 @@ class SmsActionsController < SafetyAssuranceController
 
   def edit
     load_options
+    @has_status = true
     @fields = SmsAction.get_meta_fields('form')
     choose_load_special_matrix_form(@owner, 'sms_action')
     @type = get_car_owner(@owner)

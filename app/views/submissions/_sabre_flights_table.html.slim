@@ -42,7 +42,7 @@ ruby:
           | #{title}
 
     .panel-body.header.align-left
-      = render "shared/instructions", :instruction => instruction
+      = render "shared/instructions", :instruction => instruction, :include_workflow_diagram => false
       .col-xs-12
         table id="flights_table" class="table table-bordered table-striped"
           thead
