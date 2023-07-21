@@ -47,6 +47,9 @@ class NotifyMailer < ApplicationMailer
       title = record.owner.description rescue ''
       filename = "#{record.owner.class.name}_#{record.owner.id}_#{title}"
       attachments["#{filename}.pdf"] = attachment unless attachment.nil?
+    elsif (object_name == "Meeting" || object_name == "SrmMeeting") && (notice.content.include? 'invited')
+      url = meeting_url(notice.owner)
+      attachments["#{filename}.ics"] = { mime_type: 'text/calendar', content: create_calendar_invite(record, url) }
     end
 
     if CONFIG::GENERAL[:enable_mailer]
@@ -145,4 +148,37 @@ class NotifyMailer < ApplicationMailer
     end
   end
 
+  def create_calendar_invite(meeting, url)
+    cal = Icalendar::Calendar.new
+
+    description = meeting.notes + "\nReview Start: " + meeting.review_start.to_s + "\nReview End: " + \
+    meeting.review_end.to_s + "\nType: " + meeting.meeting_type + "\nView/Respond to the message, please login to the ProSafeT Portal: " + url
+    attendee_emails = []
+
+    cal.event do |m|
+      m.uid = meeting.id.to_s
+      m.dtstart = meeting.meeting_start
+      m.dtend = meeting.meeting_end
+      m.summary = meeting.title
+      m.description = description
+      m.status = meeting.status
+
+      m.organizer = Icalendar::Values::CalAddress.new(
+        "MAILTO:#{meeting.host.user.email}",
+        cn: "\"#{meeting.host.user.full_name}\""
+      )
+
+      meeting.invitations.each do |inv|
+        attendee = Icalendar::Values::CalAddress.new(
+          "MAILTO:#{inv.user.email}",
+          cn: "\"#{inv.user.full_name}\""
+        )
+        attendee_emails << attendee
+      end
+
+      m.attendee = attendee_emails
+    end
+
+    cal.to_ical
+  end
 end

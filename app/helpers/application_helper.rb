@@ -48,7 +48,16 @@ module ApplicationHelper
 
   def get_only_current_module_notices(current_module:, unread: [1, 2])
     current_module_owner_types = CONFIG.hierarchy[current_module][:objects].keys
-    current_user.notices.where(status: unread).where(owner_type: current_module_owner_types).sort_by(&:created_at)
+    all_notices = current_user.notices.where(status: unread).where(owner_type: current_module_owner_types).sort_by(&:created_at)
+    if current_module == 'ASAP'
+      filtered_notices = all_notices.select {|n| n.owner_type == 'Meeting' ? Meeting.find(n.owner_id).type == nil : true}
+      filtered_notices
+    elsif current_module == 'SRM'
+      filtered_notices = all_notices.select {|n| n.owner_type == 'Meeting' ? Meeting.find(n.owner_id).type == 'SrmMeeting' : true}
+      filtered_notices
+    else
+      all_notices
+    end
   end
 
 

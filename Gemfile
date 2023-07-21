@@ -13,6 +13,7 @@ gem 'carrierwave', '0.5.4'
 gem 'mail'
 gem 'prawn'
 gem 'pdfkit', '0.5.0'
+gem 'icalendar'
 
 
 
