@@ -371,6 +371,18 @@ class SubmissionsController < ApplicationController
       end
 
       if params[:commit] == 'Submit'
+        template_id = params[:submission][:templates_id]
+        if is_work_order(template_id)
+          # NEED TO REFACTOR
+          wo_fields =  params[:submission][:submission_fields_attributes].values.map { |x| [x[:fields_id], x[:value]] }.to_h
+          description_field = wo_fields[CONFIG::WORK_ORDER[:description_field_id]]
+          if description_field.present?
+            create_work_order(description_field, @record.id)
+            is_descrepancy = false
+          else
+            is_descrepancy = true
+          end
+        end
         @record.create_transaction(action: 'Create', context: 'User Submitted Report')
         if params[:create_copy] == '1'
           converted = @record.convert
@@ -751,6 +763,16 @@ class SubmissionsController < ApplicationController
         utc_time  = convert_to_utc(date_time: date_time, time_zone: time_zone)
         param_submission["event_date"] = utc_time
       end
+    end
+
+    def create_work_order(description, submission_id)
+      call_rake 'create_maximo_work_order',
+        description: description,
+        submission_id: submission_id
+    end
+
+    def is_work_order(template_id)
+      template_id == CONFIG::WORK_ORDER[:template_id]
     end
 
     def notify_notifiers(owner, commit)

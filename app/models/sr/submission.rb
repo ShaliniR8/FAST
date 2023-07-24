@@ -10,6 +10,7 @@ class Submission < Sr::SafetyReportingBase
   include Commentable
   include Transactionable
   include RootCausable
+  include Parentable
 
 #Association List
   belongs_to :template,   foreign_key: 'templates_id',  class_name: 'Template'

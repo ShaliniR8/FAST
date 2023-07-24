@@ -105,6 +105,16 @@ class DefaultConfig
     investigations: ['Sra'],
   }
 
+  LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS = {
+    audits: 'Findings',
+    evaluations: 'Findings',
+    investigations: 'Findings',
+    inspections: 'Findings'
+  }
+
+  WORK_ORDER = {
+  }
+
   OBJECT_NAME_MAP = {
     'Sra'            => 'SRA',
     'SmsAction'      => 'Corrective Action',

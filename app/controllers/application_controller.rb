@@ -317,8 +317,13 @@ class ApplicationController < ActionController::Base
     parent_type = params[:controller]
     parent_id = params[:id]
     child = params[:child]
+    template_id = params[:template_id]
 
-    redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+    if child == 'submissions'
+      redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id, template: template_id, commit: 'Create'
+    else
+      redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+    end
   end
 
   def set_parent_type_id(object)
