@@ -43,9 +43,9 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
             = checklist_row.display_workorders
             - unless checklist_row.is_header? || owner.nil?
               - if owner.status != 'Completed'
-                - add_new_finding_path = new_finding_path(owner_id: checklist_row.id, owner_type: checklist_row.class.name)
-                - add_new_workorder_path = eval("launch_new_object_#{params[:controller].singularize}_path(owner, child: 'submissions', template_id: #{CONFIG::WORK_ORDER[:template_id]}, parent_id: checklist_row.id, parent_type: checklist_row.class.name)")
-                - launch_path = CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name] == 'Work Orders/Discrepancy' ? add_new_workorder_path : add_new_finding_path
+                - launch_path = new_finding_path(owner_id: checklist_row.id, owner_type: checklist_row.class.name)
+                - if CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name] == 'Work Orders/Discrepancy'
+                  - launch_path = eval("launch_new_object_#{params[:controller].singularize}_path(owner, child: 'submissions', template_id: #{CONFIG::WORK_ORDER[:template_id]}, parent_id: checklist_row.id, parent_type: checklist_row.class.name)")
 
                 = link_to '',
                   launch_path,
