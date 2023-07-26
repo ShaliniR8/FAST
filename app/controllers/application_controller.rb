@@ -314,8 +314,8 @@ class ApplicationController < ActionController::Base
   end
 
   def launch_new_object
-    parent_type = params[:controller]
-    parent_id = params[:id]
+    parent_type = params[:parent_type].nil? ? params[:controller] : params[:parent_type]
+    parent_id = params[:parent_id].nil? ? params[:id] : params[:parent_id]
     child = params[:child]
     template_id = params[:template_id]
 

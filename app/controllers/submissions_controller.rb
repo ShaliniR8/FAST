@@ -391,7 +391,9 @@ class SubmissionsController < ApplicationController
           notify_notifiers(converted, params[:commit])
           NotifyMailer.send_submitter_confirmation(current_user, converted)
         end
-        submission_class_type(type).find(@record.id).make_report
+        if !(is_work_order(template_id)) || (is_work_order(template_id) && is_descrepancy)
+          submission_class_type(type).find(@record.id).make_report
+        end
       end
 
       respond_to do |format|
