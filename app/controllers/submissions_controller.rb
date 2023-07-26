@@ -23,6 +23,10 @@ class SubmissionsController < ApplicationController
   before_filter :define_owner
   include Concerns::Mobile # used for [method]_as_json
 
+  before_filter(only: [:new])    {set_parent_type_id(:submission)}
+  before_filter(only: [:create]) {set_parent(:submission)}
+  after_filter(only: [:create])  {create_parent_and_child(parent: @parent, child: @record)}
+
   def set_table_name
     @table_name = "submissions"
   end
