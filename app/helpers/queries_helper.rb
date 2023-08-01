@@ -24,6 +24,10 @@ module QueriesHelper
         value
       else
         value.strip.gsub("\"", '') rescue ''
+        # Added as a workaround to display findings separately in visualization charts
+        if field_param == 'Included Findings'
+          value.split('<br>').map(&:strip) rescue nil
+        end
       end
     end
   end
@@ -217,7 +221,10 @@ module QueriesHelper
         temp_values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
 
         temp_values.each do |temp_val|
-          t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
+          # t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
+          # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
+
+          t_val = temp_val.send(field[:field].to_sym)
           if t_val.present? && field[:field].downcase.include?('get_source')
             t_val = t_val.split.first
           end
@@ -370,7 +377,10 @@ module QueriesHelper
         temp_values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
 
         temp_values.each do |temp_val|
-          t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
+          # t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
+          # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
+          
+          t_val = temp_val.send(field[:field].to_sym)
           if t_val.present? && field[:field].downcase.include?('get_source')
             t_val = t_val.split.first
           end
@@ -584,7 +594,10 @@ module QueriesHelper
         values = object_type.find_by_sql("SELECT * FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}") rescue []
 
         values.each do |val|
-          temp_val = strip_html_tag(val.send(field[:field]))
+          # temp_val = strip_html_tag(val.send(field[:field]))
+          # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
+
+          temp_val = val.send(field[:field])
           if temp_val.present? && field[:field].downcase.include?('get_source')
             temp_val = temp_val.split.first
           end
