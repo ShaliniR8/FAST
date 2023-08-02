@@ -235,11 +235,11 @@ class ATNConfig < DefaultConfig
     },
 
     risk_table_dict: {
-      5 => 'Low - 5',
-      4 => 'Minor - 4',
-      3 => 'Medium - 3',
-      2 => 'Serious - 2',
-      1 => 'High - 1',
+      "red" => "High - 1",
+      "orange" => "Serious - 2",
+      "yellow" => "Medium - 3",
+      "steelblue" => "Minor - 4"
+      'limegreen' => 'Low - 5',
     }
   }
 
