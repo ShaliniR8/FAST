@@ -238,7 +238,7 @@ class ATNConfig < DefaultConfig
       "red" => "High - 1",
       "orange" => "Serious - 2",
       "yellow" => "Medium - 3",
-      "steelblue" => "Minor - 4"
+      "steelblue" => "Minor - 4",
       'limegreen' => 'Low - 5',
     }
   }
