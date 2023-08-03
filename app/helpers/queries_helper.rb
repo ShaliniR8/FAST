@@ -23,11 +23,7 @@ module QueriesHelper
       if value.is_a? Integer
         value
       else
-        value.strip.gsub("\"", '') rescue ''
-        # Added as a workaround to display findings separately in visualization charts
-        if field_param == 'Included Findings'
-          value.split('<br>').map(&:strip) rescue nil
-        end
+        field_param == 'Included Findings' ? value.split('<br>').map(&:strip) : value.strip.gsub("\"", '') rescue ''
       end
     end
   end
@@ -317,7 +313,6 @@ module QueriesHelper
     field = x_axis_field_arr[0]
     field_param = x_axis_field_arr[1]
     values = []
-
     if field.is_a?(Field)
       field_type = field.display_type
       fields_ids = Template.preload(:categories, :fields).where(id: query.templates).map(&:fields).flatten.select{|x| x.label == x_axis_field_title}.map(&:id)
@@ -379,11 +374,8 @@ module QueriesHelper
         temp_values.each do |temp_val|
           # t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
-          
+
           t_val = temp_val.send(field[:field].to_sym)
-          if t_val.present? && field[:field].downcase.include?('get_source')
-            t_val = t_val.split.first
-          end
           t_val = format_val(t_val, field_type, field_param)
           values << t_val
         end
@@ -451,7 +443,8 @@ module QueriesHelper
 
       else
         values = object_type.find_by_sql("SELECT #{object_type.table_name}.#{field_name} FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
-                                          .map(&field_name.to_sym).map{|val| format_val(val, field_type, field_param)} rescue []
+                                          .map(&field_name.to_sym)
+                                          .map{|val| format_val(val, field_type, field_param)} rescue []
       end
 
     end
