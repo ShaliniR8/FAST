@@ -14,6 +14,7 @@ gem 'mail'
 gem 'prawn'
 gem 'pdfkit', '0.5.0'
 gem 'icalendar'
+gem 'rest-client'
 
 
 
