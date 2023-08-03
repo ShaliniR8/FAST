@@ -23,6 +23,7 @@ module QueriesHelper
       if value.is_a? Integer
         value
       else
+        # Added as a workaround to display findings separately in visualization charts
         field_param == 'Included Findings' ? value.split('<br>').map(&:strip) : value.strip.gsub("\"", '') rescue ''
       end
     end
@@ -221,6 +222,10 @@ module QueriesHelper
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
 
           t_val = temp_val.send(field[:field].to_sym)
+          # if t_val.present? && field[:field].downcase.include?('get_source')
+          #   t_val = t_val.split.first
+          # end
+
           if t_val.present? && field[:field].downcase.include?('get_source')
             t_val = t_val.split.first
           end
@@ -376,6 +381,9 @@ module QueriesHelper
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
 
           t_val = temp_val.send(field[:field].to_sym)
+          # if t_val.present? && field[:field].downcase.include?('get_source')
+          #   t_val = t_val.split.first
+          # end
           t_val = format_val(t_val, field_type, field_param)
           values << t_val
         end
@@ -591,6 +599,9 @@ module QueriesHelper
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
 
           temp_val = val.send(field[:field])
+          # if temp_val.present? && field[:field].downcase.include?('get_source')
+          #   temp_val = temp_val.split.first
+          # end
           temp_val = format_val(temp_val, field_type, field_param)
           if temp_val.class.name == 'Array'
             if temp_val.present?
