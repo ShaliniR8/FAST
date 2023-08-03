@@ -9,7 +9,7 @@ module QueriesHelper
         # User.find_by_full_name(value).full_name rescue ''
         User.find_by_id(value).full_name rescue ''
       end
-    when 'datetime', 'date'
+    when 'datetime', 'date', 'datetimez'
       value.strftime("%Y-%m") rescue 'N/A'
     when 'boolean_box', 'boolean'
       (value ? 'Yes' : 'No') rescue 'No'
@@ -591,9 +591,6 @@ module QueriesHelper
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
 
           temp_val = val.send(field[:field])
-          if temp_val.present? && field[:field].downcase.include?('get_source')
-            temp_val = temp_val.split.first
-          end
           temp_val = format_val(temp_val, field_type, field_param)
           if temp_val.class.name == 'Array'
             if temp_val.present?
