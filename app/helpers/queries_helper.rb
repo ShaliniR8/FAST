@@ -847,7 +847,7 @@ module QueriesHelper
       case condition.logic
       when "Equals To"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           start_date = search_value.split("to")[0]
           end_date = search_value.split("to")[1] || search_value.split("to")[0]
           str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\'"
@@ -869,7 +869,7 @@ module QueriesHelper
 
       when "Not Equal To"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime', 'datetimez'
           start_date = search_value.split("to")[0]
           end_date = search_value.split("to")[1] || search_value.split("to")[0]
           str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\')"
@@ -891,7 +891,7 @@ module QueriesHelper
 
       when "Contains"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\'"
@@ -916,7 +916,7 @@ module QueriesHelper
 
       when "Does Not Contain"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\')"
@@ -941,7 +941,7 @@ module QueriesHelper
 
       when ">="
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "DATE(#{table_name}.#{field_name}) >= \'#{dates[1]}\'"
@@ -954,7 +954,7 @@ module QueriesHelper
 
       when "<"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\'"
@@ -967,7 +967,7 @@ module QueriesHelper
 
       when 'Last ( ) Days'
         case target_field[:type]
-        when 'date', 'datetime'
+        when 'date', 'datetime','datetimez'
           start_date, end_date = (Date.current - search_value.to_f.days).strftime('%Y-%m-%d'), Date.today.strftime('%Y-%m-%d')
           str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\'"
         end
