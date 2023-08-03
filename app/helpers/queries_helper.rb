@@ -9,7 +9,7 @@ module QueriesHelper
         # User.find_by_full_name(value).full_name rescue ''
         User.find_by_id(value).full_name rescue ''
       end
-    when 'datetime', 'date'
+    when 'datetime', 'date', 'datetimez'
       value.strftime("%Y-%m") rescue 'N/A'
     when 'boolean_box', 'boolean'
       (value ? 'Yes' : 'No') rescue 'No'
@@ -23,11 +23,8 @@ module QueriesHelper
       if value.is_a? Integer
         value
       else
-        value.strip.gsub("\"", '') rescue ''
         # Added as a workaround to display findings separately in visualization charts
-        if field_param == 'Included Findings'
-          value.split('<br>').map(&:strip) rescue nil
-        end
+        field_param == 'Included Findings' ? value.split('<br>').map(&:strip) : value.strip.gsub("\"", '') rescue ''
       end
     end
   end
@@ -225,6 +222,10 @@ module QueriesHelper
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
 
           t_val = temp_val.send(field[:field].to_sym)
+          # if t_val.present? && field[:field].downcase.include?('get_source')
+          #   t_val = t_val.split.first
+          # end
+
           if t_val.present? && field[:field].downcase.include?('get_source')
             t_val = t_val.split.first
           end
@@ -317,7 +318,6 @@ module QueriesHelper
     field = x_axis_field_arr[0]
     field_param = x_axis_field_arr[1]
     values = []
-
     if field.is_a?(Field)
       field_type = field.display_type
       fields_ids = Template.preload(:categories, :fields).where(id: query.templates).map(&:fields).flatten.select{|x| x.label == x_axis_field_title}.map(&:id)
@@ -379,11 +379,11 @@ module QueriesHelper
         temp_values.each do |temp_val|
           # t_val = strip_html_tag(temp_val.send(field[:field].to_sym))
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
-          
+
           t_val = temp_val.send(field[:field].to_sym)
-          if t_val.present? && field[:field].downcase.include?('get_source')
-            t_val = t_val.split.first
-          end
+          # if t_val.present? && field[:field].downcase.include?('get_source')
+          #   t_val = t_val.split.first
+          # end
           t_val = format_val(t_val, field_type, field_param)
           values << t_val
         end
@@ -451,7 +451,8 @@ module QueriesHelper
 
       else
         values = object_type.find_by_sql("SELECT #{object_type.table_name}.#{field_name} FROM #{object_type.table_name} WHERE #{object_type.table_name}.id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"}")
-                                          .map(&field_name.to_sym).map{|val| format_val(val, field_type, field_param)} rescue []
+                                          .map(&field_name.to_sym)
+                                          .map{|val| format_val(val, field_type, field_param)} rescue []
       end
 
     end
@@ -598,9 +599,9 @@ module QueriesHelper
           # The strip_html_tag method removes the <br> tag and does not allow the values to be split in format_val method
 
           temp_val = val.send(field[:field])
-          if temp_val.present? && field[:field].downcase.include?('get_source')
-            temp_val = temp_val.split.first
-          end
+          # if temp_val.present? && field[:field].downcase.include?('get_source')
+          #   temp_val = temp_val.split.first
+          # end
           temp_val = format_val(temp_val, field_type, field_param)
           if temp_val.class.name == 'Array'
             if temp_val.present?
@@ -854,7 +855,7 @@ module QueriesHelper
       case condition.logic
       when "Equals To"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           start_date = search_value.split("to")[0]
           end_date = search_value.split("to")[1] || search_value.split("to")[0]
           str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\'"
@@ -876,7 +877,7 @@ module QueriesHelper
 
       when "Not Equal To"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime', 'datetimez'
           start_date = search_value.split("to")[0]
           end_date = search_value.split("to")[1] || search_value.split("to")[0]
           str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\')"
@@ -898,7 +899,7 @@ module QueriesHelper
 
       when "Contains"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\'"
@@ -923,7 +924,7 @@ module QueriesHelper
 
       when "Does Not Contain"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "NOT (DATE(#{table_name}.#{field_name}) >= \'#{dates[0]}\' AND DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\')"
@@ -948,7 +949,7 @@ module QueriesHelper
 
       when ">="
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "DATE(#{table_name}.#{field_name}) >= \'#{dates[1]}\'"
@@ -961,7 +962,7 @@ module QueriesHelper
 
       when "<"
         case target_field[:type]
-        when 'date','datetime'
+        when 'date','datetime','datetimez'
           dates = search_value.split("to")
           if dates.length > 1
             str = "DATE(#{table_name}.#{field_name}) <= \'#{dates[1]}\'"
@@ -974,7 +975,7 @@ module QueriesHelper
 
       when 'Last ( ) Days'
         case target_field[:type]
-        when 'date', 'datetime'
+        when 'date', 'datetime','datetimez'
           start_date, end_date = (Date.current - search_value.to_f.days).strftime('%Y-%m-%d'), Date.today.strftime('%Y-%m-%d')
           str = "DATE(#{table_name}.#{field_name}) >= \'#{start_date}\' AND DATE(#{table_name}.#{field_name}) <= \'#{end_date}\'"
         end
