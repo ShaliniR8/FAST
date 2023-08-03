@@ -4,6 +4,7 @@ class ChecklistRow < ActiveRecord::Base
 #Concerns List
   include Attachmentable
   include Findingable
+  include Childable
 
   has_many :checklist_cells, foreign_key: :checklist_row_id, dependent: :destroy
   belongs_to :checklist, foreign_key: :checklist_id, class_name: 'Checklist'
@@ -22,6 +23,17 @@ class ChecklistRow < ActiveRecord::Base
       result += "
         <a style='font-weight:bold' href='/findings/#{finding.id}'>
           ##{finding.id} - #{finding.title}
+        </a><br>"
+    end
+    result.html_safe
+  end
+
+  def display_workorders
+    result = ""
+    self.children.select { |row| row.child.completed rescue false }.map(&:child).uniq.each do |wo|
+      result += "
+        <a style='font-weight:bold' href='/submissions/#{wo.id}'>
+          ##{wo.id} - #{wo.description}
         </a><br>"
     end
     result.html_safe

@@ -91,6 +91,11 @@
           <%=hidden_field_tag 'is_autosave', 1%>
           <%=hidden_field_tag 'present_id', ""%>
 
+          <%if action_name == "new"%>
+            <%=f.hidden_field :parent_type, :value => @parent_type%>
+            <%=f.hidden_field :parent_id,   :value => @parent_id%>
+          <%end%>
+
             <%instruction = "<p>
                 Click on the <b>category panels</b> to expand the accordion tab and see the content.</br>
                 Items in <b>red</b> are required. </br>

@@ -14,13 +14,15 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
         th = header.title
       - unless ['Completion', 'SafetySurvey'].include?(checklist.owner_type)
         th Attachments
+        - object_name = owner.class.name.downcase.pluralize.to_sym
       - unless owner.class.name == 'SafetySurvey' || CONFIG::GENERAL[:hide_findings_in_checklist]
-        th Findings
+        th = CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name]
+
   tbody
     - has_row = ![[1000], []].include?(checklist.checklist_rows.map(&:row_order).uniq.compact)
     - checklists = has_row ? checklist.checklist_rows.order(:row_order) : checklist.checklist_rows
     - checklists.each do |checklist_row|
-      
+
       tr class="#{checklist_row.is_header ? 'header-row' : ''}"
         - checklist_row.checklist_cells.order{ |x| x.checklist_header_item.display_order }.each do |checklist_cell|
           td
@@ -38,13 +40,18 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
         - unless owner.nil? || owner.class.name == 'SafetySurvey' || CONFIG::GENERAL[:hide_findings_in_checklist]
           td
             = checklist_row.display_findings
+            = checklist_row.display_workorders
             - unless checklist_row.is_header? || owner.nil?
               - if owner.status != 'Completed'
+                - launch_path = new_finding_path(owner_id: checklist_row.id, owner_type: checklist_row.class.name)
+                - if CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name] == 'Work Orders/Discrepancy'
+                  - launch_path = eval("launch_new_object_#{params[:controller].singularize}_path(owner, child: 'submissions', template_id: #{CONFIG::WORK_ORDER[:template_id]}, parent_id: checklist_row.id, parent_type: checklist_row.class.name)")
+
                 = link_to '',
-                  new_finding_path( owner_id: checklist_row.id, owner_type: checklist_row.class.name ),
+                  launch_path,
                   class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
                   id: checklist_row.id,
-                  "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add Finding"
+                  "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add #{CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name]}"
               /= link_to '',
                 '#',
                 class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',

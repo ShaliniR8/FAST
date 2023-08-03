@@ -314,11 +314,16 @@ class ApplicationController < ActionController::Base
   end
 
   def launch_new_object
-    parent_type = params[:controller]
-    parent_id = params[:id]
+    parent_type = params[:parent_type].nil? ? params[:controller] : params[:parent_type]
+    parent_id = params[:parent_id].nil? ? params[:id] : params[:parent_id]
     child = params[:child]
+    template_id = params[:template_id]
 
-    redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+    if child == 'submissions'
+      redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id, template: template_id, commit: 'Create'
+    else
+      redirect_to controller: child.pluralize, action: 'new', parent_type: parent_type, parent_id: parent_id
+    end
   end
 
   def set_parent_type_id(object)

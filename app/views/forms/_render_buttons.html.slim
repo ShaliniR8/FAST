@@ -1,7 +1,7 @@
 ruby:
   op ||= {} # In case no options were passed
   owner_name = owner.class.name
-  owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil? 
+  owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?
   owner_class = owner_name.underscore
   permission = "#{owner_class}s"
   btns = prepare_btns(owner, env, **op)
@@ -287,8 +287,13 @@ ruby:
             disable_with: 'Redirecting...'
       - else
         - if owner.get_parent
-          = link_to "View Source #{parent_class.titleize}",
-            eval("#{parent_class.underscore}_path(owner.get_parent)"),
+          - parent_path = "#{parent_class.underscore}_path(owner.get_parent)"
+          - parent_name = parent_class.titleize
+          - if parent_class == 'ChecklistRow'
+            - parent_path = "#{owner.get_parent.checklist.owner.class.name.underscore}_path(owner.get_parent.checklist.owner)"
+            - parent_name = owner.get_parent.checklist.owner.class.name.titleize
+          = link_to "View Source #{parent_name}",
+            eval(parent_path),
             class: 'btn btn-info pull-right mr5 mb5',
             disable_with: 'Redirecting...'
     - else

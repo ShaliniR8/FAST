@@ -46,6 +46,20 @@ class RUHConfig < DefaultConfig
     risk_controls: ['SafetyPlan']
   }
 
+  LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS = {
+    audits: 'Findings',
+    evaluations: 'Findings',
+    investigations: 'Findings',
+    inspections: 'Work Orders/Discrepancy'
+  }
+
+  WORK_ORDER = {
+    template_id: "13",
+    description_field_id: "788",
+    wo_number_id: "775",
+    wo_status_id: "776",
+    wo_note_id: "777"
+  }
 
   def self.getTimeFormat
     {
