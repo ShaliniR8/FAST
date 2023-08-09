@@ -159,20 +159,7 @@
 
         <!-- SR Submission button-->
           <% if CONFIG::GENERAL[:has_ext_user_submission_from_login_page]%>
-            <style>
-              @media (min-width: 1023px) {
-                .ext-sub-border {
-                  border-left: 1px solid grey;
-                }
-              }
-              @media (max-width: 1023px) {
-                .ext-sub-border {
-                  border-top: 1px solid grey;
-                  padding-top: 25px;
-                }
-              }
-            </style>
-            <div class='ext-sub-border col-xs-10 col-xs-offset-1 col-md-3 col-md-offset-0'>
+            <div class='sso-border col-xs-10 col-xs-offset-1 col-md-3 col-md-offset-0'>
               <div class='text-center'>
                 <b> External User? Create a Submission here</br></b>
                 <%= link_to "<b>#{CONFIG::LOGIN_PAGE_SUBMISSION[:template_name]}</b>".html_safe,
