@@ -13,6 +13,8 @@ class RUHConfig < DefaultConfig
     time_zone:                          'Africa/Nairobi',
 
     # SYSTEM CONFIGS
+    has_ext_user_submission_from_login_page: true,
+
     # enable_sso:                         true,
     # login_option:                       'sso',
     has_mobile_app:                     false,
@@ -29,6 +31,11 @@ class RUHConfig < DefaultConfig
     gMapZoom:                        14,
     has_confidential_forms:             true
   })
+
+  LOGIN_PAGE_SUBMISSION = {
+    template_id: 19,
+    template_name: "Public - General Safety Report"
+  }
 
   LABELS = {
     corrective_actions: 'Response',
