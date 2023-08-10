@@ -18,7 +18,10 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
       - checklist.checklist_header.checklist_header_items.order('display_order').each do |header|
         th = header.title
       th Attachments
-      th Findings
+      - if checklist.owner_type == 'Im'
+        th Packages
+      - else
+        th Findings
   tbody
     - checklist.checklist_rows.order(:id).each do |checklist_row|
       tr class="#{checklist_row.is_header ? 'header-row' : ''}"

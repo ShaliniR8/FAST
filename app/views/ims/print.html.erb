@@ -50,13 +50,10 @@ table{
     <%if @im.instruction.present?%><b>Instructions: </br></b><%=@im.instruction.gsub(/\n/, '<br/>').html_safe%><%end%></br>
     <%if @im.comment.present?%><b>Reviewer Comment: </br></b><%=@im.comment.gsub(/\n/, '<br/>').html_safe%></br><%end%>-->
 
-        <%@checklist_headers=Object.const_get(@im.type+'Item').get_headers%>
         <%@im.items.each do |i|%>
             <div class="category">
                 <h5>Expectation: #<%=i.id%></h5>
-                <%@checklist_headers.each do |h|%>
-                    <b><%=h[:title]%>: </b><%=i.send(h[:field])%></br>
-                <%end%>
+                <%= render '/pdfs/print_checklists', owner: @im %>
 
                 <%if i.packages.present?%>
                     <%@headers=Package.get_headers%>

@@ -7,6 +7,10 @@ ruby:
     end
   }
 
+  if owner.class.name == "VpIm" || owner.class.name == "JobAid"
+    owner = owner.becomes(Im)
+  end
+
 table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.id}"
   thead
     tr
@@ -41,23 +45,30 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
           td
             = checklist_row.display_findings
             = checklist_row.display_workorders
+            = checklist_row.display_packages
             - unless checklist_row.is_header? || owner.nil?
               - if owner.status != 'Completed'
-                - launch_path = new_finding_path(owner_id: checklist_row.id, owner_type: checklist_row.class.name)
-                - if CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name] == 'Work Orders/Discrepancy'
-                  - launch_path = eval("launch_new_object_#{params[:controller].singularize}_path(owner, child: 'submissions', template_id: #{CONFIG::WORK_ORDER[:template_id]}, parent_id: checklist_row.id, parent_type: checklist_row.class.name)")
+                - if owner.class.name == 'Im'
+                  = link_to '', '#',
+                    class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_package_btn',
+                    item_id: checklist_row.id,
+                    "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
+                - else
+                  - launch_path = new_finding_path(owner_id: checklist_row.id, owner_type: checklist_row.class.name)
+                  - if CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name] == 'Work Orders/Discrepancy'
+                    - launch_path = eval("launch_new_object_#{params[:controller].singularize}_path(owner, child: 'submissions', template_id: #{CONFIG::WORK_ORDER[:template_id]}, parent_id: checklist_row.id, parent_type: checklist_row.class.name)")
 
-                = link_to '',
-                  launch_path,
-                  class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
+                  = link_to '',
+                    launch_path,
+                    class: 'btn btn-success pull-right mr5 mb5 glyphicon glyphicon-plus new_finding_btn',
+                    id: checklist_row.id,
+                    "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add #{CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name]}"
+                /= link_to '',
+                  '#',
+                  class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',
                   id: checklist_row.id,
-                  "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Add #{CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name]}"
-              /= link_to '',
-                '#',
-                class: 'btn btn-info pull-right mr5 mb5 glyphicon glyphicon-list show_finding_btn',
-                id: checklist_row.id,
-                "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Show Findings",
-                "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
+                  "data-toggle"=>"tooltip", "data-placement"=>"top", "title"=>"Show Findings",
+                  "data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"
 
 javascript:
   function escapeHtml(unsafe) {

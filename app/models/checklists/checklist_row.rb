@@ -39,6 +39,18 @@ class ChecklistRow < ActiveRecord::Base
     result.html_safe
   end
 
+  def display_packages
+    result = ""
+    packages = Package.where(owner_id: self.id)
+    packages.each do |package|
+      result += "
+        <a style='font-weight:bold' href='/packages/#{package.id}'>
+          ##{package.id} - #{package.title}
+        </a><br>"
+    end
+    result.html_safe
+  end
+
 
   def delete_cached_fragments
     checklist_cells.each do |cell|

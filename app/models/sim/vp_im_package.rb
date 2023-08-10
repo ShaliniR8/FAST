@@ -1,5 +1,5 @@
 class VpImPackage < Package
-  belongs_to :item,foreign_key:"owner_id",class_name:"VpImItem"
+  belongs_to :item,foreign_key:"owner_id",class_name:"ChecklistRow"
 
   def self.display_name
     "VP/Part 5 IM Package"

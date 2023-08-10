@@ -54,13 +54,6 @@
               <%end%>
 
               <%if @im.status=="New"||@im.status=="Open"%>
-              <%if @im.items.present?%>
-                <%=link_to "Update Checklist","#",:class=>"btn btn-warning pull-right mr5 mb5",:id=>'update_checklist_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-              <%end%>
-                <%=link_to "Upload Checklist","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'checklist_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-                <%#if @im.type!="VpIm"%>
-                  <%=link_to "Add #{@im.class.display_name} Expectation","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'expectation_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
-                <%#end%>
                 <%=link_to "Add Task","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'task_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
                 <%=link_to "Add Contact","#",:class=>"btn btn-success pull-right mr5 mb5",:id=>'contact_btn',"data-toggle"=>"modal","data-target"=>".bs-example-modal-lg"%>
               <%end%>
@@ -136,7 +129,7 @@
             :fields => SmsTask.get_meta_fields('show')
           %>
 
-          <%=render "items"%>
+          <%=render '/checklists/checklist_types', :owner => @im, :type => 'im'%>
           <!-- Contact -->
           <%=render "/ims/show_contact",
             :owner => @im,

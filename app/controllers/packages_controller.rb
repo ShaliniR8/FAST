@@ -19,7 +19,7 @@ class PackagesController < ApplicationController
   def create
     package=Object.const_get(params[:type]).new(params[:package])
     if package.save
-      redirect_to im_path(package.item.im)
+      redirect_to im_path(package.item.checklist.owner)
     end
   end
 

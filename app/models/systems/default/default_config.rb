@@ -109,7 +109,8 @@ class DefaultConfig
     audits: 'Findings',
     evaluations: 'Findings',
     investigations: 'Findings',
-    inspections: 'Findings'
+    inspections: 'Findings',
+    ims: 'Packages'
   }
 
   WORK_ORDER = {
