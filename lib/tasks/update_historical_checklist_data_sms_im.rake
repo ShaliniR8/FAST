@@ -20,7 +20,13 @@ task :checklist_migrate => :environment do
                 if header_item_title.include? ' '
                     header_item_title = header_item_title.gsub! ' ', '_'
                 end
-                checklist_cell = ChecklistCell.new(checklist_row_id: checklist_row.id, checklist_header_item_id: header_item.id, value: item[header_item_title])
+                if header_item_title.include? 'level_of_compliance'
+                    checklist_cell = ChecklistCell.new(checklist_row_id: checklist_row.id, checklist_header_item_id: header_item.id, value: item[header_item_title], options: 'None;Planned;Implemented', data_type: 'dropdown')
+                elsif header_item_title.include? 'status'
+                    checklist_cell = ChecklistCell.new(checklist_row_id: checklist_row.id, checklist_header_item_id: header_item.id, value: item[header_item_title], options: 'New;Open;Completed', data_type: 'dropdown')
+                else
+                    checklist_cell = ChecklistCell.new(checklist_row_id: checklist_row.id, checklist_header_item_id: header_item.id, value: item[header_item_title])
+                end
                 checklist_cell.save!
             end
 
