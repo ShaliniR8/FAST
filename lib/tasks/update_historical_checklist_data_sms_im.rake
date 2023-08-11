@@ -4,7 +4,7 @@ task :checklist_migrate => :environment do
     ims.each do |im|
         user = User.where(username: 'prosafet_admin')
         checklist_items = ChecklistItem.where(owner_id: im.id)
-        checklist_header = ChecklistHeader.where(title: 'Historical_Data_Template')
+        checklist_header = ChecklistHeader.where(title: 'SMS_IM_Default_Template')
         checklist_header_items = ChecklistHeaderItem.where(checklist_header_id: checklist_header[0].id)
         checklist_items.each do |item|
             checklist = Checklist.new(title: item.title, owner_type: 'Im', owner_id: item.owner_id, created_by_id: user[0].id, checklist_header_id: checklist_header[0].id)
