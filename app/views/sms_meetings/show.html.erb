@@ -125,6 +125,14 @@
 </div>
 
 <script>
+  function delete_package(package_id, meeting_id,btn){
+    var result = confirm("Are you sure?");
+    if(result){
+      $.get("/packages/" + package_id + "/carryover?meeting_id=" + meeting_id, function(data){
+        $(btn).closest('tr').hide();
+      });
+    }
+  }
   $(document).ready(function(){
     $("#message-btn").on('click',function(){
       $.get("<%=message_meeting_path(@meeting)%>",function(data){
