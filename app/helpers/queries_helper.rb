@@ -15,10 +15,8 @@ module QueriesHelper
       (value ? 'Yes' : 'No') rescue 'No'
     when 'checkbox'
       value.split(';').map(&:strip).map{|val| val.gsub("\"", '')} rescue nil
-    when 'list'
+    when 'list', 'category'
       value.split('<br>').map(&:strip) rescue nil
-    when 'category'
-      value.split('<br>').map{|x| x.split('>').map(&:strip)}.map{|x| x[field_param.to_i - 1] rescue nil}
     else
       if value.is_a? Integer
         value
