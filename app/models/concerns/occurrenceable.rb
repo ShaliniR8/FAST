@@ -9,17 +9,17 @@ module Occurrenceable
 
     def get_occurrences
       occurrences
-        .map{|occurrence| occurrence.value.split("\r\n").map(&:strip)}.flatten
+        .map{|occurrence| occurrence.value.split("\r\n").map(&:strip)}
+        .flatten
+        .delete_if(&:blank?)
         .join('<br>').html_safe
     end
 
 
     def get_occurrences_full
       occurrences
-        .map{|occurrence| occurrence.value.split("\r\n")
-                          .map(&:strip)
-                          .map{|value| "#{occurrence.parent_section} > #{occurrence.title} > #{value}" if value.present?}
-                          .compact}
+        .map{|occurrence| occurrence.value.split("\r\n").map(&:strip).delete_if(&:blank?)
+                          .map{|value| "#{occurrence.parent_section} > #{occurrence.title} > #{value}"}}
         .flatten
         .join('<br>').html_safe
     end
