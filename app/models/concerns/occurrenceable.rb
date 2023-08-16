@@ -16,7 +16,10 @@ module Occurrenceable
 
     def get_occurrences_full
       occurrences
-        .map{|occurrence| occurrence.value.split("\r\n").map(&:strip).map{|value| "#{occurrence.parent_section} > #{occurrence.title} > #{value}"}}
+        .map{|occurrence| occurrence.value.split("\r\n")
+                          .map(&:strip)
+                          .map{|value| "#{occurrence.parent_section} > #{occurrence.title} > #{value}" if value.present?}
+                          .compact}
         .flatten
         .join('<br>').html_safe
     end
