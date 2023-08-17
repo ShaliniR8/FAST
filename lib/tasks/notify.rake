@@ -26,37 +26,42 @@ task :submission_notify => [:environment] do |t|
   content = ("A new #{owner.template.name} submission is submitted." + "(##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} " + "#{owner.description})") if !content.present?
   subject = "#{owner.template.name}  Submission ##{owner.send(CONFIG.sr::HIERARCHY[:objects]['Submission'][:fields][:id][:field])} dated #{owner.event_date} has been Submitted (#{owner.description})"
   users.each do |user_id|
-    if attach_pdf == 'none'
-      controller.notify(
-        owner,
-        notice: {
-          users_id: user_id,
-          content: content
-        },
-        mailer: true,
-        # subject: "New #{owner.template.name} Submission",
-        subject: subject,
-      )
-    else
-      is_deidentified = attach_pdf == 'deid'
+    begin
+      logger.info "attach_pdf == 'none' : #{attach_pdf == 'none'}"
+      if attach_pdf == 'none'
+        controller.notify(
+          owner,
+          notice: {
+            users_id: user_id,
+            content: content
+          },
+          mailer: true,
+          # subject: "New #{owner.template.name} Submission",
+          subject: subject,
+        )
+      else
+        is_deidentified = attach_pdf == 'deid'
 
-      html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: owner, deidentified: is_deidentified}, layout: false)
-      pdf = PDFKit.new(html)
-      pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
-      pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
-      attachment = pdf.to_pdf
-
-      controller.notify(
-        owner,
-        notice: {
-          users_id: user_id,
-          content: content
-        },
-        mailer: true,
-        # subject: "New #{owner.template.name} Submission",
-        subject: subject,
-        attachment: attachment
-      )
+        html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: owner, deidentified: is_deidentified}, layout: false)
+        pdf = PDFKit.new(html)
+        pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
+        pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
+        attachment = pdf.to_pdf
+        controller.notify(
+          owner,
+          notice: {
+            users_id: user_id,
+            content: content
+          },
+          mailer: true,
+          # subject: "New #{owner.template.name} Submission",
+          subject: subject,
+          attachment: attachment
+        )
+      end
+      logger.info "Message sent"
+    rescue => e
+      logger.error "Error occurred while sending email to user #{user_id}: #{e}"
     end
   end
 
