@@ -12,7 +12,6 @@ task :submission_notify => [:environment] do |t|
   logger.info "#{ENV['OWNER_ID']}"
   logger.info "#{ENV['USERS']}"
   logger.info "#{ENV['ATTACH_PDF']}"
-  logger.info '##############################'
 
 
   controller = ApplicationController.new
@@ -60,8 +59,10 @@ task :submission_notify => [:environment] do |t|
         )
       end
       logger.info "Message sent"
+      logger.info '##############################'
     rescue => e
       logger.error "Error occurred while sending email to user #{user_id}: #{e}"
+      logger.info '##############################'
     end
   end
 
