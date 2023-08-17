@@ -1687,7 +1687,6 @@ module QueriesHelper
     mapping_hash['Investigation']['Investigator'] = 'responsible_user_id'
     mapping_hash['Investigation']['Final Approver'] = 'approver_id'
     mapping_hash['Investigation']['Date/Time When Event Occurred'] = 'event_occured'
-    byebug
     mapping_hash['Investigation'][CONFIG.sa::HIERARCHY[:objects]["Investigation"][:fields][:local_event_occurred][:title]] = 'local_event_occured'
     mapping_hash['Investigation']['Investigation Type'] = 'inv_type'
     mapping_hash['Investigation']['Regulatory Violation'] = 'ntsb' # SCX modification
