@@ -13,8 +13,8 @@ class JEDConfig < DefaultConfig
     time_zone:                    'Riyadh',
 
     # SYSTEM CONFIGS
-    has_mobile_app:               false,
-    has_pdf_header:                 true,
+    has_mobile_app:               true,
+    has_pdf_header:               true,
     has_pdf_footer:               true,
     external_link:                true,
     enable_sso:                   true,
