@@ -81,8 +81,8 @@ class DefaultMobileConfig
     jed_dir: { label: 'Login with ProSafeT', subdomain: 'jed' },
     jed_sso: { label: 'Login with JED', subdomain: 'jed', sso: true},
 
-    #RZN Portals
-    rzn_dir: { label: 'Login with ProSafeT', subdomain: 'rzn' },
+    #RZN(Gridiron) Portals
+    rzn_dir: { label: 'Login with ProSafeT', subdomain: 'gridiron' },
     
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
