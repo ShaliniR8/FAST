@@ -30,33 +30,74 @@ class BAHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           },
         }
       },
+      'Audit' => {
+        fields: {
+          audit_department: {
+            options: "CONFIG.custom_options['Operator/Organization']"
+          },
+          supplier: {
+            visible: '',
+          },
+          vendor: {
+            visible: '',
+          },
+          process: {
+            visible: ''
+          },
+          station_code: {
+            visible: '',
+          },
+        },
+        actions: {
+          contact: {
+            access: proc { false },
+          },
+          cost: {
+            access: proc { false },
+          },
+          task: {
+            access: proc { false },
+          }
+        },
+        panels: {
+          contact: {
+            access: proc { false },
+          },
+          cost: {
+            access: proc { false },
+          },
+          task: {
+            access: proc { false },
+          }
+        },
+      },
       'SmsAction' => {
         fields: {
+          responsible_department: {
+            options: "CONFIG.custom_options['Operator/Organization']"
+          },
           emp: {
-            field: 'emp', title: 'Employee Corrective Action',
-            num_cols: 6, type: 'boolean_box', visible: '',
-            required: false, on_newline: true
+            visible: ''
           },
           dep: {
-            field: 'dep', title: 'Company Corrective Action',
-            num_cols: 6, type: 'boolean_box', visible: '',
-            required: false
+            visible: ''
           },
           immediate_action: {
-            field: 'immediate_action', title: 'Immediate Action',
-            num_cols: 6, type: 'boolean_box', visible: '',
-            required: false, on_newline: true
+            visible: ''
           },
           comprehensive_action: {
-            field: 'comprehensive_action', title: 'Comprehensive Action',
-            num_cols: 6, type: 'boolean_box', visible: '',
-            required: false
+            visible: ''
           },
           comprehensive_action_comment: {
-            field: 'comprehensive_action_comment', title: 'Comprehensive Action Comment',
-            num_cols: 12, type: 'textarea', visible: '',
-            required: false
+            visible: ''
           },
+        }
+      },
+      'Finding' => {
+        fields: {
+          department: {
+            options: "CONFIG.custom_options['Operator/Organization']"
+          }
         }
       }
     }
