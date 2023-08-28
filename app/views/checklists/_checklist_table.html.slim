@@ -19,8 +19,7 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
         th = CONFIG::LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS[object_name]
 
   tbody
-    - has_row = ![[1000], []].include?(checklist.checklist_rows.map(&:row_order).uniq.compact)
-    - checklists = has_row ? checklist.checklist_rows.order(:row_order) : checklist.checklist_rows
+    - checklists = checklist.checklist_rows.order(:row_order)
     - checklists.each do |checklist_row|
 
       tr class="#{checklist_row.is_header ? 'header-row' : ''}"

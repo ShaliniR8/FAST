@@ -276,15 +276,20 @@ class ChecklistsController < ApplicationController
     else
       # reset checklist cell value when data type is changed
       if params[:checklist].present? && params[:checklist][:checklist_rows_attributes].present?
+        curr_row_index = 0
         params[:checklist][:checklist_rows_attributes].each do |key, checklist_row|
           if checklist_row[:checklist_cells_attributes].present?
             checklist_row[:checklist_cells_attributes].each do |key, checklist_cell|
               ChecklistCell.find(checklist_cell[:id]).update_attribute(:value, '') if checklist_cell[:data_type].present? && checklist_cell[:id].present?
             end
           end
+          if checklist_row['_destroy'] == "true"
+              next
+          end
+          checklist_row.merge!(row_order: curr_row_index)
+          curr_row_index += 1
         end
       end
-
       if params[:template_names].present?
         template_id = Checklist.where(owner_type: 'ChecklistHeader').where(title: (params[:template_names])).first.id
         params[:checklist][:template_id] = template_id
@@ -337,7 +342,6 @@ class ChecklistsController < ApplicationController
         if @record[:owner_type] == 'ChecklistHeader' && @record[:title] != updated_name
           AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
         end
-        
         @record.update_attributes(params[:checklist])
         redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
       end
