@@ -77,6 +77,13 @@ class DefaultMobileConfig
     bya_dir: { label: 'Login with ProSafeT', subdomain: 'berry' },
     bya_sso: { label: 'Login with Berry Aviation', subdomain: 'berry', sso: true},
 
+    #JED Portals
+    jed_dir: { label: 'Login with ProSafeT', subdomain: 'jed' },
+    jed_sso: { label: 'Login with JED', subdomain: 'jed', sso: true},
+
+    #RZN(Gridiron) Portals
+    rzn_dir: { label: 'Login with ProSafeT', subdomain: 'gridiron' },
+    
     #Trial Portals
     trial_general:    { label: 'General', subdomain: 'trial' },
   }
@@ -243,6 +250,21 @@ class DefaultMobileConfig
     portals: %i[
       bya_dir
       bya_sso
+    ]
+    },
+
+    'JED Key' => { # 204C-DC34-EA8D-47D8
+    key_name: 'King Abdulaziz International Airport',
+    portals: %i[
+      jed_dir
+      jed_sso
+    ]
+    },
+
+    'RZN Key' => { # 489A-32D2-459B-14BD
+    key_name: 'Gridiron Air LLC',
+    portals: %i[
+      rzn_dir
     ]
     },
 
