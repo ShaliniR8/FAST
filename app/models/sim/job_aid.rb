@@ -1,5 +1,4 @@
 class JobAid < Im
-  has_many :items,foreign_key:"owner_id",class_name:"JobAidItem",:dependent=>:destroy
   def self.display_name
     "Job Aid"
   end

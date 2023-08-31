@@ -7,7 +7,7 @@ ruby:
     end
   }
 
-  if owner.class.name == "VpIm" || owner.class.name == "JobAid"
+  if %w[VpIm JobAid].include? owner.class.name
     owner = owner.becomes(Im)
   end
 

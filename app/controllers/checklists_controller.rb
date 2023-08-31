@@ -56,7 +56,7 @@ class ChecklistsController < ApplicationController
       create_audit_from_checklist(params, true)
     else
       @owner = Object.const_get("#{params[:checklist][:owner_type]}").find(params[:checklist][:owner_id])
-      if @owner.class.name == "VpIm" || @owner.class.name == "JobAid"
+      if %w[VpIm JobAid].include? @owner.class.name
         @owner = @owner.becomes(Im)
         params[:checklist][:owner_type] = 'Im'
       end
@@ -343,7 +343,7 @@ class ChecklistsController < ApplicationController
         end
         
         @record.update_attributes(params[:checklist])
-        if @record.owner.present? && (@record.owner.class.name == "VpIm" || @record.owner.class.name == "JobAid")
+        if @record.owner.present? && (%w[VpIm JobAid].include? @record.owner.class.name)
           @record.owner = @record.owner.becomes(Im)
         end
         redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
@@ -424,7 +424,7 @@ class ChecklistsController < ApplicationController
   def destroy
     checklist = @table.preload(:checklist_rows => :checklist_cells).find(params[:id])
     owner = checklist.owner
-    if owner.class.name == "VpIm" || owner.class.name == "JobAid"
+    if %w[VpIm JobAid].include? owner.class.name
       owner = owner.becomes(Im)
     end
 

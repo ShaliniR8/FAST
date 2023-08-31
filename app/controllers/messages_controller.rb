@@ -33,7 +33,7 @@ class MessagesController < ApplicationController
       @owner = @reply_to.owner
     end
     @owner ||= Object.const_get(params[:owner_class]).find(params[:owner_id]) rescue nil
-    if @owner.class.name == "VpIm" || @owner.class.name == "JobAid"
+    if %w[VpIm JobAid].include? @owner.class.name
       @owner = @owner.becomes(Im)
     end
     @send_to = params[:send_to].present? ? params[:send_to].to_i : -1

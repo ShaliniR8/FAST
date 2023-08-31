@@ -97,7 +97,7 @@ class ImsController < ApplicationController
 
   def show
     @im = Im.find(params[:id])
-    @checklist_headers = Object.const_get(@im.type + 'Item').get_headers
+    @checklist_headers = Object.const_get(@im.type).get_headers
   end
 
   def edit
@@ -201,7 +201,7 @@ class ImsController < ApplicationController
   def new_checklist
     im = Im.find(params[:id])
     @path = upload_checklist_im_path(im)
-    render :partial => "checklist"
+    render :partial => "audits/checklist"
   end
 
   def upload_checklist
