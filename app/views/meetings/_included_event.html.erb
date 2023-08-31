@@ -69,6 +69,16 @@
                 'hover' => 'tooltip',
                 title: 'Add Meeting Minutes',
                 :route => new_minutes_report_path(event, :meeting => meeting) %>
+              <% if CONFIG.sr::GENERAL[:add_corrective_action_in_meeting] %>
+                <!-- Add Corrective Action -->
+                <%=link_to "<i class='glyphicon glyphicon-wrench'></i>".html_safe, "#",
+                  :class => "btn btn-sm btn-warning corrective_action_btn mb5",
+                  "data-toggle" => "modal",
+                  "data-target" => ".bs-example-modal-lg",
+                  'hover' => 'tooltip',
+                  title: 'View/Add Corrective Actions',
+                  :route => get_corrective_action_report_path(event, :meeting => meeting.id) %>
+              <%end%>
             <%end%>
             <!-- Remove Event -->
             <%=link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",

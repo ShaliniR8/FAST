@@ -529,6 +529,7 @@ class ReportsController < ApplicationController
     @meeting_ids = @report.meetings.map(&:id)
 
     @agenda_headers = AsapAgenda.get_headers
+    @corrective_action_headers = CorrectiveAction.get_meeting_headers
     @action_headers = CorrectiveAction.get_meta_fields('index')
     @corrective_actions = @report.corrective_actions
     load_special_matrix(@report)
@@ -701,6 +702,16 @@ class ReportsController < ApplicationController
     @tof = {"Yes" => true,"No" => false}
     @accept_deline = {"Accepted" => true, "Declined" => false}
     render :partial => "agenda"
+  end
+
+  def get_corrective_action
+    @report = Report.find(params[:id])
+    @meeting = Meeting.find(params[:meeting])
+    @corrective_actions = CorrectiveAction.where(reports_id: @report.id)
+    @station = CorrectiveAction.get_designee
+    @department = CorrectiveAction.get_departments
+    @headers = CorrectiveAction.get_meeting_headers
+    render :partial => "corrective_action"
   end
 
   def new_attachment

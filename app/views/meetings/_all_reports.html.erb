@@ -44,6 +44,12 @@
           <i class='glyphicon glyphicon-list btn btn-sm btn-warning mb5 mr5 ml5'></i>
           <b>Agendas </b>- View or add Meeting Agendas
         </td>
+        <% if CONFIG.sr::GENERAL[:add_corrective_action_in_meeting]%>
+          <td>
+            <i class='glyphicon glyphicon-wrench btn btn-sm btn-warning mb5 mr5 ml5'></i>
+            <b>Corrective Actions </b>- View or add Corrective Actions
+          </td>
+        <% end %>
         <td>
           <i class='glyphicon glyphicon-pencil btn btn-sm btn-success mb5 mr5 ml5'></i>
           <b>Add Meeting Minutes </b>- Add Meeting Minutes to the meeting
@@ -88,6 +94,12 @@
       });
     });
     $("#reports_table").on('click', ".agenda_btn", function(){
+      $.get($(this).attr('route'),function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
+      });
+    });
+    $("#reports_table").on('click', ".corrective_action_btn", function(){
       $.get($(this).attr('route'),function(data){
         $(".modal-content").html(data);
         $(window).trigger('resize');

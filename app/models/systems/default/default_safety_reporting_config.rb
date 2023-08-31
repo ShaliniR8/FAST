@@ -19,6 +19,7 @@ class DefaultSafetyReportingConfig
     matrix_carry_over:                false,
     configurable_agenda_dispositions: false,
     share_meeting_agendas:            true,
+    add_corrective_action_in_meeting: false,
 
     # Airline-Specific Features:
     attach_pdf_submission:     'ided',    # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
@@ -216,6 +217,11 @@ class DefaultSafetyReportingConfig
           event_station: {
             field: 'event_station', title: 'Event Station',
             num_cols: 4, type: 'text', visible: '',
+          },
+          operation_type: {
+            field: 'operation_type', title: 'Operation Type',
+            num_cols: 4, type: 'select', visible: '',
+            required: false, options: "CONFIG.custom_options['Operation Type']"
           },
           event_date: {
             default: true, title: 'Event Date',
@@ -432,6 +438,11 @@ class DefaultSafetyReportingConfig
             field: 'response', title: 'Response',
             num_cols: 12, type: 'textarea', visible: 'form,show',
             required: false
+          },
+          designee: {
+            field: 'designee', title: 'Station',
+            num_cols: 6, type: 'datalist', visible: '',
+            required: false, options: "CONFIG.custom_options['Station Codes']"
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
