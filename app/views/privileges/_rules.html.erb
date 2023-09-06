@@ -32,7 +32,10 @@
 $(document).ready(function(){
   $('#rt').DataTable({
     "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
-    "iDisplayLength": 10
+    "iDisplayLength": 10,
+    "drawCallback": function(settings){
+      $(".modal-content").css("max-height", "")
+    }
   });
 });
 </script>
