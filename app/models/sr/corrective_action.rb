@@ -159,6 +159,14 @@ class CorrectiveAction < ProsafetBase
     end
   end
 
+  def self.get_designee
+    CONFIG.custom_options['Station Codes']
+  end
+
+  def self.get_departments
+    CONFIG.custom_options['Departments']
+  end
+
 
   def get_response
     if self.response.blank?
@@ -199,6 +207,15 @@ class CorrectiveAction < ProsafetBase
       {:field => :get_final_approver,       :title => "Final Approver"},
       {:field => :close_date,               :title => "Completion Date"},
       {:field => :status,                   :title => "Status"},
+    ]
+  end
+
+  def self.get_meeting_headers
+    [
+      {:field => :due_date,                 :title => "Scheduled Completion Date"},
+      {:field => :department,               :title => "Department"},
+      {:field => "get_description",         :title => "Description"},
+      {:field => :designee,                 :title => "Station"},
     ]
   end
 

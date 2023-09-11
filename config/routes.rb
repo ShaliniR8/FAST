@@ -472,10 +472,13 @@ PrdgSession::Application.routes.draw do |map|
       get "carryover"
       get "meeting_ready"
       post "add_meeting_minutes"
+      post "add_corrective_actions"
       post "add_to_meeting"
       get "get_agenda"
+      get "get_corrective_action"
       get "new_attachment"
       get "new_minutes"
+      get "new_corrective_actions"
       get "carryover_another_meeting"
       post "carryover_to_another_meeting"
       get 'show_narrative'
@@ -496,6 +499,7 @@ PrdgSession::Application.routes.draw do |map|
       get "reopen"
       get "get_reports"
       post "save_agenda"
+      post "save_corrective_action"
       get 'get_cisp_reports'
       post 'send_cisp_reports'
       get 'override_status'

@@ -279,6 +279,8 @@ class MeetingsController < ApplicationController
       transaction = false
     when 'Save Agenda'
       transaction_content = "Event ##{params[:event_id]}"
+    when 'Save Corrective Action'
+      transaction_content = "Event ##{params[:event_id]}"
     when 'Send to CISP'
       send_cisp_reports
     end
@@ -326,6 +328,23 @@ class MeetingsController < ApplicationController
         next if found
 
         Meeting.find(params[:id]).agendas << Agenda.find(agenda[1][:id]) if agenda[1][:id].present?
+      end
+    end
+
+    # update included corrective_actions
+    if params[:meeting].present? && params[:meeting][:corrective_actions_attributes].present?
+      meetings_corrective_actions = Meeting.find(params[:id]).corrective_actions
+
+      corrective_actions = params[:meeting][:corrective_actions_attributes]
+      corrective_actions.each do |corrective_action|
+        found = false
+        meetings_corrective_actions.each do |meeting_corrective_action|
+          found = true if meeting_corrective_action.id == corrective_action[1][:id]
+        end
+
+        next if found
+
+        Meeting.find(params[:id]).corrective_actions << CorrectiveAction.find(corrective_action[1][:id]) if corrective_action[1][:id].present?
       end
     end
 
@@ -409,6 +428,75 @@ class MeetingsController < ApplicationController
     Transaction.build_for(
       @meeting,
       "Save Agenda",
+      current_user.id,
+      "Event ##{params[:event_id]}"
+    )
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def save_corrective_action
+    @meeting = Meeting.find(params[:id])
+    @report_headers = Report.get_meta_fields('index', 'meeting')
+    update_hash = Hash.new
+    deleted_corrective_action_ids = []
+
+    params.each do |key, value|
+      if ["reports_id", "created_by_id"].exclude?(key)
+        key_parts = key.split('_')
+        if key_parts.length == 2
+          corrective_action_id = key_parts[1].to_i rescue 0
+          if corrective_action_id > 0
+            if !update_hash.key?(corrective_action_id)
+              update_hash[corrective_action_id] = Hash.new
+            end
+            if key_parts[0] == 'destroy'
+              if eval(value) == true
+                deleted_corrective_action_ids << corrective_action_id
+              else
+                if eval(value)[:value].present? && eval(value)[:value] == 1
+                  deleted_corrective_action_ids << corrective_action_id
+                end
+              end
+            elsif key_parts[0] == 'dueDate'
+              update_hash[corrective_action_id]['due_date'] = value
+            else
+              update_hash[corrective_action_id][key_parts[0].to_sym] = value
+            end
+          end
+        end
+      end
+    end
+
+
+    # CorrectiveAction.where(id: deleted_corrective_action_ids).map(&:destroy)
+    deleted_corrective_action_ids.each do |ca_id|
+      coa = CorrectiveAction.find(ca_id)
+      if coa.present?
+        update_hash.delete(ca_id)
+        coa.destroy
+      end
+    end
+
+
+    update_hash.each do |k, v|
+      coa = CorrectiveAction.find(k) rescue nil
+      if coa.nil?
+        v[:created_by_id] = eval(params[:created_by_id])[:value]
+        v[:reports_id] = params[:event_id]
+        v[:status] = 'New'
+        CorrectiveAction.create(v)
+      else
+        coa.update_attributes(v)
+      end
+    end
+    @reports = @meeting.reports.sort_by{|x| x.id}
+
+    Transaction.build_for(
+      @meeting,
+      "Save Corrective Action",
       current_user.id,
       "Event ##{params[:event_id]}"
     )
