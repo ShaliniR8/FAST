@@ -19,6 +19,7 @@ class HAECOConfig < DefaultConfig
     has_mobile_app:                true,
     sms_im_visibility:             false,
     checklist_query:               true,
+    power_bi_integration:          true,
 
     hide_employee_group:           true,
     custom_uniq_id:                true,
@@ -164,4 +165,12 @@ class HAECOConfig < DefaultConfig
       red:        'HIGH',
     }
   }
+
+  # export query credentials
+  EXPORT_QUERY_CRED = {
+    export_query_username:        "prosafet",
+    export_query_password:        "",
+    export_query_host:            "sftp01.haeco.aero"
+  }
+
 end
