@@ -292,7 +292,7 @@ class Submission < Sr::SafetyReportingBase
         anonymous:        self.anonymous,
         confidential:     self.confidential,
         templates_id:     temp_id,
-        description:      self.description + "#{new_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{self.get_id}" : ""}",
+        description:      self.description + "#{CONFIG::GENERAL[:include_copy_submission_info] || new_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{self.get_id}" : ""}",
         event_date:       self.event_date,
         user_id:          self.user_id,
         event_time_zone:  self.event_time_zone,

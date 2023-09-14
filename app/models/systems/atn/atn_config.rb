@@ -21,6 +21,7 @@ class ATNConfig < DefaultConfig
     advanced_checklist_data_type:       true,
     checklist_query:                    true,
     hide_submission_in_dashboard:       true,
+    include_copy_submission_info:       true,
 
     # SYSTEM-WIDE FORM CONFIGS
     base_risk_matrix:                   false,
