@@ -24,7 +24,7 @@
           </div>
           <div class="top_buttons pull-right">
             <%if CONFIG::GENERAL[:power_bi_integration]%>
-              <input type="checkbox" id="export_query_result">
+              <input style="display:none;" type="checkbox" id="export_query_result">
             <%end%>
             <%=link_to 'Add/Edit Subscribers', '#',
               :class => 'btn btn-success add_subs_btn',
