@@ -33,7 +33,7 @@
               <td>
                 <%=link_to "View", sra_path(sra), :class => "btn btn-info mb5", :disable_with => "Redirecting..."%>
                 <%if current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) && @meeting.status == 'Open' && @meeting.has_user(current_user)%>
-                  <%if @meeting.status != "Closed" && sra.srm_agendas.blank?%>
+                  <%if @meeting.status != "Closed"%>
                     <%=link_to "Carryover",
                       "#",
                       'data-toggle' => 'tooltip',
