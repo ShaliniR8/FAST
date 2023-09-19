@@ -1,7 +1,7 @@
 class DHMConfig < DefaultConfig
 
   # Used for linking databases in database.yml; example would be %w[audit]
-  ENABLED_SYSTEMS = %w[audit]
+  ENABLED_SYSTEMS = %w[]
   # Used for creating different environments in database.yml; example would be %w[training]
   SYSTEM_ENVIRONMENTS = %w[training]
 
@@ -13,39 +13,11 @@ class DHMConfig < DefaultConfig
     time_zone:                    'Pacific Time (US & Canada)',
 
     # SYSTEM CONFIGS
-    enable_mailer:                false,
     has_mobile_app:               true,
-    has_investigations_app:       true,
-    track_log:                    true,
-
-    # Third Party Integrations:
-    integrations: ['mitre', 'eccairs'],
-
-    # SYSTEM-WIDE FORM CONFIGS
-    configurable_risk_matrices:   false,
-    shared_links:                 true,
-    drop_down_risk_selection:     false,
-    advanced_checklist_data_type: true,
-    # lat:                        24.958202,
-    # lng:                        46.700779, #Dammam
-    # lat:                        29.9872543,
-    # lng:                        -95.3502256, #IAH #1
-    # lat:                        29.9866102,
-    # lng:                        -95.3476103, #IAH #2
-    # lat:                          29.6459141,
-    # lng:                          -95.2768951, #HOU
-    sabre_integration:            true,
-    sabre_reports_recommendation: true,
-    checklist_query:              true,
 
     # TO BE REMOVED:
-    allow_set_alert:              true,
-    has_extension:                true,
-    has_verification:             true,
     sms_im_visibility:            false,
-    safety_promotion_visibility:  true,
-    global_admin_default:         false,
-    pin_dashboard_visualizations: true
+    safety_promotion_visibility:  true
   })
 
   RISK_MATRIX = {
@@ -211,28 +183,4 @@ class DHMConfig < DefaultConfig
 
     }
   }
-
-
-  FAA_INFO = DefaultConfig::FAA_INFO.merge({
-    'CHDO'                           => 'ProSafeT',
-    'Region'                         => 'Pacific',
-    'ASAP MOU Holder Name'           => 'ProSafeT',
-    'ASAP MOU Holder FAA Designator' => 'ProSafeT'
-  })
-
-
-  # SABRE INTEGRATION
-  SABRE_MAPPABLE_FIELD_OPTIONS = {
-    "Flight Date"        => "flight_date",
-    "Flight Number"      => "flight_number",
-    "Tail Number"        => "tail_number",
-    "Departure Airport"  => "departure_airport",
-    "Arrival Airport"    => "arrival_airport",
-    "Landing Airport"    => "landing_airport",
-    "Captain"            => "ca",
-    "First Officer"      => "fo",
-    "Flight Attendant 1" => "fa_1",
-    "Flight Attendant 2" => "fa_2"
-  }
-
 end
