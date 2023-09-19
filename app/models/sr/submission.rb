@@ -298,7 +298,10 @@ class Submission < Sr::SafetyReportingBase
         event_time_zone:  self.event_time_zone,
       })
 
-      self.description = self.description + "#{original_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{converted.get_id}" : ""}"
+      self.description = self.description + "#{CONFIG::GENERAL[:include_copy_submission_info] || original_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{converted.get_id}" : ""}"
+      if CONFIG::GENERAL[:include_copy_submission_info]
+        self.description += " (Origin)"
+      end
       self.save
 
       mapped_fields = self.submission_fields.map{|x| [x.field.map_id, x.value]}.to_h
