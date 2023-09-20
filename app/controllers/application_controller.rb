@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   def index
-    @object_name = params[:type] || controller_name.classify
+    @object_name = controller_name.classify
     @table_name = controller_name
 
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
@@ -660,22 +660,36 @@ class ApplicationController < ActionController::Base
   end
 
   def adjust_session
-    load_controller_list
-    if params[:type].present? && params[:type].include?('Osha')
-      session[:mode] = 'OSHA'
-    elsif @sms_list.include? controller_name
-      session[:mode] = 'SMS'
-    elsif @sms_im_list.include? controller_name
-      session[:mode] = 'SMS IM'
-    elsif @asap_list.include? controller_name
-      is_osha_module = params[:id].present? && Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha')
-      if is_osha_module
+    # TEMP
+    if CONFIG::GENERAL[:osha_visibility]
+      load_controller_list
+      if params[:type].present? && params[:type].include?('Osha')
         session[:mode] = 'OSHA'
-      else
-        session[:mode] = 'ASAP'
+      elsif @sms_list.include? controller_name
+        session[:mode] = 'SMS'
+      elsif @sms_im_list.include? controller_name
+        session[:mode] = 'SMS IM'
+      elsif @asap_list.include? controller_name
+        is_osha_module = params[:id].present? && Object.const_get(params[:controller].classify).find(params[:id]).class.name.include?('Osha')
+        if is_osha_module
+          session[:mode] = 'OSHA'
+        else
+          session[:mode] = 'ASAP'
+        end
+      elsif @srm_list.include? controller_name
+        session[:mode] = 'SRM'
       end
-    elsif @srm_list.include? controller_name
-      session[:mode] = 'SRM'
+    else
+      load_controller_list
+      if @sms_list.include? controller_name
+        session[:mode] = 'SMS'
+      elsif @sms_im_list.include? controller_name
+        session[:mode] = 'SMS IM'
+      elsif @asap_list.include? controller_name
+        session[:mode] = 'ASAP'
+      elsif @srm_list.include? controller_name
+        session[:mode] = 'SRM'
+      end
     end
     true
   end
