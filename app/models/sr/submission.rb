@@ -287,7 +287,8 @@ class Submission < Sr::SafetyReportingBase
     if CONFIG::GENERAL[:include_copy_submission_info] || template.report_type == 'asap' || related_template.report_type != 'asap'
        message = "-- dual submission of ##{related_obj.get_id}"
     end
-    if related_obj.id == converted.id && CONFIG::GENERAL[:include_copy_submission_info]
+    if related_obj.templates_id == self.template.map_template_id && CONFIG::GENERAL[:include_copy_submission_info]
+      ## Should run only for original template, and not the related template
       message = message + " (Origin)"
     end
     message
