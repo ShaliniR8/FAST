@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Airline313_LMVSRP>
+    <reporter_info>
+        <full_name>ProSafeT Engineering</full_name>
+        <email>noc@prodigiq.com</email>
+    </reporter_info>
+    <report_info>
+        <event_title>LIFT Maintenance Safety Report (ASRS Test)</event_title>
+        <event_date>2023-05-17 12:00</event_date>
+        <narrative>Event Narrative</narrative>
+        <aircraft_type>ABC12</aircraft_type>
+        <type_of_event>Aircraft Damage</type_of_event>
+    </report_info>
+</Airline313_LMVSRP>
