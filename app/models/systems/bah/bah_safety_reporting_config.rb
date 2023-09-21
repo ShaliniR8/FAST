@@ -6,6 +6,27 @@ class BAHSafetyReportingConfig < DefaultSafetyReportingConfig
   })
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
+    objects: {
+      'CorrectiveAction' => {
+        fields: {
+          employee: {
+            visible: ''
+          },
+          company: {
+            visible: ''
+          },
+          bimmediate_action: {
+            visible: ''
+          },
+          bcomprehensive_action: {
+            visible: ''
+          },
+          description: {
+            visible: ''
+          }
+        }
+      }
+    },
     menu_items: {
       'FAA Reports' => {
         title: 'FAA Reports', path: '#',
