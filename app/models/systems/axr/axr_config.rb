@@ -14,6 +14,8 @@ class AXRConfig < DefaultConfig
 
     # SYSTEM CONFIGS
     has_mobile_app:               true,
+    login_option:                 'dual',
+
 
     # TO BE REMOVED:
     sms_im_visibility:            false,
