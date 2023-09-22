@@ -54,6 +54,7 @@ class DefaultConfig
     osha_visibility:                    false,
     export_query_daily_digest_in_csv:   false,
     has_ext_user_submission_from_login_page: false,
+    include_copy_submission_info:       false,
 
 
     # Map Configs. Needed in default config to avoid javascript undefined errors

@@ -397,6 +397,7 @@ class SubmissionsController < ApplicationController
         end
         if !(is_work_order(template_id)) || (is_work_order(template_id) && is_descrepancy)
           submission_class_type(type).find(@record.id).make_report
+          @record = Submission.find(@record.id)
         end
       end
 

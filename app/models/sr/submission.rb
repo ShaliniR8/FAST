@@ -282,6 +282,17 @@ class Submission < Sr::SafetyReportingBase
     end
   end
 
+  def get_dual_submission_message(template: , related_template: , related_obj: )
+    message = ""
+    if CONFIG::GENERAL[:include_copy_submission_info] || template.report_type == 'asap' || related_template.report_type != 'asap'
+       message = "-- dual submission of ##{related_obj.get_id}"
+    end
+    if related_obj.templates_id == self.template.map_template_id && CONFIG::GENERAL[:include_copy_submission_info]
+      ## Should run only for original template, and not the related template
+      message = message + " (Origin)"
+    end
+    message
+  end
 
   def convert
     if template.map_template.present?
@@ -292,13 +303,13 @@ class Submission < Sr::SafetyReportingBase
         anonymous:        self.anonymous,
         confidential:     self.confidential,
         templates_id:     temp_id,
-        description:      self.description + "#{new_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{self.get_id}" : ""}",
+        description:      self.description + get_dual_submission_message(template: new_temp, related_template: original_temp, related_obj: self),
         event_date:       self.event_date,
         user_id:          self.user_id,
         event_time_zone:  self.event_time_zone,
       })
 
-      self.description = self.description + "#{original_temp.report_type == 'asap' || new_temp.report_type != 'asap' && original_temp.report_type != 'asap' ? "-- dual submission of ##{converted.get_id}" : ""}"
+      self.description = self.description + get_dual_submission_message(template: original_temp, related_template: new_temp, related_obj: converted)
       self.save
 
       mapped_fields = self.submission_fields.map{|x| [x.field.map_id, x.value]}.to_h
