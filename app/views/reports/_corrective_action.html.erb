@@ -21,9 +21,10 @@
                 <%if ca.created_by_id==current_user.id%>
                   <tr id="corrective_actions_<%= ca.id %>">
                     <td><%=text_field_tag "dueDate_",ca.due_date,:name=>"dueDate_#{ca.id}",:class=>"form-control required_field"%></td>
-                    <td width=8%><%=select_tag "department_#{ca.id}",options_for_select(@department,ca.department),:include_blank=>true,:class=>"form-control"%></td>
+                    <td width=8%><%=select_tag "department_#{ca.id}",options_for_select(@department,ca.department),:include_blank=>true,:class=>"form-control required_field"%></td>
                     <td><%=text_field_tag "description",ca.description,:name=>"description_#{ca.id}",:class=>"form-control"%></td>
                     <td width=8%><%=select_tag "designee_#{ca.id}",options_for_select(@station,ca.designee),:include_blank=>true,:class=>"form-control"%></td>
+                    <td width=8%><%=select_tag "action_#{ca.id}",options_for_select(@action,ca.action),:include_blank=>true,:class=>"form-control required_field"%></td>
                     <td><button type="button" id="<%="close_#{ca.id}"%>" class="close close_btn" aria-label="Close"><i class="mt5 glyphicon glyphicon-remove close_icon"></i></button>
                     <button type="button" id="<%="view_#{ca.id}"%>" class="btn btn-success ca_btn" aria-label="Corrective_Action" onclick="go_to_ca(<%=ca.id%>)">View</button></td>
                     <%=hidden_field_tag "destroy_#{ca.id}", :value=>0%>
@@ -34,6 +35,7 @@
                     <td width=8%><%=ca.department%></td>
                     <td><%=ca.description%></td>
                     <td width=8%><%=ca.designee%></td>
+                    <td width=8%><%=ca.action%></td>
                     <td></td>
                   </tr>
                 <%end%>
@@ -102,4 +104,26 @@
   {
     window.location = ("<%=corrective_actions_path%>/"+id);
   }
+
+  $("form").on('submit', function(){
+    var error = false;
+    var result = true;
+    $(".required_field").css('border-color', '');
+    $(".int-val").css('border-color', '');
+    $(this).find('.required_field').each(function(){
+      if ($(this).val() == "" || $(this).val() == null){
+        error = true;
+        result = false;
+        $(this).css('border-color', 'red');
+        event.preventDefault();
+      }
+    });
+    if (error){
+      swal({
+        title: "Please fill in all required fields.",
+        type: "error",
+      });
+      return result;
+    }
+  });
 </script>

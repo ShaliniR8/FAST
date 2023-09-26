@@ -2,9 +2,10 @@
   <td>
     <%=text_field_tag 'Scheduled Completion Date', "", :type=>'date',:class=>"form-control required_field corrective_action_due_date"%>
   </td>
-  <td><%=select_tag 'department',options_for_select(@department),:include_blank=>true,:class=>"form-control corrective_action_department"%></td>
+  <td><%=select_tag 'department',options_for_select(@department),:include_blank=>true,:class=>"form-control required_field corrective_action_department"%></td>
   <td><%=text_field_tag 'description',"",:class=>"form-control corrective_action_description"%></td>
   <td><%=select_tag "station",options_for_select(@station),:include_blank=>true,:class=>"form-control corrective_action_station"%></td>
+  <td><%=select_tag "action",options_for_select(@action),:include_blank=>true,:class=>"form-control required_field corrective_action_action"%></td>
   
   <%=hidden_field_tag 'reports_id',:value=>@report.id%>
   <%=hidden_field_tag 'created_by_id',:value=>current_user.id%>
@@ -18,15 +19,28 @@
   $(".corrective_action_department").last().attr('name',"department_"+timestamp)
   $(".corrective_action_description").last().attr('name',"description_"+timestamp)
   $(".corrective_action_station").last().attr('name',"designee_"+timestamp)
+  $(".corrective_action_action").last().attr('name',"action_"+timestamp)
 
-  $("form").on('submit',function(){
-      $(this).find('.required_field').each(function(){
-        if ($(this).val()=="")
-        {
-          $(".required_field").css('border-color', 'red');
-              event.preventDefault();
-        }
-      });
+  $("form").on('submit', function(){
+    var error = false;
+    var result = true;
+    $(".required_field").css('border-color', '');
+    $(".int-val").css('border-color', '');
+    $(this).find('.required_field').each(function(){
+      if ($(this).val() == "" || $(this).val() == null){
+        error = true;
+        result = false;
+        $(this).css('border-color', 'red');
+        event.preventDefault();
+      }
     });
- });
+    if (error){
+      swal({
+        title: "Please fill in all required fields.",
+        type: "error",
+      });
+      return result;
+    }
+  });
+});
 </script>

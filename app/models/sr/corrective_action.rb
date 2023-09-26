@@ -167,6 +167,10 @@ class CorrectiveAction < ProsafetBase
     CONFIG.custom_options['Departments']
   end
 
+  def self.get_actions
+    CONFIG.custom_options['Actions List for Corrective Actions']
+  end
+
 
   def get_response
     if self.response.blank?
@@ -216,6 +220,7 @@ class CorrectiveAction < ProsafetBase
       {:field => :department,               :title => "Department"},
       {:field => "get_description",         :title => "Description"},
       {:field => :designee,                 :title => "Station"},
+      {:field => :action,                   :title => "Action"},
     ]
   end
 
