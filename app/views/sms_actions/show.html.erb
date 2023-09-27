@@ -39,7 +39,7 @@
           @owner.status != "Pending Approval" &&
           current_user.has_access("sms_actions","edit")%>
 
-        <% unless ['BSK'].include? AIRLINE_CODE %>
+        <% unless ['BSK', 'BAH'].include? AIRLINE_CODE %>
           <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
         <% end %>
         <%= render '/panels/show_panels', owner: @owner %>
