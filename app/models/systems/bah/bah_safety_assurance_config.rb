@@ -91,6 +91,12 @@ class BAHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           comprehensive_action_comment: {
             visible: 'none'
           },
+          risk_factor: {
+            visible: 'none'
+          },
+          risk_factor_after: {
+            visible: 'none'
+          }
         }
       },
       'Finding' => {
