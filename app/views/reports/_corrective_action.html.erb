@@ -11,31 +11,43 @@
             <thead>
               <tr>
                 <%@headers.each do |h|%>
-                  <th><%=h[:title]%></th>
+                  <% if h[:required]%>
+                    <th class='required_label'><%=h[:title]%></th>
+                  <% else %>
+                    <th><%=h[:title]%></th>
+                  <% end %>
                 <%end%>
                 <th>Action</th>
               </tr>
             </thead>
+            <datalist id="action">
+              <%@action.each do |opt|%>
+                <option value="<%=opt%>"></option>
+              <%end%>
+            </datalist>
+            <datalist id="designee">
+              <%@station.each do |opt|%>
+                <option value="<%=opt%>"></option>
+              <%end%>
+            </datalist>
             <tbody id="corrective_actions">
               <%@corrective_actions.each do |ca|%>
                 <%if ca.created_by_id==current_user.id%>
                   <tr id="corrective_actions_<%= ca.id %>">
-                    <td><%=text_field_tag "dueDate_",ca.due_date,:name=>"dueDate_#{ca.id}",:class=>"form-control required_field"%></td>
-                    <td width=8%><%=select_tag "department_#{ca.id}",options_for_select(@department,ca.department),:include_blank=>true,:class=>"form-control required_field"%></td>
-                    <td><%=text_field_tag "description",ca.description,:name=>"description_#{ca.id}",:class=>"form-control"%></td>
-                    <td width=8%><%=select_tag "designee_#{ca.id}",options_for_select(@station,ca.designee),:include_blank=>true,:class=>"form-control"%></td>
-                    <td width=8%><%=select_tag "action_#{ca.id}",options_for_select(@action,ca.action),:include_blank=>true,:class=>"form-control required_field"%></td>
-                    <td><button type="button" id="<%="close_#{ca.id}"%>" class="close close_btn" aria-label="Close"><i class="mt5 glyphicon glyphicon-remove close_icon"></i></button>
-                    <button type="button" id="<%="view_#{ca.id}"%>" class="btn btn-success ca_btn" aria-label="Corrective_Action" onclick="go_to_ca(<%=ca.id%>)">View</button></td>
-                    <%=hidden_field_tag "destroy_#{ca.id}", :value=>0%>
+                    <td><%=text_field_tag "dueDate",ca.due_date,{:name=>"dueDate_#{ca.id}",:class=>"form-control required_field field-date",'data-format' => CONFIG.getTimeFormat[:datepicker]}%></td>
+                    <td><%=select_tag "department_#{ca.id}",options_for_select(@department,ca.department),:include_blank=>true,:class=>"form-control required_field"%></td>
+                    <td width=20%><%=text_field_tag "description",ca.description,:name=>"description_#{ca.id}",:class=>"form-control"%></td>
+                    <td><%=text_field_tag "designee",ca.designee,{:name=>"designee_#{ca.id}",:list => "designee",:class=>"form-control required_field","data-id" => "designee"}%></td>
+                    <td><%=text_field_tag "action",ca.action,{:name=>"action_#{ca.id}",:list => "action",:class=>"form-control required_field","data-id" => "action"}%></td>
+                    <td><button type="button" id="<%="view_#{ca.id}"%>" class="btn btn-success ca_btn" aria-label="Corrective_Action" onclick="go_to_ca(<%=ca.id%>)">View</button></td>
                   </tr>
                 <%else%>
                   <tr>
                     <td><%=ca.due_date%></td>
-                    <td width=8%><%=ca.department%></td>
-                    <td><%=ca.description%></td>
-                    <td width=8%><%=ca.designee%></td>
-                    <td width=8%><%=ca.action%></td>
+                    <td><%=ca.department%></td>
+                    <td width=20%><%=ca.description%></td>
+                    <td><%=ca.designee%></td>
+                    <td><%=ca.action%></td>
                     <td></td>
                   </tr>
                 <%end%>
@@ -54,6 +66,9 @@
 </div>
 
 <style>
+  .datepicker {
+    z-index: 1200 !important;
+  }
   .close_btn {
     color: red;
     font-size: 23px;
@@ -126,4 +141,10 @@
       return result;
     }
   });
+
+  $('.field-date').flatpickr({
+        altInput: true,
+        altFormat: 'Y-m-d',
+        dateFormat: 'Y-m-d',
+      });
 </script>
