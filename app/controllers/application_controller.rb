@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   def index
-    @object_name = params[:type] || controller_name.classify
+    @object_name = controller_name.classify
     @table_name = controller_name
 
     @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
