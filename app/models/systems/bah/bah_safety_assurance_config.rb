@@ -15,17 +15,17 @@ class BAHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           },
           ntsb: {
             field: 'ntsb', title: 'NTSB Reportable',
-            num_cols: 6, type: 'boolean_box', visible: '',
+            num_cols: 6, type: 'boolean_box', visible: 'none',
             required: false
           },
           safety_hazard: {
             field: 'safety_hazard', title: 'Safety Hazard',
-            num_cols: 6, type: 'boolean_box', visible: '',
+            num_cols: 6, type: 'boolean_box', visible: 'none',
             required: false
           },
           containment: {
             field: 'containment', title: 'Containment',
-            num_cols: 12, type: 'textarea', visible: '',
+            num_cols: 12, type: 'textarea', visible: 'none',
             required: false
           },
         }
@@ -36,16 +36,16 @@ class BAHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             options: "CONFIG.custom_options['Operator/Organization']"
           },
           supplier: {
-            visible: '',
+            visible: 'none',
           },
           vendor: {
-            visible: '',
+            visible: 'none',
           },
           process: {
-            visible: ''
+            visible: 'none'
           },
           station_code: {
-            visible: '',
+            visible: 'none',
           },
         },
         actions: {
@@ -77,20 +77,26 @@ class BAHSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
             options: "CONFIG.custom_options['Operator/Organization']"
           },
           emp: {
-            visible: ''
+            visible: 'none'
           },
           dep: {
-            visible: ''
+            visible: 'none'
           },
           immediate_action: {
-            visible: ''
+            visible: 'none'
           },
           comprehensive_action: {
-            visible: ''
+            visible: 'none'
           },
           comprehensive_action_comment: {
-            visible: ''
+            visible: 'none'
           },
+          risk_factor: {
+            visible: 'none'
+          },
+          risk_factor_after: {
+            visible: 'none'
+          }
         }
       },
       'Finding' => {

@@ -37,7 +37,7 @@
 
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
 
-          <% unless ['BSK'].include? AIRLINE_CODE %>
+          <% unless ['BSK', 'BAH'].include? AIRLINE_CODE %>
             <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', f: f, risk_type: 'Baseline'%>
           <% end %>
 
