@@ -180,11 +180,4 @@ class Im < Sim::ImplementationManagementBase
     end
   end
 
-  def open_checklist
-    self.items.each do |i|
-      i.status="Open"
-      i.save
-    end
-  end
-
 end

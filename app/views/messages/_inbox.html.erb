@@ -29,7 +29,7 @@
   <div class="panel-body">
     <div id="view_dialog"></div>
     <div id="current_message">
-      <%if @message.owner.class.name == "VpMeeting" || @message.owner.class.name == "JobMeeting" %>
+      <%if %w[VpMeeting JobMeeting].include? @message.owner.class.name %>
         <% @message.owner = @message.owner.becomes(SmsMeeting) %>
       <% end %>
       <%=render "message", :message => @message%>
