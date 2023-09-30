@@ -125,24 +125,28 @@ class ImsController < ApplicationController
           )
           im.date_complete=Time.now.to_date
           im.save
-          notify(im,
-            notice: {
-              users_id: im.evaluator.id,
-              content: "IM Plan ##{im.get_id} has been approved by the preliminary reviewer"},
-            mailer: true,
-            subject: 'IM Plan Approved')
+          if im.evaluator.present?
+            notify(im,
+              notice: {
+                users_id: im.evaluator.id,
+                content: "IM Plan ##{im.get_id} has been approved by the preliminary reviewer"},
+              mailer: true,
+              subject: 'IM Plan Approved')
+          end
         elsif old_status == "Pending Review" && new_status == "Open"
           Transaction.build_for(
             im,
             'Rejected',
             current_user.id
           )
-          notify(im,
-            notice: {
-              users_id: im.evaluator.id,
-              content: "IM Plan ##{im.get_id} has been rejected by the preliminary reviewer"},
-            mailer: true,
-            subject: 'IM Plan Rejected')
+          if im.evaluator.present?
+            notify(im,
+              notice: {
+                users_id: im.evaluator.id,
+                content: "IM Plan ##{im.get_id} has been rejected by the preliminary reviewer"},
+              mailer: true,
+              subject: 'IM Plan Rejected')
+          end
         end
       end
       redirect_to im_path(im), flash: {success: alert}
@@ -273,12 +277,14 @@ class ImsController < ApplicationController
         'Pending Review',
         current_user.id
       )
-      notify(im,
-        notice: {
-          users_id: im.evaluator.id,
-          content: "IM Plan ##{im.get_id} needs your review"},
-        mailer: true,
-        subject: 'IM Plan Pending Review')
+      if im.evaluator.present?
+        notify(im,
+          notice: {
+            users_id: im.evaluator.id,
+            content: "IM Plan ##{im.get_id} needs your review"},
+          mailer: true,
+          subject: 'IM Plan Pending Review')
+      end
       im.status="Pending Review"
       im.save
     else

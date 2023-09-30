@@ -39,13 +39,6 @@ class Im < Sim::ImplementationManagementBase
   end
 
 
-  def completable
-    result=true
-    self.items.each{|x| result=result&&x.status=="Completed"}
-    result
-  end
-
-
   def self.get_terms
     {
       "Status"=>"status",

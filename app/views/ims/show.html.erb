@@ -49,7 +49,7 @@
               <%if @im.type=="FrameworkIm" && @im.status=="New"%>
                 <%=link_to "Transition to VP/Part 5",transit_im_path(@im),:class=>'btn btn-info pull-right mr5 mb5' %>
               <%end%>
-              <%if @im.status == "Open" && (@im.lead_evaluator==current_user.id || !@im.lead_evaluator.present?) && @im.completable%>
+              <%if @im.status == "Open" && (@im.lead_evaluator==current_user.id || !@im.lead_evaluator.present?)%>
                 <%=link_to "Complete",complete_im_path(@im),:class=>"btn btn-warning pull-right mr5 mb5"%>
               <%end%>
 
