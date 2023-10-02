@@ -814,7 +814,11 @@ module QueriesHelper
 
 
   def generate_nested_string(condition)
-    "(#{condition.query_conditions.map{|cond| cond.operator.present? ? generate_nested_string(cond) : "C#{cond.id}C"}.join(" #{condition.operator} ")})"
+    inner_string = condition.query_conditions.map{|cond| cond.operator.present? ? generate_nested_string(cond) : "C#{cond.id}C"}.join(" #{condition.operator} ")
+    if inner_string.blank?
+      inner_string = "[]"
+    end
+    "(#{inner_string})"
   end
 
 
