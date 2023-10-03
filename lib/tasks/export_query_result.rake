@@ -50,13 +50,16 @@ def get_visualizations_json(owner)
   query_result_visualizations = []
   records_ids = @records.map {|record| record.id}
   owner.visualizations.each do |visualization|
-    data = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids) #get_data
-    if visualization.series.present?
-      data[0].shift
-    else
-      data.shift
+    begin
+      data = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids) #get_data
+      if visualization.series.present?
+        data[0].shift
+      else
+        data.shift
+      end
+      query_result_visualizations << get_visualization_json(data, visualization)
+    rescue
     end
-    query_result_visualizations << get_visualization_json(data, visualization)
   end
 
   query_result_visualizations
@@ -69,6 +72,8 @@ desc 'Export the query result as JSON'
 task export_query_result: :environment do
   include ApplicationHelper
   include QueriesHelper
+  logger = Logger.new("log/export_query_result_json.log")
+  logger.info "[#{Time.now}] Running"
 
   #------------------------------#
   host = ""
@@ -83,10 +88,9 @@ task export_query_result: :environment do
   #------------------------------#
 
   all_queries_result = {}
-  logger = Logger.new("log/export_query_benchmark.log")
   @query_fields = Query.get_meta_fields('show')
   Query.all.select { |query| query.is_ready_to_export }.each do |query|
-    puts " Query ##{query.id}"
+    logger.info " Query ##{query.id}"
 
     query_result = {
       query_detail: {},
