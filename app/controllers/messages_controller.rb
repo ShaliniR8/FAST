@@ -216,6 +216,9 @@ class MessagesController < ApplicationController
   def inbox
     @title = params[:source]
     @message = Message.find(params[:id])
+    if %w[VpIm JobAid].include? @message.owner.class.name
+      @message.owner = @message.owner.becomes(Im)
+    end
     @report_link = get_message_link(@message.owner_type, @message.owner_id)
     mark_as_read(current_user.id, @message.id)
     render :partial => 'inbox'
