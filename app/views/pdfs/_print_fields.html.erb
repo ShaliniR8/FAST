@@ -122,6 +122,9 @@
               <%end%>
             </div>
           <%else%>
+            <% if field[:field] == "get_source" %>
+              <%value = ActionView::Base.full_sanitizer.sanitize(value) %>
+            <% end %>
             <div class="col-xs-<%=field[:num_cols]%>">
               <b><%=field[:title]%>: </b>
               <%=value%>
