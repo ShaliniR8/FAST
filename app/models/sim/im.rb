@@ -14,10 +14,9 @@ class Im < Sim::ImplementationManagementBase
   belongs_to :reviewer,       foreign_key:"pre_reviewer",     class_name:"User"
   has_many :expectations,     foreign_key:"owner_id",         class_name:"FrameworkExpectation",  :dependent => :destroy
   has_many :items,            foreign_key:'owner_id',         class_name:"ChecklistItem",         :dependent => :destroy
+  has_many :checklists, as: :owner, dependent: :destroy
 
   accepts_nested_attributes_for :expectations
-  accepts_nested_attributes_for :items
-
 
   after_create :create_transaction
 

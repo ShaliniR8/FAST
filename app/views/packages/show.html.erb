@@ -26,12 +26,12 @@
             <%if @package.meeting.present?%>
               <%=link_to "View Meeting",sms_meeting_path(@package.meeting),:class=>"btn btn-info mr5 pull-right mb5"%>
             <%end%>
-            <%if @package.class.display_name == "VP/Part 5 IM Package" && @package.item.present? && @package.item.im.present?%>
-              <%=link_to "View VP/Part 5 IM", im_path(@package.item.im),:class=>"btn btn-info mr5 pull-right mb5"%>
-            <%elsif @package.class.display_name == "Job Aid Package"  && @package.item.present? && @package.item.im.present?%>
-              <%=link_to "View Job Aid", im_path(@package.item.im),:class=>"btn btn-info mr5 pull-right mb5"%>
-            <%elsif @package.class.display_name == "Framework IM Package" && @package.item.present? && @package.item.im.present?%>
-              <%=link_to "View Framework IM", im_path(@package.item.im),:class=>"btn btn-info mr5 pull-right mb5"%>
+            <%if @package.class.display_name == "VP/Part 5 IM Package" && @package.item.present? && @package.item.checklist.present? && @package.item.checklist.owner.present?%>
+              <%=link_to "View VP/Part 5 IM", im_path(@package.item.checklist.owner),:class=>"btn btn-info mr5 pull-right mb5"%>
+            <%elsif @package.class.display_name == "Job Aid Package"  && @package.item.present? && @package.item.checklist.present? && @package.item.checklist.owner.present?%>
+              <%=link_to "View Job Aid", im_path(@package.item.checklist.owner),:class=>"btn btn-info mr5 pull-right mb5"%>
+            <%elsif @package.class.display_name == "Framework IM Package" && @package.item.present? && @package.item.checklist.present? && @package.item.checklist.owner.present?%>
+              <%=link_to "View Framework IM", im_path(@package.item.checklist.owner),:class=>"btn btn-info mr5 pull-right mb5"%>
             <%end%>
             <%=link_to "Send Message",new_message_path(:link=>package_path(@package), :link_type=>"Package", :link_id=>@package.id),:class=>"btn btn-warning pull-right mr5 mb5"%>
             <%=link_to "Expand All","#",:class=>"btn btn-warning mr5 expandall pull-right mb5"%>
@@ -71,21 +71,8 @@
           <%end%>
 
           <%if @package.item.present?%>
-            <div class="col-xs-12 col-lg-12 mt5"%>
-              <div class="panel panel-info">
-                <div class="panel-heading click-heading collapsed">
-                  <div class="panel-title">
-                    <b>Expectation: <%=@package.item.title%></b><span class="pull-right clickable"><i class="mt5 glyphicon glyphicon-chevron-down"></i></span>
-                  </div>
-                </div>
-                <div class="panel-body mt5" style="display:none">
-                  <div class="row">
-                    <%=render "expectation",:item=>@package.item%>
-                  </div>
-                </div>
-              </div>
-            </div>
           <%end%>
+          <%=render "panels/checklists",:checklist=>@package.item.checklist, :checklist_row=>@package.item %>
           <%if @package.sms_agendas.present?%>
             <%=render "agendas"%>
           <%end%>

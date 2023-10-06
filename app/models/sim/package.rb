@@ -4,6 +4,8 @@ class Package < ActiveRecord::Base
 #Concern List
   include Attachmentable
   include Transactionable
+  include Parentable
+  include Childable
   include Noticeable
 
 #Associations List

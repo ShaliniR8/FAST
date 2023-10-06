@@ -36,17 +36,6 @@ body {
         <%if @package.responsibility.present?%><b>Responsibility: </b></br><%=@package.responsibility.gsub(/\n/, '<br/>').html_safe%></br><%end%>
         <%if @package.comment.present?%><b>Evaluator Comment: </b></br><%=@package.comment.gsub(/\n/, '<br/>').html_safe%></br><%end%>
 
-        <%if @package.item.present?%>
-            <div class="category">
-                <h5>Expectation: <%=@package.item.title%></h5>
-                <b>Status: </b><%=@package.item.status%></br>
-                <b>Department: </b><%=@package.item.department%></br>
-                <b>Reference Number: </b><%=@package.item.reference_number%></br>
-                <b>Level of Compliance:</b><%=@package.item.level_of_compliance%></br>
-                <b>Requirement:</b><%=@package.item.requirement%></br>
-                <b>Comment :</b><%=@package.item.comment%></br>
-            </div>
-        <%end%>
 
         <%if @package.meeting.present?%>
             <div class="category">

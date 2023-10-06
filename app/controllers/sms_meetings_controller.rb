@@ -19,6 +19,12 @@ if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR == 0 && RUBY_VERSION >= "
 end
 class SmsMeetingsController < ApplicationController
   before_filter :set_table_name,:login_required
+  before_filter :define_owner, only: [:interpret]
+
+  def define_owner
+    @class = Object.const_get('Meeting')
+    @owner = Meeting.find(params[:id]).becomes(Meeting)
+  end
 
   def destroy
     @meeting=Meeting.find(params[:id])
@@ -60,9 +66,8 @@ class SmsMeetingsController < ApplicationController
       x.save
     end
 
-
-    redirect_to sms_meetings_path(:type=>@meeting.type), flash: {danger: "Meeting ##{params[:id]} deleted."}
     @meeting.destroy
+    redirect_to sms_meetings_path(:type=>@meeting.type), flash: {danger: "Meeting ##{params[:id]} deleted."}
     #redirect_to meetings_path
 
   end
@@ -274,6 +279,7 @@ class SmsMeetingsController < ApplicationController
     @headers=User.invite_headers
     @users=User.find(:all) - [@meeting.host.user]
     @users.keep_if{|u| !u.disable && u.has_access("meetings", "index")}
+    @available_participants = User.preload(:invitations).where(id: @users.map(&:id)).active
     @timezones=Meeting.get_timezones
     @package_headers = Package.get_headers
     @packages = @meeting.packages+ Package.where("status = 'Open'")

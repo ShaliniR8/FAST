@@ -33,7 +33,7 @@ class MessagesController < ApplicationController
       @owner = @reply_to.owner
     end
     @owner ||= Object.const_get(params[:owner_class]).find(params[:owner_id]) rescue nil
-    if @owner.class.name == "VpIm"
+    if %w[VpIm JobAid].include? @owner.class.name
       @owner = @owner.becomes(Im)
     end
     @send_to = params[:send_to].present? ? params[:send_to].to_i : -1
@@ -111,7 +111,7 @@ class MessagesController < ApplicationController
 
     respond_to do |format|
       redirect_object = @message.owner
-      if @message.owner.present? && @message.owner.class.name == 'VpIm'
+      if @message.owner.present? && (@message.owner.class.name == 'VpIm' || @message.owner.class.name == 'JobAid')
         redirect_object = @message.owner.becomes(Im)
       end
       format.json {render json: {message: 'Message sent.'}}
@@ -216,6 +216,9 @@ class MessagesController < ApplicationController
   def inbox
     @title = params[:source]
     @message = Message.find(params[:id])
+    if %w[VpIm JobAid].include? @message.owner.class.name
+      @message.owner = @message.owner.becomes(Im)
+    end
     @report_link = get_message_link(@message.owner_type, @message.owner_id)
     mark_as_read(current_user.id, @message.id)
     render :partial => 'inbox'

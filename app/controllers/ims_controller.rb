@@ -97,7 +97,7 @@ class ImsController < ApplicationController
 
   def show
     @im = Im.find(params[:id])
-    @checklist_headers = Object.const_get(@im.type + 'Item').get_headers
+    @checklist_headers = Object.const_get(@im.type).get_headers
   end
 
   def edit
@@ -252,14 +252,14 @@ class ImsController < ApplicationController
 
   def new_package
     @im=Im.find(params[:id])
-    @item=ChecklistItem.find(params[:item_id])
+    @item=ChecklistRow.find(params[:item_id])
     @package=Object.const_get(@im.type+"Package").new
     @fields=Package.get_fields
       render :partial=>"new_package"
   end
 
   def show_package
-    @item=ChecklistItem.find(params[:item_id])
+    @item=ChecklistRow.find(params[:item_id])
     @headers=Package.get_headers
     render :partial=>"show_package"
   end

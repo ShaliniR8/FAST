@@ -56,6 +56,10 @@ class ChecklistsController < ApplicationController
       create_audit_from_checklist(params, true)
     else
       @owner = Object.const_get("#{params[:checklist][:owner_type]}").find(params[:checklist][:owner_id])
+      if %w[VpIm JobAid].include? @owner.class.name
+        @owner = @owner.becomes(Im)
+        params[:checklist][:owner_type] = 'Im'
+      end
       @record = @table.create(params[:checklist])
 
       if params[:checklist][:owner_type] == 'ChecklistHeader'
@@ -343,6 +347,9 @@ class ChecklistsController < ApplicationController
           AccessControl.where(entry: @record[:title]).update_all(entry: updated_name)
         end
         @record.update_attributes(params[:checklist])
+        if @record.owner.present? && (%w[VpIm JobAid].include? @record.owner.class.name)
+          @record.owner = @record.owner.becomes(Im)
+        end
         redirect_to @record.owner_type == 'ChecklistHeader' ? @record : @record.owner rescue redirect_to @record.owner.owner
       end
     end
@@ -421,6 +428,10 @@ class ChecklistsController < ApplicationController
   def destroy
     checklist = @table.preload(:checklist_rows => :checklist_cells).find(params[:id])
     owner = checklist.owner
+    if %w[VpIm JobAid].include? owner.class.name
+      owner = owner.becomes(Im)
+    end
+
     checklist_name = checklist.title
     AccessControl.where(entry: checklist_name).map(&:destroy) if checklist.owner_type == 'ChecklistHeader'
     checklist.destroy
