@@ -1,8 +1,64 @@
 class VersionDictionary
   VERSIONS = [
     {
-      title: 'Version 1.2.14',
+      title: 'Version 1.2.17',
       tag: 'New',
+      toggle: 'v1_2_17',
+      date: '10/10/2023',
+      sections: {
+        'What\'s New' => [
+          'Enabled event date de-identification',
+          'Introduced access control condition for OSHA module access',
+          'Added drag and drop functionality for editing rows in the Checklist Template',
+          'Updated Checklist Feature in IM Module and modified SMS IM Meetings to resemble SR Meetings',
+        ],
+        'Optimizations & Fixes' => [
+          'Addressed fixes for CISP integration',
+          'Fixed the "View Parent" error on some pages',
+          'Resolved the issue with Inbox messages not being visible',
+          'Fixed the issue with displaying full root causes in Query Center and other listing pages'
+        ]
+      }
+    },
+    {
+      title: 'Version 1.2.16',
+      toggle: 'v1_2_16',
+      date: '06/15/2023',
+      sections: {
+        'What\'s New' => [
+          'Added OSHA module',
+          'Introduced user filtering features',
+          'Included workflow diagrams and added additional instructions throught the system',
+          'Implemented de-identification of information in Transactions',
+        ],
+        'Optimizations & Fixes' => [
+          'Addressed issues with pinned visualizations on the dashboard',
+          'Fixed issue with FAA Report Word Export',
+          'Corrected notices displayed on the wrong modules'
+        ]
+      }
+    },
+    {
+      title: 'Version 1.2.15',
+      toggle: 'v1_2_15',
+      date: '03/20/2023',
+      sections: {
+        'What\'s New' => [
+          'Introduced the ability to pin visualizations on respective dashboard modules',
+          'Implemented feature to upload and export SR templates as YAML files',
+          'Moved the acknowledgment checkbox from the newsletter attachment panel to the newsletter attachment preview box',
+          'Enabled the addition of thresholds to Query Visualizations and the sending of threshold alerts to selected distribution groups',
+        ],
+        'Optimizations & Fixes' => [
+          'Optimized the ASAP Library',
+          'Fixed the "Make a copy" feature for templates with missing fields',
+          'Corrected the risk register matrix colors',
+          'Increased the PDF preview height in some places',
+        ]
+      }
+    },
+    {
+      title: 'Version 1.2.14',
       toggle: 'v1_2_14',
       date: '12/15/2022',
       sections: {
