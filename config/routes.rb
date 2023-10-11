@@ -737,6 +737,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'mitigate'
       get 'baseline'
       get 'carryover'
+      get "carryover_another_meeting"
+      post "carryover_to_another_meeting"
       get "new_minutes"
       get 'reopen'
       get 'new_hazard'
@@ -756,6 +758,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'add_record'
       get 'remove_record'
       put 'ajax_update'
+      get "add_meeting"
+      post "add_meeting_minutes"
     end
     collection do
       post 'load_records'
@@ -854,6 +858,7 @@ PrdgSession::Application.routes.draw do |map|
       post 'sras'
       get "reopen"
       get 'override_status'
+      post "save_agenda"
     end
     collection do
     end

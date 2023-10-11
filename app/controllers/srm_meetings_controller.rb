@@ -162,6 +162,74 @@ class SrmMeetingsController < ApplicationController
     @owner = SrmMeeting.find(params[:id]).becomes(SrmMeeting)
     render :partial => '/forms/workflow_forms/override_status'
   end
+
+  def save_agenda
+    @meeting = SrmMeeting.find(params[:id])
+    @sra_headers = Sra.get_meta_fields('index')
+    update_hash = Hash.new
+    deleted_agenda_ids = []
+    params.each do |key, value|
+      if ["authenticity_token", "event_id", "user_id"].exclude?(key)
+        key_parts = key.split('_')
+        if key_parts.length == 2
+          agenda_id = key_parts[1].to_i rescue 0
+          if agenda_id > 0
+            if !update_hash.key?(agenda_id)
+              update_hash[agenda_id] = Hash.new
+            end
+            if key_parts[0] == 'destroy'
+              if eval(value) == true
+                deleted_agenda_ids << agenda_id
+              end
+            else
+              update_hash[agenda_id][key_parts[0].to_sym] = value
+            end
+            if key_parts[0] == 'discussion'
+              if value == "true"
+                update_hash[agenda_id][key_parts[0].to_sym] = 1
+              else
+                update_hash[agenda_id][key_parts[0].to_sym] = 0
+              end
+            end
+          end
+        end
+      end
+    end
+    deleted_agenda_ids.each do |a_id|
+      ag = SrmAgenda.find(a_id)
+      if ag.present?
+        update_hash.delete(a_id)
+        ag.destroy
+      end
+    end
+
+    update_hash.each do |k, v|
+      ag = SrmAgenda.find(k) rescue nil
+      if ag.nil?
+        v[:user_id] = params[:user_id]
+        v[:event_id] = params[:event_id]
+        v[:owner_id] = params[:id]
+        v[:type] = "SrmAgenda"
+        SrmAgenda.create(v)
+      else
+        ag.update_attributes(v)
+      end
+    end
+    @meeting = SrmMeeting.find(params[:id])
+    @sras = @meeting.sras.sort_by{|x| x.id}
+
+    Transaction.build_for(
+      @meeting,
+      "Save SrmAgenda",
+      current_user.id,
+      "SRA ##{params[:event_id]}"
+    )
+
+    respond_to do |format|
+      format.js
+    end
+
+  end
   
 
   def update
@@ -352,7 +420,7 @@ class SrmMeetingsController < ApplicationController
 
   def sras
     meeting = Meeting.find(params[:id])
-    if params[:sras].present?
+    if params[:sras].present? 
       params[:sras].each do |sid|
         sra = Sra.find(sid)
         sra.meeting_id = meeting.id

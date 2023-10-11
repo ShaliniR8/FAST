@@ -51,21 +51,21 @@
                 :id => 'close',
                 "data-toggle" => "modal",
                 "data-target" => ".bs-example-modal-lg"%>
-              <%=link_to "Add SRAs","#",
-                :class=>"btn btn-success pull-right mr5 mb5",
-                :id=>"sra_btn",
-                "data-toggle"=>"modal",
-                "data-target"=>".bs-example-modal-lg"%>
               <%=link_to "Add Comment","#",
                 :class=>"btn btn-success pull-right mr5 mb5",
                 :id=>'comment_btn',
+                "data-toggle"=>"modal",
+                "data-target"=>".bs-example-modal-lg"%>
+              <%=link_to "Add SRAs","#",
+                :class=>"btn btn-success pull-right mr5 mb5",
+                :id=>"sra_btn",
                 "data-toggle"=>"modal",
                 "data-target"=>".bs-example-modal-lg"%>
 
             <%elsif @meeting.status == "Closed"%>
               <%=link_to "Reopen Meeting",
                 reopen_srm_meeting_path(@meeting),
-                :class=>"btn btn-warning pull-right mr5 mb5",
+                :class=>"btn btn-success pull-right mr5 mb5",
                 :confirm => "Are you sure?",
                 :disable_with => "Reopening..."%>
             <%end%>
@@ -96,8 +96,8 @@
           </div>
         </div>
 
-        <div class="col-xs-12">
-          <%=render "sras"%>
+        <div id="included_sras" class="col-xs-12">
+          <%=render "sras" , sra_headers: @sra_headers, meeting: @meeting %>
         </div>
 
         <%=render "/forms/show_comment",:owner=>@meeting%>
@@ -144,6 +144,15 @@
 <%=render "access_controls/new_modal"%>
 
 <script>
+  function delete_sra(sra_id, meeting_id, btn)
+  {
+    var result = confirm("Are you sure?");
+    if(result){
+      $.get("/sras/" + sra_id + "/carryover?meeting_id=" + meeting_id, function(data){
+        $(btn).closest('tr').hide();
+      });
+    }
+  }
   function delete_report(report_id,btn)
   {
     $.get("/reports/"+report_id+"/carryover",function(data){

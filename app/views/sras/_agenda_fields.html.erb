@@ -1,12 +1,24 @@
 <tr>
-  <td><%=f.text_field :title,:class=>"form-control"%></td>
-  <td><%=f.select :status,options_for_select(@status),{:include_blank=>""},:class=>"form-control"%></td>
+  <td><%= text_field_tag "title", "", :class=>"form-control agenda_title" %></td>
+  <td> <%= select_tag "status", options_for_select(@status), :include_blank => "", :class=>"form-control agenda_status" %> </td>
   <td><%=current_user.full_name%></td>
   <td><%=Time.now.strftime("%Y-%m-%d %H:%M")%></td>
   <td><%=Time.now.strftime("%Y-%m-%d %H:%M")%></td>
-  <td><%=f.select :discussion,options_for_select(@tof),{:include_blank=>""},:class=>"form-control"%></td>
-  <td><%=f.select :accepted,options_for_select(@accept_deline),{:include_blank=>""},:class=>"form-control"%></td>
-  <%=f.hidden_field :event_id,:value=>@sra.id%>
-  <%=f.hidden_field :user_id,:value=>current_user.id%>
-  <td><%=f.text_area :comment,:rows=>"2",:class=>"form-control"%></td>
+  <td><%=select_tag "discussion",options_for_select(@tof), :include_blank => "",:class=>"form-control agenda_discussion"%></td>
+  <td><%=select_tag "accepted", options_for_select(@accept_deline), :include_blank => "", :class => "form-control agenda_accepted"%></td>
+  <%=hidden_field_tag 'event_id', value="#{@sra.id}"%>
+  <%=hidden_field_tag 'user_id', value="#{current_user.id}"%>
+  <td> <%= text_area_tag "comment", "", :rows=>"2", :class=>"form_control agenda_comment"%> </td>
 </tr>
+
+
+<script type="text/javascript">
+ $(document).ready(function(){
+  timestamp = Date.now()
+  $(".agenda_title").last().attr('name',"title_"+timestamp)
+  $(".agenda_status").last().attr('name',"status_"+timestamp)
+  $(".agenda_discussion").last().attr('name',"discussion_"+timestamp)
+  $(".agenda_accepted").last().attr('name',"accepted_"+timestamp)
+  $(".agenda_comment").last().attr('name',"comment_"+timestamp)
+ });
+</script>
