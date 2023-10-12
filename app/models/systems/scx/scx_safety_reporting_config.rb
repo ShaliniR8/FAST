@@ -12,6 +12,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
     show_pdf_column_scoreboard: true,
     add_corrective_action_in_meeting: true,
     # Airline-Specific Features:
+    attach_pdf_submission:     'deid',
   })
 
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
