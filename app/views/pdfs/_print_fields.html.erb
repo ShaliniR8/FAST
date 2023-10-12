@@ -122,7 +122,7 @@
               <%end%>
             </div>
           <%else%>
-            <% if field[:field] == "get_source" %>
+            <% if (value.is_a? String) && (value.include? "</a>") %>
               <%value = ActionView::Base.full_sanitizer.sanitize(value) %>
             <% end %>
             <div class="col-xs-<%=field[:num_cols]%>">

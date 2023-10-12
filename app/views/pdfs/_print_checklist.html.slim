@@ -38,4 +38,5 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
               br
         td
           - unless checklist_row.is_header? || owner.nil?
-            = checklist_row.display_findings
+            - value = checklist_row.display_findings
+            = ActionView::Base.full_sanitizer.sanitize(value)
