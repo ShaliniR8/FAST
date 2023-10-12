@@ -37,7 +37,7 @@
                     <td><%=text_field_tag "dueDate",ca.due_date,{:name=>"dueDate_#{ca.id}",:class=>"form-control required_field field-date",'data-format' => CONFIG.getTimeFormat[:datepicker]}%></td>
                     <td><%=select_tag "department_#{ca.id}",options_for_select(@department,ca.department),:include_blank=>true,:class=>"form-control required_field"%></td>
                     <td width=20%><%=text_field_tag "description",ca.description,:name=>"description_#{ca.id}",:class=>"form-control"%></td>
-                    <td><%=text_field_tag "designee",ca.designee,{:name=>"designee_#{ca.id}",:list => "designee",:class=>"form-control required_field","data-id" => "designee"}%></td>
+                    <td><%=text_field_tag "designee",ca.designee,{:name=>"designee_#{ca.id}",:list => "designee",:class=>"form-control","data-id" => "designee"}%></td>
                     <td><%=text_field_tag "action",ca.action,{:name=>"action_#{ca.id}",:list => "action",:class=>"form-control required_field","data-id" => "action"}%></td>
                     <td><button type="button" id="<%="view_#{ca.id}"%>" class="btn btn-success ca_btn" aria-label="Corrective_Action" onclick="go_to_ca(<%=ca.id%>)">View</button></td>
                   </tr>
