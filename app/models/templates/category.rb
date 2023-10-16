@@ -163,14 +163,14 @@ class Category < ActiveRecord::Base
 		end
 	end
 
-	def self.toJson(template_id)
+	def self.to_json(template_id)
 		categories = self.where(templates_id: template_id)
 		jsons = []
     excluded_fields = ["id", "created_at", "updated_at", "templates_id"]
 		categories.each do |category|
 			category_id = category.id
 			category_json = JSON.parse(category.to_json).except(*excluded_fields)
-			field_jsons = Field.toJson(category_id)
+			field_jsons = Field.to_json(category_id)
 			category_json[:Field] = field_jsons
 			jsons << category_json
 		end

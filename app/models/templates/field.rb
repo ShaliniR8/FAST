@@ -267,7 +267,7 @@ class Field < ActiveRecord::Base
     json == {} ? nil : json
   end
 
-  def self.toJson(category_id)
+  def self.to_json(category_id)
     fields = self.where(categories_id: category_id)
 		jsons = []
     excluded_fields = ["id", "created_at", "updated_at", "categories_id", "nested_field_id", "nested_field_value"]

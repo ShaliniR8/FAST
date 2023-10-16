@@ -692,7 +692,7 @@ module ApplicationHelper
     func = "add_fields(this, '#{association}', '#{escape_javascript(fields)}', '#{target}')"
     if association.to_s == "checklist_rows"
         func = "add_fields(this, '#{association}', '#{escape_javascript(fields)};', '#{target}');update_row_order_checklist_row('table-view-#{@record.id}');"
-    end  
+    end
     link_to_function name,
       func,
       **linkOptions
@@ -987,7 +987,6 @@ module ApplicationHelper
                                                                  records_ids: records_ids,
                                                                  get_ids: false,
                                                                  query: query)
-
     elsif x_axis.present?
       data = get_data_table_for_google_visualization_sql(x_axis_field_arr: x_axis_field, records_ids: records_ids, query: query)
       data << ['N/A', 0] if data.length == 1
