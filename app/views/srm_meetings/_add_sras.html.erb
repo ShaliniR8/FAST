@@ -48,6 +48,12 @@
   $(document).ready(function(){
     var dt = $("#sras_table").DataTable();
 
+    $("#add_sras_table").DataTable({
+      destroy: true,
+      "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
+      "iDisplayLength": 5
+    });
+
     $("#add_sras_table").on('click', '.add_sra_btn', function(){
         var tr = $(this).closest('tr')
         $.get("/sras/"+$(this).closest('tr').attr('pid')+"/add_meeting?meeting=<%=@meeting.id%>", function(data){
