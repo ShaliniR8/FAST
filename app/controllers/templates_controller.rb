@@ -96,6 +96,17 @@ class TemplatesController < ApplicationController
 
 
   def create
+    if params[:template][:categories_attributes].present?
+      params[:template][:categories_attributes].each do |id, cat|
+        if cat[:fields_attributes].present?
+          cat[:fields_attributes].each do |id, field|
+            options = field[:options]
+            options = options.split("\;").map{|opt| opt.strip}
+            field[:options] = options.join("\;")
+          end
+        end
+      end
+    end
     @template=Template.new(params[:template])
     @template.created_by=current_user;
     if @template.save
@@ -178,6 +189,11 @@ class TemplatesController < ApplicationController
             end
             if !pfld[:show_label].present?
               pfld[:show_label] = false
+            end
+            if pfld[:options].present?
+              options = pfld[:options]
+              options = options.split("\;").map{|opt| opt.strip}
+              pfld[:options] = options.join("\;")
             end
           end
         end
