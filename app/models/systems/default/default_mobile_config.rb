@@ -79,7 +79,6 @@ class DefaultMobileConfig
 
     #JED Portals
     jed_dir: { label: 'Login with ProSafeT', subdomain: 'jed' },
-    jed_sso: { label: 'Login with JED', subdomain: 'jed', sso: true},
 
     #RZN(Gridiron) Portals
     rzn_dir: { label: 'Login with ProSafeT', subdomain: 'gridiron' },
@@ -257,7 +256,6 @@ class DefaultMobileConfig
     key_name: 'King Abdulaziz International Airport',
     portals: %i[
       jed_dir
-      jed_sso
     ]
     },
 
