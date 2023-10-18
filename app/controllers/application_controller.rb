@@ -632,6 +632,9 @@ class ApplicationController < ActionController::Base
   end
 
   def get_recommendation_owner(rec)
+    if rec.owner_type.nil?
+      return ""
+    end
     case rec.owner_type
     when 'Finding'
       return rec.owner.get_owner
