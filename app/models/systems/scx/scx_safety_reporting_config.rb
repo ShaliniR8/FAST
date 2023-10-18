@@ -223,7 +223,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
           department: {
             field: 'department', title: 'Department',
             num_cols: 6,  type: 'select', visible: 'form,show',
-            required: false, options: "CONFIG.custom_options['Departments']"
+            required: true, options: "CONFIG.custom_options['Departments']"
           },
           responsible_user: { default: true, on_newline: true }, # for form and show
           approver: { default: true },
@@ -270,7 +270,7 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
           action: {
             field: 'action', title: 'Action',
             num_cols: 6,  type: 'datalist', visible: 'index,form,show',
-            required: false, options: "CONFIG.custom_options['Actions List for Corrective Actions']",
+            required: true, options: "CONFIG.custom_options['Actions List for Corrective Actions']",
             on_newline: true # for form and show
           },
           response: {

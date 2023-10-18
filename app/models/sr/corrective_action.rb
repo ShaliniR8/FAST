@@ -167,6 +167,10 @@ class CorrectiveAction < ProsafetBase
     CONFIG.custom_options['Departments']
   end
 
+  def self.get_actions
+    CONFIG.custom_options['Actions List for Corrective Actions']
+  end
+
 
   def get_response
     if self.response.blank?
@@ -212,10 +216,11 @@ class CorrectiveAction < ProsafetBase
 
   def self.get_meeting_headers
     [
-      {:field => :due_date,                 :title => "Scheduled Completion Date"},
-      {:field => :department,               :title => "Department"},
+      {:field => :due_date,                 :title => "Scheduled Completion Date", :required => true},
+      {:field => :department,               :title => "Department", :required => true},
       {:field => "get_description",         :title => "Description"},
       {:field => :designee,                 :title => "Station"},
+      {:field => :action,                   :title => "Action", :required => true},
     ]
   end
 

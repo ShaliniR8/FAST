@@ -710,6 +710,7 @@ class ReportsController < ApplicationController
     @corrective_actions = CorrectiveAction.where(reports_id: @report.id)
     @station = CorrectiveAction.get_designee
     @department = CorrectiveAction.get_departments
+    @action = CorrectiveAction.get_actions
     @headers = CorrectiveAction.get_meeting_headers
     render :partial => "corrective_action"
   end

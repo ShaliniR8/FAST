@@ -24,12 +24,12 @@
           <i class='fa fa-link btn btn-sm btn-info mb5 mr5 ml5'></i>
           <b>View Event </b>- View an Event.
         </td>
-      </tr>
-      <tr>
         <td>
           <i class='glyphicon glyphicon-ok-circle btn-danger btn btn-sm mb5 mr5 ml5'></i>
           <b>Close Event </b>- Close an Event.
         </td>
+      </tr>
+      <tr>
         <td>
           <i class='glyphicon glyphicon-minus btn btn-sm btn-danger mb5 ml5 mr5'></i>
           <b>Remove Event </b>- Remove an Event from the meeting.
@@ -38,16 +38,20 @@
           <i class='glyphicon glyphicon-road btn btn-sm btn-success mb5 ml5 mr5'></i>
           <b>Carryover Event </b>- Carryover an event to another open meeting.
         </td>
-      </tr>
-      <tr>
         <td>
           <i class='glyphicon glyphicon-list btn btn-sm btn-warning mb5 mr5 ml5'></i>
           <b>Agendas </b>- View or add Meeting Agendas
         </td>
+      </tr>
+      <tr>
         <% if CONFIG.sr::GENERAL[:add_corrective_action_in_meeting]%>
           <td>
+            <i class='glyphicon glyphicon-wrench btn btn-sm btn-warning mb5 mr5 ml5' style='color:black'></i>
+            <b>Corrective Actions </b>- View or add Corrective Actions (Corrective Actions Present)
+          </td>
+          <td>
             <i class='glyphicon glyphicon-wrench btn btn-sm btn-warning mb5 mr5 ml5'></i>
-            <b>Corrective Actions </b>- View or add Corrective Actions
+            <b>Corrective Actions </b>- View or add Corrective Actions (No Corrective Actions Present)
           </td>
         <% end %>
         <td>

@@ -71,13 +71,24 @@
                 :route => new_minutes_report_path(event, :meeting => meeting) %>
               <% if CONFIG.sr::GENERAL[:add_corrective_action_in_meeting] %>
                 <!-- Add Corrective Action -->
-                <%=link_to "<i class='glyphicon glyphicon-wrench'></i>".html_safe, "#",
-                  :class => "btn btn-sm btn-warning corrective_action_btn mb5",
-                  "data-toggle" => "modal",
-                  "data-target" => ".bs-example-modal-lg",
-                  'hover' => 'tooltip',
-                  title: 'View/Add Corrective Actions',
-                  :route => get_corrective_action_report_path(event, :meeting => meeting.id) %>
+                <% if event.corrective_actions.present? %>
+                  <%=link_to "<i class='glyphicon glyphicon-wrench'></i>".html_safe, "#",
+                    :class => "btn btn-sm btn-warning corrective_action_btn mb5",
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg",
+                    'hover' => 'tooltip',
+                    :style => "color:black",
+                    title: 'View/Add Corrective Actions',
+                    :route => get_corrective_action_report_path(event, :meeting => meeting.id) %>
+                <% else %>
+                  <%=link_to "<i class='glyphicon glyphicon-wrench'></i>".html_safe, "#",
+                    :class => "btn btn-sm btn-warning corrective_action_btn mb5",
+                    "data-toggle" => "modal",
+                    "data-target" => ".bs-example-modal-lg",
+                    'hover' => 'tooltip',
+                    title: 'View/Add Corrective Actions',
+                    :route => get_corrective_action_report_path(event, :meeting => meeting.id) %>
+                <% end %>
               <%end%>
             <%end%>
             <!-- Remove Event -->
