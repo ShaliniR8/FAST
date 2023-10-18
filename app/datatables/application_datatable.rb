@@ -108,7 +108,7 @@ class ApplicationDatatable
 
   def sort_column
     column = columns[params[:order]['0'][:column].to_i]
-    column = column.nil? ? "id" : column 
+    column = column.nil? ? "id" : column
     column = column.include?('#') ? column.split('#').second : column
     column == 'id' ? "#{object.table_name}.#{column}" : column
   end
@@ -212,6 +212,7 @@ class ApplicationDatatable
 
       column = column.include?('#') ? column.split('#').second : column
       column = column.include?('.') ? column : "#{object.table_name}.#{column}"
+      column = column.include?("event_date") ? "CONVERT_TZ(event_date, 'UTC', '#{get_tz_identifier_from_timezone_name}')" : column
 
       search_string << "#{column} like '%#{term}%'"
     end
@@ -417,7 +418,7 @@ class ApplicationDatatable
       if object.name == 'Record'
         @status_count = object.joins(join_tables)
                           .order("#{sort_column} #{sort_direction}")
-                          .within_timerange(start_date, end_date) 
+                          .within_timerange(start_date, end_date)
                           .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)", full_access_templates, viewer_access_templates, confidential_access_templates)
                           .where(search_string.join(' and '))
                           .where("#{object.table_name}.#{sev_text} = ? and #{object.table_name}.#{lik_text} = ?", sev, like)

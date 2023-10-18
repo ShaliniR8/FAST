@@ -33,23 +33,23 @@ class SafetyReportingDatatable < ApplicationDatatable
       column = columns[index.to_i]
       column = column.include?('#') ? column.split('#').second : column
       column = column.include?('.') ? column : "#{object.table_name}.#{column}"
-
+      column = column.include?("event_date") ? "CONVERT_TZ(event_date, 'UTC', '#{get_tz_identifier_from_timezone_name}')" : column
       search_string << "#{column} like '%#{term}%'"
     end
 
-    if search_string.select {|substr| substr.include? '.viewer_access'}.present? 
+    if search_string.select {|substr| substr.include? '.viewer_access'}.present?
       search_string.map! { |str| str.downcase.include?('yes') ? str.downcase.gsub!('yes', '1') : str }
       search_string.map! { |str| str.downcase.include?('no') ? str.downcase.gsub!('no', '0') : str }
     end
 
     term = 'true'
-    if search_string.select {|str| str.include?('users.full_name') && str.downcase.include?('anonymous')}.present? 
+    if search_string.select {|str| str.include?('users.full_name') && str.downcase.include?('anonymous')}.present?
       search_string = search_string - search_string.select {|str| str.include?('users.full_name')}
       search_string << "anonymous = true"
-    elsif search_string.select {|str| str.include? 'users.full_name'}.present? 
+    elsif search_string.select {|str| str.include? 'users.full_name'}.present?
       search_string << "anonymous = false"
     end
-    
+
 
     {search_columns_and_terms_map: search_columns_and_terms_map, search_string: search_string}
   end

@@ -309,6 +309,9 @@ module ApplicationHelper
     return Template.find(:all)
   end
 
+  def get_tz_identifier_from_timezone_name
+    ActiveSupport::TimeZone::MAPPING[CONFIG::GENERAL[:time_zone]] || CONFIG::GENERAL[:time_zone]
+  end
 
   def convert_to_utc(date_time:, time_zone:)
     time_zone = 'UTC' if time_zone.blank?
@@ -692,7 +695,7 @@ module ApplicationHelper
     func = "add_fields(this, '#{association}', '#{escape_javascript(fields)}', '#{target}')"
     if association.to_s == "checklist_rows"
         func = "add_fields(this, '#{association}', '#{escape_javascript(fields)};', '#{target}');update_row_order_checklist_row('table-view-#{@record.id}');"
-    end  
+    end
     link_to_function name,
       func,
       **linkOptions

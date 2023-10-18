@@ -113,6 +113,7 @@ class QueryDatatable
       column = columns[index.to_i]
       column = column.include?('#') ? column.split('#').second : column
       column = column.include?('.') ? column : "#{object.table_name}.#{column}"
+      column = column.include?("event_date") ? "CONVERT_TZ(event_date, 'UTC', '#{get_tz_identifier_from_timezone_name}')" : column
 
       search_string << "#{column} like '%#{term}%'"
     end
