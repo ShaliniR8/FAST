@@ -204,6 +204,7 @@ class Submission < Sr::SafetyReportingBase
         anonymous:          anonymous,
         confidential:       confidential,
         event_time_zone:    event_time_zone,
+        viewer_access:      (false if !CONFIG.sr::GENERAL[:enable_records_viewer_access])
       )
 
       self.record = record

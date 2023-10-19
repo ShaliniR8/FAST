@@ -26,6 +26,11 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         fields: {
           id: { default: true },
           title: { default: true },
+          source: {
+            field: 'get_source', title: 'Source of Input',
+            num_cols: 6, type: 'text', visible: 'index,show',
+            required: false
+          },
           status: { default: true, on_newline: true, field: 'get_status' },
           created_by: { default: true },
           due_date: {default: true, on_newline: true },
@@ -81,7 +86,7 @@ class ATNSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
           #INLINE
           *%i[assign complete request_extension schedule_verification approve_reject reopen contact task cost finding comment],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
-        panels: %i[comments sras findings contacts costs tasks signatures extension_requests verifications attachments transaction_log
+        panels: %i[comments sras findings source_of_input contacts costs tasks signatures extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
 

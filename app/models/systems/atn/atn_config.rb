@@ -27,6 +27,15 @@ class ATNConfig < DefaultConfig
     base_risk_matrix:                   false,
   })
 
+  LAUNCH_OBJECTS = {
+    records: ['Sra', 'Investigation'],
+    reports: ['Sra', 'Investigation'],
+    audits: ['Sra'],
+    inspections: ['Sra'],
+    evaluations: ['Sra'],
+    investigations: ['Sra'],
+    sras: ['Audit'],
+  }
 
   P_CODE = {
     'ASAP - Flight' => 'A9T2N7'
