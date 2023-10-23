@@ -309,6 +309,9 @@ module ApplicationHelper
     return Template.find(:all)
   end
 
+  def get_tz_identifier_from_timezone_name
+    ActiveSupport::TimeZone::MAPPING[CONFIG::GENERAL[:time_zone]] || CONFIG::GENERAL[:time_zone]
+  end
 
   def convert_to_utc(date_time:, time_zone:)
     time_zone = 'UTC' if time_zone.blank?
