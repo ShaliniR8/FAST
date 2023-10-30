@@ -42,6 +42,9 @@ class ApplicationDatatable
       if object.table_name == 'sras' && CONFIG.srm::GENERAL[:enable_sra_viewer_access] && @current_user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         status_queries << "viewer_access = true"
       end
+      if object.table_name == 'records' && CONFIG.sr::GENERAL[:enable_records_viewer_access] && @current_user.has_access('records', 'viewer', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+        status_queries << "viewer_access = true"
+      end
       search_string << "(#{status_queries.join(' OR ')})"
     end
     start_date = params[:advance_search][:start_date]
@@ -284,6 +287,9 @@ class ApplicationDatatable
       if object.table_name == 'sras' && CONFIG.srm::GENERAL[:enable_sra_viewer_access] && @current_user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         status_queries << "viewer_access = true"
       end
+      if object.table_name == 'records' && CONFIG.sr::GENERAL[:enable_records_viewer_access] && @current_user.has_access('records', 'viewer', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+        status_queries << "viewer_access = true"
+      end
       search_string << "(#{status_queries.join(' OR ')})"
     end
     @recs = object.can_be_accessed(@current_user)
@@ -350,6 +356,9 @@ class ApplicationDatatable
       status_queries << "approver_id = #{@current_user.id}"
       status_queries << "reviewer_id = #{@current_user.id}"  if object.table_name == 'sras'
       if object.table_name == 'sras' && CONFIG.srm::GENERAL[:enable_sra_viewer_access] && @current_user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
+        status_queries << "viewer_access = true"
+      end
+      if object.table_name == 'records' && CONFIG.sr::GENERAL[:enable_records_viewer_access] && @current_user.has_access('records', 'viewer', admin: CONFIG::GENERAL[:global_admin_default], strict: true)
         status_queries << "viewer_access = true"
       end
       search_string << "(#{status_queries.join(' OR ')})"

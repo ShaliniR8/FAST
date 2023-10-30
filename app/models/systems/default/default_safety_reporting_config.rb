@@ -36,6 +36,7 @@ class DefaultSafetyReportingConfig
     show_title_deid_pdf:        true,      # Show the title of De-Id PDF. True by default but some carriers do not want this because users put identifying info on the title
     send_notifier_email_to_submitter:        true, # Submitter will get a notifier email with or without PDF if this is set to true. So submitter will get 2 emails
     deidentifying_templates:            [], # template types whose reports have to be deidentified. RJET feature. Default is empty.
+    enable_records_viewer_access: true, # records viewer access will be enabled by default
   }
 
   OBSERVATION_PHASES = [

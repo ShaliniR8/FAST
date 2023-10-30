@@ -47,6 +47,6 @@ css:
                   span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-down
               .panel-body style='display:none'
                 .row
-                  = render '/occurrences/occurrences_panel', owner: owner, show_only_table: true
+                  = render '/occurrences/occurrences_panel', owner: owner, show_only_table: true, :can_change => !%w[Rejected Completed].include?(owner.status)
         = render "/forms/show_comment", owner: owner
         = render '/forms/attachments_show', owner: owner, show_btn: false

@@ -222,7 +222,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[agendas comments source_of_input hazards contacts costs tasks extension_requests verifications attachments transaction_log
+        panels: %i[agendas comments source_of_input audits hazards contacts costs tasks extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {

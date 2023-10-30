@@ -27,6 +27,9 @@ class ATNConfig < DefaultConfig
     base_risk_matrix:                   false,
   })
 
+  LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
+    sras: ['Audit'],
+  })
 
   P_CODE = {
     'ASAP - Flight' => 'A9T2N7'

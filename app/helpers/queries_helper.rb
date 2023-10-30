@@ -1819,6 +1819,13 @@ module QueriesHelper
     mapping_hash['Sra']['Source of Input'] = 'source_of_input'
     mapping_hash['Sra']["Verifications"] = 'included_verifications'
 
+    #ATN Modification
+    if AIRLINE_CODE == 'ATN'
+      mapping_hash['Sra']['Apparent Violations'] = 'compliances'
+      mapping_hash['Sra']['Other Apparent Violations'] = 'other_compliance'
+      mapping_hash['Sra']['Apparent Violations Comments'] = 'compliances_comment'
+    end
+
     #MAF Modification
     if AIRLINE_CODE == 'MAF'
       mapping_hash['Sra']['Affected Programs'] ='departments'

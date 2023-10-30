@@ -630,6 +630,7 @@ class RecordsController < ApplicationController
     end
     @record = Record.new(params[:record])
     @record.status = "New"
+    @record.viewer_access = CONFIG.sr::GENERAL[:enable_records_viewer_access]
     if @record.save
       redirect_to record_path(@record)
     end
