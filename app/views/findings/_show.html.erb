@@ -19,7 +19,8 @@
 <%=render '/occurrences/occurrences_panel',
   owner: owner,
   show_only_table: false,
-  show_btns: show_btn%>
+  show_btns: show_btn,
+  :can_change => can_change%>
 
 
 <%=render '/sms_actions/show_all', :owner => owner, :show_btns => false%>
