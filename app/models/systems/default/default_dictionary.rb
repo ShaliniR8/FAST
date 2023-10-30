@@ -160,7 +160,7 @@ class DefaultDictionary
       btn: :request_extension,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        CONFIG::GENERAL[:has_extension] && owner.status == 'Assigned'
+        CONFIG::GENERAL[:has_extension] && owner.status == 'Assigned' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default]) 
       },
     },
     risk_control: {
@@ -174,7 +174,7 @@ class DefaultDictionary
       btn: :schedule_verification,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        CONFIG::GENERAL[:has_verification] && owner.status == 'Completed'
+        CONFIG::GENERAL[:has_verification] && owner.status == 'Completed' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default]) 
       },
     },
     send_message: {
