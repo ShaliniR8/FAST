@@ -1,0 +1,202 @@
+class SBAConfig < DefaultConfig
+  include ConfigTools
+  # DO NOT COPY THIS CONFIG AS A TEMPLATE FOR NEW AIRLINES
+    # Please look at other airline config definitions and mimic them, or copy the 'template' configs
+    # All configs inherit from their Default counterparts, then overload the default values when needed
+
+  # For linking databases in database.yml; example would be %w[audit]
+  ENABLED_SYSTEMS = %w[]
+  # For creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
+  # For selecting which modules are available to mobile; example would be %w[ASAP]
+  MOBILE_MODULES = %w[ASAP]
+
+  #############################
+  ### GLOBAL CONFIGURATIONS ###
+  #############################
+
+  GENERAL = DefaultConfig::GENERAL.merge({
+    name:                         "City of Santa Barbara",
+    sms_im_visibility:            false,
+    safety_promotion_visibility:  true
+  })
+
+  ###################################
+  ### DEFAULT RISK MATRIX CONFIGS ###
+  ###################################
+
+  RISK_MATRIX = {
+    :likelihood       => ["Frequent - A", "Probable - B", "Remote - C", "Extremely Remote - D", "Extremely Improbable - E"],
+    :severity         => (1..5).to_a,
+    :risk_factor      => {"Low Risk - Acceptable" => "lime", "Moderate Risk - Acceptable with mitigation" => "yellow", "High Risk - Unacceptable" => "red"},
+  }
+
+  MATRIX_INFO = {
+    terminology: {
+      baseline_btn: 'Baseline Risk',
+      mitigate_btn: 'Mitigate Risk',
+      'Baseline' => 'Baseline',
+      'Mitigate' => 'Mitigated'
+    },
+
+    severity_table: {
+      title: 'SEVERITY EXERCISE',
+
+      orientation: :horizontal,
+      direction: :right,
+      size: 'col-xs-6',
+      title_style: 'severityTitle',
+      main_header_style: 'sevMainHeader',
+      header_style: 'sevHeader',
+      cell_name: 'severity_td',
+
+      column_header_name: 'SEVERITY',
+      column_header: ['Negligible - 1', 'Minor - 2', 'Major - 3', 'Hazardous - 4', 'Catastrophic -5'],
+      row_header_name: 'CLASS',
+      row_header: [
+        'People (Injury)',
+        'Continuity of Operations (Impact)',
+        'Environment (Effect)',
+        'Assets (Damage)',
+        'Perception/Reputation'],
+      rows: [
+        [ 'No first aid required', 'Injury with first aid', 'Injury with transport', 'Multiple injuries with transport','Fatality'],
+        [ 'No impact, recovery time immediate', 'Minor disruption to normal ops, recovery time <2 hour', 'Major disruption to normal ops, recovery time 2-24 hours', 'Severe disruption to normal ops, recovery time 24-48 hour', 'Widespread regional disruption to ops, recovery time indefinite'],
+        [ 'No impact, non-reportable', 'Reportable, containable minimal volume of hazardous material (<20gal)', 'Reportable, containable moderate volume of hazardous material (<100gal)', 'Reportable, non-containable moderate volume of hazardous material (<100gal)', 'Reportable, non-containable significant volume of hazardous material (>100gal)'],
+        [ 'No repairs required', "<$10K", '$10K - $500K', '$500K - $1M', ">$1M" ],
+        [ 'Negligible', 'Negligible', 'Negligible', 'Negligible', 'Negligible']
+      ]
+    },
+
+    severity_table_dict: {
+      0 => "4",
+      1 => "3",
+      2 => "2",
+      3 => "1",
+      4 => "0",
+    },
+
+    probability_table: {
+      title: 'PROBABILITY EXERCISE',
+
+      orientation: :vertical,
+      direction: :up,
+      size: 'col-xs-6',
+      title_style: 'probabilityTitle',
+      main_header_style: 'probMainHeader',
+      header_style: 'probHeader',
+      cell_name: 'probability_td',
+
+      row_header_name: 'PROBABILITY',
+      row_header: ['Frequent A', 'Probable B', 'Remote C', 'Extremely Remote D', 'Extremely Improbable E'],
+      column_header_name: '',
+      column_header: ['Frequency'],
+      rows: [
+        ['Likely to occur once a day or multiple times per week; continuously expected to occur in the system.'],
+        ['Likely to occur multiple times per year or once per month; regularly expected to occur in the system.'],
+        ['Possibly once a year or multiple times from 1 year to less than 5 years; unlikely but possible to occur.'],
+        ['Conceivable but highly unlikely; possibly once in every 5 to less than 10 years.'],
+        ['Almost impossible; possibly only once in 10 to 100 years']
+      ]
+    },
+
+    probability_table_dict: {
+      0 => 'A - Improbable',
+      1 => 'B - Unlikely',
+      2 => 'C - Remote',
+      3 => 'D - Probable',
+      4 => 'E - Frequent',
+    },
+
+    risk_table: {
+      title: 'RISK ASSESSMENT MATRIX',
+
+      size: 'col-xs-6',
+      title_style: 'matrixTitle',
+      main_header_style: 'matrixMainHeader',
+      header_style: 'matrixHeader',
+      cell_name: 'risk_td',
+      cell_style: 'bold',
+
+      # maps severity / likelihood attribute to position on table
+      severity_pos: 'row',
+      likelihood_pos: 'column',
+
+      row_header_name: 'PROBABILITY',
+      row_header: ['Frequent - A', 'Probable - B', 'Remote - C', 'Extremely Remote - D', 'Extremely Improbable - E'],
+      column_header_name: 'SEVERITY',
+      column_header: ['Negligible-1','Minor-2','Major-3','Hazardous-4','Catastrophic-5'],
+
+      rows_color: [
+        ['limegreen',      'yellow',       'red',       'red',       'red' ],
+        ['limegreen',      'yellow',       'yellow',       'red',       'red' ],
+        ['limegreen',   'limegreen',    'yellow',       'yellow',       'red' ],
+        ['limegreen',   'limegreen',    'limegreen',    'yellow',    'yellow'],
+        ['limegreen',   'limegreen',    'limegreen',    'yellow',    'yellow']
+      ],
+    },
+
+    risk_definitions: {
+      limegreen:   { rating: 'Low Risk', description: "Acceptable"  },
+      yellow:      { rating: 'Moderate Risk', description: "Acceptable with mitigation"  },
+      red:      { rating: 'High Risk', description: "Unacceptable" },
+    },
+
+    risk_table_index: {
+      'Moderate Risk'  => 'yellow',
+      'Low Risk'       => 'limegreen',
+      'High Risk'      => 'red',
+
+      'Orange'   => 'orange',
+      'Yellow'   => 'yellow',
+      'Green'    => 'limegreen',
+
+      'Moderate' => 'yellow',
+      'Low'      => 'limegreen',
+      'High'     => 'red',
+
+      'MODERATE' => 'yellow',
+      'LOW'      => 'limegreen',
+      'HIGH'     => 'red',
+    },
+
+    risk_table_dict: {
+      limegreen:  'Low Risk - Acceptable',
+      red:        'High Risk - Unacceptable',
+      yellow:        'Moderate Risk - Acceptable with mitigation'
+      # orange:        'Orange - Unacceptable',
+
+    }
+  }
+
+  # Calculate the severity based on the airlines's risk matrix
+  def self.calculate_severity(list)
+    if list.present?
+      list.delete("undefined") # remove "undefined" element from javascript
+      return list.map(&:to_i).min
+    end
+  end
+
+  # Calculate the probability based on the airlines's risk matrix
+  def self.calculate_probability(list)
+    if list.present?
+      list.delete("undefined") # remove "undefined" element from javascript
+      return list.map(&:to_i).min
+    end
+  end
+
+  def self.print_severity(owner, severity_score)
+    self::MATRIX_INFO[:severity_table_dict][severity_score] if severity_score.present?
+  end
+
+  def self.print_probability(owner, probability_score)
+    self::MATRIX_INFO[:probability_table_dict][probability_score] if probability_score.present?
+  end
+
+  def self.print_risk(probability_score, severity_score)
+    if probability_score.present? && severity_score.present?
+      lookup_table = MATRIX_INFO[:risk_table][:rows]
+      return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
+    end
+  end
+end
