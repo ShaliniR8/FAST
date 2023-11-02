@@ -45,6 +45,24 @@ def get_visualization_json(data, visualization)
   visualization_hash
 end
 
+def get_narrative_with_dates(owner, visualization, data, data_ids)
+  target = Object.const_get(owner.target)
+
+  if visualization.x_axis.present?
+    x_axis_field = ApplicationHelper.get_field_helper(owner, target, visualization.x_axis)
+    x_axis_field_type = x_axis_field[0].display_type
+
+    data_ids[1..-1].each_with_index do |row, index|
+      ids = row[1..-1] - [0]
+      data[index][0] = x_axis_field_type == 'textarea' ?
+                                            "(#{ids.map{|id| target.find(id).event_date.to_s.gsub(" UTC", "")}.join(",")}) #{row[0]}"
+                                              :  row[0]
+    end
+  end
+
+  data
+
+end
 
 def get_visualizations_json(owner)
   query_result_visualizations = []
@@ -52,6 +70,12 @@ def get_visualizations_json(owner)
   owner.visualizations.each do |visualization|
     begin
       data = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids) #get_data
+      data_ids = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids, get_ids:true) #get_data
+
+      if CONFIG::GENERAL[:prepend_event_date_to_query_json_export]
+        data = get_narrative_with_dates(owner, visualization, data, data_ids)
+      end
+
       if visualization.series.present?
         data[0].shift
       else
@@ -115,18 +139,21 @@ task export_query_result: :environment do
 
     all_queries_result[@owner.id] = query_result
   end
-  Net::SFTP.start(host, username, :password => password) do |sftp|
-    begin
-      io = StringIO.new all_queries_result.to_json
-      file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
-      target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
-
-      sftp.upload!(io, target)
-
-      p 'UPLOAD SUCCESSFUL'
-    rescue Exception => e
-      p e.message
-      p 'UPLOAD FAILED'
-    end
+  File.open("export_query_result.json", "w") do |f|
+    f.write(all_queries_result.to_json)
   end
+  # Net::SFTP.start(host, username, :password => password) do |sftp|
+  #   begin
+  #     io = StringIO.new all_queries_result.to_json
+  #     file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
+  #     target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
+
+  #     sftp.upload!(io, target)
+
+  #     p 'UPLOAD SUCCESSFUL'
+  #   rescue Exception => e
+  #     p e.message
+  #     p 'UPLOAD FAILED'
+  #   end
+  # end
 end
