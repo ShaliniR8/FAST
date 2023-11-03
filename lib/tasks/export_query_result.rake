@@ -45,44 +45,50 @@ def get_visualization_json(data, visualization)
   visualization_hash
 end
 
-def get_narrative_with_dates(owner, visualization, data, data_ids)
+def get_narrative_with_dates(owner, visualization, records_ids, data)
   target = Object.const_get(owner.target)
-
-  if visualization.x_axis.present?
-    x_axis_field = ApplicationHelper.get_field_helper(owner, target, visualization.x_axis)
-    x_axis_field_type = x_axis_field[0].display_type
-
-    data_ids[1..-1].each_with_index do |row, index|
-      ids = row[1..-1] - [0]
-      data[index][0] = x_axis_field_type == 'textarea' ?
-                                            "(#{ids.map{|id| target.find(id).event_date.to_s.gsub(" UTC", "")}.join(",")}) #{row[0]}"
-                                              :  row[0]
+  x_axis_field = visualization.x_axis.present? ? ApplicationHelper.get_field_helper(owner, target, visualization.x_axis) : [nil, nil]
+  if x_axis_field[0].present? && x_axis_field[0].is_a?(Field)
+    series_field = ApplicationHelper.get_field_helper(owner, target, visualization.series)
+    if x_axis_field[0].display_type == 'textarea'
+      if series_field[0].present?
+        data_ids = QueriesHelper.get_data_table_for_google_visualization_with_series(x_axis_field_name: visualization.x_axis,
+                                                                  x_axis_field_arr: x_axis_field,
+                                                                  series_field_arr: series_field,
+                                                                  records_ids: records_ids,
+                                                                  get_ids: true,
+                                                                  query: owner)
+      else
+        data_ids = QueriesHelper.get_data_ids_table_for_google_visualization_sql(x_axis_field_arr: x_axis_field, records_ids: records_ids, query: owner)
+      end
+      data_ids[1..-1].each_with_index do |row, index|
+        ids = row[1..-1].flatten - [0]
+        data[index][0] = "(#{ids.map{|id| target.find(id).event_date.to_s.gsub(" UTC", "")}.join(",")}) #{row[0]}"
+      end
     end
   end
-
   data
-
 end
 
 def get_visualizations_json(owner)
+  logger = Logger.new("log/export_query_result_json.log")
   query_result_visualizations = []
   records_ids = @records.map {|record| record.id}
   owner.visualizations.each do |visualization|
     begin
       data = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids) #get_data
-      data_ids = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids, get_ids:true) #get_data
 
       if CONFIG::GENERAL[:prepend_event_date_to_query_json_export]
-        data = get_narrative_with_dates(owner, visualization, data, data_ids)
+        data = get_narrative_with_dates(owner, visualization, records_ids, data)
       end
-
       if visualization.series.present?
         data[0].shift
       else
         data.shift
       end
       query_result_visualizations << get_visualization_json(data, visualization)
-    rescue
+    rescue => error
+      logger.info "Failed for Query Visualization : #{ visualization.inspect }"
     end
   end
 
@@ -139,21 +145,18 @@ task export_query_result: :environment do
 
     all_queries_result[@owner.id] = query_result
   end
-  File.open("export_query_result.json", "w") do |f|
-    f.write(all_queries_result.to_json)
+  Net::SFTP.start(host, username, :password => password) do |sftp|
+    begin
+      io = StringIO.new all_queries_result.to_json
+      file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
+      target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
+
+      sftp.upload!(io, target)
+
+      p 'UPLOAD SUCCESSFUL'
+    rescue Exception => e
+      p e.message
+      p 'UPLOAD FAILED'
+    end
   end
-  # Net::SFTP.start(host, username, :password => password) do |sftp|
-  #   begin
-  #     io = StringIO.new all_queries_result.to_json
-  #     file_name = "#{Time.current.strftime("%Y%m%d%H%M")}.json"
-  #     target = "/Usr/F9ProsafeT/Incoming/#{file_name}"
-
-  #     sftp.upload!(io, target)
-
-  #     p 'UPLOAD SUCCESSFUL'
-  #   rescue Exception => e
-  #     p e.message
-  #     p 'UPLOAD FAILED'
-  #   end
-  # end
 end
