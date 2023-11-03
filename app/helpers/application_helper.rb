@@ -965,7 +965,6 @@ module ApplicationHelper
     return result
   end
 
-
   def strip_html_tag(text)
     text.gsub(/<\/?[^>]+>/, '') rescue text
   end

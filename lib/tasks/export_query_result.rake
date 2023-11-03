@@ -45,20 +45,70 @@ def get_visualization_json(data, visualization)
   visualization_hash
 end
 
+def format_datetime(event_date)
+  if CONFIG.sr::GENERAL[:submission_time_zone]
+      ApplicationHelper.display_date_time_in_zone(date_time: event_date, time_zone: CONFIG::GENERAL[:time_zone], display_zone: ApplicationHelper.display_local_time_zone)
+  else
+    ApplicationHelper.datetime_to_string(event_date)
+  end
+end
+
+def prepend_date_to_field_name(ids, target, field_name)
+  event_dates = ids.map{|id| format_datetime(target.find(id).event_date)}.join(",")
+  "(#{event_dates}) #{field_name}"
+end
+
+def get_target_table_ids(row)
+  # row[1..-1] contains target id if a field is found for that target, else 0
+  # remove 0 because it is not a valid id
+  row[1..-1].flatten - [0]
+end
+
+
+def get_narrative_with_dates(owner, visualization, records_ids, data)
+  target = Object.const_get(owner.target)
+  x_axis_field = visualization.x_axis.present? ? ApplicationHelper.get_field_helper(owner, target, visualization.x_axis) : [nil, nil]
+  if x_axis_field[0].present? && x_axis_field[0].is_a?(Field)
+    series_field = ApplicationHelper.get_field_helper(owner, target, visualization.series)
+    if x_axis_field[0].display_type == 'textarea'
+      if series_field[0].present?
+        data_ids = QueriesHelper.get_data_table_for_google_visualization_with_series(x_axis_field_name: visualization.x_axis,
+                                                                  x_axis_field_arr: x_axis_field,
+                                                                  series_field_arr: series_field,
+                                                                  records_ids: records_ids,
+                                                                  get_ids: true,
+                                                                  query: owner)
+      else
+        data_ids = QueriesHelper.get_data_ids_table_for_google_visualization_sql(x_axis_field_arr: x_axis_field, records_ids: records_ids, query: owner)
+      end
+      data_ids[1..-1].each_with_index do |row, index|
+        ids = get_target_table_ids(row)
+        data[index][0] = prepend_date_to_field_name(ids, target, row[0])
+      end
+    end
+  end
+  data
+end
 
 def get_visualizations_json(owner)
+  logger = Logger.new("log/export_query_result_json.log")
   query_result_visualizations = []
   records_ids = @records.map {|record| record.id}
   owner.visualizations.each do |visualization|
     begin
       data = ApplicationHelper.generate_visualization_helper(owner.id, visualization.x_axis, visualization.series, records_ids) #get_data
+
+      if CONFIG::GENERAL[:prepend_event_date_to_query_json_export]
+        data = get_narrative_with_dates(owner, visualization, records_ids, data)
+      end
       if visualization.series.present?
         data[0].shift
       else
         data.shift
       end
       query_result_visualizations << get_visualization_json(data, visualization)
-    rescue
+    rescue => error
+      logger.info "Failed for Query Visualization : #{ visualization.inspect }"
     end
   end
 
