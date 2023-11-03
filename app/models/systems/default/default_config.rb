@@ -39,6 +39,7 @@ class DefaultConfig
     has_pdf_footer:                     false,    # Enables custom airline footer
     has_pdf_header:                     false,
     power_bi_integration:               false,
+    prepend_event_date_to_query_json_export: false, # prepends event date to visualization x-axis field names for narratives only, while exporting query as json
     has_confidential_forms:             false,
     csv_user_import:                    false,
     checklist_query:                    false,

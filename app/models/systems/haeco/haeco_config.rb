@@ -20,11 +20,10 @@ class HAECOConfig < DefaultConfig
     sms_im_visibility:             false,
     checklist_query:               true,
     power_bi_integration:          true,
-
+    prepend_event_date_to_query_json_export: true,
     hide_employee_group:           true,
     custom_uniq_id:                true,
     hide_findings_in_checklist:    true,
-    prepend_event_date_to_query_json_export: true
   })
 
   LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
