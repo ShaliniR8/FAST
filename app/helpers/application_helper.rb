@@ -976,7 +976,7 @@ module ApplicationHelper
   end
 
 
-  def generate_visualization_helper(query_id, x_axis, series, records_ids, get_ids: false)
+  def generate_visualization_helper(query_id, x_axis, series, records_ids)
     query = Query.find(query_id)
     object_type = Object.const_get(query.target)
     x_axis_field = get_field_helper(query, object_type, x_axis)
@@ -987,7 +987,7 @@ module ApplicationHelper
                                                                  x_axis_field_arr: x_axis_field,
                                                                  series_field_arr: series_field,
                                                                  records_ids: records_ids,
-                                                                 get_ids: get_ids,
+                                                                 get_ids: false,
                                                                  query: query)
     elsif x_axis.present?
       data = get_data_table_for_google_visualization_sql(x_axis_field_arr: x_axis_field, records_ids: records_ids, query: query)
