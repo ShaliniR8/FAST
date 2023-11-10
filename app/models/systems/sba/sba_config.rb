@@ -18,7 +18,12 @@ class SBAConfig < DefaultConfig
   GENERAL = DefaultConfig::GENERAL.merge({
     name:                         "City of Santa Barbara",
     sms_im_visibility:            false,
-    safety_promotion_visibility:  true
+    safety_promotion_visibility:  true,
+    has_gmap:                           true,
+    gis_layers:                         true,
+    lat:                                34.422331644,
+    lng:                                -119.83749665,
+    gMapZoom:                           14,
   })
 
   ###################################
@@ -26,7 +31,7 @@ class SBAConfig < DefaultConfig
   ###################################
 
   RISK_MATRIX = {
-    :likelihood       => ["Frequent - A", "Probable - B", "Remote - C", "Extremely Remote - D", "Extremely Improbable - E"],
+    :likelihood       => ["Frequent (A)", "Probable (B)", "Remote (C)", "Extremely Remote (D)", "Extremely Improbable (E)"],
     :severity         => (1..5).to_a,
     :risk_factor      => {"Low Risk - Acceptable" => "lime", "Moderate Risk - Acceptable with mitigation" => "yellow", "High Risk - Unacceptable" => "red"},
   }
@@ -51,7 +56,7 @@ class SBAConfig < DefaultConfig
       cell_name: 'severity_td',
 
       column_header_name: 'SEVERITY',
-      column_header: ['Negligible - 1', 'Minor - 2', 'Major - 3', 'Hazardous - 4', 'Catastrophic -5'],
+      column_header: ['Negligible (1)', 'Minor (2)', 'Major (3)', 'Hazardous (4)', 'Catastrophic (5)'],
       row_header_name: 'CLASS',
       row_header: [
         'People (Injury)',
@@ -88,7 +93,7 @@ class SBAConfig < DefaultConfig
       cell_name: 'probability_td',
 
       row_header_name: 'PROBABILITY',
-      row_header: ['Frequent A', 'Probable B', 'Remote C', 'Extremely Remote D', 'Extremely Improbable E'],
+      row_header: ['Frequent (A)', 'Probable (B)', 'Remote (C)', 'Extremely Remote (D)', 'Extremely Improbable (E)'],
       column_header_name: '',
       column_header: ['Frequency'],
       rows: [
@@ -123,9 +128,9 @@ class SBAConfig < DefaultConfig
       likelihood_pos: 'column',
 
       row_header_name: 'PROBABILITY',
-      row_header: ['Frequent - A', 'Probable - B', 'Remote - C', 'Extremely Remote - D', 'Extremely Improbable - E'],
+      row_header: ['Frequent (A)', 'Probable (B)', 'Remote (C)', 'Extremely Remote (D)', 'Extremely Improbable (E)'],
       column_header_name: 'SEVERITY',
-      column_header: ['Negligible-1','Minor-2','Major-3','Hazardous-4','Catastrophic-5'],
+      column_header: ['Negligible (1)','Minor (2)','Major (3)','Hazardous (4)','Catastrophic (5)'],
 
       rows_color: [
         ['limegreen',      'yellow',       'red',       'red',       'red' ],
