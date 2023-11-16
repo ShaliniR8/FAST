@@ -15,11 +15,12 @@ class SBAConfig < DefaultConfig
     name:                         "City of Santa Barbara",
     sms_im_visibility:            false,
     safety_promotion_visibility:  true,
-    has_gmap:                           true,
-    gis_layers:                         true,
-    lat:                                34.422331644,
-    lng:                                -119.83749665,
-    gMapZoom:                           14,
+    has_gmap:                     true,
+    gis_layers:                   true,
+    lat:                          34.422331644,
+    lng:                          -119.83749665,
+    gMapZoom:                     14,
+    external_link:                true
   })
 
   LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.deep_merge({
@@ -38,6 +39,47 @@ class SBAConfig < DefaultConfig
   }
 
   REPORT_TYPES = {}
+
+  EXTERNAL_LINK =
+    if Rails.env.production?
+      'https://sba.prodigiq.com'
+    else
+      'http://192.168.254.64:3001'
+    end
+
+  def self.sync_user(user, prev_email)
+    conn = Faraday.new(
+      url: "#{CONFIG::EXTERNAL_LINK}",
+      params: {
+      email: [prev_email || user.email, user.email],
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      level: user.level,
+      disable: user.disable
+    },
+      headers: {'Content-Type' => 'application/json'}
+    )
+    response = conn.post('/api/jed/users/sync') do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Client-ID'] = 'VcuOWeajgfgTZcG2ak8Hatl9npc7IZ1CW-tdBoX4NUc'
+      req.headers['Client-Secret'] = 'vcAhVjM9ysZAFG9RNTV-vlo1uFwc-dymDMdEuH0DMQs'
+    end
+    response
+  end
+  
+  def self.external_link(user)
+    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/sba/users/find",
+      {email: user.email}.to_json,
+        {
+          'Content-Type' => 'application/json',
+          'Client-ID' => 'VcuOWeajgfgTZcG2ak8Hatl9npc7IZ1CW-tdBoX4NUc',
+          'Client-Secret' => 'vcAhVjM9ysZAFG9RNTV-vlo1uFwc-dymDMdEuH0DMQs'})
+    if res.success?
+      json = JSON.parse(res.body) rescue nil
+      "#{CONFIG::EXTERNAL_LINK}/users/#{json['id']}" if json.present?
+    end
+  end
 
   RISK_MATRIX = {
     :likelihood       => ["Frequent (A)", "Probable (B)", "Remote (C)", "Extremely Remote (D)", "Extremely Improbable (E)"],
