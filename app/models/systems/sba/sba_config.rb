@@ -1,5 +1,9 @@
 class SBAConfig < DefaultConfig
   
+  ENABLED_SYSTEMS = %w[]
+  # For creating different environments in database.yml; example would be %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
+
   # For selecting which modules are available to mobile; example would be %w[ASAP]
   MOBILE_MODULES = %w[ASAP]
 
@@ -16,6 +20,11 @@ class SBAConfig < DefaultConfig
     lat:                                34.422331644,
     lng:                                -119.83749665,
     gMapZoom:                           14,
+  })
+
+  LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.deep_merge({
+    records: ['Sra'],
+    reports: ['Sra']
   })
 
   ###################################
