@@ -31,6 +31,14 @@ class SBAConfig < DefaultConfig
   ### DEFAULT RISK MATRIX CONFIGS ###
   ###################################
 
+  EMPLOYEE_GROUPS = {
+    "Ground" => "ground",
+    "General" => "general",
+    "Other" => "other",
+  }
+
+  REPORT_TYPES = {}
+
   RISK_MATRIX = {
     :likelihood       => ["Frequent (A)", "Probable (B)", "Remote (C)", "Extremely Remote (D)", "Extremely Improbable (E)"],
     :severity         => (1..5).to_a,
