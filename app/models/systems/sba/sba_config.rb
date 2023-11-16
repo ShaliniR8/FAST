@@ -1,13 +1,5 @@
 class SBAConfig < DefaultConfig
-  include ConfigTools
-  # DO NOT COPY THIS CONFIG AS A TEMPLATE FOR NEW AIRLINES
-    # Please look at other airline config definitions and mimic them, or copy the 'template' configs
-    # All configs inherit from their Default counterparts, then overload the default values when needed
-
-  # For linking databases in database.yml; example would be %w[audit]
-  ENABLED_SYSTEMS = %w[]
-  # For creating different environments in database.yml; example would be %w[training]
-  SYSTEM_ENVIRONMENTS = %w[]
+  
   # For selecting which modules are available to mobile; example would be %w[ASAP]
   MOBILE_MODULES = %w[ASAP]
 
@@ -173,35 +165,4 @@ class SBAConfig < DefaultConfig
 
     }
   }
-
-  # Calculate the severity based on the airlines's risk matrix
-  def self.calculate_severity(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
-
-  # Calculate the probability based on the airlines's risk matrix
-  def self.calculate_probability(list)
-    if list.present?
-      list.delete("undefined") # remove "undefined" element from javascript
-      return list.map(&:to_i).min
-    end
-  end
-
-  def self.print_severity(owner, severity_score)
-    self::MATRIX_INFO[:severity_table_dict][severity_score] if severity_score.present?
-  end
-
-  def self.print_probability(owner, probability_score)
-    self::MATRIX_INFO[:probability_table_dict][probability_score] if probability_score.present?
-  end
-
-  def self.print_risk(probability_score, severity_score)
-    if probability_score.present? && severity_score.present?
-      lookup_table = MATRIX_INFO[:risk_table][:rows]
-      return MATRIX_INFO[:risk_table_index][lookup_table[probability_score][severity_score].to_sym] rescue nil
-    end
-  end
 end

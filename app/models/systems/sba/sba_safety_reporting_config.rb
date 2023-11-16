@@ -1,4 +1,4 @@
-class SBASafetyReportingConfig
+class SBASafetyReportingConfig < DefaultSafetyReportingConfig
   include ConfigTools
   # DO NOT COPY THIS CONFIG AS A TEMPLATE FOR NEW AIRLINES
     # Please look at other airline config definitions and mimic them or copy the template configs
