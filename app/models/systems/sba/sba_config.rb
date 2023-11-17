@@ -21,8 +21,8 @@ class SBAConfig < DefaultConfig
     lng:                          -119.83749665,
     gMapZoom:                     14,
     external_link:                true,
-    enable_sso:                   true,
-    login_option:                 'sso',
+    enable_sso:                   false,
+    login_option:                 'dual',
   })
 
   LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.deep_merge({
@@ -40,7 +40,12 @@ class SBAConfig < DefaultConfig
     "Other" => "other",
   }
 
-  REPORT_TYPES = {}
+  REPORT_TYPES = {
+    "Airside"   => "airside",
+    "Landside"  => "landside",
+    "Terminal"  => "terminal",
+    "Other"     => "other"
+  }
 
   EXTERNAL_LINK =
     if Rails.env.production?
