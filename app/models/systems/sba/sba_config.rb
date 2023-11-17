@@ -67,7 +67,7 @@ class SBAConfig < DefaultConfig
     },
       headers: {'Content-Type' => 'application/json'}
     )
-    response = conn.post('/api/jed/users/sync') do |req|
+    response = conn.post('/api/sba/users/sync') do |req|
       req.headers['Content-Type'] = 'application/json'
       req.headers['Client-ID'] = 'gr9CyN5iFjzzED9oFa9YZwMXsvc1T90c70LY3FOnnjM'
       req.headers['Client-Secret'] = 'cgNKSy15bzoJbEr3TVA2ZcItOsuOAJ82fDSj6mbN7xw'
