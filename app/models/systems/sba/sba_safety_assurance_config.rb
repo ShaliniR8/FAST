@@ -23,6 +23,7 @@ class SBASafetyAssuranceConfig < DefaultSafetyAssuranceConfig
         display: proc{|user:,**op| false}
       }
     }
-  })
-
+  }).tap do |hierarchy|
+    hierarchy[:objects].except!("Inspection", "Evaluation")
+  end
 end
