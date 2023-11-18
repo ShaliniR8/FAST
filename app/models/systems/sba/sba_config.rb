@@ -35,16 +35,14 @@ class SBAConfig < DefaultConfig
   ###################################
 
   EMPLOYEE_GROUPS = {
-    "Ground" => "ground",
-    "General" => "general",
-    "Other" => "other",
-  }
-
-  REPORT_TYPES = {
     "Airside"   => "airside",
     "Landside"  => "landside",
     "Terminal"  => "terminal",
     "Other"     => "other"
+  }
+
+  REPORT_TYPES = {
+    
   }
 
   EXTERNAL_LINK =
