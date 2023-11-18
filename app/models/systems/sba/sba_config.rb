@@ -20,7 +20,7 @@ class SBAConfig < DefaultConfig
     lat:                          34.422331644,
     lng:                          -119.83749665,
     gMapZoom:                     14,
-    external_link:                true,
+    external_link:                false,
     enable_sso:                   false,
     login_option:                 'dual',
   })
