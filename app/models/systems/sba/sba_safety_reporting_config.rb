@@ -1,4 +1,9 @@
 class SBASafetyReportingConfig < DefaultSafetyReportingConfig
+
+  GENERAL = DefaultSafetyReportingConfig::GENERAL.deep_merge({
+    submission_description_required:  false,
+  })
+
   HIERARCHY = DefaultSafetyReportingConfig::HIERARCHY.deep_merge({
     menu_items: {
       "Submissions" => {
