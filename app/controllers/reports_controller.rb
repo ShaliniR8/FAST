@@ -21,9 +21,14 @@ class ReportsController < ApplicationController
   before_filter :login_required
   before_filter :set_table_name
   before_filter :check_group, :only => [:show]
+  before_filter :define_owner, only: [
+    :interpret,
+  ]
 
-
-
+  def define_owner
+    @class = Object.const_get('Report')
+    @owner = Report.find(params[:id])
+  end
 
   def check_group
     report = Report.find(params[:id])

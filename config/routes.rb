@@ -468,6 +468,7 @@ PrdgSession::Application.routes.draw do |map|
       get 'baseline'
       get "print"
       get "close"
+      get 'interpret'
       get "add_meeting"
       get "carryover"
       get "meeting_ready"

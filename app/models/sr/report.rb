@@ -8,6 +8,7 @@ class Report < Sr::SafetyReportingBase
   include RiskHandling
   include RootCausable
   include Sraable
+  include SmsTaskable
   include Transactionable
   include Childable
   include Parentable
