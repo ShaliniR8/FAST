@@ -16,7 +16,10 @@
             </div>
             <div class="top_buttons pull-right">
               <%if CONFIG::GENERAL[:external_link]%>
-                <%= link_to external_link_user_path(@user), class: 'btn btn-info' do %>
+                <%= link_to external_link_user_path(@user), html_options={
+                   "data-toggle" => 'tooltip', 
+                   "title" => 'Redirect to SBA ProDIGIQ portal',
+                   "class" => 'btn btn-info'} do %>
                   <i class=" fa fa-arrow-right"></i>
                 <% end %>
               <%end%>
