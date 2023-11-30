@@ -22,6 +22,10 @@ class SWQConfig < DefaultConfig
     sms_im_visibility:             false,
   })
 
+  OTHER_OBJECTS_FOR_AUTOMATED_NOTIF = {
+    "Tasks" => "sms_tasks"
+  }
+
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Baseline Risk',
