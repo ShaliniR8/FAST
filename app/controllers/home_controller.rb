@@ -512,6 +512,20 @@ class HomeController < ApplicationController
           end
         end
       end
+
+      task_srm_owners = ["Report"]
+      tasks = SmsTask.where({status: 'Assigned', res: current_user.id, owner_type: task_srm_owners})
+      tasks << SmsTask.where({status: 'Pending Approval', app_id: current_user.id, owner_type: task_srm_owners})
+      tasks.flatten.each do |x|
+        @calendar_entries.push({
+          :url => "#{x.owner.class.table_name}/#{x.owner_id}",
+          :start => x.due_date,
+          :color => (x.overdue ? "lightcoral" : "skyblue"),
+          :textColor => "darkslategrey",
+          :title => "Task ##{x.id} - #{x.title} (#{x.status})"
+        })
+      end
+
     elsif session[:mode] == "OSHA"
 
       if current_user.has_access("submissions", "index") && !@submissions.empty?
@@ -898,7 +912,7 @@ class HomeController < ApplicationController
 
   def sort_by_status(records)
     return [] if records.empty?
-    
+
     modules = {
       'ASAP'   => 'sr',
       'SMS IM' => 'im',
@@ -919,7 +933,7 @@ class HomeController < ApplicationController
     all_records = records
       .where("`#{records.table.name}`.status NOT IN (?)", ['Closed', 'Completed'])
       .average("DATE(IFNULL(`#{records.table.name}`.#{end_date}, `#{records.table.name}`.updated_at)) - DATE(`#{records.table.name}`.#{start_date})")
-    
+
     return 0 if all_records.nil?
     all_records.round(1)
   end

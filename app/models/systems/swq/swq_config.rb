@@ -20,6 +20,7 @@ class SWQConfig < DefaultConfig
     # SYSTEM CONFIGS
     global_admin_default:          false,
     sms_im_visibility:             false,
+    task_notifications:            true
   })
 
   OTHER_OBJECTS_FOR_AUTOMATED_NOTIF = {

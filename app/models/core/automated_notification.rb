@@ -20,9 +20,8 @@ class AutomatedNotification < ActiveRecord::Base
 
   def self.get_object_types
     objects = AccessControl.object_types
-    other_objects = CONFIG::OTHER_OBJECTS_FOR_AUTOMATED_NOTIF
-    if other_objects.present?
-      objects = objects.merge(other_objects).sort.to_h
+    if CONFIG::GENERAL[:task_notifications]
+      objects = CONFIG::OTHER_OBJECTS_FOR_AUTOMATED_NOTIF.merge(objects).sort.to_h
     end
     objects
   end
