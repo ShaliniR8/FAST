@@ -33,11 +33,10 @@ class AutomatedNotificationsController < ApplicationController
 
   def edit
     @record = AutomatedNotification.find(params[:id])
-
     @object_type = @record.object_type
-    @object_class = Object.const_get(@object_type.classify)
+    @object_class = Object.const_get(@record.get_object_type.classify)
 
-    case @object_type.classify
+    case @record.get_object_type.classify
     when 'Meeting'
       @anchor_date_fields = get_fields(@object_class, 'form', 'datetimez')
     when 'Verification'
@@ -76,9 +75,10 @@ class AutomatedNotificationsController < ApplicationController
   def retract_fields
     @record = AutomatedNotification.new
     @object_type = params[:object_type]
-    @object_class = Object.const_get(@object_type.classify)
+    object_type = params[:object_type].include?('sms_tasks') ? "sms_tasks" : params[:object_type]
+    @object_class = Object.const_get(object_type.classify)
 
-    case @object_type.classify
+    case object_type.classify
     when 'Meeting'
       @anchor_date_fields = get_fields(@object_class, 'form', 'datetimez')
     when 'Verification'

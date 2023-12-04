@@ -17,28 +17,41 @@ class AutomatedNotification < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def self.tasks_for_automated_notifications
+    {
+      "Tasks(Event)" => "reports_sms_tasks",
+      "Tasks(Audit)" => "audits_sms_tasks",
+      "Tasks(Inspection)" => "inspections_sms_tasks",
+      "Tasks(Evaluation)" => "evaluations_sms_tasks",
+      "Tasks(Investigation)" => "investigations_sms_tasks",
+    }
+  end
 
   def self.get_object_types
     objects = AccessControl.object_types
     if CONFIG::GENERAL[:task_notifications]
-      objects = CONFIG::OTHER_OBJECTS_FOR_AUTOMATED_NOTIF.merge(objects).sort.to_h
+      objects = tasks_for_automated_notifications.merge(objects).sort.to_h
     end
     objects
   end
 
+  def get_object_type
+    object_type.include?("sms_task") ? "sms_tasks" : object_type
+  end
+
   def get_anchor_date_fields
-    case object_type.classify
+    case get_object_type.classify
     when 'Meeting'
-      get_auto_fields(object_type, 'form', 'datetimez')
+      get_auto_fields(get_object_type, 'form', 'datetimez')
     when 'Verification'
-      get_auto_fields(object_type, 'auto', 'date')
+      get_auto_fields(get_object_type, 'auto', 'date')
     else
-      get_auto_fields(object_type, 'form', 'date')
+      get_auto_fields(get_object_type, 'form', 'date')
     end
   end
 
   def get_audience_fields
-    get_auto_fields(object_type, 'auto', 'user')
+    get_auto_fields(get_object_type, 'auto', 'user')
   end
 
 

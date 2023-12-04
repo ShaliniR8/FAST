@@ -23,10 +23,6 @@ class SWQConfig < DefaultConfig
     task_notifications:            true
   })
 
-  OTHER_OBJECTS_FOR_AUTOMATED_NOTIF = {
-    "Tasks" => "sms_tasks"
-  }
-
   MATRIX_INFO = {
     terminology: {
       baseline_btn: 'Baseline Risk',

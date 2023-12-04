@@ -15,14 +15,17 @@ namespace :notifications do
         interval = rule.interval
         subject = rule.subject
         content = rule.content
-
-        records = Object.const_get(object_type.classify)
-          .where("status = ? AND DATE(#{anchor_date_field}) = ?",
+        search_string = "status = ? AND DATE(#{anchor_date_field}) = ?"
+        if object_type.include?("sms_tasks")
+          owner_type = object_type.split("_").first
+          search_string << " AND owner_type = '#{owner_type.classify}'"
+        end
+        records = Object.const_get(rule.get_object_type.classify)
+          .where(search_string,
             anchor_status, Time.now.in_time_zone.to_date + interval.days)
-
         puts "Alert Rule ##{rule.id} count: #{records.length}"
         @logger.info "Alert Rule ##{rule.id} count: #{records.length}"
-        @logger.info "#{object_type.classify}: #{records.map {|r| r.id}}"
+        @logger.info "#{rule.get_object_type.classify}: #{records.map {|r| r.id}}"
         records.each do |record|
           user_or_users = record.send(audience_field)
           @logger.info "User or Users: #{user_or_users}"
