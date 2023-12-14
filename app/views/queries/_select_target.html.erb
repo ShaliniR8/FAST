@@ -47,7 +47,20 @@
       </table>
     </div>
 
-
+    <div class="col-xs-12">
+      <table id="sources" class="mt20 table table-bordered table-hover table-striped" style="display:none">
+        <thead>
+          <tr>
+            <th style="background:tan!important">Select Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%@sources.each do |source|%>
+            <tr><td data-source-type="<%=source.downcase%>"><%=source%></td></tr>
+          <%end%>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -77,7 +90,7 @@
     $("#targets tbody tr td").on("click", function(){selectTarget($(this));});
     $("#templates tbody tr td").on("click", function(){selectTemplates($(this));});
   });
-  
+
   function selectTemplates(cell) {
     if($(cell).css("background-color") === "rgb(173, 216, 230)")
       $(cell).css("background-color", "transparent");
@@ -113,7 +126,7 @@
 
     var target = $(cell).attr("data-target-name");
     var target_name = getSelectedTargetName("targets");
-    
+
     $.ajax({
       url: "<%=load_conditions_block_queries_path%>",
       type: 'GET',
@@ -140,9 +153,17 @@
 
     if (target_name == "Submission" || target_name == "Report" || target_name == "Checklist") {
       $("#templates").show();
+      $("#sources").hide();
       $("#templates td").css("background-color", "transparent");
-    } else {
+    }
+    else if (target_name == "Task"){
+      $("#sources").show();
       $("#templates").hide();
+      $("#sources td").css("background-color", "transparent");
+    }
+    else {
+      $("#templates").hide();
+      $("#sources").hide();
     }
   }
 

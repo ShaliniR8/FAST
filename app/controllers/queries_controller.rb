@@ -616,6 +616,11 @@ class QueriesController < ApplicationController
     end
     @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     @types["OSHA Report"] = "OshaRecord" if @types["OSHA Report"]
+    if CONFIG::GENERAL[:task_notifications]
+      @types["Task"] = "SmsTask"
+      @sources = ["Event"] if session[:mode] == "ASAP"
+      @sources = ["Audit", "Inspection","Evaluation", "Investigation"] if session[:mode] == "SMS"
+    end
     @types.delete("OSHA Submission")
     @types.delete("Checklist") unless CONFIG::GENERAL[:checklist_query]
     @templates = Template.where("archive = 0").sort_by{|x| x.name}.map{|template| [template.name, template.id]}.to_h
