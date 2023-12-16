@@ -43,6 +43,14 @@ class SmsTask < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def self.get_meta_fields_keys(*args)
+    visible_fields = (args.empty? ? ['index', 'form', 'show', 'auto'] : args)
+    keys = SmsTask.get_meta_fields(nil).select { |val| (val[:visible].split(',') & visible_fields).any? }
+                                          .map { |key| key[:field].to_s }
+
+    keys
+  end
+
   def get_statuses
     ["New", "Assigned", "Pending Approval", "Completed"]
   end

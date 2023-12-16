@@ -99,7 +99,7 @@ class QueriesController < ApplicationController
 
 
   def create
-    params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
+    params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist', 'SmsTask'].exclude?(params[:query][:target])
     params[:query][:templates] = params[:query][:templates].split(",")
     @owner = Query.create(params[:query])
     if params["distribution_list_ids"].present? && params["threshold"].present?
@@ -111,7 +111,6 @@ class QueriesController < ApplicationController
     end
     @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
     @owner.save
-
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -137,7 +136,6 @@ class QueriesController < ApplicationController
     end
     @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
     @owner.save
-
     redirect_to query_path(@owner)
   end
 
@@ -169,6 +167,8 @@ class QueriesController < ApplicationController
     elsif @target == 'Checklist'
       @templates =  Checklist.where(id: params[:templates])
       @no_template_option = params[:templates].include?('-1') rescue false
+    elsif @target == 'SmsTask'
+      @templates = params[:sources]
     else
       @templates = Template.where(:id => params[:templates])
     end
@@ -223,7 +223,7 @@ class QueriesController < ApplicationController
       @fields = Object.const_get(@target).get_meta_fields('show', 'index', 'query', 'invisible', 'close').keep_if{|x| x[:field]}
     end
 
-    if @templates.length > 0 && @target != 'Checklist'
+    if @target != "SmsTask" && @templates.length > 0 && @target != 'Checklist'
       @templates.map(&:fields).flatten.select{ |field| !field.deleted }.uniq{|field| field.label}.each{|field|
         @fields << {
           title: field.label,
@@ -451,14 +451,17 @@ class QueriesController < ApplicationController
       redirect_to choose_module_home_index_path
       return
     end
-
-    adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
     @object_name = @owner.target
-    @title = CONFIG.hierarchy[session[:mode]][:objects][@object_name][:title].pluralize
     @object_type = Object.const_get(@object_name)
     @table_name = @object_type.table_name
-    @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
-
+    if @object_name == "SmsTask"
+      @title = 'Task'
+      @object = SmsTask
+    else
+      adjust_session_to_target(@owner.target) if CONFIG.hierarchy[session[:mode]][:objects].exclude?(@owner.target)
+      @title = CONFIG.hierarchy[session[:mode]][:objects][@object_name][:title].pluralize
+      @object = CONFIG.hierarchy[session[:mode]][:objects][@object_name]
+    end
     @columns = get_data_table_columns(@object_name)
     @columns.delete_if {|x| x[:data] == 'get_additional_info_html'}
 
@@ -503,7 +506,7 @@ class QueriesController < ApplicationController
     @target_fields = @object_type.get_meta_fields('show', 'index', 'invisible', 'query', 'close').keep_if{|x| x[:field]}
     @template_fields = []
 
-    if @owner.target == "Checklist"
+    if ["Checklist", "SmsTask"].include?(@owner.target)
       # @owner.templates
     else
       Template.preload(:categories, :fields)
@@ -521,7 +524,6 @@ class QueriesController < ApplicationController
         }
       }
     end
-
     @fields = @target_fields + @template_fields
     @records_ids = get_query_results_ids(@owner)
     @target = @owner.target

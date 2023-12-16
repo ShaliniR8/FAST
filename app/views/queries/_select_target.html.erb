@@ -56,7 +56,8 @@
         </thead>
         <tbody>
           <%@sources.each do |source|%>
-            <tr><td data-source-type="<%=source.downcase%>"><%=source%></td></tr>
+            <%object_name = CONFIG::OBJECT_NAME_MAP.key(source)%>
+            <tr><td data-source-type="<%=object_name.present? ? object_name : source%>"><%=source%></td></tr>
           <%end%>
         </tbody>
       </table>
@@ -89,13 +90,17 @@
 
     $("#targets tbody tr td").on("click", function(){selectTarget($(this));});
     $("#templates tbody tr td").on("click", function(){selectTemplates($(this));});
+    $("#sources tbody tr td").on("click", function(){selectSources($(this));});
   });
 
-  function selectTemplates(cell) {
+  function changeBackgroundStyle(cell){
     if($(cell).css("background-color") === "rgb(173, 216, 230)")
       $(cell).css("background-color", "transparent");
     else
       $(cell).css("background-color", "lightblue");
+    }
+  function selectTemplates(cell) {
+    changeBackgroundStyle(cell)
 
     var templates = getSelectedTemplates("templates");
     var target = getSelectedTarget("targets");
@@ -110,6 +115,29 @@
         <%end%>
         "target": target,
         "templates": templates,
+        "target_display_name": target
+      },
+      beforeSend: function(){$('#step2_loader').show();$("#building_query").css({'opacity':0.5});},
+      complete: function(){$('#step2_loader').hide();$("#building_query").css({'opacity':1});},
+      success: function(response){$("#building_query").html(response);},
+      error: function(response){console.log(response);}
+    });
+  }
+
+  function selectSources(cell){
+    changeBackgroundStyle(cell)
+    var sources = getSelectedSources("sources");
+    var target = "SmsTask"
+    var target_name = "Task";
+    $.ajax({
+      url: "<%=load_conditions_block_queries_path%>",
+      type: 'GET',
+      data: {
+        <%if @owner.id.present?%>
+          "query_id": <%=@owner.id%>,
+        <%end%>
+        "target": target,
+        "sources": sources,
         "target_display_name": target
       },
       beforeSend: function(){$('#step2_loader').show();$("#building_query").css({'opacity':0.5});},
@@ -167,7 +195,6 @@
     }
   }
 
-
   function getSelectedTemplates(table) {
     var templates = [];
     $("#" + table + " td").each(function(){
@@ -176,6 +203,16 @@
       }
     });
     return templates;
+  }
+
+  function getSelectedSources(table){
+    var sources = [];
+    $("#" + table + " td").each(function(){
+      if ($(this).css("background-color") === "rgb(173, 216, 230)") {
+        sources.push($(this).attr("data-source-type"));
+      }
+    });
+    return sources.join();
   }
 
   function getSelectedTargetName(table) {

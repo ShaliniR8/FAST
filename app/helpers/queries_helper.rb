@@ -753,6 +753,8 @@ module QueriesHelper
       checklist_ids = checklist_custom_query(query, nil, nil)
       ids = target_table.find_by_sql("SELECT #{target_table_name}.id FROM #{target_table_name} WHERE
             #{target_table_name}.id #{checklist_ids.present? ? "IN (#{checklist_ids.join(',')})" : "IS NULL"}").map(&:id)
+    elsif query.target == 'SmsTask'
+      ids = SmsTask.where(owner_type: query.templates).map(&:id)
     else
       str = "SELECT #{target_table_name}.id FROM #{target_table_name}"
       if target_table == Meeting and session[:mode] == "SRM"

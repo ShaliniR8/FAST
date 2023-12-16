@@ -1,8 +1,11 @@
 <%=form_for @owner do |f|%>
-  <% templates_id =  @no_template_option ? @templates.map(&:id).join(",") + ',-1' : @templates.map(&:id).join(",")%>
-
   <%=f.hidden_field :target, :value => @target%>
-  <%=f.hidden_field :templates, :value => templates_id%>
+  <%if @target == "SmsTask"%>
+    <%=f.hidden_field :templates, :value => @templates%>
+  <%else%>
+    <% templates_id =  @no_template_option ? @templates.map(&:id).join(",") + ',-1' : @templates.map(&:id).join(",")%>
+    <%=f.hidden_field :templates, :value => templates_id%>
+  <%end%>
   <%=f.hidden_field :created_by_id, :value => current_user.id%>
 
   <div class="panel panel-lightblue">
