@@ -1,0 +1,3 @@
+class SACSafetyReportingConfig < DefaultSafetyReportingConfig
+
+end
