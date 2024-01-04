@@ -66,6 +66,8 @@ class Query < ActiveRecord::Base
         else
           Checklist.where(:id => templates).map(&:title).join(", ")
         end
+      elsif target == "SmsTask"
+        templates.map {|source| CONFIG::OBJECT_NAME_MAP[source] || source}.join(", ")
       else
         Template.where(:id => templates).map(&:name).join(", ")
       end
