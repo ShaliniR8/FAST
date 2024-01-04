@@ -13,7 +13,7 @@ div class="#{table[:size]}"
         th class="#{table[:main_header_style]}"
           = table[:row_header_name]
       th class="#{table[:main_header_style]}" colspan="#{table[:column_header].length}"
-        = table[:column_header_name]
+        = table[:column_header_name].html_safe
     / column header
     - unless is_col_header_row_empty
       tr
