@@ -136,12 +136,13 @@
                 <%end%>
 
                 <td width="20%">
+                  <% record_link = @object_type == SmsTask ? "/#{record.owner_type.tableize}/#{record.owner.id}" : "/#{@table_name}/#{record.id}"%>
                   <%=link_to "Open",
-                    "/#{@table_name}/#{record.id}",
+                    record_link,
                     :class => "btn btn-lightblue mr5 mb5",
                     :target => nil%>
                   <%=link_to "Open in New Tab",
-                    "/#{@table_name}/#{record.id}",
+                    record_link,
                     :class => "btn btn-lightblue mr5 mb5",
                     :target => :_blank%>
                 </td>

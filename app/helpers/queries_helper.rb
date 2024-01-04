@@ -1903,6 +1903,20 @@ module QueriesHelper
     mapping_hash['Checklist']['Checklist Header'] = 'checklist_get_header'
     mapping_hash['Checklist']['Template'] = 'checklist_get_template'
 
+    mapping_hash['SmsTask'] = Hash.new
+    mapping_hash['SmsTask']['ID'] = 'id'
+    mapping_hash['SmsTask']['Title'] = 'title'
+    mapping_hash['SmsTask']['Status'] = 'status'
+    mapping_hash['SmsTask']['Scheduled Completion Date'] = 'due_date'
+    mapping_hash['SmsTask']['Actual Completion Date'] = 'close_date'
+    mapping_hash['SmsTask']['Responsible User Name'] = 'res'
+    mapping_hash['SmsTask']['Final Approver'] = 'app_id'
+    mapping_hash['SmsTask']['Responsible Department'] = 'department'
+    mapping_hash['SmsTask']['Action'] = 'action'
+    mapping_hash['SmsTask']['Responsible User Comment'] = 'res_comment'
+    mapping_hash['SmsTask']['Final Comment'] = 'final_comment'
+    mapping_hash['SmsTask']['Description'] = 'description'
+
     return (mapping_hash[target].present? && mapping_hash[target][condition_field].present?) ? mapping_hash[target][condition_field] : condition_field.downcase.gsub(' ','_')
   end
 
