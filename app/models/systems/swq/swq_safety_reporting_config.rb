@@ -15,6 +15,9 @@ class SWQSafetyReportingConfig < DefaultSafetyReportingConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[causes occurrences sras investigations tasks].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
+      'SmsTask' => {
+        title: 'Task'
+      }
     },
   })
 end

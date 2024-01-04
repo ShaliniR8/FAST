@@ -1,7 +1,8 @@
 
 <%fields.each do |field_hash|%>
   <%field_type            = field_hash[:type]%>
-  <%field_description     = field_hash[:title]%>
+  <%field_title           = field_hash[:title]%>
+  <%field_description     = record.respond_to?(field_title) ? record.send(field_title) : field_title%>
 
   <%field_name            = field_hash[:field]%>
   <%field_value           = field_name.present? ? record.send(field_name) : ''%>

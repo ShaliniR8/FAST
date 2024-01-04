@@ -682,12 +682,16 @@ class SWQSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
 
       'Checklist' => {
         title: 'Checklist',
-      }
+      },
+
+      'SmsTask' => {
+        title: 'Task'
+      },
     },
     menu_items: {
       'Audits' => {
         title: 'Audits', path: '#',
-        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) || 
+        display: proc{|user:,**op| priv_check.call(Object.const_get('Audit'), user, 'index', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Audit'), user, 'new', CONFIG::GENERAL[:global_admin_default], true) ||
                                    priv_check.call(Object.const_get('Checklist'), user, 'add', CONFIG::GENERAL[:global_admin_default], true)},
         subMenu: [

@@ -47,21 +47,23 @@
       </table>
     </div>
 
-    <div class="col-xs-12">
-      <table id="sources" class="mt20 table table-bordered table-hover table-striped" style="display:none">
-        <thead>
-          <tr>
-            <th style="background:tan!important">Select Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <%@sources.each do |source|%>
-            <%object_name = CONFIG::OBJECT_NAME_MAP.key(source)%>
-            <tr><td data-source-type="<%=object_name.present? ? object_name : source%>"><%=source%></td></tr>
-          <%end%>
-        </tbody>
-      </table>
-    </div>
+    <%if @sources.present?%>
+      <div class="col-xs-12">
+        <table id="sources" class="mt20 table table-bordered table-hover table-striped" style="display:none">
+          <thead>
+            <tr>
+              <th style="background:tan!important">Select Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%@sources.each do |source|%>
+              <%object_name = CONFIG::OBJECT_NAME_MAP.key(source)%>
+              <tr><td data-source-type="<%=object_name.present? ? object_name : source%>"><%=source%></td></tr>
+            <%end%>
+          </tbody>
+        </table>
+      </div>
+    <%end%>
   </div>
 </div>
 

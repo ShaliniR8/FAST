@@ -110,7 +110,7 @@ class QueriesController < ApplicationController
       @owner.set_threshold({:distros => nil, :threshold => nil})
     end
     @owner.templates = Template.where(report_type: 'osha').map(&:id) if params[:query][:target] == "OshaRecord"
-    @owner.save
+        @owner.save
     params[:base].each_pair{|index, condition| create_query_condition(condition, @owner.id, nil)} rescue nil
     redirect_to query_path(@owner)
   end
@@ -455,6 +455,7 @@ class QueriesController < ApplicationController
     @object_type = Object.const_get(@object_name)
     @table_name = @object_type.table_name
     if @object_name == "SmsTask"
+      adjust_session_to_target(@owner.templates.first)
       @title = 'Task'
       @object = SmsTask
     else
@@ -618,8 +619,7 @@ class QueriesController < ApplicationController
     end
     @types = CONFIG.hierarchy[session[:mode]][:objects].map{|key, value| [key, value[:title]]}.to_h.invert
     @types["OSHA Report"] = "OshaRecord" if @types["OSHA Report"]
-    if CONFIG::GENERAL[:task_notifications]
-      @types["Task"] = "SmsTask"
+    if CONFIG::GENERAL[:task_notifications] && ["ASAP", "SMS"].include?(session[:mode])
       @sources = ["Event"] if session[:mode] == "ASAP"
       @sources = ["Audit", "Inspection","Evaluation", "Investigation"] if session[:mode] == "SMS"
     end

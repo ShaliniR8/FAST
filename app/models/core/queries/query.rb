@@ -23,10 +23,13 @@ class Query < ActiveRecord::Base
       {field: 'threshold',  title: 'Threshold', num_cols: 12, type: 'text', visible: 'show,form', required: false},
       {field: 'get_created_by', title: 'Created By', num_cols: 12,  type: 'text', visible: 'index,show'},
       {field: 'get_target',     title: 'Target',     num_cols: 12,  type: 'text', visible: 'index,show'},
-      {field: 'get_templates',  title: 'Templates',  num_cols: 12,  type: 'text', visible: 'show'},
+      {field: 'get_templates',  title: 'get_templates_title',  num_cols: 12,  type: 'text', visible: 'show'},
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def get_templates_title
+    target == "SmsTask" ? "Sources" : "Templates"
+  end
 
   def get_target
     CONFIG.object[target][:title].pluralize rescue ""
