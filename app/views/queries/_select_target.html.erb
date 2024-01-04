@@ -172,10 +172,17 @@
       success: function(response){
         $("#building_query").html(response);
         <%if @owner.templates.present?%>
-          <%@owner.templates.each do |template|%>
-            $("td[data-template-id='" + <%=template%> + "']").css("background-color", "lightblue");
-          <%end%>
-          selectTemplates(null);
+          if (target == "SmsTask"){
+            <%@owner.templates.each do |template|%>
+              $("td[data-source-type='" + "<%=template%>" + "']").css("background-color", "lightblue");
+            <%end%>
+            selectSources(null);
+          }else{
+            <%@owner.templates.each do |template|%>
+              $("td[data-template-id='" + <%=template%> + "']").css("background-color", "lightblue");
+            <%end%>
+            selectTemplates(null);
+          }
         <%end%>
       },
       error: function(response){console.log(response);}

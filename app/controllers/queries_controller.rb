@@ -119,7 +119,7 @@ class QueriesController < ApplicationController
   def update
     @owner = Query.find(params[:id])
     if params[:commit] == 'Save'
-      params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist'].exclude?(params[:query][:target])
+      params[:query][:templates] = "" if ['Record', 'Report', 'Submission', 'Checklist', 'SmsTask'].exclude?(params[:query][:target])
       params[:query][:templates] = params[:query][:templates].split(",")
       @owner.update_attributes(params[:query])
       @owner.query_conditions.destroy_all

@@ -271,8 +271,13 @@ module ApplicationHelper
       # TODO: Refactor here
 
       # actions
-      open_link = "<a href="+"/#{object.table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5'>Open</a>"
-      open_in_new_tab_link = "<a href="+"/#{object.table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5' target='_blank'>Open in New Tab</a>"
+      if object == SmsTask
+        open_link = "<a href="+"/#{record.owner_type.tableize}/#{record.owner.id} "+"class='btn btn-lightblue mr5 mb5'>Open</a>"
+        open_in_new_tab_link = "<a href="+"/#{record.owner_type.tableize}/#{record.owner.id} "+"class='btn btn-lightblue mr5 mb5' target='_blank'>Open in New Tab</a>"
+      else
+        open_link = "<a href="+"/#{object.table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5'>Open</a>"
+        open_in_new_tab_link = "<a href="+"/#{object.table_name}/#{record.id} "+"class='btn btn-lightblue mr5 mb5' target='_blank'>Open in New Tab</a>"
+      end
 
       # risk matrix color
       risk_color = CONFIG::MATRIX_INFO[:risk_table_index][record_hash['get_risk_classification']]
