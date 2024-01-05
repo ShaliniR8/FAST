@@ -175,7 +175,7 @@ javascript:
       var cellIdx = $(this)[0].cellIndex;
       var lastIdx = $(this).closest("tr").find("td:last")[0].cellIndex;
       if(cellIdx != lastIdx){
-        window.location = ("/#{@table_name}/" + $(this).closest("tr").attr('record-id'));
+        window.location = $($(this).closest("tr").find("td:last a:first")[0]).attr("href");
       }
     });
 
