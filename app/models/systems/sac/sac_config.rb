@@ -11,6 +11,7 @@ class SACConfig < DefaultConfig
     # AIRLINE-SPECIFIC CONFIGS
     name:                         'Sacramento International Airport',
     sms_im_visibility:            false,
+    safety_promotion_visibility:  true,
     has_gmap:                     true,
     gis_layers:                   true,
     lat:                          38.6953,
@@ -159,16 +160,16 @@ class SACConfig < DefaultConfig
 
     risk_table: {
       title: 'RISK ASSESSMENT MATRIX',
-      column_header_name: "Probability <br/> <i><small>*Note: Unacceptable level of risk unless mitigated.</small></i>",
+      column_header_name: "Probability <br/> <i><small>✱Note: Unacceptable level of risk unless mitigated.</small></i>",
       row_header: ['5 - Catastrophic','4 - Hazardous','3 - Major','2 - Minor', '1 - Negligible'],
       column_header: ['A - EXTREMELY IMPROBABLE', 'B - EXTREMEMLY REMOTE', 'C - REMOTE', 'D - PROBABLE', 'E - FREQUENT'],
 
       rows: [
-        ['3*', '4', '4', '4', '4'],
-        ['2', '3', '3', '4', '4'],
-        ['2', '2', '3', '3', '4'],
-        ['1', '1', '2', '2', '2'],
-        ['1', '1', '1', '1', '2']
+        ['✱', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', '']
       ],
 
       rows_color: [
