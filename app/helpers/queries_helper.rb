@@ -998,8 +998,10 @@ module QueriesHelper
         str = "SELECT #{table_name}.id FROM #{table_name} WHERE #{str}"
         if table_name == "meetings" and session[:mode] == "SRM"
           str << " AND type = 'SrmMeeting'"
+        elsif table_name == "sms_tasks"
+          str << " AND #{table_name}.owner_type IN (#{query.templates.map{|type| "'#{type}'"}.join(",")})"
         end
-        str = object_type.find_by_sql(str).map(&:id).to_s rescue []
+          str = object_type.find_by_sql(str).map(&:id).to_s rescue []
       end
     end
     str
