@@ -27,6 +27,9 @@ class SCXConfig < DefaultConfig
     checklist_query:                    true,
   })
 
+  LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.merge({
+    sras: ['Sra']
+  })
 
   FAA_INFO = DefaultConfig::FAA_INFO.merge({ #CORRECT/REVISE
     'CHDO'=>'Minneapolis-St. Paul FSDO, 6020 28th Avenue South, Minneapolis, MN 55450',
