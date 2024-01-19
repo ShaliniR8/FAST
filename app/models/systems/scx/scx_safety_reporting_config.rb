@@ -167,26 +167,26 @@ class SCXSafetyReportingConfig < DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        actions: {
-          pdf: {
-            access: proc { |owner:,user:,**op|
-              # Requested only admins can use normal pdf function 11/8/2019 by Stephanie Gabert
-              super_proc('Report',:pdf).call(owner:owner,user:user,**op) && user.admin?
-            },
-          },
-          meeting_ready: {
-            access: proc { |owner:,user:,**op|
-              # Requested unavailable until root cause analysis 10/2019 by Stephanie Gabert
-              super_proc('Report',:pdf).call(owner:owner,user:user,**op) && owner.root_causes.present?
-            },
-          },
-          close: {
-            access: proc { |owner:,user:,**op|
-              # Requested unavailable until root cause analysis 10/2019 by Stephanie Gabert
-              super_proc('Report',:pdf).call(owner:owner,user:user,**op) && owner.root_causes.present?
-            },
-          },
-        },
+        # actions: {
+        #   pdf: {
+        #     access: proc { |owner:,user:,**op|
+        #       # Requested only admins can use normal pdf function 11/8/2019 by Stephanie Gabert
+        #       super_proc('Report',:pdf).call(owner:owner,user:user,**op) && user.admin?
+        #     },
+        #   },
+        #   meeting_ready: {
+        #     access: proc { |owner:,user:,**op|
+        #       # Requested unavailable until root cause analysis 10/2019 by Stephanie Gabert
+        #       super_proc('Report',:pdf).call(owner:owner,user:user,**op) && owner.root_causes.present?
+        #     },
+        #   },
+        #   close: {
+        #     access: proc { |owner:,user:,**op|
+        #       # Requested unavailable until root cause analysis 10/2019 by Stephanie Gabert
+        #       super_proc('Report',:pdf).call(owner:owner,user:user,**op) && owner.root_causes.present?
+        #     },
+        #   },
+        # },
       },
       'CorrectiveAction' => {
         title: 'Corrective Action',
