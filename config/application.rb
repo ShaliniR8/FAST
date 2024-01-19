@@ -56,7 +56,7 @@ module PrdgSession
     user_name:        ENV['SMTP_USER_NAME'] || 'noc@prosafet.com',
     password:         ENV['SMTP_PASSWORD'] || 'Cupcakes2021!',
     authentication:   ENV['SMTP_AUTHENTICATION'] || 'plain',
-    enable_starttls:  (ENV['ENABLE_START_TLS'] == "true") 
+    enable_starttls:  (ENV['SMTP_ENABLE_START_TLS'] == "true") 
   }
   config.action_mailer.raise_delivery_errors = false
 

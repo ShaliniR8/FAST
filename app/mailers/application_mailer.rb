@@ -1,5 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: ENV['EMAIL_ADDRESS'] || 'donotreply@prosafet.com'
+  default from: ENV['SMTP_SENDER_ADDRESS'] || 'donotreply@prosafet.com'
 
   protected
   def to_email(email)
