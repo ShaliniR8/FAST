@@ -58,7 +58,7 @@ module PrdgSession
     authentication:   ENV['SMTP_AUTHENTICATION'] || 'plain',
     enable_starttls:  (ENV['ENABLE_START_TLS'] == "true") 
   }
-  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.raise_delivery_errors = false
 
 
   #Kaushik Mahorker OAuth
