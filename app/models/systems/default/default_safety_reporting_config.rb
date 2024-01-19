@@ -345,6 +345,7 @@ class DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
+        actions: [],
         panels: %i[causes occurrences sras investigations
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
         print_panels: %w[risk_matrix occurrences corrective_actions records]
@@ -458,59 +459,59 @@ class DefaultSafetyReportingConfig
         fields: {
           id: { default: true, title: 'ID', num_cols: 6, type: 'text', visible: 'index,show', required: true },
           status: { default: true, title: 'Status', num_cols: 6, type: 'text', visible: 'index,show', required: false },
-          get_host: { 
-            field: 'get_host', title: 'Host', num_cols: 6, 
-            type: 'text', visible: 'index,show', 
+          get_host: {
+            field: 'get_host', title: 'Host', num_cols: 6,
+            type: 'text', visible: 'index,show',
             required: false
           },
-          meeting_type: { 
-            field: 'meeting_type', title: 'Meeting Type', num_cols: 6, 
-            type: 'text', visible: 'index,show,form', 
+          meeting_type: {
+            field: 'meeting_type', title: 'Meeting Type', num_cols: 6,
+            type: 'text', visible: 'index,show,form',
             required: false
           },
-          title: { 
-            field: 'title', title: 'Title', num_cols: 6, 
-            type: 'datalist', visible: 'index,show,form', 
+          title: {
+            field: 'title', title: 'Title', num_cols: 6,
+            type: 'datalist', visible: 'index,show,form',
             required: false, options: "CONFIG.custom_options['Meeting Titles']"
           },
-          review_start: { 
-            field: 'review_start', title: 'Review Start Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          review_start: {
+            field: 'review_start', title: 'Review Start Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true, on_newline: true
           },
-          review_end: { 
-            field: 'review_end', title: 'Review End Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          review_end: {
+            field: 'review_end', title: 'Review End Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true
           },
-          meeting_start: { 
-            field: 'meeting_start', title: 'Meeting Start Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          meeting_start: {
+            field: 'meeting_start', title: 'Meeting Start Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true
           },
-          meeting_end: { 
-            field: 'meeting_end', title: 'Meeting End Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          meeting_end: {
+            field: 'meeting_end', title: 'Meeting End Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true
           },
-          notes: { 
-            field: 'notes', title: 'Notes', num_cols: 12, 
-            type: 'textarea', visible: 'form,show', 
+          notes: {
+            field: 'notes', title: 'Notes', num_cols: 12,
+            type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { 
-            field: 'final_comment', title: 'Final Comment', num_cols: 12, 
-            type: 'textarea', visible: 'show', 
+          final_comment: {
+            field: 'final_comment', title: 'Final Comment', num_cols: 12,
+            type: 'textarea', visible: 'show',
             required: false
           },
-          host: { 
-            field: 'host', title: 'Host', num_cols: 12, 
-            type: 'user', visible: 'auto', 
+          host: {
+            field: 'host', title: 'Host', num_cols: 12,
+            type: 'user', visible: 'auto',
             required: false
           },
-          participants: { 
-            field: 'participants', title: 'Participants', num_cols: 12, 
-            type: 'user', visible: 'auto', 
+          participants: {
+            field: 'participants', title: 'Participants', num_cols: 12,
+            type: 'user', visible: 'auto',
             required: false
           },
         }.reduce({}) { |acc,(key,data)|
