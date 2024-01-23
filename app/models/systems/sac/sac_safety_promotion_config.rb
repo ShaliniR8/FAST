@@ -1,4 +1,0 @@
-class SACSafetyPromotionConfig < DefaultSafetyPromotionConfig
-  
-
-end

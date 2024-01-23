@@ -1,3 +1,0 @@
-class SACSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
-
-end

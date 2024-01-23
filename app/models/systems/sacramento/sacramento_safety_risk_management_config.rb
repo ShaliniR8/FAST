@@ -1,0 +1,3 @@
+class SacramentoSafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
+
+end

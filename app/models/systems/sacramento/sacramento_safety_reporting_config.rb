@@ -1,0 +1,3 @@
+class SacramentoSafetyReportingConfig < DefaultSafetyReportingConfig
+
+end

@@ -1,3 +1,0 @@
-class SACSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
-
-end
