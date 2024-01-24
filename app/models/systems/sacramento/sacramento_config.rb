@@ -18,7 +18,7 @@ class SacramentoConfig < DefaultConfig
     lng:                          -121.5896,
     external_link:                false,
     enable_sso:                   false,
-    login_option:                 'dual'
+    login_option:                 'login'
   })
 
   EMPLOYEE_GROUPS = {
