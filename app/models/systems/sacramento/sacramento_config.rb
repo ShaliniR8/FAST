@@ -97,7 +97,7 @@ class SacramentoConfig < DefaultConfig
         ],
         [ # Airport Operations
           "<ul> <li> Loss of total operation 3+ hours </li> <li> Loss of partial operations greater than 60+ days </li> </ul>",
-          "<ul> <li> Loss of total operation 1 to 3 hours </li> <li> Partial loss of operations 20 to 59 days </li> </ul>",
+          "<ul> <li> Loss of total operation 1 to 3 hours </li> <li> Partial loss of operation 20 to 59 days </li> </ul>",
           "<ul> <li> Loss of total operations less than 1 hour </li> <li> Loss of partial operations less than 20 days </li> </ul>",
           "<ul> <li> Very limited partial operational impact </li> <li> 2 to 4 hours </li> </ul>",
           "<ul> <li> None to minimal operational impact </li> <li> Less than 2 hours </li> </ul>"
