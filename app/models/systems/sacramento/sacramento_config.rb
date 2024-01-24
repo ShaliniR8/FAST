@@ -130,6 +130,7 @@ class SacramentoConfig < DefaultConfig
     },
 
     probability_table: {
+      title: 'PROBABILITY DEFINITIONS',
       column_header: ['A', 'B', 'C', 'D', 'E'],
       row_header: ["",""],
       rows: [

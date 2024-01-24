@@ -20,7 +20,7 @@
             = @risk_table[:row_header_name]
           /COLUMN_HEADER
           th.header colspan="#{@risk_table[:column_header].size}"
-            = @risk_table[:column_header_name]
+            = @risk_table[:column_header_name].html_safe
         tr
           th.col-header
           - @risk_table[:column_header].each do |col_header|
