@@ -43,9 +43,8 @@ link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bo
                       :id => 'view_sra'
                   - if current_user.has_access('sras','edit', admin: CONFIG::GENERAL[:global_admin_default]) || current_user.has_access('sras','admin', admin: CONFIG::GENERAL[:global_admin_default])
                     = link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
-                      :class => "btn btn-sm btn-danger mr5",
+                      :class => "btn btn-sm btn-danger mr5 unlink_sra",
                       "data-toggle" => "tooltip",
-                      :id => "unlink_sra",
                       :title => 'Unlink Sra',
                       :disable_with => "Removing..."
 
@@ -69,15 +68,13 @@ javascript:
 
     $('#sras_table_length').hide()
 
-    $('#unlink_sra').on('click', function(){
+    $('.unlink_sra').on('click', function(){
       row = $(this).closest('tr')[0]
       sra_id = $(row).attr('linked_sra_id')
-      commit = 'Unlink'
       $.ajax({
         type: 'POST',
-        url: "#{update_links_sra_path}",
+        url: "#{unlink_sra_path}",
         data: {
-          commit: commit,
           item_id: sra_id,
           item_type: 'Sra'
         },

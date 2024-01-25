@@ -763,7 +763,8 @@ PrdgSession::Application.routes.draw do |map|
       put 'ajax_update'
       get "add_meeting"
       post "add_meeting_minutes"
-      post "update_links"
+      post "add_links"
+      post "unlink"
     end
     collection do
       post 'load_records'

@@ -1,10 +1,9 @@
-<%=form_tag eval("update_links_#{owner_class.singularize}_path"), method: :post do%>
-  <%=hidden_field_tag 'id', owner.id %>
+<%=form_tag eval("add_links_#{params[:controller].singularize}_path"), method: :post do%>
   <%=hidden_field_tag 'item_type', item_type%>
   <%=hidden_field_tag 'items_selected', '' %>
   <div class="panel-warning">
     <div class="panel-heading">
-      <div class="panel-title"><%="Add #{item_type} to #{owner_class.classify} ID ##{owner.id}"%>
+      <div class="panel-title"><%="Add #{item_type} to #{params[:controller].classify} ID ##{params[:id]}"%>
         <button type="button" id="close_modal" class="close pull-right" data-dismiss="modal" aria-label="Close">
           <span class="glyphicon glyphicon-remove"></span>
         </button>
