@@ -326,13 +326,11 @@ class ApplicationController < ActionController::Base
   end
 
   def show_items_to_link
-    owner_class = params[:controller]
-    owner_object = Object.const_get(owner_class.classify)
+    owner_object = Object.const_get(params[:controller].classify)
     owner = owner_object.find(params[:id])
-    item_type = params[:type].classify
-    linked_ids = owner.linked_object_ids(object_type: item_type) + [owner.id]
-    @items = owner_object.where('id NOT IN (?)', linked_ids.join(',')).select([:id, :title, :status])
-    render :partial => "shared/show_items_to_link", locals: {owner_class: owner_class, owner: owner, owner_object: owner_object, item_type: item_type}
+    linked_ids = (owner.linked_object_ids(object_type: params[:type].classify) + [owner.id]).uniq
+    @items = owner_object.where("id NOT IN (#{linked_ids.join(',')})").select([:id, :title, :status])
+    render :partial => "shared/show_items_to_link", locals: {owner_class: params[:controller], owner: owner, item_type: params[:type].classify}
   end
 
   def update_links
