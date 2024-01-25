@@ -327,10 +327,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_link_type
-    owner_class = params[:controller]
-    owner_object = Object.const_get(owner_class.classify)
-    owner = owner_object.find(params[:id])
-    @objects =  CONFIG::LINK_OBJECTS[owner_class.to_sym].map { |object| object_class_and_table_name(object) }
+    @objects =  CONFIG::LINK_OBJECTS[params[:controller].to_sym].map { |object| object_class_and_table_name(object) }
     render :partial => '/forms/workflow_forms/get_link_type'
   end
 
