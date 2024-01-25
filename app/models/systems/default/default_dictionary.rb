@@ -410,9 +410,9 @@ class DefaultDictionary
     sras: {
       partial: '/panels/sras',
       print_partial: '/pdfs/print_sras',
-      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Sra').present? },
+      visible: proc { |owner:,user:,**op| (owner.get_children(child_type: 'Sra').map(&:id) - owner.linked_object_ids(object_type: 'Sra')).present? },
       show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { sras: owner.get_children(child_type: 'Sra') } },
+      data: proc { |owner:,user:,**op| { sras: owner.get_children(child_type: 'Sra').select{|child| !owner.linked_object_ids(object_type: 'Sra').include?(child.id)} } },
     },
     hazards: {
       partial: '/panels/hazards',
