@@ -396,6 +396,8 @@ class SrasController < ApplicationController
     )
   end
 
+
+
   def add_all_records
     @sra = Sra.find(params[:sra_id])
     records_added_ids = params[:records_selected].chomp(',').split(',')
@@ -422,6 +424,7 @@ class SrasController < ApplicationController
     redirect_to sra_path(@sra)
   end
 
+
   def remove_record
     child = Child.where(owner_type: 'Sra', owner_id: params[:id].to_i, child_id: params[:record_id].to_i, child_type: 'Record').first rescue nil
     child.destroy if child.present?
@@ -438,6 +441,7 @@ class SrasController < ApplicationController
 
     render :json => {success: "Report removed from SRA", code: 200, deleted_id: params[:record_id].to_i}
   end
+
 
   def new_hazard
     @sra = Sra.find(params[:id])
@@ -570,41 +574,6 @@ class SrasController < ApplicationController
     end
   end
 
-  def link_sras
-    @sra = Sra.find(params[:id])
-    @sra_headers = Sra.get_meta_fields('index')
-    if params[:commit] == 'Show Sras to Link'
-      linked_ids = @sra.linked_object_ids(object_type: 'Sra') + [@sra.id]
-      @sras = Sra.where('id NOT IN (?)', linked_ids.join(',')).select([:id, :title, :status])
-      render :partial => "link_sras"
-    elsif params[:commit] == 'Link Sras'
-      sra_selected_ids = params[:sras_selected].chomp(',').split(',').map{|id| id.to_i}
-      if sra_selected_ids.present?
-        sra_selected_ids.each do |id|
-          c1 = Child.create({child_type: 'Sra', child_id: id, owner_type: 'Sra', owner_id: @sra.id})
-          c2 = Child.create({child_type: 'Sra', child_id: @sra.id, owner_type: 'Sra', owner_id: id})
-          @sra.children << c1
-          Sra.find(id).children << c2
-        end
-        message = "Sra IDs #{sra_selected_ids.join(', ')} linked to this SRA"
-      end
-      flash.now[:notice] = message
-      Transaction.build_for(
-        @sra,
-        'Sras linked',
-        current_user.id,
-        message
-      )
-      redirect_to sra_path(@sra)
-    elsif params[:commit] == 'Unlink Sra'
-      id_to_remove = params[:sra_id].to_i
-      Parent.where(owner_type: 'Sra', owner_id: @sra.id, parent_type: 'Sra', parent_id: id_to_remove).destroy
-      Parent.where(owner_type: 'Sra', owner_id: id_to_remove, parent_type: 'Sra', parent_id: @sra.id).destroy
-      respond_to do |format|
-        format.json {render :json => { :result => 'Removed'}}
-      end
-    end
-  end
 
   # def mitigate
   #   @owner = Sra.find(params[:id])
