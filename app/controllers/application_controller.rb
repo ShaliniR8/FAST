@@ -354,7 +354,6 @@ class ApplicationController < ActionController::Base
         selected_ids.each do |id|
           c1 = Child.create({child_type: item_type, child_id: id, owner_type: owner_class, owner_id: owner.id})
           c2 = Child.create({child_type: owner_class, child_id: owner.id, owner_type: item_type, owner_id: id})
-          byebug
           owner.children << c1
           Object.const_get(item_type).find(id).children << c2
         end

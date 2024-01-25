@@ -378,30 +378,6 @@ class SrasController < ApplicationController
     end
   end
 
-  def link_sra
-    @sra = Sra.find(params[:sra_id])
-    sra_added_ids = params[:sras_selected].chomp(',').split(',')
-
-    if sra_added_ids.present?
-      sra_added_ids.each do |s|
-        Sra.find(s.to_i).parents << Parent.create({child_type: 'Sra', parent_id: @sra.id, owner_type: 'Sra', owner_id: s.to_i})
-        @sra.parents << Parent.create({child_type: 'Sra', parent_id: s.to_i, owner_type: 'Sra', owner_id: @sra.id})
-      end
-      @sra.save
-      message = "Sra IDs #{sra_added_ids.join(',')} linked to this SRA"
-    end
-    flash[:notice] = message
-
-    Transaction.build_for(
-      @sra,
-      'Sras Linked',
-      current_user.id,
-      message
-    )
-
-    redirect_to sra_path(@sra)
-  end
-
   def carryover
     meeting = Meeting.find(params[:meeting_id])
     sra = Sra.find(params[:id])
@@ -419,8 +395,6 @@ class SrasController < ApplicationController
       "SRA Removed from Meeting ##{meeting.id}"
     )
   end
-
-
 
   def add_all_records
     @sra = Sra.find(params[:sra_id])
@@ -464,7 +438,6 @@ class SrasController < ApplicationController
 
     render :json => {success: "Report removed from SRA", code: 200, deleted_id: params[:record_id].to_i}
   end
-
 
   def new_hazard
     @sra = Sra.find(params[:id])
