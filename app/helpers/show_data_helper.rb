@@ -16,7 +16,7 @@
   #Called in panel/show_panels; pass the owner and it will initialize all locals for each panel
   def prepare_panels(owner, **op)
     owner_name = owner.class.name
-    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?    
+    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?
     panel_data = CONFIG.hierarchy[session[:mode]][:objects][owner_name][:panels].values.select{ |data|
       data[:visible].call(owner: owner, user: current_user, **op) rescue nil
     }.map { |data|
@@ -34,7 +34,7 @@
   #    an owner's children's source_of_input, which is owner
   def print_panels(owner, **op)
     owner_name = owner.class.name
-    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?    
+    owner_name = owner.class.superclass.name if CONFIG.object[owner_name].nil?
     hierarchy_object = CONFIG.hierarchy[session[:mode]][:objects][owner_name]
     # are custom print_panels defined ? print the custom panels : print the default panels
     if hierarchy_object.present?

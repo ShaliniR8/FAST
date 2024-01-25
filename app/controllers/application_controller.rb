@@ -326,6 +326,64 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def items_to_link
+    owner_class = params[:controller]
+    owner_object = Object.const_get(owner_class.classify)
+    owner = owner_object.find(params[:id])
+    case params[:commit]
+    when 'get_link_type'
+      @objects =  CONFIG::LINK_OBJECTS[owner_class.to_sym].map { |object| object_class_and_table_name(object) }
+      render :partial => '/forms/workflow_forms/link_object_type'
+    when 'show_items_to_link'
+      item_type = params[:type].classify
+      linked_ids = owner.linked_object_ids(object_type: item_type) + [owner.id]
+      @items = owner_object.where('id NOT IN (?)', linked_ids.join(',')).select([:id, :title, :status])
+      render :partial => "shared/show_items_to_link", locals: {owner_class: owner_class, owner: owner, owner_object: owner_object, item_type: item_type}
+    end
+  end
+
+  def update_links
+    owner_class = params[:controller].classify
+    owner_object = Object.const_get(owner_class)
+    owner = owner_object.find(params[:id])
+    item_type = params[:item_type].classify
+
+    if params[:commit]. == 'Link Items'
+      selected_ids = params[:items_selected].chomp(',').split(',').map{|id| id.to_i}
+      if selected_ids.present?
+        selected_ids.each do |id|
+          c1 = Child.create({child_type: item_type, child_id: id, owner_type: owner_class, owner_id: owner.id})
+          c2 = Child.create({child_type: owner_class, child_id: owner.id, owner_type: item_type, owner_id: id})
+          byebug
+          owner.children << c1
+          Object.const_get(item_type).find(id).children << c2
+        end
+        message = "#{item_type} IDs #{selected_ids.join(', ')} linked to this #{owner_class}"
+      end
+      flash.now[:notice] = message
+      Transaction.build_for(
+        @owner,
+        "#{item_type} linked",
+        current_user.id,
+        message
+      )
+      redirect_to eval("#{params[:controller].singularize}_path(owner)")
+    elsif params[:commit] == 'Unlink'
+      id_to_remove = params[:item_id].to_i
+      Child.where(owner_type: owner_class, owner_id: owner.id, child_type: item_type, child_id: id_to_remove).first.destroy
+      Child.where(owner_type: item_type, owner_id: id_to_remove, child_type: owner_class, child_id: owner.id).first.destroy
+      Transaction.build_for(
+        owner,
+        "#{item_type} unlinked",
+        current_user.id,
+        "#{item_type} #{id_to_remove} unlinked from #{owner_class}"
+      )
+      respond_to do |format|
+        format.json {render :json => { :result => 'Removed'}}
+      end
+    end
+  end
+
   def set_parent_type_id(object)
     # if parent exists, set parent type and id
     @parent_type = params[:parent_type]

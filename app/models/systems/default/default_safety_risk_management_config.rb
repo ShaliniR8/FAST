@@ -190,9 +190,9 @@ class DefaultSafetyRiskManagementConfig
         },
         actions: [
           #TOP
-          *%i[delete override_status edit launch deid_pdf pdf viewer_access view_meeting view_parent attach_in_message expand_all],
+          *%i[delete override_status edit launch link deid_pdf pdf viewer_access view_meeting view_parent attach_in_message expand_all],
           #INLINE
-          *%i[assign complete request_extension schedule_verification approve_reject add_records hazard reopen comment contact task cost],
+          *%i[assign add_records complete request_extension schedule_verification approve_reject add_records hazard reopen comment contact task cost],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           approve_reject: {
             btn: :approve_reject,
@@ -222,7 +222,7 @@ class DefaultSafetyRiskManagementConfig
             },
           },
         }),
-        panels: %i[agendas comments source_of_input audits hazards contacts costs tasks extension_requests verifications attachments transaction_log
+        panels: %i[agendas comments source_of_input linked_sras audits hazards contacts costs tasks extension_requests verifications attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Hazard' => {
@@ -502,59 +502,59 @@ class DefaultSafetyRiskManagementConfig
         fields: {
           id: { default: true, title: 'ID', num_cols: 6, type: 'text', visible: 'index,show', required: true },
           status: { default: true, title: 'Status', num_cols: 6, type: 'text', visible: 'index,show', required: false },
-          get_host: { 
-            field: 'get_host', title: 'Host', num_cols: 6, 
-            type: 'text', visible: 'index,show', 
+          get_host: {
+            field: 'get_host', title: 'Host', num_cols: 6,
+            type: 'text', visible: 'index,show',
             required: false
           },
-          meeting_type: { 
-            field: 'meeting_type', title: 'Meeting Type', num_cols: 6, 
-            type: 'text', visible: 'index,show,form', 
+          meeting_type: {
+            field: 'meeting_type', title: 'Meeting Type', num_cols: 6,
+            type: 'text', visible: 'index,show,form',
             required: false
           },
-          title: { 
-            field: 'title', title: 'Title', num_cols: 6, 
-            type: 'datalist', visible: 'index,show,form', 
+          title: {
+            field: 'title', title: 'Title', num_cols: 6,
+            type: 'datalist', visible: 'index,show,form',
             required: false, options: "CONFIG.custom_options['Meeting Titles']"
           },
-          review_start: { 
-            field: 'review_start', title: 'Review Start Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          review_start: {
+            field: 'review_start', title: 'Review Start Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true, on_newline: true
           },
-          review_end: { 
-            field: 'review_end', title: 'Review End Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          review_end: {
+            field: 'review_end', title: 'Review End Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true
           },
-          meeting_start: { 
-            field: 'meeting_start', title: 'Meeting Start Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          meeting_start: {
+            field: 'meeting_start', title: 'Meeting Start Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true
           },
-          meeting_end: { 
-            field: 'meeting_end', title: 'Meeting End Date', num_cols: 6, 
-            type: 'datetimez', visible: 'index,form,show', 
+          meeting_end: {
+            field: 'meeting_end', title: 'Meeting End Date', num_cols: 6,
+            type: 'datetimez', visible: 'index,form,show',
             required: true
           },
-          notes: { 
-            field: 'notes', title: 'Notes', num_cols: 12, 
-            type: 'textarea', visible: 'form,show', 
+          notes: {
+            field: 'notes', title: 'Notes', num_cols: 12,
+            type: 'textarea', visible: 'form,show',
             required: false
           },
-          final_comment: { 
-            field: 'final_comment', title: 'Final Comment', num_cols: 12, 
-            type: 'textarea', visible: 'show', 
+          final_comment: {
+            field: 'final_comment', title: 'Final Comment', num_cols: 12,
+            type: 'textarea', visible: 'show',
             required: false
           },
-          host: { 
-            field: 'host', title: 'Host', num_cols: 12, 
-            type: 'user', visible: 'auto', 
+          host: {
+            field: 'host', title: 'Host', num_cols: 12,
+            type: 'user', visible: 'auto',
             required: false
           },
-          participants: { 
-            field: 'participants', title: 'Participants', num_cols: 12, 
-            type: 'user', visible: 'auto', 
+          participants: {
+            field: 'participants', title: 'Participants', num_cols: 12,
+            type: 'user', visible: 'auto',
             required: false
           },
         }.reduce({}) { |acc,(key,data)|
@@ -564,7 +564,7 @@ class DefaultSafetyRiskManagementConfig
           #TOP
           *%i[],
           #INLINE
-          *%i[pdf],
+          *%i[pdf add_records],
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc },
         panels: %i[included_sras participants attachments transaction_log
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },

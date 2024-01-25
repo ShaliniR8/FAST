@@ -33,6 +33,11 @@
 
         <div class="col-xs-12 mb20">
           <%= render '/forms/render_buttons', owner: @owner, env: :inline %>
+          <%=link_to "Link SRAs","#",
+            :class=>"btn btn-success pull-right mr5 mb5",
+            :id=>"sra_btn",
+            "data-toggle"=>"modal",
+            "data-target"=>".bs-example-modal-lg"%>
         </div>
 
         <%= render '/forms/show_fields', :fields => @fields, :record => @sra%>
@@ -43,6 +48,7 @@
           <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !current_user.has_access('sras', 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
         <%end%>
         <%= render '/panels/show_panels', owner: @owner%>
+
 
       </div>
     </div>
@@ -100,6 +106,13 @@
         if (data["code"] == 200) {
           $("tr[record_id="+ data["deleted_id"] +"]").css("display", "none");
         }
+      });
+    });
+    $('#sra_btn').on('click',function(){
+      path="<%=link_sras_sra_path(:commit => "Show Sras to Link")%>";
+      $.get(path,function(data){
+        $(".modal-content").html(data);
+        $(window).trigger('resize');
       });
     });
 

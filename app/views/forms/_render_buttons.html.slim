@@ -130,6 +130,13 @@ ruby:
       id: 'launch_btn',
       'data-toggle' => 'modal',
       'data-target' => '.bs-example-modal-lg'
+  - when :link
+    = link_to 'Link',
+      '#',
+      class: 'btn btn-warning pull-right mr5 mb5',
+      id: 'link_btn',
+      'data-toggle' => 'modal',
+      'data-target' => '.bs-example-modal-lg'
 
   - when :hazard
     = link_to 'Add Hazard',
@@ -400,6 +407,16 @@ ruby:
     javascript:
       $('#launch_btn').on('click',function(){
         $.get('#{eval("launch_#{owner_class}_path(owner)")}', function(data){
+            $(".modal-content").html(data);
+            $(window).trigger('resize');
+        });
+      });
+
+  - when :link
+    javascript:
+      $('#link_btn').on('click',function(){
+
+        $.get('#{eval("items_to_link_#{owner_class}_path(owner, :commit => \'get_link_type\')")}', function(data){
             $(".modal-content").html(data);
             $(window).trigger('resize');
         });

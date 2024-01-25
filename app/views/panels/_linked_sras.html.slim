@@ -1,0 +1,93 @@
+= javascript_include_tag \
+  'utility/jquery.dataTables.min',
+  'utility/dataTables.bootstrap.min',
+  'utility/dataTables.buttons.min'
+
+link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap/dataTables.bootstrap.min.css"
+
+.col-xs-12
+  .panel.panel-info
+    .panel-heading.click-heading
+      .panel-title
+        b Linked Sras
+        span.pull-right.clickable: i.mt5.glyphicon.glyphicon-chevron-up
+    .panel-body
+      p
+        i.glyphicon.glyphicon-minus.btn.btn-sm.btn-danger.mb5.mr5.ml5
+        <b> Unlink SRA </b> - Removes link between the two SRAs, i.e, target linked SRA will no longer be present under current SRA page, and current SRA will not be present under target SRA page.
+      p
+        i.fa.fa-link.btn.btn-sm.btn-info.mb5.mr5.ml5
+        <b> View Full Sra </b> - Opens target SRA show page on a new tab.
+      .table-responsive
+        table class="table table-bordered table-striped" id="sras_table"
+          thead
+            tr
+              - Sra.get_meta_fields('index').each do |header|
+                th class="#{header[:size]}" = header[:title]
+              th width="15%" Actions
+          tbody
+            - linked_sra_ids.each do |id|
+              - sra = Sra.find(id)
+              tr linked_sra_id="#{sra.id}"
+                - Sra.get_meta_fields('index').each do |header|
+                  td class="#{header[:html_class].present? ? sra.send(header[:html_class]) : ''}"
+                    = render "forms/show_field", :record => sra, :field_hash => header
+                td
+                  - if sra.has_show_access(current_user)
+                    = link_to "<i class='fa fa-link'></i>".html_safe,
+                      sra_path(sra),
+                      target: :_blank,
+                      "data-toggle" => "tooltip",
+                      title: 'View Full SRA',
+                      :class => "btn btn-sm btn-info mr5",
+                      :id => 'view_sra'
+                  - if current_user.has_access('sras','edit', admin: CONFIG::GENERAL[:global_admin_default]) || current_user.has_access('sras','admin', admin: CONFIG::GENERAL[:global_admin_default])
+                    = link_to "<i class='glyphicon glyphicon-minus'></i>".html_safe, "#",
+                      :class => "btn btn-sm btn-danger mr5",
+                      "data-toggle" => "tooltip",
+                      :id => "unlink_sra",
+                      :title => 'Unlink Sra',
+                      :disable_with => "Removing..."
+
+
+css:
+  .table tbody tr > td.red {
+    background-color: red !important;
+  }
+  .table tbody tr > td.yellow {
+    background-color: yellow !important;
+  }
+  .table tbody tr > td.green {
+    background-color: mediumseagreen !important;
+  }
+
+javascript:
+  $(document).ready(function() {
+    $('#sras_table').DataTable({
+        "aaSorting": [[ 0, "desc" ]]
+    })
+
+    $('#sras_table_length').hide()
+
+    $('#unlink_sra').on('click', function(){
+      row = $(this).closest('tr')[0]
+      sra_id = $(row).attr('linked_sra_id')
+      commit = 'Unlink'
+      $.ajax({
+        type: 'POST',
+        url: "#{update_links_sra_path}",
+        data: {
+          commit: commit,
+          item_id: sra_id,
+          item_type: 'Sra'
+        },
+        dataType: "json",
+        success: function(result){
+          $(row).hide()
+        },
+        error: function(result){
+          console.log(result)
+        }
+      })
+    })
+  })
