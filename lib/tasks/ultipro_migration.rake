@@ -35,6 +35,7 @@ namespace :ultipro do
         begin
           logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
           @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
+          @users_employee_numbers = User.includes(:privileges, :roles).all.map{|u| [u.employee_number, u]}.to_h
           @log_data = []
           User.transaction do
             Hash.from_xml(data_dump)['wbat_poc']['poc']
@@ -44,14 +45,16 @@ namespace :ultipro do
                 @err_username = username #Used for error logging
                 @err_user_hash = user_hash  #Used for error logging
                 @log_entry = ""
+                employee_number = user_hash['employee_number']
                 if @users.key?(username.downcase)
                   user = @users[username.downcase]
                 elsif @users.key?(username)
                   user = @users[username]
+                elsif @users_employee_numbers.key?(employee_number)
+                  user = @users_employee_numbers[employee_number]
                 else
                   user = generate_user user_hash
-                  next if user.nil?
-                  @log_entry << " Account Created"
+                  @log_entry << " Account Created" if user.present?
                 end
                 update_account_detail user, user_hash
                 update_privileges user, user_hash
@@ -145,6 +148,7 @@ namespace :ultipro do
 
 
     def update_privileges user, user_hash
+      return nil if user.nil?
       user_privileges = user.privileges.map{|priv| priv[:name]}
       @privilege_list ||= Privilege.all.map{ |priv| [priv[:name], priv.id] }.to_h
       privileges = user_hash['access_privilege_list']['access_privilege'] rescue []
@@ -173,7 +177,7 @@ namespace :ultipro do
 
 
     def update_account_detail user, user_hash
-
+      return nil if user.nil?
       case AIRLINE_CODE
       when 'SCX'
         if user.sso_id != user_hash['email_address']
@@ -186,7 +190,10 @@ namespace :ultipro do
           user.sso_id = user_hash['employee_number']
         end
       end
-
+      if user.username != user_hash['user_name']
+        @log_entry << "\n     Update Username: #{user.username} => #{user_hash['user_name']}"
+        user.username = user_hash['user_name']
+      end
       if user.email != user_hash['email_address']
         @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
         user.email = user_hash['email_address']
@@ -195,13 +202,21 @@ namespace :ultipro do
         @log_entry << "\n     Update Employee #: #{user.employee_number} => #{user_hash['employee_number']}"
         user.employee_number = user_hash['employee_number']
       end
-      if user.first_name != user_hash['first_name']
+      updated_full_name = false
+      if user_hash['first_name'].present? && user.first_name != user_hash['first_name']
         @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"
         user.first_name = user_hash['first_name']
+        updated_full_name = true
       end
-      if user.last_name != user_hash['last_name']
+      if  user_hash['last_name'].present? && user.last_name != user_hash['last_name']
         @log_entry << "\n     Update Last Name: #{user.last_name} => #{user_hash['last_name']}"
         user.last_name = user_hash['last_name']
+        updated_full_name = true
+      end
+      if user_hash['first_name'].present? && user_hash['last_name'].present? && updated_full_name
+        full_name = user_hash['first_name'] +' '+ user_hash['last_name']
+        @log_entry << "\n     Update Full Name: #{user.full_name} => #{full_name}"
+        user.full_name = full_name
       end
       user.save
     end
