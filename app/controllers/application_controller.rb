@@ -328,8 +328,10 @@ class ApplicationController < ActionController::Base
   def show_items_to_link
     owner_object = Object.const_get(params[:controller].classify)
     owner = owner_object.find(params[:id])
-    linked_ids = (owner.linked_object_ids(object_type: params[:type].classify) + [owner.id]).uniq
-    @items = owner_object.where("id NOT IN (#{linked_ids.join(',')})").select([:id, :title, :status])
+    child_ids = owner.children.map{|child| child.child_id if child.child_type == params[:type].classify }.uniq.compact
+    parents_ids = owner.parents.map{|parent| parent.parent_id if parent.parent_type == params[:type].classify }.uniq.compact
+    ids_to_exclude = (parents_ids + child_ids + [owner.id]).join(", ")
+    @items = owner_object.where("id NOT IN (#{ids_to_exclude})").select([:id, :title, :status])
     render :partial => "shared/show_items_to_link", locals: {item_type: params[:type].classify}
   end
 
