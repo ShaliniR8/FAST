@@ -69,22 +69,31 @@ javascript:
     $('#sras_table_length').hide()
 
     $('.unlink_sra').on('click', function(){
-      row = $(this).closest('tr')[0]
-      sra_id = $(row).attr('linked_sra_id')
-      $.ajax({
-        type: 'POST',
-        url: "#{unlink_sra_path}",
-        data: {
-          item_id: sra_id,
-          item_type: 'Sra'
-        },
-        dataType: "json",
-        success: function(result){
-          $(row).hide()
-        },
-        error: function(result){
-          console.log(result)
-        }
-      })
+      result = confirm('Are you sure you want to unlink this SRA?')
+      all_unlink_buttons = document.querySelectorAll('.unlink_sra')
+      if (result){
+        row = $(this).closest('tr')[0]
+        sra_id = $(row).attr('linked_sra_id')
+        $.ajax({
+          type: 'POST',
+          url: "#{unlink_sra_path}",
+          data: {
+            item_id: sra_id,
+            item_type: 'Sra'
+          },
+          dataType: "json",
+          beforeSend: function(){
+            $(all_unlink_buttons).attr('disabled', true)
+          },
+          success: function(result){
+            $(row).hide()
+            $(all_unlink_buttons).attr('disabled', false)
+          },
+          error: function(result){
+            console.log(result)
+            $(all_unlink_buttons).attr('disabled', false)
+          }
+        })
+      }
     })
   })

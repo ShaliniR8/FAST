@@ -71,6 +71,7 @@
 </style>
 
 <script type="text/javascript">
+  items = [];
   $(document).ready(function() {
     let all_items_table = $('#all_items_table').DataTable({
         "iDisplayLength": -1,
@@ -85,10 +86,12 @@
             $(this).prop('checked', false);
             $(this).closest('td').find('strong').first().css("color", "red");
             $(this).closest('td').find('strong').first().html("Not Added");
-          } else {
+            items = items.filter((e) => e!= id)
+            } else {
             $(this).prop('checked', true);
             $(this).closest('td').find('strong').first().css("color", "green");
             $(this).closest('td').find('strong').first().html("To be Added");
+            items.push(id)
           }
         }
       });
@@ -96,18 +99,11 @@
   });
 
   function serialize_item_ids() {
-    let items = '';
-    let elems = $("input.items:checked");
-
-    elems.each(function(index, elem){
-        items += $(elem).attr('id') + ",";
-    });
-
-    if (items == ''){
+    if (items == []){
       alert("Please select at least 1 item or close the pop-up");
       return false;
     }
-    $('#items_selected').val(items);
+    $('#items_selected').val(items.join(','));
     console.log(items)
     return true;
   }
