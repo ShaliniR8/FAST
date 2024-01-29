@@ -15,7 +15,8 @@ namespace :ultipro do
 
         assign_configs
         fetch_file
-
+        @sso_identifier_tag = CONFIG::ULTIPRO_DATA[:sso_identifier_tag]
+        @sso_identifier_attribute = CONFIG::ULTIPRO_DATA[:sso_identifier_attribute]
         begin
           data_dump = case AIRLINE_CODE
             when 'SCX'
@@ -35,7 +36,7 @@ namespace :ultipro do
         begin
           logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
           @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
-          @users_employee_numbers = User.includes(:privileges, :roles).all.map{|u| [u.employee_number, u]}.to_h
+          @users_sso_map = User.includes(:privileges, :roles).all.map{|u| [u.send(@sso_identifier_attribute), u]}.to_h
           @log_data = []
           User.transaction do
             Hash.from_xml(data_dump)['wbat_poc']['poc']
@@ -45,13 +46,13 @@ namespace :ultipro do
                 @err_username = username #Used for error logging
                 @err_user_hash = user_hash  #Used for error logging
                 @log_entry = ""
-                employee_number = user_hash['employee_number']
+                sso_identifier = user_hash[@sso_identifier_tag]
                 if @users.key?(username.downcase)
                   user = @users[username.downcase]
                 elsif @users.key?(username)
                   user = @users[username]
-                elsif @users_employee_numbers.key?(employee_number)
-                  user = @users_employee_numbers[employee_number]
+                elsif @users_sso_map.key?(sso_identifier)
+                  user = @users_sso_map[sso_identifier]
                 else
                   user = generate_user user_hash
                   @log_entry << " Account Created" if user.present?
@@ -127,16 +128,10 @@ namespace :ultipro do
           first_name: user_hash['first_name'],
           last_name: user_hash['last_name'],
           password: SecureRandom.urlsafe_base64(20),
-          employee_number: user_hash['employee_number'],
+          @sso_identifier_attribute.to_sym => user_hash[@sso_identifier_tag],
           level: map_account_level(user_hash['employee_group'])
         })
-
-        case AIRLINE_CODE
-        when 'SCX'
-          user[:sso_id] = user_hash['email_address']
-         when 'FFT'
-          user[:sso_id] = user_hash['employee_number']
-        end
+        user.sso_id = user_has[@sso_identifier_tag]
 
         user.save! if !@dry_run
         return user
@@ -178,17 +173,9 @@ namespace :ultipro do
 
     def update_account_detail user, user_hash
       return nil if user.nil?
-      case AIRLINE_CODE
-      when 'SCX'
-        if user.sso_id != user_hash['email_address']
-          @log_entry << "\n     Update SSO ID: to #{user_hash['email_address']}"
-          user.sso_id = user_hash['email_address']
-        end
-      when 'FFT'
-        if user.sso_id != user_hash['employee_number']
-          @log_entry << "\n     Update SSO ID: #{user.email} => #{user_hash['employee_number']}"
-          user.sso_id = user_hash['employee_number']
-        end
+      if user.sso_id != user_hash[@sso_identifier_tag]
+        @log_entry << "\n     Update SSO ID: #{user.sso_id} to #{user_hash[@sso_identifier_tag]}"
+        user.sso_id = user_hash[@sso_identifier_tag]
       end
       if user.username != user_hash['user_name']
         @log_entry << "\n     Update Username: #{user.username} => #{user_hash['user_name']}"
