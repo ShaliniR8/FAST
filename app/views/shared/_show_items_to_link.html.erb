@@ -17,7 +17,7 @@
               <th>ID</th>
               <th>Title</th>
               <th>Status</th>
-              <th>Status</th>
+              <th>Linking Status</th>
             </tr>
           </thead>
           <tbody>
@@ -49,7 +49,7 @@
                     <input type="checkbox" id="<%=item.id%>" value="<%=item.title%>" class="items">
                   </div>
                   <strong id="<%=item.id%>" style="color:red">
-                    Not Added
+                    Not Linked
                   </strong>
                 </td>
               </tr>
@@ -75,8 +75,13 @@
   $(document).ready(function() {
     let all_items_table = $('#all_items_table').DataTable({
         "iDisplayLength": -1,
-        "aaSorting": [[ 0, "desc" ]]
+        "aaSorting": [[ 0, "desc" ]],
+        drawCallback: hideLinkStatusColumnSorting,
     });
+
+    function hideLinkStatusColumnSorting() {
+      $('#all_items_table thead tr th:last-child').removeClass('sorting');
+    }
 
     $("tr").on('click', function() {
       id = $(this).attr('id');
@@ -85,12 +90,12 @@
           if ($(this).is(':checked')) {
             $(this).prop('checked', false);
             $(this).closest('td').find('strong').first().css("color", "red");
-            $(this).closest('td').find('strong').first().html("Not Added");
+            $(this).closest('td').find('strong').first().html("Not Linked");
             items = items.filter((e) => e!= id)
             } else {
             $(this).prop('checked', true);
             $(this).closest('td').find('strong').first().css("color", "green");
-            $(this).closest('td').find('strong').first().html("To be Added");
+            $(this).closest('td').find('strong').first().html("To be Linked");
             items.push(id)
           }
         }
