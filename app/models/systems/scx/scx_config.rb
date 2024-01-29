@@ -199,6 +199,8 @@ class SCXConfig < DefaultConfig
     upload_path: '/var/sftp/scxsftpuser/Suncountry_POC.xml',
     expand_output: false, #Shows full account generation details
     dry_run: false, #Prevents the saving of data to the database
+    sso_identifier_tag: 'email_address',
+    sso_identifier_attribute: 'email',
 
     #The following identifies what account type is associated with each employee-group
     group_mapping: {
