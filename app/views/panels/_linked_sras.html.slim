@@ -63,10 +63,12 @@ css:
 javascript:
   $(document).ready(function() {
     $('#sras_table').DataTable({
+      "iDisplayLength": -1,
         "aaSorting": [[ 0, "desc" ]]
     })
 
     $('#sras_table_length').hide()
+    $('#sras_table_paginate').hide()
 
     $('.unlink_sra').on('click', function(){
       result = confirm('Are you sure you want to unlink this SRA?')
