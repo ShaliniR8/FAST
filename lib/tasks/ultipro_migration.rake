@@ -35,8 +35,9 @@ namespace :ultipro do
         end
         begin
           logger.info "[INFO] #{DateTime.now}: Ultipro data updated- userbase being updated"
-          @users = User.includes(:privileges, :roles).all.map{|u| [u.username, u]}.to_h
+          @users = User.includes(:privileges, :roles).all.map{|u| [u.username.downcase, u]}.to_h
           @users_sso_map = User.includes(:privileges, :roles).all.map{|u| [u.send(@sso_identifier_attribute), u]}.to_h
+          @users_sso_map = @users_sso_map.select{|key, val| key.present?}.map{|key, val| [key.downcase, val]}.to_h
           @log_data = []
           User.transaction do
             Hash.from_xml(data_dump)['wbat_poc']['poc']
@@ -51,6 +52,8 @@ namespace :ultipro do
                   user = @users[username.downcase]
                 elsif @users.key?(username)
                   user = @users[username]
+                elsif @users_sso_map.key?(sso_identifier.downcase)
+                  user = @users_sso_map[sso_identifier.downcase]
                 elsif @users_sso_map.key?(sso_identifier)
                   user = @users_sso_map[sso_identifier]
                 else
