@@ -131,7 +131,7 @@ namespace :ultipro do
           @sso_identifier_attribute.to_sym => user_hash[@sso_identifier_tag],
           level: map_account_level(user_hash['employee_group'])
         })
-        user.sso_id = user_has[@sso_identifier_tag]
+        user.sso_id = user_hash[@sso_identifier_tag]
 
         user.save! if !@dry_run
         return user
