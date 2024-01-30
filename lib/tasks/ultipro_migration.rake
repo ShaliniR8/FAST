@@ -63,7 +63,11 @@ namespace :ultipro do
                 update_account_detail user, user_hash
                 update_privileges user, user_hash
                 if !@log_entry.empty?
-                  @log_data << ("  [User] #{user.username}:" << @log_entry)
+                  if user.present?
+                    @log_data << ("  [User] #{user.username}:" << @log_entry)
+                  else
+                    @log_data << ("  "<<@log_entry)
+                  end
                 end
               end
           end
@@ -138,8 +142,8 @@ namespace :ultipro do
 
         user.save! if !@dry_run
         return user
-      rescue
-        @log_entry << "   Account Creation Failed!\n    User: #{user_hash['user_name']}\n    Ultipro Data: #{user_hash}"
+      rescue => error
+        @log_entry << "   Account Creation Failed!\n    User: #{user_hash['user_name']}\n    Ultipro Data: #{user_hash}\n    Error Message: #{error.message}"
         return nil
       end
     end
@@ -176,39 +180,43 @@ namespace :ultipro do
 
     def update_account_detail user, user_hash
       return nil if user.nil?
-      if user.sso_id != user_hash[@sso_identifier_tag]
-        @log_entry << "\n     Update SSO ID: #{user.sso_id} to #{user_hash[@sso_identifier_tag]}"
-        user.sso_id = user_hash[@sso_identifier_tag]
+      begin
+        if user.sso_id != user_hash[@sso_identifier_tag]
+          @log_entry << "\n     Update SSO ID: #{user.sso_id} to #{user_hash[@sso_identifier_tag]}"
+          user.sso_id = user_hash[@sso_identifier_tag]
+        end
+        if user.username != user_hash['user_name']
+          @log_entry << "\n     Update Username: #{user.username} => #{user_hash['user_name']}"
+          user.username = user_hash['user_name']
+        end
+        if user.email != user_hash['email_address']
+          @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
+          user.email = user_hash['email_address']
+        end
+        if user.employee_number != user_hash['employee_number']
+          @log_entry << "\n     Update Employee #: #{user.employee_number} => #{user_hash['employee_number']}"
+          user.employee_number = user_hash['employee_number']
+        end
+        updated_full_name = false
+        if user_hash['first_name'].present? && user.first_name != user_hash['first_name']
+          @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"
+          user.first_name = user_hash['first_name']
+          updated_full_name = true
+        end
+        if  user_hash['last_name'].present? && user.last_name != user_hash['last_name']
+          @log_entry << "\n     Update Last Name: #{user.last_name} => #{user_hash['last_name']}"
+          user.last_name = user_hash['last_name']
+          updated_full_name = true
+        end
+        if user_hash['first_name'].present? && user_hash['last_name'].present? && updated_full_name
+          full_name = user_hash['first_name'] +' '+ user_hash['last_name']
+          @log_entry << "\n     Update Full Name: #{user.full_name} => #{full_name}"
+          user.full_name = full_name
+        end
+        user.save!
+      rescue => error
+        @log_entry << "   Account Update Failed!\n    User: #{user_hash['user_name']}\n    Ultipro Data: #{user_hash}\n    Error Message: #{error.message}"
       end
-      if user.username != user_hash['user_name']
-        @log_entry << "\n     Update Username: #{user.username} => #{user_hash['user_name']}"
-        user.username = user_hash['user_name']
-      end
-      if user.email != user_hash['email_address']
-        @log_entry << "\n     Update Email: #{user.email} => #{user_hash['email_address']}"
-        user.email = user_hash['email_address']
-      end
-      if user.employee_number != user_hash['employee_number']
-        @log_entry << "\n     Update Employee #: #{user.employee_number} => #{user_hash['employee_number']}"
-        user.employee_number = user_hash['employee_number']
-      end
-      updated_full_name = false
-      if user_hash['first_name'].present? && user.first_name != user_hash['first_name']
-        @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"
-        user.first_name = user_hash['first_name']
-        updated_full_name = true
-      end
-      if  user_hash['last_name'].present? && user.last_name != user_hash['last_name']
-        @log_entry << "\n     Update Last Name: #{user.last_name} => #{user_hash['last_name']}"
-        user.last_name = user_hash['last_name']
-        updated_full_name = true
-      end
-      if user_hash['first_name'].present? && user_hash['last_name'].present? && updated_full_name
-        full_name = user_hash['first_name'] +' '+ user_hash['last_name']
-        @log_entry << "\n     Update Full Name: #{user.full_name} => #{full_name}"
-        user.full_name = full_name
-      end
-      user.save
     end
 
 
