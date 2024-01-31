@@ -14,7 +14,10 @@
             tr
               - Sra.get_meta_fields('index').each do |h|
                 td
-                  = render '/forms/show_field', :record => Sra.find(id), :field_hash => h
+                  - if h[:field] == 'get_source'
+                    = ActionView::Base.full_sanitizer.sanitize(Sra.find(id).send('get_source'))
+                  - else
+                    = render '/forms/show_field', :record => Sra.find(id), :field_hash => h
 css:
   .table tbody tr > td.red {
     background-color: red !important;
