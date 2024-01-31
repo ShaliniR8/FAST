@@ -209,13 +209,13 @@ namespace :ultipro do
           update_full_name = true
         end
         if update_full_name || ("#{user.first_name} #{user.last_name}" != user.full_name)
-          full_name = user.first_name +' '+ user.last_name
+          full_name = user.first_name + " " + user.last_name
           @log_entry << "\n     Update Full Name: #{user.full_name} => #{full_name}"
           user.full_name = full_name
         end
         user.save!
       rescue => error
-        @log_entry << "   Account Update Failed!\n    User: #{user_hash['user_name']}\n    Ultipro Data: #{user_hash}\n    Error Message: #{error.message}"
+        @log_entry << "\n   Account Update Failed!\n    User: #{user_hash['user_name']}\n    Ultipro Data: #{user_hash}\n    Error Message: #{error.message}"
       end
     end
 
