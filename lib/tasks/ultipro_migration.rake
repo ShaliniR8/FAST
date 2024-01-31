@@ -197,19 +197,19 @@ namespace :ultipro do
           @log_entry << "\n     Update Employee #: #{user.employee_number} => #{user_hash['employee_number']}"
           user.employee_number = user_hash['employee_number']
         end
-        updated_full_name = false
+        update_full_name = false
         if user_hash['first_name'].present? && user.first_name != user_hash['first_name']
           @log_entry << "\n     Update First Name: #{user.first_name} => #{user_hash['first_name']}"
           user.first_name = user_hash['first_name']
-          updated_full_name = true
+          update_full_name = true
         end
         if  user_hash['last_name'].present? && user.last_name != user_hash['last_name']
           @log_entry << "\n     Update Last Name: #{user.last_name} => #{user_hash['last_name']}"
           user.last_name = user_hash['last_name']
-          updated_full_name = true
+          update_full_name = true
         end
-        if user_hash['first_name'].present? && user_hash['last_name'].present? && updated_full_name
-          full_name = user_hash['first_name'] +' '+ user_hash['last_name']
+        if update_full_name || ("#{user.first_name} #{user.last_name}" != user.full_name)
+          full_name = user.first_name +' '+ user.last_name
           @log_entry << "\n     Update Full Name: #{user.full_name} => #{full_name}"
           user.full_name = full_name
         end
