@@ -1,0 +1,27 @@
+- if linked_sra_ids.present?
+  .col-xs-12
+    hr
+    .title Linked Sras
+    .content
+      table.table.table-bordered.table-striped
+        thead
+          tr
+            - Sra.get_meta_fields('index').each do |header|
+              th class="#{header[:size]}"
+                = header[:title]
+        tbody
+          - linked_sra_ids.each do |id|
+            tr
+              - Sra.get_meta_fields('index').each do |h|
+                td
+                  = render '/forms/show_field', :record => Sra.find(id), :field_hash => h
+css:
+  .table tbody tr > td.red {
+    background-color: red !important;
+  }
+  .table tbody tr > td.yellow {
+    background-color: yellow !important;
+  }
+  .table tbody tr > td.green {
+    background-color: mediumseagreen !important;
+  }

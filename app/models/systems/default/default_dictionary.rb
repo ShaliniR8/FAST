@@ -282,12 +282,6 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { audits: owner.get_children(child_type: 'Audit') } },
     },
-    linked_sras: {
-      partial: '/panels/linked_sras',
-      visible: proc { |owner:,user:,**op| owner.linked_object_ids(object_type: 'Sra').present?},
-      show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { linked_sra_ids: owner.linked_object_ids(object_type: 'Sra') } },
-    },
     source_of_input: {
       partial: '/panels/source_of_input',
       visible: proc { |owner:,user:,**op| owner.parents.present? || owner.owner.present? },
@@ -406,6 +400,13 @@ class DefaultDictionary
       visible: proc { |owner:,user:,**op| owner.becomes(SrmMeeting).sras.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { sras: owner.becomes(SrmMeeting).sras } },
+    },
+    linked_sras: {
+      partial: '/panels/linked_sras',
+      print_partial: '/pdfs/print_linked_sras',
+      visible: proc { |owner:,user:,**op| owner.linked_object_ids(object_type: 'Sra').present?},
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { linked_sra_ids: owner.linked_object_ids(object_type: 'Sra') } },
     },
     sras: {
       partial: '/panels/sras',
