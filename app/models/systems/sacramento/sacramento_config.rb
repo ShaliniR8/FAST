@@ -16,9 +16,10 @@ class SacramentoConfig < DefaultConfig
     gis_layers:                   true,
     lat:                          38.6953,
     lng:                          -121.5896,
-    external_link:                false,
-    enable_sso:                   false,
-    login_option:                 'login'
+    login_option:                 'sso',
+    enable_sso:                   true,
+    external_link:                true,
+
   })
 
   EMPLOYEE_GROUPS = {
@@ -34,9 +35,9 @@ class SacramentoConfig < DefaultConfig
 
   EXTERNAL_LINK =
     if Rails.env.production?
-      'https://sca.prodigiq.com'
+      'https://saccounty.prodigiq.com'
     else
-      'http://192.168.254.64:3001'
+      'http://192.168.254.64:3000'
     end
 
   def self.sync_user(user, prev_email)
@@ -52,21 +53,21 @@ class SacramentoConfig < DefaultConfig
     },
       headers: {'Content-Type' => 'application/json'}
     )
-    response = conn.post('/api/sba/users/sync') do |req|
+    response = conn.post('/api/sacramento/users/sync') do |req|
       req.headers['Content-Type'] = 'application/json'
-      req.headers['Client-ID'] = 'gr9CyN5iFjzzED9oFa9YZwMXsvc1T90c70LY3FOnnjM'
-      req.headers['Client-Secret'] = 'cgNKSy15bzoJbEr3TVA2ZcItOsuOAJ82fDSj6mbN7xw'
+      req.headers['Client-ID'] = 'pWX6P0z2tfNUWIfPc_Ra9sflZMfyWoVdYoeg0C0RO5c'
+      req.headers['Client-Secret'] = 'TP1PD2DkM5v8ayVobP3CLDEDGNhKTWOz7vHSV88_MeA'
     end
     response
   end
   
   def self.external_link(user)
-    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/sba/users/find",
+    res = Faraday.post("#{CONFIG::EXTERNAL_LINK}/api/sacramento/users/find",
       {email: user.email}.to_json,
         {
           'Content-Type' => 'application/json',
-          'Client-ID' => 'gr9CyN5iFjzzED9oFa9YZwMXsvc1T90c70LY3FOnnjM',
-          'Client-Secret' => 'cgNKSy15bzoJbEr3TVA2ZcItOsuOAJ82fDSj6mbN7xw'})
+          'Client-ID' => 'pWX6P0z2tfNUWIfPc_Ra9sflZMfyWoVdYoeg0C0RO5c',
+          'Client-Secret' => 'TP1PD2DkM5v8ayVobP3CLDEDGNhKTWOz7vHSV88_MeA'})
     if res.success?
       json = JSON.parse(res.body) rescue nil
       "#{CONFIG::EXTERNAL_LINK}/users/#{json['id']}" if json.present?
