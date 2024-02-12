@@ -1,4 +1,0 @@
-class SacramentoSafetyPromotionConfig < DefaultSafetyPromotionConfig
-  
-
-end

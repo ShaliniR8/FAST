@@ -1,3 +1,0 @@
-class SacramentoSafetyAssuranceConfig < DefaultSafetyAssuranceConfig
-
-end

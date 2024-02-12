@@ -3,9 +3,9 @@ class SacramentoConfig < DefaultConfig
   # Used for linking databases in database.yml; example would be %w[audit]
   ENABLED_SYSTEMS = %w[]
   # Used for creating different environments in database.yml; example would be %w[training]
-  SYSTEM_ENVIRONMENTS = %w[training]
+  SYSTEM_ENVIRONMENTS = %w[]
 
-  MOBILE_MODULES = ['ASAP']
+  MOBILE_MODULES = ['ASAP','SMS']
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
