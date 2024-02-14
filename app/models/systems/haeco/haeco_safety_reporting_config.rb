@@ -383,7 +383,7 @@ class HAECOSafetyReportingConfig < DefaultSafetyReportingConfig
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
-        panels: %i[occurrences audits
+        panels: %i[occurrences
         ].reduce({}) { |acc,panel| acc[panel] = DICTIONARY::PANEL[panel]; acc },
       },
       'Meeting' => {
