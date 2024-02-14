@@ -375,6 +375,10 @@ class DefaultSafetyRiskManagementConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          occurrences: {default: true, title: (RiskControl.find_top_level_section.label rescue nil)},
+          occurrences_full: {default: true,
+            visible: 'query',
+            title: "Full #{RiskControl.find_top_level_section.label rescue nil}"},
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

@@ -1886,6 +1886,8 @@ module QueriesHelper
     mapping_hash['RiskControl']['Final Approver\'s Comments'] = 'final_comment'
     mapping_hash['RiskControl']['Source of Input'] = 'source_of_input'
     mapping_hash['RiskControl']["Verifications"] = 'included_verifications'
+    mapping_hash['RiskControl']["#{RiskControl.find_top_level_section.label}"] = 'included_occurrences'
+    mapping_hash['RiskControl']["Full #{RiskControl.find_top_level_section.label}"] = 'included_occurrences'
 
     mapping_hash['SafetyPlan'] = Hash.new
     mapping_hash['SafetyPlan']["#{I18n.t('srm.risk.baseline.title')} Risk"] = 'risk_factor'
