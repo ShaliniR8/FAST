@@ -98,6 +98,11 @@ class DefaultDictionary
       btn_loc: [:top],
       access: proc { |owner:,user:,**op| CONFIG::LAUNCH_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? && priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true) },
     },
+    link: {
+      btn: :link,
+      btn_loc: [:top],
+      access: proc { |owner:,user:,**op| CONFIG::LINK_OBJECTS[owner.class.name.underscore.pluralize.to_sym].present? && priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true) },
+    },
     hazard: {
       btn: :hazard,
       btn_loc: [:inline],
@@ -160,7 +165,7 @@ class DefaultDictionary
       btn: :request_extension,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        CONFIG::GENERAL[:has_extension] && owner.status == 'Assigned' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default]) 
+        CONFIG::GENERAL[:has_extension] && owner.status == 'Assigned' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default])
       },
     },
     risk_control: {
@@ -174,7 +179,7 @@ class DefaultDictionary
       btn: :schedule_verification,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        CONFIG::GENERAL[:has_verification] && owner.status == 'Completed' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default]) 
+        CONFIG::GENERAL[:has_verification] && owner.status == 'Completed' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default])
       },
     },
     send_message: {
@@ -396,12 +401,19 @@ class DefaultDictionary
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { sras: owner.becomes(SrmMeeting).sras } },
     },
+    linked_sras: {
+      partial: '/panels/linked_sras',
+      print_partial: '/pdfs/print_linked_sras',
+      visible: proc { |owner:,user:,**op| owner.linked_object_ids(object_type: 'Sra').present?},
+      show_btns: proc { |owner:,user:,**op| false },
+      data: proc { |owner:,user:,**op| { linked_sra_ids: owner.linked_object_ids(object_type: 'Sra') } },
+    },
     sras: {
       partial: '/panels/sras',
       print_partial: '/pdfs/print_sras',
-      visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Sra').present? },
+      visible: proc { |owner:,user:,**op| (owner.get_children(child_type: 'Sra').map(&:id) - owner.linked_object_ids(object_type: 'Sra')).present? },
       show_btns: proc { |owner:,user:,**op| false },
-      data: proc { |owner:,user:,**op| { sras: owner.get_children(child_type: 'Sra') } },
+      data: proc { |owner:,user:,**op| { sras: owner.get_children(child_type: 'Sra').select{|child| !owner.linked_object_ids(object_type: 'Sra').include?(child.id)} } },
     },
     hazards: {
       partial: '/panels/hazards',

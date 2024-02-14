@@ -295,40 +295,8 @@ class SrasController < ApplicationController
     @description_headers = Cause.get_meta_fields('show')
     @agenda_headers = SrmAgenda.get_headers
     @sra = Sra.find(params[:id])
-
-    related_user_ids = []
-    related_user_ids << @sra.created_by_id
-    if @sra.responsible_user_id.present?
-      related_user_ids << @sra.responsible_user_id
-    end
-    if @sra.reviewer_id.present?
-      related_user_ids << @sra.reviewer_id
-    end
-    if @sra.approver_id.present?
-      related_user_ids << @sra.approver_id
-    end
-    if @sra.tasks.present?
-      @sra.tasks.each do |t|
-        if t.res.present?
-          related_user_ids << t.res
-        end
-        if t.app_id.present?
-          related_user_ids << t.app_id
-        end
-      end
-    end
-
-    has_access = false
-    if current_user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) && @sra.viewer_access.present?
-      has_access = true
-    else
-      has_access = current_user.has_access('sras', 'show', admin: CONFIG::GENERAL[:global_admin_default]) &&
-                   (related_user_ids.include?(current_user.id) ||
-                   current_user.has_access('sras', 'admin', admin: CONFIG::GENERAL[:global_admin_default]))
-    end
-
+    has_access = @sra.has_show_access(current_user)
     redirect_to errors_path unless has_access
-
     @records = @sra.children.present? ? Record.where(id: @sra.children.map(&:child_id)) : []
     @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
     @owner = @sra
@@ -579,7 +547,7 @@ class SrasController < ApplicationController
     @srm_meeting.sras.delete(sra)
     @srm_meeting.save
 
-    ## Updating 
+    ## Updating
     meetings_added = SrmMeeting.where(id: params[:meetings_selected].chomp(',').split(','))
     meetings_added.each do |m|
       sra.meeting = m
@@ -605,7 +573,6 @@ class SrasController < ApplicationController
       format.js
     end
   end
-
 
 
   # def mitigate

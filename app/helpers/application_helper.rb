@@ -1057,4 +1057,12 @@ module ApplicationHelper
     flag
   end
 
+  def object_class_and_table_name(object)
+    if CONFIG::OBJECT_NAME_MAP[object].present?
+      [CONFIG::OBJECT_NAME_MAP[object], object.underscore]
+    else
+      [object, object.underscore]
+    end
+  end
+
 end

@@ -108,6 +108,9 @@ class DefaultConfig
     investigations: ['Sra'],
   }
 
+  LINK_OBJECTS = {
+  }
+
   LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS = {
     audits: 'Findings',
     evaluations: 'Findings',

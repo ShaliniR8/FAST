@@ -93,4 +93,10 @@ class ProsafetBase < ActiveRecord::Base
     end
     result.html_safe
   end
+
+  def linked_object_ids(object_type: object_type)
+    child_ids = Child.where(child_type: object_type, owner_type: object_type, owner_id: self.id).map(&:child_id)
+    linked_ids = Child.where(child_type: object_type, owner_type: object_type, child_id: self.id, owner_id: child_ids).map(&:owner_id)
+    linked_ids.select {|id| !Object.const_get(object_type).find_by_id(id).nil?}
+  end
 end

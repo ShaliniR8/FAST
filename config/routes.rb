@@ -754,6 +754,8 @@ PrdgSession::Application.routes.draw do |map|
       get 'override_status'
       get 'launch'
       get 'launch_new_object'
+      get 'get_link_type'
+      get "show_items_to_link"
       get 'comment'
       get 'viewer_access'
       get 'add_record'
@@ -761,6 +763,8 @@ PrdgSession::Application.routes.draw do |map|
       put 'ajax_update'
       get "add_meeting"
       post "add_meeting_minutes"
+      post "add_links"
+      post "unlink"
     end
     collection do
       post 'load_records'

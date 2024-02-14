@@ -1,0 +1,32 @@
+- headers = Sra.get_meta_fields('index')
+- headers.delete_if {|h| h[:field] == 'responsible_user_id' && deidentified}
+- if linked_sra_ids.present?
+  .col-xs-12
+    hr
+    .title Linked Sras
+    .content
+      table.table.table-bordered.table-striped
+        thead
+          tr
+            - headers.each do |header|
+              th class="#{header[:size]}"
+                = header[:title]
+        tbody
+          - linked_sra_ids.each do |id|
+            tr
+              - headers.each do |h|
+                td
+                  - if h[:field] == 'get_source'
+                    = ActionView::Base.full_sanitizer.sanitize(Sra.find(id).send('get_source'))
+                  - else
+                    = render '/forms/show_field', :record => Sra.find(id), :field_hash => h
+css:
+  .table tbody tr > td.red {
+    background-color: red !important;
+  }
+  .table tbody tr > td.yellow {
+    background-color: yellow !important;
+  }
+  .table tbody tr > td.green {
+    background-color: mediumseagreen !important;
+  }

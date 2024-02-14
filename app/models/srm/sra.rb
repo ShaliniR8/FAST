@@ -128,4 +128,39 @@ end
     ActionController::Base.new.expire_fragment(show_fragment_name)
   end
 
+  def has_show_access(user)
+    related_user_ids = []
+    related_user_ids << self.created_by_id
+    if self.responsible_user_id.present?
+      related_user_ids << self.responsible_user_id
+    end
+    if self.reviewer_id.present?
+      related_user_ids << self.reviewer_id
+    end
+    if self.approver_id.present?
+      related_user_ids << self.approver_id
+    end
+    if self.tasks.present?
+      self.tasks.each do |t|
+        if t.res.present?
+          related_user_ids << t.res
+        end
+        if t.app_id.present?
+          related_user_ids << t.app_id
+        end
+      end
+    end
+
+
+    has_access = false
+    if user.has_access('sras', 'viewer', admin: CONFIG::GENERAL[:global_admin_default]) && self.viewer_access.present?
+      has_access = true
+    else
+      has_access = user.has_access('sras', 'show', admin: CONFIG::GENERAL[:global_admin_default]) &&
+                   (related_user_ids.include?(user.id) ||
+                   user.has_access('sras', 'admin', admin: CONFIG::GENERAL[:global_admin_default]))
+    end
+    has_access
+  end
+
 end
