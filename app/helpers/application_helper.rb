@@ -835,6 +835,17 @@ module ApplicationHelper
     session[:permissions] = accesses.to_json
   end
 
+  def current_module_objects
+    CONFIG.hierarchy[session[:mode]][:objects].keys
+  end
+
+  def filter_task_queries_for_current_module(sms_task_queries)
+    sms_task_queries.delete_if do |query|
+      query_source_objects = query.templates
+      query.templates.present? && (current_module_objects & query_source_objects).empty?
+    end
+  end
+
   def module_display_to_mode module_display
     module_display = 'OSHA / OJI' if module_display == 'OSHA'
     mode, val = CONFIG.hierarchy.find{ |k, hash| hash[:display_name] == module_display}

@@ -872,10 +872,10 @@ class ApplicationController < ActionController::Base
   # Deals with Advanced Search for different types of reports, such as Events, Corrective Actions, Audits, SRAs, etc
   def handle_search
     @terms = @table.get_meta_fields('index')
-    tasks_to_remove = Proc.new {|rec| rec.templates.present? && (CONFIG.hierarchy[session[:mode]][:objects].keys & rec.templates).empty?}
     if @table == Query
-      @records = @table.where(target: @types.values).includes(:created_by)
-      @records.delete_if{|record| record.target == "SmsTask" && tasks_to_remove.call(record)}
+      @records = @table.where(target: @types.values - ['SmsTask']).includes(:created_by)
+      sms_task_queries = @table.where(target: 'SmsTask').includes(:created_by)
+      @records += filter_task_queries_for_current_module(sms_task_queries)
     elsif @table == Meeting
       @records = @table.includes(:invitations, :host).where('meetings.type is null')
       unless current_user.has_access('meetings', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: true )
