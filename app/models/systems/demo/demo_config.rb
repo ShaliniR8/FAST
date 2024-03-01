@@ -54,6 +54,10 @@ class DemoConfig < DefaultConfig
     pin_dashboard_visualizations: true
   })
 
+  LINK_OBJECTS = {
+    sras: ['Sra']
+  }
+
   RISK_MATRIX = {
     :likelihood       => ["A - Improbable","B - Unlikely","C - Remote","D - Probable","E - Frequent"],
     :severity         => (0..4).to_a.reverse,
