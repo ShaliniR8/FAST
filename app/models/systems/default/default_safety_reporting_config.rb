@@ -22,7 +22,7 @@ class DefaultSafetyReportingConfig
     add_corrective_action_in_meeting: false,
 
     # Airline-Specific Features:
-    attach_pdf_submission:     'ided',    # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
+    attach_pdf_submission:     'deid',    # 1: ided (identified pdf), 2: deid (deidentified pdf), 3: none (no pdf attachment)
     observation_phases_trend:  false,     # Specific Feature for BSK - default off
     event_summary:             false,     # Adds summary Tab for Events in Safety Reporting nav bar - default off
     event_tabulation:          false,     # Adds Tabulation Tab for Events in Safety Reporting nav bar - default off
