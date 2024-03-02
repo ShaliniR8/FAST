@@ -60,7 +60,6 @@ class SBAConfig < DefaultConfig
       username: user.username,
       first_name: user.first_name,
       last_name: user.last_name,
-      level: user.level,
       disable: user.disable
     },
       headers: {'Content-Type' => 'application/json'}
