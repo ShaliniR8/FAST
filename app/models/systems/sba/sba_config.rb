@@ -20,9 +20,9 @@ class SBAConfig < DefaultConfig
     lat:                          34.422331644,
     lng:                          -119.83749665,
     gMapZoom:                     14,
-    external_link:                false,
-    enable_sso:                   false,
-    login_option:                 'dual',
+    external_link:                true,
+    enable_sso:                   true,
+    login_option:                 'sso',
   })
 
   LAUNCH_OBJECTS = DefaultConfig::LAUNCH_OBJECTS.deep_merge({
