@@ -343,10 +343,12 @@ class ApplicationController < ActionController::Base
 
     selected_ids = params[:items_selected].chomp(',').split(',').map{|id| id.to_i}
     selected_ids.each do |id|
+      item = Object.const_get(item_type).find(id)
       c1 = Child.create({child_type: item_type, child_id: id, owner_type: owner_class, owner_id: owner.id})
       c2 = Child.create({child_type: owner_class, child_id: owner.id, owner_type: item_type, owner_id: id})
       owner.children << c1
-      Object.const_get(item_type).find(id).children << c2
+      item.children << c2
+      Transaction.build_for(item, "#{owner_class} Linked", current_user.id, "#{owner_class} ##{owner.id} linked to this #{item_type}")
     end
     message = "#{item_type} IDs ##{selected_ids.join(', ')} linked to this #{owner_class}"
 
@@ -362,15 +364,11 @@ class ApplicationController < ActionController::Base
     owner = owner_object.find(params[:id])
     item_type = params[:item_type].classify
 
-    id_to_remove = params[:item_id].to_i
-    Child.where(owner_type: owner_class, owner_id: owner.id, child_type: item_type, child_id: id_to_remove).first.destroy
-    Child.where(owner_type: item_type, owner_id: id_to_remove, child_type: owner_class, child_id: owner.id).first.destroy
-    Transaction.build_for(
-      owner,
-      "#{item_type} Unlinked",
-      current_user.id,
-      "#{item_type} ##{id_to_remove} unlinked from #{owner_class}"
-    )
+    item_to_remove = Object.const_get(item_type).find(params[:item_id].to_i)
+    Child.where(owner_type: owner_class, owner_id: owner.id, child_type: item_type, child_id: item_to_remove.id).first.destroy
+    Child.where(owner_type: item_type, owner_id: item_to_remove.id, child_type: owner_class, child_id: owner.id).first.destroy
+    Transaction.build_for(owner, "#{item_type} Unlinked", current_user.id, "#{item_type} ##{item_to_remove.id} unlinked from #{owner_class}")
+    Transaction.build_for(item_to_remove, "#{owner_class} Unlinked", current_user.id, "#{owner_class} ##{owner.id} unlinked from #{item_type}")
     respond_to do |format|
       format.json {render :json => { :result => 'Removed'}}
     end
