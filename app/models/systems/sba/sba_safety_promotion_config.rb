@@ -1,3 +1,0 @@
-class SBASafetyPromotionConfig < DefaultSafetyPromotionConfig
-  
-end

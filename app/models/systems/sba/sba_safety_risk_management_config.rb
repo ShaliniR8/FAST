@@ -1,3 +1,0 @@
-class SBASafetyRiskManagementConfig < DefaultSafetyRiskManagementConfig
-
-end

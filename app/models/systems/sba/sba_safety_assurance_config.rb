@@ -1,3 +1,0 @@
-class SBASafetyAssuranceConfig < DefaultSafetyAssuranceConfig
-  
-end

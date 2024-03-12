@@ -6,12 +6,12 @@ class SBASsoConfig
 
 
     name_id_format:    'urn:oasis:names:tc:SAML:2.0:nameid-format:emailAddress',
-    access_point: 'http://192.168.254.64:3001',
+    access_point: 'https://sba.prodigiq.com',
 
-    idp_slo_target_url: 'http://192.168.254.64:3001/saml/idp/logout',
-    idp_sso_target_url: 'http://192.168.254.64:3001/saml/idp/auth',
+    idp_slo_target_url: 'https://sba.prodigiq.com/saml/idp/logout',
+    idp_sso_target_url: 'https://sba.prodigiq.com/saml/idp/auth',
 
-    idp_entity_id: 'http://192.168.254.64:3001/saml/idp',
+    idp_entity_id: 'https://sba.prodigiq.com/saml/idp',
 
     ### Fingerprint Config ###
 
