@@ -66,8 +66,8 @@ class SBAConfig < DefaultConfig
     )
     response = conn.post('/api/sba/users/sync') do |req|
       req.headers['Content-Type'] = 'application/json'
-      req.headers['Client-ID'] = 'gr9CyN5iFjzzED9oFa9YZwMXsvc1T90c70LY3FOnnjM'
-      req.headers['Client-Secret'] = 'cgNKSy15bzoJbEr3TVA2ZcItOsuOAJ82fDSj6mbN7xw'
+      req.headers['Client-ID'] = '7Z-EvK7Zz_Z0wRstFpue7dARFpNpX2QIMhQLRw7dsDY'
+      req.headers['Client-Secret'] = 'MhmyiRvin2cydhYLk7FcGMaRg6VXknUP7Tvo7MZEVlY'
     end
     response
   end
@@ -77,8 +77,8 @@ class SBAConfig < DefaultConfig
       {email: user.email}.to_json,
         {
           'Content-Type' => 'application/json',
-          'Client-ID' => 'gr9CyN5iFjzzED9oFa9YZwMXsvc1T90c70LY3FOnnjM',
-          'Client-Secret' => 'cgNKSy15bzoJbEr3TVA2ZcItOsuOAJ82fDSj6mbN7xw'})
+          'Client-ID' => '7Z-EvK7Zz_Z0wRstFpue7dARFpNpX2QIMhQLRw7dsDY',
+          'Client-Secret' => 'MhmyiRvin2cydhYLk7FcGMaRg6VXknUP7Tvo7MZEVlY'})
     if res.success?
       json = JSON.parse(res.body) rescue nil
       "#{CONFIG::EXTERNAL_LINK}/users/#{json['id']}" if json.present?
