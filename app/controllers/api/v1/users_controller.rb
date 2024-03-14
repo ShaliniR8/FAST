@@ -15,8 +15,7 @@ class Api::V1::UsersController < ApplicationController
     user.full_name = "#{params[:first_name]} #{params[:last_name]}"
     user.email = params[:email][1]
     user.sso_id = params[:email][1]
-    user.level = params[:level]
-    user.level = 'Global Admin' if user.level == 'Account Manager'
+    user.level = user.level || 'Staff'
     user.disable = params[:disable]
 
     user.save
