@@ -55,8 +55,8 @@ class SacramentoConfig < DefaultConfig
     )
     response = conn.post('/api/sacramento/users/sync') do |req|
       req.headers['Content-Type'] = 'application/json'
-      req.headers['Client-ID'] = 'pWX6P0z2tfNUWIfPc_Ra9sflZMfyWoVdYoeg0C0RO5c'
-      req.headers['Client-Secret'] = 'TP1PD2DkM5v8ayVobP3CLDEDGNhKTWOz7vHSV88_MeA'
+      req.headers['Client-ID'] = '24FOfwU88KZXQoi49TF0DRg1eIWOMggrq0g6oLF2WH0'
+      req.headers['Client-Secret'] = 'ViZ1QkCbrlFVLz76wGqzDBFhYbj5fCQRzt99AC-8NhQ'
     end
     response
   end
@@ -66,8 +66,8 @@ class SacramentoConfig < DefaultConfig
       {email: user.email}.to_json,
         {
           'Content-Type' => 'application/json',
-          'Client-ID' => 'pWX6P0z2tfNUWIfPc_Ra9sflZMfyWoVdYoeg0C0RO5c',
-          'Client-Secret' => 'TP1PD2DkM5v8ayVobP3CLDEDGNhKTWOz7vHSV88_MeA'})
+          'Client-ID' => '24FOfwU88KZXQoi49TF0DRg1eIWOMggrq0g6oLF2WH0',
+          'Client-Secret' => 'ViZ1QkCbrlFVLz76wGqzDBFhYbj5fCQRzt99AC-8NhQ'})
     if res.success?
       json = JSON.parse(res.body) rescue nil
       "#{CONFIG::EXTERNAL_LINK}/users/#{json['id']}" if json.present?
