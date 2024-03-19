@@ -375,6 +375,8 @@ class DefaultSafetyRiskManagementConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
           occurrences: {default: true, title: (RiskControl.find_top_level_section.label rescue nil)},
           occurrences_full: {default: true,
             visible: 'query',

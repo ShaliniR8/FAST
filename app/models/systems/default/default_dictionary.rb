@@ -729,6 +729,12 @@ class DefaultDictionary
       num_cols: 6,  type: 'text', visible: 'index',
       required: false
     },
+    verification_additional_validators: {
+      field: 'additional_validators', title: 'Verification - Validators', visible: 'query'
+    },
+    verification_status: {
+      field: 'verification_status', title: 'Verification - Status', visible: 'query'
+    },
     template: {
       field: 'get_template', title: 'Template Type',
       num_cols: 6, type: 'text', visible: 'index,show',
