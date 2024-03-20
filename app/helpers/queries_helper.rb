@@ -240,7 +240,7 @@ module QueriesHelper
         values = Verification.find_by_sql("SELECT verifications.owner_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
                                           .map{|r| [r.owner_id,
-                                                    r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).join(", ") : nil]}.to_h rescue {}
+                                                    r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).sort.join(", ") : nil]}.to_h rescue {}
       when 'verification_status'
         values = Verification.find_by_sql("SELECT verifications.owner_id, verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
@@ -401,7 +401,7 @@ module QueriesHelper
       when 'additional_validators'
         values = Verification.find_by_sql("SELECT verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                          .map{|r| r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).join(", ") : nil} rescue {}
+                                          .map{|r| r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).sort.join(", ") : nil} rescue {}
       when 'verification_status'
         values = Verification.find_by_sql("SELECT verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
@@ -639,7 +639,7 @@ module QueriesHelper
         values = Verification.find_by_sql("SELECT verifications.owner_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
         values.each do |val|
-          validator_name = val.additional_validators.present? ? val.additional_validators.map{|id| User.find(id).full_name} : nil
+          validator_name = val.additional_validators.present? ? val.additional_validators.map{|id| User.find(id).full_name}.sort.join(", ") : nil
           val_hash[validator_name] << val.owner_id if val.additional_validators.present?
         end
       when 'verification_status'
