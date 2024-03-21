@@ -78,6 +78,8 @@ class DefaultSafetyAssuranceConfig
             required: false
           },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
@@ -148,6 +150,8 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
           findings: {
             field: 'included_findings', title: 'Included Findings',
             num_cols: 6,  type: 'text', visible: 'index',
@@ -226,6 +230,8 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
           findings: {
             field: 'included_findings', title: 'Included Findings',
             num_cols: 6,  type: 'text', visible: 'index',
@@ -330,6 +336,8 @@ class DefaultSafetyAssuranceConfig
             title: "Full #{Investigation.find_top_level_section.label rescue nil}"
           },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -480,6 +488,8 @@ class DefaultSafetyAssuranceConfig
             title: "Full #{Finding.find_top_level_section.label rescue nil}"
           },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -588,6 +598,8 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
           likelihood: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Likelihood" },
           severity: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Severity" },
           risk_factor: { default: true, title: "#{I18n.t("sa.risk.baseline.title")} Risk" },
@@ -668,6 +680,8 @@ class DefaultSafetyAssuranceConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },
