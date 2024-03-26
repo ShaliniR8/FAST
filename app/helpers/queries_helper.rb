@@ -237,14 +237,19 @@ module QueriesHelper
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
                                           .map{|r| [r.owner_id, r.ver_status]}.to_h rescue {}
       when 'additional_validators'
-        values = Verification.find_by_sql("SELECT verifications.owner_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+        records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                          .map{|r| [r.owner_id,
-                                                    r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).sort.join(", ") : nil]}.to_h rescue {}
+        values = Hash.new{|h,k| h[k] = []}
+        records.each do |r|
+          values[r.owner_id] << (r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).sort.join(", ") : nil)
+        end
       when 'verification_status'
-        values = Verification.find_by_sql("SELECT verifications.owner_id, verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+        records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                          .map{|r| [r.owner_id, r.status]}.to_h rescue {}
+        values = Hash.new{|h,k| h[k] = []}
+        records.each do |r|
+          values[r.owner_id] << r.status
+        end
       when 'cause_label'
         values = Hash.new { |h, k| h[k] = [] }
         Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
