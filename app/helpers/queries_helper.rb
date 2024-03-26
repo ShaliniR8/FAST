@@ -32,7 +32,7 @@ module QueriesHelper
     if x_val.is_a?(Array) && y_val.is_a?(Array)
       if fields_compare_same_objects_in_a_target_record(x_val, y_val)
         (0..x_val.size-1).each do |idx|
-          res << {x_axis: x_val[idx][1], series: x_val[idx][1], id: record_id}
+          res << {x_axis: x_val[idx][1], series: y_val[idx][1], id: record_id}
         end
       else
         x_val.each do |x|
@@ -44,10 +44,10 @@ module QueriesHelper
         end
       end
     elsif x_val.is_a?(Array)
-      x_axis = x.is_a?(Array) ? x[1] : x
+      x_axis = x_val.first.is_a?(Array) ? x_val[0][1] : x_val
       x_val.each{|x| res << {x_axis: x_axis, series: y_val, id: record_id}}
     elsif y_val.is_a?(Array)
-      y_axis = y.is_a?(Array) ? y[1] : y
+      y_axis = y_val.first.is_a?(Array) ? y_val[0][1] : y_val
       y_val.each{|y| res << {x_axis: x_val, series: y_axis, id: record_id}}
     else
       res << {x_axis: x_val, series: y_val, id: record_id}
@@ -150,7 +150,6 @@ module QueriesHelper
     x_vals_by_id = get_mapped_data_for_field(field_arr: x_axis_field_arr, records_ids: records_ids, query: query)
     y_vals_by_id = get_mapped_data_for_field(field_arr: series_field_arr, records_ids: records_ids, query: query)
     res = []
-
     records_ids.each do |rid|
       x_vals = x_vals_by_id[rid.to_i]
       y_vals = y_vals_by_id[rid.to_i]
@@ -251,9 +250,10 @@ module QueriesHelper
         end
 
       when 'included_verifications'
-        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
+        values = Hash.new{|h,k| h[k] = []}
+        Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                          .map{|r| [r.owner_id, ["verifications", r.ver_status]]}.to_h rescue {}
+                                          .map{|r| values[r.owner_id] << ["verifications", r.ver_status]} rescue {}
       when 'additional_validators'
         records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
