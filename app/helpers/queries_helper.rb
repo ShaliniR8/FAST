@@ -30,22 +30,40 @@ module QueriesHelper
 
   def populate_hash_to_be_created(res, x_val, y_val, record_id)
     if x_val.is_a?(Array) && y_val.is_a?(Array)
-      x_val.each do |x|
-        y_val.each do |y|
-          res << {x_axis: x, series: y, id: record_id}
+      if fields_compare_same_objects_in_a_target_record(x_val, y_val)
+        (0..x_val.size-1).each do |idx|
+          res << {x_axis: x_val[idx][1], series: x_val[idx][1], id: record_id}
+        end
+      else
+        x_val.each do |x|
+          y_val.each do |y|
+            x_axis = x.is_a?(Array) ? x[1] : x
+            y_axis = y.is_a?(Array) ? y[1] : y
+            res << {x_axis: x_axis, series: y_axis, id: record_id}
+          end
         end
       end
-      res << {x_axis: x_val[0], series: y_val[0], id: record_id}
     elsif x_val.is_a?(Array)
-      x_val.each{|x| res << {x_axis: x, series: y_val, id: record_id}}
+      x_axis = x.is_a?(Array) ? x[1] : x
+      x_val.each{|x| res << {x_axis: x_axis, series: y_val, id: record_id}}
     elsif y_val.is_a?(Array)
-      y_val.each{|y| res << {x_axis: x_val, series: y, id: record_id}}
+      y_axis = y.is_a?(Array) ? y[1] : y
+      y_val.each{|y| res << {x_axis: x_val, series: y_axis, id: record_id}}
     else
       res << {x_axis: x_val, series: y_val, id: record_id}
     end
     return res
   end
 
+  def fields_compare_same_objects_in_a_target_record(x_val, y_val)
+    if x_val.first.is_a?(Array) && y_val.first.is_a?(Array)
+      x_axis_object = x_val[0][0]
+      series_object = y_val[0][0]
+      x_axis_object == series_object
+    else
+      false
+    end
+  end
 
   # return 2D hash of x_axis and series values
   def populate_hash(data_hash, x_axis, series, get_ids: false, record_id: nil)
@@ -235,20 +253,21 @@ module QueriesHelper
       when 'included_verifications'
         values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                          .map{|r| [r.owner_id, r.ver_status]}.to_h rescue {}
+                                          .map{|r| [r.owner_id, ["verifications", r.ver_status]]}.to_h rescue {}
       when 'additional_validators'
         records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
         values = Hash.new{|h,k| h[k] = []}
         records.each do |r|
-          values[r.owner_id] << (r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).sort.join(", ") : nil)
+          additional_validators = (r.additional_validators.present? ? User.where(id: r.additional_validators).map(&:full_name).sort.join(", ") : nil)
+          values[r.owner_id] << ["verifications", additional_validators]
         end
       when 'verification_status'
         records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
                                           verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
         values = Hash.new{|h,k| h[k] = []}
         records.each do |r|
-          values[r.owner_id] << r.status
+          values[r.owner_id] << ["verifications", r.status]
         end
       when 'cause_label'
         values = Hash.new { |h, k| h[k] = [] }
