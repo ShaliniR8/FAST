@@ -393,7 +393,9 @@ class SubmissionsController < ApplicationController
           converted.make_report
           converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
           notify_notifiers(converted, params[:commit])
-          NotifyMailer.send_submitter_confirmation(current_user, converted)
+          if CONFIG::GENERAL[:enable_mailer]
+            NotifyMailer.send_submitter_confirmation(current_user, converted)
+          end
         end
         if !(is_work_order(template_id)) || (is_work_order(template_id) && is_descrepancy)
           submission_class_type(type).find(@record.id).make_report
@@ -405,7 +407,9 @@ class SubmissionsController < ApplicationController
         flash = {}
         if params[:commit] == 'Submit'
           flash = { success: 'Submission submitted.' }
-          NotifyMailer.send_submitter_confirmation(current_user, @record)
+          if CONFIG::GENERAL[:enable_mailer]
+            NotifyMailer.send_submitter_confirmation(current_user, @record)
+          end
           format.html { redirect_to submission_path(@record), flash: flash }
           format.json { render :json => { success: 'Submission submitted.', record_id: @record.id, sub_fields: @record.submission_fields, attach: @record.attachments, comms: @record.comments }}
         else
@@ -597,14 +601,18 @@ class SubmissionsController < ApplicationController
           else
             @record.make_report
             @record.create_transaction(action: 'Create', context: 'User Submitted Report')
-            NotifyMailer.send_submitter_confirmation(current_user, @record)
+            if CONFIG::GENERAL[:enable_mailer]
+              NotifyMailer.send_submitter_confirmation(current_user, @record)
+            end
           end
           if params[:create_copy] == '1'
             converted = @record.convert
             converted.make_report
             converted.create_transaction(action: 'Create', context: 'User Submitted Dual Report')
             notify_notifiers(converted, params[:commit])
-            NotifyMailer.send_submitter_confirmation(current_user, converted)
+            if CONFIG::GENERAL[:enable_mailer]
+              NotifyMailer.send_submitter_confirmation(current_user, converted)
+            end
           end
           respond_to do |format|
             flash = { success: param_submission[:comments_attributes].present? ? 'Notes added.' : 'Submission submitted.' }

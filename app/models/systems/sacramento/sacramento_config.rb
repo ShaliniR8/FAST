@@ -9,6 +9,7 @@ class SacramentoConfig < DefaultConfig
 
   GENERAL = DefaultConfig::GENERAL.merge({
     # AIRLINE-SPECIFIC CONFIGS
+    enable_mailer:                false,
     name:                         'Sacramento International Airport',
     sms_im_visibility:            false,
     safety_promotion_visibility:  true,
