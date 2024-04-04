@@ -316,7 +316,8 @@ class FFTConfig < DefaultConfig
     upload_path: '/var/sftp/fftsftpuser/ProSafeT_User_List.XML',
     expand_output: false, #Shows full account generation details
     dry_run: false, #Prevents the saving of data to the database
-
+    sso_identifier_tag: 'employee_number',
+    sso_identifier_attribute: 'employee_number',
     #The following identifies what account type is associated with each employee-group
     group_mapping: {
       'dispatch'    => 'Analyst',
