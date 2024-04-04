@@ -1,7 +1,7 @@
 class NotifyMailer < ApplicationMailer
   include ApplicationHelper
 
-  default :from => "donotreply@prosafet.com"
+  default :from => ENV['SMTP_SENDER_ADDRESS'] || 'donotreply@prosafet.com'
 
 
   def notify_rake_errors(subject, error, location)

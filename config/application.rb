@@ -51,11 +51,12 @@ module PrdgSession
   airline_code += '-training' if Rails.env.training?
   config.action_mailer.default_url_options = { :host => "#{airline_code}.prosafet.com" }
   config.action_mailer.smtp_settings = {
-    address: 'smtp.1and1.com',
-    port: 587,
-    user_name: 'noc@prosafet.com',
-    password: 'Cupcakes2021!',
-    authentication: 'plain',
+    address:          ENV['SMTP_ADDRESS'] || 'smtp.1and1.com',
+    port:             ENV['SMTP_PORT'] || 587,
+    user_name:        ENV['SMTP_USER_NAME'] || 'noc@prosafet.com',
+    password:         ENV['SMTP_PASSWORD'] || 'Cupcakes2021!',
+    authentication:   ENV['SMTP_AUTHENTICATION'] || 'plain',
+    enable_starttls:  (ENV['SMTP_ENABLE_START_TLS'] == "true") 
   }
   config.action_mailer.raise_delivery_errors = false
 
