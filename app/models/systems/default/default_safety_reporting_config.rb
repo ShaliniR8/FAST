@@ -448,6 +448,8 @@ class DefaultSafetyReportingConfig
           },
           final_comment: { default: true, title: "Final Approver's Comments" },
           verifications: { default: true },
+          verification_additional_validators: {default: true},
+          verification_status: {default: true},
         }.reduce({}) { |acc,(key,data)|
           acc[key] = (data[:default] ? DICTIONARY::META_DATA[key].merge(data) : data); acc
         },

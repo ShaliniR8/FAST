@@ -30,22 +30,40 @@ module QueriesHelper
 
   def populate_hash_to_be_created(res, x_val, y_val, record_id)
     if x_val.is_a?(Array) && y_val.is_a?(Array)
-      x_val.each do |x|
-        y_val.each do |y|
-          res << {x_axis: x, series: y, id: record_id}
+      if fields_compare_same_objects_in_a_target_record(x_val, y_val)
+        (0..x_val.size-1).each do |idx|
+          res << {x_axis: x_val[idx][1], series: y_val[idx][1], id: record_id}
+        end
+      else
+        x_val.each do |x|
+          y_val.each do |y|
+            x_axis = x.is_a?(Array) ? x[1] : x
+            y_axis = y.is_a?(Array) ? y[1] : y
+            res << {x_axis: x_axis, series: y_axis, id: record_id}
+          end
         end
       end
-      res << {x_axis: x_val[0], series: y_val[0], id: record_id}
     elsif x_val.is_a?(Array)
-      x_val.each{|x| res << {x_axis: x, series: y_val, id: record_id}}
+      x_axis = x_val.first.is_a?(Array) ? x_val[0][1] : x_val
+      x_val.each{|x| res << {x_axis: x_axis, series: y_val, id: record_id}}
     elsif y_val.is_a?(Array)
-      y_val.each{|y| res << {x_axis: x_val, series: y, id: record_id}}
+      y_axis = y_val.first.is_a?(Array) ? y_val[0][1] : y_val
+      y_val.each{|y| res << {x_axis: x_val, series: y_axis, id: record_id}}
     else
       res << {x_axis: x_val, series: y_val, id: record_id}
     end
     return res
   end
 
+  def fields_compare_same_objects_in_a_target_record(x_val, y_val)
+    if x_val.first.is_a?(Array) && y_val.first.is_a?(Array)
+      x_axis_object = x_val[0][0]
+      series_object = y_val[0][0]
+      x_axis_object == series_object
+    else
+      false
+    end
+  end
 
   # return 2D hash of x_axis and series values
   def populate_hash(data_hash, x_axis, series, get_ids: false, record_id: nil)
@@ -132,7 +150,6 @@ module QueriesHelper
     x_vals_by_id = get_mapped_data_for_field(field_arr: x_axis_field_arr, records_ids: records_ids, query: query)
     y_vals_by_id = get_mapped_data_for_field(field_arr: series_field_arr, records_ids: records_ids, query: query)
     res = []
-
     records_ids.each do |rid|
       x_vals = x_vals_by_id[rid.to_i]
       y_vals = y_vals_by_id[rid.to_i]
@@ -233,10 +250,25 @@ module QueriesHelper
         end
 
       when 'included_verifications'
-        values = Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
+        values = Hash.new{|h,k| h[k] = []}
+        Verification.find_by_sql("SELECT verifications.owner_id, CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
-                                          .map{|r| [r.owner_id, r.ver_status]}.to_h rescue {}
-
+                                          .map{|r| values[r.owner_id] << ["verifications", r.ver_status]} rescue {}
+      when 'additional_validators'
+        records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.users_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+                                          verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
+        values = Hash.new{|h,k| h[k] = []}
+        records.each do |r|
+          additional_validators = User.where(id: r.additional_validators || r.users_id).map(&:full_name).sort.join(", ")
+          values[r.owner_id] << ["verifications", additional_validators]
+        end
+      when 'verification_status'
+        records = Verification.find_by_sql("SELECT verifications.owner_id, verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+                                          verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
+        values = Hash.new{|h,k| h[k] = []}
+        records.each do |r|
+          values[r.owner_id] << ["verifications", r.status]
+        end
       when 'cause_label'
         values = Hash.new { |h, k| h[k] = [] }
         Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
@@ -390,7 +422,14 @@ module QueriesHelper
         values = Verification.find_by_sql("SELECT CONCAT(verifications.status, \', \', verifications.verify_date) AS ver_status FROM verifications WHERE
                                           (verifications.owner_type = \'#{target}\' AND verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
                                           .map(&:ver_status) rescue []
-
+      when 'additional_validators'
+        values = Verification.find_by_sql("SELECT distinct(concat(verifications.owner_id, verifications.additional_validators)), verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+                                          verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
+                                          .map{|r| User.where(id: (r.additional_validators || r.users_id)).map(&:full_name).sort.join(", ")} rescue {}
+      when 'verification_status'
+        values = Verification.find_by_sql("SELECT verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+                                          verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
+                                          .map(&:status) rescue []
       when 'cause_label'
         values = Cause.find_by_sql("SELECT CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
                                     (causes.owner_type = \'#{target}\' AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})").map(&:cause_label) rescue []
@@ -620,6 +659,19 @@ module QueriesHelper
           val_hash[val.ver_status] << val.owner_id if val.ver_status.present?
         end
 
+      when 'additional_validators'
+        values = Verification.find_by_sql("SELECT distinct(concat(verifications.owner_id, verifications.additional_validators)), verifications.owner_id, verifications.users_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+                                          verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
+        values.each do |val|
+          validator_name = User.where(id: val.additional_validators || val.users_id).map(&:full_name).sort.join(", ")
+          val_hash[validator_name] << val.owner_id
+        end
+              when 'verification_status'
+        values = Verification.find_by_sql("SELECT verifications.owner_id, verifications.status FROM verifications WHERE (verifications.owner_type = \'#{target}\' AND
+                                          verifications.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})")
+        values.each do |val|
+          val_hash[val.status] << val.owner_id
+        end
       when 'cause_label'
         values = Cause.find_by_sql("SELECT causes.owner_id, CONCAT(causes.category, \' > \', causes.attr) AS cause_label FROM causes WHERE
                                     (causes.owner_type = \'#{target}\' AND causes.owner_id #{records_ids.present? ? "IN (#{records_ids.join(',')})" : "IS NULL"})") rescue []
@@ -1078,7 +1130,14 @@ module QueriesHelper
     when 'included_verifications'
       ids = Verification.find_by_sql("SELECT verifications.owner_id FROM verifications WHERE (verifications.owner_type=\'#{query.target}\' AND
                                      LOWER(CONCAT(verifications.status, \', \', verifications.verify_date)) #{comparison_string})").map(&:owner_id) rescue ""
-
+    when 'additional_validators'
+      validator_ids = User.where("full_name #{comparison_string}").map(&:id)
+      ids = Verification.find_by_sql("SELECT verifications.owner_id, verifications.users_id, verifications.additional_validators FROM verifications WHERE (verifications.owner_type=\'#{query.target}\')")
+                        .select{|val| ((val.additional_validators || [val.users_id]).map(&:to_i) & validator_ids).present?}
+                        .map(&:owner_id)
+    when 'verification_status'
+      ids = Verification.find_by_sql("SELECT verifications.owner_id FROM verifications WHERE (verifications.owner_type=\'#{query.target}\' AND
+                                     LOWER(verifications.status) #{comparison_string})").map(&:owner_id) rescue ""
     when 'included_findings'
       case condition.logic
       when 'Equals To', 'Contains'
@@ -1920,6 +1979,13 @@ module QueriesHelper
     mapping_hash['SmsTask']['Responsible User Comment'] = 'res_comment'
     mapping_hash['SmsTask']['Final Comment'] = 'final_comment'
     mapping_hash['SmsTask']['Description'] = 'description'
+
+    verification_targets = ['CorrectiveAction', 'Audit', 'Inspection', 'Evaluation', 'Investigation',
+    'Finding', 'SmsAction', 'Recommendation','Sra', 'Hazard', 'RiskControl']
+    if verification_targets.include?(target)
+      mapping_hash[target]["Verification - Validators"] = 'additional_validators'
+      mapping_hash[target]["Verification - Status"] = 'verification_status'
+    end
 
     return (mapping_hash[target].present? && mapping_hash[target][condition_field].present?) ? mapping_hash[target][condition_field] : condition_field.downcase.gsub(' ','_')
   end

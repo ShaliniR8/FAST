@@ -65,9 +65,9 @@
                         <%=record.validator.full_name%>
                         <%validator_ids << record.validator.id%>
                       <% else %>
-                        <%valiators = field_value.select { |validator| validator.present?}.map { |validator| User.find(validator).full_name }%>
-                        <%validator_ids = field_value.map { |validator| User.find(validator).id }%>
-                        <%=valiators.join(', ')%>
+                        <%validator_ids = field_value.select { |value| User.find_by_id(value) }%>
+                        <%validators = validator_ids.map { |id| User.find(id).full_name }%>
+                        <%=validators.join(', ')%>
                       <% end%>
                     <%else%>
                       <%=field_value%>
