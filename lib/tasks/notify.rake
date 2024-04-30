@@ -40,9 +40,23 @@ task :submission_notify => [:environment] do |t|
         )
       else
         is_deidentified = attach_pdf == 'deid'
-
         html = controller.render_to_string(:template => "/pdfs/_print_submission.html.erb",  locals: {owner: owner, deidentified: is_deidentified}, layout: false)
-        pdf = PDFKit.new(html)
+        pdf_options = {
+          header_html:  'app/views/pdfs/print_header.html',
+          header_spacing:  1,
+
+          header_right: '[page] of [topage]'
+        }
+        if CONFIG::GENERAL[:has_pdf_header]
+          pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+        end
+        if CONFIG::GENERAL[:has_pdf_footer]
+          pdf_options.merge!({
+            footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+            footer_spacing:  3,
+          })
+        end
+        pdf = PDFKit.new(html, pdf_options)
         pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
         pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
         attachment = pdf.to_pdf
@@ -109,7 +123,22 @@ task :notify => [:environment] do |t|
           html = controller.render_to_string(:template => "/pdfs/_print.html.erb",  locals: {owner: @record, deidentified: true}, layout: false)
         end
 
-        pdf = PDFKit.new(html)
+        pdf_options = {
+          header_html:  'app/views/pdfs/print_header.html',
+          header_spacing:  1,
+
+          header_right: '[page] of [topage]'
+        }
+        if CONFIG::GENERAL[:has_pdf_header]
+          pdf_options[:header_html] =  "app/views/pdfs/#{AIRLINE_CODE}/print_header.html"
+        end
+        if CONFIG::GENERAL[:has_pdf_footer]
+          pdf_options.merge!({
+            footer_html:  "app/views/pdfs/#{AIRLINE_CODE}/print_footer.html",
+            footer_spacing:  3,
+          })
+        end
+        pdf = PDFKit.new(html, pdf_options)
         pdf.stylesheets << ("#{Rails.root}/public/css/bootstrap.css")
         pdf.stylesheets << ("#{Rails.root}/public/css/print.css")
 
