@@ -1,0 +1,20 @@
+- attachments = owner.attachments
+- if attachments.present?
+  .col-xs-12.wrap
+    hr
+    .title = "Attachments"
+    .col-xs-12
+      .content
+        table.table.table-striped.table-bordered width="100%"
+          thead
+            tr
+              th ="Filename"
+              th ="Caption"
+              th ="Preview"
+          tbody
+            - attachments.each do |attachment|
+              tr
+                  td = attachment.document_filename
+                  td = attachment.caption
+                  - if Attachment.image_extensions.include? (attachment.name.file.extension)
+                    td  = image_tag "#{root_url}#{attachment.url}"
