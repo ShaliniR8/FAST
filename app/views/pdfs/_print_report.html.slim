@@ -49,3 +49,6 @@
                 deidentified: deidentified
           - else
             = render "/pdfs/print_#{panel}", owner: owner, deidentified: deidentified
+
+    - if CONFIG::GENERAL[:add_attachment_in_pdf]
+      = render '/pdfs/print_attachments', owner: owner

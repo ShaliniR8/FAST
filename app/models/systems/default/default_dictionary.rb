@@ -293,6 +293,7 @@ class DefaultDictionary
     },
     attachments: {
       partial: '/panels/attachments',
+      partial: '/pdfs/attachments',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
       data: proc { |owner:,user:,**op| { attachments: owner.attachments} },

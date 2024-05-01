@@ -31,6 +31,10 @@
           <%end%>
         </tbody>
       </table>
+
+      <% if CONFIG::GENERAL[:add_attachment_in_pdf] %>
+        <%= render '/pdfs/print_attachments', owner: owner%>
+      <%end%>
     </div>
   </div>
 

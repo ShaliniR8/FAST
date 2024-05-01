@@ -34,7 +34,7 @@ table.table.table-bordered.table-striped.mt10 id="checklist_records_#{checklist.
         td
           - unless checklist_row.is_header?
             - checklist_row.attachments.each do |a|
-              = link_to a[:name], '#'
+              = link_to a[:name], (root_url + a.url)
               br
         td
           - unless checklist_row.is_header? || owner.nil?

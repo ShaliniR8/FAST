@@ -175,6 +175,10 @@
       <%end%>
     </div>
 
+    <% if CONFIG::GENERAL[:add_attachment_in_pdf] %>
+      <%= render '/pdfs/print_attachments', owner: owner%>
+    <%end%>
+
   </div>
 </div>
 <!-- sub_field.value.include?(nest_field.nested_field_value) -->

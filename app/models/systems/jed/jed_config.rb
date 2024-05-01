@@ -22,6 +22,7 @@ class JEDConfig < DefaultConfig
     safety_promotion_visibility:  true,
     sms_im_visibility:            false,
     display_logo:                 true,
+    add_attachment_in_pdf:        true,
 
     #Map
     has_gmap:                           true,

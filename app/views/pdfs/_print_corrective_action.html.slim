@@ -18,3 +18,5 @@
     = render '/pdfs/print_comments',
       comments: owner.comments,
       deidentified: deidentified
+    - if CONFIG::GENERAL[:add_attachment_in_pdf]
+      = render '/pdfs/print_attachments', owner: owner

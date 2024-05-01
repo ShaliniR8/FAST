@@ -31,3 +31,6 @@
           = render '/pdfs/print_record', deidentified: true, owner: r
 
       = render '/pdfs/print_panels', owner: owner, deidentified: deidentified, options: options
+
+      - if CONFIG::GENERAL[:add_attachment_in_pdf]
+        = render '/pdfs/print_attachments', owner: owner

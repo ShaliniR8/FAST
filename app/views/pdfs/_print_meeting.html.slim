@@ -9,3 +9,5 @@
       = render '/pdfs/print_reports_table', owner: owner, deidentified: deidentified
       = render '/pdfs/print_comments', comments: owner.comments
       = render '/pdfs/print_participants', owner: owner
+      - if CONFIG::GENERAL[:add_attachment_in_pdf]
+        = render '/pdfs/print_attachments', owner: owner

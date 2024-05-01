@@ -227,5 +227,11 @@
       <%=render "pdfs/print_comments",
         comments: owner.comments%>
     <%end%>
+
+    <%if CONFIG::GENERAL[:add_attachment_in_pdf]%>
+      <%=render "pdfs/print_attachments",
+          :owner => owner,
+          :deidentified => deidentified%>
+    <%end%>
   </div>
 </div>

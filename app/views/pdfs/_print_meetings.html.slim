@@ -20,6 +20,8 @@
                       = datetimez_to_string(m.send(h[:field]))
                     - else
                       = m.send(h[:field])
+        - if CONFIG::GENERAL[:add_attachment_in_pdf]
+          = render '/pdfs/print_attachments', owner: owner
 
 css:
   tfoot {
