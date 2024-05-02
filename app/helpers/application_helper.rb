@@ -1077,8 +1077,8 @@ module ApplicationHelper
   end
 
   def valid_img_attachment_url(attachment)
-    uri = URI(root_url + attachment.url)
-    http = Net::HTTP.start(uri.host, uri.port)
+    uri = URI(CONFIG.default_root_url + attachment.url)
+    http = Net::HTTP.start( uri.host, uri.port)
     http.read_timeout = 2
     begin
       http.head(uri.request_uri)['Content-Type'].start_with? 'image'

@@ -17,7 +17,7 @@
                   td = attachment.document_filename
                   td = attachment.caption
                   - if Attachment.image_extensions.include?(attachment.name.file.extension) && valid_img_attachment_url(attachment)
-                    td = image_tag "#{root_url}#{attachment.url}", class: "attachment_img"
+                      td = image_tag "#{CONFIG.default_root_url}#{attachment.url}", class: "attachment_img"
 
 css:
   .attachment_img {

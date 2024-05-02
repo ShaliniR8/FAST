@@ -227,6 +227,9 @@ class DefaultConfig
     Rails.application.config.custom_options_arr
   end
 
+  def self.default_root_url
+    "http://" + Rails.application.config.action_mailer.default_url_options[:host]
+  end
 
   def self.custom_options_by_id
     Rails.application.config.custom_options_arr.map{|x| [x.id, x]}.to_h
