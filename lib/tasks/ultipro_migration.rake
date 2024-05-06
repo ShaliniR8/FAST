@@ -135,6 +135,7 @@ namespace :ultipro do
           first_name: user_hash['first_name'],
           last_name: user_hash['last_name'],
           password: SecureRandom.urlsafe_base64(20),
+          employee_number: user_hash['employee_number'],
           @sso_identifier_attribute.to_sym => user_hash[@sso_identifier_tag],
           level: map_account_level(user_hash['employee_group'])
         })
