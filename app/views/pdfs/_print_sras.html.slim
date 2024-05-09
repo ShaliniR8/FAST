@@ -1,5 +1,4 @@
-- sras.each do |sra|
-  = render '/pdfs/print',
-    owner: sra,
-    deidentified: deidentified,
-    launch_item: true
+= render '/pdfs/launched',
+  objects: sras,
+  owner: 'Sra',
+  deidentified: deidentified
