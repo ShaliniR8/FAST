@@ -278,6 +278,7 @@ class DefaultDictionary
     # },
     audits: {
       partial: '/panels/audits',
+      print_partial: '/pdfs/print_audits',
       visible: proc { |owner:,user:,**op| owner.get_children(child_type: 'Audit').present?},
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { audits: owner.get_children(child_type: 'Audit') } },
