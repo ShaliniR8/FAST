@@ -111,6 +111,9 @@ class DefaultConfig
   LINK_OBJECTS = {
   }
 
+  INSTRUCTIONS = {
+  }
+
   LAUNCH_OBJECTS_FROM_CHECKLIST_ROWS = {
     audits: 'Findings',
     evaluations: 'Findings',

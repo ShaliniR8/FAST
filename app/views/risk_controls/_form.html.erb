@@ -30,6 +30,7 @@
             <%=f.hidden_field :hazard_id, :value => params[:owner_id]%>
           <%end%>
 
+          <%= render 'shared/form_instructions', :instructions => CONFIG::INSTRUCTIONS['RiskControl']%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @risk_control %>
           <%=render '/forms/attachments_form', :f => f, :owner => @risk_control%>
 

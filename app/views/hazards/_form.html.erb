@@ -28,7 +28,7 @@
           <%if params[:owner_id].present?%>
             <%=f.hidden_field :sra_id, :value => params[:owner_id]%>
           <%end%>
-
+          <%= render 'shared/form_instructions', :instructions => CONFIG::INSTRUCTIONS['Hazard']%>
           <%=render "/forms/form_fields", :f => f, :fields => @fields, :record => @hazard%>
 
           <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', f: f, risk_type: 'Baseline'%>
