@@ -57,7 +57,6 @@ class EvaluationsController < SafetyAssuranceController
       addressable_templates = current_user.get_all_checklist_addressable_templates
       @checklist_templates = Checklist.where(:owner_type => 'ChecklistHeader').keep_if {|t| addressable_templates.include?(t.title)}.map{|x| [x.title, x.id]}.to_h
     end
-
     @checklist_headers = ChecklistHeader.where(:status => 'Published').map{|x| [x.title, x.id]}.to_h
   end
 
@@ -88,8 +87,8 @@ class EvaluationsController < SafetyAssuranceController
       @checklist_upload = params[:checklist_upload]
 
       if @selected_checklists
-        add_checklist_template_to_item(@selected_checklists, @evaluation)   
-      end 
+        add_checklist_template_to_item(@selected_checklists, @evaluation)
+      end
 
       if @checklist_header.present?
         create_custom_checklist(@evaluation, @checklist_header, @checklist_title, @checklist_upload)
@@ -138,9 +137,8 @@ class EvaluationsController < SafetyAssuranceController
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-      .keep_if{|p| keep_privileges(p, 'evaluations')}
-      .sort_by!{|a| a.name}
+    privileges_id = AccessControl.where(action: action_name, entry: 'evaluations').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
     @plan = {"Yes" => true, "No" => false}
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood

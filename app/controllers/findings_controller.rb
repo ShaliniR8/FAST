@@ -152,9 +152,11 @@ class FindingsController < SafetyAssuranceController
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-    @users = User.find(:all)
-    @users.keep_if{|u| !u.disable}
+    rule = AccessControl.where(action: action_name, entry: 'findings').first
+    if rule
+      privileges_id = rule.privileges.map(&:id)
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    end
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood

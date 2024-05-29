@@ -84,7 +84,8 @@ class RiskControlsController < ApplicationController
     else # from Launch Object
       @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id])
     end
-
+    privileges_id = AccessControl.where(action: 'new', entry: 'risk_controls').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
     @risk_control = RiskControl.new
     @fields = RiskControl.get_meta_fields('form')
   end
@@ -104,9 +105,8 @@ class RiskControlsController < ApplicationController
   def edit
     @has_status = true
     @risk_control = RiskControl.find(params[:id])
-    @users = User
-      .find(:all)
-      .keep_if{|u| !u.disable && u.has_access('sras', 'edit')}
+    privileges_id = AccessControl.where(action: 'edit', entry: 'risk_controls').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
     @headers = User.get_headers
     @fields = RiskControl.get_meta_fields('form')
   end

@@ -203,6 +203,11 @@ class HazardsController < ApplicationController
 
 
   def load_options
+    rule = AccessControl.where(action: action_name, entry: 'hazards').first
+    if rule
+      privileges_id = rule.privileges.map(&:id)
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    end
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
     risk_matrix_initializer

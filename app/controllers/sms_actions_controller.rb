@@ -54,7 +54,8 @@ class SmsActionsController < SafetyAssuranceController
       .becomes(Object.const_get(params[:owner_type])) rescue nil
     @owner = Object.const_get(@table).new
     @owner.open_date = Time.now
-    @users = User.where(:disable => 0)
+    privileges_id = AccessControl.where(action: 'new', entry: 'sms_actions').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
     @headers = User.get_headers
     load_options
     @fields = SmsAction.get_meta_fields('form')
@@ -110,15 +111,18 @@ class SmsActionsController < SafetyAssuranceController
     @fields = SmsAction.get_meta_fields('form')
     choose_load_special_matrix_form(@owner, 'sms_action')
     @type = get_car_owner(@owner)
-    @users.keep_if{|u| u.has_access(@type, 'edit')}
+    privileges_id = AccessControl.where(action: 'edit', entry: 'sms_actions').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
     @risk_type = 'Baseline'
   end
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-    @users = User.find(:all)
-    @users.keep_if{|u| !u.disable}
+    rule = AccessControl.where(action: action_name, entry: 'sms_actions').first
+    if rule
+      privileges_id = rule.privileges.map(&:id)
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    end
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
@@ -128,6 +132,8 @@ class SmsActionsController < SafetyAssuranceController
 
 
   def reassign
+    privileges_id = AccessControl.where(action: 'edit', entry: 'sms_actions').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
     @owner = SmsAction.find(params[:id])
     render :partial => "reassign"
   end

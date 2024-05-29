@@ -130,8 +130,8 @@ class InvestigationsController < SafetyAssuranceController
       @checklist_upload = params[:checklist_upload]
 
       if @selected_checklists
-        add_checklist_template_to_item(@selected_checklists, @investigation)   
-      end 
+        add_checklist_template_to_item(@selected_checklists, @investigation)
+      end
 
       if @checklist_header.present?
         create_custom_checklist(@investigation, @checklist_header, @checklist_title, @checklist_upload)
@@ -167,8 +167,6 @@ class InvestigationsController < SafetyAssuranceController
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-    @privileges.keep_if{|p| keep_privileges(p, 'investigations')}.sort_by!{|a| a.name}
     # @types = Investigation.types
     # @sources = Investigation.sources
 
@@ -180,12 +178,10 @@ class InvestigationsController < SafetyAssuranceController
       }
       priv_ids = @user_groups.values.flatten
     else
-      priv_ids = Privilege.all.map(&:id)
+      priv_ids = AccessControl.where(action: action_name, entry: 'risk_controls').first.privileges.map(&:id)
     end
 
-    @users = User.includes(:privileges).active.where(privileges: {id: priv_ids})
-
-    @users.keep_if{|u| !u.disable && u.has_access('investigations', 'edit')}
+    @users = User.joins(:privileges).where("privileges_id in (#{priv_ids.join(",")})")
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse
     # @departments = Audit.get_departments
