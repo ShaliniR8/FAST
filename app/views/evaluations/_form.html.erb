@@ -20,9 +20,8 @@
       <div class="panel-body" id="form_body">
         <%=form_for @owner ,:html => {:multipart => true} do |f|%>
           <%= render partial: "shared/instructions", :locals => { :owner => @owner, :action_name => action_name, :include_workflow_diagram => CONFIG.hierarchy[session[:mode]][:display_workflow_diagram_module] }%>
-          <%=render "/shared/privilege_form", :target => "evaluation[privileges][]", :owner => @owner, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
-          <% if CONFIG.sa::GENERAL[:non_recurring_item_checklist] %>      
+          <% if CONFIG.sa::GENERAL[:non_recurring_item_checklist] %>
             <%=render '/forms/checklist_templates'%>
           <%end%>
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>

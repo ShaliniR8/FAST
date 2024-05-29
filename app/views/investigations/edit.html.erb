@@ -31,7 +31,6 @@
             <%=f.hidden_field :parent_type, :value => @parent_type%>
             <%=f.hidden_field :parent_id,   :value => @parent_id%>
           <%end%>
-          <%=render "/shared/privilege_form", :target => "investigation[privileges][]", :owner => @owner, :f => f%>
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
           <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', f: f, risk_type: 'Baseline'%>
           <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
