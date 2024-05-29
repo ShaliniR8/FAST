@@ -24,7 +24,6 @@
           <%if action_name == "new"%>
             <%=f.hidden_field :created_by_id, :value => current_user.id%>
           <%end%>
-          <%=render "shared/privilege_form", :target => "corrective_action[privileges][]", :owner => @corrective_action, :f => f%>
 
           <%if params[:report].present?%>
             <%=f.hidden_field :reports_id, :value => @report.id%>

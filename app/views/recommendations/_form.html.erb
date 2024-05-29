@@ -33,7 +33,6 @@
               <%=hidden_field_tag :owner_id, params[:owner_id]%>
             <%end%>
 
-            <%=render "shared/privilege_form",:target => "recommendation[privileges][]",:owner => @owner,:f => f%>
             <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
             <%=render '/forms/attachments_form', :f => f, :owner => @owner%>
 
