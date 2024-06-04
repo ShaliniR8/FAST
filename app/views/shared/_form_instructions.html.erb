@@ -1,5 +1,5 @@
-<%if form.present?%>
-  <%instructions = CONFIG::INSTRUCTIONS[form]%>
+<%instructions = CONFIG::INSTRUCTIONS[form]%>
+<%if instructions.present?%>
   <%fields = (simplified ||= false) ? instructions[:simplified_form_fields] : instructions[:fields]%>
   <div class="span4 collapse-group">
     <a class="btn" data-toggle="collapse" data-target="<%="#view-#{form}"%>"> <%="Instructions (for filling out #{ form.underscore.dasherize } fields)"%> &raquo;</a>
