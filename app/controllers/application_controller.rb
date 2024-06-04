@@ -427,7 +427,7 @@ class ApplicationController < ActionController::Base
 
     when :assign # was assign route
       privileges_id = AccessControl.where(action: 'edit', entry: @owner.class.name.tableize).first.privileges.map(&:id)
-      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
       render partial: '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
 
     when :attach_in_message

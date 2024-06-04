@@ -155,7 +155,7 @@ class FindingsController < SafetyAssuranceController
     rule = AccessControl.where(action: action_name, entry: 'findings').first
     if rule
       privileges_id = rule.privileges.map(&:id)
-      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     end
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse

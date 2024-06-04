@@ -208,7 +208,7 @@ class AuditsController < SafetyAssuranceController
 
   def load_options
     privileges_id = AccessControl.where(action: action_name, entry: 'audits').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
     @cause_headers = FindingCause.get_headers

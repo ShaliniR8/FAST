@@ -47,7 +47,7 @@ class CorrectiveActionsController < ApplicationController
       @submission = Submission.find(params[:submission])
     end
     privileges_id = AccessControl.where(action: 'new', entry: 'corrective_actions').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @fields = CorrectiveAction.get_meta_fields('form')
   end
 
@@ -130,7 +130,7 @@ class CorrectiveActionsController < ApplicationController
   def assign
     @owner = CorrectiveAction.find(params[:id]).becomes(CorrectiveAction)
     privileges_id = AccessControl.where(action: 'edit', entry: 'corrective_actions').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     render :partial => '/forms/workflow_forms/assign', locals: {field_name: 'responsible_user_id'}
   end
 
@@ -211,7 +211,7 @@ class CorrectiveActionsController < ApplicationController
       @submission = @corrective_action.submission
     end
     privileges_id = AccessControl.where(action: 'edit', entry: 'corrective_actions').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @fields = CorrectiveAction.get_meta_fields('form')
   end
 

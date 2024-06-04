@@ -206,7 +206,7 @@ class HazardsController < ApplicationController
     rule = AccessControl.where(action: action_name, entry: 'hazards').first
     if rule
       privileges_id = rule.privileges.map(&:id)
-      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     end
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood

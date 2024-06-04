@@ -138,7 +138,7 @@ class EvaluationsController < SafetyAssuranceController
 
   def load_options
     privileges_id = AccessControl.where(action: action_name, entry: 'evaluations').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @plan = {"Yes" => true, "No" => false}
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood

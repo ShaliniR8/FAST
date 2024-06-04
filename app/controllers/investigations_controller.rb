@@ -181,7 +181,7 @@ class InvestigationsController < SafetyAssuranceController
       priv_ids = AccessControl.where(action: action_name, entry: 'risk_controls').first.privileges.map(&:id)
     end
 
-    @users = User.joins(:privileges).where("privileges_id in (#{priv_ids.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{priv_ids.join(",")})").uniq
     @headers = User.get_headers
     @frequency = (0..4).to_a.reverse
     # @departments = Audit.get_departments

@@ -85,7 +85,7 @@ class RiskControlsController < ApplicationController
       @owner = Object.const_get(params[:parent_type].capitalize.singularize).find(params[:parent_id])
     end
     privileges_id = AccessControl.where(action: 'new', entry: 'risk_controls').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @risk_control = RiskControl.new
     @fields = RiskControl.get_meta_fields('form')
   end
@@ -106,7 +106,7 @@ class RiskControlsController < ApplicationController
     @has_status = true
     @risk_control = RiskControl.find(params[:id])
     privileges_id = AccessControl.where(action: 'edit', entry: 'risk_controls').first.privileges.map(&:id)
-    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @headers = User.get_headers
     @fields = RiskControl.get_meta_fields('form')
   end

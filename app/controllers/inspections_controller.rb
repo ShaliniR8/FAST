@@ -136,7 +136,7 @@ class InspectionsController < SafetyAssuranceController
     rule = AccessControl.where(action: action_name, entry: 'inspections').first
     if rule
       privileges_id = rule.privileges.map(&:id)
-      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})")
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     end
       @headers = User.get_headers
       # @departments = Inspection.get_departments
