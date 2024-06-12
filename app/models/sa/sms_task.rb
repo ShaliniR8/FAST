@@ -10,6 +10,11 @@ class SmsTask < ActiveRecord::Base
 
   after_create :transaction_log
 
+  def related_users
+    related_users_id = self.owner.related_users + [self.res, self.app_id]
+    related_users_id.flatten.compact
+  end
+
   def transaction_log
     Transaction.build_for(
       self.owner,

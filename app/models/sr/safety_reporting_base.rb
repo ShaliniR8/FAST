@@ -10,6 +10,9 @@ module Sr
       template.categories
     end
 
+    def related_users
+      []
+    end
 
     def get_date
       event_date.strftime("%Y-%m-%d") rescue ''

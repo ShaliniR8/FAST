@@ -44,6 +44,12 @@ class Audit < Sa::SafetyAssuranceBase
   scope :templates, -> {where(template: 1)}
   scope :regulars, -> {where(template: 0)}
 
+  
+  def related_users
+    related_users = [self.created_by_id, self.approver_id, self.responsible_user_id].compact
+    related_users
+  end
+
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)
     CONFIG.object['Audit'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}

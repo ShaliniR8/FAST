@@ -297,6 +297,7 @@ class SrasController < ApplicationController
     @sra = Sra.find(params[:id])
     has_access = @sra.has_show_access(current_user)
     redirect_to errors_path unless has_access
+    @sra_edit_access = (@sra.related_users.include? current_user.id) || current_user.has_access("sras", "edit", admin: CONFIG::GENERAL[:global_admin_default])
     @records = @sra.children.present? ? Record.where(id: @sra.children.map(&:child_id)) : []
     @risk_group = @sra.matrix_connection.present? ? @sra.matrix_connection.matrix_group : ''
     @owner = @sra

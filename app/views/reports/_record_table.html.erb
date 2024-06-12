@@ -140,7 +140,7 @@
                 <td>
                   <%if @report.status != "Closed" &&
                     record.status != "Closed" &&
-                    current_user.has_access('corrective_actions', 'new')%>
+                    current_user.has_access('corrective_actions', 'new') && current_user.has_access("reports", "edit") %>
                     <%=link_to "<i class='glyphicon glyphicon-paperclip'></i>".html_safe,
                       new_corrective_action_path(:record => record.id, :report => @report.id),
                       'data-toggle' => 'tooltip',

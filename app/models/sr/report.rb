@@ -51,6 +51,10 @@ class Report < Sr::SafetyReportingBase
     CONFIG.object['Report'][:fields].values.select{ |f| (f[:visible].split(',') & visible_fields).any? }
   end
 
+  def related_users
+    created_by_ids = self.transactions.where(action: "Create").map(&:users_id)
+    [self.records.map(&:related_users), self.corrective_actions.map(&:related_users), created_by_ids].flatten.compact
+  end
 
   def self.update_event_title_list(template_id:, fields:)
     template_name = Template.find(template_id).name

@@ -45,6 +45,11 @@ class Meeting < ProsafetBase
     keys
   end
 
+  def related_users
+    related_users = [self.host, self.participants].flatten.compact
+    related_users.map(&:id)
+  end
+
 
   def participants
     parts = []

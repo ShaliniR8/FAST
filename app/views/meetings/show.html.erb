@@ -151,7 +151,7 @@
           </div>
         </div>
 
-        <%=render "/forms/attachments_show", :owner => @meeting%>
+        <%=render "/forms/attachments_show", :owner => @meeting, show_btn: @meetings_edit_access%>
         <%=render "records/transactions", :owner => @meeting%>
       </div>
 

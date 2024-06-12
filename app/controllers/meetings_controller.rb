@@ -181,6 +181,7 @@ class MeetingsController < ApplicationController
   def show
     @has_status = true
     @meeting = Meeting.find(params[:id])
+    @meetings_edit_access = (@meeting.related_users.include? current_user.id) || current_user.has_access('meetings', 'edit', admin: CONFIG::GENERAL[:global_admin_default])
     if @meeting.type.present?
       case @meeting.type
       when "SrmMeeting"

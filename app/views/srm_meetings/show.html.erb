@@ -17,6 +17,7 @@
           <div class="top_text">
             Meeting #<%=@meeting.get_id%>
           </div>
+          <% srm_meeting_edit_access = current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) %>
           <div class="top_buttons pull-right">
             <% if current_user.has_access('srm_meetings','destroy', admin: CONFIG::GENERAL[:global_admin_default]) %>
               <%=link_to 'Delete',srm_meeting_path(@meeting),:method=>"delete",:confirm=>'Please confirm that you want to cancel this meeting. The cancellation cannot be reverted',:class=>"btn btn-danger pull-right"%>
@@ -130,7 +131,7 @@
 
         <div class="row">
           <div class="col-xs-12">
-            <%=render "/forms/attachments_show", :owner => @meeting%>
+            <%=render "/forms/attachments_show", :owner => @meeting, show_btn: srm_meeting_edit_access %>
           </div>
           <div class="col-xs-12">
             <%=render "records/transactions", :owner => @meeting%>

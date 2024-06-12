@@ -26,6 +26,11 @@ class Submission < Sr::SafetyReportingBase
   # after_create :make_report  # Logic moved to Submissions Controller create & update methods
   # after_update :make_report
 
+  def related_users
+    related_users = [self.user_id].compact
+    related_users
+  end
+
   def create_transaction(action: nil, context: nil)
     Transaction.build_for(
       self,

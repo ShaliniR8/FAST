@@ -22,6 +22,11 @@ class CorrectiveAction < ProsafetBase
   after_create :create_report_record_transaction
   after_create :create_transaction
 
+  def related_users
+    ## returns ids of related users
+    related_users = [self.created_by_id, self.approver_id, self.responsible_user_id].compact
+    related_users
+  end
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show'] : args)

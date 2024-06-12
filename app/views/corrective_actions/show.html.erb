@@ -65,7 +65,7 @@
                 :class => "btn btn-info pull-right mr5 mb5",
                 :disable_with => "Redirecting..."%>
             <%end%>
-            <%=render '/forms/btns/attach_in_message_btn', owner: @corrective_action%>
+            <%=render '/forms/btns/attach_in_message_btn', owner: @corrective_action if @corrective_action_edit_access%>
             <%=link_to "Expand All",
               "#",
               :class => "btn btn-default mr5 expandall pull-right mb5"%>
@@ -79,8 +79,8 @@
         <div class="col-xs-12 mb15">
 
             <% if @corrective_action.status == "New" %>
-              <% if current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: false) ||
-                  @corrective_action.created_by_id == current_user.id %>
+              <% if @corrective_action_edit_access && (current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: false) ||
+                  @corrective_action.created_by_id == current_user.id) %>
                 <%=link_to 'Assign', '#',
                   :id => 'assign_btn',
                   :class => 'btn btn-warning pull-right mr5',
@@ -104,8 +104,8 @@
               <%end%>
 
             <%elsif @corrective_action.status == "Pending Approval"%>
-              <% if current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: false) ||
-                @corrective_action.approver_id == current_user.id %>
+              <% if @corrective_action_edit_access && (current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: false) ||
+                @corrective_action.approver_id == current_user.id) %>
                 <%=link_to "Approve", "#",
                   :class => "btn btn-success pull-right mr5 approve_btn mb5",
                   :id => 'approve',
@@ -117,7 +117,7 @@
                   "data-toggle" => "modal",
                   "data-target" => ".bs-example-modal-lg"%>
               <%end%>
-            <%elsif @corrective_action.status == "Completed"%>
+            <%elsif @corrective_action.status == "Completed" && @corrective_action_edit_access%>
               <%=link_to 'Schedule Verification', '#',
                 :class => 'btn btn-info pull-right mr5',
                 :id => 'verification_btn',
@@ -135,9 +135,9 @@
         <%=render "/forms/show_fields",                           :record   => @corrective_action, :fields => @fields%>
         <%=render '/panels/show_panels',                          :owner    => @corrective_action%>
         <%=render('/extension_requests/show_extension_requests',  :records  => @corrective_action.extension_requests) if @corrective_action.extension_requests.present?%>
-        <%=render('/verifications/show_verifications',            :records  => @corrective_action.verifications) if @corrective_action.verifications.present?%>
+        <%=render('/verifications/show_verifications',            :records  => @corrective_action.verifications, verification_edit_access: @corrective_action_edit_access) if @corrective_action.verifications.present?%>
         <%=render "/forms/show_comment",                          :owner    => @corrective_action%>
-        <%=render "/forms/attachments_show",                      :owner    => @corrective_action%>
+        <%=render "/forms/attachments_show",                      :owner    => @corrective_action, show_btn: @corrective_action_edit_access%>
         <%=render "records/transactions",                         :owner    => @corrective_action%>
 
       </div>

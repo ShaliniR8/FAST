@@ -23,5 +23,10 @@ module Sa
     def get_created_by_name
       self.created_by.full_name
     end
+
+    def related_users
+      return []
+    end
+    
   end
 end

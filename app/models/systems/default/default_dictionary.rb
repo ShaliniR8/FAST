@@ -18,7 +18,8 @@ class DefaultDictionary
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
         user_confirmed = [owner.approver_id].include?(user.id) if CONFIG::GENERAL[:only_approver_approve]
-        form_confirmed && user_confirmed
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit',CONFIG::GENERAL[:global_admin_default])
+        form_confirmed && user_confirmed && owner_edit_access
       },
     },
     assign: {
@@ -29,13 +30,14 @@ class DefaultDictionary
         user_confirmed = [owner.created_by_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
-        form_confirmed && user_confirmed
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit',CONFIG::GENERAL[:global_admin_default])
+        form_confirmed && user_confirmed && owner_edit_access
       },
     },
     attach_in_message: {
       btn: :attach_in_message,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| true },
+      access: proc { |owner:,user:,**op| (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default]) },
     },
     comment: {
       btn: :comment,
@@ -50,18 +52,25 @@ class DefaultDictionary
         user_confirmed = [owner.responsible_user_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
-        form_confirmed && user_confirmed
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        form_confirmed && user_confirmed && owner_edit_access
       },
     },
     contact: {
       btn: :contact,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (!['Pending Approval', 'Completed'].include? owner.status) && owner_edit_access
+      },
     },
     cost: {
       btn: :cost,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (!['Pending Approval', 'Completed'].include? owner.status) && owner_edit_access
+      },
     },
     deid_pdf: {
       btn: :deid_pdf,
@@ -81,7 +90,10 @@ class DefaultDictionary
     evaluate: {
       btn: :evaluate,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| owner.status == "New" },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', admin: CONFIG::GENERAL[:global_admin_default])
+        owner.status == "New" && owner_edit_access
+      },
     },
     expand_all: {
       btn: :expand_all,
@@ -91,7 +103,10 @@ class DefaultDictionary
     finding: {
       btn: :finding,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (!['Pending Approval', 'Completed'].include? owner.status) && owner_edit_access
+      },
     },
     launch: {
       btn: :launch,
@@ -107,14 +122,15 @@ class DefaultDictionary
       btn: :hazard,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        ['Completed'].exclude?(owner.status) &&
-        priv_check.call(Object.const_get('Hazard'),user,'new',CONFIG::GENERAL[:global_admin_default],true)
+        owner_edit_access = true
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default]) if (owner.class.name != 'Hazard')
+        ['Completed'].exclude?(owner.status) && priv_check.call(Object.const_get('Hazard'),user,'new',CONFIG::GENERAL[:global_admin_default],true) && owner_edit_access
       },
     },
     message_submitter: {
       btn: :message_submitter,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| true },
+      access: proc { |owner:,user:,**op| (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default], false) },
     },
     override_status: {
       btn: :override_status,
@@ -141,13 +157,17 @@ class DefaultDictionary
         user_confirmed = [owner.created_by_id, owner.responsible_user_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
-        form_confirmed && user_confirmed
+        owner_edit_access = (owner.related_users.include?user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        form_confirmed && user_confirmed && owner_edit_access
       },
     },
     reject: {
       btn: :reject,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| owner.can_complete?(user) },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        owner_edit_access && owner.can_complete?(user) 
+      },
     },
     reopen: {
       btn: :reopen,
@@ -158,7 +178,8 @@ class DefaultDictionary
         user_confirmed = [owner.created_by_id].include?(user.id) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
-        form_confirmed && user_confirmed
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        form_confirmed && user_confirmed && owner_edit_access
       },
     },
     request_extension: {
@@ -172,7 +193,8 @@ class DefaultDictionary
       btn: :risk_control,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op|
-        !['Completed', 'Rejected'].include?(owner.status) && !owner.occurrence_lock?
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (!['Completed', 'Rejected'].include?(owner.status)) && (!owner.occurrence_lock?) && owner_edit_access
       },
     },
     schedule_verification:{
@@ -185,17 +207,26 @@ class DefaultDictionary
     send_message: {
       btn: :send_message,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| user.id.present? },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        user.id.present? && owner_edit_access
+      },
     },
     set_alert: {
       btn: :set_alert,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| CONFIG::GENERAL[:allow_set_alert] },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        CONFIG::GENERAL[:allow_set_alert] && owner_edit_access
+      },
     },
     sign: {
       btn: :sign,
       btn_loc: [:top],
-      access: proc { |owner:,user:,**op| owner.status != 'Completed'}
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (owner.status != 'Completed') && owner_edit_access
+      }
     },
     sms_action: {
       btn: :sms_action,
@@ -205,13 +236,17 @@ class DefaultDictionary
         user_confirmed = [owner.responsible_user, owner.approver].include?(user) ||
           priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
           op[:user_conds]
-        form_confirmed && user_confirmed
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        form_confirmed && user_confirmed && owner_edit_access
       }
     },
     task: {
       btn: :task,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (!['Pending Approval', 'Completed'].include? owner.status) && owner_edit_access 
+      },
     },
     view_event: {
       btn: :view_event,
@@ -252,9 +287,9 @@ class DefaultDictionary
     add_records: {
       btn: :add_records,
       btn_loc: [:inline],
-      access: proc { |owner:,user:,**op| (priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true) ||
-                                         priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true)) &&
-                                         owner.status != 'Completed' && CONFIG.srm::GENERAL[:add_reports_to_sra].present?
+      access: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include?user.id) || priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true)
+        owner_edit_access && owner.status != 'Completed' && CONFIG.srm::GENERAL[:add_reports_to_sra].present?
       },
     },
   }
@@ -296,7 +331,10 @@ class DefaultDictionary
       partial: '/panels/attachments',
       partial: '/pdfs/attachments',
       visible: proc { |owner:,user:,**op| true },
-      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
+      show_btns: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include?user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
+        (!['Pending Approval', 'Completed'].include? owner.status) && owner_edit_access 
+      },
       data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
     },
     causes: {
@@ -451,7 +489,10 @@ class DefaultDictionary
       partial: '/occurrences/occurrences_panel',
       print_partial: '/pdfs/print_occurrences',
       visible: proc { |owner:,user:,**op| true },
-      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status rescue true },
+      show_btns: proc { |owner:,user:,**op| 
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default],true)
+        ((!['Pending Approval', 'Completed'].include? owner.status) && owner_edit_access) rescue true 
+      },
       data: proc { |owner:,user:,**op| { owner: owner, can_change: owner.status != 'Completed' &&  priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default]) } },
     },
     participants: {
@@ -533,7 +574,8 @@ class DefaultDictionary
       visible: proc { |owner:, user:, **op| owner.verifications.present?},
       show_btns: proc { |owner:, user:, **op| true},
       data: proc { |owner:, user:, **op| {
-        records: owner.verifications
+        records: owner.verifications,
+        verification_edit_access: (owner.related_users.include? user.id) || priv_check.call(owner,user,'edit',CONFIG::GENERAL[:global_admin_default])
       }},
     },
     agendas: {
@@ -541,12 +583,6 @@ class DefaultDictionary
       visible: proc { |owner:,user:,**op| owner.srm_agendas.present? },
       show_btns: proc { |owner:,user:,**op| false },
       data: proc { |owner:,user:,**op| { sra: owner } },
-    },
-    attachments: {
-      partial: '/panels/attachments',
-      visible: proc { |owner:,user:,**op| true },
-      show_btns: proc { |owner:,user:,**op| !['Pending Approval', 'Completed'].include? owner.status },
-      data: proc { |owner:,user:,**op| { attachments: owner.attachments} },
     },
     comments: {
       partial: '/panels/comments',

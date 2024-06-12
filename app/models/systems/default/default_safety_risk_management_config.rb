@@ -400,7 +400,8 @@ class DefaultSafetyRiskManagementConfig
               user_confirmed = [owner.created_by_id, owner.approver_id].include?(user.id) ||
                 priv_check.call(owner,user,'admin',CONFIG::GENERAL[:global_admin_default],true) ||
                 op[:user_conds]
-              form_confirmed && user_confirmed
+              owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit',CONFIG::GENERAL[:global_admin_default])
+              form_confirmed && user_confirmed && owner_edit_access
             },
           },
           complete: {

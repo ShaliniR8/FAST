@@ -5,6 +5,7 @@ ruby:
   owner_class = owner_name.underscore
   permission = "#{owner_class}s"
   btns = prepare_btns(owner, env, **op)
+  owner_edit_access = (owner.related_users.include? current_user.id) || current_user.has_access(owner.rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])
 / All Renderable Buttons
 - btns.each do |btn|
   - case btn
@@ -57,18 +58,20 @@ ruby:
       'data-target' => '.bs-example-modal-lg'
 
   - when :complete_hazard
-    = link_to "Complete",
-      complete_hazard_path(owner, status: "Completed"),
-      class: "btn btn-warning pull-right mr5 mb5",
-      disable_with: "Completing...",
-      confirm: "Are you sure?"
+    - if owner_edit_access
+      = link_to "Complete",
+        complete_hazard_path(owner, status: "Completed"),
+        class: "btn btn-warning pull-right mr5 mb5",
+        disable_with: "Completing...",
+        confirm: "Are you sure?"
 
   - when :complete_safety_plan
-    = link_to "Complete",
-      complete_safety_plan_path(owner),
-      class: "btn btn-warning pull-right mr5 mb5",
-      disable_with: "Completing...",
-      confirm: "Are you sure?"
+    - if owner_edit_access
+      = link_to "Complete",
+        complete_safety_plan_path(owner),
+        class: "btn btn-warning pull-right mr5 mb5",
+        disable_with: "Completing...",
+        confirm: "Are you sure?"
 
   - when :contact
     = link_to 'Add Contact',
@@ -187,9 +190,10 @@ ruby:
       confirm: "Are you sure?"
 
   - when :reopen
-    = link_to 'Reopen',
-      eval("interpret_#{owner_class}_path(owner, act: :reopen)"),
-      class: 'btn btn-success pull-right mr5 mb5'
+    - if owner_edit_access
+      = link_to 'Reopen',
+        eval("interpret_#{owner_class}_path(owner, act: :reopen)"),
+        class: 'btn btn-success pull-right mr5 mb5'
 
   - when :request_extension
     = link_to 'Request Extension',
@@ -328,9 +332,10 @@ ruby:
       disable_with: 'Redirecting...'
 
   - when :viewer_access
-    = link_to owner.viewer_access ? 'Disable Viewer Access' : 'Enable Viewer Access',
-      eval("viewer_access_#{owner_class}_path(owner)"),
-      class: 'btn btn-warning pull-right mr5 mb5'
+    - if owner_edit_access
+      = link_to owner.viewer_access ? 'Disable Viewer Access' : 'Enable Viewer Access',
+        eval("viewer_access_#{owner_class}_path(owner)"),
+        class: 'btn btn-warning pull-right mr5 mb5'
 
   - when :add_records
     = link_to 'Add Reports',

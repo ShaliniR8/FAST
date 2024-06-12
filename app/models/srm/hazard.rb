@@ -31,6 +31,10 @@ class Hazard < Srm::SafetyRiskManagementBase
   after_create :create_owner_transaction
   after_save   :delete_cached_fragments
 
+  def related_users
+    related_users = [self.created_by_id, self.approver_id, self.responsible_user_id].compact
+    related_users
+  end
 
   def self.get_meta_fields(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv'] : args)

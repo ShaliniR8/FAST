@@ -60,8 +60,8 @@
         </div>
         <div class="col-xs-12">
           <%=hidden_field_tag :event_id, @report.id%>
-          <%=submit_tag "Save Agenda",:class=>"btn btn-success pull-right", :disable_with => "Saving..."%>
-          <%=link_to_agenda_fields "Add",:agendas,"AsapAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5"%>
+          <%=submit_tag "Save Agenda",:class=>"btn btn-success pull-right", :disable_with => "Saving..." if (@meetings_edit_access)%>
+          <%=link_to_agenda_fields "Add",:agendas,"AsapAgenda","agenda_fields","agendas",:class=>"btn btn-info pull-right mr5" if (@meetings_edit_access)%>
         </div>
       <%end%>
     </div>

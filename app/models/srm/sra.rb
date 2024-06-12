@@ -48,6 +48,10 @@ class Sra < Srm::SafetyRiskManagementBase
     CONFIG.object['Sra'][:fields].values.select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def related_users
+    related_users = [self.created_by_id, self.approver_id, self.responsible_user_id, self.reviewer_id].compact
+    related_users
+  end
 
   def self.get_meta_fields_keys(*args)
     visible_fields = (args.empty? ? ['index', 'form', 'show', 'adv', 'admin'] : args)

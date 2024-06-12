@@ -44,7 +44,7 @@
               </span>
             <%end%>
             <%if !@osha_module && CONFIG.sr::GENERAL[:submission_corrective_action_root_cause].present?%>
-              <%show_ca_btn = @record.record.status != 'Closed'%>
+              <%show_ca_btn = (@record.record.status != 'Closed') && current_user.has_access('submissions','edit', admin: CONFIG::GENERAL[:global_admin_default])%>
               <%=link_to 'Add Corrective Action',
                 new_corrective_action_path(submission: @record.id, record: @record.records_id),
                 id: 'ca-btn',

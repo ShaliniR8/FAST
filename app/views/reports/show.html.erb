@@ -19,6 +19,7 @@
               Event #<%=@report.get_id%>: <%=@report.name%>
             </div>
             <div class="top_buttons pull-right">
+              <% report_edit_access = current_user.has_access('reports', 'edit', admin: CONFIG::GENERAL[:global_admin_default]) || (@report.related_users.include? current_user.id) %>
               <%if current_user.has_access('reports','destroy', admin: CONFIG::GENERAL[:global_admin_default], strict: true)%>
                 <%=link_to 'Delete',
                   report_path(@report),
@@ -93,7 +94,7 @@
                   :class => "btn btn-info pull-right mb5 ml5",
                   :disable_with => "Redirecting..."%>
               <%#end%>
-              <%=render '/forms/btns/attach_in_message_btn', owner: @report%>
+              <%=(render '/forms/btns/attach_in_message_btn', owner: @report) if report_edit_access%>
               <%=link_to "Expand All",
                 "#",
                 :class => "btn btn-default expandall pull-right mb5 mr5"%>
@@ -175,7 +176,7 @@
           <%=render "closing_note"%>
           <%=render "record_table"%>
           <%=render '/panels/show_panels', owner: @report%>
-          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All'%>
+          <%=render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !report_edit_access%>
 
           <%if @report.meetings.present?%>
             <div class="col-xs-12 col-md-12 col-lg-12"%>
@@ -226,7 +227,7 @@
           <%end%>
 
           <%=render "/forms/show_comment", :owner => @report%>
-          <%=render "/forms/attachments_show", owner: @report, attachments: @report.attachments + @report.records.map(&:attachments).flatten%>
+          <%=render "/forms/attachments_show", owner: @report, attachments: @report.attachments + @report.records.map(&:attachments).flatten, show_btn: report_edit_access%>
           <%=render "/records/transactions", :owner => @report%>
 
         </div>

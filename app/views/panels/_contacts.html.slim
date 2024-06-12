@@ -7,6 +7,7 @@
     .panel-body style='display:none'
       .row
         - contacts.each do |contact|
+          - contact_edit_access = current_user.has_access(contact.owner.rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default]) || (contact.related_users.include? current_user.id)
           .col-xs-12
             .panel.panel-info
               .panel-heading.click-heading.collapsed
@@ -20,7 +21,7 @@
                     fields: fields
 
                   .col-xs-12
-                    - if @owner.present? && !['Pending Approval', 'Completed'].include?(@owner.status)
+                    - if @owner.present? && (!['Pending Approval', 'Completed'].include?(@owner.status)) && contact_edit_access
                       = link_to 'Edit', '#',
                         class: 'edit-contact-btn btn btn-warning pull-right mr5',
                         'data-path' => edit_contact_path(contact),

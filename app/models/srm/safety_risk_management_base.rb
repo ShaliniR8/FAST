@@ -12,5 +12,9 @@ module Srm
       }
     end
 
+    def related_users
+      []
+    end
+    
   end
 end

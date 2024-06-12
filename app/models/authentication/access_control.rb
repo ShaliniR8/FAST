@@ -120,6 +120,7 @@ class AccessControl < ActiveRecord::Base
         "library"             => generate_desc("Submission", "library"),
         "admin"               => generate_desc("Submission", "admin"),
         "shared"              => "Only apply this to accounts that will be shared by multiple users. This will block the user from accessing any previous submissions.",
+        "edit"                => "This gives user access to send Message to Submitter and Attach Submission to a Message. #{'This will also allow a user to add Corrective Actions to a Submission.' if CONFIG.sr::GENERAL[:submission_corrective_action_root_cause]}"
       },
 
       "records"=>{
@@ -434,7 +435,8 @@ class AccessControl < ActiveRecord::Base
         "Listing"=>"index",
         "Shared"=>"shared",
         "ASAP Library"=>"library",
-        "Full Access"=>"admin"
+        "Full Access"=>"admin",
+        "Edit" => "edit"
       },
       "records"=>{
         "View Narrative" => "summary",

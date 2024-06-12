@@ -137,9 +137,11 @@
                   <%end%>
                 <%end%>
               <%end%>
-
-              <%=render '/forms/btns/attach_in_message_btn', owner: @record%>
-              <%=render '/forms/btns/message_submitter_btn', owner: @record%>
+              
+              <% if record_edit_access %>
+                <%=render '/forms/btns/attach_in_message_btn', owner: @record%>
+                <%=render '/forms/btns/message_submitter_btn', owner: @record%>
+              <% end %>
 
               <a class="btn btn-default expandall pull-right mr5 mb5">Expand All</a>
 
@@ -169,7 +171,7 @@
                 disable_with: 'Opening...',
                 style: "display: #{record_status == 'New' ? 'block' : 'none'}"%>
             <%end%>
-            <%if template_full_access || report_admin_access%>
+            <%if (template_full_access || report_admin_access) && record_edit_access%>
               <%if @record.status == "Closed"%>
                 <%=link_to "Reopen",
                   reopen_record_path(@record),

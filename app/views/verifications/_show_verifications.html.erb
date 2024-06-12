@@ -75,7 +75,7 @@
                   </td>
                 <%end%>
                 <td>
-                  <%if ["New", "Overdue"].include? record.status%>
+                  <%if (["New", "Overdue"].include? record.status) && (verification_edit_access || (validator_ids.include? (current_user.id)))%>
                     <%=link_to "Edit",
                       "#",
                       :route => edit_verification_path(record),
@@ -92,11 +92,13 @@
                     <%end%>
                   <%end%>
                   <%#if final_user.present? && final_user.id == current_user.id%>
+                  <% if (verification_edit_access || (validator_ids.include? (current_user.id)) ) %>
                     <%=link_to "Delete",
                       verification_path(record),
                       :method => :delete,
                       :confirm=>'Are you sure?',
                       :class => "btn btn-danger mr5 mb5"%>
+                  <% end %>
                   <%#end%>
                 </td>
               </tr>

@@ -41,6 +41,10 @@ class Record < Sr::SafetyReportingBase
   after_create -> { create_transaction(context: 'Generated Report From User Submission.') if self.description.present? && !self.description.include?('-- copy')}
   after_save :delete_cached_fragments
 
+  def related_users
+    related_users = [self.users_id].compact
+    related_users
+  end
 
   def handle_anonymous_reports
     transactions.update_all(users_id: nil) if anonymous

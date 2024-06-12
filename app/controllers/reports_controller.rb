@@ -704,6 +704,7 @@ class ReportsController < ApplicationController
     @agendas = @report.get_agendas(@meeting)
     @headers = AsapAgenda.get_headers
     @status = AsapAgenda.get_status
+    @meetings_edit_access = (@meeting.related_users.include? current_user.id) || current_user.has_access("meetings", "edit", admin: CONFIG::GENERAL[:global_admin_default])
     @tof = {"Yes" => true,"No" => false}
     @accept_deline = {"Accepted" => true, "Declined" => false}
     render :partial => "agenda"

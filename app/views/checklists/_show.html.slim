@@ -12,8 +12,8 @@ ruby:
           i class="mt5 glyphicon glyphicon-chevron-down"
 
     .panel-body style="display:none"
-
-      - if owner.status != 'Completed' && current_user.has_access(Object.const_get('Checklist').rule_name,'add', admin: CONFIG::GENERAL[:global_admin_default])
+      - checklist_edit_access = current_user.has_access(owner.rule_name, 'edit', admin: CONFIG::GENERAL[:global_admin]) || (owner.related_users.include?current_user.id)
+      - if owner.status != 'Completed' && current_user.has_access(Object.const_get('Checklist').rule_name,'add', admin: CONFIG::GENERAL[:global_admin_default]) && checklist_edit_access
         = link_to 'Add New Checklist', '#',
           class: 'btn btn-success pull-right mr5 mb10',
           id: 'upload_btn',
@@ -52,7 +52,7 @@ ruby:
               b Assignees:
               = checklist.assignees.map(&:full_name).join(', ')
 
-              - if owner.status != 'Completed' && (\
+              - if owner.status != 'Completed' && checklist_edit_access && (\
                 current_user.has_access(owner.class.table_name,'admin', admin: CONFIG::GENERAL[:global_admin_default]) || \
                 owner.responsible_user_id == current_user.id)
                 = link_to "Address", address_checklist_path(checklist),

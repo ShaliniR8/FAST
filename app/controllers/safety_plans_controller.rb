@@ -102,6 +102,7 @@ class SafetyPlansController < ApplicationController
   def show
     @has_status = true
     @safety_plan=SafetyPlan.find(params[:id])
+    @owner = @safety_plan
     @fields=SafetyPlan.get_meta_fields('show')
   end
 

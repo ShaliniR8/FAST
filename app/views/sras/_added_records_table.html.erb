@@ -151,7 +151,8 @@
                       "data-target" => ".bs-example-modal-lg",
                       :class => "btn btn-default mt5 view_btn"%>
                   <%end%>
-                  <%if current_user.has_access('sras','edit', admin: CONFIG::GENERAL[:global_admin_default]) ||
+                  <% sra_edit_access = current_user.has_access('sras', 'edit', admin: CONFIG::GENERAL[:global_admin_default]) || (@sra.related_users.include? current_user.id) %>
+                  <%if sra_edit_access && current_user.has_access('sras','edit', admin: CONFIG::GENERAL[:global_admin_default]) ||
                        current_user.has_access('sras','admin', admin: CONFIG::GENERAL[:global_admin_default])%>
 
                     <%=link_to "<i class='glyphicon glyphicon-remove'></i>".html_safe, "#",

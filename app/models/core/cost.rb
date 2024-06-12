@@ -18,6 +18,10 @@ class Cost < ActiveRecord::Base
     ].select{|f| (f[:visible].split(',') & visible_fields).any?}
   end
 
+  def related_users
+    self.owner.related_users
+  end
+
   def transaction_log
     Transaction.build_for(
       self.owner,
