@@ -104,6 +104,7 @@ class SafetyPlansController < ApplicationController
     @safety_plan=SafetyPlan.find(params[:id])
     @owner = @safety_plan
     @fields=SafetyPlan.get_meta_fields('show')
+    @safety_plan_edit_access = (@owner.related_users.include? current_user.id) || current_user.has_access(@owner.rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])
   end
 
 

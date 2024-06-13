@@ -69,6 +69,7 @@ class HazardsController < ApplicationController
     @owner = @hazard
     @i18nbase = 'srm.hazard'
     @root_cause_headers = HazardRootCause.get_headers
+    @hazard_edit_access = (@owner.related_users.include? current_user.id) || current_user.has_access(@owner.rule_name, "edit", admin: CONFIG::GENERAL[:global_admin_default])
     load_options
     @fields = Hazard.get_meta_fields('show')
     load_special_matrix(@hazard)

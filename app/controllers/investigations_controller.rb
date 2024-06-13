@@ -206,6 +206,7 @@ class InvestigationsController < SafetyAssuranceController
         load_options
         @fields = Investigation.get_meta_fields('show')
         @recommendation_fields = Recommendation.get_meta_fields('show')
+        @investigation_edit_access = (@owner.related_users.include? current_user.id) || current_user.has_access(@owner.rule_name, 'edit',admin: CONFIG::GENERAL[:global_admin_default])
         load_special_matrix(@investigation)
       end
       format.json { show_as_json }

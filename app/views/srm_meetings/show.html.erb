@@ -17,7 +17,7 @@
           <div class="top_text">
             Meeting #<%=@meeting.get_id%>
           </div>
-          <% srm_meeting_edit_access = current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) %>
+          <% srm_meeting_edit_access = (@meeting.related_users.include?current_user.id) || current_user.has_access('srm_meetings','edit', admin: CONFIG::GENERAL[:global_admin_default]) %>
           <div class="top_buttons pull-right">
             <% if current_user.has_access('srm_meetings','destroy', admin: CONFIG::GENERAL[:global_admin_default]) %>
               <%=link_to 'Delete',srm_meeting_path(@meeting),:method=>"delete",:confirm=>'Please confirm that you want to cancel this meeting. The cancellation cannot be reverted',:class=>"btn btn-danger pull-right"%>

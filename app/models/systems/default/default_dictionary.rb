@@ -91,7 +91,7 @@ class DefaultDictionary
       btn: :evaluate,
       btn_loc: [:inline],
       access: proc { |owner:,user:,**op| 
-        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', admin: CONFIG::GENERAL[:global_admin_default])
+        owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])
         owner.status == "New" && owner_edit_access
       },
     },
@@ -329,7 +329,6 @@ class DefaultDictionary
     },
     attachments: {
       partial: '/panels/attachments',
-      partial: '/pdfs/attachments',
       visible: proc { |owner:,user:,**op| true },
       show_btns: proc { |owner:,user:,**op| 
         owner_edit_access = (owner.related_users.include?user.id) || priv_check.call(owner, user, 'edit', CONFIG::GENERAL[:global_admin_default])

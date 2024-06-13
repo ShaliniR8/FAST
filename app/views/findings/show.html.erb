@@ -42,7 +42,7 @@
              @owner.status != "Pending Approval" &&
              current_user.has_access("findings","edit")%>
 
-          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !current_user.has_access(@owner.rule_name, 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
+          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !@finding_edit_access%>
           <%= render '/panels/show_panels', owner: @owner %>
 
         </div>

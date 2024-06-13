@@ -40,7 +40,7 @@
           current_user.has_access("sms_actions","edit")%>
 
         <% unless ['BSK', 'BAH'].include? AIRLINE_CODE %>
-          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !current_user.has_access(@owner.rule_name, 'edit', admin: CONFIG::GENERAL[:global_admin_default])%>
+          <%= render 'risk_matrices/panel_matrix/risk_assessment_panel', risk_type: 'All', hide_btns: !@sms_action_edit_access%>
         <% end %>
         <%= render '/panels/show_panels', owner: @owner %>
       </div>

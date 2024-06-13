@@ -145,6 +145,7 @@ class FindingsController < SafetyAssuranceController
         @type = @owner.get_owner
         @fields = Finding.get_meta_fields('show')
         @true_owner = @owner.find_true_owner
+        @finding_edit_access = (@owner.related_users.include? current_user.id) || current_user.has_access(@owner.rule_name, 'edit', admin: CONFIG::GENERAL[:global_admin_default])
       end
       format.json { show_as_json }
     end

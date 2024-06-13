@@ -46,8 +46,8 @@ class Meeting < ProsafetBase
   end
 
   def related_users
-    related_users = [self.host, self.participants].flatten.compact
-    related_users.map(&:id)
+    related_users = [self.host.users_id, self.participants.map(&:id)].flatten.compact
+    related_users
   end
 
 

@@ -89,8 +89,8 @@
               <%end%>
 
             <%elsif @corrective_action.status == 'Assigned'%>
-              <% if current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: false) ||
-                @corrective_action.responsible_user_id == current_user.id %>
+              <% if @corrective_action_edit_access && (current_user.has_access('corrective_actions', 'admin', admin: CONFIG::GENERAL[:global_admin_default], strict: false) ||
+                @corrective_action.responsible_user_id == current_user.id) %>
                 <%=link_to "Complete", '#',
                   :class => "btn btn-warning pull-right complete_btn mr5 mb5",
                   :id => 'complete',

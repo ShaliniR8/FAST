@@ -205,7 +205,8 @@ class DefaultSafetyRiskManagementConfig
                                op[:user_conds] ||
                                (owner.status == "Pending Approval" && owner.approver_id == user.id) ||
                                (owner.status == "Pending Review" && owner.reviewer_id == user.id)
-              form_confirmed && user_confirmed
+              owner_edit_access = (owner.related_users.include? user.id) || priv_check.call(owner, user, 'edit',CONFIG::GENERAL[:global_admin_default])
+              form_confirmed && user_confirmed && owner_edit_access
             },
           },
           contact: {
@@ -302,7 +303,7 @@ class DefaultSafetyRiskManagementConfig
         ].reduce({}) { |acc,act| acc[act] = DICTIONARY::ACTION[act]; acc }.deep_merge({
           complete: {
             access: proc { |owner:,user:,**op|
-              owner.can_complete?(user)
+              owner.can_complete?(user) && DICTIONARY::ACTION[:complete][:access].call(owner:owner,user:user,**op)
             },
           },
           reopen: {
@@ -406,7 +407,7 @@ class DefaultSafetyRiskManagementConfig
           },
           complete: {
             access: proc { |owner:,user:,**op|
-              owner.can_complete?(user)
+              owner.can_complete?(user) && DICTIONARY::ACTION[:complete][:access].call(owner:owner,user:user,**op)
             },
           },
           edit: {

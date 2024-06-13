@@ -26,7 +26,8 @@ class SafetyPlan < Srm::SafetyRiskManagementBase
   end
 
   def related_users
-    related_users = [self.created_by_id].compact
+    created_by_ids = self.transactions.where(action: "Create").map(&:users_id)
+    related_users = [self.created_by_id, created_by_ids].flatten.compact
     related_users
   end
 
