@@ -76,12 +76,10 @@
               </div>
               <div class="panel-body">
                 <%=fields_for @template, html: {multipart: true} do |f|%>
-                  <%=render "shared/privilege_form",
-                  target: "#{@type}[privileges][]",:owner => @template,:f => f%>
                   <%=render '/forms/form_fields', :f => f, :fields => @template_fields, :record => @template %>
                   <%=render '/checklists/checklist_types', :owner => @owner, :type => 'audit'%>
-                  <%=render '/forms/attachments_form', :f => f, :owner => @template%>                 
-                <%end%>               
+                  <%=render '/forms/attachments_form', :f => f, :owner => @template%>
+                <%end%>
               </div>
             </div>
           </div>

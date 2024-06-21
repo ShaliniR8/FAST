@@ -33,8 +33,6 @@
             <%=f.hidden_field :parent_id,   :value => @parent_id%>
           <%end%>
 
-          <%=render "shared/privilege_form",:target => "sms_action[privileges][]",:owner => @owner,:f => f%>
-
           <%=render '/forms/form_fields', :f => f, :fields => @fields, :record => @owner %>
 
           <% unless ['BSK', 'BAH'].include? AIRLINE_CODE %>

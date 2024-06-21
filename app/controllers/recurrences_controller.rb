@@ -96,9 +96,6 @@ class RecurrencesController < ApplicationController
 
 
   def load_options
-    #load_options Equivalent; in Audits, Investigations, Evaluations, and Inspections.
-    @privileges = Privilege.find(:all)
-    @privileges.keep_if{|p| keep_privileges(p, 'evaluations')}.sort_by!{|a| a.name}
     @plan = {"Yes" => true, "No" => false}
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood

@@ -37,6 +37,9 @@ class SCXConfig < DefaultConfig
 
   INSTRUCTIONS = {
     'Hazard' => {
+      simplified_form_fields: [
+        '<p class="field_name">Hazard Description:</p> A hazard can also be understood as a Hazardous Condition. What is currently in the system/program/process that might contribute to an unsafe condition or elevated risk to employees or company?'
+      ],
       fields: [
         '<p class="field_name">Description:</p> A hazard can also be understood as a Hazardous Condition. What is currently in the system/program/process that might contribute to an unsafe condition or elevated risk to employees or company?'
       ],
@@ -45,10 +48,14 @@ class SCXConfig < DefaultConfig
       ]
     },
     'RiskControl' => {
+      simplified_form_fields: [
+        '<p class="field_name">Risk Control Description:</p> A Risk Control is an action to remove or lessen the cause or effects of a detected nonconformity or other undesirable situation. If this risk control is implemented, are other processes going to be adversely affected? Be sure this corrective action does not introduce a substitute, additional, or transferred risk elsewhere.',
+        '<p class="field_name">Risk Control Scheduled Completion Date:</p> The date this risk control is due to be identified, documented and approved by the responsible user and final approver. (Plan not implementation)'
+      ],
       fields: [
+        '<p class="field_name">Date for Follow-Up/Monitor Plan:</p> The date this risk control is planned to be implemented. (i.e, occur, published, updated, etc.)',
         '<p class="field_name">Description of Risk Control/Mitigation Plan:</p> A Risk Control is an action to remove or lessen the cause or effects of a detected nonconformity or other undesirable situation. If this risk control is implemented, are other processes going to be adversely affected? Be sure this corrective action does not introduce a substitute, additional, or transferred risk elsewhere.',
-        '<p class="field_name">Scheduled Completion Date:</p> The date this risk control is due to be identified, documented and approved by the responsible user and final approver. (Plan not implementation)',
-        '<p class="field_name">Date for Follow-Up/Monitor Plan:</p> The date this risk control is planned to be implemented. (i.e, occur, published, updated, etc.)'
+        '<p class="field_name">Scheduled Completion Date:</p> The date this risk control is due to be identified, documented and approved by the responsible user and final approver. (Plan not implementation)'
       ]
     }
   }

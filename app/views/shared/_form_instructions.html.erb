@@ -1,11 +1,13 @@
+<%instructions = CONFIG::INSTRUCTIONS[form]%>
 <%if instructions.present?%>
+  <%fields = (simplified ||= false) ? instructions[:simplified_form_fields] : instructions[:fields]%>
   <div class="span4 collapse-group">
-    <a class="btn" data-toggle="collapse" data-target="#viewnotes"> Instructions (for filling out form fields) &raquo;</a>
-    <div class="collapse" id="viewnotes">
+    <a class="btn" data-toggle="collapse" data-target="<%="#view-#{form}"%>"> <%="Instructions (for filling out #{ form.underscore.dasherize } fields)"%> &raquo;</a>
+    <div class="collapse" id=<%="view-#{form}"%>>
       <div class="col-xs-12">
         <div class="col-xs-12 well">
           <ul class="list-group">
-            <%instructions[:fields].each do |instruction|%>
+            <%fields.each do |instruction|%>
               <li class="list-group-item"> <%=instruction.html_safe%>
             <%end%>
           </ul>
@@ -33,13 +35,11 @@
     border-color: #94bedb;
   }
 
-
-
   .field_name{
-    color: red
+    color: blue
   }
 </style>
 
 <script>
-  $('a.btn[data-target="#viewnotes"]').click()
+  $("<%="a.btn[data-target='#view-#{form}'"%>").click()
 </script>

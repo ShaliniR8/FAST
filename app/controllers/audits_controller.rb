@@ -107,8 +107,8 @@ class AuditsController < SafetyAssuranceController
       @checklist_upload = params[:checklist_upload]
 
       if @selected_checklists
-        add_checklist_template_to_item(@selected_checklists, @audit)   
-      end 
+        add_checklist_template_to_item(@selected_checklists, @audit)
+      end
 
       if @checklist_header.present?
         create_custom_checklist(@audit, @checklist_header, @checklist_title, @checklist_upload)
@@ -207,9 +207,8 @@ class AuditsController < SafetyAssuranceController
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-      .keep_if{|p| keep_privileges(p, 'audits')}
-      .sort_by!{|a| a.name}
+    privileges_id = AccessControl.where(action: action_name, entry: 'audits').first.privileges.map(&:id)
+    @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
     @cause_headers = FindingCause.get_headers

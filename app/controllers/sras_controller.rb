@@ -465,6 +465,11 @@ class SrasController < ApplicationController
 
 
   def load_options
+    rule = AccessControl.where(action: action_name, entry: 'sras').first
+    if rule
+      privileges_id = rule.privileges.map(&:id)
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
+    end
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
     risk_matrix_initializer

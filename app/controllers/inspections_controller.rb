@@ -87,8 +87,8 @@ class InspectionsController < SafetyAssuranceController
       @checklist_upload = params[:checklist_upload]
 
       if @selected_checklists
-        add_checklist_template_to_item(@selected_checklists, @inspection)   
-      end 
+        add_checklist_template_to_item(@selected_checklists, @inspection)
+      end
 
       if @checklist_header.present?
         create_custom_checklist(@inspection, @checklist_header, @checklist_title, @checklist_upload)
@@ -133,10 +133,11 @@ class InspectionsController < SafetyAssuranceController
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-    @privileges.keep_if{|p| keep_privileges(p, 'inspections')}.sort_by!{|a| a.name}
-      @users = User.find(:all)
-      @users.keep_if{|u| !u.disable && u.has_access('inspections', 'edit')}
+    rule = AccessControl.where(action: action_name, entry: 'inspections').first
+    if rule
+      privileges_id = rule.privileges.map(&:id)
+      @users = User.joins(:privileges).where("privileges_id in (#{privileges_id.join(",")})").uniq
+    end
       @headers = User.get_headers
       # @departments = Inspection.get_departments
       @plan = {"Yes" => true, "No" => false}

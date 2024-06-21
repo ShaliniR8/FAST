@@ -27,7 +27,7 @@
             data-target="#view_instructions">
             View Instructions &raquo;
           </a>
-          
+
           <div class="collapse well" id="view_instructions">
             <b>Recurrence Instructions</b>
             <br>
@@ -53,7 +53,7 @@
             These fields will be mapped over from the template when the item is generated.
             <ol>
               <li>
-                <% if CONFIG.sa::GENERAL[:days_to_complete_instead_of_date] %> 
+                <% if CONFIG.sa::GENERAL[:days_to_complete_instead_of_date] %>
                   Days to Complete: select the number of days for the recurrent item to be scheduled for completion
                 <%else%>
                   Scheduled Completion Date: select a date for the recurrent item to be scheduled for completion
@@ -62,7 +62,7 @@
                       This field is updated by the selected interval upon each recurrence
                     </li>
                   </ul>
-                <%end%>               
+                <%end%>
               </li>
             </ol>
           </div>
@@ -81,12 +81,10 @@
               </div>
               <div class="panel-body">
                 <%=fields_for @template, html: {multipart: true} do |f|%>
-                  <%=render "shared/privilege_form",
-                  target: "#{@type}[privileges][]",:owner => @template,:f => f%>
                   <%=render '/forms/form_fields', :f => f, :fields => @template_fields, :record => @template %>
                   <%=render '/forms/checklist_templates'%>
-                  <%=render '/forms/attachments_form', :f => f, :owner => @template%>                 
-                <%end%>               
+                  <%=render '/forms/attachments_form', :f => f, :owner => @template%>
+                <%end%>
               </div>
             </div>
           </div>

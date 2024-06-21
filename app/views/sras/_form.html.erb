@@ -54,6 +54,8 @@
                 </div>
               </div>
               <div class="panel-body">
+                <%= render 'shared/form_instructions', :form => 'Hazard', :simplified =>  true%>
+                <%= render 'shared/form_instructions', :form => 'RiskControl', :simplified => true%>
                 <div class="row">
                   <div class="col-xs-12">
                     <div class="form-group col-xs-6">
@@ -123,7 +125,7 @@
 <script>
 
   $(document).ready(function(){
-    
+
     $("#<%=@sra.severity%>-<%=Investigation.get_likelihood.index(@sra.likelihood)%>").html("<span class='glyphicon glyphicon-remove' style='color:red'></span>");
     $('#sev').on('change',function(){
       reset_risk();

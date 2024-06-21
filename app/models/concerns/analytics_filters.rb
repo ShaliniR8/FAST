@@ -23,11 +23,12 @@ module AnalyticsFilters
           full_access_templates, viewer_access_templates, confidential_access_templates)
     elsif self.to_s == 'Report'
       viewer_access_templates = is_admin ? Template.all.map(&:id) : Template.where(name: current_user.get_all_templates_hash[:viewer_template_deid])
-      reports = Record.preload(:template, :report)
-        .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
-          full_access_templates, viewer_access_templates, confidential_access_templates)
-        .map(&:report).flatten.uniq.compact
-      Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports.map(&:id))
+      reports = Report.joins(records: :template)
+                      .where("(records.templates_id IN (?) AND confidential = false) OR (records.templates_id IN (?) AND viewer_access = true AND confidential = false) OR (records.templates_id IN (?) AND confidential = true)",
+                        full_access_templates, viewer_access_templates, confidential_access_templates)
+                      .map(&:id)
+                      .uniq
+      Report.preload(:occurrences, records: [:template, :created_by]).where(id: reports)
     elsif self.to_s == "OshaSubmission"
       # byebug
       shared_user = current_user.has_access(self.name.downcase.pluralize, 'shared', admin: false, strict: true)

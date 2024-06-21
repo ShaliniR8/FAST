@@ -150,9 +150,6 @@ class SafetyPlansController < ApplicationController
 
 
   def load_options
-    @privileges = Privilege.find(:all)
-      .keep_if{|p| keep_privileges(p, 'audits')}
-      .sort_by!{|a| a.name}
     @frequency = (0..4).to_a.reverse
     @like = Finding.get_likelihood
     @cause_headers = FindingCause.get_headers
