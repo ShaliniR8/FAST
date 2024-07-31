@@ -1,4 +1,0 @@
-<%= raw(@templates.as_json(:include => {
-  :categories => { :include => :fields }
-}).map{ |data| { template: data } }.to_json)
-%>

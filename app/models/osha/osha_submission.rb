@@ -1,3 +1,0 @@
-class OshaSubmission < Submission
-
-end

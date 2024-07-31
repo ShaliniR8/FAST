@@ -1,6 +1,0 @@
-<%#=raw(@submission.to_json(:include=>{:submission_fields=>{},:categories=>{}}))%>
-
-
-
-[<%=raw(@template.to_json(:include=>:categories))%>,
-<%=raw(@submission.to_json(:include=>{:submission_fields=>{:include=>:field}, :attachments=>{}}))%>]

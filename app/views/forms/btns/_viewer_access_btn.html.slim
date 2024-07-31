@@ -1,6 +1,0 @@
-- if current_user.global_admin? || \
-  current_user.has_access(permission,'admin') || \
-  current_user.has_access(permission,'edit')
-  = link_to owner.viewer_access ? 'Disable Viewer Access' : 'Enable Viewer Access',
-    eval("viewer_access_#{owner_class}_path(owner)"),
-    class: 'btn btn-warning pull-right mr5 mb5'

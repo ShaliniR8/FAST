@@ -1,9 +1,0 @@
-<%=CSV.generate_line(@record.checklist_header.checklist_header_items.map(&:title)).html_safe.strip%>
-<%@record.checklist_rows.each do |checklist_row|%>
-  <%row = []%>
-  <%checklist_row.checklist_cells.each do |checklist_cell|%>
-    <% value = checklist_cell.value.present? ? checklist_cell.value.html_safe : ' ' %>
-    <% row << value %>
-  <%end%>
-  <%=CSV.generate_line(row).html_safe.strip%>
-<%end%>

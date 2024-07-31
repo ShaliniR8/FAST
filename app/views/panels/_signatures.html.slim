@@ -1,9 +1,0 @@
-.col-xs-12.col-lg-12
-  .panel.panel-info
-    .panel-heading.click-heading.collapsed
-      .panel-title
-        b Signatures <span class='pull-right clickable'><i class='mt5 glyphicon glyphicon-chevron-down'></i></span>
-    .panel-body style='display:none'
-      - signatures.each do |x|
-        - cache("show_signatures_#{x.id}") do
-          = render 'forms/signatures/show_signature', owner: x, fields: fields

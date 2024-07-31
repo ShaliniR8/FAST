@@ -1,3 +1,0 @@
-[<%=raw({ user: @user.as_json }.to_json)%>,
-<%=raw(@submissions.as_json(:include => :template).map{ |data| { submission: data } }.to_json)%>,
-<%=raw(@user.notices.as_json.map{ |data| { notice: data } }.to_json)%>]

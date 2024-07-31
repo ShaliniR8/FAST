@@ -1,3 +1,0 @@
-class OshaRecord < Record
-
-end

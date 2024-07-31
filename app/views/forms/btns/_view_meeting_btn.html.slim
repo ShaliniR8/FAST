@@ -1,6 +1,0 @@
-- if owner.meeting.present?
-  - meeting_class = owner.meeting.class.name
-  = link_to "View Meeting",
-    eval("#{meeting_class.underscore}_path(owner.meeting)"),
-    class: 'btn btn-info pull-right mr5 mb5',
-    disable_with: 'Redirecting...'

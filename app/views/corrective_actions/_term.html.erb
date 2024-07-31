@@ -1,9 +1,0 @@
-<%if @item[:type]=="select"%>
-  <%=select_tag "term[#{params[:id]}][value]",options_for_select(@item[:options]),{:include_blank=>true,:class=>"form-control"}%>
-<%elsif @item[:type]=="text"%>
-  <%=text_field_tag "term[#{params[:id]}][value]",nil,{:class=>"form-control"}%>
-<%elsif @item[:type]=="datalist"%>
-  <%=text_field_tag "term[#{params[:id]}][value]",nil,{:class=>"form-control",:list=>"term_list"}%>
-    <datalist id='term_list'><%=options_for_select(@item[:options])%></datalist>
-<%end%>
-
